@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -90,7 +90,7 @@ The display shows:
 
 **Date range**: The simulation supports dates from ancient history to far future, enabling observation of long-term precession cycles.
 
-**Deep-time scrubbing (ESSRT).** When you scrub the date by millions of years, the simulation automatically applies **Expanding Solar System Resonance Theory** scaling — length-of-day, the precession period, planet orbital periods, and the Moon's distance all evolve smoothly according to the two physical drivers (Earth-Moon tidal evolution + solar mass loss). This mode is on by default; the scene-graph stays consistent at any epoch from Hadean (~−4 Gyr) to +200 Myr in the future. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full framework.
+**Deep-time scrubbing (ESSRT).** When you scrub the date by millions of years, the simulation automatically applies **Expanding Solar System Resonance Theory** scaling — length-of-day, the precession period, planet orbital periods, and the Moon's distance all evolve smoothly according to the two physical drivers (Earth-Moon tidal evolution + solar mass loss). This mode is on by default; the scene-graph stays consistent at any epoch from Hadean (~−4 Gyr) to +200 Myr in the future. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full model.
 
 ### Playback Controls
 

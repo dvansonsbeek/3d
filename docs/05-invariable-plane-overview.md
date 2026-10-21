@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -121,7 +121,7 @@ Year 50000 (near minimum tilt):  ~0.85° → max height ≈ 0.015 AU
 
 ### The invariable-plane argument of periapsis
 
-`ω_inv` — the in-orbit-plane angle from the orbit's ascending node **on the invariable plane** to the perihelion direction — is computed by an exact vector construction (perihelion unit vector and orbit normal in ecliptic-J2000, node direction = ẑ_inv × n̂_orbit; `_kcArgPeriInvPlaneDeg` in [src/script.js](../src/script.js)). No frame-mixed shortcut (such as differencing an equatorial-frame ϖ against an ICRF node) is used. For Earth, ω_inv sits near 180° − i_inv ≈ 178.4°: Earth's perihelion lies very close to its descending node on the invariable plane.
+`ω_inv` — the in-orbit-plane angle from the orbit's ascending node **on the invariable plane** to the perihelion direction — is computed by an exact vector construction (perihelion unit vector and orbit normal in ecliptic-J2000, node direction = ẑ_inv × n̂_orbit; `_chainArgPeriInvPlaneDeg` in [src/script.js](../src/script.js)). No frame-mixed shortcut (such as differencing an equatorial-frame ϖ against an ICRF node) is used. For Earth, ω_inv sits near 180° − i_inv ≈ 178.4°: Earth's perihelion lies very close to its descending node on the invariable plane.
 
 ---
 

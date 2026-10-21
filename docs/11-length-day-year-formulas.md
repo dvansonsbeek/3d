@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -147,7 +147,7 @@ Separately (physical/USNO branch — does NOT feed the derivation chain above):
 
 ### Day Types
 
-**Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The framework maintains **two mean-LOD values**:
+**Solar day** — the time for the Sun to return to the same local meridian (noon to noon). The solar day varies throughout the year due to orbital eccentricity and obliquity (equation of time). The model maintains **two mean-LOD values**:
 
 - **LOD_mean** = ω₀, the SI day, <!--v:meanSolarDaySeconds-->86,400.000000<!--/v--> s at J2000 (plan 09: ONE J2000 day basis) — the baseline inside all sidereal↔tropical conversions and the calibrated ΔT correction stack; of date it is the Layer-0 tidal mean length of day (`o.lodKinematic`).
 - **LOD_real** = lod_kinematic + lod_kinematic/(T_s₃ × mSY) + DT cycle sum = <!--v:lodRealPhysical-->86,400.001200<!--/v--> s at J2000 — Layer 4: adds the ecliptic missing-motion correction on the nodal period (~<!--v:h5LodCorrectionMs-->3.441<!--/v--> ms) + the Bond/Hallstatt/Jose5/Jose4 cyclic δLOD (Layer 3) + the Core-mantle swing. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0012<!--/v--> s on the same basis (doc 99 § "The J2000 day basis"). Used in the user-facing physical LOD display.
@@ -187,7 +187,7 @@ See § "The ecliptic missing-motion LOD Correction" below for the distinction be
 
 ### The ecliptic missing-motion LOD Correction (Kinematic vs Physical)
 
-The framework maintains two distinct LOD values that differ by a small correction on the nodal period of Earth's orbit plane (see below):
+The model maintains two distinct LOD values that differ by a small correction on the nodal period of Earth's orbit plane (see below):
 
 **LOD_mean** — the kinematic baseline, the SI day (plan 09; the retired era
 device anchored it on its H/13 identity, siderealYearSeconds / (mSY × H/(H−13))

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -171,14 +171,14 @@ Full per-anchor agreement table + statistical summary at [doc 99 §"Validation a
 ## Scope and limitations
 
 1. **Earth-centric quantities only.** The 6 plotted quantities all describe Earth (axial precession, obliquity, LOD, year, AU, Moon). Per-planet deep-time evolution (e.g. Jupiter's perihelion period at deep time) is implicit — every planet's secular period stretches with the one Driver-2 solar-mass law — but the modal doesn't plot per-planet curves directly. The structural argument is in [doc 99 §"Predicted planetary perihelion precession periods through time"](99-expanding-solar-system-resonance-theory.md).
-2. **Two-driver framework only.** The proper-physics formulas combine Driver 1 (Farhat polynomial + angular-momentum conservation) and Driver 2 (Kepler scaling under solar mass loss). Other long-term effects — late-stage giant-planet migration, dust accretion, GR perturbations beyond Kepler — are not in the formulas. Forward validity is bounded by the proper-physics formula's horizon (~+2 Gyr per [doc 99 §"The proper-physics formula's predictive horizon"](99-expanding-solar-system-resonance-theory.md)).
+2. **Two-driver model only.** The proper-physics formulas combine Driver 1 (Farhat polynomial + angular-momentum conservation) and Driver 2 (Kepler scaling under solar mass loss). Other long-term effects — late-stage giant-planet migration, dust accretion, GR perturbations beyond Kepler — are not in the formulas. Forward validity is bounded by the proper-physics formula's horizon (~+2 Gyr per [doc 99 §"The proper-physics formula's predictive horizon"](99-expanding-solar-system-resonance-theory.md)).
 3. **Hadean uncertainty is real.** Backward to Earth-Moon genesis, the formulas extrapolate well beyond the Wu 2024 anchor range (max 650 Ma). The Hadean predictions (e.g., LOD ~5 hr) are model output, not observation — see [doc 99 §"Interpretation 2: Proper-physics formula at the Hadean"](99-expanding-solar-system-resonance-theory.md) for the discussion.
 4. **No discrimination between Wu and Williams 2000.** The Williams 2000 620-Ma tidal-rhythmite LOD estimate (21.9 hr) disagrees mildly with the proper-physics curve (~21.0 hr) and with Wu 2024's nearby 650-Ma anchor (20.94 hr). [Doc 99 §"The Williams 2000 (620 Ma) discrepancy"](99-expanding-solar-system-resonance-theory.md) discusses both views; the modal plots only the model curve + Wu anchors.
 5. **Read-only.** No "edit polynomial coefficients" feature. To update the proper-physics formulas, edit the helper functions in `src/script.js` and reload.
 
 ## Related documentation
 
-- [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — complete theoretical framework, Driver 1 + 2 derivations, per-anchor validation tables, deep-time L1 predictions, falsifiable claims
+- [doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — complete theoretical model, Driver 1 + 2 derivations, per-anchor validation tables, deep-time L1 predictions, falsifiable claims
 - [doc 92 — Climate Formula](92-climate-formula.md) — the L1 physical line set (the precession-band lines ride T_p(t); the eccentricity-band planetary beats do not)
 - [doc 58 — Earth Climate Analysis](58-climate-formula-explorer.md) — sibling Tools-menu modal (companion to Earth–Moon Genesis Analysis)
 - [doc 57 — Framework Verification](57-formula-verification.md) — sibling Tools-menu modal comparing model vs published celestial-mechanics formulas across ±12 kyr

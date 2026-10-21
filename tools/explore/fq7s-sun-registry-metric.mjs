@@ -20,6 +20,7 @@
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { FITTED_COEFFICIENTS as _DT_FIT } from '@essrt/physics';   // plan 14: the ΔT anchor is the fit's own (FIT.DT_ANCHOR)
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const require = createRequire(new URL('../../package.json', import.meta.url).pathname);
 const SG = require('./tools/lib/scene-graph.js');
@@ -39,7 +40,7 @@ const D2R = Math.PI / 180, AS = 3600, J2000 = 2451545.0;
 // bridge adds the J2000 ΔT so the model's clock meets the cache's. Reading the
 // instants as TT instead (the R1 mistake, reverted here) injects −ΔT(t) into
 // the comparison and manufactures a trend of ~4″ across the window.
-const BRIDGE = C.earthOrbital.deltaTStart / 86400;
+const BRIDGE = _DT_FIT.DT_ANCHOR.deltaTStartSeconds / 86400;
 const NU = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 

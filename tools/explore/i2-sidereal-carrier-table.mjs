@@ -23,6 +23,7 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { FITTED_COEFFICIENTS as _DT_FIT } from '@essrt/physics';   // plan 14: the ΔT anchor is the fit's own (FIT.DT_ANCHOR)
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const require = createRequire(ROOT + 'package.json');
@@ -133,7 +134,7 @@ if (LP) {
 {
   const model = createModel(DEFAULT_CONSTANTS);
   const Cc = DEFAULT_CONSTANTS;
-  const BRIDGE = Cc.earthOrbital.deltaTStart / 86400;
+  const BRIDGE = _DT_FIT.DT_ANCHOR.deltaTStartSeconds / 86400;
   const Nnut = Cc.physicalConstants.nutationLeadingTermsArcsec;
   const wrap = (d) => ((d + 540) % 360) - 180;
   const EMB = (Cc.moonReference.moonDistance / (1 + Cc.physicalConstants.MASS_RATIO_EARTH_MOON) / Cc.physicalConstants.currentAUDistance) * (648000 / Math.PI);

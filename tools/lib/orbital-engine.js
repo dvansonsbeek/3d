@@ -112,7 +112,7 @@ function computePlanetObliquity(planetName, year) {
 // through the deep-time twin — and `computeEccentricity` — the H/16
 // law-of-cosines form kept for the planets' wobble laws that K5 excised — are
 // deleted. Earth's eccentricity of date is the N-body series on every path:
-// `createModel().earth.eccentricity(year)`, the scene's `_kcElementsOfDate`.)
+// `createModel().earth.eccentricity(year)`, the scene's `_chainElementsOfDate`.)
 
 /**
  * Compute perihelion and aphelion distances from eccentricity.
@@ -194,7 +194,7 @@ function computeArgumentOfPerihelionInvPlane(lonPerihelion, ascNodeInvPlane) {
 // device's linear perihelion advance on the lattice period, delegating to
 // the planets/predict module retired at plan 06 R8 — had no caller; gone.
 // A planet's ϖ of date is the chain's: packages/physics model.js
-// planetPerihelionDeg / src/script.js _kcPerihelionEclLonDeg.)
+// planetPerihelionDeg / src/script.js _chainPerihelionEclLonDeg.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PRECESSION

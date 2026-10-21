@@ -12,6 +12,7 @@
 // Usage: node tools/explore/d2-joint-preview.mjs
 import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { FITTED_COEFFICIENTS as _DT_FIT } from '@essrt/physics';   // plan 14: the ΔT anchor is the fit's own (FIT.DT_ANCHOR)
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const { createModel, DEFAULT_CONSTANTS, computeMeanTropicalYearJ2000Days } = await import(new URL('../../packages/physics/src/index.js', import.meta.url).href);
 const { createSunPlanetaryCompletion } = await import(new URL('../../packages/physics/src/eclipse/sun-planetary-completion.cjs', import.meta.url).href).then((m) => m.default ?? m);
@@ -33,7 +34,7 @@ const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
   },
 });
 const D2R = Math.PI / 180;
-const BRIDGE = C.earthOrbital.deltaTStart / 86400;
+const BRIDGE = _DT_FIT.DT_ANCHOR.deltaTStartSeconds / 86400;
 const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const Nnut = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((d + 540) % 360) - 180;

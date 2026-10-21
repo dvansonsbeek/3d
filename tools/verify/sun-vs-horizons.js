@@ -74,10 +74,10 @@ const req = createRequire(path.join(ROOT, 'package.json'));
 const { createModel } = req('@essrt/physics');
 const series = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
 const model = createModel(undefined, { secularSeriesArtifact: series });
-const J2000 = 2451545.0, AS = 3600;
+const J2000 = require('@essrt/physics/constants/units').J2000_JD, AS = 3600;   // ONE home (plan 14 step 2)
 const wrap180 = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 const dTs = (jd) => model.eclipse.deltaTSecondsAtJD(jd);
-const BRIDGE_DAYS = model.constants.earthOrbital.deltaTStart / 86400;   // the finder axis = true UT + this bridge
+const BRIDGE_DAYS = model.eclipse.ttBridgeSeconds / 86400;   // the finder axis = true UT + this bridge (the joint fit's anchor, plan 14)
 /** the UT model-JD whose model-TT equals jdTT (fixed point; ΔT varies slowly) */
 const utForTT = (jdTT) => { let ut = jdTT - dTs(jdTT) / 86400; ut = jdTT - dTs(ut) / 86400; return jdTT - dTs(ut) / 86400; };
 const modelApparentAtTT = (jdTT) => model.eclipse.sunApparentLonDegAtJD(utForTT(jdTT));

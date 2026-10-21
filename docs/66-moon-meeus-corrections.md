@@ -1,13 +1,13 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
 # Moon Meeus Corrections — Implementation Reference
 
-**Status**: Complete (full Meeus Ch. 47: 60L+60B terms + the 46-term Σr distance column + the derived framework extension tails, RA+Dec override, JPL-verified; Σr derived-validated at 100.0% weighted by the Stage-D1 laboratory)
+**Status**: Complete (full Meeus Ch. 47: 60L+60B terms + the 46-term Σr distance column + the derived model extension tails, RA+Dec override, JPL-verified; Σr derived-validated at 100.0% weighted by the Stage-D1 laboratory)
 
 **Public capstone**: the derivation program documented here is presented as the
 website document **"The Derived Moon" (DLT-1)** — a framework-native lunar
@@ -28,7 +28,7 @@ The Moon's position in the model is determined by two systems working together:
 
 2. **Meeus analytical corrections + derived extensions** (perturbative): the equation
    of center, solar perturbations (evection, variation, annual equation), ecliptic
-   latitude from Meeus "Astronomical Algorithms" Ch. 47, and the framework's own
+   latitude from Meeus "Astronomical Algorithms" Ch. 47, and the model's own
    derived series tails. These shift the Moon's actual position away from its
    geometric circle.
 
@@ -61,11 +61,11 @@ The polynomials above are the A/B reference. The shipped default
 (`MOON_ARGS_FRAMEWORK_NATIVE = true`, declared in the toggle block at the top
 of script.js) computes the same five arguments framework-natively in
 `_fwMoonArgs()`, dispatched through `_moonArgsAt()`. Every Meeus quantity it
-replaces is either derived from framework primitives or anchored to a single
+replaces is either derived from model primitives or anchored to a single
 classical constant:
 
 - **Linear rates — the frame convention.** Meeus's argument rates differ from
-  the framework's star-referenced chain rates by exactly ± general precession. The
+  the model's star-referenced chain rates by exactly ± general precession. The
   general precession p — the IAU 2006 p_A input, 50.288″/yr — closes the ±1.4°/century M′/F
   drift with zero new constants — the drift is frame bookkeeping, not
   missing physics. Meter: "Meeus vs Integrator (lunar argument drift)".
@@ -114,10 +114,10 @@ classical constant:
   zero-mean oscillation around it (currently in its decelerating phase
   because ė < 0). The Meeus polynomial entangles them in single
   coefficients.
-- **D and M — identity-composed from the real-time framework rates.** D and M
+- **D and M — identity-composed from the real-time model rates.** D and M
   carry no independent physics: Meeus's own coefficients satisfy
   D = L′ − L_sun (rate to 3e-6 °/cy, T² to 1e-7 °/cy²) and M = L_sun − ϖ_sun.
-  The framework composes them literally — D = L′ − L_sun, M = L_sun − ϖ_sun —
+  The model composes them literally — D = L′ − L_sun, M = L_sun − ϖ_sun —
   with Meeus J2000 anchors (Ls0 ≡ L′0 − D0 absorbs the Ch. 25/47 convention
   offset) and the Sun of date injected from the ONE certified Sun (plan 09
   step 3): L_sun is its mean longitude, which integrates the one-family
@@ -139,7 +139,7 @@ classical constant:
   `K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′` along the deep e_E channel,
   with K_PL = −2332 °/cy per e² derived lazily from the budget — and
   `_fwLpObliquityCarrier` carries the figure+frame part (+1.30363″/cy²)
-  along the framework obliquity cycle, `C · ∫₀ᵀ (ε(t′) − ε₀) dt′` with
+  along the model obliquity cycle, `C · ∫₀ᵀ (ε(t′) − ε₀) dt′` with
   C = 2·T2_OBL/ε̇₀ (tools mirrors of both in scene-graph.js). In-window
   the carriers are Taylor-identical to the polynomial (−584:
   +0.017° ≈ 2 min); at deep time they stay bounded (≤ ~230°) where the T²
@@ -202,7 +202,7 @@ classical constant:
   The frame term ṗ_A is itself derived: the composition
   (`tools/explore/v4-pdot-composer{,2,3}.js`) builds the general-precession
   acceleration from the lab's gravity-derived ecliptic-of-date pole track
-  (π̇ 47.49″/cy vs IAU 46.998) + the framework ε(T) + a luni-solar cone
+  (π̇ 47.49″/cy vs IAU 46.998) + the model ε(T) + a luni-solar cone
   about the moving pole with the classical cos ε torque law + one rate
   anchor — which independently lands ψ̇₀ = 5039.15″/cy, 0.013% from the
   IAU luni-solar 5038.48 that was never an input — giving composed
@@ -307,7 +307,7 @@ Measured against the model's own m(t): the frozen-amplitude error is
 < 0.5″ within ±1 Myr, ≈ 9″ at ±10 Myr, ≈ 1.5′ at ±100 Myr and ≈ 4′ at
 −300 Myr — an amplitude-scaling layer is BANKED until a deep-time lunar
 consumer needs the ≥10 Myr range. The eccentricity-family scaling (annual
-equation, E/E² terms) needs no layer: the framework E-factor rides the
+equation, E/E² terms) needs no layer: the model E-factor rides the
 derived e(t) channel, so it is epoch-aware in-chain. Two documented
 limits: the ratio scales all amplitudes linearly with a_M(t) (the
 second-order m(t)-dependence is not modeled — negligible against the
@@ -319,12 +319,12 @@ there before any deep-time eclipse work runs through that path.
 **Derivation status
 (`tools/explore/derive-meeus-distance-amplitudes.js`).** The same 3-body
 laboratory that derives the Σl amplitudes at 100.0 ± 0.1% derives the
-distance column from framework constants alone: the top-12 Σr
+distance column from model constants alone: the top-12 Σr
 amplitudes emerge at 99.5–100.1% (amplitude-weighted **100.0%**), and
 the constant term itself emerges at **384,993 km — −19 ppm of Meeus's
-385,000.56 km** — from the framework's a_M = 384,399.07 km
+385,000.56 km** — from the model's a_M = 384,399.07 km
 input, demonstrating from first principles that Meeus's constant is the
-time-averaged mean and the framework's is the LLR/parallax mean
+time-averaged mean and the model's is the LLR/parallax mean
 (the doc 24 taxonomy): the ~601 km offset between the two definitions
 is gravity, not a discrepancy.
 
@@ -434,10 +434,10 @@ ecliptic (measured ε_ecl = <!--v:moonObliquityEcliptic-->1.5424<!--/v-->° — 
 of the catalog composition moonTilt <!--v:moonAxialTilt-->6.687<!--/v-->° = i + ε) is derived as the
 equilibrium of Cassini state 2 (`tools/explore/cassini-moontilt.js`):
 numerical gravity-gradient torque averaging over the locked triaxial figure
-balanced against the framework's of-date node regression. Inputs: three
+balanced against the model's of-date node regression. Inputs: three
 documented observed constants of the lunar gravity field
 (J₂ = <!--v:moonJ2Grail-->203.305<!--/v-->e-6, C₂₂ = <!--v:moonC22Grail-->22.4261<!--/v-->e-6, C/MR² = <!--v:moonCMR2-->0.392728<!--/v--> — GRAIL+LLR,
-Williams et al. 2014) plus framework rates (sidereal month, of-date nodal
+Williams et al. 2014) plus model rates (sidereal month, of-date nodal
 period 6798.3303 d, sidereal year, mass ratio; the Earth-only torque mass
 fraction M_E/(M_E+M_M) is a 1.2% term first-order treatments miss).
 
@@ -474,7 +474,7 @@ over the 250-yr span.
 size of the known channels the rigid treatment omits — elastic (k₂)
 moments, degree-3 gravity, a two-layer mantle+core solution — and is left
 **named rather than absorbed**; chasing it further is lunar interior
-physics, not framework physics. What is claimed: the framework's own month,
+physics, not model physics. What is claimed: the model's own month,
 node rate and mass ratio, plus three published gravity coefficients and
 Newtonian gravity, reproduce a lunar constant the model previously adopted,
 with nothing fitted.
@@ -668,7 +668,7 @@ omits the classical planetary perturbations of the geocentric Sun
 Horizons). The completion is DERIVED from twin epoch-phased 8-body
 integrations (planet phases from the engine scene graph, full-vs-base3
 differential, the EMB secular-perihelion channel projected out — it
-belongs to the framework's own ϖ(t)/e(t) laws), read analytically as a
+belongs to the model's own ϖ(t)/e(t) laws), read analytically as a
 70-term table: main synodic tones plus eccentricity-modulation sidebands
 (main ± modulator anomaly, main ± M_E — the largest single terms ARE
 sidebands: 2(E−J)−M_E 8.3″, E−M−M_Ma 7.5″, invisible to
@@ -694,9 +694,9 @@ yr. The planetary mean-longitude RATES and the Moon-elongation rate are
 framework-native carriers injected by `model.js`: since I3 the planets'
 carriers are the model's own banked J2000 sidereal mean motions (the
 embedded artifact; the former record-based carriers sat 4.1″/yr off for
-Venus — 83° of the Venus–Earth argument at ±9000 yr), Earth the framework
+Venus — 83° of the Venus–Earth argument at ±9000 yr), Earth the model
 sidereal year, the elongation from the sidereal month/year identity, and
-the lunar equation's argument is the framework's own Moon elongation of
+the lunar equation's argument is the model's own Moon elongation of
 date (ṅ included; the constant-rate carrier ran ~29° off it at ±9000 yr): a
 perturbation argument is inertial, and on of-date carriers every
 argument whose multipliers do not sum to zero drifted with precession —
@@ -751,12 +751,12 @@ a decade-wide plateau that cannot discriminate — and the 26-event corpus
 test leaves 0.187 min event-to-event, under the ~0.2-min discriminating
 power).
 
-#### The derived series extensions (the framework's own tails)
+#### The derived series extensions (the model's own tails)
 
-Both location-tier tails are DERIVED from the framework's own
+Both location-tier tails are DERIVED from the model's own
 integrations, with external references in protocol roles only (MPP02
 discovery-only, JPL out-of-sample-only); every shipped amplitude is read
-from the framework integration, and rows the lab does not fully produce
+from the model integration, and rows the lab does not fully produce
 stay unshipped even where "fitting" them would improve the gates
 (stop-gate: derive or don't ship).
 
@@ -811,7 +811,7 @@ declared-fitted values, REJECTED by owner decision: the chain keeps
 representational gap that MPP02 and ELP82B share to 0.03″. The external
 ELP/MPP02 series lift was ANALYZED AND REJECTED on the same principle:
 it would buy ~2″, but ELP/MPP02 is a fitted external model, and this
-chain stays fully derived and explained. Extending the framework's OWN
+chain stays fully derived and explained. Extending the model's OWN
 series remains the only sanctioned path lower. The chain is thereby
 measured to sit AT the analytic limit of derived lunar theory.
 
@@ -931,10 +931,10 @@ The polynomial terms (T², T³, T⁴) in the fundamental arguments accumulate
 errors for large |T|; the theory was designed for high accuracy near the
 present epoch.
 
-**Layer 1b: Meeus Ch. 47 (the framework's series) — empirical accuracy at deep time**
+**Layer 1b: Meeus Ch. 47 (the model's series) — empirical accuracy at deep time**
 
-The framework's series is a truncated form of ELP-2000/82 (plus the derived
-framework tails), so its residual at deep time can in principle exceed the
+The model's series is a truncated form of ELP-2000/82 (plus the derived
+model tails), so its residual at deep time can in principle exceed the
 Layer 1 floor at specific JDs. Empirically, the -135 case study (doc 103)
 tested this directly: Meeus Ch. 47, ELP-2000/82 (truncated and full), and
 ELP/MPP02 (DE-fit and LLR-fit) all converge to β ≈ 0.706° at the -135
@@ -950,8 +950,8 @@ residual sweep of adjacent events (-584 Thales, -309 Sicily, -762
 Bur-Sagale) shows β differences ≤ 0.12° against the same references.
 
 A one-time DE441 A/B of the 26-event audit (JPL DE441 lunar positions
-injected in place of the framework series) found mean Δ ≈ 0 with a clean
-epoch pattern — modern era slightly worse under DE441 (the framework
+injected in place of the model series) found mean Δ ≈ 0 with a clean
+epoch pattern — modern era slightly worse under DE441 (the model
 series is tightly calibrated at present), late-ancient worse, deep-ancient
 (−556…−762) better by up to ~1000 km — quantifying the truncation
 degradation past the calibration horizon at the few-hundred-km class, and
@@ -959,7 +959,7 @@ showing the Cairo 977–985 cluster moves < 120 km under DE441 (NOT a Moon
 problem — misidentification/partial-zone/Sun-side; doc 107).
 
 The framework-native fundamental arguments are the shipped default (§1):
-the Meeus M′/F T²⁺ polynomial physics is expressed through the framework's
+the Meeus M′/F T²⁺ polynomial physics is expressed through the model's
 own channels, and the "Meeus vs Integrator (lunar argument drift)" test
 button confirms closure (M′ ≤ 0.015° at −584, versus the ≈ +1.4°/century
 drift of the raw ICRF-rate comparison). Framework-native D/M is likewise

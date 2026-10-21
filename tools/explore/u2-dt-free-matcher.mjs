@@ -36,6 +36,7 @@ import { createModel, DEFAULT_CONSTANTS } from '@essrt/physics';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
+import { FITTED_COEFFICIENTS as _DT_FIT } from '@essrt/physics';   // plan 14: the ΔT anchor is the fit's own (FIT.DT_ANCHOR)
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const model = createModel(DEFAULT_CONSTANTS);
@@ -55,7 +56,7 @@ const RECORDS = [
     lat: 39.0, lon: 35.0, year: -584, months: null, hours: null, trad: '-584-05-28' },
 ];
 
-const dtModelAbs = (jd) => DEFAULT_CONSTANTS.earthOrbital.deltaTStart + model.eclipse.deltaTSecondsAtJD(jd);
+const dtModelAbs = (jd) => _DT_FIT.DT_ANCHOR.deltaTStartSeconds + model.eclipse.deltaTSecondsAtJD(jd);
 function jdToDate(jd) {
   const J = jd + 0.5, Z = Math.floor(J), F = J - Z;
   const B = Z + 1524, C = Math.floor((B - 122.1) / 365.25);

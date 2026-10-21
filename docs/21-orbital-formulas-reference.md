@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -100,7 +100,7 @@ For each planet (Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune):
 
 For current values, see [Constants Reference](20-constants-reference.md).
 
-The seven planets' live elements of date come from the N-body chain (`_kcElementsOfDate`), not from these constants. The constants are the J2000 catalogue inputs the chain is anchored on, the scene scaffolding's device parameters, and derived display values.
+The seven planets' live elements of date come from the N-body chain (`_chainElementsOfDate`), not from these constants. The constants are the J2000 catalogue inputs the chain is anchored on, the scene scaffolding's device parameters, and derived display values.
 
 | Variable Pattern | Description |
 |------------------|-------------|
@@ -237,7 +237,7 @@ Naming taxonomy: `lodKinematic` = the kinematic day of date (the Layer-0 tidal m
 | `o.axialPrecession` | The clock of date: the beat of the sidereal and tropical year laws (`computeAxialPrecessionYears`) |
 | `o.inclinationPrecession` | The apsidal beat of the year laws, anomalistic/(anomalistic − sidereal) (years; the identifier keeps the historical name) |
 | `o.perihelionPrecession` | The kinematic perihelion-of-date beat, anomalistic/(anomalistic − solar) (years). The DISPLAYED of-date value is the one-source family's beat (`predictions.perihelionPrecession`) |
-| `predictions.eclipticPrecession` | The displayed nodal period of date — the chain's, `_kcNodeInvPlanePeriodYears('earth', jd)` |
+| `predictions.eclipticPrecession` | The displayed nodal period of date — the chain's, `_chainNodeInvPlanePeriodYears('earth', jd)` |
 
 The published obliquity period is the beat of the spin axis's inertial rate
 against the nodal mode (`obliqBeatJ2000Kyr`; [doc 110](110-calculation-map.md) §4.4).
@@ -1357,7 +1357,7 @@ z_max = sin(i_inv)          Mean maximum height above invariable plane (AU)
 β = arcsin(sin(i_inv)·sin(u)) Heliocentric latitude
 ```
 
-The inclination of date to the invariable plane is the chain's element (`_kcElementsOfDate(k, jd).inclInvPlaneDeg`) for the seven planets and the engine's one-source orbit normal for Earth; there is no inclination law.
+The inclination of date to the invariable plane is the chain's element (`_chainElementsOfDate(k, jd).inclInvPlaneDeg`) for the seven planets and the engine's one-source orbit normal for Earth; there is no inclination law.
 
 ---
 
@@ -1380,7 +1380,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Pluto | `orbitalEccentricityBase` (JSON input) | `invPlaneInclinationMean` (JSON input) | derived | `solarYearInput` |
 
 **How values are sourced:**
-- **Eccentricity**: the chain's element of date (`_kcElementsOfDate(k, jd).e`)
+- **Eccentricity**: the chain's element of date (`_chainElementsOfDate(k, jd).e`)
 - **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`)
 - **Semi-major axis**: the chain's element of date for the seven planets; for the no-chain bodies derived from the observed period input via Kepler's third law (`_planetGeom.<k>`, `@essrt/physics` `planets/geometry`)
 - **Period**: Input constant per planet (`planets.{name}.solarYearInput`)

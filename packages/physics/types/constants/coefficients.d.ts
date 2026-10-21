@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from the fit artifacts under data/.
 
-export declare const COEFFICIENTS_HASH: "f62e8a7b8b7ed53d";
+export declare const COEFFICIENTS_HASH: "b2d4e64c4e6a947e";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly BALANCE_PRESETS: Array<Array<number | string>>;
@@ -477,6 +477,10 @@ export declare const FITTED_COEFFICIENTS: {
       "stitched_lr04_r2": number;
       "stitched_lr04_note": string;
     };
+  };
+  readonly DT_ANCHOR: {
+    "deltaTStartSeconds": number;
+    "usnoTargetLodSeconds": number;
   };
   readonly DT_RESONATOR: {
     "display_name": string;

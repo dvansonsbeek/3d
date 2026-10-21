@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -525,7 +525,7 @@ the 8 and 16 wheels were the structural claim in its purest form,
 "obliquity cycle = H/8"; they are now a recorded pose).
 
 Since plan 06 R4 the engine PLACES the Earth frame (`_applyEngineEarthFrame`,
-relative to the J2000 pose `_kcDeriveFrameR`): the axis is the hybrid's ŝ(t)
+relative to the J2000 pose `_chainDeriveFrameR`): the axis is the hybrid's ŝ(t)
 on the ecliptic of date each update; the wheels still turn underneath but
 set nothing observable.
 

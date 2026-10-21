@@ -540,7 +540,7 @@ function sunGeomAt(jd, latDeg, lonDeg) {
   // sun, obliquity and GMST constants; metric NORMALIZATION only, not part
   // of the model chain.
   const K2 = TIER.constants.physicalConstants;
-  const jb = jd + TIER.constants.earthOrbital.deltaTStart / 86400;
+  const jb = jd + TIER.eclipse.ttBridgeSeconds / 86400;   // the joint fit's anchor (plan 14: FIT.DT_ANCHOR)
   const year = TIER.time.yearFromJD(jb);
   const eps = TIER.earth.obliquityDeg(year) * D2R;
   const lam = TIER.eclipse.sunLonDegAtJD(jb) * D2R;

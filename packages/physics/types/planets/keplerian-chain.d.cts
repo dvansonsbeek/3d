@@ -77,7 +77,8 @@ export type KcPlanetChain = {
     invariablePlane?: (KcInvariablePlane | undefined);
 };
 export const ANCHOR_EPOCH_YEAR: 2000;
-export const ANCHOR_EPOCH_JD: 2451545;
+import ANCHOR_EPOCH_JD_1 = require("../constants/units.cjs");
+import ANCHOR_EPOCH_JD = ANCHOR_EPOCH_JD_1.J2000_JD;
 /** Full osculating elements from a heliocentric ecliptic-J2000 state vector.
  *  @param {number[]} rKm  heliocentric position, km
  *  @param {number[]} vKmS heliocentric velocity, km/s
@@ -172,3 +173,4 @@ export function buildPlanetChainsFromArtifactData(art: any, opts?: {
 } | undefined): {
     [x: string]: KcPlanetChain;
 };
+export { ANCHOR_EPOCH_JD };

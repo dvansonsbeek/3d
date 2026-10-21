@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -51,17 +51,17 @@ content, not a defect.
 **What the chain serves, per body and date (JD):**
 
 - **Elements of date** — `a`, `e`, ecliptic inclination and node, longitude
-  of perihelion, mean longitude (`_kcElementsOfDate` in the scene), plus
+  of perihelion, mean longitude (`_chainElementsOfDate` in the scene), plus
   the inclination and node **on the engine's own invariable plane** (the
   K5c s-frame; published node longitudes go through the derived
   Souami & Souchay origin conversion — see
   [doc 05](05-invariable-plane-overview.md)).
-- **Heliocentric positions** — ecliptic-J2000 vectors (`_kcHelioAU`),
+- **Heliocentric positions** — ecliptic-J2000 vectors (`_chainHelioAU`),
   which feed the rendered orbits, the plane heights (`h = r⃗ · ẑ_inv`),
   the mass-weighted balance gauge and the Sun-SSB chart.
 - **Secular shapes** — the panels' precession attribution (base mode /
   largest companion / remainder with % shares) reads the chain's own
-  secular modes (`_kcSecularShape`); long-window charts evaluate the
+  secular modes (`_chainSecularShape`); long-window charts evaluate the
   chain's secular skeleton, with the banked deep secular series overriding
   where loaded (default-on; inside each planet's measured boundary the
   override is a no-op — the chain serves).
@@ -117,7 +117,7 @@ E, distance, phase angle, elongation, descending node) — extracted
 geometrically from `matrixWorld` rather than analytically. See
 [doc 21 §1.4.2](21-orbital-formulas-reference.md) for the full list and
 [doc 66](66-moon-meeus-corrections.md) for the Moon's correction
-framework.
+model.
 
 ## Tier 3: What remains of the geometric elements device
 
@@ -158,7 +158,7 @@ Two rules keep element comparisons honest across all three tiers:
 | Function | Location | Purpose |
 |----------|----------|---------|
 | `keplerian-chain.cjs` | `packages/physics/src/planets/` | THE chain implementation (elements of date, positions, secular evaluation) |
-| `_kcElementsOfDate()` / `_kcHelioAU()` | [script.js](../src/script.js) | Scene bindings of the chain |
+| `_chainElementsOfDate()` / `_chainHelioAU()` | [script.js](../src/script.js) | Scene bindings of the chain |
 | `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Chain projections (heights, nodes); legacy construction for no-chain bodies |
 | `updateDynamicInclinations()` | [script.js](../src/script.js) | Legacy device inclinations (no-chain bodies, engine-K) |
 | `updateAscendingNodes()` / `updateOrbitalPlaneRotations()` | [script.js](../src/script.js) | Ecliptic nodes and 3D plane orientation |

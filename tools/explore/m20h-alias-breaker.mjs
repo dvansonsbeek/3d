@@ -15,6 +15,7 @@
 // The class subtotals decide Phase 2b: extract, or stop at the floor.
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
+import { FITTED_COEFFICIENTS as _DT_FIT } from '@essrt/physics';   // plan 14: the ΔT anchor is the fit's own (FIT.DT_ANCHOR)
 const require = createRequire(new URL('../../package.json', import.meta.url).pathname);
 const MPP = require('./tools/lib/elp-mpp02.js');
 const { moonSeriesExtensionDeg } = require('@essrt/physics/moon/series-extension');
@@ -22,7 +23,7 @@ const { createModel, DEFAULT_CONSTANTS: C } = require('@essrt/physics');
 
 const D2R = Math.PI / 180, R2D = 180 / Math.PI, AS = 3600, J2000 = 2451545.0;
 const model = createModel();
-const BRIDGE = C.earthOrbital.deltaTStart / 86400;
+const BRIDGE = _DT_FIT.DT_ANCHOR.deltaTStartSeconds / 86400;
 const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const mpp = MPP.loadMpp02(1);
 const PREC = [0, 5029.0966 / 3600, 1.1120 / 3600, 0.000077 / 3600, 0];

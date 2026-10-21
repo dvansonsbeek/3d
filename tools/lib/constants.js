@@ -25,7 +25,7 @@ const fs = require('fs');
 // Plan 13 B3: the J2000 mass chain, the Moon's J2000 periods and the unit
 // constants have ONE home in @essrt/physics (three copies each before).
 const { computeMassChainJ2000, computeMoonPeriodsJ2000 } = require('@essrt/physics/earth/mass-chain');
-const { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS } = require('@essrt/physics/constants/units');
+const { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, J2000_JD } = require('@essrt/physics/constants/units');
 const astroRef = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
 // The deep-time block of the generated constants module (plan 11 step 1) —
@@ -114,7 +114,7 @@ const perihelionalignmentYear = astroRef.earthOrbital.perihelionalignmentYear;
 // kDeviceWheelPeriodYears, kDeviceInclinationPhaseJ2000Deg, the derived
 // earthRAAngle and eccentricityAmplitude — is deleted with the scaffold. The
 // scene's world frame is the J2000 ecliptic, @essrt/physics
-// earth/frame-of-date computeSceneWorldFrameJ2000 (scene-graph.js _kcR); the
+// earth/frame-of-date computeSceneWorldFrameJ2000 (scene-graph.js _chainR); the
 // three precession wheels are gone and every frame of date is placed from the
 // engine through that bridge. Mirror: src/script.js A2.)
 const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;
@@ -331,7 +331,7 @@ for (const [type, jd2000] of Object.entries(ASTRO_REFERENCE.cardinalPointAnchors
 // J2000.0 epoch (standard astronomical convention: Jan 1.5, 2000 TT = JD 2451545.0)
 // Julian century = exactly 36525 days by IAU definition (used in Meeus, IAU precession, parallax)
 // Tropical century = 100 model tropical years (used in obliquity rate solver for phase-clean measurement)
-const j2000JD = 2451545.0;
+const j2000JD = J2000_JD;
 const julianCenturyDays = JULIAN_CENTURY_DAYS;
 const tropicalCenturyDays = 100 * meanSolarYearDays;
 

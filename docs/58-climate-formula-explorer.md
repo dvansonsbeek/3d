@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -83,7 +83,7 @@ The forward tab carries an explicit caveat addressing the CO₂-causality debate
 
 > *Orbital-only projection. Natural orbital + carbon-cycle + boundary terms only; no anthropogenic CO₂ forcing. Glacial / interglacial markers auto-detected from the curve. Under natural forcing the curve shows glacial inception in the next 20–30 kyr (next peak at ~58 kyr). Whether anthropogenic CO₂ alters this depends on CO₂'s causal role in glacial cycles — itself contested. If CO₂ drives temperature (Ganopolski et al. 2016), present cumulative emissions delay inception ~50 kyr (high-emission scenarios ~100 kyr). If CO₂ lags as a feedback (ice-core record, Caillon et al. 2003), the orbital projection largely holds. Honest scope: post-MPT regime continues.*
 
-This framing addresses the Ganopolski-vs-Caillon debate without endorsing either causal direction — the framework treats CO₂ as a feedback (L2 silicate-weathering thermostat is the natural carbon response), but the modal's forward projection is orbital-only and lets the reader decide which CO₂ view to overlay.
+This framing addresses the Ganopolski-vs-Caillon debate without endorsing either causal direction — the model treats CO₂ as a feedback (L2 silicate-weathering thermostat is the natural carbon response), but the modal's forward projection is orbital-only and lets the reader decide which CO₂ view to overlay.
 
 ## Data pipeline
 
@@ -130,7 +130,7 @@ Re-running scripts only needed after dataset updates or refit changes — see [d
 ## Scope and limitations
 
 1. **Earth only.** All proxies measure Earth's climate state (δ¹⁸O temperature proxy, δ¹³C carbon proxy, CO₂ atmospheric concentration). The L1 lines are beats of Earth's secular modes (doc 92 §2); the comb-era per-planet attributions are in the archived records (docs 91 and 93), not in this modal.
-2. **Regime-aware fits, not free-floating.** The formula has different L1 amplitudes in each of the 8 regimes (`lr04-post-mpt`, `lr04-inhg-mpt`, `lr04-pre-inhg`, `lr04-full`, `cenogrid-d18o`, `cenogrid-d13c`, `epica-co2`, `cenco2pip`) — they are not the same global coefficients. The modal handles regime stitching automatically. **Forward prediction across regime boundaries fails catastrophically** (R² = −0.87 across the MPT in Tier B Round 3 R3-3 of doc 92); the framework is descriptive within regimes, not predictive across boundary-condition shifts.
+2. **Regime-aware fits, not free-floating.** The formula has different L1 amplitudes in each of the 8 regimes (`lr04-post-mpt`, `lr04-inhg-mpt`, `lr04-pre-inhg`, `lr04-full`, `cenogrid-d18o`, `cenogrid-d13c`, `epica-co2`, `cenco2pip`) — they are not the same global coefficients. The modal handles regime stitching automatically. **Forward prediction across regime boundaries fails catastrophically** (R² = −0.87 across the MPT in Tier B Round 3 R3-3 of doc 92); the model is descriptive within regimes, not predictive across boundary-condition shifts.
 3. **L1 = 28 physical lines** (25 orbital beats — 5 climatic precession, 10 obliquity, 10 eccentricity — plus the 405-kyr family). The line list is the generated table of [doc 92 §2](92-climate-formula.md#2-layer-1--the-orbital-lines); the retired 33-integer comb and its dual attribution are record (doc 109 §22; doc 93, archived).
 4. **Read-only.** The modal has no "edit formula" feature; coefficients are baked at bundle time from the Python fit pipeline.
 5. **Coefficient updates require re-running the pipeline.** See the data-pipeline section above.

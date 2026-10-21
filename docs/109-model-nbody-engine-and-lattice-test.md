@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -14,7 +14,7 @@ later a Wisdom–Holman engine, and a frequency analysis — instead of quoting
 secular theory. It grew out of the Mercury-anomaly work in doc 13 §1.8
 (the projection identity, the transit test and the candidate slot stay
 there); doc 108 asked the question this doc answers (a self-consistent
-secular solution from the framework's own dynamics). Every comparison below
+secular solution from the model's own dynamics). Every comparison below
 is labelled by what it is: **theory-vs-theory** (our integration against
 another integration or against secular theory — agreement shows the
 calculation is consistent, nothing more) or **theory-vs-observation**
@@ -203,7 +203,7 @@ population.
 > "Shipped law" below means the law shipped at the time.
 
 Doc 108 §6 asked for a self-consistent secular solution for Earth's e and ϖ
-from the framework's own dynamics. `derived-earth-orbit-vector.mjs` builds
+from the model's own dynamics. `derived-earth-orbit-vector.mjs` builds
 z_E(t) from the NAFF mode table and tests it. From a 1-Myr table the
 reconstruction fits its own window (La2004 corr 0.98–1.00, RMS ≤ 8e-4 over
 250 kyr — theory-vs-theory) and reproduces the measured J2000 slope (ė
@@ -232,7 +232,7 @@ laws, bit-identical — engine gates green), and `eclipse-audit.js` a
 probe-only override (`ECLIPSE_AUDIT_LAWS=curvature:<ë>`; `--write` is
 refused under it). A control run with the H/3 line's own curvature
 reproduces the recorded artifact exactly; the run with ë = −2.5e-7/cy²
-moves Babylon −135 from 198 to 209 km (ΔUT and the framework UT unchanged
+moves Babylon −135 from 198 to 209 km (ΔUT and the model UT unchanged
 at the minute), Plutarch 71 from 34 to 23 km, Lu −708 from 106 to 90,
 Nabonidus −556 from 74 to 81, Ibn Yunus 1004 from 90 to 66; the verdict
 counts and the Stephenson lunar/solar residuals do not change. The reason

@@ -471,7 +471,7 @@ for (const url of SAMPLE_REQUESTS) {
     // sub-solar point from the tier's own sun (metric normalization only)
     /** @type {(jdUT:number) => {ssLat:number, ssLon:number}} */
     const subSolar = (jdUT) => {
-      const jb = jdUT + DEFAULT_CONSTANTS.earthOrbital.deltaTStart / 86400;
+      const jb = jdUT + apiModel.eclipse.ttBridgeSeconds / 86400;   // the joint fit's anchor (plan 14: FIT.DT_ANCHOR)
       const year = apiModel.time.yearFromJD(jb);
       const eps = apiModel.earth.obliquityDeg(year) * D2R;
       const lam = apiModel.eclipse.sunLonDegAtJD(jb) * D2R;

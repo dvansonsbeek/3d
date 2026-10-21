@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -21,6 +21,10 @@ their diffs), and the sections below give the intended reading order instead.
 ---
 
 ## Reading Order
+
+### Five documents, in order
+
+If you read nothing else: [00](00-readme.md) this index → [99](99-expanding-solar-system-resonance-theory.md) the theory → [110](110-calculation-map.md) every published quantity traced to its formula, code and live value → [20](20-constants-reference.md) the constants and their provenance → [111](111-measured-traps-and-gate-origins.md) the measured traps behind every rule. Developers add [40](40-architecture.md) and [41](41-scene-graph-hierarchy.md).
 
 ### Start here
 
@@ -66,7 +70,7 @@ their diffs), and the sections below give the intended reading order instead.
 | # | Document | Description |
 |---|----------|-------------|
 | 106 | [Deep-Time Validation Dossier](106-deep-time-validation-dossier.md) | The single entry point for "how well does the model match the geological and historical record, and how would we know if it stopped?" Four evidence classes, gate-backed (41 paleo anchors, Phanerozoic MAD <!--v:paleoMadPhanPct-->0.48<!--/v-->%), including **the honesty ledger** — documented deviations asserted as bands so an unexplained improvement fails CI too |
-| 102 | [Pure-tidal + GIA α(t) vs the historical lunar record](102-gia-alpha-lunar-validation.md) | 267 primary-source lunar observations (Stephenson 2016): framework mean \|residual\| **20.2 min** vs NASA's fitted polynomial at 20.0 min — a 2-s excess over Stephenson's own fit, with zero ΔT-polynomial fitting; the α(t) GIA channel from independent satellite gravimetry; the 4-flag ΔT stack; the full hypothesis-testing and residual-decomposition record |
+| 102 | [Pure-tidal + GIA α(t) vs the historical lunar record](102-gia-alpha-lunar-validation.md) | 267 primary-source lunar observations (Stephenson 2016): model mean \|residual\| **20.2 min** vs NASA's fitted polynomial at 20.0 min — a 2-s excess over Stephenson's own fit, with zero ΔT-polynomial fitting; the α(t) GIA channel from independent satellite gravimetry; the 4-flag ΔT stack; the full hypothesis-testing and residual-decomposition record |
 | 104 | [The Millennial Rotation Swing](104-millennial-rotation-swing.md) | The core–mantle identification of the post-stack residual: one aperiodic swing, independently confirmed against archeomagnetic core-flow ΔLOD (r = +0.91), the lattice closed under difference tones, and the low-Q Magneto-Coriolis eigenmode reading |
 | 105 | [ΔT stack: what each flag buys](105-dt-stack-flag-audit.md) | Audit of the four ΔT correction flags under pre-fixed criteria: the shipped set is optimal in- and out-of-sample (Espenak RMS <!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s); the two measurement traps (stage_* metrics rank backwards; Jose5/Jose4 are a coupled pair) |
 | 103 | [-135 Babylonian solar eclipse case study](103-135-babylonian-case-study.md) | The flagship ancient event: BestGap <!--v:babylon135BestGapKm-->152<!--/v--> km (off-peak verdict), documented UT matched to 9 minutes, local magnitude 0.988, the ΔT-free cascade selecting the traditional date uniquely — plus the component decomposition and the α(t) sensitivity proof |
@@ -131,30 +135,7 @@ The research one-offs that print and never fail live in `tools/explore/` (its RE
 
 ## Project Infrastructure
 
-Beyond the documentation, the project includes several tool directories that power the optimization, verification, and data pipelines.
-
-### `tools/lib/` — Core Engine
-
-The shared libraries that both the simulation (`src/script.js`) and the optimization tool use:
-
-| File | Description |
-|------|-------------|
-| `constants.js` | All model constants for the Node tools, loaded from the JSON source of truth in `public/input/`. `src/script.js` reads the same JSON through the generated module (`npm run constants:generate`) |
-| `scene-graph.js` | Headless scene graph: builds the same orbital hierarchy as Three.js without a browser |
-| `orbital-engine.js` | Computes planet positions for any date using the scene graph |
-| `precession.js` | IAU 1976 precession correction (J2000 → of-date frame conversion) |
-| `horizons-client.js` | JPL Horizons API client for fetching reference ephemeris data |
-
-### The scene-pose optimizers — deleted (plan 11 step 2)
-
-`tools/optimize.js` and `tools/lib/optimizer.js` fitted the scene
-scaffold's pose constants (the Sun's start angle, the eccentricity base, the
-planets' start angles) against JPL reference points. Every quantity they
-tuned is now placed by the engine (the planets by the N-body chain, the Sun
-and the Moon by the certified series), so the constants and the tools are
-gone; the chain-vs-JPL RMS has one home, `data/chain-vs-jpl-rms.json`
-(`tools/verify/measure-rms-by-epoch.js`). The programme documentation is
-archived; git history keeps the tools.
+The repository's layout — the browser monolith, the Node engine in `tools/lib/`, the published packages, the gates and generators in `tools/verify/`, the fitters, the shipped artifacts — is stated once in [CLAUDE.md § Key paths](../CLAUDE.md); `npm run test:verify:list` prints the gate/generator classification and `npm run regen:cascade` the artifact regeneration order. The sections below index what that table does not list.
 
 ### `tools/pipeline/` — Reference Data Pipeline
 

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -18,7 +18,7 @@ This is the analytical twin of the [Perihelion of Planets Verification](56-webge
 
 Together the two panels let you check the model from two independent directions: does it match what JPL *measures*, and does it match what textbook celestial mechanics *predicts*?
 
-> **Scope note (ESSRT).** The default ±12,000 yr comparison range is modern-era for ESSRT purposes — the drift of the composed precession clock T_p(t) over this span is sub-ppm and well below the noise floor of the published polynomial and trigonometric formulas being compared. The Export Cycles long-baseline plots (−248,000 BC to +102,000 AD, ~350 kyr) push into the regime where ESSRT scaling becomes marginally non-negligible (~0.04% clock drift over 250 kyr per Drivers 1 and 2 — see [doc 99](99-expanding-solar-system-resonance-theory.md)), but Laskar's La2004/La2010 N-body integrations the model is compared against also do not incorporate this drift, so any discrepancy at long range reflects framework differences rather than ESSRT scaling. The model quantities under test carry no fitted correction (the anchor unit's harmonic combs were deleted at plan 09): they are the composed precession clock and the N-body series' elements of date.
+> **Scope note (ESSRT).** The default ±12,000 yr comparison range is modern-era for ESSRT purposes — the drift of the composed precession clock T_p(t) over this span is sub-ppm and well below the noise floor of the published polynomial and trigonometric formulas being compared. The Export Cycles long-baseline plots (−248,000 BC to +102,000 AD, ~350 kyr) push into the regime where ESSRT scaling becomes marginally non-negligible (~0.04% clock drift over 250 kyr per Drivers 1 and 2 — see [doc 99](99-expanding-solar-system-resonance-theory.md)), but Laskar's La2004/La2010 N-body integrations the model is compared against also do not incorporate this drift, so any discrepancy at long range reflects model differences rather than ESSRT scaling. The model quantities under test carry no fitted correction (the anchor unit's harmonic combs were deleted at plan 09): they are the composed precession clock and the N-body series' elements of date.
 
 ## The twelve categories
 
@@ -133,7 +133,7 @@ At any point the panel answers: *"Does our model agree with published celestial 
 
 ## Why this panel matters for the model's claims
 
-ESSRT is an analytic framework — harmonic bases on a fitted anchor for Earth's spin and time — with its own N-body chain for the planets — not a restatement of standard secular theory. A natural skeptical question is: "how does such a model compare with the polynomial and N-body formulas that the astronomy community already uses?" This panel answers that question visually, quantitatively, and for eleven independent quantities at once.
+ESSRT is an analytic model — harmonic bases on a fitted anchor for Earth's spin and time — with its own N-body chain for the planets — not a restatement of standard secular theory. A natural skeptical question is: "how does such a model compare with the polynomial and N-body formulas that the astronomy community already uses?" This panel answers that question visually, quantitatively, and for eleven independent quantities at once.
 
 Cases where the model *disagrees* with a reference are also documented in the panel — rather than hidden. The residual chart and J2000 table make the gaps numerical and reproducible. Together with WebGeoCalc (the observational comparison), this panel is the second leg of the model's validation.
 

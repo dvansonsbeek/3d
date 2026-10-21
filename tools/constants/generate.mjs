@@ -109,6 +109,11 @@ const EXTRA_COEFFICIENT_SOURCES = [
   // exactly that reason: it carried bond.cos_coeff_s = 165.927 against the
   // 145.595 actually shipped.
   { dir: 'data', file: 'deltaT-4flag-fit.json', as: 'DT_STACK', pick: (j) => j.shipped_coefficients },
+  // Plan 14 step 1: the ΔT trend anchor at J2000 is the joint fit's OUTPUT and lives in the
+  // fit's own artifact — it had sat in astro-reference.json (an INPUT file the N-body node
+  // hashes wholesale), so every by-hand re-close that moved it by a µs cost the 26-min
+  // N-body re-stamp. Readers: FIT.DT_ANCHOR.deltaTStartSeconds (never K.earthOrbital).
+  { dir: 'data', file: 'deltaT-4flag-fit.json', as: 'DT_ANCHOR', pick: (j) => ({ deltaTStartSeconds: j.optimum.deltaTStart, usnoTargetLodSeconds: j.optimum.usno_target_lod_s }) },
 
   // Plan 06 layer B — the eclipse Sun's DERIVED mean-element offset over the
   // secular series (the 1890–2110 mean of osculating − secular e and ϖ of the

@@ -25,7 +25,7 @@ const { createSunPlanetaryCompletion } = await import(new URL('../../packages/ph
 const model = createModel(DEFAULT_CONSTANTS);
 const C = DEFAULT_CONSTANTS;
 const D2R = Math.PI / 180;
-const BRIDGE = C.earthOrbital.deltaTStart / 86400;
+const BRIDGE = _DT_FIT.DT_ANCHOR.deltaTStartSeconds / 86400;
 const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const Nnut = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((d + 540) % 360) - 180;
@@ -51,6 +51,7 @@ const NS = SIG.dlP.length;
 const jdAtS = (i) => SIG.jd0 + i * SIG.stride;
 const RATES_LIT = { lMe: 149472.674, lV: 58517.815676, lE: 36000.769780, lM: 19141.696300, lJ: 3036.302389, lS: 1223.511013 };
 import { createRequire } from 'node:module';
+import { FITTED_COEFFICIENTS as _DT_FIT } from '@essrt/physics';   // plan 14: the ΔT anchor is the fit's own (FIT.DT_ANCHOR)
 const require = createRequire(import.meta.url);
 const TL = require('../lib/constants.js');
 const CY = 36525;

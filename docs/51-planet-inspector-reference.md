@@ -1,7 +1,7 @@
 ---
 docVersion: 2.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -42,8 +42,8 @@ was the valuable part and is rebuilt on the chain.
 
 | Quantity | Source |
 |---|---|
-| Elements of date (a, e, i, Ω, ϖ, λ̄, M) | `_kcElementsOfDate(planet, o.julianDay)` — `@essrt/physics/planets/keplerian-chain` with the banked secular-series override, at the engine year (true TT) |
-| Heliocentric points of the orbit | `_kcHelioAU(planet, jd)` over one Kepler-III period, through the frame bridge `_kcR` into world axes |
+| Elements of date (a, e, i, Ω, ϖ, λ̄, M) | `_chainElementsOfDate(planet, o.julianDay)` — `@essrt/physics/planets/keplerian-chain` with the banked secular-series override, at the engine year (true TT) |
+| Heliocentric points of the orbit | `_chainHelioAU(planet, jd)` over one Kepler-III period, through the frame bridge `_chainR` into world axes |
 | Rendered planet | the planet mesh's world position (light-time retarded, as the eye sees it) |
 | Ecliptic of date (pole n̂, equinox ĝ) | the sun-plane container's world basis `[ĝ, n̂, ĝ×n̂]`, placed from the engine every frame (R4) |
 | Sun | the Sun mesh's world position |

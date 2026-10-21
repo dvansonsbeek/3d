@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -282,7 +282,7 @@ Input constants used in the formulas above:
 
 The planets carry no frame corrections: the engine-D chain places every
 rendered planet quantity, each planet's rotation axis is placed from the spin
-channel's pole of date (`_kcPlacePlanetPole`), and the planet containers take
+channel's pole of date (`_chainPlacePlanetPole`), and the planet containers take
 the plain node tilt.
 
 ## Mass Computation & Universal Constants
@@ -455,7 +455,7 @@ Earth's perihelion of date is the series' ϖ in every runtime (doc 110 chain 1.1
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->56.08<!--/v--> s | Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0012<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
+| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->56.08<!--/v--> s | The joint fit's OUTPUT, shipped in its own artifact `data/deltaT-4flag-fit.json` (`optimum.deltaTStart`, embedded as `FIT.DT_ANCHOR.deltaTStartSeconds` — not an astro-reference input). Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0012<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
 ---
 
@@ -787,7 +787,7 @@ geometric scaffolding; their one remaining reach (plan 11 step 0b) was each
 planet's pole azimuth and Saturn's ring plane, which turned once per orbit
 with the wheel. Each planet's rotation axis is now placed in world from the
 spin channel's pole of date through the frame bridge, as Earth's axis is
-(`_kcPlacePlanetPole`; the Node twin mirrors it), and the scaffold wheels rest
+(`_chainPlacePlanetPole`; the Node twin mirrors it), and the scaffold wheels rest
 at zero. The planets' `type` (the wheel ellipse family) and the
 `perihelionPassageRef` JDs (the planet equation-of-centre branch) left with
 them; the family is a code taxonomy in `@essrt/physics` planets/geometry. The

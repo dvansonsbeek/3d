@@ -1,13 +1,13 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
 # Pure-tidal + L1-orbital-coupled α(t) validates against the historical lunar record
 
-**Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Under the joint world (4-flag stack + Core-mantle swing, doc 104), framework mean |residual| **20.2 min (1212 s)**, with **117/267 events (43.8%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity; the framework's excess over Stephenson's own fit is **2 s** — the dataset noise floor. The framework's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 3 confirmed + 13 off-peak, 5 regional, 0 with residual ΔT-signal (framework agrees with the documented UT on every event), 5 geographic-class events (umbra-*centerline* >1,000 km from the site — a centerline-distance gate, not visibility: at high γ the shadow strikes the tilted Earth obliquely and the penumbra can still cover the site with a deep partial; the class collects penumbra-only sites and attribution debates — all unrelated to physics).
+**Status**: Validation complete — 267 primary-source historical lunar observations (Babylonian, Greek, Chinese, Arab; -720 BCE to 1280 CE) cross-validated against the pure-tidal Farhat 2022 (LLR-anchored α₁ giving da/dt = 3.82 cm/yr at J2000) + L1-orbital-coupled α(t) GIA model. Under the joint world (4-flag stack + Core-mantle swing, doc 104), model mean |residual| **20.2 min (1212 s)**, with **117/267 events (43.8%)** falling closer to observation than NASA Espenak/Meeus's polynomial. NASA polynomial mean |residual|: 20.0 min (1199 s); Stephenson 2016 spline polynomial: 20.2 min (1211 s) — both are fit to essentially this exact dataset, so per-event residuals against either index fit quality against a smoothed representation of the observations rather than physical validity; the model's excess over Stephenson's own fit is **2 s** — the dataset noise floor. The model's independent validation is the [26-event solar-eclipse alignment audit](https://holisticuniverse.com/model/historical-eclipse-validation): 3 confirmed + 13 off-peak, 5 regional, 0 with residual ΔT-signal (model agrees with the documented UT on every event), 5 geographic-class events (umbra-*centerline* >1,000 km from the site — a centerline-distance gate, not visibility: at high γ the shadow strikes the tilted Earth obliquely and the penumbra can still cover the site with a deep partial; the class collects penumbra-only sites and attribution debates — all unrelated to physics).
 
 ---
 
@@ -40,7 +40,7 @@ baked into mainstream Stephenson empirical fits is rejected. A GIA-scale
 non-tidal contribution IS detectable in the record and its dominant
 component is well-matched by the GIA viscoelastic relaxation measured by
 GRACE/LAGEOS satellite gravimetry — about ten times smaller than the
-Munk-MacDonald estimate, and included in the framework via α(t). Additional
+Munk-MacDonald estimate, and included in the model via α(t). Additional
 structure in the residual after GIA correction is captured by the 4-flag
 stack — four fitted millennial cycles (Bond 1466 yr dominant) whose periods
 come from the record and the canonical paleoclimate values.
@@ -193,10 +193,10 @@ Maxwell viscoelastic body, `τ_Maxwell = η / μ` with `μ_mantle ≈ 1.5 × 10�
 degree n = 2 (dominant ice-sheet mode) inflates this by geometric factor
 ~20-30, giving `τ ≈ 4-6 kyr` — the kyr scale on which α evolves.
 
-This provides the *timescale* — but the framework goes further and provides
+This provides the *timescale* — but the model goes further and provides
 the *driver*. Instead of parameterising α(t) as a sum of viscoelastic
 relaxation exponentials with amplitudes fit to boundary conditions, the
-framework binds α(t) directly to the L1 orbital layer of the canonical
+model binds α(t) directly to the L1 orbital layer of the canonical
 Climate Formula (LR04 post-MPT regime; see [doc 92](92-climate-formula.md)).
 One physical mechanism, two observables — the same L1 orbital signal that
 drives ice-mass cycles in the δ¹⁸O record also drives α on the same
@@ -245,7 +245,7 @@ fitted to eclipses):
    Peltier ICE-6G distributed-loading fingerprints give factors in the
    1.5-2.5 range depending on mantle viscosity assumptions. Factor 2.0
    sits at the mid-range of the Peltier ICE-6G LOD-coupling estimates
-   and gives framework dLOD/dt at J2000 = 1.77 ms/century, matching
+   and gives model dLOD/dt at J2000 = 1.77 ms/century, matching
    IERS observation of 1.75 ms/century within 1%.
 
 **3. L1 orbital layer** — Climate Formula LR04 post-MPT regime coefficients
@@ -430,20 +430,20 @@ Both the Stephenson 2016 spline polynomial and the NASA Espenak/Meeus
 polynomial are fit to (essentially) this exact observation dataset —
 per-event residuals against either measure model distance from a
 smoothed representation of the observations, not physical validity.
-The framework's independent validation is the 26-event solar-eclipse
+The model's independent validation is the 26-event solar-eclipse
 alignment audit (current certified-chain run): 16/26 with the umbra
 reaching the observation site (3 confirmed at greatest moment + 13
 off-peak alignments — including −135 Babylon at BestGap
 <!--v:babylon135BestGapKm-->152<!--/v--> km and −708 Lu at 9 km),
-5/26 regional (framework umbra in same continental band
-but off site), 0/26 with residual ΔT-signal — the framework agrees
+5/26 regional (model umbra in same continental band
+but off site), 0/26 with residual ΔT-signal — the model agrees
 with the documented UT on every event — and 5/26 geographic-class
 events (umbra-*centerline* >1,000 km from the site; the gate measures
 centerline distance, not visibility — at high γ the penumbral
 footprint on the tilted Earth spans thousands of km, so these sites
 can still see a deep partial; the class collects penumbra-only sites
 and attribution debates — unrelated to physics). That audit uses the
-framework's own predicted UT and umbra track with no ΔT polynomial
+model's own predicted UT and umbra track with no ΔT polynomial
 in the loop.
 
 ### Convergence story: each physical constant swapped in isolation
@@ -495,9 +495,9 @@ medieval — Ibn Yunus, Habash al-Ḥāsib, Battānī) is the tightest at
 ±57 s with RMS 763 s. This is the *agreement-across-cultures*
 cross-validation: four independent observation traditions, separated
 by thousands of years and tens of thousands of kilometres, agree on
-the magnitude of the framework's residual to within the noise floor.
+the magnitude of the model's residual to within the noise floor.
 That cannot be accidental — it confirms the residual is a real
-property of the framework, not regional observational bias.
+property of the model, not regional observational bias.
 
 ### Per-century convergence at ancient Babylonian era
 
@@ -523,8 +523,8 @@ literature — zero fitting parameters. That this works is the headline.
 The small residual trend toward -400 (the model runs ~0.1–0.2 hr below
 the tablet reductions there) is recorded and gated rather than tuned
 away; the reductions carry the Stephenson team's conversion assumptions,
-and the assumption-light cross-check agrees with the framework — the
-untimed-bounds section of the same gate places the framework ΔT at −135
+and the assumption-light cross-check agrees with the model — the
+untimed-bounds section of the same gate places the model ΔT at −135
 (<!--v:lunarDtBoundsBabylon135FrameworkSeconds-->11,982<!--/v--> s) inside the
 tablet's published totality window
 [<!--v:lunarDtBoundsBabylon135LowSeconds-->11,220<!--/v-->, <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s.
@@ -533,19 +533,19 @@ tablet's published totality window
 
 Every `dt_observed_sec` in the corpus was produced by converting the raw
 tablet timing through the Stephenson team's ELP-class lunar ephemeris with
-its constant-ṅ convention. The framework's Moon is not that Moon: its
+its constant-ṅ convention. The model's Moon is not that Moon: its
 month evolution is chain-integrated on the model's own recession history. The `theoryDrift`
 section of the same gate measures the difference directly, on the TT axis
-(framework opposition vs the NASA canon's greatest-eclipse instant, era
+(model opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
 drift reaching <!--v:lunarDrift800Minutes-->−2.7<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
 Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.22<!--/v--> ″/cy² between the two
-theories. A re-reduction of the tablets with the framework's own Moon
+theories. A re-reduction of the tablets with the model's own Moon
 shifts each century's implied ΔT by exactly that drift, which converts
 the one-sided residual column above into sign-mixed, noise-class scatter:
 
-| Century | residual today | **pre-registered** residual after framework re-reduction |
+| Century | residual today | **pre-registered** residual after model re-reduction |
 |---|---:|---:|
 | -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+1.5<!--/v--> min |
 | -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.09<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.4<!--/v--> min |
@@ -557,7 +557,7 @@ These predictions are recorded in the gate BEFORE the contact-time
 re-reduction machinery exists — first-order only (contacts assumed to
 shift with the opposition; the moonrise conversion shares part of the
 drift; century and era bins are offset by 50 yr). When the re-reduction
-campaign runs, landing near this column confirms the framework's
+campaign runs, landing near this column confirms the model's
 dLOD/dt at the corpus noise floor with zero free parameters; landing
 significantly elsewhere is a discovery about out-of-window LOD
 structure. Either outcome is informative — that is why the column is
@@ -598,7 +598,7 @@ years), so weights must not concentrate a century into one tablet.
 century means, ±1-yr candidate straddle, per-table split, verdict
 against the RECORDED pre-registered column). The re-reduced
 tablet corpus remains statistically consistent with the pinned
-column: **the framework's dLOD/dt stack survives its pre-registered
+column: **the model's dLOD/dt stack survives its pre-registered
 falsification test.** Both the column and the measured medians are
 the conscious re-measurement under the certified framework-native
 Sun with the derived torque term (the column re-derives per the
@@ -652,7 +652,7 @@ torqueless Sun variant that partially fit the structure was itself the
 form the SOLAR corpus and the Phase C test reject — the stress test
 corroborates rather than contradicts the verdict).
 
-**Attribution.** The framework curve and Stephenson's own 2016 spline
+**Attribution.** The model curve and Stephenson's own 2016 spline
 agree to −6..−103 s at every century midpoint, yet *both* miss the
 timed-lunar observations by the same −1,200..+500 s century medians
 (e.g. −300: fw −1,222 vs spline −1,175). Stephenson's solution misfits
@@ -740,39 +740,39 @@ Events where framework closer to obs than NASA: 42/89 (47.2%)
 Framework 0.8% closer to primary-source observations than NASA on average.
 ```
 
-The framework edges NASA on the L-7 solar record — mean residual
-666 s vs 672 s (the framework residual sits below NASA's), closer to
+The model edges NASA on the L-7 solar record — mean residual
+666 s vs 672 s (the model residual sits below NASA's), closer to
 observations on 42/89 events (47.2%). This is the strong independent
 cross-validation: NASA's Espenak/Meeus polynomial is fit precisely to
-these Stephenson solar observations, and the framework — with zero
+these Stephenson solar observations, and the model — with zero
 fitting to any per-observation ΔT data — lands at the same residual
 magnitude.
 
 Per-table:
 
-| Table | Tradition | n | Year range | NASA \|res\| (s) | Framework \|res\| (s) | Framework closer |
+| Table | Tradition | n | Year range | NASA \|res\| (s) | Model \|res\| (s) | Model closer |
 |---|---|---:|---|---:|---:|---:|
 | S03 | Babylonian solar | 25 | −356…−9 | 873 | 880 | 48% |
 | S06 | Chinese timed | 42 | 586…1277 | 700 | 717 | 33% |
 | S08 | Arab timed | 22 | 829…1004 | 390 | **326** | **73%** |
 
 The absolute residuals are smaller than L-5b lunar (NASA 672 vs 1199 s,
-framework 666 vs 1212 s — the solar framework residual sits below
+model 666 vs 1212 s — the solar model residual sits below
 NASA's) because solar observations have tighter intrinsic precision —
 narrow totality paths give sharper timing. Per tradition: the ancient
-Babylonian S03 table is a statistical tie (880 vs 873 s, framework
+Babylonian S03 table is a statistical tie (880 vs 873 s, model
 closer on 48% of events — the deepest solar observations carry no
 framework-side excess), the Arab S08 table is markedly
 framework-favorable (326 vs 390 s, closer on 73%), and the Chinese S06
 table leans NASA (717 vs 700 s, closer on 33%). No per-tradition
-fitting is involved on the framework side.
+fitting is involved on the model side.
 
 ### Per-century medieval signal — the cross-validation
 
 The per-century L-7 breakdown shows where each clock sits against the
 solar record through the medieval window:
 
-| Century | n | obs ΔT (hr) | framework ΔT (hr) | NASA \|res\| (s) | framework \|res\| (s) | framework closer |
+| Century | n | obs ΔT (hr) | model ΔT (hr) | NASA \|res\| (s) | model \|res\| (s) | model closer |
 |---|---:|---:|---:|---:|---:|---:|
 | 800…899 | 6 | 0.55 | 0.64 | 538 | **480** | **67%** |
 | 900…999 | 15 | 0.46 | 0.46 | 337 | **288** | **67%** |
@@ -780,7 +780,7 @@ solar record through the medieval window:
 | 1100…1199 | 8 | 0.33 | 0.24 | 347 | 368 | 25% |
 | 1200…1299 | 9 | 0.19 | 0.18 | 294 | 303 | 33% |
 
-The framework leads the 800–999 centuries (closer on 67% of events in
+The model leads the 800–999 centuries (closer on 67% of events in
 each; in the 900s its mean ΔT matches the observed 0.46 hr exactly)
 and trails NASA modestly in 1000–1299, with the global balance still
 framework-favorable (666 vs 672 s). Both clocks track the observed ΔT
@@ -933,7 +933,7 @@ decomposition" below).
 | 4 | Mass balance lagged (Δ ∈ {0,100,...,1000} yr scan) | Pearson + best-of-scan + Bonferroni | 267 | ✗ Lunar best lag Δ=0: r = −0.108 (p = 0.065); solar best lag Δ=200: r = +0.246 (p = 0.020). Opposite signs at different best lags — no coherent lagged coupling |
 | 5 | Mass balance signed sign-duration | Pearson + permutation | 267 | ✗ Lunar null (r = −0.054); solar r = −0.228 (p = 0.033) — same sign but only solar reaches significance |
 | 6 | **9 literature periodic-forcing cycles in 10-2500 yr** | Lomb-Scargle periodogram, FAP < 5% threshold, within 20% of literature period | 267 | ✗ **Joint world (shipped): 0/9 detected at FAP < 5%.** The intermediate L1-α-era result was 3/9 (Gleissberg 89.9 yr FAP 0.35%; Jose 179 / de Vries 182 both at 173.9 yr FAP 1.72% — all solar-activity-related); those peaks do not survive the joint residual. |
-| 7 | **14.2 yr peak from #6 robustness test** | 3-test focused robustness: noise floor / jackknife / half-split, all anchored on 14.2 yr target in 12-16 yr window | 267 | ✗ **Resolved: sampling-window artifact.** All three in-catalog tests pass (FAP 0.000; jackknife 50/50; half-split 14.1 / 13.1 yr, both within ±2 yr) — but the observation epochs' own spectral window peaks at 14.30 yr (part of a ~7.15-yr eclipse-cadence comb), so every subset shares the peak. Physical ceiling: a real 0.15-ms decadal LOD line integrates to ~0.12 s of ΔT — four orders below the fitted amplitude. No framework component warranted. |
+| 7 | **14.2 yr peak from #6 robustness test** | 3-test focused robustness: noise floor / jackknife / half-split, all anchored on 14.2 yr target in 12-16 yr window | 267 | ✗ **Resolved: sampling-window artifact.** All three in-catalog tests pass (FAP 0.000; jackknife 50/50; half-split 14.1 / 13.1 yr, both within ±2 yr) — but the observation epochs' own spectral window peaks at 14.30 yr (part of a ~7.15-yr eclipse-cadence comb), so every subset shares the peak. Physical ceiling: a real 0.15-ms decadal LOD line integrates to ~0.12 s of ΔT — four orders below the fitted amplitude. No model component warranted. |
 | 8 | Lunar nodal cycle (18.6 yr) in medieval data | High-res Lomb-Scargle + 500 nulls + per-source | 83 | ✗ Empirical FAP = 70.6% at the 18.7 yr peak, 75.8% at exact nodal (well above 5% significance) |
 
 ### Residual shape decomposition — one symmetric Medieval Warm Period (MWP) bump plus linear drift
@@ -1056,7 +1056,7 @@ eclipse cycle — so every subset of the catalog reproduces the peak
 because every subset shares the observing cadence. The physical ceiling
 seals the verdict: a real 0.15-ms decadal LOD line integrates to only
 ~0.12 s of ΔT, four orders of magnitude below the fitted peak amplitude.
-No framework component is warranted (kill recorded in
+No model component is warranted (kill recorded in
 `data/deltaT-142yr-window-test.json`).
 
 ### Two additional predictive tests beyond the eight hypotheses
@@ -1361,7 +1361,7 @@ away for baseline measurement without the stack.
 
 Current shipped fit (sole runtime source of truth):
 
-- `tools/fit/dt-corrections-fit.js` — Node cascaded-LSQ fit tool (Phase 8 Step 11). Reads Stephenson polynomial, samples the pure-tidal framework residual (with `DT_CORRECTIONS_DISABLED=1` bypassing the shipped corrections), fits Bond→Hallstatt→Jose5→Jose4 in cascade, writes the artifact below.
+- `tools/fit/dt-corrections-fit.js` — Node cascaded-LSQ fit tool (Phase 8 Step 11). Reads Stephenson polynomial, samples the pure-tidal model residual (with `DT_CORRECTIONS_DISABLED=1` bypassing the shipped corrections), fits Bond→Hallstatt→Jose5→Jose4 in cascade, writes the artifact below.
 - The website consumes the ΔT-stack and resonator constants through the published `@essrt/physics` package (`FITTED_COEFFICIENTS.DT_STACK` / `DT_RESONATOR`). `src/script.js` imports the same values from the generated constants module; `tools/lib/deep-time.js` reads the JSON directly.
 - `data/deltaT-4flag-fit.json` — combined 4-cycle fit output; sole authoritative source for the shipped coefficients.
 
@@ -1713,11 +1713,11 @@ ms/century — is essentially UNCHANGED by Bond correction**, indicating
 this is a distinct physical channel independent of the Bond-scale
 oscillation. Compared to literature values:
 
-- Cox & Chao 2002 (framework baseline, satellite-measured): +0.23 ms/century
+- Cox & Chao 2002 (model baseline, satellite-measured): +0.23 ms/century
 - **Diagnostic optimum: +0.48 ms/century (~2× Cox-Chao)**
 - Munk-MacDonald 1960 postulate: +5 to +6 ms/century
 
-**The framework's Cox-Chao rate captures only ~half the needed secular
+**The model's Cox-Chao rate captures only ~half the needed secular
 non-tidal contribution.** The remaining ~0.25 ms/century is unmodelled.
 This is a fractional non-tidal channel ~10% of the full Munk-MacDonald
 postulate — NOT the full MM rate (which remains rejected), but not zero
@@ -1807,7 +1807,7 @@ What this validation establishes:
    IERS α at J2000, Cox & Chao satellite-measured dJ₂/dt with the
    Peltier ICE-6G factor-2.0 J₂→α conversion, and direct coupling to
    the L1 orbital layer of the canonical Climate Formula (see [doc 92](92-climate-formula.md))
-   — and produces a framework that agrees with NASA's empirical
+   — and produces a model that agrees with NASA's empirical
    polynomial to within 13 s (0.2 min) on a 20 min observation noise
    floor.
    NASA's polynomial uses ~10+ coefficients fitted to this exact
@@ -1885,7 +1885,7 @@ What this validation establishes:
    the Bond 2001 IRD stack (North Atlantic MC52 + VM29-191 + MC21 +
    GGC22 — the same hematite-stained-grain drift-ice series Bond
    used to identify his Bond 0-8 cold events). Detrended, on the
-   framework's validated window −4000 BC to +1800 AD (the range where
+   model's validated window −4000 BC to +1800 AD (the range where
    the ΔT fit is not extrapolating): **r = +0.49 at lag 0** with the
    pre-joint flags-only stack (re-measured under the shipped joint
    world — where part of the late-Holocene structure moved into the
@@ -1897,7 +1897,7 @@ What this validation establishes:
    framework-vs-GISP2 (r ≈ +0.20 in the same window) because GISP2
    is a local Greenland temperature signal while Bond 2001 is the
    same physical drift-ice-driven mass-redistribution signal the
-   framework's Bond harmonic is modelling.
+   model's Bond harmonic is modelling.
 
    The sign convention tested here is the one proposed for the STACK —
    "Σ > 0 = higher LOD than baseline = surface mass equatorward = warm
@@ -1928,9 +1928,9 @@ What this validation establishes:
    event at −6250 BC, Holocene Optimum peak at −5000 BC), where
    fit-window extrapolation drift accumulates the 4-flag phases
    beyond the harmonic coherence budget. One is post-window
-   (Modern warm, 2000 AD), which is anthropogenic — the framework, a
+   (Modern warm, 2000 AD), which is anthropogenic — the model, a
    pure orbital/tidal model, correctly does not predict it. That the
-   framework does *not* predict recent industrial warming is a
+   model does *not* predict recent industrial warming is a
    feature, not a bug: it isolates the natural orbital rhythm from
    the anthropogenic signal.
 
@@ -1954,7 +1954,7 @@ What this validation establishes:
    sign agreement does not survive being tested across the full named
    periods instead of at hand-picked peak years. The Little Ice Age
    result is the most serious: the event test books it as a single
-   narrow miss (Maunder), when the framework in fact has the wrong sign
+   narrow miss (Maunder), when the model in fact has the wrong sign
    for all five centuries of it.
 
    **What this means for the claim.** The correspondence between the
@@ -1969,7 +1969,7 @@ What this validation establishes:
 
 What we are NOT claiming:
 
-- **That NASA's polynomial is comprehensively "beaten."** The framework
+- **That NASA's polynomial is comprehensively "beaten."** The model
   matches NASA within 13 s on average across L-5b lunar (1212 s vs
   1199 s), beats NASA on 117/267 lunar events (43.8%), and edges past
   NASA on L-7 solar (666 s vs 672 s, 42/89 events beating).
@@ -1979,7 +1979,7 @@ What we are NOT claiming:
   timing to essentially the same accuracy as NASA's ~10-coefficient
   fit, using only first-principles physical constants."
 
-- **That the 20.2 min framework residual is purely physical.** The
+- **That the 20.2 min model residual is purely physical.** The
   Stephenson 2016 dataset has a ~20 min irreducible per-observation
   scatter; the remaining 13-s gap to NASA is at the level of
   observation noise and small unmodelled contributions (sea-level
@@ -1996,7 +1996,7 @@ What we are NOT claiming:
 ## Limits of this analysis
 
 1. **Stephenson 2016 observation noise** is ~20 min per observation
-   (RMS), dominant at the per-event level. Neither the framework nor
+   (RMS), dominant at the per-event level. Neither the model nor
    NASA can do better than this. The ~13-s framework-vs-NASA gap in
    mean |residual| is the structural disagreement on top of the noise
    floor.
@@ -2011,8 +2011,8 @@ What we are NOT claiming:
    climate structure is captured separately by the 4-flag millennial
    stack rather than by additional α(t) coupling.
 
-3. **Medieval residual** (years 800-1300, framework overshoots by
-   ~20 min under α(t) alone) is a residual signal that the framework's
+3. **Medieval residual** (years 800-1300, model overshoots by
+   ~20 min under α(t) alone) is a residual signal that the model's
    α(t) does not fully capture. This has been decomposed in detail
    (see "Complete residual decomposition" and "Companion millennial
    harmonics") into four millennial harmonics (Bond 1466 yr, Hallstatt
@@ -2035,7 +2035,7 @@ What we are NOT claiming:
    orbital coupling over 2,000+ years, matches the historical record.
    It does — but the underlying assumption that the satellite-era
    dJ₂/dt is representative of the millennial-scale rate (up to the
-   L1-orbital modulation) is implicit in the framework. The Peltier
+   L1-orbital modulation) is implicit in the model. The Peltier
    ICE-6G factor-2.0 J₂→α conversion is the standard literature
    treatment for this extrapolation.
 
@@ -2076,7 +2076,7 @@ The natural extensions, in order from most to least defensible:
    geomagnetic-secular-variation observations (rather than fit to
    eclipses). Cleanest research direction for the remaining residual.
 
-3. **Independent LLR cross-check — done**. The framework's α₁ tidal
+3. **Independent LLR cross-check — done**. The model's α₁ tidal
    parameter is anchored directly to LLR (Dickey 1994 / Chapront 2002:
    3.82 cm/yr Moon recession at J2000), closing the Moon secular-physics
    half of the deep-time story alongside the L1-orbital α(t) coupling.

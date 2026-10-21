@@ -354,15 +354,15 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/nbody-deep-secular-modes.json": "sha256:87c325fac77d94a45e1381b62a2a4c5cd8253bc4765c8d497a1d9f5466649ccc",
-   "data/nbody-secular-series.json": "sha256:c8807608f9364cd6f8c910e8c9da99a25dfa12d354e5aaef79400bd30e28049e",
+   "data/nbody-secular-series.json": "sha256:733bfe77e209edc23475367dba48cf78ee5c15770f0254eca68cedc1532ed5fe",
    "packages/physics/src/climate/l1-orbital.cjs": "sha256:2cc864c563ca816df4ccc01f651bd67fde8f29215b6670f8f8842b5d4f68445f",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:2d4d606e79985c175368bcb0d2a8429f9963962515a9175da7054ae5c9d5554d",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:9ef39bf53a66a5ddbcb79b34d0442c322aa2fc0e4edced3ec11394c7ae1de8dc",
    "packages/physics/src/earth/frame-of-date.cjs": "sha256:a06a089d35b82e97d6fa3ea9255c36aff4df0f6ea32182f009cd8dd8a648cdce",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
    "packages/reference/src/published-curves.cjs": "sha256:2cbc57757926f893fccf5df42ad52e76ee6d14c5b5cf0cc30daf5ce9d63ec318",
-   "public/input/astro-reference.json": "sha256:910e896e02467a495eeb80eb843666d95a8e00a2e70714b87e8e22edc13095b7",
-   "public/input/climate-formula-coefficients.json": "sha256:34b4ae964b514b31cc0fbe3403b05c50d0a5d5d8fc490c8b48eb42cad966323d",
+   "public/input/astro-reference.json": "sha256:dfa6049d8a2464eacfc60c90a915f7e57443051868848ef589ac81679fba50fb",
+   "public/input/climate-formula-coefficients.json": "sha256:761d73233316f4c76494575c03b976cf05f7a1640337df1a99ab0e5657de33a5",
    "tools/lib/deep-orbital-history.js": "sha256:965e2f2e8c1c27a3d36e70c3a66a80102cf655208b1b0729dcb9f7a857710385",
    "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
    "tools/verify/equinox-vs-vondrak.js": "sha256:cada313d44f72daa6f0d3fd4b83f813a59e7197b5ba5b84f9422b6fc200caba5"

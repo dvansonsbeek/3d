@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -61,7 +61,7 @@ camera were authored against. Every gated quantity is frame-invariant, so
 the `perihelion-at-sun` gate pins the convention against the frame's own
 columns (the measurement behind that gate: doc 111 §2).
 The frame bridge R = `computeSceneWorldFrameJ2000()` (`@essrt/physics`
-earth/frame-of-date — ONE home; browser `_kcR`, Node `_kcR`) maps every
+earth/frame-of-date — ONE home; browser `_chainR`, Node `_chainR`) maps every
 J2000-ecliptic vector to world, and every frame of date — Earth's axis, the
 sun plane, the Moon stack, the planets' poles, paths and markers — is placed
 from the engine through it (Part 5). No observable rides R: every physical
@@ -280,7 +280,7 @@ identical placement (`_applyEngineEarthFrame`). Since the certified Sun is
 defined over the whole ±500 Myr domain, the former 3,000–20,000-yr taper
 between "the TT-clock Sun" and "the UT scene" is gone: every body of date —
 Sun, axis, sun plane, Moon, planets — rides one clock, true TT. (The planets
-caught up in R9: until then `_kcElementsOfDate` and the Node `_kcHelioAU`
+caught up in R9: until then `_chainElementsOfDate` and the Node `_chainHelioAU`
 turned the scene's UT JD straight into the chain year, so the chain — a
 dynamical-time construct anchored at J2000.0 TT — lagged the Sun by ΔT of
 mean motion: Mercury 9″ at J2000, 0.8° at −500, 3.5° at −3000, an arbitrary
@@ -301,7 +301,7 @@ end to end — the scene consumes its output.
 **The chain frame bridge** (ecliptic-J2000 → scene world, the one rotation
 every chain planet, orbit ring, perihelion marker and Standard-Model ghost is
 placed through, and the frame the engine Earth frame is placed in; browser
-`_kcR`, Node `_kcR`, identical ops) is R = `computeSceneWorldFrameJ2000()`,
+`_chainR`, Node `_chainR`, identical ops) is R = `computeSceneWorldFrameJ2000()`,
 the J2000 ecliptic (Part 2) — a constant, nothing derived from a first
 frame's Sun, nothing to re-derive when the series artifact lands. What the
 landing block DOES do is request one paused frame (and drop the umbra tier's

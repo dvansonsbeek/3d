@@ -18,6 +18,7 @@
 import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { FITTED_COEFFICIENTS as _DT_FIT } from '@essrt/physics';   // plan 14: the ΔT anchor is the fit's own (FIT.DT_ANCHOR)
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 const require = createRequire(new URL('../../package.json', import.meta.url).pathname);
 const { moonSeriesExtensionDeg } = require('@essrt/physics/moon/series-extension');
@@ -25,7 +26,7 @@ const { createModel, DEFAULT_CONSTANTS: C } = require('@essrt/physics');
 
 const D2R = Math.PI / 180, AS = 3600, J2000 = 2451545.0;
 const model = createModel();
-const BRIDGE = C.earthOrbital.deltaTStart / 86400;
+const BRIDGE = _DT_FIT.DT_ANCHOR.deltaTStartSeconds / 86400;
 const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
 const N = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = (d) => ((((d + 540) % 360) + 360) % 360) - 180;

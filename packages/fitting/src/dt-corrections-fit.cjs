@@ -27,8 +27,9 @@
  *     Espenak-only selection degenerates)
  *   • --write ships atomically: data/deltaT-4flag-fit.json (flag coefficients
  *     + optimum + usno_anchor), data/core-mantle-resonator-stage1.json
- *     (resonator amplitudes; T₀/Q/epochs stay the convention), and
- *     public/input/astro-reference.json (deltaTStart, --sync-code). The
+ *     (resonator amplitudes; T₀/Q/epochs stay the convention); the anchor
+ *     deltaTStart ships INSIDE the fit artifact (optimum.deltaTStart, embedded
+ *     as FIT.DT_ANCHOR — plan 14: it no longer touches astro-reference.json). The
  *     engines read the JSONs directly; the website consumes the published
  *     packages — regenerate + republish @essrt/model-values after a refit
  *     (npm run values:package:write). Then re-run
@@ -74,10 +75,8 @@
  * absolute fit). Note the integrator master-gate: DT_CORRECTIONS_DISABLED=1
  * also removes the resonator from the model ΔT, so no extra env is needed.
  *
- * The --sync-code flag also updates the three code sites that hold the shipped
- * coefficients: src/script.js, tools/lib/deep-time.js, and the website
- * calculator's src/lib/orbital/deepTime.ts. Only run this after inspecting
- * the fit output.
+ * (The former --sync-code flag is gone with the astro-reference write: every
+ * consumer reads the embedded fit artifact through the generated constants.)
  *
  * KNOWN LIMITATION (H/5 baseline): The fit's inner `fitCycles()` subtracts a
  * polynomial trend (1 + t + t²) before fitting the harmonic components, so
@@ -118,58 +117,14 @@ const TOOLS_LIB = path.join(ROOT, 'tools', 'lib');
 // (a stack fitted on one engine, shipped on another, unseen for weeks).
 const { buildInputsBlock } = require(path.join(TOOLS_LIB, 'artifact-inputs.js'));
 
-// ─── Sync auto-optimum deltaTStart to public/input/astro-reference.json ─────
-// The JSON is the source of truth for that constant; Step 9 of the pipeline
-// (npm run constants:generate) then carries it from astro-reference.json into
-// the module src/script.js imports. One writer per value across the pipeline.
-// No-op when fit.optimum.deltaTStart is null (--fixed-anchors or DT flag
-// unset — the sweep was skipped and the previous JSON value stays).
-// Moved here from the deleted export-dt-corrections.js: this is the fitter's
-// own 3d-internal write, not website sync.
-const ASTRO_REFERENCE_PATH = path.join(ROOT, 'public', 'input', 'astro-reference.json');
-function syncAstroReference(fit, { dryRun = false } = {}) {
-  if (!fit.optimum || typeof fit.optimum.deltaTStart !== 'number') {
-    console.log('  → public/input/astro-reference.json  (auto-optimum not available, skipping)');
-    return 0;
-  }
-  if (!fs.existsSync(ASTRO_REFERENCE_PATH)) {
-    console.log('  → public/input/astro-reference.json  (not found, skipping)');
-    return 0;
-  }
-  console.log('  → public/input/astro-reference.json');
-  const raw = fs.readFileSync(ASTRO_REFERENCE_PATH, 'utf8');
-  const json = JSON.parse(raw);
-  const oldVal = json.earthOrbital && json.earthOrbital.deltaTStart;
-  const newVal = fit.optimum.deltaTStart;
-  if (typeof oldVal !== 'number') {
-    console.log('    (earthOrbital.deltaTStart not present or non-numeric — skipping)');
-    return 0;
-  }
-  if (Math.abs(oldVal - newVal) < 1e-9) {
-    console.log('    (already in sync: ' + oldVal + ')');
-    return 0;
-  }
-  console.log(`    deltaTStart: ${oldVal} → ${newVal}`);
-  if (dryRun) {
-    console.log('    1 change pending (dry run)');
-    return 1;
-  }
-  // Regex-patch the specific line so surrounding formatting is preserved.
-  const re = /("deltaTStart"\s*:\s*)(-?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)/;
-  const m = raw.match(re);
-  if (!m) {
-    console.log('    (deltaTStart line pattern not found — skipping)');
-    return 0;
-  }
-  const patched = raw.replace(re, `$1${newVal}`);
-  fs.writeFileSync(ASTRO_REFERENCE_PATH, patched);
-  console.log('    ✓ deltaTStart updated (propagates to script.js at pipeline Step 9)');
-  return 1;
-}
+// (Plan 14 step 1: the former syncAstroReference — the fitter's write of deltaTStart into
+// public/input/astro-reference.json — is gone. The anchor is the fit's output and lives in
+// this artifact's `optimum.deltaTStart`; the constants generator embeds it as
+// FIT.DT_ANCHOR.deltaTStartSeconds. astro-reference.json is an INPUT file the N-body node
+// hashes wholesale: writing a µs into it cost the 26-minute N-body re-stamp per re-close.)
 
 // ─── Guard: DT_CORRECTIONS_DISABLED must be set for --write ───
 const WRITE = process.argv.includes('--write');
-const SYNC_CODE = process.argv.includes('--sync-code');
 const FIXED_ANCHORS = process.argv.includes('--fixed-anchors');
 if (WRITE && process.env.DT_CORRECTIONS_DISABLED !== '1') {
   console.log('✗ REFUSING TO WRITE: DT_CORRECTIONS_DISABLED=1 is not set.');
@@ -333,8 +288,8 @@ if (process.env.DT_FIT_WINDOW) {
     console.error(`DT_FIT_WINDOW end (${end}) must exceed start (${start}).`);
     process.exit(1);
   }
-  if (process.argv.includes('--write') || process.argv.includes('--sync-code')) {
-    console.error('DT_FIT_WINDOW cannot be combined with --write/--sync-code: a stack');
+  if (process.argv.includes('--write')) {
+    console.error('DT_FIT_WINDOW cannot be combined with --write: a stack');
     console.error('fitted on a sub-window is a cross-validation artifact, not a shippable fit.');
     process.exit(1);
   }
@@ -367,8 +322,8 @@ if (process.env.DT_FLAGS) {
     console.error('DT_FLAGS: at least one flag required.');
     process.exit(1);
   }
-  if (process.argv.includes('--write') || process.argv.includes('--sync-code')) {
-    console.error('DT_FLAGS cannot be combined with --write/--sync-code: the ship path');
+  if (process.argv.includes('--write')) {
+    console.error('DT_FLAGS cannot be combined with --write: the ship path');
     console.error('assumes the full four-flag design matrix. Reduced fits are diagnostic.');
     process.exit(1);
   }
@@ -398,8 +353,8 @@ if (process.env.DT_RESONATOR_COMPONENTS !== undefined) {
     process.exit(1);
   }
   ACTIVE_RES = _ALL_RES.filter(f => want.includes(f));
-  if (process.argv.includes('--write') || process.argv.includes('--sync-code')) {
-    console.error('DT_RESONATOR_COMPONENTS cannot be combined with --write/--sync-code: the ship');
+  if (process.argv.includes('--write')) {
+    console.error('DT_RESONATOR_COMPONENTS cannot be combined with --write: the ship');
     console.error('path writes all three swing components by index. Reduced fits are diagnostic.');
     process.exit(1);
   }
@@ -1385,9 +1340,9 @@ function main() {
     collinearity_warnings: warnings,
     optimum: (effectiveDeltaTStart !== null) ? {
       // Joint-optimum values selected by findJointOptimum() against the
-      // ESPENAK_REFERENCE year list. With --sync-code, deltaTStart is written
-      // to astro-reference.json (syncAstroReference above) and reaches
-      // src/script.js via pipeline Step 9; usno_target_lod_s stays inside the
+      // ESPENAK_REFERENCE year list. deltaTStart ships HERE (plan 14: the fit's
+      // own artifact, embedded as FIT.DT_ANCHOR.deltaTStartSeconds — never
+      // written into astro-reference.json); usno_target_lod_s stays inside the
       // fit config (JSON).
       usno_target_lod_s: effectiveUsnoTarget,
       deltaTStart:       effectiveDeltaTStart,
@@ -1476,21 +1431,14 @@ function main() {
     const outPath = path.join(ROOT, 'data', 'deltaT-4flag-fit.json');
     fs.writeFileSync(outPath, JSON.stringify(output, null, 2) + '\n');
     console.log(`  ✓ Written to ${outPath}`);
-    if (SYNC_CODE) {
-      // deltaTStart (auto-optimum) → public/input/astro-reference.json — the
-      // single writer for that value; pipeline Step 9 (constants:generate)
-      // carries it into the module src/script.js imports. INLINED from the
-      // deleted export-dt-corrections.js. The coefficient consts need no code
-      // sync — src/script.js and tools/lib/deep-time.js read the JSONs
-      // directly. The WEBSITE consumes the published @essrt packages; a
-      // refit reaches it via values:package:write + republish, deliberately
-      // manual: a fitter must not publish across a repo boundary as a side
-      // effect of --write.
-      syncAstroReference(output, { dryRun: false });
-      console.log('  → website: regenerate + republish @essrt/model-values (npm run values:package:write)');
-    } else {
-      console.log('  (JSON only. Add --sync-code to also update astro-reference.json deltaTStart.)');
-    }
+    // Plan 14 step 1: deltaTStart is the fit's OUTPUT and lives HERE (optimum.deltaTStart),
+    // embedded by constants:generate as FIT.DT_ANCHOR.deltaTStartSeconds. The former
+    // --sync-code write into public/input/astro-reference.json is gone: that file is an
+    // INPUT the N-body node hashes wholesale, so a µs move of the anchor cost the 26-min
+    // re-stamp. The WEBSITE consumes the published @essrt packages; a refit reaches it via
+    // values:package:write + republish, deliberately manual: a fitter must not publish
+    // across a repo boundary as a side effect of --write.
+    console.log('  → then: npm run regen:cascade -- --run (constants LAST), npm run values:package:write, republish @essrt/model-values');
   } else {
     console.log('  (dry run — add --write to persist to data/deltaT-4flag-fit.json)');
   }
@@ -1907,13 +1855,11 @@ function runJointMode() {
   rb.status = ('JOINT WORLD SHIPPED (--joint --write): the two impulse kicks from the joint '
     + 'equality-constrained fit, the drive tone retired at amplitude 0 (plan 06 D7 follow-up); '
     + 'phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.');
-  // astro-reference deltaTStart FIRST (single source; constants:generate
-  // propagates) — the two governed artifacts below hash it as written.
-  const arPath = path.join(ROOT, 'public', 'input', 'astro-reference.json');
-  const ar = JSON.parse(fs.readFileSync(arPath, 'utf8'));
-  ar.earthOrbital.deltaTStart = best.dts;
-  fs.writeFileSync(arPath, JSON.stringify(ar, null, 2) + '\n');
-  console.log(`  ✓ wrote ${arPath} (deltaTStart = ${best.dts.toFixed(4)})`);
+  // Plan 14 step 1: the anchor deltaTStart is NOT written into astro-reference.json any more
+  // (an input file the N-body node hashes wholesale — a µs move cost the 26-min re-stamp). It
+  // ships in this artifact's `optimum.deltaTStart` (below) and reaches every runtime as
+  // FIT.DT_ANCHOR.deltaTStartSeconds through constants:generate.
+  console.log(`  deltaTStart = ${best.dts.toFixed(4)} s (ships inside data/deltaT-4flag-fit.json → FIT.DT_ANCHOR)`);
 
   // ── GOVERNANCE (plan 12 §1b close-out) ──────────────────────────────────
   // The inputs block: the data the fit reads (Stephenson 2016, the GIA τ,

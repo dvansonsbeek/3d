@@ -16,5 +16,8 @@ const DAYS_PER_JULIAN_YEAR = 365.25;
 const JULIAN_CENTURY_DAYS = 36525;
 /** The Julian year, SI seconds. */
 const SECONDS_PER_JULIAN_YEAR = DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY;
+/** J2000.0 — 2000 Jan 1.5 TT as a Julian Day (plan 14 step 2: ONE home; it had been
+ *  declared locally in model.js, keplerian-chain.cjs, tools/lib/constants.js and three gates). */
+const J2000_JD = 2451545.0;
 
-module.exports = { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, SECONDS_PER_JULIAN_YEAR };
+module.exports = { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, SECONDS_PER_JULIAN_YEAR, J2000_JD };

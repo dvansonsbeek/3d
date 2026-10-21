@@ -120,7 +120,8 @@ const MIGRATED = [
   'astro.earthOrbital.juneSolstice2000_JD',
   // (plan 09 step 6: earthInclinationCycleAnchor — the retired eccentricity law's 21.77° — left the inputs;
   //  the scene's K-device inclination phase at J2000 is the recorded pose kDeviceInclinationPhaseJ2000Deg)
-  'astro.earthOrbital.deltaTStart',
+  // (plan 14 step 1: deltaTStart left astro-reference — it is the joint fit's OUTPUT and
+  //  lives in data/deltaT-4flag-fit.json, embedded as FIT.DT_ANCHOR.deltaTStartSeconds)
   'astro.earthOrbital.sunTilt',
 
   // The three ELP W1 T^2 terms script.js actually consumes. The other three in

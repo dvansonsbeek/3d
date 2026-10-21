@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -227,7 +227,7 @@ heliocentricLatitude(i_deg, omega_deg, nu_deg)
 ### 3.1 Dynamic Inclination to Invariable Plane
 
 A planet's inclination to the invariable plane of date is the N-body
-chain's element (`_kcElementsOfDate(k, jd).inclInvPlaneDeg`). The former
+chain's element (`_chainElementsOfDate(k, jd).inclInvPlaneDeg`). The former
 ψ-law `i(t) = i_mean + A·cos(ω̃_ICRF(t) − cycleAnchor)` —
 `computePlanetInvPlaneInclinationDynamic`, phased at the balanced year — is
 deleted with its inputs (plan 07 R5/R9; doc 109 is the evidence record).
@@ -252,7 +252,7 @@ i_app = arccos(n_ecl · n_planet)
 
 **Implementation (`src/script.js`):**
 - Function: `updateDynamicInclinations()`
-- One value per planet (plan 07 R5): `o.{planet}EclipticInclinationDynamic` — the chain's own orbit plane (`inclEclipticDeg`, `ascNodeEclipticDeg`) against the engine Earth-orbit normal of date (`_kcEarthEngineOrbitNormalJ2000`), both in the J2000 ecliptic frame. At J2000 it equals the chain's `inclEclipticDeg`; away from it, it is the mutual inclination of the two planes of date. (The former second version on the Souami & Souchay device nodes left with the device.)
+- One value per planet (plan 07 R5): `o.{planet}EclipticInclinationDynamic` — the chain's own orbit plane (`inclEclipticDeg`, `ascNodeEclipticDeg`) against the engine Earth-orbit normal of date (`_chainEarthEngineOrbitNormalJ2000`), both in the J2000 ecliptic frame. At J2000 it equals the chain's `inclEclipticDeg`; away from it, it is the mutual inclination of the two planes of date. (The former second version on the Souami & Souchay device nodes left with the device.)
 
 ### 3.3 Earth Inclination to the Invariable Plane
 

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -18,7 +18,7 @@ is retired).
 
 The planet panels show the **chain's** secular-shape attribution (base
 mode / largest companion / remainder with % shares, plus the rate of
-date — read live from the governed element chain via `_kcSecularShape`).
+date — read live from the governed element chain via `_chainSecularShape`).
 The first-order Laplace–Lagrange breakdown in this document is the
 educational reference for the underlying physics, not a shipped display.
 

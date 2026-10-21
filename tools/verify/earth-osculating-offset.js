@@ -60,7 +60,7 @@ async function derive() {
   const KC = require(path.join(ROOT, 'tools', 'lib', 'keplerian-chain.js'));
   const { CHAIN_ARTIFACT } = require(path.join(ROOT, 'packages', 'physics', 'src', 'planets', 'chain-artifact.js'));
   const chains = KC.buildPlanetChainsFromArtifact ? KC.buildPlanetChainsFromArtifact(CHAIN_ARTIFACT) : KC.buildPlanetChains(CHAIN_ARTIFACT);
-  const DAY = 86400, R2D = 180 / Math.PI, AS = 3600, J2000 = 2451545.0;
+  const DAY = 86400, R2D = 180 / Math.PI, AS = 3600, J2000 = require('@essrt/physics/constants/units').J2000_JD;   // ONE home (plan 14 step 2)
   const bodies = ['sun', ...NAMES];
   const gms = bodies.map((b) => (b === 'sun' ? GM_SUN : gmOf(b)));
   const n = bodies.length;

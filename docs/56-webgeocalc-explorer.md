@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -31,7 +31,7 @@ The main result. `ϖ = Ω + ω` is the angle between the vernal equinox and the 
 
 The chart plots the unwrapped `ϖ(t)` values directly (so a monotonic precession shows as a straight line even though `ϖ` wraps every 360°). A linear regression is fit through the data and the slope is reported in `″/cy`. For planets with resolvable trends, both a raw-OLS rate and a sin+lin rate (linear + sinusoid model, removes the dominant oscillation) are reported; they should agree closely.
 
-**Overlaid in red**: the model's own `ϖ(t)` — the N-body chain's longitude of perihelion of date in the plotted ECLIPJ2000 frame (`wgcModelCurves` → `_kcPerihelionEclLonDeg`), unwrapped and branch-aligned to the observed series' start. When the red and blue curves overlap, the model reproduces the observation.
+**Overlaid in red**: the model's own `ϖ(t)` — the N-body chain's longitude of perihelion of date in the plotted ECLIPJ2000 frame (`wgcModelCurves` → `_chainPerihelionEclLonDeg`), unwrapped and branch-aligned to the observed series' start. When the red and blue curves overlap, the model reproduces the observation.
 
 ### 2. Ascending Node — `Ω` (collapsible)
 
@@ -62,7 +62,7 @@ The five un-determined planets (Venus, Jupiter, Saturn, Uranus, Neptune) fall in
 
 ## Frame note
 
-All three angles are measured in **ECLIPJ2000** — Earth's mean ecliptic and equinox of J2000, a FIXED frame. The WebGeoCalc queries request it (`tools/lib/webgeocalc-client.js`, `referenceFrame = 'ECLIPJ2000'`; every cached entry carries it) and the model overlay reads the chain's J2000-frame ϖ (`_kcPerihelionEclLonDeg`). Rates in this frame are therefore already star-referenced: no general-precession term enters the comparison. The same motion referred to the moving equinox of date runs faster by the general precession, to first order (the ecliptic's own slow turn aside):
+All three angles are measured in **ECLIPJ2000** — Earth's mean ecliptic and equinox of J2000, a FIXED frame. The WebGeoCalc queries request it (`tools/lib/webgeocalc-client.js`, `referenceFrame = 'ECLIPJ2000'`; every cached entry carries it) and the model overlay reads the chain's J2000-frame ϖ (`_chainPerihelionEclLonDeg`). Rates in this frame are therefore already star-referenced: no general-precession term enters the comparison. The same motion referred to the moving equinox of date runs faster by the general precession, to first order (the ecliptic's own slow turn aside):
 
 ```
 ω_of-date ≈ ω_ECLIPJ2000 + p_A          (p_A = 50.288 ″/yr, the IAU 2006 general precession, the model's J2000 input)
@@ -133,7 +133,7 @@ Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON fro
 
 ## Model comparison logic
 
-For the model overlay, the Explorer samples the chain's longitude of perihelion of date at each observed timestamp (`wgcModelCurves` → `_kcPerihelionEclLonDeg`, ECLIPJ2000 — the plotted frame), unwraps the series, and aligns its 360° branch to the observed series' start. The model's `ϖ(t)` can thus be compared pointwise to the observed curve, not just through a single slope number.
+For the model overlay, the Explorer samples the chain's longitude of perihelion of date at each observed timestamp (`wgcModelCurves` → `_chainPerihelionEclLonDeg`, ECLIPJ2000 — the plotted frame), unwraps the series, and aligns its 360° branch to the observed series' start. The model's `ϖ(t)` can thus be compared pointwise to the observed curve, not just through a single slope number.
 
 The summary block above the chart reports the chain's 1800–2100 window rate split as **Newtonian + relativistic (1PN)** — the relativistic share is derived from the model's constants, not fitted. Nothing on the model side is calibrated to the observations; the retired lattice's divisor labels are kept in [doc 109 §9](109-model-nbody-engine-and-lattice-test.md) as window-epoch descriptors of the record.
 

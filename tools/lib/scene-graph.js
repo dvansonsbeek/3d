@@ -242,7 +242,7 @@ function _jdTTToolsFromUT(jd) {
 }
 /** deltaTStart — the ΔT trend anchor at J2000 (astro-reference earthOrbital),
  *  read from the package constants (the one home every runtime shares). */
-const _TT_BRIDGE_SECONDS = _req('@essrt/physics').DEFAULT_CONSTANTS.earthOrbital.deltaTStart;
+const _TT_BRIDGE_SECONDS = _req('@essrt/physics').FITTED_COEFFICIENTS.DT_ANCHOR.deltaTStartSeconds;   // plan 14: the fit's own artifact
 /** The finder-axis JD for a true-UT JD (the package's finder-axis APIs add the
  *  curve themselves; the bridge is the caller's — mirror of the besselian's jb). */
 function _finderAxisJdTools(jdUT) { return jdUT + _TT_BRIDGE_SECONDS / 86400; }
@@ -784,7 +784,7 @@ function buildSceneGraph() {
     // (recorded period 25,793.6 yr, tilt earthtiltMean) no longer turns this
     // node: its rotation axis is ENGINE-PLACED every call (R4), so the def's
     // tilt and speed are the rest pose only, zero. The world frame is the
-    // J2000 ecliptic (_kcR, @essrt/physics computeSceneWorldFrameJ2000).
+    // J2000 ecliptic (_chainR, @essrt/physics computeSceneWorldFrameJ2000).
     tilt: 0,
     startPos: 0,
     speed: 0,
@@ -1003,7 +1003,7 @@ function buildSceneGraph() {
 // two-normal device form (orbital-engine computeEclipticInclinationFromBalanced)
 // — stood here. It fed only the planet containers' tilt in moveModel, which
 // the K5 excision left rendered-dead: Node planet positions are
-// sun + 100·R·_kcHelioAU, never a container rotation. Deleted with the law.)
+// sun + 100·R·_chainHelioAU, never a container rotation. Deleted with the law.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MOVE MODEL — Update all rotations/positions for a given pos
@@ -1302,19 +1302,19 @@ function _invalidateGraph() {
 // fitted stack were EXCISED with K5.
 // R — the scene's world frame (plan 11 step 4): the J2000 ecliptic, ONE home
 // @essrt/physics earth/frame-of-date (the K-device pose it was derived from
-// is deleted; see _kcFrameR below).
-let _kcModule = null, _kcChains = null;
-const _kcR = _req('@essrt/physics/earth/frame-of-date').computeSceneWorldFrameJ2000();
-function _kc() { if (!_kcModule) _kcModule = require('./keplerian-chain.js'); return _kcModule; }
-function _kcHelioAU(target, jd) {
+// is deleted; see _chainFrameR below).
+let _chainModule = null, _chainChains = null;
+const _chainR = _req('@essrt/physics/earth/frame-of-date').computeSceneWorldFrameJ2000();
+function _kc() { if (!_chainModule) _chainModule = require('./keplerian-chain.js'); return _chainModule; }
+function _chainHelioAU(target, jd) {
   const KCm = _kc();
-  if (!_kcChains) _kcChains = KCm.buildPlanetChainsFromArtifact();
+  if (!_chainChains) _chainChains = KCm.buildPlanetChainsFromArtifact();
   // R9: the chain's argument is dynamical time — the ONE engine year (true
   // TT, Julian from J2000.0 TT = the KC anchor; browser twin
-  // _kcElementsOfDate identical). At UT the planets lagged the Sun by ΔT of
+  // _chainElementsOfDate identical). At UT the planets lagged the Sun by ΔT of
   // mean motion (Mercury 9″ at 2000, 0.8° at −500).
   const year = _osmYearForJD(jd);
-  let el = KCm.computePlanetElementsAtYear(year, _kcChains[target], _kcChains);
+  let el = KCm.computePlanetElementsAtYear(year, _chainChains[target], _chainChains);
   // D5/one-source: beyond a planet's measured handover boundary the secular
   // elements substitute from the banked engine series (the SAME
   // @essrt/physics module the browser runs — cross-engine parity); inside
@@ -1342,7 +1342,7 @@ function _kcHelioAU(target, jd) {
 // docs/41. Everything of date is placed from the engine THROUGH R by
 // _applyEngineEarthFrame, so every physical reading, taken in the placed Earth
 // frame, is R-invariant; only the view is R.
-function _kcFrameR() { return _kcR; }
+function _chainFrameR() { return _chainR; }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // R4 — THE EARTH FRAME FROM THE ENGINE (plan 06; mirror of src/script.js
@@ -1368,7 +1368,7 @@ function _kcFrameR() { return _kcR; }
 // ═══════════════════════════════════════════════════════════════════════════
 const _FRAME = _req('@essrt/physics/earth/frame-of-date');
 function _applyEngineEarthFrame(graph, jdUT) {
-  const R = _kcFrameR();
+  const R = _chainFrameR();
   // The sampler's time coordinate is JULIAN years from J2000 TT (t = 0 at JD
   // 2451545.0 — the anchor elements; the chain planets use the same mapping).
   // NOT the scene's SI-year counter (_jdToSIyearTools: startmodel origin,
@@ -1421,7 +1421,7 @@ function _applyEngineEarthFrame(graph, jdUT) {
   graph.sunNodes.orbit.ry = _FRAME.solveWheelAngleForLongitude(lam, smp.e, peri);
   // the axis
   graph.earthNodes.rotAxis.worldRotOverride = [cross(s, g), s, g];
-  // the planets' poles (plan 11 step 3; mirror src/script.js _kcPlacePlanetPole):
+  // the planets' poles (plan 11 step 3; mirror src/script.js _chainPlacePlanetPole):
   // each chain planet's rotation axis takes [X = ŝ × ĝₚ, Y = ŝ, Z = ĝₚ] with
   // ŝ(t) the spin channel's pole of date and ĝₚ = unit(ŝ × n̂) the planet's
   // own equinox on its orbit plane of date, both through the frame bridge —
@@ -1472,7 +1472,7 @@ function computePlanetPosition(target, jd) {
     // decoding exactly as motion × delay): re-evaluate the planet at
     // jd − τ, τ = geocentric distance / c — c and AU from the model's
     // single homes. Proper physics, not a correction fit.
-    const R = _kcR;
+    const R = _chainR;
     const sun = graph.sunNodes.pivot.getWorldPosition();
     const earthW = graph.earthNodes.rotAxis.getWorldPosition();
     const toWorld = (hv) => [
@@ -1480,10 +1480,10 @@ function computePlanetPosition(target, jd) {
       sun[1] + 100 * (R[1][0] * hv[0] + R[1][1] * hv[1] + R[1][2] * hv[2]),
       sun[2] + 100 * (R[2][0] * hv[0] + R[2][1] * hv[1] + R[2][2] * hv[2]),
     ];
-    const wp = toWorld(_kcHelioAU(target, jd));
+    const wp = toWorld(_chainHelioAU(target, jd));
     const dKm = Math.hypot(wp[0] - earthW[0], wp[1] - earthW[1], wp[2] - earthW[2]) / 100 * C.currentAUDistance;
     const tauDays = dKm / C.speedOfLight / 86400;
-    targetWP = toWorld(_kcHelioAU(target, jd - tauDays));
+    targetWP = toWorld(_chainHelioAU(target, jd - tauDays));
   }
 
   // Get Sun world position for sun distance
@@ -1723,8 +1723,8 @@ module.exports = {
   Node,
   cartesianToSpherical,
   _getGraphForProbe: () => getGraph(),   // research probes: the internal graph AFTER a computePlanetPosition call
-  _injectKeplerChains: (chains) => { _kcChains = chains; },   // research probes (K4.5 acceptance): override the flag path's chains (null → reload from the artifact)
-  _kcDebugR: () => _kcR,   // research probes (K4b parity): the J2000 pose bridge (R4: the one frame)
+  _injectKeplerChains: (chains) => { _chainChains = chains; },   // research probes (K4.5 acceptance): override the flag path's chains (null → reload from the artifact)
+  _chainDebugR: () => _chainR,   // research probes (K4b parity): the J2000 pose bridge (R4: the one frame)
   _moonSeriesForProbe: () => _moonSeriesM(),   // research probes: the shared Meeus series (incl. the truncated eclipse-finder forms)
   _moonArgsForProbe: () => _moonArgsM(),   // research probes (plan 06 R5, the Moon twin split): this engine's argument factory
   _moonChainForProbe: () => ({ tropical: _mcTropical, apsidalOfDate: _mcApsidalOfDate, nodalOfDate: _mcNodalOfDate, epsDeg: (y) => _oneSourceM().epsDeg(y) }),   // research probes: the injected chain wrappers

@@ -55,7 +55,7 @@ const D2R = Math.PI / 180;
 // linear-vs-calendar JD→year trap), never a hand-made offset; a half-day
 // slip is 2° of Mercury mean longitude.
 const ANCHOR_EPOCH_YEAR = 2000;
-const ANCHOR_EPOCH_JD = 2451545.0;
+const ANCHOR_EPOCH_JD = require('../constants/units.cjs').J2000_JD;   // ONE home (plan 14 step 2); export name kept
 
 /** Full osculating elements from a heliocentric ecliptic-J2000 state vector.
  *  @param {number[]} rKm  heliocentric position, km

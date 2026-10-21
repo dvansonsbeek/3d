@@ -104,7 +104,7 @@ let   MOON_ARGS_FRAMEWORK_NATIVE = true;       // Framework-native lunar argumen
 // earth/frame-of-date — ONE home for both twins; the equinox along world +X,
 // this bundle's own pose at J2000 measured at 90.0066° with 0.026° of pole
 // tilt, both dropped; step 4 had shipped the Node twin's 158.2265° and turned
-// this world 68.2° against its skydome). The frame bridge _kcR is that matrix; every frame of
+// this world 68.2° against its skydome). The frame bridge _chainR is that matrix; every frame of
 // date — Earth's axis, the sun plane, the Moon stack, the planets' poles and
 // paths — is placed from the engine through it (_applyEngineEarthFrame), so no
 // observable rides it. Two display literals remain, the exact former products:
@@ -128,7 +128,7 @@ let   currentAUDistance = K.physicalConstants.currentAUDistance;  // 1 AU in km 
 const AU_J2000_KM = currentAUDistance;                    // J2000 reference snapshot — used as a frozen anchor for physical constants (GM_SUN, masses) and Driver 2 evolution formula
 const speedOfLight = K.physicalConstants.speedOfLight;    // Speed of light in km/s (CODATA)
 const perihelionalignmentYear = K.earthOrbital.perihelionalignmentYear;  // Year when perihelion longitude = 90° (Meeus)
-const deltaTStart = K.earthOrbital.deltaTStart;                       // Delta-T at model epoch (seconds) — joint-world optimum (dt-corrections-fit.js --joint --write) with hard USNO closure 86400.0021 s; Espenak RMS 13.4 s across 20 reference years 1650-2017, Stephenson full-window 28.8 s. Distinct from IERS instantaneous ~63.6 s (~8.4-s trend/instantaneous offset). Moves atomically with the fit coefficients.
+const deltaTStart = FIT.DT_ANCHOR.deltaTStartSeconds;                 // Delta-T at model epoch (seconds) — the joint fit's own artifact (plan 14); joint-world optimum (dt-corrections-fit.js --joint --write) with hard USNO closure 86400.0021 s; Espenak RMS 13.4 s across 20 reference years 1650-2017, Stephenson full-window 28.8 s. Distinct from IERS instantaneous ~63.6 s (~8.4-s trend/instantaneous offset). Moves atomically with the fit coefficients.
 
 
 // ─── E1. Early derived (needed before ASTRO_REFERENCE) ───────────────────
@@ -138,17 +138,17 @@ const deltaTStart = K.earthOrbital.deltaTStart;                       // Delta-T
 // perihelion-of-date period is the lunisolar surface's T_peri,
 // _periOfDatePeriodYearsJ2000() / lunisolar.periOfDatePeriodYearsAtYear.
 let   meansolaryearlengthinDays = computeMeanTropicalYearJ2000Days(K.yearLengthRef.siderealYear, K.earthOrbital.generalPrecessionJ2000_arcsecPerYr);  // Phase 1: mutable for deep-time mode
-const _kcWinN = (k) => CHAIN_ARTIFACT.windowElementRates[k].meanMotionDegPerYr;  // the chain's fitted era-window mean motion (deg per Julian year; engine-D, 1800–2100) — the era evaluator's element rate. NOT the panels' period source since C1: a 300-yr window fit absorbs local inequality slope into this term (Neptune −497 ppm vs the secular rate); the period rows ride the banked λ̇ channel (_kcNOfDate), and this remains only its stale-artifact fallback
+const _chainWinN = (k) => CHAIN_ARTIFACT.windowElementRates[k].meanMotionDegPerYr;  // the chain's fitted era-window mean motion (deg per Julian year; engine-D, 1800–2100) — the era evaluator's element rate. NOT the panels' period source since C1: a 300-yr window fit absorbs local inequality slope into this term (Neptune −497 ppm vs the secular rate); the period rows ride the banked λ̇ channel (_chainNOfDate), and this remains only its stale-artifact fallback
 // ORBIT-tab element accessor (plan 02 §11 item 2): the chain's osculating
 // elements of date, memoized per (planet, JD) so one panel refresh
 // evaluates the chain once per planet, not once per row. Resolves
-// _kcElementsOfDate and o at CALL time (both defined later in module
+// _chainElementsOfDate and o at CALL time (both defined later in module
 // scope; panel closures run post-init).
-let _kcOrbElCache = { key: '', el: null };
-const _kcOrbEl = (k) => {
+let _chainOrbElCache = { key: '', el: null };
+const _chainOrbEl = (k) => {
   const key = k + ':' + o.julianDay;
-  if (_kcOrbElCache.key !== key) _kcOrbElCache = { key, el: _kcElementsOfDate(k, o.julianDay) };
-  return _kcOrbElCache.el;
+  if (_chainOrbElCache.key !== key) _chainOrbElCache = { key, el: _chainElementsOfDate(k, o.julianDay) };
+  return _chainOrbElCache.el;
 };
 // ── C1 (plan 02 §11): the planets' two-tier mean motion OF DATE,
 // mirroring Earth's shipped sidereal-year channel exactly:
@@ -165,12 +165,12 @@ const _kcOrbEl = (k) => {
 // All three ≡ 1 at J2000. The retired K-device H·mSY scaling mixed the
 // recession driver into an orbital quantity (the driver-separation
 // finding); stale-artifact fallbacks: λ̇₀ → the chain winN, lamRel → 1.
-let _kcMassLossJ2000S = 0;
-function _kcMassLossPeriodRatio(year) {
-  if (!_kcMassLossJ2000S) _kcMassLossJ2000S = meanSiderealYearSecondsAtAge((startmodelYear - 2000) / 1e6);
-  return meanSiderealYearSecondsAtAge((startmodelYear - year) / 1e6) / _kcMassLossJ2000S;
+let _chainMassLossJ2000S = 0;
+function _chainMassLossPeriodRatio(year) {
+  if (!_chainMassLossJ2000S) _chainMassLossJ2000S = meanSiderealYearSecondsAtAge((startmodelYear - 2000) / 1e6);
+  return meanSiderealYearSecondsAtAge((startmodelYear - year) / 1e6) / _chainMassLossJ2000S;
 }
-function _kcLamRel(k, year) {
+function _chainLamRel(k, year) {
   const A = _planetSeriesData;
   const B = A && A.bodies[k];
   if (!B || !B.lamDotRel) return 1;
@@ -179,23 +179,23 @@ function _kcLamRel(k, year) {
   const i = Math.max(0, Math.min(B.lamDotRel.length - 2, Math.floor(x))), f = x - i;
   return B.lamDotRel[i] * (1 - f) + B.lamDotRel[i + 1] * f;
 }
-function _kcLamDot0(k) {
+function _chainLamDot0(k) {
   if (k === 'earth') {
     // Earth's λ̇₀ DERIVES from the certified IAU anchor, never the dump
     // absolute: the run's absolute λ̇ carries a ~1e-7 seed-class offset
     // vs the anchor (~3 s on the sidereal year) — D6 banks a RATIO for
     // exactly this reason. Zero literals: 360°·(Julian yr in s)/anchor.
-    _kcMassLossPeriodRatio(2000);   // primes the J2000-seconds memo
-    return 360 * DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY / _kcMassLossJ2000S;
+    _chainMassLossPeriodRatio(2000);   // primes the J2000-seconds memo
+    return 360 * DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY / _chainMassLossJ2000S;
   }
   const A = _planetSeriesData;
   if (A && A.verdict) {
     const v = A.verdict.planetLamDot;
     if (v) { const r = v.rows.find((row) => row.body === k); if (r) return r.lamDotJ2000DegPerYr; }
   }
-  return _kcWinN(k);
+  return _chainWinN(k);
 }
-function _kcNOfDate(k, year) { return _kcLamDot0(k) * _kcLamRel(k, year) / _kcMassLossPeriodRatio(year); }
+function _chainNOfDate(k, year) { return _chainLamDot0(k) * _chainLamRel(k, year) / _chainMassLossPeriodRatio(year); }
 const j2000JD = K.timeReference.j2000JD;                    // Standard J2000.0 epoch: Jan 1.5, 2000 TT (JD 2451545.0)
 const julianCenturyDays = K.timeReference.julianCenturyDays; // IAU Julian century (365.25 × 100 days)
 const tropicalCenturyDays = 100 * meansolaryearlengthinDays;  // 100 model tropical years
@@ -276,7 +276,7 @@ const BOND_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;  
 // ─── A4. Planet input constants ──────────────────────────────────────────
 // Per-planet J2000 orbital elements and the chain's perihelion precession
 // periods; the chain places every rendered planet quantity and
-// _kcPlacePlanetPole each planet's axis.
+// _chainPlacePlanetPole each planet's axis.
 // Source: public/input/astro-reference.json
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -1113,7 +1113,7 @@ const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s
 
 // ─── E2c. (the ψ inclination law and its per-planet loop are DELETED, plan 07
 // R5 — a planet's inclination of date has one home, the N-body chain,
-// _kcElementsOfDate; the SYSTEM/ALONE mass convention is doc 24's) ──────────
+// _chainElementsOfDate; the SYSTEM/ALONE mass convention is doc 24's) ──────────
 
 // ─── E2d. Wobble periods, obliquity cycles, and K-derived eccentricity ──
 // Moved here (before scene geometry) so orbitalEccentricityBase is available
@@ -1161,7 +1161,7 @@ const uranusObliquityMean  = calcObliquityMean('uranus');
 const neptuneObliquityMean = calcObliquityMean('neptune');
 
 // The K-derived eccentricity parameters are RETIRED (plan 07 R6); a planet's
-// eccentricity of date has ONE home, the chain: `_kcElementsOfDate(key, jd).e`.
+// eccentricity of date has ONE home, the chain: `_chainElementsOfDate(key, jd).e`.
 
 // ─── E3. Orbital formulas ───────────────────────────────────────────────
 // Pure helper functions for orbital mechanics. No model-specific state.
@@ -4354,7 +4354,7 @@ if (typeof window !== 'undefined') {
       forceSceneUpdate('light');
       const out = {};
       for (const p of tracePlanets) {
-        if (_KC_PLANET_NAMES.has(p.name)) out[p.name] = { ra: p.ra, dec: p.dec, distAU: p.distAU };
+        if (_CHAIN_PLANET_NAMES.has(p.name)) out[p.name] = { ra: p.ra, dec: p.dec, distAU: p.distAU };
       }
       jumpToJulianDay(savedJD);
       forceSceneUpdate('light');
@@ -4445,16 +4445,16 @@ if (typeof window !== 'undefined') {
         // corrected helio vectors) vs the scene's sun-plane normal; must
         // equal the true MUTUAL inclination planet-vs-Earth-engine.
         planets: Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter'].map((nm) => {
-          const el = _kcElementsOfDate(nm, jd);
+          const el = _chainElementsOfDate(nm, jd);
           const pDays = DAYS_PER_JULIAN_YEAR * Math.pow(el.aAU, 1.5);
-          const h0 = _kcHelioAU(nm, jd), h1 = _kcHelioAU(nm, jd + pDays / 4), h2 = _kcHelioAU(nm, jd + pDays / 2);
+          const h0 = _chainHelioAU(nm, jd), h1 = _chainHelioAU(nm, jd + pDays / 4), h2 = _chainHelioAU(nm, jd + pDays / 2);
           const v1 = [h1[0] - h0[0], h1[1] - h0[1], h1[2] - h0[2]];
           const v2 = [h2[0] - h0[0], h2[1] - h0[1], h2[2] - h0[2]];
           let nn = [v1[1] * v2[2] - v1[2] * v2[1], v1[2] * v2[0] - v1[0] * v2[2], v1[0] * v2[1] - v1[1] * v2[0]];
           const nl = Math.hypot(nn[0], nn[1], nn[2]); nn = [nn[0] / nl, nn[1] / nl, nn[2] / nl];
           // scene plane normal pulled into helio-J2000: Rᵀ · world-Y-of-barycenter
           const nsW = new THREE.Vector3(0, 1, 0).applyQuaternion(barycenterEarthAndSun.pivotObj.getWorldQuaternion(new THREE.Quaternion())).normalize();
-          const R = _kcR;
+          const R = _chainR;
           const nsH = [R[0][0] * nsW.x + R[1][0] * nsW.y + R[2][0] * nsW.z,
                        R[0][1] * nsW.x + R[1][1] * nsW.y + R[2][1] * nsW.z,
                        R[0][2] * nsW.x + R[1][2] * nsW.y + R[2][2] * nsW.z];
@@ -4512,11 +4512,11 @@ if (typeof window !== 'undefined') {
     })[k],
     // The planets' eccentricity of date is the chain's;
     // the probe reads it through the deep calendar's year→JD, and
-    // _kcElementsOfDate resolves the engine year (true TT) internally (R4b).
-    planetEccAt: (k, year) => _kcElementsOfDate(k, yearToJD(year)).e,
+    // _chainElementsOfDate resolves the engine year (true TT) internally (R4b).
+    planetEccAt: (k, year) => _chainElementsOfDate(k, yearToJD(year)).e,
     planetObliquityAt: (k, year) => computePlanetObliquity(k, year),
     // The chain's inclination of date to the engine's own invariable plane.
-    planetInvPlaneInclAt: (k, year) => _kcElementsOfDate(k, yearToJD(year)).inclInvPlaneDeg,
+    planetInvPlaneInclAt: (k, year) => _chainElementsOfDate(k, yearToJD(year)).inclInvPlaneDeg,
     planetCyclesBetween: (k, yearA, yearB) => ({
       mercury: meanMercuryOrbitalCyclesBetween, venus: meanVenusOrbitalCyclesBetween,
       mars: meanMarsOrbitalCyclesBetween, jupiter: meanJupiterOrbitalCyclesBetween,
@@ -4526,7 +4526,7 @@ if (typeof window !== 'undefined') {
     // The planet's ecliptic ascending node of date is the chain's element (the
     // ζ-vector secular skeleton + derived terms, J2000 ecliptic) — the value
     // updateAscendingNodes writes to o.<planet>AscendingNode.
-    planetAscNodeEclAt: (k, year) => _kcElementsOfDate(k, yearToJD(year)).ascNodeEclipticDeg,
+    planetAscNodeEclAt: (k, year) => _chainElementsOfDate(k, yearToJD(year)).ascNodeEclipticDeg,
     // ── ΔT/LOD probe surface ─────────────────────────────────────────────────
     // Pins the ΔT/LOD behaviour — including the browser flag gates and taper
     // wiring, and the _eclDeltaT year convention (KNOWN divergence from Node
@@ -4609,20 +4609,20 @@ if (typeof window !== 'undefined') {
     // wall-clock floor bypassed — and return its wall time (ringMs, 7 × 257
     // chain evaluations on the one-bridge year route) next to the LIVE cost
     // of the regression class itself: one ring's 257 vertices read through
-    // the per-JD route (_kcHelioAU → _kcElementsOfDate → the ΔT bridge per
+    // the per-JD route (_chainHelioAU → _chainElementsOfDate → the ΔT bridge per
     // vertex; perJdRingMs, Mars, a fresh jd so the exact-key memo misses).
     // The gate is ringMs/7 against perJdRingMs (perf-regression row 5).
     ringResampleProbe: (jd) => {
       const t0 = performance.now();
       for (const obj of planetObjects) {
-        if (!_KC_PLANET_NAMES.has(obj.name)) continue;
-        if (obj._kcOrbitLine) { obj._kcOrbitLine._kcSampleJD = undefined; obj._kcOrbitLine._kcSampleMs = 0; }
-        _kcUpdateOrbitLine(obj, obj.name.toLowerCase(), jd);
+        if (!_CHAIN_PLANET_NAMES.has(obj.name)) continue;
+        if (obj._chainOrbitLine) { obj._chainOrbitLine._chainSampleJD = undefined; obj._chainOrbitLine._chainSampleMs = 0; }
+        _chainUpdateOrbitLine(obj, obj.name.toLowerCase(), jd);
       }
       const t1 = performance.now();
       const jdM = jd + 0.123;
-      const pDays = DAYS_PER_JULIAN_YEAR * Math.pow(_kcElementsOfDate('mars', jdM).aAU, 1.5);
-      for (let i = 0; i <= _KC_ORBIT_SEGS; i++) _kcHelioAU('mars', jdM + (i / _KC_ORBIT_SEGS - 0.5) * pDays);
+      const pDays = DAYS_PER_JULIAN_YEAR * Math.pow(_chainElementsOfDate('mars', jdM).aAU, 1.5);
+      for (let i = 0; i <= _CHAIN_ORBIT_SEGS; i++) _chainHelioAU('mars', jdM + (i / _CHAIN_ORBIT_SEGS - 0.5) * pDays);
       const t2 = performance.now();
       return { ringMs: t1 - t0, perJdRingMs: t2 - t1 };
     },
@@ -4691,7 +4691,7 @@ if (typeof window !== 'undefined') {
     openVerificationPanel: () => openVerificationPanel(),
     updateVerificationPanel: (id) => updateVerificationPanel(id),
     // C1 period-of-date probe surface: the two-tier composition, per factor
-    kcNOfDate: (k, y) => ({ n: _kcNOfDate(k, y), lamDot0: _kcLamDot0(k), lamRel: _kcLamRel(k, y), massRatio: _kcMassLossPeriodRatio(y) }),
+    kcNOfDate: (k, y) => ({ n: _chainNOfDate(k, y), lamDot0: _chainLamDot0(k), lamRel: _chainLamRel(k, y), massRatio: _chainMassLossPeriodRatio(y) }),
     // C-VIS smoke surface: exercise both Visualization toggles headlessly
     visInvPlaneProbe: () => {
       invariablePlaneGroup.visible = true;
@@ -4699,7 +4699,7 @@ if (typeof window !== 'undefined') {
       updateInvariablePlanePosition();
       updateInclinationPathMarker();
       const ud = inclinationPathGroup.userData;
-      const cyc = _kcEarthInclCycle(o.currentYear);
+      const cyc = _chainEarthInclCycle(o.currentYear);
       const pos = ud.pathLine.geometry.getAttribute('position');
       return {
         nextMax: cyc.nextMax, nextMin: cyc.nextMin, mid: cyc.mid, samples: cyc.samples.length,
@@ -4715,11 +4715,11 @@ if (typeof window !== 'undefined') {
     // chain's ϖ, and the marker's component along the orbit normal.
     periSunMarkerProbe: (planetName) => {
       const planetObj = planetObjects.find((p) => p.name === planetName);
-      if (!planetObj || !_KC_PLANET_NAMES.has(planetName) || !_kcR) return null;
-      const nm = planetName.toLowerCase(), m = _kcPeriSunMarker(planetObj);
+      if (!planetObj || !_CHAIN_PLANET_NAMES.has(planetName) || !_chainR) return null;
+      const nm = planetName.toLowerCase(), m = _chainPeriSunMarker(planetObj);
       m.visible = true; m.onToggle(true);
-      _kcUpdatePeriSunMarker(planetObj, nm, o.julianDay);
-      const el = _kcElementsOfDate(nm, o.julianDay), R = _kcR;
+      _chainUpdatePeriSunMarker(planetObj, nm, o.julianDay);
+      const el = _chainElementsOfDate(nm, o.julianDay), R = _chainR;
       const S = new THREE.Vector3(); sun.planetObj.getWorldPosition(S);
       const d = m.dot.position.clone().sub(S);
       const j = [R[0][0] * d.x + R[1][0] * d.y + R[2][0] * d.z, R[0][1] * d.x + R[1][1] * d.y + R[2][1] * d.z, R[0][2] * d.x + R[1][2] * d.y + R[2][2] * d.z];   // Rᵀ·d: J2000 ecliptic
@@ -4736,8 +4736,8 @@ if (typeof window !== 'undefined') {
     // axis; null while its texture has not loaded).
     planetPoleProbe: (planetName) => {
       const pd = planetObjects.find((p) => p.name === planetName);
-      if (!pd || !_KC_PLANET_NAMES.has(planetName) || !_kcR || !pd.rotationAxis) return null;
-      const nm = planetName.toLowerCase(), R = _kcR, D2R = Math.PI / 180;
+      if (!pd || !_CHAIN_PLANET_NAMES.has(planetName) || !_chainR || !pd.rotationAxis) return null;
+      const nm = planetName.toLowerCase(), R = _chainR, D2R = Math.PI / 180;
       const year = _engineYearTT(o.julianDay), ch = _tierModelB().planets.spin(nm);
       const sE = ch.spinAxisEclipticJ2000AtYear(year), nE = ch.orbitNormalEclipticJ2000AtYear(year);
       if (!sE) return null;
@@ -4755,8 +4755,8 @@ if (typeof window !== 'undefined') {
     // earth.rotationAxis) is the engine frame of date through R: the Earth
     // placement itself.
     worldFrameProbe: () => {
-      if (!_kcR) return null;
-      const R = _kcR, D2R = Math.PI / 180;
+      if (!_chainR) return null;
+      const R = _chainR, D2R = Math.PI / 180;
       const smp = _hybridSpinActive() ? _hybridSeriesSampleAt(_engineYearTT(o.julianDay)) : null;
       const F = smp ? computeEarthFrameOfDate(smp) : null;
       const toW = (v) => new THREE.Vector3(R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2], R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2], R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
@@ -4835,9 +4835,9 @@ if (typeof window !== 'undefined') {
     // first update, AFTER the init-time alignment — the catalogs inherited an
     // unposed frame and nothing gated it (the goldens record observables).
     starFrameProbe: () => {
-      if (!_kcR) return null;
-      const R = _kcR, D2R = Math.PI / 180;
-      const F0 = computeEarthFrameOfDate(_KC_J2000_REST_SAMPLE);
+      if (!_chainR) return null;
+      const R = _chainR, D2R = Math.PI / 180;
+      const F0 = computeEarthFrameOfDate(_CHAIN_J2000_REST_SAMPLE);
       const toW = (v) => new THREE.Vector3(R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2], R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2], R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
       const s0 = toW(F0.s), g0 = toW(F0.g);
       const frameOf = (obj) => {
@@ -4951,7 +4951,7 @@ if (typeof window !== 'undefined') {
         o.currentYear = julianDateToDecimalYear(o.julianDay);
         moveModel(px);
         earth.containerObj.updateMatrixWorld();
-        if (!_kcChainWorldPos(obj, o.julianDay, _tracePos)) {
+        if (!_chainChainWorldPos(obj, o.julianDay, _tracePos)) {
           obj.planetObj.getWorldPosition(_tracePos);
         }
         // component split for the smoothness attribution: Earth's world
@@ -4962,7 +4962,7 @@ if (typeof window !== 'undefined') {
           p: [_tracePos.x, _tracePos.y, _tracePos.z],
           e: [_pe.x, _pe.y, _pe.z],
           a: [_pa.x, _pa.y, _pa.z],
-          lp: _kcPerihelionEclLonDeg('earth', jdFromPos(px)),
+          lp: _chainPerihelionEclLonDeg('earth', jdFromPos(px)),
         });
       }
       o.julianDay = sJD;
@@ -5058,7 +5058,7 @@ if (typeof window !== 'undefined') {
       _lastEccPathUpdateYear = null;
       updateEccentricityPathMarker();
       const ud = eccentricityPathGroup.userData;
-      const cyc = _kcEarthEccCycle(o.currentYear);
+      const cyc = _chainEarthEccCycle(o.currentYear);
       const pos = ud.pathLine.geometry.getAttribute('position');
       const anat = _eccAnatomy();
       return {
@@ -5821,7 +5821,7 @@ const _planetAscNodeDynKey = {
 
 const mercury = {
   name: "Mercury",
-  startPos: 0,   // plan 11 step 3: the scaffold's fitted start angle is deleted — the chain places the planet, _kcPlacePlanetPole its axis
+  startPos: 0,   // plan 11 step 3: the scaffold's fitted start angle is deleted — the chain places the planet, _chainPlacePlanetPole its axis
   speed: Math.PI*2/_planetGeom.mercury.periodYears,   // plan 09 step 7b: the chain's period in scene years (was the device count's H/N)
   rotationSpeed: Math.PI*2*(SI_TROPICAL_YEAR_DAYS/(mercuryRotationPeriod/24)),  // Phase 9.5c: SI-anchored
   tilt: -planets.mercury.axialTiltJ2000,
@@ -7164,7 +7164,7 @@ planetObjects.forEach(obj => createPlanet(obj));
 // zero by a quarter turn in the plan 07/09 arc — the grid sat 1.36 AU from the
 // Sun with its tilt 19.8° off Mercury's orbit normal (measured by the
 // perihelion-at-sun gate's orbit-plane rows; the wheel layers are deleted
-// since). _kcPlaceOrbitPlaneHelpers places them every frame from the engine:
+// since). _chainPlaceOrbitPlaneHelpers places them every frame from the engine:
 // centre at the rendered Sun, normal along the chain's orbit normal of date
 // through R.
 for (const pd of [mercury, venus, mars, jupiter, saturn, uranus, neptune]) {
@@ -7193,7 +7193,7 @@ moonNodalPrecession.pivotObj.add(moon.containerObj);
 
 // Each chain planet: its Perihelion-at-Earth marker layer (the "Perihelion at
 // Earth" chip and trace; its mesh is placed from the chain's ϖ of date,
-// _kcPerihelionEclLonDeg) and the planet container itself, both siblings under
+// _chainPerihelionEclLonDeg) and the planet container itself, both siblings under
 // the barycenter.
 barycenterEarthAndSun.pivotObj.add(mercuryPerihelionFromEarth.containerObj);
 barycenterEarthAndSun.pivotObj.add(mercury.containerObj);
@@ -7808,7 +7808,7 @@ function createInvariablePlaneVisualization(size = 500, divisions = 20) {
 // (the chain reads later-declared consts: the C1 hover-TDZ lesson).
 let _earthInclCycleCache = null;
 let _earthInclCycleBuiltMs = 0;
-function _kcEarthInclCycle(yearNow) {
+function _chainEarthInclCycle(yearNow) {
   if (_earthInclCycleCache && Math.abs(yearNow - _earthInclCycleCache.year) < 500) return _earthInclCycleCache;
   // Wall-clock throttle (owner-measured perf catch): at deep-time travel
   // speeds every frame moves > 500 yr, which made this full rescan + the
@@ -7872,7 +7872,7 @@ const _fmtSceneYear = (y) => (y < 0 ? Math.abs(Math.round(y)).toLocaleString('en
 // Rebuild the path line from the engine cycle (lazy; called from the
 // marker updater once the panel is visible and when the cache refreshes).
 function _rebuildInclinationPathGeometry() {
-  const cyc = _kcEarthInclCycle(o.currentYear);
+  const cyc = _chainEarthInclCycle(o.currentYear);
   if (inclinationPathGroup.userData.builtCache === cyc) return cyc;
   inclinationPathGroup.userData.builtCache = cyc;
   const radius = inclinationPathGroup.userData.radius;
@@ -8104,7 +8104,7 @@ function updateInclinationPathMarker() {
 // + 250 ms wall-clock floor) and the same LAZY-ONLY rule (the C1
 // hover-TDZ lesson). Evaluators = the pair the scene itself renders:
 // e from _sceneEccTargetAt (one-source series; K law when the flag is
-// off) and ϖ from _kcPerihelionEclLonDeg (chain of date) — so the
+// off) and ϖ from _chainPerihelionEclLonDeg (chain of date) — so the
 // marker agrees with the perihelion marker's direction and the
 // eccentric-center offset by construction. The path's radius is
 // e×100 — the scene's own eccentric-offset display convention (the
@@ -8113,13 +8113,13 @@ function updateInclinationPathMarker() {
 // swinging against the g₅ carrier.
 let _earthEccCycleCache = null;
 let _earthEccCycleBuiltMs = 0;
-function _kcEarthEccCycle(yearNow) {
+function _chainEarthEccCycle(yearNow) {
   if (_earthEccCycleCache && Math.abs(yearNow - _earthEccCycleCache.year) < 500) return _earthEccCycleCache;
   const nowMs = performance.now();
   if (_earthEccCycleCache && nowMs - _earthEccCycleBuiltMs < 250) return _earthEccCycleCache;
   _earthEccCycleBuiltMs = nowMs;
   const jdOf = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
-  const pomAt = (y) => _kcPerihelionEclLonDeg('earth', jdOf(y));
+  const pomAt = (y) => _chainPerihelionEclLonDeg('earth', jdOf(y));
   const BEAT_YR = DEEP_MODES_ARTIFACT.verdict.strongestBeatPeriodKyr * 1000;   // ≈ 405,626 yr
   const N = 240;   // ~1.7-kyr steps: ≥ 56 samples per shortest e-component (~95 kyr)
   const samples = [];
@@ -8430,7 +8430,7 @@ function createEccentricityPath() {
 }
 
 function _rebuildEccentricityPathGeometry() {
-  const cyc = _kcEarthEccCycle(o.currentYear);
+  const cyc = _chainEarthEccCycle(o.currentYear);
   const ud = eccentricityPathGroup.userData;
   if (ud.builtCache === cyc) return cyc;
   ud.builtCache = cyc;
@@ -8480,7 +8480,7 @@ function updateEccentricityPathMarker() {
     }
     return;
   }
-  if (!_kcR) return;   // chain frame not derived yet (first frames)
+  if (!_chainR) return;   // chain frame not derived yet (first frames)
   const needsImmediateUpdate = !ud.marker.visible;
   if (!needsImmediateUpdate && _lastEccPathUpdateYear !== null
       && Math.abs(o.currentYear - _lastEccPathUpdateYear) < 0.1) return;
@@ -8488,7 +8488,7 @@ function updateEccentricityPathMarker() {
   const cyc = _rebuildEccentricityPathGeometry();
   // the group rides the CHAIN frame anchored at Earth — the same
   // construction as the perihelion marker (K5b): world = Earth + R·local
-  const R = _kcR;
+  const R = _chainR;
   _ECCP_M4.set(R[0][0], R[0][1], R[0][2], 0,
                R[1][0], R[1][1], R[1][2], 0,
                R[2][0], R[2][1], R[2][2], 0,
@@ -8497,7 +8497,7 @@ function updateEccentricityPathMarker() {
   earth.rotationAxis.getWorldPosition(_ECCP_V);
   eccentricityPathGroup.position.copy(_ECCP_V);
   const eNow = _sceneEccTargetAt(o.currentYear);
-  const pomNow = _kcPerihelionEclLonDeg('earth', o.julianDay) * Math.PI / 180;
+  const pomNow = _chainPerihelionEclLonDeg('earth', o.julianDay) * Math.PI / 180;
   ud.marker.position.set(ECC_PATH_SCALE * eNow * Math.cos(pomNow), ECC_PATH_SCALE * eNow * Math.sin(pomNow), 0);
   // the anatomy overlay: carrier dot at Δ + g₅(t); the g₂ ring rides it
   // by parenting (its radius is the constant epicycle amplitude)
@@ -9071,7 +9071,7 @@ function updateSunCenteredInvPlane() {
   // surface had been missed by the K5c published-surface sweep and
   // showed the internal s-frame number (Earth 287.6°). Every body here is a
   // chain body.
-  const ascSSDeg = _kcAscNodeInvPlaneSSDeg(planetData.key, o.julianDay);
+  const ascSSDeg = _chainAscNodeInvPlaneSSDeg(planetData.key, o.julianDay);
   ascLabelDiv.innerHTML = `<span style="font-size:18px;">☊</span><br><span style="font-size:11px;">ASC NODE</span><br><span style="font-size:10px;color:#88ddff;">Ω: ${ascSSDeg.toFixed(2)}°</span>`;
 
   // Descending node = ascending + 180°, same convention
@@ -9150,7 +9150,7 @@ const sceneObjects = {
 // places before the series artifact arrives, and the frame the J2000 star
 // catalog is aligned to below. Declared here because the alignment runs at
 // module init.
-const _KC_J2000_REST_SAMPLE = Object.freeze({
+const _CHAIN_J2000_REST_SAMPLE = Object.freeze({
   epsDeg: ASTRO_REFERENCE.obliquityJ2000_deg, equinoxLonJ2000Deg: 0, orbitNormalX: 0, orbitNormalY: 0,
   periOfDateDeg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg, e: ASTRO_REFERENCE.eccentricityJ2000,
 });
@@ -9175,10 +9175,10 @@ createStarfield();
 // star-field rows.
 {
   const R0 = computeSceneWorldFrameJ2000();
-  const F0 = computeEarthFrameOfDate(_KC_J2000_REST_SAMPLE);
+  const F0 = computeEarthFrameOfDate(_CHAIN_J2000_REST_SAMPLE);
   const toW = (v) => new THREE.Vector3(R0[0][0] * v[0] + R0[0][1] * v[1] + R0[0][2] * v[2], R0[1][0] * v[0] + R0[1][1] * v[1] + R0[1][2] * v[2], R0[2][0] * v[0] + R0[2][1] * v[1] + R0[2][2] * v[2]);
   const s0 = toW(F0.s), g0 = toW(F0.g);
-  _kcSetWorldRotation(earth.rotationAxis, new THREE.Vector3().crossVectors(s0, g0), s0, g0);
+  _chainSetWorldRotation(earth.rotationAxis, new THREE.Vector3().crossVectors(s0, g0), s0, g0);
 }
 scene.updateMatrixWorld();
 sceneObjects.stars.applyMatrix4(earth.rotationAxis.matrixWorld);
@@ -10929,8 +10929,8 @@ const PLANET_OBJECTS = {
 // PLANET INSPECTOR (plan 06 R10) — the orbit of date from the N-body chain
 // ═══════════════════════════════════════════════════════════════════════
 // One view per planet, everything from the chain the scene renders:
-// elements of date via _kcElementsOfDate at o.julianDay, heliocentric points
-// via _kcHelioAU through the frame bridge _kcR, the rendered ecliptic of date
+// elements of date via _chainElementsOfDate at o.julianDay, heliocentric points
+// via _chainHelioAU through the frame bridge _chainR, the rendered ecliptic of date
 // (the sun-plane container's pole n̂ and equinox ĝ — R4). The visual (the
 // former "Step 4", the part worth keeping): the actual chain orbit fanned
 // from the Sun, green above / red below the ecliptic of date, its ascending
@@ -10970,7 +10970,7 @@ const _HI_ORBIT_SEGS = 256;   // orbit fan resolution (one period of the chain o
 const _HI_ARC_SEGS = 64;      // anomaly arcs
 const _HI_TILT_DEG = 3;       // top-down camera tilt: keeps the screen-up direction defined (see focusInspectorCamera)
 const _hiD2R = Math.PI / 180;
-const _kcPeriSunMarkers = {};   // the chain planets' perihelion-at-Sun markers (built by the Show/Hide grid; see _kcPeriSunMarker)
+const _chainPeriSunMarkers = {};   // the chain planets' perihelion-at-Sun markers (built by the Show/Hide grid; see _chainPeriSunMarker)
 const _moonMarkers = {};        // the Moon's perigee and line-of-nodes markers (built by the Show/Hide grid; see _moonMarker)
 const _ssbMarkers = {};         // the Sun-barycenter marker (built by the Show/Hide grid; see _ssbMarker)
 const _SSB_PATH_HALF_YEARS = 25, _SSB_PATH_STEP_YEARS = 0.25, _SSB_PATH_SAMPLES = 2 * _SSB_PATH_HALF_YEARS / _SSB_PATH_STEP_YEARS;
@@ -11020,13 +11020,13 @@ function _hiRotJ2000(R, v, out) {
  */
 function computeInspectorOrbitFrame(planetKey) {
   const target = PLANET_HIERARCHIES[planetKey];
-  if (!target || !target.chain || !_kcR) return null;
+  if (!target || !target.chain || !_chainR) return null;
   const f = _hiFrame();
   const obj = target.obj();
   if (!obj?.planetObj || !sun?.planetObj) return null;
   const jd = o.julianDay;
-  const el = _kcElementsOfDate(planetKey, jd);
-  const R = _kcR;
+  const el = _chainElementsOfDate(planetKey, jd);
+  const R = _chainR;
   const Om = el.ascNodeEclipticDeg * _hiD2R, inc = el.inclEclipticDeg * _hiD2R;
   const w = (el.lonPeriEclipticDeg - el.ascNodeEclipticDeg) * _hiD2R;
   const cw = Math.cos(w), sw = Math.sin(w), cO = Math.cos(Om), sO = Math.sin(Om), ci = Math.cos(inc), si = Math.sin(inc);
@@ -11043,7 +11043,7 @@ function computeInspectorOrbitFrame(planetKey) {
   obj.planetObj.getWorldPosition(f.P);              // the RENDERED planet (light-time retarded, as the eye sees it)
   f.el = el; f.obj = obj; f.jd = jd;
   f.aScene = 100 * el.aAU;
-  f.pDays = DAYS_PER_JULIAN_YEAR * Math.pow(el.aAU, 1.5);         // Kepler III in the solar-mass unit (as _kcUpdateOrbitLine)
+  f.pDays = DAYS_PER_JULIAN_YEAR * Math.pow(el.aAU, 1.5);         // Kepler III in the solar-mass unit (as _chainUpdateOrbitLine)
   f.r.subVectors(f.P, f.S);
   f.rAU = f.r.length() / 100;
   f.rPeriAU = el.aAU * (1 - el.e);
@@ -11129,7 +11129,7 @@ function inspectorRenderPaperSVG(planetKey) {
   const W = 800, PLOT = 736;   // the month ring (radius 310), the constellation band (to 358) and their names
   // the equinox of date in the chain's J2000 frame (R's columns are the J2000
   // axes in world coordinates): where the vernal point stands among the stars
-  const Rj = _kcR, gJx = Rj[0][0] * f.g.x + Rj[1][0] * f.g.y + Rj[2][0] * f.g.z, gJy = Rj[0][1] * f.g.x + Rj[1][1] * f.g.y + Rj[2][1] * f.g.z;
+  const Rj = _chainR, gJx = Rj[0][0] * f.g.x + Rj[1][0] * f.g.y + Rj[2][0] * f.g.z, gJy = Rj[0][1] * f.g.x + Rj[1][1] * f.g.y + Rj[2][1] * f.g.z;
   const eqLonJ2000 = _hiWrap360(Math.atan2(gJy, gJx) / _hiD2R);
   const eqConstellation = _hiConstellationAt(eqLonJ2000);
   // projection onto the ecliptic of date: x along ĝ (the equinox), y along û₂ (longitude +90°), h along n̂
@@ -11443,7 +11443,7 @@ function clearVisualHelpers() {
  * Per-frame geometry update. The ORBIT (fan, outline, nodes, extremes,
  * ecliptic ring) is resampled from the chain over one period when the epoch
  * has moved by more than 1/720 of the period and at most four times a second
- * (the _kcUpdateOrbitLine floor: 257 chain evaluations per resample); the
+ * (the _chainUpdateOrbitLine floor: 257 chain evaluations per resample); the
  * planet-dependent parts (lines, arcs, locator, perihelion) move every frame.
  */
 function updateInspectorVisuals(f, force = false) {
@@ -11454,13 +11454,13 @@ function updateInspectorVisuals(f, force = false) {
   if (P.fanPos && (force || H._orbitSampleJD === null ||
       (Math.abs(f.jd - H._orbitSampleJD) > f.pDays / 720 && nowMs - H._orbitSampleMs >= 250))) {
     H._orbitSampleJD = f.jd; H._orbitSampleMs = nowMs;
-    const R = _kcR, key = H.currentPlanet;
+    const R = _chainR, key = H.currentPlanet;
     const fp = P.fanPos.array, op = P.orbitLine.geometry.attributes.position.array, ep = P.eclipticRing.geometry.attributes.position.array;
     fp[0] = f.S.x; fp[1] = f.S.y; fp[2] = f.S.z;
     let iHi = 0, iLo = 0;
-    const yC = _engineYearTT(f.jd);   // one ΔT bridge per resample, as the scene rings (_kcHelioAUAtEngineYear)
+    const yC = _engineYearTT(f.jd);   // one ΔT bridge per resample, as the scene rings (_chainHelioAUAtEngineYear)
     for (let i = 0; i <= N; i++) {
-      const hv = _kcHelioAUAtEngineYear(key, yC + (i / N - 0.5) * f.pDays / DAYS_PER_JULIAN_YEAR);
+      const hv = _chainHelioAUAtEngineYear(key, yC + (i / N - 0.5) * f.pDays / DAYS_PER_JULIAN_YEAR);
       _hiRotJ2000(R, hv, _hiTmpA).multiplyScalar(100).add(f.S);
       const k = (i + 1) * 3;
       fp[k] = _hiTmpA.x; fp[k + 1] = _hiTmpA.y; fp[k + 2] = _hiTmpA.z;
@@ -11629,7 +11629,7 @@ function _hiWriteReadouts(f) {
   e.ascNodeJ2000.textContent = fx(_hiWrap360(el.ascNodeEclipticDeg), 4, '°');
   e.inclInv.textContent = fx(el.inclInvPlaneDeg, 4, '°');
   e.ascNodeInv.textContent = Number.isFinite(el.ascNodeInvPlaneDeg)
-    ? fx(_hiWrap360(convertNodeSFrameToEquatorOriginDeg(el.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg())), 4, '°') : '—';
+    ? fx(_hiWrap360(convertNodeSFrameToEquatorOriginDeg(el.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg())), 4, '°') : '—';
   e.lonPeri.textContent = fx(_hiWrap360(el.lonPeriEclipticDeg), 4, '°');
   e.argPeri.textContent = fx(_hiWrap360(el.lonPeriEclipticDeg - el.ascNodeEclipticDeg), 4, '°');
   e.meanLon.textContent = fx(_hiWrap360(el.meanLonEclipticDeg), 4, '°');
@@ -12275,7 +12275,7 @@ function wgcModelCurves(planetKey, d) {
     // ϖ(t) in ECLIPJ2000 (the plotted frame). The jd construction mirrors
     // the chain's own year coordinate exactly (round-trip identity, no
     // calendar slip).
-    values[i] = _kcPerihelionEclLonDeg(modelPlanetKey, KC_ANCHOR_EPOCH_JD + (d.yrArr[i] - 2000) * DAYS_PER_JULIAN_YEAR);
+    values[i] = _chainPerihelionEclLonDeg(modelPlanetKey, KC_ANCHOR_EPOCH_JD + (d.yrArr[i] - 2000) * DAYS_PER_JULIAN_YEAR);
   }
   // Unwrap the curve (owner-corrected: Neptune's near-zero e lets ϖ wobble
   // across 0° — the wrapped series jumped to ~360) and align its branch to
@@ -16377,7 +16377,7 @@ let _zetaSeriesEndYr = 0;
         _deepHistSeriesM = null;
         _epsSeriesSamplers.clear();
         _epsSeriesDeepRangeYr = 0;
-        // (R4: the J2000 pose bridge _kcR is read from the deterministic K
+        // (R4: the J2000 pose bridge _chainR is read from the deterministic K
         // device — nothing to re-derive when the artifact lands)
         // Perf (measured, the Play-start wait): the rebuilt tier model's
         // chain-cycle tables (±250 kyr — the four Moon chains and the
@@ -16427,7 +16427,7 @@ function _yearLengthsM() {
       // The anomalistic year rides THIS movement's own apsidal line — the
       // scene's perihelion (year-lengths.cjs owns the construction). Earth's
       // Perihelion Longitudes Prec. cell reads the SAME family
-      // (_kcApsidalPeriodYears → inclinationPrecessionYearsAtYear), so the
+      // (_chainApsidalPeriodYears → inclinationPrecessionYearsAtYear), so the
       // Predictions beat and the cell agree by construction (owner-found
       // split 111,491 vs 111,570 stays closed — now on the scene's family).
     });
@@ -16584,7 +16584,7 @@ function _sceneEccTargetAt(year) {
 // minima), zero-mean element class.
 function inclInvPlaneModel(year) {
   // D4 review: the ONE-SOURCE i_inv — the engine Earth orbit normal (series
-  // ζ inside ±10 Myr, mode tail beyond, via _kcEarthEngineOrbitNormalJ2000)
+  // ζ inside ±10 Myr, mode tail beyond, via _chainEarthEngineOrbitNormalJ2000)
   // against the artifact's invariable plane. The era chain's inclInvPlaneDeg
   // that used to sit here is the 8-mode ζ SKELETON: its ~0.204° rms gap vs
   // La2010 is OUR compression, not physics — the engine series matches
@@ -16594,7 +16594,7 @@ function inclInvPlaneModel(year) {
   const ip = CHAIN_ARTIFACT.invariablePlane;
   const si = Math.sin(ip.inclEclipticDeg * D2R), ci = Math.cos(ip.inclEclipticDeg * D2R);
   const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
-  const nE = _kcEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(year));   // R9: `year` is the SCENE calendar year; the series samples at the engine year
+  const nE = _chainEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(year));   // R9: `year` is the SCENE calendar year; the series samples at the engine year
   const d = nE[0] * nInv[0] + nE[1] * nInv[1] + nE[2] * nInv[2];
   return Math.acos(Math.min(1, Math.max(-1, d))) / D2R;
 }
@@ -16612,13 +16612,13 @@ function ascNodeInvPlaneModel(year) {
   const nInv = [si * Math.sin(ip.ascNodeEclipticDeg * D2R), -si * Math.cos(ip.ascNodeEclipticDeg * D2R), ci];
   const xIp = [Math.cos(ip.ascNodeEclipticDeg * D2R), Math.sin(ip.ascNodeEclipticDeg * D2R), 0];
   const yIp = [nInv[1] * xIp[2] - nInv[2] * xIp[1], nInv[2] * xIp[0] - nInv[0] * xIp[2], nInv[0] * xIp[1] - nInv[1] * xIp[0]];
-  const nE = _kcEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(year));   // R9: scene calendar year in, engine year to the series
+  const nE = _chainEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(year));   // R9: scene calendar year in, engine year to the series
   let N = [nInv[1] * nE[2] - nInv[2] * nE[1], nInv[2] * nE[0] - nInv[0] * nE[2], nInv[0] * nE[1] - nInv[1] * nE[0]];
   const L = Math.hypot(N[0], N[1], N[2]);
   N = [N[0] / L, N[1] / L, N[2] / L];
   const sFrameDeg = ((Math.atan2(N[0] * yIp[0] + N[1] * yIp[1] + N[2] * yIp[2],
     N[0] * xIp[0] + N[1] * xIp[1] + N[2] * xIp[2]) / D2R + ip.ascNodeEclipticDeg) % 360 + 360) % 360;
-  return convertNodeSFrameToEquatorOriginDeg(sFrameDeg, _kcNodeOriginSSDeg());
+  return convertNodeSFrameToEquatorOriginDeg(sFrameDeg, _chainNodeOriginSSDeg());
 }
 
 // ── Earth-clock day and year lines: ONE home for the Solar Day, the
@@ -16803,7 +16803,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => _hybridSpinActive()
         ? _hybridSeriesSampleAt(year).periOfDateDeg
-        : wrap360(_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) },
+        : wrap360(_chainPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) },
     references: [
       { name: 'Meeus (1991)', color: '#81c784', fn: perihelionMeeusEarth, validYears: [-10000, 10000], sourceUrl: 'https://ui.adsabs.harvard.edu/abs/1994A%26A...282..663S' },
       { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
@@ -17156,7 +17156,7 @@ const VFP_CATEGORIES = [
     // ── Inclination of all planets (owner spec 2026-09-15) — the LAST
     // panel: a STATIC multi-planet chart over the cycles convention
     // [−248,000, +102,000] on the smooth series-tier chart evaluator
-    // (_kcChartElementsOfDate — no handover steps). Ecliptic inclinations
+    // (_chainChartElementsOfDate — no handover steps). Ecliptic inclinations
     // (J2000 frame) per-planet toggleable (defaults: 7 planets ON, Earth
     // OFF — owner E1: Earth's J2000-frame curve included but default-off,
     // its of-date convention being 0 elsewhere); one global toggle adds
@@ -17498,11 +17498,11 @@ function _vfpPISamples(range) {
         // would give the 8-mode ζ skeleton (rms 0.134° vs La2010 over this
         // span — "our compression"); the engine orbit normal is the
         // validated route (the panel's inclInvPlaneModel headline).
-        const nE = _kcEarthEngineOrbitNormalJ2000(y);
+        const nE = _chainEarthEngineOrbitNormalJ2000(y);
         data.earth.ecl[i] = Math.acos(Math.min(1, Math.max(-1, nE[2]))) * 180 / Math.PI;
         data.earth.inv[i] = inclInvPlaneModel(y);
       } else {
-        const el = _kcChartElementsOfDate(p, yrToJd(y));
+        const el = _chainChartElementsOfDate(p, yrToJd(y));
         data[p].ecl[i] = el.inclEclipticDeg;
         data[p].inv[i] = el.inclInvPlaneDeg;
       }
@@ -17860,7 +17860,7 @@ function _vfpPESamples(range) {
     const y = y0 + ((y1 - y0) * i) / (N - 1);
     yrs[i] = y;
     for (const p of _vfpPI_PLANETS) {
-      data[p][i] = p === 'earth' ? _vfpPEEarthEcc(y) : _kcChartElementsOfDate(p, yrToJd(y)).e;
+      data[p][i] = p === 'earth' ? _vfpPEEarthEcc(y) : _chainChartElementsOfDate(p, yrToJd(y)).e;
     }
   }
   return (_vfpPECacheByRange[key] = { y0, y1, yrs, data });
@@ -18108,10 +18108,10 @@ function _vfpPEAfterRender(bodyEl) {
 //
 // WHICH RATE FAMILY (the load-bearing choice — a displayed rate must name its
 // window). This panel rides the SECULAR tier — the smooth series evaluator the
-// two sibling panels already use (_kcChartElementsOfDate, handover forced to
+// two sibling panels already use (_chainChartElementsOfDate, handover forced to
 // 0) — differenced over a NAMED ±1000-yr stencil. The planet panels' "Prec."
 // cells and CYCLES Duration rows ride the SAME family and stencil
-// (_kcApsidalPeriodYears), so the two surfaces agree by construction. A
+// (_chainApsidalPeriodYears), so the two surfaces agree by construction. A
 // ±150-yr central difference on the FULL chain, periodic terms in, cannot be
 // sampled across a deep-time window (its ~900-yr content aliases at kyr steps
 // into noise), and measured at the scene's own dates it was the
@@ -18183,8 +18183,8 @@ function _vfpPPEarthRateArcsecCy(year, frame) {
 // never the interpolated Cartesian e-vector components — the estimator-bias
 // class the hybrid's polar-chord fix closed).
 function _vfpPPChainRateArcsecCy(p, year) {
-  const w1 = _kcChartElementsOfDate(p, _vfpPPYrToJd(year - _VFPPP_STENCIL_YR)).lonPeriEclipticDeg;
-  const w2 = _kcChartElementsOfDate(p, _vfpPPYrToJd(year + _VFPPP_STENCIL_YR)).lonPeriEclipticDeg;
+  const w1 = _chainChartElementsOfDate(p, _vfpPPYrToJd(year - _VFPPP_STENCIL_YR)).lonPeriEclipticDeg;
+  const w2 = _chainChartElementsOfDate(p, _vfpPPYrToJd(year + _VFPPP_STENCIL_YR)).lonPeriEclipticDeg;
   let d = w2 - w1;
   while (d > 180) d -= 360;
   while (d < -180) d += 360;
@@ -18217,10 +18217,10 @@ function _vfpPPSamples(range) {
       if (p === 'earth') {
         sid = _vfpPPEarthRateArcsecCy(y, 'sid');
         e = _vfpPEEarthEcc(y);
-        aAU = _kcChartElementsOfDate('earth', _vfpPPYrToJd(y)).aAU;
+        aAU = _chainChartElementsOfDate('earth', _vfpPPYrToJd(y)).aAU;
         periodYr = Math.pow(aAU, 1.5);
       } else {
-        const el = _kcChartElementsOfDate(p, _vfpPPYrToJd(y));
+        const el = _chainChartElementsOfDate(p, _vfpPPYrToJd(y));
         sid = _vfpPPChainRateArcsecCy(p, y);
         e = el.e;
         aAU = el.aAU;
@@ -18635,8 +18635,8 @@ const _vfpAPCacheByRange = {};   // static samples — once per session per rang
 function _vfpAPModelYears(key, year) {
   if (key === 'ecl') {
     const jd = KC_ANCHOR_EPOCH_JD + (year - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
-    const n1 = _kcChartElementsOfDate('earth', jd - 150 * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
-    const n2 = _kcChartElementsOfDate('earth', jd + 150 * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
+    const n1 = _chainChartElementsOfDate('earth', jd - 150 * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
+    const n2 = _chainChartElementsOfDate('earth', jd + 150 * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
     let d = n2 - n1;
     while (d > 180) d -= 360;
     while (d < -180) d += 360;
@@ -19846,7 +19846,7 @@ const _VFPAN_DOMAIN_YEARS = 10000000;   // the banked series span (±10 Myr)
 function _vfpANPeriEarthDeg(year) {
   return _hybridSpinActive()
     ? _hybridSeriesSampleAt(year).periOfDateDeg
-    : wrap360(_kcPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000));
+    : wrap360(_chainPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000));
 }
 function _vfpANInputs(year) {
   const y = Math.max(-_VFPAN_DOMAIN_YEARS, Math.min(_VFPAN_DOMAIN_YEARS, year));
@@ -22274,7 +22274,7 @@ function setupGUI() {
   const eigenFolder = gui.addFolder({ title: 'Secular Eigenmodes (g & s)', expanded: false });
   eigenFolder.element.dataset.category = 'calculated';
   addFolderTooltip(eigenFolder, 'The solar system’s slow dynamics decomposes into eight apsidal eigenmodes (g1–g8, prograde perihelion circulation) and eight nodal ones (s1–s8, retrograde node regression; s5 ≡ 0 on the invariable plane). Each planet’s eccentricity/perihelion and inclination/node motion is a mixture of all of them — this table shows the DOMINANT mode each planet rides, measured from the model’s own N-body integration (the governed chain artifact). The Laskar (2004) names are reference labels, never inputs. Note the sharing: Earth, Jupiter and Uranus ride Jupiter’s g5 (Earth’s apsidal shape is borrowed); Jupiter and Saturn share s6; Venus and Earth share s3. Doc 109 carries the full mode tables.');
-  // Table built LAZILY on first expand — the chain helpers (_kcSecularShape
+  // Table built LAZILY on first expand — the chain helpers (_chainSecularShape
   // and its module constants) initialize later in this module (TDZ at UI
   // build), and the values are session-constants from the artifact.
   {
@@ -22285,7 +22285,7 @@ function setupGUI() {
       _eigenTableBuilt = true;
       const _cell = 'padding:2px 6px;text-align:right;font-variant-numeric:tabular-nums;';
       const rows = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'].map((k) => {
-        const dom = _kcSecularShape(k).dom;   // dominant apsidal (z) mode
+        const dom = _chainSecularShape(k).dom;   // dominant apsidal (z) mode
         const sN = CHAIN_ARTIFACT.s[k];       // dominant nodal (ζ) mode (banked)
         const name = k.charAt(0).toUpperCase() + k.slice(1);
         const fmt = (x) => Math.round(x).toLocaleString('en-US');
@@ -22757,7 +22757,7 @@ function setupGUI() {
     objs.sort((a, b) => (a.isNotPhysicalObject ? 1 : 0) - (b.isNotPhysicalObject ? 1 : 0));
     // the chain planets' perihelion AT THE SUN, right after the planet
     const chainPlanet = objs.find((obj) => !obj.isNotPhysicalObject && /^(Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune)$/.test(obj.name));
-    if (chainPlanet) objs.splice(1, 0, _kcPeriSunMarker(chainPlanet));
+    if (chainPlanet) objs.splice(1, 0, _chainPeriSunMarker(chainPlanet));
     if (g.label === 'Moon') objs.push(_moonMarker('apsidal'), _moonMarker('nodal'));   // the perigee and the line of nodes, of date
     if (g.label === 'Sun') objs.push(_ssbMarker('sun'), _ssbMarker('earth'));           // the Solar System Barycenter and its path, at the Sun and transposed to Earth
     return { label: g.label, objects: objs };
@@ -32818,10 +32818,10 @@ function render(now) {
       }
       // Update dynamic values from the chain's elements of date (P5/K5b)
       if (hl.planetKey && hl.eccSpan) {
-        hl.eccSpan.textContent = _kcElementsOfDate(hl.planetKey, o.julianDay).e.toFixed(8);
+        hl.eccSpan.textContent = _chainElementsOfDate(hl.planetKey, o.julianDay).e.toFixed(8);
       }
       if (hl.planetKey && hl.precSpan) {
-        const _T = _kcApsidalPeriodYears(hl.planetKey, o.julianDay);
+        const _T = _chainApsidalPeriodYears(hl.planetKey, o.julianDay);
         hl.precSpan.textContent = isFinite(_T)
           ? Math.abs(Math.round(_T)).toLocaleString() + ' yr (' + (_T >= 0 ? 'prograde' : 'retrograde') + ')'
           : 'near-stationary';
@@ -40115,50 +40115,50 @@ async function runRATest() {
     // come from ONE element set (the one the scene renders). The legacy
     // lattice inv-plane family (ICRF/ecliptic node conventions, phase
     // angles, MaxIncl anchors) left the report with K5c — plan 02.
-    const mercuryEl    = _kcElementsOfDate('mercury', o.julianDay);
+    const mercuryEl    = _chainElementsOfDate('mercury', o.julianDay);
     const mercuryPer   = o.mercuryPerihelion;
     const mercuryPerEcl = o.mercuryPerihelionEcliptic;
     const mercuryAsc   = o.mercuryAscendingNode;
     const mercuryArg   = o.mercuryArgumentOfPeriapsis;
     const mercuryAppIncl = mercuryEl.inclEclipticDeg;
-    const venusEl      = _kcElementsOfDate('venus', o.julianDay);
+    const venusEl      = _chainElementsOfDate('venus', o.julianDay);
     const venusPer     = o.venusPerihelion;
     const venusPerEcl  = o.venusPerihelionEcliptic;
     const venusAsc     = o.venusAscendingNode;
     const venusArg     = o.venusArgumentOfPeriapsis;
     const venusAppIncl = venusEl.inclEclipticDeg;
-    const earthEl      = _kcElementsOfDate('earth', o.julianDay);
+    const earthEl      = _chainElementsOfDate('earth', o.julianDay);
     // The CHAIN's ecliptic ϖ (J2000 frame) — the same element convention as
     // every planet column in this export; the panel's of-date gauge is this
     // plus the general-precession term. (The K predictive law that sat here
     // was the pre-option-A panel source — a stranded twin once the panel
     // moved to the chain.)
-    const earthPerEcl  = _kcPerihelionEclLonDeg('earth', o.julianDay);
-    const marsEl       = _kcElementsOfDate('mars', o.julianDay);
+    const earthPerEcl  = _chainPerihelionEclLonDeg('earth', o.julianDay);
+    const marsEl       = _chainElementsOfDate('mars', o.julianDay);
     const marsPer      = o.marsPerihelion;
     const marsPerEcl   = o.marsPerihelionEcliptic;
     const marsAsc      = o.marsAscendingNode;
     const marsArg      = o.marsArgumentOfPeriapsis;
     const marsAppIncl  = marsEl.inclEclipticDeg;
-    const jupiterEl    = _kcElementsOfDate('jupiter', o.julianDay);
+    const jupiterEl    = _chainElementsOfDate('jupiter', o.julianDay);
     const jupiterPer   = o.jupiterPerihelion;
     const jupiterPerEcl = o.jupiterPerihelionEcliptic;
     const jupiterAsc   = o.jupiterAscendingNode;
     const jupiterArg   = o.jupiterArgumentOfPeriapsis;
     const jupiterAppIncl = jupiterEl.inclEclipticDeg;
-    const saturnEl     = _kcElementsOfDate('saturn', o.julianDay);
+    const saturnEl     = _chainElementsOfDate('saturn', o.julianDay);
     const saturnPer    = o.saturnPerihelion;
     const saturnPerEcl = o.saturnPerihelionEcliptic;
     const saturnAsc    = o.saturnAscendingNode;
     const saturnArg    = o.saturnArgumentOfPeriapsis;
     const saturnAppIncl = saturnEl.inclEclipticDeg;
-    const uranusEl     = _kcElementsOfDate('uranus', o.julianDay);
+    const uranusEl     = _chainElementsOfDate('uranus', o.julianDay);
     const uranusPer    = o.uranusPerihelion;
     const uranusPerEcl = o.uranusPerihelionEcliptic;
     const uranusAsc    = o.uranusAscendingNode;
     const uranusArg    = o.uranusArgumentOfPeriapsis;
     const uranusAppIncl = uranusEl.inclEclipticDeg;
-    const neptuneEl    = _kcElementsOfDate('neptune', o.julianDay);
+    const neptuneEl    = _chainElementsOfDate('neptune', o.julianDay);
     const neptunePer   = o.neptunePerihelion;
     const neptunePerEcl = o.neptunePerihelionEcliptic;
     const neptuneAsc   = o.neptuneAscendingNode;
@@ -40207,14 +40207,14 @@ async function runRATest() {
 //    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
 
         periRows.push([jd, date, time, modelYear,
-          mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(mercuryEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), mercuryPerEcl.toFixed(6),
-          venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(venusEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), venusPerEcl.toFixed(6),
-          earthPerEcl.toFixed(6), earthPerRA.toFixed(6), inclInvPlaneModel(o.currentYear).toFixed(6), convertNodeSFrameToEquatorOriginDeg(earthEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6),
-          marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAppIncl.toFixed(6), marsEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(marsEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), marsPerEcl.toFixed(6),
-          jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAppIncl.toFixed(6), jupiterEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(jupiterEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), jupiterPerEcl.toFixed(6),
-          saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAppIncl.toFixed(6), saturnEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(saturnEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), saturnPerEcl.toFixed(6),
-          uranusPer.toFixed(6), uranusAsc.toFixed(6), uranusArg.toFixed(6), uranusAppIncl.toFixed(6), uranusEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(uranusEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), uranusPerEcl.toFixed(6),
-          neptunePer.toFixed(6), neptuneAsc.toFixed(6), neptuneArg.toFixed(6), neptuneAppIncl.toFixed(6), neptuneEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(neptuneEl.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg()).toFixed(6), neptunePerEcl.toFixed(6),
+          mercuryPer.toFixed(6), mercuryAsc.toFixed(6), mercuryArg.toFixed(6), mercuryAppIncl.toFixed(6), mercuryEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(mercuryEl.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg()).toFixed(6), mercuryPerEcl.toFixed(6),
+          venusPer.toFixed(6), venusAsc.toFixed(6), venusArg.toFixed(6), venusAppIncl.toFixed(6), venusEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(venusEl.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg()).toFixed(6), venusPerEcl.toFixed(6),
+          earthPerEcl.toFixed(6), earthPerRA.toFixed(6), inclInvPlaneModel(o.currentYear).toFixed(6), convertNodeSFrameToEquatorOriginDeg(earthEl.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg()).toFixed(6),
+          marsPer.toFixed(6), marsAsc.toFixed(6), marsArg.toFixed(6), marsAppIncl.toFixed(6), marsEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(marsEl.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg()).toFixed(6), marsPerEcl.toFixed(6),
+          jupiterPer.toFixed(6), jupiterAsc.toFixed(6), jupiterArg.toFixed(6), jupiterAppIncl.toFixed(6), jupiterEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(jupiterEl.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg()).toFixed(6), jupiterPerEcl.toFixed(6),
+          saturnPer.toFixed(6), saturnAsc.toFixed(6), saturnArg.toFixed(6), saturnAppIncl.toFixed(6), saturnEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(saturnEl.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg()).toFixed(6), saturnPerEcl.toFixed(6),
+          uranusPer.toFixed(6), uranusAsc.toFixed(6), uranusArg.toFixed(6), uranusAppIncl.toFixed(6), uranusEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(uranusEl.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg()).toFixed(6), uranusPerEcl.toFixed(6),
+          neptunePer.toFixed(6), neptuneAsc.toFixed(6), neptuneArg.toFixed(6), neptuneAppIncl.toFixed(6), neptuneEl.inclInvPlaneDeg.toFixed(6), convertNodeSFrameToEquatorOriginDeg(neptuneEl.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg()).toFixed(6), neptunePerEcl.toFixed(6),
           earthPerDistE.toFixed(8), (o.obliquityEarth || 0).toFixed(6)
         ]);
     
@@ -41847,7 +41847,7 @@ function perihelionFrameBreakdown(planetKey, year) {
   const eps = _sceneEpsTargetDeg(year) * D2R;   // Phase 3 S3b: the published ε (the hybrid)
   const epsRate = (_sceneEpsTargetDeg(year + 50) - _sceneEpsTargetDeg(year - 50)) * 3600;  // ″/cy
   // projection excess and obliquity-rate term for the chain motion at ecliptic longitude lamDeg
-  const lam = _kcPerihelionEclLonDeg(planetKey, yearToJDApprox(year)) * D2R;
+  const lam = _chainPerihelionEclLonDeg(planetKey, yearToJDApprox(year)) * D2R;
   const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
   const projection = lattice * (Math.cos(eps) / den - 1);
   const obliquityTerm = (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate;
@@ -41907,7 +41907,7 @@ const planetStats = {
        hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). It rides the model's own N-body series inside ±10 Myr, the mode-tail beyond (ONE SOURCE — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18); before the series has loaded, the framework's device law is the fallback (the ?hybridSpin=0 opt-out is gone — plan 06 D5). The obliquity oscillates with the DERIVED beat 2π/(|ψ̇| − |s₃|) ≈ 40.6 kyr — the "Obliquity cycle (derived beat)" row in the CYCLES tab.`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _kcElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
+       value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _chainElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
        hover : [`The model's own N-body eccentricity of date — the published Earth element, the SECULAR convention (J2000: 0.016702, ≡ JPL's osculating seed state and La2004). The IAU/Standish mean-elements value is 0.016710 (the Calibration Inputs row) and the eclipse Sun's derived mean element 0.016708 — conventions, not discrepancies. This row IS the scene's rendered e (the banked engine series inside ±10 Myr, the mode-tail beyond — ONE SOURCE: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Under ?hybridSpin=0: the era chain of date (the framework's eccentricity law e(t) = base′·(1 + cos θ/2) that once rode the scene's orbit machinery is deleted — plan 09 step 6 the law, plan 11 step 2 its base′; the scene offset is the series on every path).`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
@@ -42097,10 +42097,10 @@ const planetStats = {
        hover : [`Earth's node of date on the engine's own invariable plane — the ONE-SOURCE series route (engine orbit normal; ≡ the inclination path and the Orbital Plane Precession chart; the chain's 8-mode skeleton read here before R9 matched it at J2000 to 0.007° and wandered 4.3° rms at deep time), in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('earth', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => (_chainAscNodeInvPlaneSSDeg('earth', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => _kcArgPeriInvPlaneDeg('earth', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainArgPeriInvPlaneDeg('earth', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
@@ -42155,7 +42155,7 @@ const planetStats = {
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(inclInvPlaneModel(o.currentYear), _kcArgPeriInvPlaneDeg('earth', o.julianDay), o.earthTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(inclInvPlaneModel(o.currentYear), _chainArgPeriInvPlaneDeg('earth', o.julianDay), o.earthTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
@@ -42233,8 +42233,8 @@ const planetStats = {
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => _kcApsidalPeriodYears('earth', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('earth'); return [`Period for Earth's perihelion to complete one revolution against the fixed stars — the ONE movement's own apsidal rate of date (the scene's apsidal wheel; the year-over-year advance of the series' ϖ, the same family as the anomalistic year, so anom/(anom − sid) reproduces this number exactly; the SAME evaluator as the Prec. cell under Perihelion Longitudes). Julian years. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]} (borrowed from Jupiter), ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr.`]; },
+       value : [ { v: () => _chainApsidalPeriodYears('earth', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : () => { const _s = _chainSecularShape('earth'); return [`Period for Earth's perihelion to complete one revolution against the fixed stars — the ONE movement's own apsidal rate of date (the scene's apsidal wheel; the year-over-year advance of the series' ϖ, the same family as the anomalistic year, so anom/(anom − sid) reproduces this number exactly; the SAME evaluator as the Prec. cell under Perihelion Longitudes). Julian years. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]} (borrowed from Jupiter), ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr.`]; },
        highlight: true},
       {label : () => `Axial precession period`,
        value : [ { v: () => -predictions.axialPrecession, dec:2, sep:',' },{ small: 'years' }],
@@ -42259,26 +42259,26 @@ const planetStats = {
        value : [ { v: () => DEEP_MODES_ARTIFACT.verdict.companion95Kyr * 1000, dec:0, sep:',' },{ small: 'years' }],
        hover : [`The third eccentricity beat from the SAME T5-gated deep verdict — the classical ~95-kyr line of the Milankovitch short-eccentricity band. With the 124-kyr companion above it composes the ~100-kyr eccentricity envelope around the 405.6-kyr metronome.`]},
       {label : () => `Nodal Precession Period`,
-       value : [ { v: () => _kcNodeInvPlanePeriodYears('earth', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => _chainNodeInvPlanePeriodYears('earth', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : () => { const _s = CHAIN_ARTIFACT.s.earth; return [`The engine's of-date tangent of Earth's orbital-plane node ON the invariable plane (±150-yr central difference of the chain's node of date — the same evaluator as the Predictions panel's Ecliptic Cycle row and the Positions-panel Period cell). Negative = retrograde regression (the panel-wide sign convention: prograde +, retrograde −). Stable deep-time base: the dominant nodal mode ${_s.nearestLaskar.mode}, ${Math.round(1296000/_s.arcsecPerYr).toLocaleString('en-US')} yr — the cycle the chart below draws.`]; }},    null,
     null,
       { viz: 'perihelion-chart', planet: 'earth' },
     null,
     null,
-      {label : () => { const s = _kcSecularShape('earth'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Earth' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('earth').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('earth'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Earth' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('earth').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The dominant secular mode of the eccentricity vector z = e·e^{iϖ} in the model's own N-body mode table (the governed artifact). Its frequency is the base rate the perihelion rides — the long-term mean while this amplitude dominates. Earth rides Jupiter's g5 eigenmode: its base shape is borrowed. The percentage is this mode's share of the planet's summed mode amplitudes (Σ|A| over the full table). Labelled by the nearest Laskar (2004) reference frequency: a label, never an input`],
        static: true},
-      {label : () => { const s = _kcSecularShape('earth'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Earth' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('earth').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('earth'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Earth' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('earth').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The second-largest mode: the planet whose eigenmode contributes most to the wobble around the base rate. The percentage is its share of the summed mode amplitudes. Earth's companion (Venus's g2) is 92 % of its base amplitude — the two-vector geometry, not either mode alone, sets the fast rate of the current era`],
        static: true},
-      {label : () => { const s = _kcSecularShape('earth'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
+      {label : () => { const s = _chainSecularShape('earth'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
       {label : () => `└ Perihelion rate of date (the movement)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYears('earth', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYears('earth', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The ONE movement's apsidal rate against the fixed stars at the current scene date: the year-over-year advance of the series' perihelion of date (the scene's apsidal wheel) minus the general precession of date — per Julian century. The same quantity the tweakpane Prec row and the anomalistic year carry.`]},
 
     ],
@@ -42821,13 +42821,13 @@ const planetStats = {
       'null_row',
     null,
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _kcElementsOfDate('mercury', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
+       value : [ { v: () => _chainElementsOfDate('mercury', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => _kcElementsOfDate('mercury', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('mercury', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 7.00°) — from the N-body element set the scene renders. Highest of the eight planets`]},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => _kcElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -42858,23 +42858,23 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbital period (P)`,
-       value : [ { v: () => 360/_kcNOfDate('mercury', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
+       value : [ { v: () => 360/_chainNOfDate('mercury', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Mercury's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_chainNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Mercury's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('mercury', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_chainNOfDate('mercury', o.currentYear) - _chainNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Mercury's synodic period with Earth, of date: P = 360°/|n_Mercury − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('mercury', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _chainNOfDate('mercury', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(mercuryOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (mercuryRotationPeriod*(((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-mercuryRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (mercuryRotationPeriod*(((360/_chainNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_chainNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-mercuryRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Mercury's solar day ≈ 176 Earth days. 3:2 spin-orbit resonance makes the solar day twice the orbital period`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => mercuryRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -42882,20 +42882,20 @@ const planetStats = {
 
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
-       value : [ { v: () => _kcOrbEl('mercury').aAU, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => _chainOrbEl('mercury').aAU, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mercury’s osculating semi-major axis of date from the model’s own N-body chain (engine-D elements at the loaded epoch; short-period terms included). The scene’s ring geometry keeps its fixed anchor as machinery.`]},
       {label : () => `Semi-major axis (km)`,
-       value : [ { v: () => _kcOrbEl('mercury').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => _chainOrbEl('mercury').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
        hover : [`The osculating a of date × the AU in km (currentAUDistance — deep-time mutable).`]},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_kcOrbEl('mercury').aAU, _kcOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_chainOrbEl('mercury').aAU, _chainOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`]},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(_kcOrbEl('mercury').aAU, _kcOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(_chainOrbEl('mercury').aAU, _chainOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`]},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(_kcOrbEl('mercury').aAU, _kcOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(_chainOrbEl('mercury').aAU, _chainOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`]},
       {label : () => `Current distance from Sun (r)`,
        value : [ { v: () => mercury.sunDistAU, dec:6, sep:',' },{ small: 'AU' }],
@@ -42903,36 +42903,36 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_kcOrbEl('mercury').aAU, _kcOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_chainOrbEl('mercury').aAU, _chainOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`]},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(_kcOrbEl('mercury').aAU, _kcOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(_chainOrbEl('mercury').aAU, _chainOrbEl('mercury').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`]},
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('mercury').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
+       value : [ { v: () => (_chainOrbEl('mercury').aAU * currentAUDistance * Math.PI * 2) / (((360/_chainNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Mercury mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
-       value : [ { v: () => OrbitalFormulas.orbitalVelocity(mercury.sunDistAU * currentAUDistance, _kcOrbEl('mercury').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_kcOrbEl('mercury').aAU * currentAUDistance, _kcOrbEl('mercury').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_kcOrbEl('mercury').aAU * currentAUDistance, _kcOrbEl('mercury').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
+       value : [ { v: () => OrbitalFormulas.orbitalVelocity(mercury.sunDistAU * currentAUDistance, _chainOrbEl('mercury').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_chainOrbEl('mercury').aAU * currentAUDistance, _chainOrbEl('mercury').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_chainOrbEl('mercury').aAU * currentAUDistance, _chainOrbEl('mercury').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(_kcOrbEl('mercury').aAU * currentAUDistance, _kcOrbEl('mercury').e, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(_chainOrbEl('mercury').aAU * currentAUDistance, _chainOrbEl('mercury').e, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(_kcOrbEl('mercury').aAU * currentAUDistance, _kcOrbEl('mercury').e, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(_chainOrbEl('mercury').aAU * currentAUDistance, _chainOrbEl('mercury').e, o.mercuryTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_kcOrbEl('mercury').aAU * currentAUDistance, _kcOrbEl('mercury').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_chainOrbEl('mercury').aAU * currentAUDistance, _chainOrbEl('mercury').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`]},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_kcOrbEl('mercury').aAU * currentAUDistance, _kcOrbEl('mercury').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_chainOrbEl('mercury').aAU * currentAUDistance, _chainOrbEl('mercury').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_kcOrbEl('mercury').e), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('mercury').e), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -42943,18 +42943,18 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.circularVelocity(mercury.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity needed for circular orbit at current distance: v_circ = √(GM/r)`]},
       {label : () => `Velocity ratio (v/v_circ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(mercury.sunDistAU * currentAUDistance, _kcOrbEl('mercury').aAU * currentAUDistance), mercury.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(mercury.sunDistAU * currentAUDistance, _chainOrbEl('mercury').aAU * currentAUDistance), mercury.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
        hover : [`Current velocity vs circular: >1 near perihelion, <1 near aphelion, =√2 at escape`]},
 
     {header : '—  Energy & Momentum —' },
       {label : () => `Specific Orbital Energy (ε)`,
-       value : [ { v: () => OrbitalFormulas.specificEnergy(_kcOrbEl('mercury').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.specificEnergy(_chainOrbEl('mercury').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`]},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_kcOrbEl('mercury').aAU * currentAUDistance, _kcOrbEl('mercury').e), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_chainOrbEl('mercury').aAU * currentAUDistance, _chainOrbEl('mercury').e), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`]},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(_kcOrbEl('mercury').aAU * currentAUDistance, _kcOrbEl('mercury').e), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(_chainOrbEl('mercury').aAU * currentAUDistance, _chainOrbEl('mercury').e), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
@@ -42981,14 +42981,14 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
        {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('mercury', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainAscNodeInvPlaneSSDeg('mercury', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('mercury', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => (_chainAscNodeInvPlaneSSDeg('mercury', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => _kcArgPeriInvPlaneDeg('mercury', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainArgPeriInvPlaneDeg('mercury', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
@@ -42999,10 +42999,10 @@ const planetStats = {
        hover : [`Whether planet is currently north (above) or south (below) of the invariable plane`]},
     null,
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * mercuryOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * mercuryOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × a. Actual values vary slightly with orbital position due to eccentricity.`]},
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * mercuryOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * mercuryOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
        hover : [`Mean maximum height in km: ±sin(i) × a × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
@@ -43039,39 +43039,39 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(_kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(_chainElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_kcElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg, _kcArgPeriInvPlaneDeg('mercury', o.julianDay), o.mercuryTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_chainElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg, _chainArgPeriInvPlaneDeg('mercury', o.julianDay), o.mercuryTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
       {label : () => `Phase Angle to Earth (α)`,
-       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.mercuryTrueAnomaly, o.mercuryPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _kcPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.mercuryTrueAnomaly, o.mercuryPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _chainPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('mercury', o.julianDay).e, o.mercuryEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(mercuryOrbitDistance * currentAUDistance, _kcElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(mercuryOrbitDistance * currentAUDistance, _chainElementsOfDate('mercury', o.julianDay).e, o.mercuryTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_chainNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_chainNOfDate('mercury', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.mercuryMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => _kcApsidalPeriodYears('mercury', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('mercury'); return [`Period for Mercury's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       value : [ { v: () => _chainApsidalPeriodYears('mercury', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : () => { const _s = _chainSecularShape('mercury'); return [`Period for Mercury's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -43080,7 +43080,7 @@ const planetStats = {
        hover : [`Mercury is in a Cassini state (MESSENGER): its spin axis precesses with the orbit's ascending node. Value = the chain's MEASURED window node rate (governed artifact windowElementRates, 1800–2100). Negative = retrograde. At J2000.`]},
       ..._planetSpinRows('mercury', 'Mercury', { cassini: true }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
-       value : [ { v: () => { const _s = _kcSecularShape('mercury'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => { const _s = _chainSecularShape('mercury'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Mercury's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
       {label : () => `Obliquity Cycle (observed)`,
        value : [ { v: () => 895000, dec:0, sep:',' },{ small: 'years' }],
@@ -43090,23 +43090,23 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'mercury' },
     null,
     null,
-      {label : () => { const s = _kcSecularShape('mercury'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Mercury' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('mercury').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('mercury'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Mercury' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('mercury').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The dominant secular mode of the eccentricity vector z = e·e^{iϖ} in the model's own N-body mode table (the governed artifact). Its frequency is the base rate the perihelion rides — the long-term mean while this amplitude dominates. The percentage is this mode's share of the planet's summed mode amplitudes (Σ|A| over the full table). Labelled by the nearest Laskar (2004) reference frequency: a label, never an input`],
        static: true},
-      {label : () => { const s = _kcSecularShape('mercury'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Mercury' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('mercury').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('mercury'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Mercury' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('mercury').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The second-largest mode: the planet whose eigenmode contributes most to the wobble around the base rate. For Mercury the Venus (g2) and Jupiter (g5) companions are a near-tie (A 0.0243 vs 0.0242). The percentage is its share of the summed mode amplitudes; the companion/base ratio sets how far the rate of date swings`],
        static: true},
-      {label : () => { const s = _kcSecularShape('mercury'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
+      {label : () => { const s = _chainSecularShape('mercury'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
       {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('mercury', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : _kcSceneRateHover},
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYearsScene('mercury', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _chainSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYears('mercury', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYears('mercury', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
     ],
     venus: [
@@ -43128,13 +43128,13 @@ const planetStats = {
       'null_row',
     null,
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _kcElementsOfDate('venus', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
+       value : [ { v: () => _chainElementsOfDate('venus', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => _kcElementsOfDate('venus', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('venus', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 3.39°) — from the N-body element set the scene renders`]},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => _kcElementsOfDate('venus', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('venus', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -43165,23 +43165,23 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbital period (P)`,
-       value : [ { v: () => 360/_kcNOfDate('venus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
+       value : [ { v: () => 360/_chainNOfDate('venus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Venus's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_chainNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Venus's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('venus', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_chainNOfDate('venus', o.currentYear) - _chainNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Venus's synodic period with Earth, of date: P = 360°/|n_Venus − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('venus', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _chainNOfDate('venus', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(venusOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (venusRotationPeriod*(((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)+venusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (venusRotationPeriod*(((360/_chainNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_chainNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)+venusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Venus's solar day ≈ 117 Earth days. Shorter than its sidereal day (243 d) due to retrograde rotation`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => venusRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -43189,20 +43189,20 @@ const planetStats = {
 
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
-       value : [ { v: () => _kcOrbEl('venus').aAU, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => _chainOrbEl('venus').aAU, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Venus’s osculating semi-major axis of date from the model’s own N-body chain (engine-D elements at the loaded epoch; short-period terms included). The scene’s ring geometry keeps its fixed anchor as machinery.`]},
       {label : () => `Semi-major axis (km)`,
-       value : [ { v: () => _kcOrbEl('venus').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => _chainOrbEl('venus').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
        hover : [`The osculating a of date × the AU in km (currentAUDistance — deep-time mutable).`]},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_kcOrbEl('venus').aAU, _kcOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_chainOrbEl('venus').aAU, _chainOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`]},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(_kcOrbEl('venus').aAU, _kcOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(_chainOrbEl('venus').aAU, _chainOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`]},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(_kcOrbEl('venus').aAU, _kcOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(_chainOrbEl('venus').aAU, _chainOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`]},
       {label : () => `Current distance from Sun (r)`,
        value : [ { v: () => venus.sunDistAU, dec:6, sep:',' },{ small: 'AU' }],
@@ -43210,36 +43210,36 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_kcOrbEl('venus').aAU, _kcOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_chainOrbEl('venus').aAU, _chainOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`]},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(_kcOrbEl('venus').aAU, _kcOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(_chainOrbEl('venus').aAU, _chainOrbEl('venus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`]},
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('venus').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
+       value : [ { v: () => (_chainOrbEl('venus').aAU * currentAUDistance * Math.PI * 2) / (((360/_chainNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Venus mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
-       value : [ { v: () => OrbitalFormulas.orbitalVelocity(venus.sunDistAU * currentAUDistance, _kcOrbEl('venus').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_kcOrbEl('venus').aAU * currentAUDistance, _kcOrbEl('venus').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_kcOrbEl('venus').aAU * currentAUDistance, _kcOrbEl('venus').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
+       value : [ { v: () => OrbitalFormulas.orbitalVelocity(venus.sunDistAU * currentAUDistance, _chainOrbEl('venus').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_chainOrbEl('venus').aAU * currentAUDistance, _chainOrbEl('venus').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_chainOrbEl('venus').aAU * currentAUDistance, _chainOrbEl('venus').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(_kcOrbEl('venus').aAU * currentAUDistance, _kcOrbEl('venus').e, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(_chainOrbEl('venus').aAU * currentAUDistance, _chainOrbEl('venus').e, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(_kcOrbEl('venus').aAU * currentAUDistance, _kcOrbEl('venus').e, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(_chainOrbEl('venus').aAU * currentAUDistance, _chainOrbEl('venus').e, o.venusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_kcOrbEl('venus').aAU * currentAUDistance, _kcOrbEl('venus').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_chainOrbEl('venus').aAU * currentAUDistance, _chainOrbEl('venus').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`]},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_kcOrbEl('venus').aAU * currentAUDistance, _kcOrbEl('venus').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_chainOrbEl('venus').aAU * currentAUDistance, _chainOrbEl('venus').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_kcOrbEl('venus').e), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('venus').e), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -43250,18 +43250,18 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.circularVelocity(venus.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity needed for circular orbit at current distance: v_circ = √(GM/r)`]},
       {label : () => `Velocity ratio (v/v_circ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(venus.sunDistAU * currentAUDistance, _kcOrbEl('venus').aAU * currentAUDistance), venus.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(venus.sunDistAU * currentAUDistance, _chainOrbEl('venus').aAU * currentAUDistance), venus.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
        hover : [`Current velocity vs circular: >1 near perihelion, <1 near aphelion, =√2 at escape`]},
 
     {header : '—  Energy & Momentum —' },
       {label : () => `Specific Orbital Energy (ε)`,
-       value : [ { v: () => OrbitalFormulas.specificEnergy(_kcOrbEl('venus').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.specificEnergy(_chainOrbEl('venus').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`]},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_kcOrbEl('venus').aAU * currentAUDistance, _kcOrbEl('venus').e), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_chainOrbEl('venus').aAU * currentAUDistance, _chainOrbEl('venus').e), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`]},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(_kcOrbEl('venus').aAU * currentAUDistance, _kcOrbEl('venus').e), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(_chainOrbEl('venus').aAU * currentAUDistance, _chainOrbEl('venus').e), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
@@ -43288,14 +43288,14 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('venus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainAscNodeInvPlaneSSDeg('venus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('venus', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => (_chainAscNodeInvPlaneSSDeg('venus', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => _kcArgPeriInvPlaneDeg('venus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainArgPeriInvPlaneDeg('venus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
@@ -43306,10 +43306,10 @@ const planetStats = {
        hover : [`Whether planet is currently north (above) or south (below) of the invariable plane`]},
     null,
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('venus', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * venusOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('venus', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * venusOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × a. Actual values vary slightly with orbital position due to eccentricity.`]},
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('venus', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * venusOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('venus', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * venusOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
        hover : [`Mean maximum height in km: ±sin(i) × a × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
@@ -43346,67 +43346,67 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(_kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(_chainElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_kcElementsOfDate('venus', o.julianDay).inclInvPlaneDeg, _kcArgPeriInvPlaneDeg('venus', o.julianDay), o.venusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_chainElementsOfDate('venus', o.julianDay).inclInvPlaneDeg, _chainArgPeriInvPlaneDeg('venus', o.julianDay), o.venusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
       {label : () => `Phase Angle to Earth (α)`,
-       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.venusTrueAnomaly, o.venusPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _kcPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.venusTrueAnomaly, o.venusPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _chainPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('venus', o.julianDay).e, o.venusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('venus', o.julianDay).e, o.venusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(venusOrbitDistance * currentAUDistance, _kcElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(venusOrbitDistance * currentAUDistance, _chainElementsOfDate('venus', o.julianDay).e, o.venusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_chainNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_chainNOfDate('venus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.venusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => _kcApsidalPeriodYears('venus', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('venus'); return [`Period for Venus's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       value : [ { v: () => _chainApsidalPeriodYears('venus', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : () => { const _s = _chainSecularShape('venus'); return [`Period for Venus's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
       ..._planetSpinRows('venus', 'Venus', { retrograde: true, note: 'Closure at J2000: the derived pole rate against the measured 44.58 ± 3.3 ″/yr (Margot et al. 2021, whose C/MR² was inferred from that rate).' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
-       value : [ { v: () => { const _s = _kcSecularShape('venus'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => { const _s = _chainSecularShape('venus'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Venus's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'venus' },
     null,
     null,
-      {label : () => { const s = _kcSecularShape('venus'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Venus' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('venus').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('venus'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Venus' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('venus').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The dominant secular mode of the eccentricity vector z = e·e^{iϖ} in the model's own N-body mode table (the governed artifact). Its frequency is the base rate the perihelion rides — the long-term mean while this amplitude dominates. The percentage is this mode's share of the planet's summed mode amplitudes (Σ|A| over the full table). Labelled by the nearest Laskar (2004) reference frequency: a label, never an input`],
        static: true},
-      {label : () => { const s = _kcSecularShape('venus'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Venus' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('venus').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('venus'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Venus' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('venus').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The second-largest mode: the planet whose eigenmode contributes most to the wobble around the base rate. The percentage is its share of the summed mode amplitudes; the companion/base ratio sets how far the rate of date swings`],
        static: true},
-      {label : () => { const s = _kcSecularShape('venus'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
+      {label : () => { const s = _chainSecularShape('venus'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
       {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('venus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : _kcSceneRateHover},
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYearsScene('venus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _chainSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYears('venus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYears('venus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
@@ -43438,13 +43438,13 @@ const planetStats = {
        static: true},
     null,
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _kcElementsOfDate('mars', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
+       value : [ { v: () => _chainElementsOfDate('mars', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => _kcElementsOfDate('mars', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('mars', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 1.85°) — from the N-body element set the scene renders`]},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => _kcElementsOfDate('mars', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('mars', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -43475,23 +43475,23 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbital period (P)`,
-       value : [ { v: () => 360/_kcNOfDate('mars', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
+       value : [ { v: () => 360/_chainNOfDate('mars', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Mars's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_chainNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Mars's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('mars', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_chainNOfDate('mars', o.currentYear) - _chainNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Mars's synodic period with Earth, of date: P = 360°/|n_Mars − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('mars', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _chainNOfDate('mars', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(marsOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (marsRotationPeriod*(((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-marsRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (marsRotationPeriod*(((360/_chainNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_chainNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-marsRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Martian solar day (sol) ≈ 24h 39m. Very close to Earth's day, enabling human-like work schedules`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => marsRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -43499,20 +43499,20 @@ const planetStats = {
 
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
-       value : [ { v: () => _kcOrbEl('mars').aAU, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => _chainOrbEl('mars').aAU, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mars’s osculating semi-major axis of date from the model’s own N-body chain (engine-D elements at the loaded epoch; short-period terms included). The scene’s ring geometry keeps its fixed anchor as machinery.`]},
       {label : () => `Semi-major axis (km)`,
-       value : [ { v: () => _kcOrbEl('mars').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => _chainOrbEl('mars').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
        hover : [`The osculating a of date × the AU in km (currentAUDistance — deep-time mutable).`]},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_kcOrbEl('mars').aAU, _kcOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_chainOrbEl('mars').aAU, _chainOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`]},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(_kcOrbEl('mars').aAU, _kcOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(_chainOrbEl('mars').aAU, _chainOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`]},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(_kcOrbEl('mars').aAU, _kcOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(_chainOrbEl('mars').aAU, _chainOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`]},
       {label : () => `Current distance from Sun (r)`,
        value : [ { v: () => mars.sunDistAU, dec:6, sep:',' },{ small: 'AU' }],
@@ -43520,36 +43520,36 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_kcOrbEl('mars').aAU, _kcOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_chainOrbEl('mars').aAU, _chainOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`]},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(_kcOrbEl('mars').aAU, _kcOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(_chainOrbEl('mars').aAU, _chainOrbEl('mars').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`]},
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('mars').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
+       value : [ { v: () => (_chainOrbEl('mars').aAU * currentAUDistance * Math.PI * 2) / (((360/_chainNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Mars mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
-       value : [ { v: () => OrbitalFormulas.orbitalVelocity(mars.sunDistAU * currentAUDistance, _kcOrbEl('mars').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_kcOrbEl('mars').aAU * currentAUDistance, _kcOrbEl('mars').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_kcOrbEl('mars').aAU * currentAUDistance, _kcOrbEl('mars').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
+       value : [ { v: () => OrbitalFormulas.orbitalVelocity(mars.sunDistAU * currentAUDistance, _chainOrbEl('mars').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_chainOrbEl('mars').aAU * currentAUDistance, _chainOrbEl('mars').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_chainOrbEl('mars').aAU * currentAUDistance, _chainOrbEl('mars').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(_kcOrbEl('mars').aAU * currentAUDistance, _kcOrbEl('mars').e, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(_chainOrbEl('mars').aAU * currentAUDistance, _chainOrbEl('mars').e, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(_kcOrbEl('mars').aAU * currentAUDistance, _kcOrbEl('mars').e, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(_chainOrbEl('mars').aAU * currentAUDistance, _chainOrbEl('mars').e, o.marsTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_kcOrbEl('mars').aAU * currentAUDistance, _kcOrbEl('mars').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_chainOrbEl('mars').aAU * currentAUDistance, _chainOrbEl('mars').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`]},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_kcOrbEl('mars').aAU * currentAUDistance, _kcOrbEl('mars').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_chainOrbEl('mars').aAU * currentAUDistance, _chainOrbEl('mars').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_kcOrbEl('mars').e), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('mars').e), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -43560,18 +43560,18 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.circularVelocity(mars.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity needed for circular orbit at current distance: v_circ = √(GM/r)`]},
       {label : () => `Velocity ratio (v/v_circ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(mars.sunDistAU * currentAUDistance, _kcOrbEl('mars').aAU * currentAUDistance), mars.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(mars.sunDistAU * currentAUDistance, _chainOrbEl('mars').aAU * currentAUDistance), mars.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
        hover : [`Current velocity vs circular: >1 near perihelion, <1 near aphelion, =√2 at escape`]},
 
     {header : '—  Energy & Momentum —' },
       {label : () => `Specific Orbital Energy (ε)`,
-       value : [ { v: () => OrbitalFormulas.specificEnergy(_kcOrbEl('mars').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.specificEnergy(_chainOrbEl('mars').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`]},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_kcOrbEl('mars').aAU * currentAUDistance, _kcOrbEl('mars').e), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_chainOrbEl('mars').aAU * currentAUDistance, _chainOrbEl('mars').e), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`]},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(_kcOrbEl('mars').aAU * currentAUDistance, _kcOrbEl('mars').e), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(_chainOrbEl('mars').aAU * currentAUDistance, _chainOrbEl('mars').e), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
@@ -43598,14 +43598,14 @@ const planetStats = {
   
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('mars', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainAscNodeInvPlaneSSDeg('mars', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('mars', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => (_chainAscNodeInvPlaneSSDeg('mars', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => _kcArgPeriInvPlaneDeg('mars', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainArgPeriInvPlaneDeg('mars', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
@@ -43616,10 +43616,10 @@ const planetStats = {
        hover : [`Whether planet is currently north (above) or south (below) of the invariable plane`]},
     null,
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('mars', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * marsOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('mars', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * marsOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × a. Actual values vary slightly with orbital position due to eccentricity.`]},
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('mars', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * marsOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('mars', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * marsOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
        hover : [`Mean maximum height in km: ±sin(i) × a × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
@@ -43656,45 +43656,45 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(_kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(_chainElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_kcElementsOfDate('mars', o.julianDay).inclInvPlaneDeg, _kcArgPeriInvPlaneDeg('mars', o.julianDay), o.marsTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_chainElementsOfDate('mars', o.julianDay).inclInvPlaneDeg, _chainArgPeriInvPlaneDeg('mars', o.julianDay), o.marsTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
       {label : () => `Phase Angle to Earth (α)`,
-       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.marsTrueAnomaly, o.marsPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _kcPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.marsTrueAnomaly, o.marsPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _chainPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('mars', o.julianDay).e, o.marsEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('mars', o.julianDay).e, o.marsEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(marsOrbitDistance * currentAUDistance, _kcElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(marsOrbitDistance * currentAUDistance, _chainElementsOfDate('mars', o.julianDay).e, o.marsTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_chainNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_chainNOfDate('mars', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.marsMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => _kcApsidalPeriodYears('mars', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('mars'); return [`Period for Mars's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       value : [ { v: () => _chainApsidalPeriodYears('mars', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : () => { const _s = _chainSecularShape('mars'); return [`Period for Mars's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
       ..._planetSpinRows('mars', 'Mars', { note: 'Closure at J2000: the derived pole rate against the measured −7.606 ″/yr (Konopliv 2016, whose C/MR² was inferred from that rate) — within 0.1 %.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
-       value : [ { v: () => { const _s = _kcSecularShape('mars'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => { const _s = _chainSecularShape('mars'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Mars's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
       {label : () => `Obliquity Cycle (observed)`,
        value : [ { v: () => 124800, dec:0, sep:',' },{ small: 'years' }],
@@ -43704,23 +43704,23 @@ const planetStats = {
       { viz: 'perihelion-chart', planet: 'mars' },
     null,
     null,
-      {label : () => { const s = _kcSecularShape('mars'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Mars' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('mars').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('mars'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Mars' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('mars').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The dominant secular mode of the eccentricity vector z = e·e^{iϖ} in the model's own N-body mode table (the governed artifact). Its frequency is the base rate the perihelion rides — the long-term mean while this amplitude dominates. The percentage is this mode's share of the planet's summed mode amplitudes (Σ|A| over the full table). Labelled by the nearest Laskar (2004) reference frequency: a label, never an input`],
        static: true},
-      {label : () => { const s = _kcSecularShape('mars'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Mars' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('mars').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('mars'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Mars' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('mars').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The second-largest mode: the planet whose eigenmode contributes most to the wobble around the base rate. The percentage is its share of the summed mode amplitudes; the companion/base ratio sets how far the rate of date swings`],
        static: true},
-      {label : () => { const s = _kcSecularShape('mars'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
+      {label : () => { const s = _chainSecularShape('mars'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
       {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('mars', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : _kcSceneRateHover},
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYearsScene('mars', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _chainSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYears('mars', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYears('mars', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
@@ -43752,13 +43752,13 @@ const planetStats = {
        static: true},
     null,
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _kcElementsOfDate('jupiter', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
+       value : [ { v: () => _chainElementsOfDate('jupiter', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => _kcElementsOfDate('jupiter', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('jupiter', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 1.30°) — from the N-body element set the scene renders`]},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => _kcElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — Jupiter dominates the plane, lowest inclination of all planets`]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -43789,23 +43789,23 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbital period (P)`,
-       value : [ { v: () => 360/_kcNOfDate('jupiter', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
+       value : [ { v: () => 360/_chainNOfDate('jupiter', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Jupiter's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_chainNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Jupiter's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('jupiter', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_chainNOfDate('jupiter', o.currentYear) - _chainNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Jupiter's synodic period with Earth, of date: P = 360°/|n_Jupiter − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('jupiter', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _chainNOfDate('jupiter', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(jupiterOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (jupiterRotationPeriod*(((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-jupiterRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (jupiterRotationPeriod*(((360/_chainNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_chainNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-jupiterRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Jupiter's solar day ≈ 9h 55m. Fastest-rotating planet, causing a visible equatorial bulge`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => jupiterRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -43813,20 +43813,20 @@ const planetStats = {
 
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
-       value : [ { v: () => _kcOrbEl('jupiter').aAU, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => _chainOrbEl('jupiter').aAU, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Jupiter’s osculating semi-major axis of date from the model’s own N-body chain (engine-D elements at the loaded epoch; short-period terms included). The scene’s ring geometry keeps its fixed anchor as machinery.`]},
       {label : () => `Semi-major axis (km)`,
-       value : [ { v: () => _kcOrbEl('jupiter').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => _chainOrbEl('jupiter').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
        hover : [`The osculating a of date × the AU in km (currentAUDistance — deep-time mutable).`]},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_kcOrbEl('jupiter').aAU, _kcOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_chainOrbEl('jupiter').aAU, _chainOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`]},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(_kcOrbEl('jupiter').aAU, _kcOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(_chainOrbEl('jupiter').aAU, _chainOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`]},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(_kcOrbEl('jupiter').aAU, _kcOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(_chainOrbEl('jupiter').aAU, _chainOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`]},
       {label : () => `Current distance from Sun (r)`,
        value : [ { v: () => jupiter.sunDistAU, dec:6, sep:',' },{ small: 'AU' }],
@@ -43834,36 +43834,36 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_kcOrbEl('jupiter').aAU, _kcOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_chainOrbEl('jupiter').aAU, _chainOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`]},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(_kcOrbEl('jupiter').aAU, _kcOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(_chainOrbEl('jupiter').aAU, _chainOrbEl('jupiter').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`]},
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('jupiter').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
+       value : [ { v: () => (_chainOrbEl('jupiter').aAU * currentAUDistance * Math.PI * 2) / (((360/_chainNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Jupiter mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
-       value : [ { v: () => OrbitalFormulas.orbitalVelocity(jupiter.sunDistAU * currentAUDistance, _kcOrbEl('jupiter').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_kcOrbEl('jupiter').aAU * currentAUDistance, _kcOrbEl('jupiter').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_kcOrbEl('jupiter').aAU * currentAUDistance, _kcOrbEl('jupiter').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
+       value : [ { v: () => OrbitalFormulas.orbitalVelocity(jupiter.sunDistAU * currentAUDistance, _chainOrbEl('jupiter').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_chainOrbEl('jupiter').aAU * currentAUDistance, _chainOrbEl('jupiter').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_chainOrbEl('jupiter').aAU * currentAUDistance, _chainOrbEl('jupiter').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(_kcOrbEl('jupiter').aAU * currentAUDistance, _kcOrbEl('jupiter').e, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(_chainOrbEl('jupiter').aAU * currentAUDistance, _chainOrbEl('jupiter').e, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(_kcOrbEl('jupiter').aAU * currentAUDistance, _kcOrbEl('jupiter').e, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(_chainOrbEl('jupiter').aAU * currentAUDistance, _chainOrbEl('jupiter').e, o.jupiterTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_kcOrbEl('jupiter').aAU * currentAUDistance, _kcOrbEl('jupiter').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_chainOrbEl('jupiter').aAU * currentAUDistance, _chainOrbEl('jupiter').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`]},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_kcOrbEl('jupiter').aAU * currentAUDistance, _kcOrbEl('jupiter').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_chainOrbEl('jupiter').aAU * currentAUDistance, _chainOrbEl('jupiter').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_kcOrbEl('jupiter').e), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('jupiter').e), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -43874,18 +43874,18 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.circularVelocity(jupiter.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity needed for circular orbit at current distance: v_circ = √(GM/r)`]},
       {label : () => `Velocity ratio (v/v_circ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(jupiter.sunDistAU * currentAUDistance, _kcOrbEl('jupiter').aAU * currentAUDistance), jupiter.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(jupiter.sunDistAU * currentAUDistance, _chainOrbEl('jupiter').aAU * currentAUDistance), jupiter.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
        hover : [`Current velocity vs circular: >1 near perihelion, <1 near aphelion, =√2 at escape`]},
 
     {header : '—  Energy & Momentum —' },
       {label : () => `Specific Orbital Energy (ε)`,
-       value : [ { v: () => OrbitalFormulas.specificEnergy(_kcOrbEl('jupiter').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.specificEnergy(_chainOrbEl('jupiter').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`]},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_kcOrbEl('jupiter').aAU * currentAUDistance, _kcOrbEl('jupiter').e), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_chainOrbEl('jupiter').aAU * currentAUDistance, _chainOrbEl('jupiter').e), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`]},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(_kcOrbEl('jupiter').aAU * currentAUDistance, _kcOrbEl('jupiter').e), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(_chainOrbEl('jupiter').aAU * currentAUDistance, _chainOrbEl('jupiter').e), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
@@ -43912,14 +43912,14 @@ const planetStats = {
 
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('jupiter', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainAscNodeInvPlaneSSDeg('jupiter', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('jupiter', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => (_chainAscNodeInvPlaneSSDeg('jupiter', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => _kcArgPeriInvPlaneDeg('jupiter', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainArgPeriInvPlaneDeg('jupiter', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
@@ -43929,10 +43929,10 @@ const planetStats = {
        value : [ { v: () => o.jupiterAboveInvPlane ? 'ABOVE' : 'BELOW' },{ small: '' }]},
     null,
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * jupiterOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * jupiterOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × a. Actual values vary slightly with orbital position due to eccentricity.`]},
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * jupiterOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * jupiterOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
        hover : [`Mean maximum height in km: ±sin(i) × a × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
@@ -43969,67 +43969,67 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(_kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(_chainElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_kcElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg, _kcArgPeriInvPlaneDeg('jupiter', o.julianDay), o.jupiterTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_chainElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg, _chainArgPeriInvPlaneDeg('jupiter', o.julianDay), o.jupiterTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
       {label : () => `Phase Angle to Earth (α)`,
-       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.jupiterTrueAnomaly, o.jupiterPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _kcPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.jupiterTrueAnomaly, o.jupiterPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _chainPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('jupiter', o.julianDay).e, o.jupiterEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(jupiterOrbitDistance * currentAUDistance, _kcElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(jupiterOrbitDistance * currentAUDistance, _chainElementsOfDate('jupiter', o.julianDay).e, o.jupiterTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_chainNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_chainNOfDate('jupiter', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.jupiterMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => _kcApsidalPeriodYears('jupiter', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('jupiter'); return [`Period for Jupiter's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       value : [ { v: () => _chainApsidalPeriodYears('jupiter', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : () => { const _s = _chainSecularShape('jupiter'); return [`Period for Jupiter's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
       ..._planetSpinRows('jupiter', 'Jupiter', { note: 'Prediction (gravity-constrained C/MR² 0.2639): α lands at the low end of Saillenfest et al. 2020\'s 2.64–3.17 ″/yr range; the spin is adjacent to the engine\'s own s7 line.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
-       value : [ { v: () => { const _s = _kcSecularShape('jupiter'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => { const _s = _chainSecularShape('jupiter'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Jupiter's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'jupiter' },
     null,
     null,
-      {label : () => { const s = _kcSecularShape('jupiter'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Jupiter' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('jupiter').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('jupiter'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Jupiter' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('jupiter').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The dominant secular mode of the eccentricity vector z = e·e^{iϖ} in the model's own N-body mode table (the governed artifact). Its frequency is the base rate the perihelion rides — the long-term mean while this amplitude dominates. The percentage is this mode's share of the planet's summed mode amplitudes (Σ|A| over the full table). Labelled by the nearest Laskar (2004) reference frequency: a label, never an input`],
        static: true},
-      {label : () => { const s = _kcSecularShape('jupiter'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Jupiter' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('jupiter').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('jupiter'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Jupiter' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('jupiter').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The second-largest mode: the planet whose eigenmode contributes most to the wobble around the base rate. The percentage is its share of the summed mode amplitudes; the companion/base ratio sets how far the rate of date swings`],
        static: true},
-      {label : () => { const s = _kcSecularShape('jupiter'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
+      {label : () => { const s = _chainSecularShape('jupiter'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
       {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('jupiter', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : _kcSceneRateHover},
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYearsScene('jupiter', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _chainSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYears('jupiter', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYears('jupiter', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
@@ -44061,13 +44061,13 @@ const planetStats = {
        static: true},
     null,
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _kcElementsOfDate('saturn', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
+       value : [ { v: () => _chainElementsOfDate('saturn', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => _kcElementsOfDate('saturn', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('saturn', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 2.49°) — from the N-body element set the scene renders`]},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => _kcElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -44098,23 +44098,23 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbital period (P)`,
-       value : [ { v: () => 360/_kcNOfDate('saturn', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
+       value : [ { v: () => 360/_chainNOfDate('saturn', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Saturn's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_chainNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Saturn's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('saturn', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_chainNOfDate('saturn', o.currentYear) - _chainNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Saturn's synodic period with Earth, of date: P = 360°/|n_Saturn − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('saturn', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _chainNOfDate('saturn', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(saturnOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (saturnRotationPeriod*(((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-saturnRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (saturnRotationPeriod*(((360/_chainNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_chainNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-saturnRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Saturn's solar day ≈ 10h 34m. Second fastest rotation, determined from Cassini radio emissions`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => saturnRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -44122,20 +44122,20 @@ const planetStats = {
 
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
-       value : [ { v: () => _kcOrbEl('saturn').aAU, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => _chainOrbEl('saturn').aAU, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Saturn’s osculating semi-major axis of date from the model’s own N-body chain (engine-D elements at the loaded epoch; short-period terms included). The scene’s ring geometry keeps its fixed anchor as machinery.`]},
       {label : () => `Semi-major axis (km)`,
-       value : [ { v: () => _kcOrbEl('saturn').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => _chainOrbEl('saturn').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
        hover : [`The osculating a of date × the AU in km (currentAUDistance — deep-time mutable).`]},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_kcOrbEl('saturn').aAU, _kcOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_chainOrbEl('saturn').aAU, _chainOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`]},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(_kcOrbEl('saturn').aAU, _kcOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(_chainOrbEl('saturn').aAU, _chainOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`]},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(_kcOrbEl('saturn').aAU, _kcOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(_chainOrbEl('saturn').aAU, _chainOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`]},
       {label : () => `Current distance from Sun (r)`,
        value : [ { v: () => saturn.sunDistAU, dec:6, sep:',' },{ small: 'AU' }],
@@ -44143,36 +44143,36 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_kcOrbEl('saturn').aAU, _kcOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_chainOrbEl('saturn').aAU, _chainOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`]},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(_kcOrbEl('saturn').aAU, _kcOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(_chainOrbEl('saturn').aAU, _chainOrbEl('saturn').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`]},
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('saturn').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
+       value : [ { v: () => (_chainOrbEl('saturn').aAU * currentAUDistance * Math.PI * 2) / (((360/_chainNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Saturn mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
-       value : [ { v: () => OrbitalFormulas.orbitalVelocity(saturn.sunDistAU * currentAUDistance, _kcOrbEl('saturn').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_kcOrbEl('saturn').aAU * currentAUDistance, _kcOrbEl('saturn').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_kcOrbEl('saturn').aAU * currentAUDistance, _kcOrbEl('saturn').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
+       value : [ { v: () => OrbitalFormulas.orbitalVelocity(saturn.sunDistAU * currentAUDistance, _chainOrbEl('saturn').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_chainOrbEl('saturn').aAU * currentAUDistance, _chainOrbEl('saturn').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_chainOrbEl('saturn').aAU * currentAUDistance, _chainOrbEl('saturn').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(_kcOrbEl('saturn').aAU * currentAUDistance, _kcOrbEl('saturn').e, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(_chainOrbEl('saturn').aAU * currentAUDistance, _chainOrbEl('saturn').e, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(_kcOrbEl('saturn').aAU * currentAUDistance, _kcOrbEl('saturn').e, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(_chainOrbEl('saturn').aAU * currentAUDistance, _chainOrbEl('saturn').e, o.saturnTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_kcOrbEl('saturn').aAU * currentAUDistance, _kcOrbEl('saturn').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_chainOrbEl('saturn').aAU * currentAUDistance, _chainOrbEl('saturn').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`]},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_kcOrbEl('saturn').aAU * currentAUDistance, _kcOrbEl('saturn').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_chainOrbEl('saturn').aAU * currentAUDistance, _chainOrbEl('saturn').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_kcOrbEl('saturn').e), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('saturn').e), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -44183,18 +44183,18 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.circularVelocity(saturn.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity needed for circular orbit at current distance: v_circ = √(GM/r)`]},
       {label : () => `Velocity ratio (v/v_circ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(saturn.sunDistAU * currentAUDistance, _kcOrbEl('saturn').aAU * currentAUDistance), saturn.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(saturn.sunDistAU * currentAUDistance, _chainOrbEl('saturn').aAU * currentAUDistance), saturn.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
        hover : [`Current velocity vs circular: >1 near perihelion, <1 near aphelion, =√2 at escape`]},
 
     {header : '—  Energy & Momentum —' },
       {label : () => `Specific Orbital Energy (ε)`,
-       value : [ { v: () => OrbitalFormulas.specificEnergy(_kcOrbEl('saturn').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.specificEnergy(_chainOrbEl('saturn').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`]},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_kcOrbEl('saturn').aAU * currentAUDistance, _kcOrbEl('saturn').e), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_chainOrbEl('saturn').aAU * currentAUDistance, _chainOrbEl('saturn').e), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`]},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(_kcOrbEl('saturn').aAU * currentAUDistance, _kcOrbEl('saturn').e), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(_chainOrbEl('saturn').aAU * currentAUDistance, _chainOrbEl('saturn').e), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
@@ -44221,14 +44221,14 @@ const planetStats = {
    
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('saturn', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainAscNodeInvPlaneSSDeg('saturn', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('saturn', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => (_chainAscNodeInvPlaneSSDeg('saturn', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => _kcArgPeriInvPlaneDeg('saturn', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainArgPeriInvPlaneDeg('saturn', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
@@ -44239,10 +44239,10 @@ const planetStats = {
        hover : [`Whether planet is currently north (above) or south (below) of the invariable plane`]},
     null,
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * saturnOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * saturnOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × a. Actual values vary slightly with orbital position due to eccentricity.`]},
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * saturnOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * saturnOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
        hover : [`Mean maximum height in km: ±sin(i) × a × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
@@ -44279,67 +44279,67 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(_kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(_chainElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_kcElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg, _kcArgPeriInvPlaneDeg('saturn', o.julianDay), o.saturnTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_chainElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg, _chainArgPeriInvPlaneDeg('saturn', o.julianDay), o.saturnTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
       {label : () => `Phase Angle to Earth (α)`,
-       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.saturnTrueAnomaly, o.saturnPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _kcPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.saturnTrueAnomaly, o.saturnPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _chainPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('saturn', o.julianDay).e, o.saturnEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('saturn', o.julianDay).e, o.saturnEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(saturnOrbitDistance * currentAUDistance, _kcElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(saturnOrbitDistance * currentAUDistance, _chainElementsOfDate('saturn', o.julianDay).e, o.saturnTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_chainNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_chainNOfDate('saturn', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.saturnMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => _kcApsidalPeriodYears('saturn', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('saturn'); return [`Period for Saturn's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       value : [ { v: () => _chainApsidalPeriodYears('saturn', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : () => { const _s = _chainSecularShape('saturn'); return [`Period for Saturn's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
       ..._planetSpinRows('saturn', 'Saturn', { note: 'Prediction (gravity-constrained C/MR² 0.2181): the derived pole rate lands ~11 % above the engine\'s own s8 line (the Ward–Hamilton capture); inside the WH04 libration band 0.2257–0.2438 it lands within 7 %.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
-       value : [ { v: () => { const _s = _kcSecularShape('saturn'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => { const _s = _chainSecularShape('saturn'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Saturn's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'saturn' },
     null,
     null,
-      {label : () => { const s = _kcSecularShape('saturn'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Saturn' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('saturn').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('saturn'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Saturn' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('saturn').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The dominant secular mode of the eccentricity vector z = e·e^{iϖ} in the model's own N-body mode table (the governed artifact). Its frequency is the base rate the perihelion rides — the long-term mean while this amplitude dominates. The percentage is this mode's share of the planet's summed mode amplitudes (Σ|A| over the full table). Labelled by the nearest Laskar (2004) reference frequency: a label, never an input`],
        static: true},
-      {label : () => { const s = _kcSecularShape('saturn'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Saturn' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('saturn').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('saturn'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Saturn' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('saturn').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The second-largest mode: the planet whose eigenmode contributes most to the wobble around the base rate. The percentage is its share of the summed mode amplitudes. Saturn's companion — Jupiter's g5 — is 68 % of its base amplitude, which is why Saturn's rate of date reads retrograde in the current era`],
        static: true},
-      {label : () => { const s = _kcSecularShape('saturn'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
+      {label : () => { const s = _chainSecularShape('saturn'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
       {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('saturn', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : _kcSceneRateHover},
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYearsScene('saturn', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _chainSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYears('saturn', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYears('saturn', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
@@ -44371,13 +44371,13 @@ const planetStats = {
        static: true},
     null,
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _kcElementsOfDate('uranus', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
+       value : [ { v: () => _chainElementsOfDate('uranus', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => _kcElementsOfDate('uranus', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('uranus', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 0.77°) — from the N-body element set the scene renders. Lowest of the outer planets`]},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => _kcElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -44408,23 +44408,23 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbital period (P)`,
-       value : [ { v: () => 360/_kcNOfDate('uranus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
+       value : [ { v: () => 360/_chainNOfDate('uranus', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Uranus's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_chainNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Uranus's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('uranus', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_chainNOfDate('uranus', o.currentYear) - _chainNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Uranus's synodic period with Earth, of date: P = 360°/|n_Uranus − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('uranus', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _chainNOfDate('uranus', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(uranusOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (uranusRotationPeriod*(((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)+uranusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (uranusRotationPeriod*(((360/_chainNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_chainNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)+uranusRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Uranus's solar day ≈ 17h 14m. Extreme axial tilt makes solar/sidereal day relationship unusual`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => uranusRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -44432,20 +44432,20 @@ const planetStats = {
 
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
-       value : [ { v: () => _kcOrbEl('uranus').aAU, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => _chainOrbEl('uranus').aAU, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Uranus’s osculating semi-major axis of date from the model’s own N-body chain (engine-D elements at the loaded epoch; short-period terms included). The scene’s ring geometry keeps its fixed anchor as machinery.`]},
       {label : () => `Semi-major axis (km)`,
-       value : [ { v: () => _kcOrbEl('uranus').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => _chainOrbEl('uranus').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
        hover : [`The osculating a of date × the AU in km (currentAUDistance — deep-time mutable).`]},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_kcOrbEl('uranus').aAU, _kcOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_chainOrbEl('uranus').aAU, _chainOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`]},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(_kcOrbEl('uranus').aAU, _kcOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(_chainOrbEl('uranus').aAU, _chainOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`]},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(_kcOrbEl('uranus').aAU, _kcOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(_chainOrbEl('uranus').aAU, _chainOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`]},
       {label : () => `Current distance from Sun (r)`,
        value : [ { v: () => uranus.sunDistAU, dec:6, sep:',' },{ small: 'AU' }],
@@ -44453,36 +44453,36 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_kcOrbEl('uranus').aAU, _kcOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_chainOrbEl('uranus').aAU, _chainOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`]},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(_kcOrbEl('uranus').aAU, _kcOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(_chainOrbEl('uranus').aAU, _chainOrbEl('uranus').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`]},
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('uranus').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
+       value : [ { v: () => (_chainOrbEl('uranus').aAU * currentAUDistance * Math.PI * 2) / (((360/_chainNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Uranus mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
-       value : [ { v: () => OrbitalFormulas.orbitalVelocity(uranus.sunDistAU * currentAUDistance, _kcOrbEl('uranus').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_kcOrbEl('uranus').aAU * currentAUDistance, _kcOrbEl('uranus').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_kcOrbEl('uranus').aAU * currentAUDistance, _kcOrbEl('uranus').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
+       value : [ { v: () => OrbitalFormulas.orbitalVelocity(uranus.sunDistAU * currentAUDistance, _chainOrbEl('uranus').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_chainOrbEl('uranus').aAU * currentAUDistance, _chainOrbEl('uranus').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_chainOrbEl('uranus').aAU * currentAUDistance, _chainOrbEl('uranus').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(_kcOrbEl('uranus').aAU * currentAUDistance, _kcOrbEl('uranus').e, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(_chainOrbEl('uranus').aAU * currentAUDistance, _chainOrbEl('uranus').e, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(_kcOrbEl('uranus').aAU * currentAUDistance, _kcOrbEl('uranus').e, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(_chainOrbEl('uranus').aAU * currentAUDistance, _chainOrbEl('uranus').e, o.uranusTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_kcOrbEl('uranus').aAU * currentAUDistance, _kcOrbEl('uranus').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_chainOrbEl('uranus').aAU * currentAUDistance, _chainOrbEl('uranus').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`]},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_kcOrbEl('uranus').aAU * currentAUDistance, _kcOrbEl('uranus').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_chainOrbEl('uranus').aAU * currentAUDistance, _chainOrbEl('uranus').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_kcOrbEl('uranus').e), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('uranus').e), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -44493,18 +44493,18 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.circularVelocity(uranus.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity needed for circular orbit at current distance: v_circ = √(GM/r)`]},
       {label : () => `Velocity ratio (v/v_circ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(uranus.sunDistAU * currentAUDistance, _kcOrbEl('uranus').aAU * currentAUDistance), uranus.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(uranus.sunDistAU * currentAUDistance, _chainOrbEl('uranus').aAU * currentAUDistance), uranus.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
        hover : [`Current velocity vs circular: >1 near perihelion, <1 near aphelion, =√2 at escape`]},
 
     {header : '—  Energy & Momentum —' },
       {label : () => `Specific Orbital Energy (ε)`,
-       value : [ { v: () => OrbitalFormulas.specificEnergy(_kcOrbEl('uranus').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.specificEnergy(_chainOrbEl('uranus').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`]},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_kcOrbEl('uranus').aAU * currentAUDistance, _kcOrbEl('uranus').e), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_chainOrbEl('uranus').aAU * currentAUDistance, _chainOrbEl('uranus').e), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`]},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(_kcOrbEl('uranus').aAU * currentAUDistance, _kcOrbEl('uranus').e), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(_chainOrbEl('uranus').aAU * currentAUDistance, _chainOrbEl('uranus').e), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
@@ -44531,14 +44531,14 @@ const planetStats = {
   
    {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('uranus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainAscNodeInvPlaneSSDeg('uranus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('uranus', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => (_chainAscNodeInvPlaneSSDeg('uranus', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => _kcArgPeriInvPlaneDeg('uranus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainArgPeriInvPlaneDeg('uranus', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
@@ -44549,10 +44549,10 @@ const planetStats = {
        hover : [`Whether planet is currently north (above) or south (below) of the invariable plane`]},
     null,
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * uranusOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * uranusOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × a. Actual values vary slightly with orbital position due to eccentricity.`]},
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * uranusOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * uranusOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
        hover : [`Mean maximum height in km: ±sin(i) × a × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
@@ -44589,67 +44589,67 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(_kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(_chainElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_kcElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg, _kcArgPeriInvPlaneDeg('uranus', o.julianDay), o.uranusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_chainElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg, _chainArgPeriInvPlaneDeg('uranus', o.julianDay), o.uranusTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
       {label : () => `Phase Angle to Earth (α)`,
-       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.uranusTrueAnomaly, o.uranusPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _kcPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.uranusTrueAnomaly, o.uranusPerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _chainPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('uranus', o.julianDay).e, o.uranusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('uranus', o.julianDay).e, o.uranusEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(uranusOrbitDistance * currentAUDistance, _kcElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(uranusOrbitDistance * currentAUDistance, _chainElementsOfDate('uranus', o.julianDay).e, o.uranusTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_chainNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_chainNOfDate('uranus', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.uranusMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => _kcApsidalPeriodYears('uranus', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('uranus'); return [`Period for Uranus's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       value : [ { v: () => _chainApsidalPeriodYears('uranus', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : () => { const _s = _chainSecularShape('uranus'); return [`Period for Uranus's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
       ..._planetSpinRows('uranus', 'Uranus', { retrograde: true, note: 'C/MR² is the interior-model class (no measurement); the satellites\' quadrupole dominates J₂ and the period is of order 10⁸ yr.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
-       value : [ { v: () => { const _s = _kcSecularShape('uranus'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => { const _s = _chainSecularShape('uranus'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Uranus's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'uranus' },
     null,
     null,
-      {label : () => { const s = _kcSecularShape('uranus'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Uranus' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('uranus').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('uranus'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Uranus' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('uranus').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The dominant secular mode of the eccentricity vector z = e·e^{iϖ} in the model's own N-body mode table (the governed artifact). Its frequency is the base rate the perihelion rides — the long-term mean while this amplitude dominates. Uranus rides Jupiter's g5 eigenmode: its base shape is borrowed. The percentage is this mode's share of the planet's summed mode amplitudes (Σ|A| over the full table). Labelled by the nearest Laskar (2004) reference frequency: a label, never an input`],
        static: true},
-      {label : () => { const s = _kcSecularShape('uranus'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Uranus' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('uranus').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('uranus'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Uranus' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('uranus').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The second-largest mode: the planet whose eigenmode contributes most to the wobble around the base rate. The percentage is its share of the summed mode amplitudes; the companion/base ratio sets how far the rate of date swings`],
        static: true},
-      {label : () => { const s = _kcSecularShape('uranus'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
+      {label : () => { const s = _chainSecularShape('uranus'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
       {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('uranus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : _kcSceneRateHover},
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYearsScene('uranus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _chainSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYears('uranus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYears('uranus', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
@@ -44681,13 +44681,13 @@ const planetStats = {
        static: true},
     null,
       {label : () => `Orbital Eccentricity (e)`,
-       value : [ { v: () => _kcElementsOfDate('neptune', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
+       value : [ { v: () => _chainElementsOfDate('neptune', o.julianDay).e, dec:8, sep:',' },{ small: 'dimensionless' }],
        hover : [`The chain's eccentricity of date — |z| of the element set the scene renders (secular modes + derived periodic terms)`]},
       {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => _kcElementsOfDate('neptune', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('neptune', o.julianDay).inclEclipticDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the ecliptic (J2000 ≈ 1.77°) — from the N-body element set the scene renders`]},
       {label : () => `Inclination to Inv. plane (I)`,
-       value : [ { v: () => _kcElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg, dec:6, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's inclination of date to the engine's own invariable plane (the system's total-angular-momentum plane) — from the N-body element set the scene renders`]},
 
     {header : '—  Gravitational Influence Zones —' },
@@ -44718,23 +44718,23 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Orbital period (P)`,
-       value : [ { v: () => 360/_kcNOfDate('neptune', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
+       value : [ { v: () => 360/_chainNOfDate('neptune', o.currentYear), dec:6, sep:',' },{ small: 'Julian years' }],
        hover : [`Neptune's sidereal orbital period OF DATE: P = 360°/n with n from the model's own banked λ̇ channel — λ̇₀ (the ±10-Myr run's secular J2000 rate, 2-kyr window: it averages the great-inequality-class wiggles a short era-window fit absorbs, and matches JPL-class periods) × the planet's own constant-GM N-body drift (±10 Myr, clamped beyond) ÷ the Driver-2 mass-loss stretch (the model's falsifiable μ-leg). All factors ≡ 1 at J2000; Julian years = 365.25 SI days (the chain's clock is JD/TT). The era evaluator keeps its own fitted window rate — the measured decomposition split is banked in the artifact (Neptune −497 ppm the largest: a 300-yr window fit absorbs local U–N-inequality slope).`]},
       {label : () => `Orbital period (sidereal)`,
-       value : [ { v: () => (360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/_chainNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Neptune's sidereal period of date in SI days: P = (360°/n) × 365.25, n from the banked λ̇ channel (secular J2000 rate × own N-body drift ÷ Driver-2 mass-loss stretch, each ≡ 1 at J2000). Agreement with JPL-class periods is a result, not an input.`]},
       {label : () => `Orbit Period Synodic`,
-       value : [ { v: () => (360/Math.abs(_kcNOfDate('neptune', o.currentYear) - _kcNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
+       value : [ { v: () => (360/Math.abs(_chainNOfDate('neptune', o.currentYear) - _chainNOfDate('earth', o.currentYear)))*DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: 'days' }],
        hover : [`Neptune's synodic period with Earth, of date: P = 360°/|n_Neptune − n_Earth| × 365.25 — both mean motions from the banked λ̇ channels (each body's own N-body drift; the shared mass-loss stretch scales both, so the synodic period stretches with them). SI days.`]},
       {label : () => `Mean Motion (n)`,
-       value : [ { v: () => _kcNOfDate('neptune', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => _chainNOfDate('neptune', o.currentYear)/DAYS_PER_JULIAN_YEAR, dec:6, sep:',' },{ small: '°/day' }],
        hover : [`The banked λ̇ channel of date (degrees per Julian year: secular J2000 rate × the planet's own N-body drift ÷ the Driver-2 mass-loss stretch), converted to °/SI-day by ÷365.25 — a pure unit conversion; the chain's clock is JD/TT. (365.2422 is Earth's measured mean solar year — an Earth observable that plays no role in another planet's clock.)`]},
       {label : () => `Period (Kepler verification)`,
        value : [ { v: () => OrbitalFormulas.keplerPeriod(neptuneOrbitDistance * currentAUDistance), dec:6, sep:',' },{ small: 'days' }],
        hover : [`Kepler's 3rd Law: P = 2π√(a³/(GM_Sun + GM_Earth)) × (meanSolar/meanSidereal ≈ 0.99996). The system-mass denominator anchors the model's AU and applies to every planet. Algebraically identical to the elaborate two-body form P = 2π√((a−Δa)³/(GM_Sun + GM_Earth − GM_body)) with the exact symmetric Δa = a·(1 − ((GM_Sun + GM_Earth − GM_body)/(GM_Sun + GM_Earth))^(1/3)) — the (a−Δa)³ and (GM_sys − GM_body) terms cancel exactly (see doc 24). The compensation factor reconciles the model's dual year-frame: GM is derived in sidereal-year units, orbit distances in solar-year units via long-term-mean ratios. Deliberately stays on the DEVICE inputs — this row verifies the model’s GM↔AU closure, not the ephemeris; the surrounding rows are the chain’s dynamical values.`]},
     null,
       {label : () => `Length of Day`,
-       value : [ { v: () => (neptuneRotationPeriod*(((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-neptuneRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
+       value : [ { v: () => (neptuneRotationPeriod*(((360/_chainNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24))/((((360/_chainNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24)-neptuneRotationPeriod), dec:6, sep:',' }, { small : 'hours' }],
        hover : [`Neptune's solar day ≈ 16h 7m. Rotation rate determined from Voyager 2 magnetic field measurements`]},
       {label : () => `Length of Sidereal Day`,
        value : [ { v: () => neptuneRotationPeriod, dec:6, sep:',' },{ small: 'hours' }],
@@ -44742,20 +44742,20 @@ const planetStats = {
 
     {header : '—  Orbital Shape & Geometry —' },
       {label : () => `Semi-major axis (a)`,
-       value : [ { v: () => _kcOrbEl('neptune').aAU, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => _chainOrbEl('neptune').aAU, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Neptune’s osculating semi-major axis of date from the model’s own N-body chain (engine-D elements at the loaded epoch; short-period terms included). The scene’s ring geometry keeps its fixed anchor as machinery.`]},
       {label : () => `Semi-major axis (km)`,
-       value : [ { v: () => _kcOrbEl('neptune').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
+       value : [ { v: () => _chainOrbEl('neptune').aAU*currentAUDistance, dec:2, sep:',' },{ small: 'km' }],
        hover : [`The osculating a of date × the AU in km (currentAUDistance — deep-time mutable).`]},
       {label : () => `Semi-minor axis (b)`,
-       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_kcOrbEl('neptune').aAU, _kcOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiMinorAxis(_chainOrbEl('neptune').aAU, _chainOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Half-width of orbital ellipse: b = a × √(1-e²)`]},
     null,
       {label : () => `Perihelion distance (q)`,
-       value : [ { v: () => OrbitalFormulas.perihelionDist(_kcOrbEl('neptune').aAU, _kcOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.perihelionDist(_chainOrbEl('neptune').aAU, _chainOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Closest approach to Sun: q = a(1-e)`]},
       {label : () => `Aphelion distance (Q)`,
-       value : [ { v: () => OrbitalFormulas.aphelionDist(_kcOrbEl('neptune').aAU, _kcOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.aphelionDist(_chainOrbEl('neptune').aAU, _chainOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Farthest distance from Sun: Q = a(1+e)`]},
       {label : () => `Current distance from Sun (r)`,
        value : [ { v: () => neptune.sunDistAU, dec:6, sep:',' },{ small: 'AU' }],
@@ -44763,36 +44763,36 @@ const planetStats = {
        observed: true},
     null,
       {label : () => `Semi-latus rectum (p)`,
-       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_kcOrbEl('neptune').aAU, _kcOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.semiLatusRectum(_chainOrbEl('neptune').aAU, _chainOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Orbital radius at true anomaly = 90°: p = a × (1-e²)`]},
       {label : () => `Focal distance (c)`,
-       value : [ { v: () => OrbitalFormulas.focalDistance(_kcOrbEl('neptune').aAU, _kcOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => OrbitalFormulas.focalDistance(_chainOrbEl('neptune').aAU, _chainOrbEl('neptune').e), dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Distance from ellipse center to focus (Sun): c = a × e`]},
 
     {header : '—  Velocities —' },
       {label : () => `Mean orbital speed`,
-       value : [ { v: () => (_kcOrbEl('neptune').aAU * currentAUDistance * Math.PI * 2) / (((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
+       value : [ { v: () => (_chainOrbEl('neptune').aAU * currentAUDistance * Math.PI * 2) / (((360/_chainNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR)*24),
                    dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Neptune mean speed: v = 2π·a/P — a the chain’s osculating semi-major axis of date, P the λ̇-channel period of date (360°/n × 365.25 d × 24 h). The AU conversion (currentAUDistance) stays deep-time mutable`]},
       {label : () => `Current orbital velocity`,
-       value : [ { v: () => OrbitalFormulas.orbitalVelocity(neptune.sunDistAU * currentAUDistance, _kcOrbEl('neptune').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
-       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_kcOrbEl('neptune').aAU * currentAUDistance, _kcOrbEl('neptune').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_kcOrbEl('neptune').aAU * currentAUDistance, _kcOrbEl('neptune').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
+       value : [ { v: () => OrbitalFormulas.orbitalVelocity(neptune.sunDistAU * currentAUDistance, _chainOrbEl('neptune').aAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       hover : () => [`Instantaneous velocity from vis-viva equation: v = √(GM(2/r - 1/a)). Varies from ${fmtNum(OrbitalFormulas.perihelionVelocity(_chainOrbEl('neptune').aAU * currentAUDistance, _chainOrbEl('neptune').e) * 3600, 0, ',')} km/h at perihelion to ${fmtNum(OrbitalFormulas.aphelionVelocity(_chainOrbEl('neptune').aAU * currentAUDistance, _chainOrbEl('neptune').e) * 3600, 0, ',')} km/h at aphelion (at the loaded epoch)`]},
     null,
       {label : () => `Radial velocity (vᵣ)`,
-       value : [ { v: () => OrbitalFormulas.radialVelocity(_kcOrbEl('neptune').aAU * currentAUDistance, _kcOrbEl('neptune').e, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.radialVelocity(_chainOrbEl('neptune').aAU * currentAUDistance, _chainOrbEl('neptune').e, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component toward/away from Sun: vᵣ = √(GM/p) × e × sin(ν). Positive = moving away, negative = approaching`]},
       {label : () => `Transverse velocity (vₜ)`,
-       value : [ { v: () => OrbitalFormulas.transverseVelocity(_kcOrbEl('neptune').aAU * currentAUDistance, _kcOrbEl('neptune').e, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.transverseVelocity(_chainOrbEl('neptune').aAU * currentAUDistance, _chainOrbEl('neptune').e, o.neptuneTrueAnomaly) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity component perpendicular to radius: vₜ = √(GM/p) × (1 + e × cos(ν)). Always positive`]},
     null,
       {label : () => `Perihelion velocity (vₚ)`,
-       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_kcOrbEl('neptune').aAU * currentAUDistance, _kcOrbEl('neptune').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.perihelionVelocity(_chainOrbEl('neptune').aAU * currentAUDistance, _chainOrbEl('neptune').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Maximum orbital velocity at perihelion: vₚ = √(GM/a) × √((1+e)/(1-e))`]},
       {label : () => `Aphelion velocity (vₐ)`,
-       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_kcOrbEl('neptune').aAU * currentAUDistance, _kcOrbEl('neptune').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
+       value : [ { v: () => OrbitalFormulas.aphelionVelocity(_chainOrbEl('neptune').aAU * currentAUDistance, _chainOrbEl('neptune').e) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_kcOrbEl('neptune').e), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('neptune').e), dec:4, sep:',' },{ small: '' }],
        hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
        static: true},
     null,
@@ -44803,18 +44803,18 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.circularVelocity(neptune.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
        hover : [`Velocity needed for circular orbit at current distance: v_circ = √(GM/r)`]},
       {label : () => `Velocity ratio (v/v_circ)`,
-       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(neptune.sunDistAU * currentAUDistance, _kcOrbEl('neptune').aAU * currentAUDistance), neptune.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
+       value : [ { v: () => OrbitalFormulas.velocityRatio(OrbitalFormulas.orbitalVelocity(neptune.sunDistAU * currentAUDistance, _chainOrbEl('neptune').aAU * currentAUDistance), neptune.sunDistAU * currentAUDistance), dec:4, sep:',' },{ small: '' }],
        hover : [`Current velocity vs circular: >1 near perihelion, <1 near aphelion, =√2 at escape`]},
 
     {header : '—  Energy & Momentum —' },
       {label : () => `Specific Orbital Energy (ε)`,
-       value : [ { v: () => OrbitalFormulas.specificEnergy(_kcOrbEl('neptune').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
+       value : [ { v: () => OrbitalFormulas.specificEnergy(_chainOrbEl('neptune').aAU * currentAUDistance), dec:4, sep:',' },{ small: 'km²/s²' }],
        hover : [`Total mechanical energy per unit mass: ε = -GM/(2a). Negative for bound orbits`]},
       {label : () => `Specific Angular Momentum (h)`,
-       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_kcOrbEl('neptune').aAU * currentAUDistance, _kcOrbEl('neptune').e), dec:2, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.specificAngularMomentum(_chainOrbEl('neptune').aAU * currentAUDistance, _chainOrbEl('neptune').e), dec:2, sep:',' },{ small: 'km²/s' }],
        hover : [`Angular momentum per unit mass: h = √(GM × a × (1-e²)). Constant throughout orbit`]},
       {label : () => `Area Sweep Rate (dA/dt)`,
-       value : [ { v: () => OrbitalFormulas.areaSweepRate(_kcOrbEl('neptune').aAU * currentAUDistance, _kcOrbEl('neptune').e), dec:0, sep:',' },{ small: 'km²/s' }],
+       value : [ { v: () => OrbitalFormulas.areaSweepRate(_chainOrbEl('neptune').aAU * currentAUDistance, _chainOrbEl('neptune').e), dec:0, sep:',' },{ small: 'km²/s' }],
        hover : [`Kepler's 2nd Law: dA/dt = h/2. Constant rate - equal areas in equal times`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
@@ -44841,14 +44841,14 @@ const planetStats = {
  
     {header : '—  Orbital Orientation to Invariable Plane —' },
       {label : () => `Ascending Node on Inv. Plane (Ω)`,
-       value : [ { v: () => _kcAscNodeInvPlaneSSDeg('neptune', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainAscNodeInvPlaneSSDeg('neptune', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The chain's node of date on the engine's own invariable plane, in the Souami & Souchay (2012) longitude origin (the plane's ascending node on the ICRF equator) — derived conversion, zero fitted constants; the remaining offset vs S&S is element class (of-date vs their mean elements)`],
        info  : 'https://en.wikipedia.org/wiki/Invariable_plane'},
       {label : () => `Descending Node on Inv. Plane`,
-       value : [ { v: () => (_kcAscNodeInvPlaneSSDeg('neptune', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => (_chainAscNodeInvPlaneSSDeg('neptune', o.julianDay) + 180) % 360, dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Longitude (S&S origin) where the orbit crosses the invariable plane going south: Ω + 180°`]},
       {label : () => `Arg. of Perihelion to Inv. Plane (ω)`,
-       value : [ { v: () => _kcArgPeriInvPlaneDeg('neptune', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => _chainArgPeriInvPlaneDeg('neptune', o.julianDay), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`The exact in-orbit-plane angle from the orbit's ascending node on the invariable plane to the perihelion direction — from the chain's element set`]},
     null,
       {label : () => `Height above Invariable Plane`,
@@ -44859,10 +44859,10 @@ const planetStats = {
        hover : [`Whether planet is currently north (above) or south (below) of the invariable plane`]},
     null,
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * neptuneOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * neptuneOrbitDistance, dec:6, sep:',' },{ small: 'AU' }],
        hover : [`Mean maximum height above/below the invariable plane: ±sin(i) × a. Actual values vary slightly with orbital position due to eccentricity.`]},
       {label : () => `Max height above Inv. Plane`,
-       value : [ { v: () => Math.sin(_kcElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * neptuneOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => Math.sin(_chainElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg * Math.PI / 180) * neptuneOrbitDistance * currentAUDistance, dec:0, sep:',' },{ small: 'km' }],
        hover : [`Mean maximum height in km: ±sin(i) × a × 149,597,870.7 km. Actual values vary slightly with orbital position due to eccentricity.`]},
 
     {header : '—  Position & Anomalies —' },
@@ -44899,67 +44899,67 @@ const planetStats = {
        info  : 'https://en.wikipedia.org/wiki/Argument_of_latitude'},
     null,
       {label : () => `Flight Path Angle (γ)`,
-       value : [ { v: () => OrbitalFormulas.flightPathAngle(_kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.flightPathAngle(_chainElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angle between velocity vector and local horizontal: tan(γ) = e·sin(ν) / (1 + e·cos(ν))`],
        info  : 'https://en.wikipedia.org/wiki/Flight_path_angle'},
       {label : () => `Heliocentric Latitude (β)`,
-       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_kcElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg, _kcArgPeriInvPlaneDeg('neptune', o.julianDay), o.neptuneTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.heliocentricLatitude(_chainElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg, _chainArgPeriInvPlaneDeg('neptune', o.julianDay), o.neptuneTrueAnomaly), dec:4, sep:',' },{ small: 'degrees (°)' }],
        hover : [`sin(β) = sin(i) × sin(ω + ν), where i = inclination to inv. plane, ω = argument of periapsis measured from the ascending node ON the invariable plane (the K5c vector construction — matching the latitude's reference plane), ν = true anomaly. Oscillates ±i`]},
       {label : () => `Phase Angle to Earth (α)`,
-       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.neptuneTrueAnomaly, o.neptunePerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _kcPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
+       value : [ { v: () => OrbitalFormulas.phaseAngle(OrbitalFormulas.trueLongitude(o.neptuneTrueAnomaly, o.neptunePerihelionEcliptic), OrbitalFormulas.trueLongitude(o.earthTrueAnomaly, _chainPerihelionEclLonDeg('earth', o.julianDay))), dec:2, sep:',' },{ small: 'degrees (°)' }],
        hover : [`Angular separation from Earth as seen from Sun: 0° = conjunction, 180° = opposition`],
        info  : 'https://en.wikipedia.org/wiki/Phase_angle_(astronomy)'},
     null,
       {label : () => `True Anomaly Rate (dν/dt)`,
-       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.trueAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of true anomaly: dν/dt = n(1+e·cos(ν))²/(1-e²)^1.5. Fastest at perihelion`]},
       {label : () => `Eccentric Anomaly Rate (dE/dt)`,
-       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR), _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
+       value : [ { v: () => OrbitalFormulas.eccentricAnomalyRate(OrbitalFormulas.meanMotion((360/_chainNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR), _chainElementsOfDate('neptune', o.julianDay).e, o.neptuneEccentricAnomaly), dec:6, sep:',' },{ small: '°/day' }],
        hover : [`Rate of change of eccentric anomaly: dE/dt = n / (1 - e×cos(E))`]},
       {label : () => `Radius of Curvature (ρ)`,
-       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(neptuneOrbitDistance * currentAUDistance, _kcElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
+       value : [ { v: () => OrbitalFormulas.radiusOfCurvature(neptuneOrbitDistance * currentAUDistance, _chainElementsOfDate('neptune', o.julianDay).e, o.neptuneTrueAnomaly), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Radius of osculating circle at current position: smallest at perihelion, largest at aphelion`]},
 
     {header : '—  Time Calculations —' },
       {label : () => `Time since perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeSincePerihelion((360/_chainNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days elapsed since last perihelion passage: t = P × M / 360°`]},
       {label : () => `Time to next perihelion`,
-       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_kcNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
+       value : [ { v: () => OrbitalFormulas.timeToNextPerihelion((360/_chainNOfDate('neptune', o.currentYear))*DAYS_PER_JULIAN_YEAR, o.neptuneMeanAnomaly), dec:2, sep:',' },{ small: 'days' }],
        hover : [`Days until next perihelion passage: t = P × (360° - M) / 360°`]},
 
     {header : '—  Perihelion Precession (apsidal · g) —' },
       {label : () => `Perihelion Precession Duration against Ecliptic`,
-       value : [ { v: () => _kcApsidalPeriodYears('neptune', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : () => { const _s = _kcSecularShape('neptune'); return [`Period for Neptune's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
+       value : [ { v: () => _chainApsidalPeriodYears('neptune', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
+       hover : () => { const _s = _chainSecularShape('neptune'); return [`Period for Neptune's perihelion to complete one revolution against the ecliptic — the SECULAR tier's tangent of date (the series evaluator, ±1,000-yr central difference; the SAME evaluator as the Prec. cell under Perihelion Longitudes and the Framework Verification "Perihelion precession" form, so all three read identically and move together). Negative = retrograde. Stable deep-time base: the dominant secular mode ${_s.dom.g[0]}, ${Math.round(1296000/_s.dom.arcsecPerYr).toLocaleString('en-US')} yr (the model's own N-body mode table; the Laskar name is a label, never an input).`]; },
        highlight: true},
     null,
     {header : '—  Long-Period Cycles —' },
       ..._planetSpinRows('neptune', 'Neptune', { note: 'Starts from the MEAN pole (the 688-yr Triton-forced nutation is not in the channel): the J2000 obliquity reads 27.85°, 0.5° below the instantaneous IAU 28.32°. C/MR² is the interior-model class; Triton\'s retrograde orbit enters the angular-momentum term with its sign.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
-       value : [ { v: () => { const _s = _kcSecularShape('neptune'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
+       value : [ { v: () => { const _s = _chainSecularShape('neptune'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : [`|e| wobble period = the beat of the two largest secular modes of Neptune's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'neptune' },
     null,
     null,
-      {label : () => { const s = _kcSecularShape('neptune'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Neptune' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('neptune').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('neptune'); return `┌ Secular base mode — ${s.dom.g[0]} (${s.dom.g[1] === 'Neptune' ? 'own' : s.dom.g[1]}), A ${s.dom.amp.toFixed(4)} · ${s.dom.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('neptune').dom.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The dominant secular mode of the eccentricity vector z = e·e^{iϖ} in the model's own N-body mode table (the governed artifact). Its frequency is the base rate the perihelion rides — the long-term mean while this amplitude dominates. The percentage is this mode's share of the planet's summed mode amplitudes (Σ|A| over the full table). Labelled by the nearest Laskar (2004) reference frequency: a label, never an input`],
        static: true},
-      {label : () => { const s = _kcSecularShape('neptune'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Neptune' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
-       value : [ { v: () => _kcSecularShape('neptune').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
+      {label : () => { const s = _chainSecularShape('neptune'); return `├ Largest companion — ${s.sub.g[0]} (${s.sub.g[1] === 'Neptune' ? 'own family' : s.sub.g[1]}), A ${s.sub.amp.toFixed(4)} · ${s.sub.sharePct.toFixed(0)} %`; },
+       value : [ { v: () => _chainSecularShape('neptune').sub.arcsecPerYr * 100, dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The second-largest mode: the planet whose eigenmode contributes most to the wobble around the base rate. The percentage is its share of the summed mode amplitudes; the companion/base ratio sets how far the rate of date swings`],
        static: true},
-      {label : () => { const s = _kcSecularShape('neptune'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
+      {label : () => { const s = _chainSecularShape('neptune'); return `├ Remaining ${s.rest.count} modes — A ${s.rest.amp.toFixed(4)} · ${s.rest.sharePct.toFixed(0)} %`; },
        value : [ { v: () => '—' }],
        hover : [`The smaller modes of the table summed: base + companion + these account for 100 % of the summed mode amplitudes. Each turns at its own frequency, so no single rate applies to the group`],
        static: true},
       {label : () => `├ Perihelion rate of date (scene, osculating, ±150 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYearsScene('neptune', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
-       hover : _kcSceneRateHover},
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYearsScene('neptune', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       hover : _chainSceneRateHover},
       {label : () => `└ Perihelion rate of date (secular tier, ±1,000 yr)`,
-       value : [ { v: () => 129600000 / _kcApsidalPeriodYears('neptune', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
+       value : [ { v: () => 129600000 / _chainApsidalPeriodYears('neptune', o.julianDay), dec:1, sep:',' },{ small: '″/100yr' }],
        hover : [`The secular apsidal rate at the current scene date: central difference of the series tier's ϖ over ±1,000 yr — the same evaluator and stencil as the Framework Verification "Perihelion precession" form, so the two read one number. Signed (negative = retrograde). The row above shows what the scene's perihelion marker does NOW instead — the osculating apse, which for Jupiter and Saturn carries the Great-Inequality phase (Saturn regresses in the current centuries) and for the near-circular giants is the apse's jitter on the synodic lines`]},
 
     ],
@@ -45150,11 +45150,11 @@ function computeSunSSBOffset(year) {
   const contributions = {};
 
   for (const p of planetList) {
-    const r = _kcHelioAU(p.key, jd);   // AU, ecliptic J2000
+    const r = _chainHelioAU(p.key, jd);   // AU, ecliptic J2000
     const scale = (p.mass / M_SUN) * AU_J2000_KM;
-    const cx = (r[0] * _KC_IP_X[0] + r[1] * _KC_IP_X[1] + r[2] * _KC_IP_X[2]) * scale;
-    const cy = (r[0] * _KC_IP_Y[0] + r[1] * _KC_IP_Y[1] + r[2] * _KC_IP_Y[2]) * scale;
-    const cz = (r[0] * _KC_IP_Z[0] + r[1] * _KC_IP_Z[1] + r[2] * _KC_IP_Z[2]) * scale;
+    const cx = (r[0] * _CHAIN_IP_X[0] + r[1] * _CHAIN_IP_X[1] + r[2] * _CHAIN_IP_X[2]) * scale;
+    const cy = (r[0] * _CHAIN_IP_Y[0] + r[1] * _CHAIN_IP_Y[1] + r[2] * _CHAIN_IP_Y[2]) * scale;
+    const cz = (r[0] * _CHAIN_IP_Z[0] + r[1] * _CHAIN_IP_Z[1] + r[2] * _CHAIN_IP_Z[2]) * scale;
     x += cx;  y += cy;  z += cz;
     contributions[p.key] = Math.sqrt(cx * cx + cy * cy + cz * cz);
   }
@@ -45385,7 +45385,7 @@ function buildSunSSBChart(currentYear) {
 const _periChartCache = {};   // per-planet sampled cycle window {k, yrs, incl, ecl, iMin, iMax}
 function buildPerihelionChart(planetKey, currentYear) {
   // P5 restatement — the chart draws the CHAIN's own inclination history:
-  // elements of date via _kcElementsOfDate (era chain + the D5 series
+  // elements of date via _chainElementsOfDate (era chain + the D5 series
   // override at deep time), sampled over ONE period of the planet's
   // dominant nodal secular mode (governed artifact `s`; owner choice:
   // per-planet mode period).
@@ -45414,7 +45414,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   // the chain element set (their series override serves them).
   const inclOf = (el, yr) => planetKey === 'earth' ? inclInvPlaneModel(yr) : el.inclInvPlaneDeg;
   // Series-identity guard (the owner-seen "jump came back"): the samples
-  // below ride _kcChartElementsOfDate, whose smoothing needs the async
+  // below ride _chainChartElementsOfDate, whose smoothing needs the async
   // series artifact — a window sampled BEFORE the artifact landed cached
   // the raw era-chain curve (the old handover step) and, with Mercury's
   // 232-kyr window, kept it for the session. A series flip invalidates.
@@ -45424,7 +45424,7 @@ function buildPerihelionChart(planetKey, currentYear) {
     let iMin = 0, iMax = 0;
     for (let i = 0; i < N; i++) {
       const y = y0 + (T * i) / (N - 1);
-      const el = _kcChartElementsOfDate(planetKey, yrToJd(y));
+      const el = _chainChartElementsOfDate(planetKey, yrToJd(y));
       // Earth's ecliptic inclination is 0 BY DEFINITION at every epoch
       // (the ecliptic of date IS Earth's mean orbital plane — the panel
       // row's convention, owner-ruled). The J2000-frame drift the element
@@ -45458,9 +45458,9 @@ function buildPerihelionChart(planetKey, currentYear) {
 
   const curYear = Math.round(currentYear || startmodelYear);
   const simInWindow = curYear >= y0 && curYear <= y0 + T;
-  const elNow = _kcChartElementsOfDate(planetKey, yrToJd(curYear));
+  const elNow = _chainChartElementsOfDate(planetKey, yrToJd(curYear));
   const refYear = Math.round(startmodelYear);
-  const elFix = _kcChartElementsOfDate(planetKey, yrToJd(refYear));
+  const elFix = _chainChartElementsOfDate(planetKey, yrToJd(refYear));
   const fixedInWindow = refYear >= y0 && refYear <= y0 + T;
   const cx = toX(curYear).toFixed(1), cy = toY(inclOf(elNow, curYear)).toFixed(1);
   const fxX = toX(refYear).toFixed(1), fxY = toY(inclOf(elFix, refYear)).toFixed(1);
@@ -45483,7 +45483,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   // own element set so the dot readouts ride the curves.
   const invNodeOf = (el, yr) => planetKey === 'earth'
     ? ascNodeInvPlaneModel(yr)   // R9: the one-source node (≡ the drawer row and the inclination path)
-    : convertNodeSFrameToEquatorOriginDeg(el.ascNodeInvPlaneDeg, _kcNodeOriginSSDeg());
+    : convertNodeSFrameToEquatorOriginDeg(el.ascNodeInvPlaneDeg, _chainNodeOriginSSDeg());
   // Earth's ϖ of date: the series the chart curve itself draws (sampled at
   // the engine year — R4b), else the certified J2000 general-precession
   // rate — never the H/13 counter (4.3″/cy off the curve, measured).
@@ -46577,25 +46577,25 @@ const _moonVisualMatrix = new THREE.Matrix4();
 // Pluto/Halleys/Eros (no chain) stay on the geometric construction.
 // R — the scene's world frame: the J2000 ecliptic, ONE home
 // @essrt/physics earth/frame-of-date (A2).
-let _kcChains = null;
-const _kcR = computeSceneWorldFrameJ2000();
-const _KC_PLANET_NAMES = new Set(['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']);
-function _kcHelioAU(nameLower, jd) {
+let _chainChains = null;
+const _chainR = computeSceneWorldFrameJ2000();
+const _CHAIN_PLANET_NAMES = new Set(['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune']);
+function _chainHelioAU(nameLower, jd) {
   // D5: positions and rings share the SAME override (DEFAULT-ON, the early
   // flip) — the planet stays on its ring by construction at every epoch.
   // One home + the exact-key memo: this was an inline copy of
-  // _kcElementsOfDate (same chain call, same override, same order). The sun
+  // _chainElementsOfDate (same chain call, same override, same order). The sun
   // plane IS the engine's ecliptic of date (_applyEngineEarthFrame), the same
   // ζ series the chain's Earth rides, so the chain sits on it by construction.
   // Raw J2000 ecliptic AU.
-  const el = _kcElementsOfDate(nameLower, jd);
+  const el = _chainElementsOfDate(nameLower, jd);
   const p = kcComputeHeliocentricEclipticFromElements(el);
   return [p.xAU, p.yAU, p.zAU];
 }
 /** The chain's heliocentric ecliptic-J2000 AU at an ENGINE year (true TT,
  *  Julian from J2000 — _engineYearTT's axis), bypassing the JD→TT bridge and
  *  the exact-key memo: for the RING samplers, which read 257 vertices per
- *  planet per resample. Since R9 every _kcElementsOfDate read pays the ΔT
+ *  planet per resample. Since R9 every _chainElementsOfDate read pays the ΔT
  *  Simpson integration (33 nodes of the LOD stack, α(t) included), so a ring
  *  resample paid 7 × 257 of them — measured 35 % of the frame at 1000 yr/s,
  *  where the 10-yr resample condition fires every frame (4×/s floor). The
@@ -46603,12 +46603,12 @@ function _kcHelioAU(nameLower, jd) {
  *  seconds to minutes across a period, and the vertex at the current date
  *  reads the mesh's own year exactly — so the samplers bridge ONCE per
  *  resample and step in Julian years. Same elements, same override, same
- *  order as _kcElementsOfDate; the mesh, panels and traces keep the exact
+ *  order as _chainElementsOfDate; the mesh, panels and traces keep the exact
  *  per-JD route. */
-function _kcHelioAUAtEngineYear(nameLower, year) {
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
-  const p = kcComputeHeliocentricEclipticFromElements(_planetSeriesData ? _kcSeriesSecularEl(nameLower, year, el) : el);
+function _chainHelioAUAtEngineYear(nameLower, year) {
+  if (!_chainChains) _chainChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  const el = kcComputePlanetElementsAtYear(year, _chainChains[nameLower], _chainChains);
+  const p = kcComputeHeliocentricEclipticFromElements(_planetSeriesData ? _chainSeriesSecularEl(nameLower, year, el) : el);
   return [p.xAU, p.yAU, p.zAU];
 }
 // D5 (?hybridSpin) — the planets' deep-time secular elements: beyond a
@@ -46622,7 +46622,7 @@ function _kcHelioAUAtEngineYear(nameLower, year) {
 // well-behaved (the secular/fast split). The inv-plane pair is
 // recomputed from the substituted ecliptic elements with the SAME K5c
 // exact rotation the evaluator uses.
-function _kcModeSum(modes, t) {
+function _chainModeSum(modes, t) {
   let re = 0, im = 0;
   for (const m of modes) {
     const c = Math.cos(m.omegaRadPerYr * t), s = Math.sin(m.omegaRadPerYr * t);
@@ -46635,11 +46635,11 @@ function _kcModeSum(modes, t) {
 // (the same module the Node engine mirror consumes — cross-engine-probed);
 // this is the browser's thin construction over the fetched artifact + the
 // embedded chain anchors and deep mode tables.
-let _kcSeriesOverrideM = null;
-function _kcSeriesSecularEl(nm, year, el) {
+let _chainSeriesOverrideM = null;
+function _chainSeriesSecularEl(nm, year, el) {
   if (!_planetSeriesData) return el;
-  if (!_kcSeriesOverrideM) {
-    _kcSeriesOverrideM = createSecularSeriesOverride({
+  if (!_chainSeriesOverrideM) {
+    _chainSeriesOverrideM = createSecularSeriesOverride({
       series: _planetSeriesData,
       anchorElements: CHAIN_ARTIFACT.j2000AnchorElements,
       invariablePlane: CHAIN_ARTIFACT.invariablePlane,
@@ -46647,7 +46647,7 @@ function _kcSeriesSecularEl(nm, year, el) {
       planetZetaModes: DEEP_MODES_ARTIFACT.planetZeta,
     });
   }
-  return _kcSeriesOverrideM.applyToElements(nm, year, el);
+  return _chainSeriesOverrideM.applyToElements(nm, year, el);
 }
 // D5b — THE RELATIVE-PLANE CORRECTION (owner finding: "the universe becomes
 // too chaotic"). The engine-true planet planes wander vs the FIXED J2000
@@ -46660,9 +46660,9 @@ function _kcSeriesSecularEl(nm, year, el) {
 // PLANE OF DATE, mounted on the scene's sun plane: one minimal rotation
 // (engine-Earth normal → scene-plane normal), applied in the helio-J2000
 // frame so positions, rings and traces all inherit it through the one
-// _kcHelioAU path. The visible tilts then ARE the true mutual
+// _chainHelioAU path. The visible tilts then ARE the true mutual
 // inclinations (Mercury ~8°, Mars ~5° at +1.35 Myr).
-function _kcEarthEngineOrbitNormalJ2000(year) {
+function _chainEarthEngineOrbitNormalJ2000(year) {
   const t = year - 2000;
   const D2R = DEG2RAD;
   let qx, qy;
@@ -46673,8 +46673,8 @@ function _kcEarthEngineOrbitNormalJ2000(year) {
     qx = li(S.q, t) + (s2h * Math.cos(DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg * D2R) - li(S.q, 0));
     qy = li(S.p, t) + (s2h * Math.sin(DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg * D2R) - li(S.p, 0));
   } else {
-    const [mr, mi] = _kcModeSum(DEEP_MODES_ARTIFACT.earthZeta, t);
-    const [m0r, m0i] = _kcModeSum(DEEP_MODES_ARTIFACT.earthZeta, 0);
+    const [mr, mi] = _chainModeSum(DEEP_MODES_ARTIFACT.earthZeta, t);
+    const [m0r, m0i] = _chainModeSum(DEEP_MODES_ARTIFACT.earthZeta, 0);
     const s2h = Math.sin(DEEP_MODES_ARTIFACT.anchorInclEclipticDeg / 2 * D2R);
     qx = mr + (s2h * Math.cos(DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg * D2R) - m0r);
     qy = mi + (s2h * Math.sin(DEEP_MODES_ARTIFACT.anchorAscNodeEclipticDeg * D2R) - m0i);
@@ -46691,31 +46691,31 @@ function _kcEarthEngineOrbitNormalJ2000(year) {
 // (pure in (name, jd) given the loaded series; the series-identity guard
 // clears the memo when the async artifact arrives). Callers treat the
 // elements as read-only. Bounded by wholesale clear.
-let _kcElMemoSeries = null;
-const _kcElMemo = new Map();
-const _KC_EL_MEMO_CAP = 2048;   // > one Sun-SSB chart burst (201×8 keys) so a chart rebuild cannot evict the frame's panel entries
-function _kcElementsOfDate(nameLower, jd) {
-  if (_planetSeriesData !== _kcElMemoSeries) { _kcElMemo.clear(); _kcElMemoSeries = _planetSeriesData; }
+let _chainElMemoSeries = null;
+const _chainElMemo = new Map();
+const _CHAIN_EL_MEMO_CAP = 2048;   // > one Sun-SSB chart burst (201×8 keys) so a chart rebuild cannot evict the frame's panel entries
+function _chainElementsOfDate(nameLower, jd) {
+  if (_planetSeriesData !== _chainElMemoSeries) { _chainElMemo.clear(); _chainElMemoSeries = _planetSeriesData; }
   const memoKey = nameLower + '|' + jd;
-  const hit = _kcElMemo.get(memoKey);
+  const hit = _chainElMemo.get(memoKey);
   if (hit !== undefined) return hit;
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  if (!_chainChains) _chainChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   // R9: the chain's argument is DYNAMICAL time — the ONE engine year (true
   // TT, Julian from J2000.0 TT = the KC anchor), the axis the Sun, Moon and
   // Earth frame already ride (R4/R4b/R5). Read at UT the planets lagged the
   // Sun by ΔT of mean motion: Mercury 9″ at 2000, 0.8° at −500, 3.5° at
   // −3000, an arbitrary phase at deep time (measured; Node twin identical).
   const year = _engineYearTT(jd);
-  const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
+  const el = kcComputePlanetElementsAtYear(year, _chainChains[nameLower], _chainChains);
   // Planet override DEFAULT-ON once the series is loaded (the early flip);
   // inside each planet's measured boundary this is a no-op (chain serves).
-  const out = _planetSeriesData ? _kcSeriesSecularEl(nameLower, year, el) : el;
-  if (_kcElMemo.size >= _KC_EL_MEMO_CAP) _kcElMemo.clear();
-  _kcElMemo.set(memoKey, out);
+  const out = _planetSeriesData ? _chainSeriesSecularEl(nameLower, year, el) : el;
+  if (_chainElMemo.size >= _CHAIN_EL_MEMO_CAP) _chainElMemo.clear();
+  _chainElMemo.set(memoKey, out);
   return out;
 }
-function _kcPerihelionEclLonDeg(nameLower, jd) {
-  return _kcElementsOfDate(nameLower, jd).lonPeriEclipticDeg;
+function _chainPerihelionEclLonDeg(nameLower, jd) {
+  return _chainElementsOfDate(nameLower, jd).lonPeriEclipticDeg;
 }
 /** Earth's ecliptic ϖ OF DATE (equinox-referenced), degrees — ONE home for the
  *  Earth panel's ϖ/ω rows, the perihelion gauge and the mean/true-longitude
@@ -46736,7 +46736,7 @@ function _kcPerihelionEclLonDeg(nameLower, jd) {
  *  campaign replaces the offset by its movement, the panel follows. */
 function earthPerihelionEclipticOfDateDeg(jd, year) {
   if (_hybridSpinActive()) return wrap360(_tierModelB().sun.perihelionLongitudeDegAt(_engineYearTT(jd)));
-  const w = _kcPerihelionEclLonDeg('earth', jd) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000);
+  const w = _chainPerihelionEclLonDeg('earth', jd) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000);
   return wrap360(w);
 }
 // D5 CHART SMOOTHING (owner: the chain→series handover drew visible jumps
@@ -46747,16 +46747,16 @@ function earthPerihelionEclipticOfDateDeg(jd, year) {
 // so the curves stay scene-faithful to displayed precision while losing
 // the artificial step. The SCENE and panels keep the D5 handover exactly
 // as certified — this evaluator serves buildPerihelionChart ONLY.
-let _kcChartSeriesM = null;
-function _kcChartElementsOfDate(nameLower, jd) {
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
-  const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _kcElementsOfDate
-  const el = kcComputePlanetElementsAtYear(year, _kcChains[nameLower], _kcChains);
+let _chainChartSeriesM = null;
+function _chainChartElementsOfDate(nameLower, jd) {
+  if (!_chainChains) _chainChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _chainElementsOfDate
+  const el = kcComputePlanetElementsAtYear(year, _chainChains[nameLower], _chainChains);
   if (!_planetSeriesData) return el;
-  if (!_kcChartSeriesM) {
+  if (!_chainChartSeriesM) {
     const rows = {};
     for (const nm of Object.keys(_planetSeriesData.bodies)) rows[nm] = { pastKyr: 0, futureKyr: 0 };
-    _kcChartSeriesM = createSecularSeriesOverride({
+    _chainChartSeriesM = createSecularSeriesOverride({
       series: Object.assign({}, _planetSeriesData, { verdict: Object.assign({}, _planetSeriesData.verdict, { planetHandover: { rows } }) }),
       anchorElements: CHAIN_ARTIFACT.j2000AnchorElements,
       invariablePlane: CHAIN_ARTIFACT.invariablePlane,
@@ -46764,7 +46764,7 @@ function _kcChartElementsOfDate(nameLower, jd) {
       planetZetaModes: DEEP_MODES_ARTIFACT.planetZeta,
     });
   }
-  return _kcChartSeriesM.applyToElements(nameLower, year, el);
+  return _chainChartSeriesM.applyToElements(nameLower, year, el);
 }
 // K5c node-origin derivation — the chain's invariable-plane node expressed
 // in the Souami & Souchay (2012) longitude origin (the plane's ascending
@@ -46772,25 +46772,25 @@ function _kcChartElementsOfDate(nameLower, jd) {
 // (@essrt/physics/planets/inv-plane-frame: banked plane + J2000 mean
 // obliquity, zero fitted constants). The engine s-frame stays the internal
 // machinery convention; published surfaces speak this one.
-let _kcNodeOriginSSDegCache = null;
-function _kcNodeOriginSSDeg() {
-  if (_kcNodeOriginSSDegCache === null) {
-    _kcNodeOriginSSDegCache = computeEquatorNodeOriginSFrameDeg(CHAIN_ARTIFACT.invariablePlane, K.earthOrbital.obliquityJ2000_deg);
+let _chainNodeOriginSSDegCache = null;
+function _chainNodeOriginSSDeg() {
+  if (_chainNodeOriginSSDegCache === null) {
+    _chainNodeOriginSSDegCache = computeEquatorNodeOriginSFrameDeg(CHAIN_ARTIFACT.invariablePlane, K.earthOrbital.obliquityJ2000_deg);
   }
-  return _kcNodeOriginSSDegCache;
+  return _chainNodeOriginSSDegCache;
 }
-function _kcAscNodeInvPlaneSSDeg(nameLower, jd) {
-  return convertNodeSFrameToEquatorOriginDeg(_kcElementsOfDate(nameLower, jd).ascNodeInvPlaneDeg, _kcNodeOriginSSDeg());
+function _chainAscNodeInvPlaneSSDeg(nameLower, jd) {
+  return convertNodeSFrameToEquatorOriginDeg(_chainElementsOfDate(nameLower, jd).ascNodeInvPlaneDeg, _chainNodeOriginSSDeg());
 }
 // K5c — the EXACT invariable-plane argument of periapsis: the in-orbit-plane
 // angle from the orbit's ascending node ON THE INVARIABLE PLANE to the
 // perihelion direction (vector construction).
-function _kcArgPeriInvPlaneDeg(nameLower, jd) {
-  return _kcArgPeriInvPlaneFromEl(_kcElementsOfDate(nameLower, jd));
+function _chainArgPeriInvPlaneDeg(nameLower, jd) {
+  return _chainArgPeriInvPlaneFromEl(_chainElementsOfDate(nameLower, jd));
 }
 // Same construction on a CALLER-SUPPLIED element set (the cycle chart's
 // series-tier elements) — one implementation, two entry points.
-function _kcArgPeriInvPlaneFromEl(el) {
+function _chainArgPeriInvPlaneFromEl(el) {
   const D2R = DEG2RAD;
   const O = el.ascNodeEclipticDeg * D2R, inc = el.inclEclipticDeg * D2R;
   const w = (el.lonPeriEclipticDeg - el.ascNodeEclipticDeg) * D2R;
@@ -46818,25 +46818,25 @@ function _kcArgPeriInvPlaneFromEl(el) {
 // artifact, x̂ = ecliptic-X projected into the plane (the s-frame node
 // origin), ŷ = ẑ × x̂. Serves the heights above the plane, the mass-weighted
 // balance gauge and the Sun-SSB offset.
-const _KC_IP_Z = (() => {
+const _CHAIN_IP_Z = (() => {
   const D2R = DEG2RAD, IP = CHAIN_ARTIFACT.invariablePlane;
   const fi = IP.inclEclipticDeg * D2R, fO = IP.ascNodeEclipticDeg * D2R;
   return [Math.sin(fi) * Math.sin(fO), -Math.sin(fi) * Math.cos(fO), Math.cos(fi)];
 })();
-const _KC_IP_X = (() => {
-  const z = _KC_IP_Z;
+const _CHAIN_IP_X = (() => {
+  const z = _CHAIN_IP_Z;
   const x = [1 - z[0] * z[0], -z[0] * z[1], -z[0] * z[2]];
   const n = Math.hypot(x[0], x[1], x[2]);
   return [x[0] / n, x[1] / n, x[2] / n];
 })();
-const _KC_IP_Y = [
-  _KC_IP_Z[1] * _KC_IP_X[2] - _KC_IP_Z[2] * _KC_IP_X[1],
-  _KC_IP_Z[2] * _KC_IP_X[0] - _KC_IP_Z[0] * _KC_IP_X[2],
-  _KC_IP_Z[0] * _KC_IP_X[1] - _KC_IP_Z[1] * _KC_IP_X[0],
+const _CHAIN_IP_Y = [
+  _CHAIN_IP_Z[1] * _CHAIN_IP_X[2] - _CHAIN_IP_Z[2] * _CHAIN_IP_X[1],
+  _CHAIN_IP_Z[2] * _CHAIN_IP_X[0] - _CHAIN_IP_Z[0] * _CHAIN_IP_X[2],
+  _CHAIN_IP_Z[0] * _CHAIN_IP_X[1] - _CHAIN_IP_Z[1] * _CHAIN_IP_X[0],
 ];
 // The planet-family bodies the inv-plane machinery reads from the chain
 // (option A: Earth's DISPLAY rides the chain with the other seven).
-const _KC_IP_BODY_KEYS = new Set(['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
+const _CHAIN_IP_BODY_KEYS = new Set(['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
 // P5/K5b — the VISIBLE perihelion markers ("PERIHELION MERCURY" …): under
 // the flag their DIRECTION is the chain's ϖ(t) while the PRESENTATION stays
 // the established device convention — a direction indicator at the legacy
@@ -46852,16 +46852,16 @@ const _KC_IP_BODY_KEYS = new Set(['mercury', 'venus', 'earth', 'mars', 'jupiter'
 // calibrated on — is engine-placed from the series (R4). At deep time the
 // display shows the true wander + the 405-kyr eccentricity beat.
 // Pluto/Halleys/Eros: no chain.
-const _KC_PERI_MARKERS = {
+const _CHAIN_PERI_MARKERS = {
   'PERIHELION MERCURY': 'mercury', 'PERIHELION VENUS': 'venus',
   'PERIHELION MARS': 'mars', 'PERIHELION JUPITER': 'jupiter',
   'PERIHELION SATURN': 'saturn', 'PERIHELION URANUS': 'uranus',
   'PERIHELION NEPTUNE': 'neptune', 'PERIHELION-OF-EARTH': 'earth',
 };
-const _KC_ANCHOR = new THREE.Vector3();   // scratch for the device origin
+const _CHAIN_ANCHOR = new THREE.Vector3();   // scratch for the device origin
 // The apsidal period of date the planet panels quote — the SECULAR tier
 // (measured): the smooth series evaluator the VFP
-// Perihelion-precession form rides (_kcChartElementsOfDate, handover 0),
+// Perihelion-precession form rides (_chainChartElementsOfDate, handover 0),
 // differenced over the form's named ±1,000-yr stencil (_VFPPP_STENCIL_YR),
 // so the two surfaces read one family by construction. The former family —
 // a ±150-yr central difference on the FULL chain, periodic terms in — was
@@ -46874,7 +46874,7 @@ const _KC_ANCHOR = new THREE.Vector3();   // scratch for the device origin
 // secular tier moved a few ″/cy per century. Signed: a negative period is a
 // retrograde apse (Venus's secular ϖ turns slowly; a near-zero rate is the
 // e → 0 polar singularity, not physics — the form's caption says the same).
-const _kcWrapPeriod = (d, D) => {
+const _chainWrapPeriod = (d, D) => {
   while (d > 180) d -= 360;
   while (d < -180) d += 360;
   return d === 0 ? Infinity : 360 * (2 * D) / d;
@@ -46888,21 +46888,21 @@ const _kcWrapPeriod = (d, D) => {
 // osculating apse's jitter on the synodic lines (Neptune swings tens of
 // thousands of ″/cy century to century) and must be read as such — the
 // hovers say which. Earth: its one movement (the same as the secular row).
-function _kcSceneRateHover() {   // hoisted — the planet panels' row objects are built before this point in the file
+function _chainSceneRateHover() {   // hoisted — the planet panels' row objects are built before this point in the file
   return ['What the scene’s perihelion marker does NOW: central difference of ϖ over ±150 yr on the FULL chain, periodic terms included (the osculating apse). Signed — Saturn’s perihelion regresses in the current centuries because the Jupiter–Saturn great inequality is in that phase (JPL 1900–2100: −1,577 ″/cy), which the secular row below averages away. For the near-circular giants (Uranus, Neptune) this is the apse’s jitter on the synodic lines, tens of thousands of ″/cy swinging sign century to century — the polar coordinate near e → 0, not a precession; read the secular row for the precession.'];
 }
-function _kcApsidalPeriodYearsScene(nameLower, jd) {
-  if (nameLower === 'earth') return _kcApsidalPeriodYears('earth', jd);
+function _chainApsidalPeriodYearsScene(nameLower, jd) {
+  if (nameLower === 'earth') return _chainApsidalPeriodYears('earth', jd);
   const year = _engineYearTT(jd);
-  if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+  if (!_chainChains) _chainChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
   const D = 150;
-  const w1 = kcComputePlanetElementsAtYear(year - D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
-  const w2 = kcComputePlanetElementsAtYear(year + D, _kcChains[nameLower], _kcChains).lonPeriEclipticDeg;
-  return _kcWrapPeriod(w2 - w1, D);
+  const w1 = kcComputePlanetElementsAtYear(year - D, _chainChains[nameLower], _chainChains).lonPeriEclipticDeg;
+  const w2 = kcComputePlanetElementsAtYear(year + D, _chainChains[nameLower], _chainChains).lonPeriEclipticDeg;
+  return _chainWrapPeriod(w2 - w1, D);
 }
-function _kcApsidalPeriodYears(nameLower, jd) {
-  const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _kcElementsOfDate
-  const wrapPeriod = _kcWrapPeriod;
+function _chainApsidalPeriodYears(nameLower, jd) {
+  const year = _engineYearTT(jd);   // R9: the engine year (true TT), as _chainElementsOfDate
+  const wrapPeriod = _chainWrapPeriod;
   if (nameLower === 'earth') {
     // EARTH rides the ONE movement (the scene's apsidal wheel turns with the
     // series' ϖ of date): the one family's anom/(anom − sid), ≡ 360°/its
@@ -46912,15 +46912,15 @@ function _kcApsidalPeriodYears(nameLower, jd) {
     // ?hybridSpin=0 page): the chain's own ±150-yr tangent, as before — Earth's
     // chain carries no periodic layer, so that tangent IS its secular rate.
     if (_hybridSpinActive()) return _yearLengthsM().inclinationPrecessionYearsAtYear(year);
-    if (!_kcChains) _kcChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
+    if (!_chainChains) _chainChains = buildPlanetChainsFromArtifactData(CHAIN_ARTIFACT);
     const D = 150;
-    const w1 = kcComputePlanetElementsAtYear(year - D, _kcChains.earth, _kcChains).lonPeriEclipticDeg;
-    const w2 = kcComputePlanetElementsAtYear(year + D, _kcChains.earth, _kcChains).lonPeriEclipticDeg;
+    const w1 = kcComputePlanetElementsAtYear(year - D, _chainChains.earth, _chainChains).lonPeriEclipticDeg;
+    const w2 = kcComputePlanetElementsAtYear(year + D, _chainChains.earth, _chainChains).lonPeriEclipticDeg;
     return wrapPeriod(w2 - w1, D);
   }
   const D = _VFPPP_STENCIL_YR;
-  const w1 = _kcChartElementsOfDate(nameLower, _vfpPPYrToJd(year - D)).lonPeriEclipticDeg;
-  const w2 = _kcChartElementsOfDate(nameLower, _vfpPPYrToJd(year + D)).lonPeriEclipticDeg;
+  const w1 = _chainChartElementsOfDate(nameLower, _vfpPPYrToJd(year - D)).lonPeriEclipticDeg;
+  const w2 = _chainChartElementsOfDate(nameLower, _vfpPPYrToJd(year + D)).lonPeriEclipticDeg;
   return wrapPeriod(w2 - w1, D);
 }
 // The OF-DATE TANGENT of the orbit's ascending node ON the invariable
@@ -46928,10 +46928,10 @@ function _kcApsidalPeriodYears(nameLower, jd) {
 // on the series-aware elements of date. Signed: nodal regression reads
 // negative. The STABLE statement is the dominant nodal s-mode
 // (CHAIN_ARTIFACT.s, Laskar-labeled) — the panel hover carries it.
-function _kcNodeInvPlanePeriodYears(nameLower, jd) {
+function _chainNodeInvPlanePeriodYears(nameLower, jd) {
   const D = 150;
-  const n1 = _kcElementsOfDate(nameLower, jd - D * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
-  const n2 = _kcElementsOfDate(nameLower, jd + D * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
+  const n1 = _chainElementsOfDate(nameLower, jd - D * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
+  const n2 = _chainElementsOfDate(nameLower, jd + D * DAYS_PER_JULIAN_YEAR).ascNodeInvPlaneDeg;
   let d = n2 - n1;
   while (d > 180) d -= 360;
   while (d < -180) d += 360;
@@ -46947,25 +46947,25 @@ function _kcNodeInvPlanePeriodYears(nameLower, jd) {
 // nearestLaskar convention) — and each label names the planet whose
 // eigenmode it is: Earth and Uranus ride Jupiter's g5, their base shape is
 // borrowed.
-const _KC_G_REFERENCE = [
+const _CHAIN_G_REFERENCE = [
   ['g1', 'Mercury', 5.5965], ['g2', 'Venus', 7.4555], ['g3', 'Earth', 17.3688],
   ['g4', 'Mars', 17.9159], ['g5', 'Jupiter', 4.2575], ['g6', 'Saturn', 28.2450],
   ['g7', 'Uranus', 3.0868], ['g8', 'Neptune', 0.6730],
 ];
-const _kcShapeCache = {};
-function _kcSecularShape(nameLower) {
-  if (_kcShapeCache[nameLower]) return _kcShapeCache[nameLower];
+const _chainShapeCache = {};
+function _chainSecularShape(nameLower) {
+  if (_chainShapeCache[nameLower]) return _chainShapeCache[nameLower];
   const radToArcsec = 180 / Math.PI * 3600;
   const modes = CHAIN_ARTIFACT.secularModes[nameLower].z
     .map((m) => ({ arcsecPerYr: m.omegaRadPerYr * radToArcsec, amp: Math.hypot(m.re, m.im) }))
     .sort((a, b) => b.amp - a.amp);
-  const label = (f) => _KC_G_REFERENCE.reduce((best, g) => (Math.abs(f - g[2]) < Math.abs(f - best[2]) ? g : best));
+  const label = (f) => _CHAIN_G_REFERENCE.reduce((best, g) => (Math.abs(f - g[2]) < Math.abs(f - best[2]) ? g : best));
   const ampSumAll = modes.reduce((t, m) => t + m.amp, 0);
   const dom = { ...modes[0], g: label(modes[0].arcsecPerYr), sharePct: modes[0].amp / ampSumAll * 100 };
   const sub = { ...modes[1], g: label(modes[1].arcsecPerYr), sharePct: modes[1].amp / ampSumAll * 100 };
   const restAmp = ampSumAll - modes[0].amp - modes[1].amp;
   const rest = { count: modes.length - 2, amp: restAmp, sharePct: restAmp / ampSumAll * 100 };
-  return (_kcShapeCache[nameLower] = { dom, sub, rest });
+  return (_chainShapeCache[nameLower] = { dom, sub, rest });
 }
 // R4 "one Earth frame": R IS the J2000 ecliptic frame (A2 — world Y the J2000
 // ecliptic pole, the equinox at the recorded view azimuth 90°; ONE home
@@ -47004,7 +47004,7 @@ function _kcSecularShape(nameLower) {
 // is pending and the rest pose renders (a few frames); no state is derived
 // from those frames.
 // ═══════════════════════════════════════════════════════════════════════════
-function _kcSetWorldRotation(obj, X, Y, Z) {
+function _chainSetWorldRotation(obj, X, Y, Z) {
   // obj takes the WORLD rotation with unit columns X, Y, Z: local = parentWorld⁻¹ · W
   _HTC_M4.makeBasis(X, Y, Z);
   _HTC_Q3.setFromRotationMatrix(_HTC_M4);
@@ -47012,22 +47012,22 @@ function _kcSetWorldRotation(obj, X, Y, Z) {
   obj.quaternion.copy(_HTC_Q4.multiply(_HTC_Q3));
   obj.updateMatrixWorld(true);
 }
-// (The J2000 rest sample _KC_J2000_REST_SAMPLE — the frame placed before the
+// (The J2000 rest sample _CHAIN_J2000_REST_SAMPLE — the frame placed before the
 // series artifact arrives — is declared beside the star field's alignment,
 // which reads it at module init.)
 function _applyEngineEarthFrame(jdUT) {
-  const R = _kcR;
+  const R = _chainR;
   // one clock, one argument: the engine year (true TT, Julian — _engineYearTT);
   // the J2000 anchors until the series artifact has arrived
-  const smp = _hybridSpinActive() ? _hybridSeriesSampleAt(_engineYearTT(jdUT)) : _KC_J2000_REST_SAMPLE;
+  const smp = _hybridSpinActive() ? _hybridSeriesSampleAt(_engineYearTT(jdUT)) : _CHAIN_J2000_REST_SAMPLE;
   const F = computeEarthFrameOfDate(smp);
   const toW = (v, out) => out.set(
     R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
     R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2],
     R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
-  const n = toW(F.n, _KC_TA), g = toW(F.g, _KC_TE), s = toW(F.s, _KC_TS);
+  const n = toW(F.n, _CHAIN_TA), g = toW(F.g, _CHAIN_TE), s = toW(F.s, _CHAIN_TS);
   // the sun plane and the apsidal wheel
-  _kcSetWorldRotation(earthPerihelionPrecession1.containerObj, g, n, _HTC_U.crossVectors(g, n));
+  _chainSetWorldRotation(earthPerihelionPrecession1.containerObj, g, n, _HTC_U.crossVectors(g, n));
   // the Moon stack's base — the ecliptic OF DATE (pole n, equinox g), placed
   // like the sun plane (measured on the Node twin: a flat J2000 base put the
   // visible ring's plane 0.5° (−3 kyr) to 8.7° (−5 Myr) off the rendered series
@@ -47037,7 +47037,7 @@ function _applyEngineEarthFrame(jdUT) {
   // quarter turn from ĝ (measured exactly 90.0000° at J2000 on the Node twin):
   // basis [X = n̂ × ĝ, Y = n̂, Z = ĝ]. Mirror: tools/lib/scene-graph.js
   // _applyEngineEarthFrame.
-  _kcSetWorldRotation(moonApsidalPrecession.containerObj, _HTC_U.crossVectors(n, g), n, g);
+  _chainSetWorldRotation(moonApsidalPrecession.containerObj, _HTC_U.crossVectors(n, g), n, g);
   // the Moon RING's stack layers from the lunar arguments: in the stack's
   // basis a layer angle θ carries the longitude 90° + θ, the apsidal arm
   // −a·e·X̂ points at the apogee, and the Moon def's fixed tilt puts the
@@ -47061,7 +47061,7 @@ function _applyEngineEarthFrame(jdUT) {
   const lam = _tierModelB().eclipse.sunLonCompletedDegAtJD(jdUT + deltaTStart / SECONDS_PER_DAY) * (Math.PI / 180);
   sun.orbitObj.rotation.y = solveWheelAngleForLongitude(lam, smp.e, peri);
   // the axis
-  _kcSetWorldRotation(earth.rotationAxis, _HTC_A.crossVectors(s, g), s, g);
+  _chainSetWorldRotation(earth.rotationAxis, _HTC_A.crossVectors(s, g), s, g);
   startingPoint.pivotObj.updateMatrixWorld(true);
 }
 // The focused chain planet's orbit-plane grid, placed from the engine every
@@ -47071,8 +47071,8 @@ function _applyEngineEarthFrame(jdUT) {
 // direction — the frame computeInspectorOrbitFrame renders. Only a visible
 // grid is placed (one at a time: switchToPlanet hides the others). Gate:
 // perihelion-at-sun's orbit-plane rows.
-const _KC_OP_X = new THREE.Vector3(), _KC_OP_Z = new THREE.Vector3();
-function _kcPlaceOrbitPlaneHelpers() {
+const _CHAIN_OP_X = new THREE.Vector3(), _CHAIN_OP_Z = new THREE.Vector3();
+function _chainPlaceOrbitPlaneHelpers() {
   for (const key of Object.keys(PLANET_HIERARCHIES)) {
     const pd = PLANET_HIERARCHIES[key].obj();
     const grid = pd && pd.orbitPlaneHelper;
@@ -47080,50 +47080,50 @@ function _kcPlaceOrbitPlaneHelpers() {
     const f = computeInspectorOrbitFrame(key);
     if (!f) continue;
     grid.position.copy(f.S);
-    _KC_OP_X.copy(f.p);
-    _KC_OP_Z.crossVectors(_KC_OP_X, f.nOrb).normalize();
-    _HTC_M4.makeBasis(_KC_OP_X, f.nOrb, _KC_OP_Z);
+    _CHAIN_OP_X.copy(f.p);
+    _CHAIN_OP_Z.crossVectors(_CHAIN_OP_X, f.nOrb).normalize();
+    _HTC_M4.makeBasis(_CHAIN_OP_X, f.nOrb, _CHAIN_OP_Z);
     grid.quaternion.setFromRotationMatrix(_HTC_M4);
     grid.updateMatrixWorld(true);
   }
 }
-const _KC_V = new THREE.Vector3();   // scratch for the visual override
+const _CHAIN_V = new THREE.Vector3();   // scratch for the visual override
 // P5/K5b — the chain position AT AN ARBITRARY MOMENT, for consumers that
 // re-animate the scene to past epochs (the trace sampler): the overridden
 // meshes carry only the CURRENT date's chain offset, so a time-travelling
 // reader must re-evaluate the chain at the sampled jd. This mirrors the two
 // updatePositions override branches — keep them in step.
-const _KC_TS = new THREE.Vector3(), _KC_TE = new THREE.Vector3(), _KC_TA = new THREE.Vector3();
-function _kcChainWorldPos(obj, jd, out) {
-  if (!_kcR) return false;
-  const _R = _kcR;
-  const periKey = _KC_PERI_MARKERS[obj.name];
-  const isPlanet = _KC_PLANET_NAMES.has(obj.name);
+const _CHAIN_TS = new THREE.Vector3(), _CHAIN_TE = new THREE.Vector3(), _CHAIN_TA = new THREE.Vector3();
+function _chainChainWorldPos(obj, jd, out) {
+  if (!_chainR) return false;
+  const _R = _chainR;
+  const periKey = _CHAIN_PERI_MARKERS[obj.name];
+  const isPlanet = _CHAIN_PLANET_NAMES.has(obj.name);
   if (!periKey && !isPlanet) return false;
-  sun.planetObj.getWorldPosition(_KC_TS);          // updates ancestor matrices
+  sun.planetObj.getWorldPosition(_CHAIN_TS);          // updates ancestor matrices
   if (isPlanet) {
     const nm = obj.name.toLowerCase();
     const toW = (hv) => out.set(
-      _KC_TS.x + 100 * (_R[0][0] * hv[0] + _R[0][1] * hv[1] + _R[0][2] * hv[2]),
-      _KC_TS.y + 100 * (_R[1][0] * hv[0] + _R[1][1] * hv[1] + _R[1][2] * hv[2]),
-      _KC_TS.z + 100 * (_R[2][0] * hv[0] + _R[2][1] * hv[1] + _R[2][2] * hv[2]));
-    earth.rotationAxis.getWorldPosition(_KC_TE);
-    toW(_kcHelioAU(nm, jd));
-    const dAU = out.distanceTo(_KC_TE) / 100;
+      _CHAIN_TS.x + 100 * (_R[0][0] * hv[0] + _R[0][1] * hv[1] + _R[0][2] * hv[2]),
+      _CHAIN_TS.y + 100 * (_R[1][0] * hv[0] + _R[1][1] * hv[1] + _R[1][2] * hv[2]),
+      _CHAIN_TS.z + 100 * (_R[2][0] * hv[0] + _R[2][1] * hv[1] + _R[2][2] * hv[2]));
+    earth.rotationAxis.getWorldPosition(_CHAIN_TE);
+    toW(_chainHelioAU(nm, jd));
+    const dAU = out.distanceTo(_CHAIN_TE) / 100;
     const tauDays = auToKm(dAU) / speedOfLight / SECONDS_PER_DAY;
-    toW(_kcHelioAU(nm, jd - tauDays));
+    toW(_chainHelioAU(nm, jd - tauDays));
     return true;
   }
-  const lp = _kcPerihelionEclLonDeg(periKey, jd) * (Math.PI / 180);
+  const lp = _chainPerihelionEclLonDeg(periKey, jd) * (Math.PI / 180);
   const sgn = periKey === 'earth' ? 1 : -1;
   const h0 = sgn * Math.cos(lp), h1 = sgn * Math.sin(lp);
-  obj.containerObj.parent.getWorldPosition(_KC_TA);
-  let ax = _KC_TA.x, ay = _KC_TA.y, az = _KC_TA.z;
+  obj.containerObj.parent.getWorldPosition(_CHAIN_TA);
+  let ax = _CHAIN_TA.x, ay = _CHAIN_TA.y, az = _CHAIN_TA.z;
   let D = obj.containerObj.position.length();
   if (periKey === 'earth') {
-    earth.rotationAxis.getWorldPosition(_KC_TE);
-    D = _KC_TA.distanceTo(_KC_TE);
-    ax = _KC_TE.x; ay = _KC_TE.y; az = _KC_TE.z;
+    earth.rotationAxis.getWorldPosition(_CHAIN_TE);
+    D = _CHAIN_TA.distanceTo(_CHAIN_TE);
+    ax = _CHAIN_TE.x; ay = _CHAIN_TE.y; az = _CHAIN_TE.z;
   }
   out.set(
     ax + D * (_R[0][0] * h0 + _R[0][1] * h1),
@@ -47131,7 +47131,7 @@ function _kcChainWorldPos(obj, jd, out) {
     az + D * (_R[2][0] * h0 + _R[2][1] * h1));
   return true;
 }
-window._kcDebug = () => ({ R: _kcR, chains: !!_kcChains });   // K4b parity probe: the derived frame bridge
+window._chainDebug = () => ({ R: _chainR, chains: !!_chainChains });   // K4b parity probe: the derived frame bridge
 
 // K5 excision — the ORBIT LINE onto the chain: the rendered ring is the
 // chain's own heliocentric path over one orbital period (the same curve the
@@ -47141,19 +47141,19 @@ window._kcDebug = () => ({ R: _kcR, chains: !!_kcChains });   // K4b parity prob
 // anchor are applied per frame, exactly as for the planet mesh itself. The
 // GUI 'Orbits' toggle keeps working: obj.orbitLineObj is repointed to the
 // chain ring and the legacy ellipse leaves the graph.
-const _KC_ORBIT_SEGS = 256;
-const _KC_ORBIT_RESAMPLE_DAYS = 3652.5;   // ~10 yr between vertex resamples
-const _KC_M4 = new THREE.Matrix4();
+const _CHAIN_ORBIT_SEGS = 256;
+const _CHAIN_ORBIT_RESAMPLE_DAYS = 3652.5;   // ~10 yr between vertex resamples
+const _CHAIN_M4 = new THREE.Matrix4();
 // P5/K5b — the perihelion AT THE SUN: a marker at Sun + a(1−e)·p̂ with a
 // Sun → P line, p̂ from the chain elements of date through the frame bridge —
 // the same construction as the Planet Orbit Analysis' P. One per chain
 // planet, each with its own Show/Hide chip.
-// (_kcPeriSunMarkers — nameLower → the chip object { name, visible, group,
+// (_chainPeriSunMarkers — nameLower → the chip object { name, visible, group,
 // dot, line, onToggle } — is declared beside the inspector constants: the
 // Show/Hide chip grid builds it before this section is evaluated.)
-function _kcPeriSunMarker(planetObj) {
+function _chainPeriSunMarker(planetObj) {
   const nm = planetObj.name.toLowerCase();
-  if (_kcPeriSunMarkers[nm]) return _kcPeriSunMarkers[nm];
+  if (_chainPeriSunMarkers[nm]) return _chainPeriSunMarkers[nm];
   const group = new THREE.Group();
   group.visible = false;
   const dot = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: planetObj.color, depthTest: false }));
@@ -47165,8 +47165,8 @@ function _kcPeriSunMarker(planetObj) {
   group.add(dot); group.add(line);
   scene.add(group);
   const m = { name: planetObj.name + ' Perihelion At Sun', planet: planetObj, visible: false, group, dot, line, isNotPhysicalObject: true,
-    onToggle: (on) => { group.visible = !!on; if (on) _kcUpdatePeriSunMarker(planetObj, nm, o.julianDay); } };
-  _kcPeriSunMarkers[nm] = m;
+    onToggle: (on) => { group.visible = !!on; if (on) _chainUpdatePeriSunMarker(planetObj, nm, o.julianDay); } };
+  _chainPeriSunMarkers[nm] = m;
   return m;
 }
 // Each chain planet's ROTATION AXIS from the spin channel's
@@ -47179,37 +47179,37 @@ function _kcPeriSunMarker(planetObj) {
 // BEFORE the mesh's local position is written — the mesh and Saturn's rings
 // are this axis's children. Beyond the channel's ±10 Myr the axis keeps its
 // last pose. Mirror: tools/lib/scene-graph.js _applyEngineEarthFrame.
-const _KC_PS = new THREE.Vector3(), _KC_PN = new THREE.Vector3(), _KC_PG = new THREE.Vector3(), _KC_PX = new THREE.Vector3();
-function _kcPlacePlanetPole(obj, nm, jdUT) {
-  if (!obj.rotationAxis || !_kcR) return;
+const _CHAIN_PS = new THREE.Vector3(), _CHAIN_PN = new THREE.Vector3(), _CHAIN_PG = new THREE.Vector3(), _CHAIN_PX = new THREE.Vector3();
+function _chainPlacePlanetPole(obj, nm, jdUT) {
+  if (!obj.rotationAxis || !_chainR) return;
   const ch = _tierModelB().planets.spin(nm), year = _engineYearTT(jdUT);
   const sE = ch.spinAxisEclipticJ2000AtYear(year);
   if (!sE) return;
-  const nE = ch.orbitNormalEclipticJ2000AtYear(year), R = _kcR;
+  const nE = ch.orbitNormalEclipticJ2000AtYear(year), R = _chainR;
   const toW = (v, out) => out.set(
     R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
     R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2],
     R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
-  const s = toW(sE, _KC_PS), n = toW(nE, _KC_PN);
-  const g = _KC_PG.crossVectors(s, n).normalize();
-  _kcSetWorldRotation(obj.rotationAxis, _KC_PX.crossVectors(s, g), s, g);
+  const s = toW(sE, _CHAIN_PS), n = toW(nE, _CHAIN_PN);
+  const g = _CHAIN_PG.crossVectors(s, n).normalize();
+  _chainSetWorldRotation(obj.rotationAxis, _CHAIN_PX.crossVectors(s, g), s, g);
 }
-function _kcUpdatePeriSunMarker(planetObj, nm, jd) {
-  const m = _kcPeriSunMarkers[nm];
-  if (!m || !m.visible || !_kcR) return;
-  const el = _kcElementsOfDate(nm, jd), R = _kcR, D2R = Math.PI / 180;
+function _chainUpdatePeriSunMarker(planetObj, nm, jd) {
+  const m = _chainPeriSunMarkers[nm];
+  if (!m || !m.visible || !_chainR) return;
+  const el = _chainElementsOfDate(nm, jd), R = _chainR, D2R = Math.PI / 180;
   const Om = el.ascNodeEclipticDeg * D2R, inc = el.inclEclipticDeg * D2R, w = (el.lonPeriEclipticDeg - el.ascNodeEclipticDeg) * D2R;
   const cw = Math.cos(w), sw = Math.sin(w), cO = Math.cos(Om), sO = Math.sin(Om), ci = Math.cos(inc), si = Math.sin(inc);
   const p = [cw * cO - sw * sO * ci, cw * sO + sw * cO * ci, sw * si];   // p̂ in the J2000 ecliptic (as computeInspectorOrbitFrame)
   const rP = 100 * el.aAU * (1 - el.e);                                   // a(1−e), scene units
-  sun.planetObj.getWorldPosition(_KC_TS);
-  const px = _KC_TS.x + rP * (R[0][0] * p[0] + R[0][1] * p[1] + R[0][2] * p[2]);
-  const py = _KC_TS.y + rP * (R[1][0] * p[0] + R[1][1] * p[1] + R[1][2] * p[2]);
-  const pz = _KC_TS.z + rP * (R[2][0] * p[0] + R[2][1] * p[1] + R[2][2] * p[2]);
+  sun.planetObj.getWorldPosition(_CHAIN_TS);
+  const px = _CHAIN_TS.x + rP * (R[0][0] * p[0] + R[0][1] * p[1] + R[0][2] * p[2]);
+  const py = _CHAIN_TS.y + rP * (R[1][0] * p[0] + R[1][1] * p[1] + R[1][2] * p[2]);
+  const pz = _CHAIN_TS.z + rP * (R[2][0] * p[0] + R[2][1] * p[1] + R[2][2] * p[2]);
   m.dot.position.set(px, py, pz);
   m.dot.scale.setScalar(rP * 0.008);   // reads at the orbit's own scale
   const a = m.line.geometry.attributes.position.array;
-  a[0] = _KC_TS.x; a[1] = _KC_TS.y; a[2] = _KC_TS.z; a[3] = px; a[4] = py; a[5] = pz;
+  a[0] = _CHAIN_TS.x; a[1] = _CHAIN_TS.y; a[2] = _CHAIN_TS.z; a[3] = px; a[4] = py; a[5] = pz;
   m.line.geometry.attributes.position.needsUpdate = true;
 }
 
@@ -47302,10 +47302,10 @@ function _moonUpdateMarkers(jdUT) {
 // place, the production bundle hoists it, so only the dev page threw)
 /** The Sun → SSB offset at jd in world axes, scene units (100 = 1 AU). */
 function _ssbOffsetWorld(jd, out) {
-  const R = _kcR, masses = { M_MERCURY_SYSTEM, M_VENUS_SYSTEM, M_EARTH_SYSTEM, M_MARS_SYSTEM, M_JUPITER_SYSTEM, M_SATURN_SYSTEM, M_URANUS_SYSTEM, M_NEPTUNE_SYSTEM };
+  const R = _chainR, masses = { M_MERCURY_SYSTEM, M_VENUS_SYSTEM, M_EARTH_SYSTEM, M_MARS_SYSTEM, M_JUPITER_SYSTEM, M_SATURN_SYSTEM, M_URANUS_SYSTEM, M_NEPTUNE_SYSTEM };
   let x = 0, y = 0, z = 0;
   for (const [key, mKey] of _SSB_BODIES) {
-    const r = _kcHelioAU(key, jd), s = 100 * masses[mKey] / M_SUN;
+    const r = _chainHelioAU(key, jd), s = 100 * masses[mKey] / M_SUN;
     x += s * (R[0][0] * r[0] + R[0][1] * r[1] + R[0][2] * r[2]);
     y += s * (R[1][0] * r[0] + R[1][1] * r[1] + R[1][2] * r[2]);
     z += s * (R[2][0] * r[0] + R[2][1] * r[1] + R[2][2] * r[2]);
@@ -47344,7 +47344,7 @@ function _ssbUpdateMarker(jdUT) {
   const shown = [];
   if (mS && mS.visible) shown.push(mS);
   if (mE && mE.visible) shown.push(mE);
-  if (!shown.length || !_kcR) return;
+  if (!shown.length || !_chainR) return;
   _ssbOffsetWorld(jdUT, _SSB_D);
   // the path: ±25 yr around the date on the panel chart's quarter-year grid
   // (its exact-argument memo makes a sliding window cheap), re-anchored to
@@ -47388,11 +47388,11 @@ function _ssbUpdateMarker(jdUT) {
   }
 }
 
-function _kcUpdateOrbitLine(obj, nm, jd) {
-  let line = obj._kcOrbitLine;
+function _chainUpdateOrbitLine(obj, nm, jd) {
+  let line = obj._chainOrbitLine;
   if (!line) {
     const geom = new THREE.BufferGeometry();
-    geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array((_KC_ORBIT_SEGS + 1) * 3), 3));
+    geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array((_CHAIN_ORBIT_SEGS + 1) * 3), 3));
     const legacy = obj.orbitLineObj;
     const mat = legacy ? legacy.material
       : new THREE.LineBasicMaterial({ color: obj.color, transparent: true, opacity: 0.4 });
@@ -47405,7 +47405,7 @@ function _kcUpdateOrbitLine(obj, nm, jd) {
     }
     scene.add(line);
     obj.orbitLineObj = line;
-    obj._kcOrbitLine = line;
+    obj._chainOrbitLine = line;
   }
   // Wall-clock floor on the epoch-driven resample (the deep-time perf
   // catch): at travel speeds above ~10 yr/frame the JD condition fires
@@ -47415,25 +47415,25 @@ function _kcUpdateOrbitLine(obj, nm, jd) {
   // holds it for ~10 yr at normal speeds); positions and panels are
   // untouched. Four resamples a second is visually indistinguishable.
   const _resampleNowMs = performance.now();
-  if (line._kcSampleJD === undefined || (Math.abs(jd - line._kcSampleJD) > _KC_ORBIT_RESAMPLE_DAYS
-      && _resampleNowMs - (line._kcSampleMs ?? 0) >= 250)) {
-    line._kcSampleMs = _resampleNowMs;
-    const pDays = DAYS_PER_JULIAN_YEAR * Math.pow(_kcElementsOfDate(nm, jd).aAU, 1.5);   // Kepler III, solar-mass unit
+  if (line._chainSampleJD === undefined || (Math.abs(jd - line._chainSampleJD) > _CHAIN_ORBIT_RESAMPLE_DAYS
+      && _resampleNowMs - (line._chainSampleMs ?? 0) >= 250)) {
+    line._chainSampleMs = _resampleNowMs;
+    const pDays = DAYS_PER_JULIAN_YEAR * Math.pow(_chainElementsOfDate(nm, jd).aAU, 1.5);   // Kepler III, solar-mass unit
     const arr = line.geometry.attributes.position.array;
-    const yC = _engineYearTT(jd);   // ONE ΔT bridge per resample; the vertices step in Julian years (see _kcHelioAUAtEngineYear)
-    for (let i = 0; i <= _KC_ORBIT_SEGS; i++) {
-      const hv = _kcHelioAUAtEngineYear(nm, yC + (i / _KC_ORBIT_SEGS - 0.5) * pDays / DAYS_PER_JULIAN_YEAR);
+    const yC = _engineYearTT(jd);   // ONE ΔT bridge per resample; the vertices step in Julian years (see _chainHelioAUAtEngineYear)
+    for (let i = 0; i <= _CHAIN_ORBIT_SEGS; i++) {
+      const hv = _chainHelioAUAtEngineYear(nm, yC + (i / _CHAIN_ORBIT_SEGS - 0.5) * pDays / DAYS_PER_JULIAN_YEAR);
       arr[i * 3] = 100 * hv[0]; arr[i * 3 + 1] = 100 * hv[1]; arr[i * 3 + 2] = 100 * hv[2];
     }
     line.geometry.attributes.position.needsUpdate = true;
-    line._kcSampleJD = jd;
+    line._chainSampleJD = jd;
   }
-  const R = _kcR;
-  _KC_M4.set(R[0][0], R[0][1], R[0][2], 0,
+  const R = _chainR;
+  _CHAIN_M4.set(R[0][0], R[0][1], R[0][2], 0,
              R[1][0], R[1][1], R[1][2], 0,
              R[2][0], R[2][1], R[2][2], 0,
              0, 0, 0, 1);
-  line.setRotationFromMatrix(_KC_M4);
+  line.setRotationFromMatrix(_CHAIN_M4);
   line.position.copy(SUN_POS);
 }
 
@@ -47526,7 +47526,7 @@ function _k8UpdateGhostOrbit(name, ghost) {
     ghost._k8Orbit = line;
   }
   const jd = o.julianDay;
-  if (line._k8SampleJD === undefined || Math.abs(jd - line._k8SampleJD) > _KC_ORBIT_RESAMPLE_DAYS) {
+  if (line._k8SampleJD === undefined || Math.abs(jd - line._k8SampleJD) > _CHAIN_ORBIT_RESAMPLE_DAYS) {
     const r0 = vsop87HelioEclipticAU(name, jd);
     let p = DAYS_PER_JULIAN_YEAR * Math.pow(Math.hypot(r0[0], r0[1], r0[2]), 1.5);   // first-pass span from |r|
     let rMin = Infinity, rMax = 0;
@@ -47545,12 +47545,12 @@ function _k8UpdateGhostOrbit(name, ghost) {
     line.geometry.attributes.position.needsUpdate = true;
     line._k8SampleJD = jd;
   }
-  const R = _kcR;
-  _KC_M4.set(R[0][0], R[0][1], R[0][2], 0,
+  const R = _chainR;
+  _CHAIN_M4.set(R[0][0], R[0][1], R[0][2], 0,
              R[1][0], R[1][1], R[1][2], 0,
              R[2][0], R[2][1], R[2][2], 0,
              0, 0, 0, 1);
-  line.setRotationFromMatrix(_KC_M4);
+  line.setRotationFromMatrix(_CHAIN_M4);
   line.position.copy(_K8_SUNPOS);
   line.visible = ghost.visible;
 }
@@ -47590,7 +47590,7 @@ function _k8UpdateStandardOverlay() {
 
 function _k8UpdateStandardOverlayInner() {
   _k8EnsureGhosts();
-  const R = _kcR;
+  const R = _chainR;
   if (!R) {
     // no bridge this frame (the frame derivation is in progress — its anchor
     // capture re-enters updatePositions — or the series artifact just
@@ -47707,43 +47707,43 @@ function updatePositions() {
     // (astrometric — K4.6 measured the uncorrected gap decoding exactly as
     // motion × delay): re-evaluate the planet at jd − τ, τ = geocentric
     // distance / c — c and AU from the model's single homes.
-    const _kcOn = _KC_PLANET_NAMES.has(obj.name);
-    if (_kcOn) {
-      const _R = _kcR, _nm = obj.name.toLowerCase();
+    const _chainOn = _CHAIN_PLANET_NAMES.has(obj.name);
+    if (_chainOn) {
+      const _R = _chainR, _nm = obj.name.toLowerCase();
       const _toWorld = (hv) => [
         SUN_POS.x + 100 * (_R[0][0] * hv[0] + _R[0][1] * hv[1] + _R[0][2] * hv[2]),
         SUN_POS.y + 100 * (_R[1][0] * hv[0] + _R[1][1] * hv[1] + _R[1][2] * hv[2]),
         SUN_POS.z + 100 * (_R[2][0] * hv[0] + _R[2][1] * hv[1] + _R[2][2] * hv[2]),
       ];
-      const _wp0 = _toWorld(_kcHelioAU(_nm, o.julianDay));
+      const _wp0 = _toWorld(_chainHelioAU(_nm, o.julianDay));
       const _dAU = Math.hypot(_wp0[0] - EARTH_POS.x, _wp0[1] - EARTH_POS.y, _wp0[2] - EARTH_POS.z) / 100;
       const _tauDays = auToKm(_dAU) / speedOfLight / SECONDS_PER_DAY;
-      const _wp = _toWorld(_kcHelioAU(_nm, o.julianDay - _tauDays));
+      const _wp = _toWorld(_chainHelioAU(_nm, o.julianDay - _tauDays));
       PLANET_POS.set(_wp[0], _wp[1], _wp[2]);
       // THE VISUAL FLIP: the rendered planet IS the chain planet (world →
       // the mesh parent's local; parent matrices are current from step 0).
       // The orbit ring and the trace are chain-sampled too
-      // (_kcUpdateOrbitLine below / _kcChainWorldPos in the trace sampler).
-      _kcPlacePlanetPole(obj, _nm, o.julianDay);   // the axis first (plan 11 step 3): the mesh and the rings hang under it
-      _KC_V.set(_wp[0], _wp[1], _wp[2]);
-      obj.planetObj.parent.worldToLocal(_KC_V);
-      obj.planetObj.position.copy(_KC_V);
+      // (_chainUpdateOrbitLine below / _chainChainWorldPos in the trace sampler).
+      _chainPlacePlanetPole(obj, _nm, o.julianDay);   // the axis first (plan 11 step 3): the mesh and the rings hang under it
+      _CHAIN_V.set(_wp[0], _wp[1], _wp[2]);
+      obj.planetObj.parent.worldToLocal(_CHAIN_V);
+      obj.planetObj.position.copy(_CHAIN_V);
       // The ring system is a SIBLING of the mesh under rotationAxis (created
       // at the origin) — carry it with the mesh or it stays at the legacy
       // position (owner-found: Saturn's rings vanished once the camera
       // followed the chain mesh).
-      if (obj.ringObj) obj.ringObj.position.copy(_KC_V);
+      if (obj.ringObj) obj.ringObj.position.copy(_CHAIN_V);
       obj.planetObj.updateMatrixWorld(true);   // same-tick consumers read fresh world matrices
-      _kcUpdateOrbitLine(obj, _nm, o.julianDay);
-      _kcUpdatePeriSunMarker(obj, _nm, o.julianDay);
+      _chainUpdateOrbitLine(obj, _nm, o.julianDay);
+      _chainUpdatePeriSunMarker(obj, _nm, o.julianDay);
     }
 
     // P5/K5b — the perihelion MARKERS onto the chain: chain ϖ(t) direction
-    // at the LEGACY anchor + display radius (see _KC_PERI_MARKERS above).
-    const _kcPeri = _KC_PERI_MARKERS[obj.name];
-    if (_kcPeri && _kcR) {   // R may be absent for one frame (derivation in progress / artifact just cleared it)
-      const _R = _kcR;
-      const _lpRad = _kcPerihelionEclLonDeg(_kcPeri, o.julianDay) * (Math.PI / 180);
+    // at the LEGACY anchor + display radius (see _CHAIN_PERI_MARKERS above).
+    const _chainPeri = _CHAIN_PERI_MARKERS[obj.name];
+    if (_chainPeri && _chainR) {   // R may be absent for one frame (derivation in progress / artifact just cleared it)
+      const _R = _chainR;
+      const _lpRad = _chainPerihelionEclLonDeg(_chainPeri, o.julianDay) * (Math.PI / 180);
       // GEOCENTRIC DEVICE CONVENTIONS (owner-verified against the legacy
       // build, one planet at a time): the PLANET markers sit on the
       // SUN-side — anti-ϖ, +180° (the June-21 start / "Perihelion ICRF"
@@ -47751,21 +47751,21 @@ function updatePositions() {
       // side (the Sun-ring eccentric-center geometry is offset from Earth
       // TOWARD the perihelion direction). The PANEL values stay the
       // conventional heliocentric ϖ in every case.
-      const _sgn = _kcPeri === 'earth' ? 1 : -1;
+      const _sgn = _chainPeri === 'earth' ? 1 : -1;
       const _hv = [_sgn * Math.cos(_lpRad), _sgn * Math.sin(_lpRad), 0];   // ecliptic-J2000 unit
-      obj.containerObj.parent.getWorldPosition(_KC_ANCHOR);  // the device origin: the perihelion-of-Earth construction
-      let _ax = _KC_ANCHOR.x, _ay = _KC_ANCHOR.y, _az = _KC_ANCHOR.z;
+      obj.containerObj.parent.getWorldPosition(_CHAIN_ANCHOR);  // the device origin: the perihelion-of-Earth construction
+      let _ax = _CHAIN_ANCHOR.x, _ay = _CHAIN_ANCHOR.y, _az = _CHAIN_ANCHOR.z;
       // the display radius: the chain's a·e of date — the orbit's focus
-      // offset, scene units (_kcUpdatePeriSunMarker takes a(1−e))
-      const _elD = _kcPeri === 'earth' ? null : _kcElementsOfDate(_kcPeri, o.julianDay);
+      // offset, scene units (_chainUpdatePeriSunMarker takes a(1−e))
+      const _elD = _chainPeri === 'earth' ? null : _chainElementsOfDate(_chainPeri, o.julianDay);
       let _D = _elD ? 100 * _elD.aAU * _elD.e : 0;
-      if (_kcPeri === 'earth') {
+      if (_chainPeri === 'earth') {
         // PERIHELION-OF-EARTH has no shell — it sits AT the construction
         // point. Chain version: EARTH + the same construction distance in
         // the chain's ϖ_earth direction. Only this display mesh moves; the
         // barycenter NODE (the Sun's parent — the calibrated spine) stays
         // on the engine-K law.
-        _D = Math.hypot(_KC_ANCHOR.x - EARTH_POS.x, _KC_ANCHOR.y - EARTH_POS.y, _KC_ANCHOR.z - EARTH_POS.z);
+        _D = Math.hypot(_CHAIN_ANCHOR.x - EARTH_POS.x, _CHAIN_ANCHOR.y - EARTH_POS.y, _CHAIN_ANCHOR.z - EARTH_POS.z);
         _ax = EARTH_POS.x; _ay = EARTH_POS.y; _az = EARTH_POS.z;
       }
       const _wp = [
@@ -47774,9 +47774,9 @@ function updatePositions() {
         _az + _D * (_R[2][0] * _hv[0] + _R[2][1] * _hv[1]),
       ];
       PLANET_POS.set(_wp[0], _wp[1], _wp[2]);
-      _KC_V.set(_wp[0], _wp[1], _wp[2]);
-      obj.planetObj.parent.worldToLocal(_KC_V);
-      obj.planetObj.position.copy(_KC_V);
+      _CHAIN_V.set(_wp[0], _wp[1], _wp[2]);
+      obj.planetObj.parent.worldToLocal(_CHAIN_V);
+      obj.planetObj.position.copy(_CHAIN_V);
       obj.planetObj.updateMatrixWorld(true);
     }
 
@@ -47801,9 +47801,9 @@ function updatePositions() {
         PLANET_POS.set(EARTH_POS.x + earthWobbleCenter.orbitRadius * _a.x,
                        EARTH_POS.y + earthWobbleCenter.orbitRadius * _a.y,
                        EARTH_POS.z + earthWobbleCenter.orbitRadius * _a.z);
-        _KC_V.copy(PLANET_POS);
-        obj.planetObj.parent.worldToLocal(_KC_V);
-        obj.planetObj.position.copy(_KC_V);
+        _CHAIN_V.copy(PLANET_POS);
+        obj.planetObj.parent.worldToLocal(_CHAIN_V);
+        obj.planetObj.position.copy(_CHAIN_V);
         obj.planetObj.updateMatrixWorld(true);
       }
     }
@@ -48120,7 +48120,7 @@ function tracePlanet(obj, pos) {
     // carries the CURRENT date's chain position, so reading it under past
     // pivot rotations traced circles around the device anchor (owner-found:
     // "drawn from the Sun").
-    if (!_kcChainWorldPos(obj, _sampleJD, _tracePos)) {
+    if (!_chainChainWorldPos(obj, _sampleJD, _tracePos)) {
       obj.planetObj.getWorldPosition(_tracePos);
     }
 
@@ -48427,7 +48427,7 @@ function moveModel(pos) {
   // R4: the Earth frame — sun plane, apsidal wheel, Sun and axis — placed
   // from the engine on top of the animated device (see _applyEngineEarthFrame).
   _applyEngineEarthFrame(o.julianDay);
-  _kcPlaceOrbitPlaneHelpers();   // the focused planet's orbit-plane grid, at the Sun just placed
+  _chainPlaceOrbitPlaneHelpers();   // the focused planet's orbit-plane grid, at the Sun just placed
 
   _moonUpdateMarkers(o.julianDay);   // the Moon's perigee / line-of-nodes markers (when shown) on the placed frame
   _ssbUpdateMarker(o.julianDay);     // the Sun-barycenter marker (when shown) on the placed Sun
@@ -48436,9 +48436,9 @@ function moveModel(pos) {
   // the chain's frame bridge (the J2000 ecliptic and equinox in world axes)
   // — star-fixed; nothing of date turns it
   if (zodiac.visible) earth.planetObj.getWorldPosition(zodiac.position);
-  if (zodiac.visible && _kcR && !zodiac.userData.placed) {
-    const X = new THREE.Vector3(_kcR[0][0], _kcR[1][0], _kcR[2][0]);   // the J2000 equinox
-    const Y = new THREE.Vector3(_kcR[0][2], _kcR[1][2], _kcR[2][2]);   // the J2000 ecliptic pole
+  if (zodiac.visible && _chainR && !zodiac.userData.placed) {
+    const X = new THREE.Vector3(_chainR[0][0], _chainR[1][0], _chainR[2][0]);   // the J2000 equinox
+    const Y = new THREE.Vector3(_chainR[0][2], _chainR[1][2], _chainR[2][2]);   // the J2000 ecliptic pole
     const Z = new THREE.Vector3().crossVectors(X, Y);                  // = −(longitude +90°), the band's local −z convention
     zodiac.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z));
     zodiac.userData.placed = true;
@@ -48908,7 +48908,7 @@ function updatePerihelion() {
   // Pluto/Halleys/Eros have no chain and stay legacy.
   {
     for (const _p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      const _lp = _kcPerihelionEclLonDeg(_p, o.julianDay);
+      const _lp = _chainPerihelionEclLonDeg(_p, o.julianDay);
       o[_p + 'PerihelionEcliptic'] = _lp;
       o[_p + 'Perihelion'] = eclipticLongitudeToRaDeg(_lp, o.currentYear);
     }
@@ -48955,7 +48955,7 @@ function updateAscendingNodes() {
   // same Ω.
   {
     for (const _p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      const _el = _kcElementsOfDate(_p, o.julianDay);
+      const _el = _chainElementsOfDate(_p, o.julianDay);
       o[_p + 'AscendingNode'] = _el.ascNodeEclipticDeg;
       o[_p + 'DescendingNode'] = (_el.ascNodeEclipticDeg + 180) % 360;
       o[_p + 'ArgumentOfPeriapsis'] = ((_el.lonPeriEclipticDeg - _el.ascNodeEclipticDeg) % 360 + 360) % 360;
@@ -48982,7 +48982,7 @@ function updateAscendingNodes() {
 function updateOrbitalPlaneRotations() {
 
   // The planet's own container — the plain node tilt (the chain places the
-  // mesh and _kcPlacePlanetPole its axis; the orbit-plane grid is a scene
+  // mesh and _chainPlacePlanetPole its axis; the orbit-plane grid is a scene
   // child placed from the engine).
   const updatePlaneRotation = (planetData, ascendingNode, inclination) => {
     const angle = (-90 - ascendingNode) * DEG2RAD;
@@ -49030,7 +49030,7 @@ function updatePlanetAnomalies() {
   // construction that PLACES the rendered planet
   // (kcComputeHeliocentricEclipticFromElements).
   for (const key of _ANOM_CHAIN_KEYS) {
-    const el = _kcElementsOfDate(key, o.julianDay);
+    const el = _chainElementsOfDate(key, o.julianDay);
     const Mdeg = ((el.meanLonEclipticDeg - el.lonPeriEclipticDeg) % 360 + 360) % 360;
     const Edeg = OrbitalFormulas.eccentricAnomaly(Mdeg, el.e);
     const Erad = Edeg * Math.PI / 180;
@@ -49094,17 +49094,17 @@ function updatePlanetAnomalies() {
       // osculating apsidal period (\u00B1150-yr tangent on the full chain \u2014
       // what the perihelion marker does now; Saturn regresses in the current
       // centuries on the Great-Inequality phase), Secular the series tier's
-      // (\u00B11,000-yr stencil \u2014 _kcApsidalPeriodYears, one family with the
+      // (\u00B11,000-yr stencil \u2014 _chainApsidalPeriodYears, one family with the
       // VFP form). Earth: its one movement in both (owner-ruled).
       const _fmtT = (_T) => (_T >= 0 ? '+' : '\u2212') + (isFinite(_T) ? Math.abs(_T).toFixed(0) : '\u221E') + ' yr';
       const _colT = (_T) => (_T >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)');
       if (dt.precEl) {
-        const _T = _kcApsidalPeriodYearsScene(dt.planetKey, o.julianDay);
+        const _T = _chainApsidalPeriodYearsScene(dt.planetKey, o.julianDay);
         dt.precEl.textContent = _fmtT(_T);
         dt.precEl.style.color = _colT(_T);
       }
       if (dt.precSecEl) {
-        const _Ts = _kcApsidalPeriodYears(dt.planetKey, o.julianDay);
+        const _Ts = _chainApsidalPeriodYears(dt.planetKey, o.julianDay);
         dt.precSecEl.textContent = _fmtT(_Ts);
         dt.precSecEl.style.color = _colT(_Ts);
       }
@@ -49112,7 +49112,7 @@ function updatePlanetAnomalies() {
       // (owner-requested; the same pair the CYCLES Duration row carries).
       // Set once \u2014 the chain globals are live here, never at UI build.
       if (!dt.precTitleSet && dt.precEl) {
-        const _s = _kcSecularShape(dt.planetKey);
+        const _s = _chainSecularShape(dt.planetKey);
         const _base = ' Stable deep-time base: the dominant secular mode ' + _s.dom.g[0] + ', ' + Math.round(1296000 / _s.dom.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar name \u2014 a label, never an input).';
         dt.precEl.title = 'The scene\u2019s apsidal period of date: \u00B1150-yr central difference of the chain\u2019s ecliptic \u03D6, periodic terms in \u2014 what the perihelion marker does now (the osculating apse; Saturn regresses in the current centuries on the Jupiter\u2013Saturn great inequality; for Uranus and Neptune this is the apse\u2019s jitter on the synodic lines near e \u2192 0, not a precession). Same as the planetStats CYCLES \u201Cscene, osculating\u201D row.' + _base;
         if (dt.precSecEl) dt.precSecEl.title = 'The secular apsidal period of date: \u00B11,000-yr central difference of the series tier\u2019s ecliptic \u03D6 \u2014 the precession proper, the same evaluator as the planetStats CYCLES \u201CPerihelion Precession Duration\u201D row and the Framework Verification \u201CPerihelion precession\u201D form (all three read identically and move together).' + _base;
@@ -49238,7 +49238,7 @@ function updateMoonOrbitalElements() {
  */
 function updatePlanetInvariablePlaneHeights() {
 
-  // Every body here is a chain body (the eight of _KC_IP_BODY_KEYS).
+  // Every body here is a chain body (the eight of _CHAIN_IP_BODY_KEYS).
   const planetConfigs = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 
   for (const key of planetConfigs) {
@@ -49248,11 +49248,11 @@ function updatePlanetInvariablePlaneHeights() {
     // h = r⃗ · ẑ_inv of the chain's heliocentric vector — no per-frame
     // reconstruction from legacy anomaly/node/inclination readouts.
     {
-      const el = _kcElementsOfDate(key, o.julianDay);
+      const el = _chainElementsOfDate(key, o.julianDay);
       o[key + 'AscendingNodeInvPlane'] = el.ascNodeInvPlaneDeg;
       o[key + 'AscendingNodeInvPlaneEcliptic'] = el.ascNodeEclipticDeg;
-      const r = _kcHelioAU(key, o.julianDay);
-      const height = r[0] * _KC_IP_Z[0] + r[1] * _KC_IP_Z[1] + r[2] * _KC_IP_Z[2];
+      const r = _chainHelioAU(key, o.julianDay);
+      const height = r[0] * _CHAIN_IP_Z[0] + r[1] * _CHAIN_IP_Z[1] + r[2] * _CHAIN_IP_Z[2];
       o[key + 'HeightAboveInvPlane'] = height;
       o[key + 'AboveInvPlane'] = height > 0;
       const gaugeKey = key + 'HeightAboveInvPlane';
@@ -49262,7 +49262,7 @@ function updatePlanetInvariablePlaneHeights() {
       if (dt2) {
         // Asc Node Inv — the chain node in the Souami & Souchay longitude
         // origin (the published-surface convention; Earth 284.04° at J2000).
-        dt2.nodeEl.textContent = _kcAscNodeInvPlaneSSDeg(key, o.julianDay).toFixed(2) + '°';
+        dt2.nodeEl.textContent = _chainAscNodeInvPlaneSSDeg(key, o.julianDay).toFixed(2) + '°';
         // Incl. — the inclination of date to the model's own invariable
         // plane (display only; the engine-K machinery is untouched).
         // Earth rides its ONE-SOURCE series route (inclInvPlaneModel —
@@ -49272,14 +49272,14 @@ function updatePlanetInvariablePlaneHeights() {
         const iNow = key === 'earth' ? inclInvPlaneModel(o.currentYear) : el.inclInvPlaneDeg;
         dt2.inclEl.textContent = iNow.toFixed(4) + '°';
         // increasing/decreasing from the same route's slope (±100 yr)
-        const di = (key === 'earth' ? inclInvPlaneModel(o.currentYear + 100) : _kcElementsOfDate(key, o.julianDay + 36525).inclInvPlaneDeg) - iNow;
+        const di = (key === 'earth' ? inclInvPlaneModel(o.currentYear + 100) : _chainElementsOfDate(key, o.julianDay + 36525).inclInvPlaneDeg) - iNow;
         dt2.inclEl.style.color = di >= 0
           ? 'hsla(140, 65%, 55%, 1)'  // green = increasing
           : 'hsla(0, 70%, 60%, 1)';   // red = decreasing
         // Period — the of-date tangent of the inv-plane node (signed;
         // regression reads negative). The stable dominant nodal s-mode is
         // the row's hover text.
-        const _Tn = _kcNodeInvPlanePeriodYears(key, o.julianDay);
+        const _Tn = _chainNodeInvPlanePeriodYears(key, o.julianDay);
         dt2.periodEl.textContent = (_Tn >= 0 ? '+' : '−') + (isFinite(_Tn) ? Math.abs(_Tn).toFixed(0) : '∞') + ' yr';
         dt2.periodEl.style.color = _Tn >= 0 ? 'hsla(140, 65%, 55%, 1)' : 'hsla(0, 70%, 60%, 1)';
       }
@@ -49554,19 +49554,19 @@ function updateDynamicInclinations() {
   // the CHAIN's (i to the engine's own invariable plane, K5c). The legacy
   // J2000-calibrated oscillation law remains only for the no-chain bodies
   // below (and as the probe-pinned reference implementation).
-  o.mercuryInvPlaneInclinationDynamic = _kcElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg;
-  o.venusInvPlaneInclinationDynamic = _kcElementsOfDate('venus', o.julianDay).inclInvPlaneDeg;
-  o.marsInvPlaneInclinationDynamic = _kcElementsOfDate('mars', o.julianDay).inclInvPlaneDeg;
-  o.jupiterInvPlaneInclinationDynamic = _kcElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg;
-  o.saturnInvPlaneInclinationDynamic = _kcElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg;
-  o.uranusInvPlaneInclinationDynamic = _kcElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg;
-  o.neptuneInvPlaneInclinationDynamic = _kcElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg;
+  o.mercuryInvPlaneInclinationDynamic = _chainElementsOfDate('mercury', o.julianDay).inclInvPlaneDeg;
+  o.venusInvPlaneInclinationDynamic = _chainElementsOfDate('venus', o.julianDay).inclInvPlaneDeg;
+  o.marsInvPlaneInclinationDynamic = _chainElementsOfDate('mars', o.julianDay).inclInvPlaneDeg;
+  o.jupiterInvPlaneInclinationDynamic = _chainElementsOfDate('jupiter', o.julianDay).inclInvPlaneDeg;
+  o.saturnInvPlaneInclinationDynamic = _chainElementsOfDate('saturn', o.julianDay).inclInvPlaneDeg;
+  o.uranusInvPlaneInclinationDynamic = _chainElementsOfDate('uranus', o.julianDay).inclInvPlaneDeg;
+  o.neptuneInvPlaneInclinationDynamic = _chainElementsOfDate('neptune', o.julianDay).inclInvPlaneDeg;
 
   // The planets' obliquity OF DATE from the spin channel (ONE home
   // @essrt/physics/planets/spin-channel, through the package model) at the
   // ENGINE year (R4b) — the o.<planet>Obliquity value in the angular-momentum
   // sense (Venus ≈ 177°, Uranus ≈ 98°). The RENDERED axis is placed in world
-  // from the channel's ŝ(t) by _kcPlacePlanetPole in the chain override.
+  // from the channel's ŝ(t) by _chainPlacePlanetPole in the chain override.
   {
     const engineYear = _engineYearOfSceneYear(o.currentYear);
     for (const k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
@@ -49584,15 +49584,15 @@ function updateDynamicInclinations() {
   // consistent: the chain's own orbit plane (inclEclipticDeg,
   // ascNodeEclipticDeg — the J2000 ecliptic element set the scene renders)
   // against the engine Earth-orbit normal of date
-  // (_kcEarthEngineOrbitNormalJ2000, the one-source normal the Earth
+  // (_chainEarthEngineOrbitNormalJ2000, the one-source normal the Earth
   // panel's i_inv reads), both in the J2000 ecliptic frame. At J2000 the
   // Earth normal is the J2000 pole and the value is the chain's
   // inclEclipticDeg; away from it this is the mutual inclination of the two
   // planes of date. The visual orbital-plane tilt groups
   // (updateOrbitalPlaneRotations) read the same value.
-  const nE = _kcEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(o.currentYear));
+  const nE = _chainEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(o.currentYear));
   for (const key of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-    const el = _kcElementsOfDate(key, o.julianDay);
+    const el = _chainElementsOfDate(key, o.julianDay);
     const i = el.inclEclipticDeg * DEG2RAD, Om = el.ascNodeEclipticDeg * DEG2RAD;
     // the orbit normal in the J2000 ecliptic frame, the engine's convention
     // (the same form as the Earth normal: [sin i sin Ω, −sin i cos Ω, cos i])
@@ -50143,7 +50143,7 @@ function updatePredictions() {
   // route — the of-date tangent of Earth's orbital-plane node ON the
   // invariable plane (±150-yr central difference; the same evaluator as
   // the Positions-panel Period cell; ≈ −79,560 at J2000, retrograde).
-  predictions.eclipticPrecession = _kcNodeInvPlanePeriodYears('earth', o.julianDay);
+  predictions.eclipticPrecession = _chainNodeInvPlanePeriodYears('earth', o.julianDay);
   
   // Note: obliquityEarth and eccentricityEarth are computed earlier (before solarYearDays/siderealYearDays) as they're needed for year length calculations.
   // R9: ONE published i_inv everywhere (the S3b pattern for ε) — the panel
@@ -50461,7 +50461,7 @@ function _eccentricityInline(key, year) {
     // equation of center — the scene's e is one value everywhere.
     return _sceneEccTargetAt(year);
   }
-  // A planet's eccentricity of date is `_kcElementsOfDate(key, jd).e` (the
+  // A planet's eccentricity of date is `_chainElementsOfDate(key, jd).e` (the
   // meshes are placed from the N-body chain).
   return undefined;
 }

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -28,7 +28,7 @@ status: current
 
 ### 1.1 Why a layered taxonomy
 
-The framework's existing decomposition treats LR04 as orbital signal + monolithic residual. That conflates physically distinct mechanisms:
+The model's existing decomposition treats LR04 as orbital signal + monolithic residual. That conflates physically distinct mechanisms:
 
 - **Orbital forcing** is *external* — planetary eigenmodes are stationary on Myr timescales and produce strictly periodic signals at the engine's own secular beat frequencies (§2)
 - **Climate-system response** is *internal* — silicate-weathering, ice-sheet hysteresis, carbon-cycle feedbacks have their own time constants that may resonate with or amplify orbital input
@@ -112,7 +112,7 @@ The 33-integer comb that preceded the physical line set — its precession-band 
 
 ## 3. Layer 2 — Climate-System Internal Periodic
 
-> **L2: investigated vs canonical.** This section investigates **five L2 candidate lines** in the variance-budget framework: 405-kyr fundamental (§3.1), the 4.36-Myr Boulila libration (§3.2), 9-Myr long-period carbon resonance (§3.3), 405-kyr 2nd harmonic at 202 kyr and 3rd harmonic at 135 kyr (§3.4). The **canonical climate formula** (§9.1) deploys only the **405-kyr family — three lines: 405 + 202 + 135 kyr** — as its L2 layer. **The Boulila libration and the 9-Myr line are documented here as investigated candidates but excluded from the canonical formula** because Round 3 cross-window stability tests (the comb-era R3-4 record in doc 109 §22 for the libration; §3.3 for 9-Myr) showed they are either phase-incoherent across windows or rely on per-record-length variance absorption that doesn't generalize. Read §3 as: "what L2 candidates does the data support?"; read §9.1 as: "what survives into the deployed formula?"
+> **L2: investigated vs canonical.** This section investigates **five L2 candidate lines** in the variance-budget model: 405-kyr fundamental (§3.1), the 4.36-Myr Boulila libration (§3.2), 9-Myr long-period carbon resonance (§3.3), 405-kyr 2nd harmonic at 202 kyr and 3rd harmonic at 135 kyr (§3.4). The **canonical climate formula** (§9.1) deploys only the **405-kyr family — three lines: 405 + 202 + 135 kyr** — as its L2 layer. **The Boulila libration and the 9-Myr line are documented here as investigated candidates but excluded from the canonical formula** because Round 3 cross-window stability tests (the comb-era R3-4 record in doc 109 §22 for the libration; §3.3 for 9-Myr) showed they are either phase-incoherent across windows or rely on per-record-length variance absorption that doesn't generalize. Read §3 as: "what L2 candidates does the data support?"; read §9.1 as: "what survives into the deployed formula?"
 
 ### 3.1 The 405-kyr silicate-weathering thermostat (Tier A2)
 
@@ -147,7 +147,7 @@ Test: add a single component at 9,000 kyr. LR04 has only 0.59 cycles in 5.32 Myr
 
 **Interpretation — promoted to confirmed Layer-2 candidate**: this is a much larger ΔR² than doc 91 §13.10's marginal F-statistic suggested. On CENOGRID δ¹³C alone, the 9-Myr line accounts for **+7.8% of variance**, making it the single largest Layer-2 contribution on the 67-Myr record — and the δ¹³C/δ¹⁸O variance-decomposition ratio is **0.0780 / 0.0187 = 4.2**, by far the strongest carbon-amplification signature in the suite (vs 2.2 for the 405-kyr line). The earlier F-statistic test in doc 91 §13 used a different power-spectrum-based criterion that under-weighs broadband variance contribution; the joint-fit ΔR² measurement reveals the line's actual decomposition role.
 
-**Promotion criteria**: the line satisfies the framework's L2 diagnostic (δ¹³C/δ¹⁸O > 1.0 on amplitude, > 2.0 on variance decomposition), is statistically significant in joint fit (ΔR² > 0.01 on CENOGRID δ¹³C), and is physically interpretable as a long-period carbon-cycle resonance. This document promotes it to **investigated Layer-2 candidate** for the purposes of variance decomposition; doc 91 §13.10's "tentative" framing is consistent. **Note: the 9-Myr line is NOT deployed in the canonical formula (§9.1)** — only the 405-kyr family (405 + 202 + 135 kyr) survives the Round 3 cross-window stability criteria (§8.5).
+**Promotion criteria**: the line satisfies the model's L2 diagnostic (δ¹³C/δ¹⁸O > 1.0 on amplitude, > 2.0 on variance decomposition), is statistically significant in joint fit (ΔR² > 0.01 on CENOGRID δ¹³C), and is physically interpretable as a long-period carbon-cycle resonance. This document promotes it to **investigated Layer-2 candidate** for the purposes of variance decomposition; doc 91 §13.10's "tentative" framing is consistent. **Note: the 9-Myr line is NOT deployed in the canonical formula (§9.1)** — only the 405-kyr family (405 + 202 + 135 kyr) survives the Round 3 cross-window stability criteria (§8.5).
 
 **LR04 caveat**: the +1.5% on LR04 with condition number 9.3 is unreliable — at 0.59 cycles per record the cos/sin pair is essentially absorbing residual trend. CENOGRID is the right test record for this line.
 
@@ -182,7 +182,7 @@ Fit strategy:
 
 **Interpretation — the biggest finding in this doc**: the regime split is the biggest single improvement in the entire decomposition. Post-MPT R² = **<!--v:canonR2PostMpt-->0.7804<!--/v-->** means **the L1 line set captures ~78 % of post-MPT LR04 variance** in the well-resolved 0–1 Myr window — a dramatically sharper story than the conflated full-record R² = <!--v:canonR2Full-->0.3329<!--/v-->.
 
-The iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.6090<!--/v--> is also far above the full-record value. The MPT itself is the L3 mechanism whose presence inflates the residual when the two regimes are conflated. Implication: **the framework's headline figure for LR04 should be R² = <!--v:canonR2PostMpt-->0.7804<!--/v--> (post-MPT) / R² = <!--v:canonR2InhgMpt-->0.6090<!--/v--> (iNHG-MPT) / R² = <!--v:canonR2PreInhg-->0.4547<!--/v--> (pre-iNHG) — not R² = <!--v:canonR2Full-->0.3329<!--/v--> (conflated)**. The conflated number underestimates the framework's explanatory power by ~3.4×.
+The iNHG-MPT R² = <!--v:canonR2InhgMpt-->0.6090<!--/v--> is also far above the full-record value. The MPT itself is the L3 mechanism whose presence inflates the residual when the two regimes are conflated. Implication: **the model's headline figure for LR04 should be R² = <!--v:canonR2PostMpt-->0.7804<!--/v--> (post-MPT) / R² = <!--v:canonR2InhgMpt-->0.6090<!--/v--> (iNHG-MPT) / R² = <!--v:canonR2PreInhg-->0.4547<!--/v--> (pre-iNHG) — not R² = <!--v:canonR2Full-->0.3329<!--/v--> (conflated)**. The conflated number underestimates the model's explanatory power by ~3.4×.
 
 Why this works:
 - Pre-MPT is dominated by the 41-kyr obliquity rhythm (the obliquity lines near p+s₃ carry the largest amplitude)
@@ -265,7 +265,7 @@ Per-regime fits with the canonical L1 + 3-line L2 + 6-step L3 pipeline:
 
 The full-record R² = <!--v:canonR2Full-->0.3329<!--/v--> suppresses the formula's explanatory power because forcing one set of component amplitudes to fit physically distinct climate regimes (pre-MPT obliquity-dominated, post-MPT 100-kyr-dominated) is over-constrained.
 
-**Critical caveat (the comb-era forward-prediction test, doc 109 §22)**: **the high R² numbers are DESCRIPTIVE within each regime, NOT PREDICTIVE across regimes.** A formula trained on one regime and applied to another's timestamps predicts worse than the mean. The line set is a frequency framework — it says where lines sit, not what their amplitudes and phases are in a regime it was not fitted on; only the 405-kyr line is structurally distinct (the one line with cross-proxy phase coherence). Predictive power across regimes requires modelling how line amplitudes evolve with boundary conditions (CO₂, ice-sheet area) — open work.
+**Critical caveat (the comb-era forward-prediction test, doc 109 §22)**: **the high R² numbers are DESCRIPTIVE within each regime, NOT PREDICTIVE across regimes.** A formula trained on one regime and applied to another's timestamps predicts worse than the mean. The line set is a frequency model — it says where lines sit, not what their amplitudes and phases are in a regime it was not fitted on; only the 405-kyr line is structurally distinct (the one line with cross-proxy phase coherence). Predictive power across regimes requires modelling how line amplitudes evolve with boundary conditions (CO₂, ice-sheet area) — open work.
 
 ### 6.3 What the L5 floor implies
 
@@ -291,7 +291,7 @@ The three Tier B rounds on the 33-integer comb (the detrend comparison, the harm
 
 ### 8.6 Tier C (sub-LR04 resolution, out of scope)
 
-Sub-LR04-resolution components (ENSO ~2–7 yr, solar cycles ~11/100/210 yr, Heinrich ~7 kyr, Dansgaard–Oeschger ~1.5 kyr) require non-LR04 proxies (high-resolution ice cores, tree rings, speleothems) and are not part of the LR04 / CENOGRID variance budget. The LR04 ceiling of R² = <!--v:canonR2PostMpt-->0.7804<!--/v--> (post-MPT) already approaches what the 1-kyr binning permits — pursuing these would require swapping the proxy, not extending the framework.
+Sub-LR04-resolution components (ENSO ~2–7 yr, solar cycles ~11/100/210 yr, Heinrich ~7 kyr, Dansgaard–Oeschger ~1.5 kyr) require non-LR04 proxies (high-resolution ice cores, tree rings, speleothems) and are not part of the LR04 / CENOGRID variance budget. The LR04 ceiling of R² = <!--v:canonR2PostMpt-->0.7804<!--/v--> (post-MPT) already approaches what the 1-kyr binning permits — pursuing these would require swapping the proxy, not extending the model.
 
 ---
 
@@ -334,7 +334,7 @@ The canonical formula is **28 physical lines + up to 6 step terms** (in the comb
 - **Cross-record phase coherence Δφ** — used to distinguish L2-direct (405-kyr, same phase across proxies) from L2-feedback (everything else, ~half-cycle lag); not a gate for inclusion (§8.3 C2)
 - **VIF / condition number / max-amplitude diagnostics** — used to motivate ridge regression in §9.5, not fitted as components
 
-The result: the canonical formula's component set is **closed** at the variance-decomposition level. The framework explains the climate-band variance it can; the remainder lives in L4 (chronology), L5 (stochastic / sub-LR04-resolution), or in nonlinear amplitude-modulation physics that the framework explicitly does not attempt to model (R3-2 / R3-3 honest negatives).
+The result: the canonical formula's component set is **closed** at the variance-decomposition level. The model explains the climate-band variance it can; the remainder lives in L4 (chronology), L5 (stochastic / sub-LR04-resolution), or in nonlinear amplitude-modulation physics that the model explicitly does not attempt to model (R3-2 / R3-3 honest negatives).
 
 ### 9.1 Architecture
 
@@ -360,7 +360,7 @@ The formula uses **sequential regression**: L1 is fit first to y, then L2 is fit
 - **ΔR² L2** = *unique* variance L2 explains AFTER L1 (zero if L2 is collinear with L1 at this window length)
 - **ΔR² L3** = *unique* variance L3 explains AFTER L1+L2
 
-**Why sequential, not joint OLS?** Sequential fitting resolves the **L1↔L2 collinearity** at short windows. At post-MPT 1000 kyr, the L2 135-kyr 3rd harmonic sits within one Rayleigh element of the L1 eccentricity line at 134.50 kyr (labelled z₅−g₂: a combination mode of the deep table beside g₃, beating against g₂ — not a Laskar pair; the lines are named by Laskar identity only where a mode is Laskar's). Joint OLS finds degenerate cancelling solutions (L1 amplitude +17607, L2 −17608 → cancel) with no physical meaning. Sequential fitting hands all the shared variance to L1 (the more fundamental layer) and reports L2 as the orthogonal remainder. This matches the framework's hierarchy: orbital forcing is primary, carbon-cycle response is secondary.
+**Why sequential, not joint OLS?** Sequential fitting resolves the **L1↔L2 collinearity** at short windows. At post-MPT 1000 kyr, the L2 135-kyr 3rd harmonic sits within one Rayleigh element of the L1 eccentricity line at 134.50 kyr (labelled z₅−g₂: a combination mode of the deep table beside g₃, beating against g₂ — not a Laskar pair; the lines are named by Laskar identity only where a mode is Laskar's). Joint OLS finds degenerate cancelling solutions (L1 amplitude +17607, L2 −17608 → cancel) with no physical meaning. Sequential fitting hands all the shared variance to L1 (the more fundamental layer) and reports L2 as the orthogonal remainder. This matches the model's hierarchy: orbital forcing is primary, carbon-cycle response is secondary.
 
 There is a *second*, distinct collinearity problem — **L1↔L1 collinearity** *within* the L1 line set itself — that sequential fitting does **not** solve. The L1 sub-fit therefore uses ridge regularization rather than plain OLS; see §9.5.
 
@@ -609,7 +609,7 @@ This complements the broader **L2 carbon thermostat** (Section 3): individual L1
 
 ## 11. CenCO2PIP CO₂ — deep-time validation (0–66 Ma)
 
-The same L1 + L2 + L3 formula fitted to the **Bayesian Cenozoic CO₂ synthesis** from the CenCO2PIP Consortium tests the framework across the entire Cenozoic (16× longer time span than EPICA, ~6× longer than LR04).
+The same L1 + L2 + L3 formula fitted to the **Bayesian Cenozoic CO₂ synthesis** from the CenCO2PIP Consortium tests the model across the entire Cenozoic (16× longer time span than EPICA, ~6× longer than LR04).
 
 ### 11.1 Dataset
 

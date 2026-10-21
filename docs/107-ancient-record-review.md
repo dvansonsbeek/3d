@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -128,7 +128,7 @@ Applied to the −708 window (±30 yr, local magnitude ≥ 0.6 at Qufu
 35.60 N, 116.98 E): **20 candidates → the renchen filter keeps 3**
 (−708 total 1.019 · −703 partial 0.869 · −687 partial 0.697) **→ the
 record's totality ("ji", complete) keeps exactly one** — the
-traditional −708-07-17, on which the framework independently computes
+traditional −708-07-17, on which the model independently computes
 totality at the site (audit BestGap 9 km). The traditional
 identification survives a filter that never consulted the chronology it
 confirms.
@@ -137,7 +137,7 @@ confirms.
 
 ## Limits
 
-- Magnitudes are framework local circumstances under the shipped stack;
+- Magnitudes are model local circumstances under the shipped stack;
   they carry the series' own ancient error budget (~0.01 magnitude
   class at −2 kyr) — rankings are robust to it, absolute totality
   verdicts at the 0.99 boundary are not.

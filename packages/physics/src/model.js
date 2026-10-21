@@ -27,6 +27,7 @@ import { createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from '
 import { PLANET_DISPLAY_NAMES } from './planets/display-names.cjs';
 import { createDeepTimeChain } from './deltat/deep-time-chain.js';
 import { computeMassChainJ2000 } from './earth/mass-chain.cjs';
+import { J2000_JD, JULIAN_CENTURY_DAYS } from './constants/units.cjs';
 import { MOON_DISTANCE_ARTIFACT } from './deltat/moon-distance-artifact.cjs';
 import { evalClimateL1OrbitalPermil } from './climate/l1-orbital.cjs';
 import { DEEP_MODES_ARTIFACT } from './moon/deep-modes-artifact.cjs';
@@ -576,7 +577,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
     return result;
   };
   /** @param {number} year @returns {number} */
-  const deltaTSeconds = (year) => C.earthOrbital.deltaTStart + meanDeltaTSecondsAtAge(yearToTMa(year));
+  const deltaTSeconds = (year) => F.DT_ANCHOR.deltaTStartSeconds + meanDeltaTSecondsAtAge(yearToTMa(year));   // the joint fit's anchor (plan 14: its own artifact)
 
   // ── Planets: Fibonacci-law derivation chain + orientation ─────────────────
   const PLANET_KEYS = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
@@ -796,8 +797,8 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   // tools/verify/eclipse-audit.js (finders). Deep-time and framework-native
   // are hardwired ON here: they are the shipped defaults; the A/B env
   // toggles (SG_DEEP_TIME/MOON_ARGS_PURE_MEEUS) stay an engine concern.
-  const j2000JD = 2451545.0;
-  const julianCenturyDays = 36525;
+  const j2000JD = J2000_JD;                       // ONE home: constants/units (plan 14 step 2)
+  const julianCenturyDays = JULIAN_CENTURY_DAYS;
 
   // J2000 Moon precession anchors (plan 09: the IAU inputs themselves). The
   // legacy-'ICRF'-named inputs hold the EQUINOX-OF-DATE observables (Meeus/
@@ -1208,7 +1209,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       sunDiameterKm: C.bodyDiametersKm.sun,
       sunDistanceKm: currentAUDistance,
       earthFlatteningInverse: C.physicalConstants.earthFlatteningInverseWGS84,
-      ttBridgeSeconds: C.earthOrbital.deltaTStart,
+      ttBridgeSeconds: F.DT_ANCHOR.deltaTStartSeconds,
       gmstMeanSiderealT0Deg: C.physicalConstants.gmstMeanSiderealT0Deg,
       gmstMeanSiderealRateDegPerDay: C.physicalConstants.gmstMeanSiderealRateDegPerDay,
       gmstMeanSiderealT2Deg: C.physicalConstants.gmstMeanSiderealT2Deg,
@@ -1306,7 +1307,7 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       jd -= d / RATE;
       if (Math.abs(d) < 1e-10) break;
     }
-    return jd - C.earthOrbital.deltaTStart / 86400;
+    return jd - F.DT_ANCHOR.deltaTStartSeconds / 86400;
   };
   /** The TRUE-UT JD at which the APPARENT Sun's longitude of date equals
    *  the cardinal target in the given year — Newton on the crossing (the
@@ -1610,6 +1611,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
       findLunarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd),
       findSolarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd),
       deltaTSecondsAtJD: frameworkDeltaTSecondsAtJD,
+      /** The ΔT trend anchor at J2000 (seconds): the TT − UT bridge every finder axis adds to a
+       *  true-UT JD. The joint ΔT fit's output, shipped in its own artifact (FIT.DT_ANCHOR —
+       *  plan 14: never a constants-file input), exposed here so no consumer reaches into the
+       *  constants for it. */
+      ttBridgeSeconds: F.DT_ANCHOR.deltaTStartSeconds,
       // E4 — the framework-native Sun deps, exported so the OTHER finder
       // construction sites (tools/verify/eclipse-audit.js, the browser
       // _eclipse twins) spread the SAME assembly into their own

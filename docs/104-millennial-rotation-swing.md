@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -32,7 +32,7 @@ historical record of how the episode was found, not a shipped mechanism.
 
 ## 1. The phenomenon
 
-After the framework's kinematic trend and the shipped 4-flag ΔT stack (Bond 1466 yr, Hallstatt 2430 yr, Jose5 897 yr, Jose4 716 yr — n = 1830 / 1104 / 2989 / 3749 as identifiers) are removed from the Stephenson eclipse record, one aperiodic structure remains — the **millennial rotation swing**:
+After the model's kinematic trend and the shipped 4-flag ΔT stack (Bond 1466 yr, Hallstatt 2430 yr, Jose5 897 yr, Jose4 716 yr — n = 1830 / 1104 / 2989 / 3749 as identifiers) are removed from the Stephenson eclipse record, one aperiodic structure remains — the **millennial rotation swing**:
 
 | Era | Behavior |
 |---|---|
@@ -45,7 +45,7 @@ The often-quoted "~0.75 ms/day missing motion" is the window-average of this swi
 
 ### Identification
 
-This is the documented **millennial LOD fluctuation** of the eclipse literature — Stephenson & Morrison's "~1,500-yr oscillation" — whose physical mechanism is **core–mantle angular momentum exchange**, demonstrated archeomagnetically by Dumberry & Bloxham (2006): episodic eastward/westward zonal flows in the outer core, inverted from archeomagnetic field models, reproduce the ±3–4 ms LOD signal in amplitude and timescale. In the framework's decomposition, the shipped Bond flag carries the quasi-periodic part of this fluctuation over the eclipse window; the swing is its aperiodic remainder.
+This is the documented **millennial LOD fluctuation** of the eclipse literature — Stephenson & Morrison's "~1,500-yr oscillation" — whose physical mechanism is **core–mantle angular momentum exchange**, demonstrated archeomagnetically by Dumberry & Bloxham (2006): episodic eastward/westward zonal flows in the outer core, inverted from archeomagnetic field models, reproduce the ±3–4 ms LOD signal in amplitude and timescale. In the model's decomposition, the shipped Bond flag carries the quasi-periodic part of this fluctuation over the eclipse window; the swing is its aperiodic remainder.
 
 ### Amplitude budget: two engines
 
@@ -103,7 +103,7 @@ Decadal context (relevant to §6): ~6-yr torsional/Alfvén waves (Gillet, Jault,
 2. **Axisymmetric Magneto-Coriolis (axiMC) eigenmodes** — Dumberry, Gerick & Gillet 2025, *GJI* 240:2076: predicted periods **one to a few thousand years (gravest mode ~3,000 yr)**, quality factors **Q ~ 1–10** — damped resonances, episodically re-excited, explicitly proposed to "exchange axial angular momentum with the mantle and hence… explain a part of the observed millennial changes in length of day." The only published wave theory aimed squarely at this band.
 3. **Stochastic/chaotic convection** (red noise, no oscillator) — the null hypothesis; no published analysis demonstrates the millennial line rises above red noise with > 2–3 cycles of record.
 4. **Ruled out for this band**: torsional oscillations (fundamental ~6 yr since Gillet 2010), inner-core superrotation oscillations (decadal-to-multidecadal only; the mantle–inner-core gravitational mode may not even survive in the strong-field regime — Dumberry 2025, arXiv:2505.21271), gravitational-coupling oscillations (decadal).
-5. **External/astronomical forcing**: no published mechanism converts astronomical forcing into a 500–2,000-yr core oscillation. Precession/tidal mechanical forcing of the geodynamo exists as a *power-budget* argument (Malkus 1968, *Science* 160:259; Le Bars, Cébron & Le Gal 2015, *Annu. Rev. Fluid Mech.* 47:163; Andrault, Monteux, Le Bars & Samuel 2016, *EPSL* 443:195 — which notes mechanically driven core flow would be episodically variable) but derives no millennial period. Planetary-tidal dynamo synchronization exists only for the Sun (Stefani et al. 2019, *Sol. Phys.* 294:60 — 11.07-yr Venus–Earth–Jupiter beat, Suess–de Vries and Hallstatt as further beats; rebutted by Nauman et al. 2022). Solar-heliospheric planetary claims for Hallstatt (Abreu et al. 2012, *A&A* 548:A88; Scafetta et al. 2016, *Earth-Sci. Rev.* 162:24; Charvátová 2000, *Ann. Geophys.* 18:399) concern the Sun, not the core. No published work ties the Jupiter–Saturn synodic family to core/LOD millennial signals — the framework's beat interpretation (§6) has **no published competitor and no published support**.
+5. **External/astronomical forcing**: no published mechanism converts astronomical forcing into a 500–2,000-yr core oscillation. Precession/tidal mechanical forcing of the geodynamo exists as a *power-budget* argument (Malkus 1968, *Science* 160:259; Le Bars, Cébron & Le Gal 2015, *Annu. Rev. Fluid Mech.* 47:163; Andrault, Monteux, Le Bars & Samuel 2016, *EPSL* 443:195 — which notes mechanically driven core flow would be episodically variable) but derives no millennial period. Planetary-tidal dynamo synchronization exists only for the Sun (Stefani et al. 2019, *Sol. Phys.* 294:60 — 11.07-yr Venus–Earth–Jupiter beat, Suess–de Vries and Hallstatt as further beats; rebutted by Nauman et al. 2022). Solar-heliospheric planetary claims for Hallstatt (Abreu et al. 2012, *A&A* 548:A88; Scafetta et al. 2016, *Earth-Sci. Rev.* 162:24; Charvátová 2000, *Ann. Geophys.* 18:399) concern the Sun, not the core. No published work ties the Jupiter–Saturn synodic family to core/LOD millennial signals — the model's beat interpretation (§6) has **no published competitor and no published support**.
 6. **Predictability**: geodynamo e-folding time ~30 yr (Hulot, Lhuillier & Aubert 2010, *GRL* 37:L06305; Lhuillier, Aubert & Hulot 2011, *GJI* 186:492); practical forecast horizon half-to-one century (Aubert 2015, *GJI* 203:1738; Sanchez, Wicht & Bärenzung 2020, *EPS* 72:157). **No deterministic millennial core-flow prediction exists in the literature**; at best, statistical phase persistence over one or two cycles if a low-Q eigenmode or a stable drift-interference pattern (Nilsson et al. 2022, *PNAS* 119:e2200749119) exists.
 
 ---
@@ -114,7 +114,7 @@ Evidence: `data/lod-swing-archeomag-calibration.json`.
 
 **Same-lineage consistency (observational).** Against the state-of-the-art observational LOD residual (Kiani Shahvandi et al. 2024, *GRL* 51:e2024GL111148 companion data, Zenodo 13885017, CC-BY 4.0 — Morrison et al. 2021 Addendum lineage; local copy `data/kiani-shahvandi2024-lod-residual.txt`):
 
-| Framework component | r vs observed residual |
+| Model component | r vs observed residual |
 |---|---|
 | 4-flag stack alone | +0.84 |
 | swing alone | +0.37 |
@@ -173,7 +173,7 @@ The beat of two tones P₁, P₂ is 1/|1/P₁ − 1/P₂|. This study ran in the
 
 ### Physical carrier
 
-Item 5 is not a defect — it is the signature the axiMC eigenmode theory predicts. Dumberry, Gerick & Gillet 2025's gravest mode (~3,000 yr, Q ~ 1–10) sits at the framework's beat periods (3,530–3,695 yr); low Q means the mode rings down in one-to-few cycles unless re-excited. The synthesis:
+Item 5 is not a defect — it is the signature the axiMC eigenmode theory predicts. Dumberry, Gerick & Gillet 2025's gravest mode (~3,000 yr, Q ~ 1–10) sits at the model's beat periods (3,530–3,695 yr); low Q means the mode rings down in one-to-few cycles unless re-excited. The synthesis:
 
 > **The core acts as a damped, low-pass resonator. The stack cycles' beat envelope supplies the excitation clock; the core rectifies it (difference tones, no sum tones) and rings down between excitations (quiet modern window). The literature's inability to agree on "the period" (1,150 vs 1,350 vs 1,500 vs 2,000 yr) is expected: a damped resonator excited by several beats has characteristic times, not an eigenline.**
 
@@ -258,7 +258,7 @@ Two astronomically flavored driver hypotheses were tested and rejected for the s
 
 Evidence: `data/deltaT-142yr-window-test.json`.
 
-The ~14.2-yr line in the 270-observation eclipse residual is a **sampling-window artifact**: (a) physical ceiling — the observations span −720…+1280 with ~10³-s timing noise, and a real 0.15-ms decadal LOD line integrates to only ~0.12 s of ΔT (SMH 2016: decadal fluctuations resolved only after +1600); (b) the observation epochs' own spectral window peaks at **14.30 yr** (2nd-strongest structure, part of a ~7.15-yr harmonic comb ≈ the 88-lunation eclipse cycle) — a property of *when* eclipses were recorded, which also explains why it passed subset-robustness checks. The genuine 13.5–13.6-yr core mode (Hsu 2021; Ding & Jiang 2024) is undetectable at ancient noise; no framework component is warranted.
+The ~14.2-yr line in the 270-observation eclipse residual is a **sampling-window artifact**: (a) physical ceiling — the observations span −720…+1280 with ~10³-s timing noise, and a real 0.15-ms decadal LOD line integrates to only ~0.12 s of ΔT (SMH 2016: decadal fluctuations resolved only after +1600); (b) the observation epochs' own spectral window peaks at **14.30 yr** (2nd-strongest structure, part of a ~7.15-yr harmonic comb ≈ the 88-lunation eclipse cycle) — a property of *when* eclipses were recorded, which also explains why it passed subset-robustness checks. The genuine 13.5–13.6-yr core mode (Hsu 2021; Ding & Jiang 2024) is undetectable at ancient noise; no model component is warranted.
 
 ---
 

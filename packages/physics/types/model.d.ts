@@ -244,6 +244,11 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
             moonSunRatio: number;
         }[];
         deltaTSecondsAtJD: (jd: number) => number;
+        /** The ΔT trend anchor at J2000 (seconds): the TT − UT bridge every finder axis adds to a
+         *  true-UT JD. The joint ΔT fit's output, shipped in its own artifact (FIT.DT_ANCHOR —
+         *  plan 14: never a constants-file input), exposed here so no consumer reaches into the
+         *  constants for it. */
+        ttBridgeSeconds: any;
         frameworkSunDeps: Readonly<{
             sunMeanLongitudeJ2000Deg: any;
             tropicalRateDegPerCy: number;

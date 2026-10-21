@@ -20,6 +20,7 @@
 //
 //   node tools/explore/u2-ndot-consistency.mjs
 import { createModel, DEFAULT_CONSTANTS } from '@essrt/physics';
+import { FITTED_COEFFICIENTS as _DT_FIT } from '@essrt/physics';   // plan 14: the ΔT anchor is the fit's own (FIT.DT_ANCHOR)
 
 const model = createModel(DEFAULT_CONSTANTS);
 const K = DEFAULT_CONSTANTS;
@@ -46,7 +47,7 @@ const EPOCHS = [
   [2451534.708, 82.4269957],
 ];
 const LP = 0;   // the fitted Lp anchor, retired to 0 (plan 06 R3 item 1); its key left the inputs at plan 11 step 2
-const BRIDGE = K.earthOrbital.deltaTStart / 86400;
+const BRIDGE = _DT_FIT.DT_ANCHOR.deltaTStartSeconds / 86400;
 const N = K.physicalConstants.nutationLeadingTermsArcsec;
 
 const pts = [];

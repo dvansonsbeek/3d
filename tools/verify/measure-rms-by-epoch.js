@@ -40,7 +40,7 @@ const { j2000ToOfDate } = require('../lib/precession');
 const CACHE_PATH = path.resolve(__dirname, '..', '..', 'data', 'jpl-cache.json');
 const cache = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
 
-const J2000_JD = 2451545.0;
+const { J2000_JD } = require('@essrt/physics/constants/units');   // ONE home (plan 14 step 2)
 const J2000_YEAR = 2000.0;
 
 const TARGETS = {

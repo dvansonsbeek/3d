@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.4
-coefficients: sha256:f62e8a7b8b7ed53d
+modelVersion: v26.5
+coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
@@ -38,7 +38,7 @@ metrics.
 
 ## 2. Diagnostic hooks
 
-All three are diagnostic-only and refuse `--write`/`--sync-code`. With every one
+All three are diagnostic-only and refuse `--write`. With every one
 unset, tool output is byte-identical to the shipped run.
 
 | variable | effect |

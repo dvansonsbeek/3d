@@ -176,9 +176,9 @@
     "generator": "DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write <a FIT — re-close by hand, then npm run regen:cascade --run>",
     "files": {
       "data/astrogeo22-earth-moon.json": "sha256:77d87c4e0c3543ef4cdaca1482e065dcff5457b694fa519a58061cf013d4461b",
-      "data/core-mantle-resonator-stage1.json": "sha256:b17277b561e042f618973508e9973e4ea258cc951463c923164425b6289e902c",
+      "data/core-mantle-resonator-stage1.json": "sha256:681d8a069398f2e38b307e50483486f87b17c15cd44767a7df8fbb662e5f3d05",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "packages/fitting/src/dt-corrections-fit.cjs": "sha256:f7fabaf718165cea5cf59d83bd75514a0061bc8fcdc08c916535e8c4568fbc2f",
+      "packages/fitting/src/dt-corrections-fit.cjs": "sha256:bac7694d18b07d22b0835281344028b0e468367cfa82ca7d720ae13bd2d5dfe7",
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:2cc864c563ca816df4ccc01f651bd67fde8f29215b6670f8f8842b5d4f68445f",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/deltat/deep-time-chain.js": "sha256:47d57ed3f23a6ed8b00bdd47f23fbe1076440a48daff6af3043319fbe1063c10",
@@ -186,11 +186,11 @@
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
       "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:f85dd33c548b107e2983c9bd550897895229ee451ed83c9ff83033bc1bccfd8a",
       "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
-      "public/input/astro-reference.json": "sha256:910e896e02467a495eeb80eb843666d95a8e00a2e70714b87e8e22edc13095b7",
-      "public/input/climate-formula-coefficients.json": "sha256:34b4ae964b514b31cc0fbe3403b05c50d0a5d5d8fc490c8b48eb42cad966323d",
+      "public/input/astro-reference.json": "sha256:dfa6049d8a2464eacfc60c90a915f7e57443051868848ef589ac81679fba50fb",
+      "public/input/climate-formula-coefficients.json": "sha256:761d73233316f4c76494575c03b976cf05f7a1640337df1a99ab0e5657de33a5",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
-      "tools/lib/constants.js": "sha256:78d2914b3d1d40022c300e08a7354d42a2b68f731e476b6d1e56e33d524bb8ba",
+      "tools/lib/constants.js": "sha256:4d1c727394e89268ab570c4771dfde6987b69e71d4d8b8a80b89142054fcbad7",
       "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd"
     }
   }

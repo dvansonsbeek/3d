@@ -21,11 +21,11 @@ const fs = require('fs');
 const path = require('path');
 // 9-3f: moved from tools/fit (shim remains); REPO now three levels up.
 const REPO = path.join(__dirname, '..', '..', '..');
-// Single source of truth — read from astro-reference.json, never hardcoded
-// (current joint-world value is 55.16 s; the JSON is authoritative if they disagree)
+// Single source of truth — the joint fit's own artifact (plan 14: the anchor is the
+// fit's output and lives beside its coefficients), never hardcoded.
 const DELTA_T_START = JSON.parse(fs.readFileSync(
-  path.join(REPO, 'public', 'input', 'astro-reference.json'),
-  'utf8')).earthOrbital.deltaTStart;
+  path.join(REPO, 'data', 'deltaT-4flag-fit.json'),
+  'utf8')).optimum.deltaTStart;
 
 function freshDT(resonatorOn) {
   for (const k of Object.keys(require.cache)) delete require.cache[k];

@@ -61,7 +61,7 @@ const EPOCHS = [-4000, 10000];
 const HALF = 100;
 const TOL = { yearS: 0.030, raArcsec: 0.30, epsArcsec: 0.001, e: 1e-6, periArcsec: 3.0, instantS: 8.0, axialYr: 0.3 };
 
-const BRIDGE = P.DEFAULT_CONSTANTS.earthOrbital.deltaTStart;
+const BRIDGE = P.FITTED_COEFFICIENTS.DT_ANCHOR.deltaTStartSeconds;   // the joint fit's anchor (plan 14: its own artifact)
 const M = DOH.createOneSourceMovement();
 if (!M) { console.error('FAIL scene-year-lengths: data/nbody-secular-series.json is absent'); process.exit(1); }
 const YL = M.yearLengths;
