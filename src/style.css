@@ -2471,6 +2471,13 @@ details.wgc-chart-collapsible > .wgc-chart { margin-top:8px; }
   justify-content: center;
 }
 #verificationPanel.visible { display: flex; }
+/* Plan 17 — Framework images: the Framework Verification shell, a white figure inside */
+#frameworkImagesPanel { display: none; position: fixed; inset: 0; z-index: 10000; align-items: center; justify-content: center; }
+#frameworkImagesPanel.visible { display: flex; }
+.fip-figure { background: #ffffff; border-radius: 6px; padding: 8px; margin: 0 auto; max-width: 100%; }
+.fip-figure svg { display: block; width: 100%; height: auto; }
+.fip-sources { font-size: 11px; color: #8a93a5; margin: 8px 4px 0; }
+.fip-planned { color: #8a93a5; font-size: 13px; padding: 40px 12px; text-align: center; }
 
 .vfp-overlay {
   position: absolute;

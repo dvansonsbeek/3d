@@ -76,6 +76,8 @@ const REQUIRED = [
   'public/input/climate-formula-coefficients.json',
   // the L1 line audit whose line labels reach the paper through @essrt/model-values:
   'data/l1-line-audit-results.json',
+  // plan 17 — the ice-core records the Framework images panel draws (tools/pipeline/import-ice-cores.js):
+  'public/input/ice-core-data.json',
 ];
 
 // Artifacts STALE BY CONSTRUCTION (plan 06 R3 item 1 cleanup, owner-checked):

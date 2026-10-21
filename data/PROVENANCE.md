@@ -28,6 +28,9 @@ retains its original NOAA header giving the full citation.
 | `cheng2016-speleothem.txt` | Cheng et al. (2016) — China 640 kyr speleothem δ¹⁸O |
 | `dyez-2018-boron-co2.txt` | Dyez et al. (2018) — boron-isotope CO₂ |
 | `epica-co2-bereiter2015.txt` | Bereiter et al. (2015) — revised 800 kyr Antarctic CO₂ |
+| `epica-domec-temperature-jouzel2007.txt` | Jouzel et al. (2007) — EPICA Dome C 800 kyr deuterium and temperature (NOAA `edc3deuttemp2007.txt`) |
+| `vostok-deuterium-temperature-petit1999.txt` | Petit et al. (1999) — Vostok 420 kyr deuterium and temperature (NOAA `deutnat.txt`) |
+| `vostok-co2-petit1999.txt` | Petit et al. (1999) — Vostok 420 kyr CO₂ (NOAA `co2nat.txt`) |
 | `gisp2-alley2000-raw.txt` | Alley (2000) — GISP2 temperature |
 | `martinez-boti-2015-boron-co2.txt` | Martínez-Botí et al. (2015) — boron-isotope CO₂ |
 | `moberg2005-raw.txt` | Moberg et al. (2005) — 2000-yr NH temperature |

@@ -24,6 +24,8 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
 // chain depends on it). publishedCurves migrated here from
 // @essrt/physics at its 4.0.0 major.
 import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipticAU, mpp02GeoEclipticJ2000Km, publishedCurves as _PC } from '@essrt/reference';
+// Plan 17 — the Framework images panel's figures (renderers + paper kit; no THREE, no scene).
+import { FRAMEWORK_IMAGES } from './framework-images.js';
 
 /*
   Expanding Solar System Resonance Theory (ESSRT) — a holistic view of our universe · holisticuniverse.com
@@ -4587,6 +4589,10 @@ if (typeof window !== 'undefined') {
       };
     },
     inspectorPaperSvg: (planetKey) => inspectorRenderPaperSVG(planetKey || hierarchyInspector.currentPlanet),
+    // Plan 17: the Framework images — each built figure's { svg, numbers, sources } at J2000
+    frameworkImages: () => Object.fromEntries(FRAMEWORK_IMAGES.filter((c) => c.render).map((c) => [c.id, _fipRender(c)])),
+    openFrameworkImagesPanel: (id) => { openFrameworkImagesPanel(); if (id) updateFrameworkImagesPanel(id); },
+    frameworkImageIds: () => FRAMEWORK_IMAGES.filter((c) => c.render).map((c) => c.id),
     vfpPIState: () => _vfpPIState,
     vfpPIRender: () => renderVFPPlanetInclinations(),
     vfpPIAfterRender: (el) => _vfpPIAfterRender(el),
@@ -20917,6 +20923,185 @@ function closeVerificationPanel() {
   if (verificationPanel) verificationPanel.classList.remove('visible');
 }
 
+// ═══ Framework images (plan 17) ══════════════════════════════════════════════
+// Twelve explanatory figures drawn from the model (src/framework-images.js);
+// the Framework Verification shell — prev/next, a grouped dropdown, one Export
+// that hands the figure's paper SVG to the shared export modal.
+
+/** The model readers the figures draw from — published surfaces only. */
+function createFrameworkImagesContext(epochYear) {
+  const M = _tierModelB();
+  const jdOfYear = (y) => KC_ANCHOR_EPOCH_JD + (y - KC_ANCHOR_EPOCH_YEAR) * DAYS_PER_JULIAN_YEAR;
+  return {
+    epochYear,
+    /** Earth's eccentricity of date — the one-source series (the scene's e). */
+    eccentricity: (y) => _sceneEccTargetAt(y),
+    /** Earth's longitude of perihelion in the J2000 ecliptic — the chain (the scene's eccentricity path). */
+    perihelionLongitudeJ2000Deg: (y) => _chainPerihelionEclLonDeg('earth', jdOfYear(y)),
+    /** The next eccentricity minimum after `y` — the scene's own scan ({ year, e, pom }). */
+    nextEccentricityMinimum: (y) => _chainEarthEccCycle(y).nextMin,
+    /** The next eccentricity maximum after `y` — the same scan. */
+    nextEccentricityMaximum: (y) => _chainEarthEccCycle(y).nextMax,
+    /** Earth's longitude of perihelion of date (the published Sun tier), degrees. */
+    perihelionLongitudeOfDateDeg: (y) => earthPerihelionEclipticOfDateDeg(jdOfYear(y), y),
+    /** The model's cardinal instant `cp` ('VE' | 'SS' | 'AE' | 'WS') of calendar year `y`, JD (UT) — the Planet Orbit Analysis call (the crossing nearest the year's midpoint). */
+    cardinalJD: (y, cp) => _tierModelB().cardinal.jdNearUT(dateToJulianDay(y, 7, 2) + 0.5, cp),
+    /** "YYYY-MM-DD HH:MM UT" for a JD (UT). */
+    formatUT: (jd) => _hiDateTimeFromJD(jd),
+    /** The seven planets' keys, inner to outer. */
+    planetKeys: PLANET_KEYS,
+    /** A body's longitude of perihelion in the J2000 ecliptic at a JD — the chain (the package's `planets.perihelionLongitudeDeg` frame); 'earth' included. */
+    perihelionLongitudeJ2000AtJD: (name, jd) => _chainPerihelionEclLonDeg(name, jd),
+    /** The ONE engine year (true TT, Julian from J2000) of a JD — every engine read takes it (R4b). */
+    engineYearOfJD: (jd) => _engineYearTT(jd),
+    /** The day and year lengths of date, SI seconds — the package's published family (the Earth panel's Days rows: ONE day, LOD_real). */
+    dayAndYearLengths: (y) => {
+      const M = _tierModelB();
+      return {
+        solarDaySeconds: M.lengths.lodRealSeconds(y),
+        siderealDaySeconds: M.lengths.siderealDaySeconds(y),
+        stellarDaySeconds: M.lengths.stellarDaySeconds(y),
+        tropicalYearSeconds: M.epoch.tropicalYearSecondsAtYear(y),
+        siderealYearSeconds: M.epoch.siderealYearSecondsAtYear(y),
+      };
+    },
+    /** The ONE certified Sun's mean elements of date (the eclipse Sun): mean longitude, its perigee (Earth's ϖ + 180°) and e, degrees. */
+    sunMeanElements: (y) => {
+      const d = _tierModelB().eclipse.frameworkSunDeps;
+      return { meanLongitudeDeg: d.meanLongitudeDegAt(y), perigeeLongitudeDeg: d.perihelionLongitudeDegAt(y) + 180, eccentricity: d.eccentricityAt(y) };
+    },
+    /** The anomalistic year of date, SI seconds (the one family's perihelion-to-perihelion year). */
+    anomalisticYearSeconds: (y) => _tierModelB().cardinalStructure.anomalisticYearSeconds(y),
+    /** The obliquity of date ε(t), degrees — the hybrid (the published ε; the scene's own target). */
+    obliquityDeg: (y) => _sceneEpsTargetDeg(y),
+    /** The thirteen IAU constellations along the ecliptic: [name, entry longitude J2000 °] (the scene's band and the orbit picture's ring). */
+    eclipticConstellations: _HI_ECLIPTIC_CONSTELLATIONS,
+    /** The astronomical unit, km (IAU 2012 — the model's J2000 snapshot). */
+    auKm: AU_J2000_KM,
+    /** The export standard's header: the 16-px title and the legend rows (the other Tools exports' one home). */
+    paperHeader: (title, legend, W) => chartExportHeader(title, legend, W),
+    /** The apsidal period of date (perihelion vs the stars), Julian years. */
+    apsidalPeriodYears: (y) => M.lunisolar.apsidalPeriodYearsAtYear(y),
+    /** The axial precession period of date, years. */
+    axialPrecessionYears: (y) => M.epoch.axialPrecessionYearsAtYear(y),
+  };
+}
+
+let frameworkImagesPanel = null;
+
+function _fipRender(item) {
+  if (!item.render) return null;
+  return item.render(createFrameworkImagesContext(2000));
+}
+
+function createFrameworkImagesPanel() {
+  const panel = document.createElement('div');
+  panel.id = 'frameworkImagesPanel';
+  const overlay = document.createElement('div');
+  overlay.className = 'vfp-overlay';
+  overlay.addEventListener('click', closeFrameworkImagesPanel);
+  panel.appendChild(overlay);
+  const dialog = document.createElement('div');
+  dialog.className = 'vfp-dialog';
+  panel.appendChild(dialog);
+
+  const header = document.createElement('div');
+  header.className = 'vfp-header';
+  header.innerHTML = '<h2>Framework images <span class="vfp-subtitle">— the website’s explanatory figures, drawn from the model</span></h2>';
+  const exportBtn = document.createElement('button');
+  exportBtn.className = 'vfp-export-btn';
+  exportBtn.textContent = 'Export';
+  exportBtn.addEventListener('click', () => {
+    const item = FRAMEWORK_IMAGES.find((c) => c.id === panel._current);
+    const out = item && _fipRender(item);
+    if (out) openChartExportModal(out.svg, item.file);
+  });
+  header.appendChild(exportBtn);
+  const close = document.createElement('div');
+  close.className = 'vfp-close';
+  close.addEventListener('click', closeFrameworkImagesPanel);
+  header.appendChild(close);
+  dialog.appendChild(header);
+
+  const nav = document.createElement('div');
+  nav.className = 'vfp-nav';
+  const step = (d) => {
+    const i = FRAMEWORK_IMAGES.findIndex((c) => c.id === panel._current) + d;
+    if (i >= 0 && i < FRAMEWORK_IMAGES.length) updateFrameworkImagesPanel(FRAMEWORK_IMAGES[i].id);
+  };
+  const navPrev = document.createElement('button');
+  navPrev.className = 'vfp-nav-arrow';
+  navPrev.textContent = '‹';
+  navPrev.addEventListener('click', () => step(-1));
+  nav.appendChild(navPrev);
+  const navName = document.createElement('button');
+  navName.className = 'vfp-nav-name';
+  nav.appendChild(navName);
+  const navNext = document.createElement('button');
+  navNext.className = 'vfp-nav-arrow';
+  navNext.textContent = '›';
+  navNext.addEventListener('click', () => step(1));
+  nav.appendChild(navNext);
+  const dropdown = document.createElement('div');
+  dropdown.className = 'vfp-dropdown';
+  dropdown.style.display = 'none';
+  let lastGroup = null;
+  for (const item of FRAMEWORK_IMAGES) {
+    if (item.group !== lastGroup) {
+      const head = document.createElement('div');
+      head.className = 'vfp-dropdown-group';
+      head.textContent = item.group;
+      head.style.cssText = 'padding:6px 12px 2px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8a93a5;cursor:default;';
+      dropdown.appendChild(head);
+      lastGroup = item.group;
+    }
+    const row = document.createElement('div');
+    row.className = 'vfp-dropdown-item';
+    row.style.paddingLeft = '24px';
+    row.textContent = item.render ? item.label : `${item.label} (planned)`;
+    row.addEventListener('click', () => { dropdown.style.display = 'none'; updateFrameworkImagesPanel(item.id); });
+    dropdown.appendChild(row);
+  }
+  nav.appendChild(dropdown);
+  navName.addEventListener('click', () => { dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none'; });
+  dialog.appendChild(nav);
+
+  const body = document.createElement('div');
+  body.className = 'vfp-body';
+  dialog.appendChild(body);
+  Object.assign(panel, { _body: body, _navName: navName, _navPrev: navPrev, _navNext: navNext, _dropdown: dropdown, _exportBtn: exportBtn, _current: FRAMEWORK_IMAGES[0].id });
+  document.body.appendChild(panel);
+  return panel;
+}
+
+function updateFrameworkImagesPanel(id) {
+  const P = frameworkImagesPanel;
+  const idx = FRAMEWORK_IMAGES.findIndex((c) => c.id === id);
+  if (!P || idx < 0) return;
+  const item = FRAMEWORK_IMAGES[idx];
+  P._current = id;
+  P._navName.textContent = `${item.label} · ${item.file}`;
+  P._navPrev.disabled = idx === 0;
+  P._navNext.disabled = idx === FRAMEWORK_IMAGES.length - 1;
+  P._dropdown.style.display = 'none';
+  P._exportBtn.style.display = item.render ? '' : 'none';
+  let out = null;
+  try { out = _fipRender(item); } catch (err) { console.error('[FrameworkImages]', item.id, err); }
+  P._body.innerHTML = out
+    ? `<div class="fip-figure">${out.svg}</div><div class="fip-sources">Sources: ${escapeXml(out.sources)}</div>`
+    : `<div class="fip-planned">${escapeXml(item.label)} — planned (plan 17); the figure is not built yet.</div>`;
+}
+
+function openFrameworkImagesPanel() {
+  if (!frameworkImagesPanel) frameworkImagesPanel = createFrameworkImagesPanel();
+  frameworkImagesPanel.classList.add('visible');
+  updateFrameworkImagesPanel(frameworkImagesPanel._current);
+}
+
+function closeFrameworkImagesPanel() {
+  if (frameworkImagesPanel) frameworkImagesPanel.classList.remove('visible');
+}
+
 // Update live data in hierarchy inspector (called from render loop)
 /**
  * Planet Orbit Analysis — per-frame update (called from the animation loop): the
@@ -23001,6 +23186,8 @@ function setupGUI() {
     'Modular climate formula: L1 orbital lines (the engine’s secular beats + the 405.6-kyr eccentricity family) + L2 silicate-weathering carbon thermostat (405/202/135 kyr) + L3 boundary-condition steps (PETM, EOT, Mi-1, MMCT, iNHG, MPT). Per-regime fits vs LR04 \u03b4\u00b9\u2078O (Lisiecki & Raymo 2005) and CENOGRID \u03b4\u00b9\u2078O / \u03b4\u00b9\u00b3C (Westerhold 2020). Independent layer toggles + per-layer R\u00b2 breakdown. Forward-projection tab; cross-regime prediction fails honestly (doc 92 \u00a78.4).');
   addTooltip(analysisFolder.addButton({ title: 'Earth dLOD/dt Analysis' }).on('click', () => openLcrPanel()),
     'The day-length rate dLOD/dt decomposed into its drivers (tidal + GIA + the cycle stack + the core\u2013mantle swing) against named historical climate periods (MWP / LIA / Bond events / 8.2 ka / 4.2 ka / LBA / Iron Age cold / modern warming) and the GISP2 / LR04 temperature proxies.');
+  addTooltip(analysisFolder.addButton({ title: 'Framework images' }).on('click', () => openFrameworkImagesPanel()),
+    'The website\u2019s twelve explanatory figures, drawn from the model: every number and date on them is the model\u2019s own, so a changed model changes the figure. Export downloads the figure on screen (PNG or SVG).');
 
   // ── K8: the Standard-Model overlay — a comparison INSTRUMENT (toggles and
   // readouts, not a panel), so it is a folder under the tabs, beside the
