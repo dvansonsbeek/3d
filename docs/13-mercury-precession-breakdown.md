@@ -12,9 +12,8 @@ quantities the model computes and displays (ecliptic longitude of date vs
 Earth-frame right ascension), the Earth-frame fluctuation pattern and why
 it averages out, the first-order Laplace–Lagrange physics and its
 measured limitations, and §1.8 — the equatorial-projection account of the
-Earth-frame rate for all seven planets (since plan 06 R8 the Earth-frame
-rate IS that projection; the fitted surrogate it used to be checked against
-is retired).
+Earth-frame rate for all seven planets (the Earth-frame rate IS that
+projection — one formula, zero fitted constants).
 
 The planet panels show the **chain's** secular-shape attribution (base
 mode / largest companion / remainder with % shares, plus the rate of
@@ -60,9 +59,7 @@ average returns to the ecliptic value. Two implementations exist:
   (rate × dα/dλ + ∂α/∂ε·ε̇), evaluated at any year for all seven planets —
   one formula, zero fitted constants. Mercury:
   <!--v:mercuryEarthFrameRa1900-->576.17<!--/v--> ″/cy at 1900,
-  <!--v:mercuryEarthFrameRa2000-->576.19<!--/v--> ″/cy at 2000. (The former
-  "predict basis" — ~2,421 fitted terms per planet trained on the retired
-  geometric scene's export — is archived.)
+  <!--v:mercuryEarthFrameRa2000-->576.19<!--/v--> ″/cy at 2000.
 
 | Metric | Mercury |
 |--------|-----------------|
@@ -79,10 +76,7 @@ apsidal and nodal modes, so measured in Earth's equatorial frame the
 apparent rate oscillates about the ecliptic value. Over a full secular
 perihelion period of the chain the oscillations cancel — sometimes
 Earth's orientation adds to the apparent rate, sometimes it subtracts —
-so the long-term Earth-frame average equals the ecliptic value. (The
-retired device read a dominant ~7,450-yr period off the beat of its
-inclination and ecliptic wheels; the wheels are a scene pose, not a law,
-and the device's period and its narrative script are retired — plan 09.)
+so the long-term Earth-frame average equals the ecliptic value.
 
 ### When to use which
 
@@ -227,8 +221,7 @@ don't disagree qualitatively. But it fails where frame matters:
 planet the model stores:
 
 - `perihelionEclipticYears` — the chain's inertial apsidal period,
-  1,296,000/g yr in the J2000 ecliptic (plan 07 R1; the H·num/den lattice
-  period it replaced sat in the same slot)
+  1,296,000/g yr in the J2000 ecliptic
 - Derived ICRF period: `T_ICRF = (T_peri · T_p) / (T_p − T_peri)` —
   the rate in the inertial frame after subtracting general precession
 
@@ -239,8 +232,7 @@ equatorial frame and the star field share the `earth` node's axial-precession
 rotation, so a scene measurement cannot separate "relative to the equinox"
 from "relative to the stars" — see §1.8, "Frames, measured". **The model
 treats the ICRF as the stable foundation** — the frame of the chain's
-inertial apsidal periods (and the frame the retired integer structure was
-anchored in) — and derives the ecliptic rate from it via this relation. That's why the model's ecliptic
+inertial apsidal periods — and derives the ecliptic rate from it via this relation. That's why the model's ecliptic
 rates match WebGeoCalc directly (both measure the date-frame) while L-L's
 ecliptic rates match neither cleanly (L-L's "ecliptic" is a hybrid of
 conventions).
@@ -248,12 +240,10 @@ conventions).
 **Testable prediction from the frame distinction.** Standard secular theory
 says Saturn's ecliptic retrograde rate is a transient phase of the
 Great-Inequality oscillation (~900-yr period) and will reverse within
-~450 yr. The retired device said Saturn's ecliptic rate is
-permanently retrograde at `−3,140 ″/cy` (its ecliptic-period value, as the
-date-frame expression of the integer ICRF structure — a record, retired with
-the lattice at plan 07 R1). Long-baseline JPL
-DE441 integrations (13 000 BC → 17 000 AD) can in principle distinguish
-these. Saturn's window retrograde is the chain's own reading ([doc 109](109-model-nbody-engine-and-lattice-test.md)).
+~450 yr. Saturn's window retrograde is the chain's own reading ([doc 109](109-model-nbody-engine-and-lattice-test.md)):
+the chain's 1800–2100 window rate is <!--v:saturnPeriRateEclipticArcsecCy-->-1,576.66<!--/v--> ″/cy
+while its secular g₆ is prograde. Long-baseline JPL DE441 integrations
+(13 000 BC → 17 000 AD) can in principle time the reversal.
 
 ---
 
@@ -262,9 +252,7 @@ these. Saturn's window retrograde is the chain's own reading ([doc 109](109-mode
 The Cycles tab pairs Mercury's projection excess at the IAU J2000 perihelion
 longitude (§1.8, <!--v:mercuryPeriProjectionExcessJ2000-->42.51<!--/v-->″/cy)
 with the general-relativistic advance derived from the model's own constants
-(<!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v-->″/cy). The former
-"Missing advance around 1900 AD (Model)" row read the retired predictive
-formula at 1900 (retired); §1.8 carries the
+(<!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v-->″/cy); §1.8 carries the
 measured verdict on the projection.
 
 ### 1.7 Historical Context
@@ -283,8 +271,7 @@ Urbain Le Verrier (1859) discovered that Mercury's observed perihelion precessio
 ### 1.8 The Earth-frame rate is the equatorial projection of the ecliptic advance
 
 The Earth-frame perihelion rate the model measures (the right ascension of
-the perihelion direction in the scene's equatorial frame — the Step-3 export's
-`<Planet> Perihelion RA` column; since plan 06 R8 the projection itself,
+the perihelion direction in the scene's equatorial frame — the projection
 `perihelionFrameBreakdown`) is
 not a new quantity: it is the ecliptic advance projected into that frame,
 plus the term the changing obliquity adds to any right ascension:
@@ -297,11 +284,8 @@ dα/dλ  =  cos ε / (cos²λ + sin²λ cos²ε)                  (β = 0)
 ```
 
 with ε̇ = <!--v:obliquityRateJ2000ArcsecCy-->-46.8<!--/v--> ″/cy from the shipped
-obliquity law. (Before plan 06 R8 the Earth-frame rate came from a fitted
-surrogate of the retired scene's export and κ, a residual ≤ 0.7 ″/cy, closed
-the identity under a gate; the surrogate is retired and the Earth-frame rate
-IS this projection, so the identity holds by construction and the gate is
-gone.)
+obliquity law. The Earth-frame rate IS this projection, so the identity
+holds by construction.
 
 **Mercury.** The ecliptic advance is the lattice divisor,
 <!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> ″/cy (the device's ecliptic-period value). At the
@@ -314,8 +298,7 @@ The general-relativistic advance derived from the same model constants
 <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> ″/cy. Adding the obliquity-rate
 term (<!--v:mercuryPeriObliquityRateTermJ2000-->4.65<!--/v-->) gives the
 Earth-frame rate, <!--v:mercuryPeriRateEarthFrameMeasuredJ2000-->576.19<!--/v--> ″/cy
-at J2000 (plan 06 R8: this sum IS the model's Earth-frame rate; the retired
-device's 579.83 carried a κ ≤ 1.4″/cy residual of the retired scene) — the
+at J2000 (this sum IS the model's Earth-frame rate) — the
 amount above the ecliptic advance oscillates around zero over a full
 perihelion cycle as the perihelion turns against the equinox.
 
@@ -335,7 +318,7 @@ condition in apparent geocentric longitude, re-solved in
 the excess is present in longitude-reduced positions with no transit and no
 modern constant in the chain.
 
-**The two coordinates, kept apart** (the instrument `tools/explore/mercury-perihelion-frames.mjs` read the scene marker's fitted `angleCorrection`, deleted at plan 11 step 2 — the script went with its input; git history keeps it).
+**The two coordinates, kept apart.**
 The advance is one motion in two coordinates: (a) ecliptic longitude of date,
 λ̇ = ϖ̇_sidereal + p_A — what Le Verrier, Newcomb and Clemence measured; (b)
 right ascension of date, α̇ = λ̇·dα/dλ + ∂α/∂ε·ε̇ — what the scene's export
@@ -467,32 +450,31 @@ long-term g₁ by 0.473 ″/yr — the same physics at the quantity-A level.
 ## The Three-Way Comparison
 
 For each planet: **WebGeoCalc observed** (JPL/NAIF short-baseline
-1900–2100, the actual observed rate), **first-order L-L A_ii** (the
-diagonal sum from §1.1), and the **model's value** (whose quantity TYPE
-differs per planet — doc 109 §9: Mars = long-term mean, Mercury =
-present-epoch rate, Jupiter/Saturn/Uranus = window-epoch values). All in
-″/century. The Model figures marked "(device)" are the RECORD of the retired
-lattice's J2000 ecliptic periods (retired at plan 07 R1 — a planet's apsidal
-period is now the chain's 1,296,000/g, and its present-epoch rates are the
-§1.8 table above); Earth's is the N-body series' perihelion-of-date rate.
+1900–2100, the actual observed rate) against **first-order L-L A_ii** (the
+diagonal sum from §1.1) — a window rate against a secular one, so the
+quantity types differ (doc 109 §9). All in
+″/century. A planet's apsidal period is the chain's 1,296,000/g and its
+present-epoch rates are the §1.8 table above; Earth's is the N-body series'
+perihelion-of-date rate.
 
-| Planet | WebGeoCalc observed | First-order A_ii | Model | Notes |
-|--------|--------------------|-----------------|-----------------|-------|
-| Mercury | ~570 | ~553 | 531 (device ecliptic period) | L-L matches obs to ~3 % |
-| Venus | ~0 | ~1,199 | −290 (device) | L-L fails catastrophically (low-e singularity) |
-| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> | ~1,280 | 6,187 (the perihelion-of-date rate) | Model matches obs exactly; L-L gives inertial rate (different frame) |
-| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~1,776 | 1,739 (device) | L-L over by ~11 %; model matches obs to ~9 % |
-| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~754 | 1,884 (device) | L-L under by ~58 % (Jupiter–Saturn 5:2 coupling missing); model matches obs to ~5 % |
-| Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | −3,140 (device) | L-L has wrong sign; model sits within the observed window-spread |
-| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~278 | 1,160 (device) | L-L under by ~75 %; model matches obs to ~5 % |
-| Neptune | ~200 | ~68 | 193 (device) | L-L under by ~66 %; model matches obs to ~4 % |
+| Planet | WebGeoCalc observed | First-order A_ii | Notes |
+|--------|--------------------|-----------------|-------|
+| Mercury | ~570 | ~553 | L-L matches obs to ~3 % |
+| Venus | ~0 | ~1,199 | L-L fails catastrophically (low-e singularity) |
+| Earth | ~<!--v:earthObservedRate-->6,186<!--/v--> | ~1,280 | the model's perihelion-of-date rate matches obs exactly; L-L gives the inertial rate (different frame) |
+| Mars | ~<!--v:marsObservedRate-->1,600<!--/v--> | ~1,776 | L-L over by ~11 % |
+| Jupiter | ~<!--v:jupiterObservedRate-->1,800<!--/v--> | ~754 | L-L under by ~58 % (Jupiter–Saturn 5:2 coupling missing) |
+| Saturn | retrograde, magnitude window-sensitive (~−1,800 to −3,600) | +1,867 | L-L has the wrong sign |
+| Uranus | ~<!--v:uranusObservedRate-->1,100<!--/v--> | ~278 | L-L under by ~75 % |
+| Neptune | ~200 | ~68 | L-L under by ~66 % |
 
 First-order L-L is a reasonable approximation for Mercury and Mars but
 fails significantly for every other planet — structural failures of
 first-order theory (missing off-diagonal coupling, resonances, the frame
-collapse of §1.5a), not implementation bugs. The model's rates match the
-six determinable planets to 3–10 % (Venus's observed rate flips sign
-across windows; Saturn's observed magnitude is window-sensitive); the
+collapse of §1.5a), not implementation bugs. The model's own planet
+positions are the N-body chain's, gated against JPL by `chain-vs-jpl-rms`
+(`data/chain-vs-jpl-rms.json`); its window apsidal rates are the §1.8
+table above, read on the same stencil as WebGeoCalc's. The
 per-planet dominances follow the α·ᾱ weighting (Jupiter ~83 % of Mars's
 rate; Venus ~52 % of Mercury's; Jupiter↔Saturn ~98 % of each other's
 diagonal rate — and inner perturbers carry one less power of α, which is

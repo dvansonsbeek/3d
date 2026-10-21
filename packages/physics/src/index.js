@@ -148,7 +148,11 @@ export * as planetOrbitChain from './planets/orbit-chain.cjs';
 // P5/K4.6c — the engine-D Keplerian chain (pure evaluator + the embedded
 // governed artifact; the browser flag path consumes exactly these).
 export { computeSecularShape } from './planets/secular-shape.cjs';
-export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
+// `computeApsidalTangentDegPerYr` is the chain's ±150-yr central tangent of the perihelion
+// longitude (the panels' "Prec." cell — osculating, NOT the ±1-kyr secular stencil of the
+// "Secular" cell); `computeApsidalSecularDegPerYr` is its former name, kept as a deprecated
+// alias on the API axis (plan 14 follow-up).
+export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, computeApsidalSecularDegPerYr as computeApsidalTangentDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
 export { createSecularSeriesOverride } from './planets/secular-series.cjs';
 // Plan 06 Phase 7 — the planets' spin channel (the precession constant from

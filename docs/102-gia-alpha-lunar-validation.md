@@ -1303,7 +1303,7 @@ Earth-perihelion sub-harmonics.
 
 **Selection-rule note (T5)**: n=1830, 1104, 2989 and 3749 were selected
 under the gcd rule the Sun-longitude harmonic runtime filter enforced
-(commit 6d87173; the filter and its comb are deleted, plan 09) — each shares a prime factor with H (61, 23, 61, 23).
+(the filter and its comb are deleted) — each shared a prime factor with the retired unit.
 The T5 null shows a compliant integer sits inside every fitted plateau by
 density alone: the rule selected divisors, it did not predict periods.
 
@@ -1433,7 +1433,7 @@ carrying no information about the periods.
 
 ### Hallstatt harmonic (~2430 yr) — solar-activity coupling
 
-**Period 2429.83 yr** (the former divisor 1104, = H/138 in the retired lattice — a selection record). The divisor
+**Period 2429.83 yr** (the former divisor 1104 — a selection record). The divisor
 1104 = 2⁴·3·23 shares H's 23 prime factor — the selection filter (T5);
 equivalently 138 = 6·23 places the harmonic at the sixth sub-harmonic of
 the ~14.6-kyr period H/23 = 14,579 yr.

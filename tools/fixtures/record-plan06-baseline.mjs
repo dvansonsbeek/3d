@@ -37,7 +37,7 @@ const require = createRequire(join(ROOT, 'package.json'));
 
 const {
   createModel, createDeepEccChannel, DEEP_MODES_ARTIFACT,
-  buildPlanetChainsFromArtifactData, CHAIN_ARTIFACT, computeApsidalSecularDegPerYr,
+  buildPlanetChainsFromArtifactData, CHAIN_ARTIFACT, computeApsidalTangentDegPerYr,
 } = await import('@essrt/physics');
 const DT = require(join(ROOT, 'tools/lib/deep-time.js'));
 const DOH = require(join(ROOT, 'tools/lib/deep-orbital-history.js'));
@@ -84,7 +84,7 @@ function measure() {
     // S5: the composed lunisolar period on the derived J2000 anchor (the retired H/13 identity read 0.086 % slow)
     v[`${tag}.meanPrecessionPeriodYr`] = num(m.lunisolar.meanPeriodYearsAtYear(year));
     // the orbital side, engine D
-    const apsRate = num(computeApsidalSecularDegPerYr(year, chains.earth, chains) * 3600);
+    const apsRate = num(computeApsidalTangentDegPerYr(year, chains.earth, chains) * 3600);
     const Taps = apsRate ? 1296000 / apsRate : null;
     v[`${tag}.apsidalRateArcsecPerYr`] = apsRate;
     v[`${tag}.apsidalPeriodYr`] = Taps;

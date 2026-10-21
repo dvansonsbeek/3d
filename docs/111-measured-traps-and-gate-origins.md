@@ -118,7 +118,7 @@ evaluator and stencil (100-kyr window mean / chain tangent / series
 year-over-year / deep-mode tail); two panel surfaces showing different
 windows of the same rate split 111,491 vs 111,570 yr. Surfaces quoting one
 physical rate ride ONE family — the anomalistic takes the chain tangent the
-Prec. cell shows (`computeApsidalSecularDegPerYr`, one home). Second
+Prec. cell shows (`computeApsidalTangentDegPerYr` — the ±150-yr tangent; `computeApsidalSecularDegPerYr` is its deprecated alias, plan 14 follow-up — one home). Second
 measured instance (C1): a mean motion FITTED over a window shorter than a
 resonant inequality absorbs the inequality's local phase slope into the mean
 term — the chain's 300-yr `windowElementRates` gave Neptune 164.71 yr where

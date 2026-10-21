@@ -5238,7 +5238,7 @@
   },
   {
    "file": "packages/physics/src/index.js",
-   "line": 159,
+   "line": 163,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -5246,7 +5246,7 @@
   },
   {
    "file": "packages/physics/src/index.js",
-   "line": 171,
+   "line": 175,
    "runtime": "package",
    "token": "/ 13",
    "class": "comment",
@@ -5254,7 +5254,7 @@
   },
   {
    "file": "packages/physics/src/index.js",
-   "line": 273,
+   "line": 277,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -5262,7 +5262,7 @@
   },
   {
    "file": "packages/physics/src/index.js",
-   "line": 273,
+   "line": 277,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -5270,7 +5270,7 @@
   },
   {
    "file": "packages/physics/src/index.js",
-   "line": 273,
+   "line": 277,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -5278,7 +5278,7 @@
   },
   {
    "file": "packages/physics/src/index.js",
-   "line": 273,
+   "line": 277,
    "runtime": "package",
    "token": "/ 13",
    "class": "comment",
@@ -5286,7 +5286,7 @@
   },
   {
    "file": "packages/physics/src/index.js",
-   "line": 281,
+   "line": 285,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
@@ -6264,7 +6264,7 @@
    "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
    "packages/physics/src/earth/year-lengths.cjs": "sha256:ad86136a5455e5d846cee9cd03f55dc66b942edab56fa5c57f51fa2923decdb2",
    "packages/physics/src/eclipse/besselian.cjs": "sha256:f731968aa72105b31ca578f14644a5afcf228bb3a1103359414171de38baaf52",
-   "packages/physics/src/index.js": "sha256:71f8f31c28d1c34cfaad64a11eb6925967ea55aa1a17733c9308385a41e43233",
+   "packages/physics/src/index.js": "sha256:1fcac7f2f0955332fca790ee004f7307f5d6d6517670f0e1e9ae99e210904452",
    "packages/physics/src/layer0/derive-params.js": "sha256:f269af7ad405eb30b56c992f8e710dd1e5fde8abea47058f5dc990d06acd84f4",
    "packages/physics/src/layer0/index.js": "sha256:d1de030f8810621a6a0db20590aa31a24b19ade1450caeb4bdcbdcd61e3da557",
    "packages/physics/src/layer1/index.js": "sha256:ba7a15893b0d4b38ff53521f2180384b805160b313e4711740802b356cbd4e2f",
@@ -6328,7 +6328,7 @@
    "tools/explore/zbound-l-projection.mjs": "sha256:241c4a78e9ff7a06d59e547ddf5f9739e7725e073a57e1859daf75ddfb17ba56",
    "tools/fit/python/_dump_constants.js": "sha256:65565d492053398d08f2e56409d64c5bb11e2839f6df6c175e7c12b6a74f98a7",
    "tools/fit/python/load_constants.py": "sha256:61f63ee0e58ceca51c31dd8892871153699fa7b21d3f5fbcd6c45711eba9cbdc",
-   "tools/fixtures/record-plan06-baseline.mjs": "sha256:1b208621f7976ce08b5f9b73235124a58e83b12c8cf14eedb26480d3bfd707ba",
+   "tools/fixtures/record-plan06-baseline.mjs": "sha256:5a5be582ce686604cca2ab3a2d10c8a1b55c7569a022ea1da7a070a1cc63bb9a",
    "tools/fixtures/record-tools-lib.mjs": "sha256:2c4daa7c0fcf6e07e87bf2e50da48df937274c322d3ca67fde70c3301bdd0b21",
    "tools/lib/constants.js": "sha256:4d1c727394e89268ab570c4771dfde6987b69e71d4d8b8a80b89142054fcbad7",
    "tools/lib/deep-orbital-history.js": "sha256:965e2f2e8c1c27a3d36e70c3a66a80102cf655208b1b0729dcb9f7a857710385",
