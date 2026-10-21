@@ -37,4 +37,18 @@ function buildInputsBlock(generatorCommand, relPaths) {
   return { generator: generatorCommand, files };
 }
 
-module.exports = { ROOT, hashFile, buildInputsBlock };
+/**
+ * The package model's source files — the composer `packages/physics/src/model.js` and every slice
+ * in `packages/physics/src/model/` (plan 15). A generator that runs on the assembled model lists
+ * these in place of the one monolith it hashed before the split. The set is read from the
+ * directory, and it is complete by construction: a slice the composer does not import is not part
+ * of the model, and adding one edits the composer, which is in the set.
+ * @returns {string[]} repo-relative paths
+ */
+function modelSourceFiles() {
+  const dir = 'packages/physics/src/model';
+  const slices = fs.readdirSync(path.join(ROOT, dir)).filter((f) => f.endsWith('.js')).sort();
+  return ['packages/physics/src/model.js', ...slices.map((f) => `${dir}/${f}`)];
+}
+
+module.exports = { ROOT, hashFile, buildInputsBlock, modelSourceFiles };

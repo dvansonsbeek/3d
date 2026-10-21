@@ -41,7 +41,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { ROOT, buildInputsBlock } = require('../lib/artifact-inputs');
+const { ROOT, buildInputsBlock, modelSourceFiles } = require('../lib/artifact-inputs');
 const C = require('../lib/constants.js');
 
 const WRITE = process.argv.includes('--write');
@@ -125,7 +125,7 @@ const art = {
     'data/nbody-secular-series.json',
     'data/la2004-earth-51myr-back.asc',
     'data/lr04-stack.txt',   // v23.0: the realized window is the record's span
-    'packages/physics/src/model.js',   // v23.0: the one-home window-mean pole rate the verdict gates on
+    ...modelSourceFiles(),   // v23.0: the one-home window-mean pole rate the verdict gates on (the composer plus its slices, plan 15)
     // R4 (measured): the verdict runs the hybrid on these evaluators; they
     // were not inputs, so the banked verdict had gone stale unseen (the
     // fitted-law rows 711″ → 529″, the deep fork rows) until an unrelated

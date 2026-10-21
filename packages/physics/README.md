@@ -129,7 +129,10 @@ pass the artifact.
 receives everything through one deps object — plain numbers plus
 functions — and no module imports another; that is what makes
 counterfactuals first-class and lets the same core run in Node and the
-browser. For custom wiring (different α channel, subset assembly), use
+browser. The assembly itself is `src/model.js`, a composer of the named
+slices in `src/model/` (one file per family of quantities —
+`one-source-movement`, `lunar-theory`, `sun-and-eclipses`, `surface`, …),
+so a quantity is found by its slice's filename. For custom wiring (different α channel, subset assembly), use
 the factories directly: the reference adapter is `tools/lib/` in the
 [public repository](https://github.com/dvansonsbeek/3d) — the hosted
 simulator and the project's verification gates run on it. A service

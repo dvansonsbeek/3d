@@ -35,7 +35,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createRequire } = require('module');
-const { ROOT, buildInputsBlock } = require('../lib/artifact-inputs');
+const { ROOT, buildInputsBlock, modelSourceFiles } = require('../lib/artifact-inputs');
 
 const OUT = path.join(ROOT, 'data', 'sun-vs-horizons-summary.json');
 const CACHE = path.join(ROOT, 'data', 'jpl-sun-ecliptic-longitude-tt.json');
@@ -44,7 +44,7 @@ const INPUT_FILES = [
   'data/jpl-sun-ecliptic-longitude-tt.json',
   'data/nbody-secular-series.json',
   'tools/explore/fetch-jpl-sun-longitude-tt.mjs',
-  'packages/physics/src/model.js',
+  ...modelSourceFiles(),   // the model assembly: the composer plus its slices (plan 15)
   // The Sun's mean longitude of date integrates the one-family tropical year
   // on the movement's own frame of date — the sampler is an input (2026-09:
   // the general-precession booking and the C1 perihelion rate live there).

@@ -691,7 +691,7 @@ description of the historical era. These
 are terms a 200-yr extraction window folds into its secular basis, and the
 reason the certified Sun carried a 6″ ripple against Horizons over ±3000
 yr. The planetary mean-longitude RATES and the Moon-elongation rate are
-framework-native carriers injected by `model.js`: since I3 the planets'
+framework-native carriers injected by `model/sun-and-eclipses.js`: since I3 the planets'
 carriers are the model's own banked J2000 sidereal mean motions (the
 embedded artifact; the former record-based carriers sat 4.1″/yr off for
 Venus — 83° of the Venus–Earth argument at ±9000 yr), Earth the model

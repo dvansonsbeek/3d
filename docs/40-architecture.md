@@ -172,6 +172,9 @@ WebGL Render (60 FPS target)
 │   ├── physics/                # @essrt/physics — the full analytic model incl. the
 │   │                           #   certified eclipse chain (framework-native Sun,
 │   │                           #   full-series Moon, besselian umbra) and MCP/api
+│   │   └── src/model.js        #   createModel()'s assembly: a composer of the named
+│   │       + src/model/        #   slices (derived-constants → deep-time-chain → … →
+│   │                           #   lunar-theory → sun-and-eclipses → surface)
 │   ├── model-values/           # @essrt/model-values — the rendered value registry
 │   ├── fitting/                # Fitter implementations (tools/fit are CLI shims)
 │   └── fixtures/               # Golden masters for the regression gates

@@ -407,7 +407,7 @@ single geometric object: the rotating perihelion vector.
 The eclipse chain's Sun is assembled entirely from model structure — **zero
 fitted solar constants** — and the visible simulator rides the same
 certified longitude. The assembly (in
-`packages/physics/src/model.js`, exported as `eclipse.frameworkSunDeps` and
+`packages/physics/src/model/sun-and-eclipses.js`, exported as `eclipse.frameworkSunDeps` and
 consumed identically by the package tier finders/besselian, `eclipse-audit.js`,
 and the browser's `_eclipseM` — the three-runtimes rule):
 

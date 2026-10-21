@@ -35,7 +35,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
-const { buildInputsBlock } = require('../lib/artifact-inputs');
+const { buildInputsBlock, modelSourceFiles } = require('../lib/artifact-inputs');
 const { stephensonDeltaT } = require('@essrt/reference/published-curves');   // comparison band only (one-way)
 const DT = require('../lib/deep-time.js');
 
@@ -75,7 +75,7 @@ const INPUT_FILES = [
   // χ² 29.5 → 49.5 — and nothing flagged it, because the lunar chain's
   // eccentricity channel, its arguments, the model assembly and the ΔT stack
   // were not hashed here. The recording sat stale for four days.
-  'packages/physics/src/model.js',
+  ...modelSourceFiles(),   // the model assembly: the composer plus its slices (plan 15)
   // the Sun of date the lunar arguments ride (mean longitude on the one-family
   // tropical year over the movement's own frame — 2026-09)
   'packages/physics/src/earth/deep-orbital-history.cjs',

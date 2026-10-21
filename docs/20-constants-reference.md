@@ -436,7 +436,7 @@ them.
 ## Sun Longitude — the certified chain
 
 The certified apparent solar longitude is **assembled, not fitted** (E4/E5
-framework-native Sun, `packages/physics/src/model.js`, exported as
+framework-native Sun, `packages/physics/src/model/sun-and-eclipses.js`, exported as
 `eclipse.frameworkSunDeps`): the mean longitude as the INTEGRAL of the
 one-source tropical year of date (route B, SI seconds) + equation of centre
 on the banked series' e(t) and ϖ(t) plus the derived mean-element offset

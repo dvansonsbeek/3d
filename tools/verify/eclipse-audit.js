@@ -70,7 +70,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ROOT, buildInputsBlock } = require('../lib/artifact-inputs');
+const { ROOT, buildInputsBlock, modelSourceFiles } = require('../lib/artifact-inputs');
 const DT = require('../lib/deep-time');
 const C = require('../lib/constants.js');
 const SG = require('../lib/scene-graph.js');
@@ -130,8 +130,9 @@ const INPUT_FILES = [
   'data/core-mantle-resonator-stage1.json',
   'packages/physics/src/deltat/cycles.cjs',
   // the audit-26 / Babylon / centerlines umbra chain — U1: the package
-  // besselian tier (single implementation; the scene twin is retired here):
-  'packages/physics/src/model.js',
+  // besselian tier (single implementation; the scene twin is retired here);
+  // the model assembly is the composer plus its slices (plan 15):
+  ...modelSourceFiles(),
   // the Sun of date (mean longitude on the one-family tropical year over the
   // movement's own frame — 2026-09)
   'packages/physics/src/earth/deep-orbital-history.cjs',

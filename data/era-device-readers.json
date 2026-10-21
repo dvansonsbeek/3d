@@ -28,7 +28,7 @@
   ]
  },
  "summary": {
-  "hits": 702,
+  "hits": 654,
   "codeHits": 10,
   "files": 88,
   "excludedClasses": [
@@ -56,9 +56,6 @@
     "node-lib": {
      "comment": 2
     },
-    "package": {
-     "comment": 1
-    },
     "source": {
      "source": 4
     }
@@ -74,9 +71,6 @@
      "comment": 1
     },
     "node-lib": {
-     "comment": 1
-    },
-    "package": {
      "comment": 1
     },
     "source": {
@@ -117,7 +111,7 @@
      "comment": 1
     },
     "package": {
-     "comment": 13
+     "comment": 7
     },
     "other": {
      "comment": 1
@@ -161,7 +155,7 @@
      "comment": 9
     },
     "package": {
-     "comment": 61
+     "comment": 28
     },
     "other": {
      "comment": 2
@@ -200,7 +194,7 @@
      "comment": 2
     },
     "package": {
-     "comment": 7
+     "comment": 3
     },
     "source": {
      "source": 4
@@ -218,7 +212,6 @@
     },
     "package": {
      "comb": 6,
-     "comment": 2,
      "counter": 1
     },
     "source": {
@@ -230,9 +223,6 @@
      "comment": 3
     },
     "node-lib": {
-     "comment": 1
-    },
-    "package": {
      "comment": 1
     },
     "tests": {
@@ -297,7 +287,7 @@
    }
   },
   "byClass": {
-   "comment": 519,
+   "comment": 471,
    "comb": 9,
    "display": 25,
    "diagnostic": 59,
@@ -308,7 +298,7 @@
   },
   "codeHitsByFile": {
    "packages/physics/src/chain-cycles/index.cjs": 2,
-   "packages/physics/src/model.js": 5,
+   "packages/physics/src/model/lunar-theory.js": 5,
    "src/script.js": 2,
    "tools/lib/scene-graph.js": 1
   }
@@ -5325,336 +5315,8 @@
    "text": "// (Plan 09 step 5d: `anomalisticYearDays` — the H/16 device identity — and"
   },
   {
-   "file": "packages/physics/src/model.js",
-   "line": 80,
-   "runtime": "package",
-   "token": "holisticyearLength",
-   "class": "comment",
-   "text": "// (plan 09 step 7b: `foundational.holisticyearLength` — the unit H — is no"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 85,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// 365.2421897 left the registry, the device's rounding onto 1/(H/8) before it."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 95,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/16 = −302,635, the \"balanced year\" — was rotated out of every fitted"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 104,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/13 kinematic-sidereal-days construction (86,399.99968 s) is deleted."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 104,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// H/13 kinematic-sidereal-days construction (86,399.99968 s) is deleted."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 111,
-   "runtime": "package",
-   "token": "earthtiltMean",
-   "class": "comment",
-   "text": "// Plan 07 R5/R6/R9: `earthtiltMean`, `earthInvPlaneInclinationAmplitude`"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 111,
-   "runtime": "package",
-   "token": "earthInvPlaneInclinationAmplitude",
-   "class": "comment",
-   "text": "// Plan 07 R5/R6/R9: `earthtiltMean`, `earthInvPlaneInclinationAmplitude`"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 113,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// constants from Earth's calibration and to build the H/3 inclination"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 128,
-   "runtime": "package",
-   "token": "8H",
-   "class": "comment",
-   "text": "// eighth-integer-per-8H count read it back 7.8 ms long; deleted)."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 209,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "// `cyclesBetween` — the frozen era clock's own convention H_era ="
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 211,
-   "runtime": "package",
-   "token": "cyclesBetween",
-   "class": "comment",
-   "text": "// read — are DELETED with the last comb; `epoch.cyclesBetween` left the"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 242,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// length base' along the ICRF perihelion (rotating once per H/3), v₂ of"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 251,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// there being 0.05%). No new constants. Why H/3 and not the former H/16"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 251,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// there being 0.05%). No new constants. Why H/3 and not the former H/16"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 253,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// lattice periods; H/16 is the OF-DATE perihelion period (13 + 3 = 16 —"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 254,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the H/3 rotation seen from the H/13 equinox) and belongs to ϖ_of-date;"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 254,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the H/3 rotation seen from the H/13 equinox) and belongs to ϖ_of-date;"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 254,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// the H/3 rotation seen from the H/13 equinox) and belongs to ϖ_of-date;"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 255,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// measured, the H/16 law's present ė (−0.84e-5/cy) is 5× below the"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 257,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/3-law candidate instrument, deleted at plan 09 step 7e — docs/109 §22;"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 263,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// engine's own ±10-Myr z-vector); this H/3 line is its epoch-local"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 271,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (The H/3 eccentricity-law channel — createMoonEccChannel — left this"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 286,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// sunPerihelionDegAt). The former H/3 eccentricity law is retired here."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 293,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (Plan 07 R5/R9: Earth's H/3 inclination cosine and −H/5 linear node — the"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 293,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (Plan 07 R5/R9: Earth's H/3 inclination cosine and −H/5 linear node — the"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 311,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* at 2000 (plan 06 S5: 25,771.395 yr, 8 ppm faster); the H/13 reading"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 311,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "* at 2000 (plan 06 S5: 25,771.395 yr, 8 ppm faster); the H/13 reading"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 333,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// mean + lines on H/16 and H/8 — and measuredSolarDaySeconds = dayLength + that"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 333,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// mean + lines on H/16 and H/8 — and measuredSolarDaySeconds = dayLength + that"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 339,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// \"H/16\" line, 5.6 ms vs 5.2 first-order) and the tan²(ε/2) term on the obliquity"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 340,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// cycle (the \"H/8\" line, 1.7 vs 1.4). A property of the window, not of the sky:"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 359,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// 3, the movement's leg-1 convention, NOT the H/13 kinematic identity at"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 359,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// 3, the movement's leg-1 convention, NOT the H/13 kinematic identity at"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 529,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// unit's counter H(t)/13 (0.086 % slow; 7 µs on the 8.37 ms offset)."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 599,
-   "runtime": "package",
-   "token": "8H",
-   "class": "comment",
-   "text": "// the −8H/N node period) — had no reader left after R6/R5 and is gone with"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 688,
-   "runtime": "package",
-   "token": "8H",
-   "class": "comment",
-   "text": "// perihelionEclipticYears, ascendingNodePeriod = −8H/N, the balanced-year"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 741,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// takes. The H/3 cosine on the fixed apsidal carrier and the −H/5 linear"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 741,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// takes. The H/3 cosine on the fixed apsidal carrier and the −H/5 linear"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 808,
-   "runtime": "package",
-   "token": "8H",
-   "class": "comment",
-   "text": "// The retired era device counted these as eighth-integers per 8H and read"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 809,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the periods back as totalDaysInH/N (the ∓13 was H/13 cycles per H)."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 809,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// the periods back as totalDaysInH/N (the ∓13 was H/13 cycles per H)."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 845,
+   "file": "packages/physics/src/model/lunar-theory.js",
+   "line": 68,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "counter",
@@ -5662,8 +5324,8 @@
    "twin": "era-counter"
   },
   {
-   "file": "packages/physics/src/model.js",
-   "line": 847,
+   "file": "packages/physics/src/model/lunar-theory.js",
+   "line": 70,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "comb",
@@ -5671,8 +5333,8 @@
    "twin": "era-counter"
   },
   {
-   "file": "packages/physics/src/model.js",
-   "line": 849,
+   "file": "packages/physics/src/model/lunar-theory.js",
+   "line": 72,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "comb",
@@ -5680,8 +5342,8 @@
    "twin": "era-counter"
   },
   {
-   "file": "packages/physics/src/model.js",
-   "line": 851,
+   "file": "packages/physics/src/model/lunar-theory.js",
+   "line": 74,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "comb",
@@ -5689,69 +5351,13 @@
    "twin": "era-counter"
   },
   {
-   "file": "packages/physics/src/model.js",
-   "line": 853,
+   "file": "packages/physics/src/model/lunar-theory.js",
+   "line": 76,
    "runtime": "package",
    "token": "cyclesBetween",
    "class": "comb",
    "text": "const mcSidereal = (a, b) => chainCycles.cyclesBetween(siderealMonthPeriodFn, a, b);",
    "twin": "era-counter"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 1004,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   e(t) = the H/16 eccentricity-channel law + the derived H/3"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 1004,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   e(t) = the H/16 eccentricity-channel law + the derived H/3"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 1007,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//          osculating e = H/16 channel + inclination coupling."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 1019,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//          drift scale 1 + p₀·tan²ε·H/(2π·div) = 1.306 (H/8) / 1.815"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 1020,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//          (H/3) — the structure the ancient corpus blind-selected before"
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 1025,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//   ϖ(t) = the shipped H/16 perihelion law (earthPerihelionDeg)."
-  },
-  {
-   "file": "packages/physics/src/model.js",
-   "line": 1035,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// C-small: the J2000-anchored H/3 line) was the additive-anchor form of the"
   },
   {
    "file": "packages/physics/src/moon/arguments.cjs",
@@ -6268,7 +5874,7 @@
    "packages/physics/src/layer0/derive-params.js": "sha256:f269af7ad405eb30b56c992f8e710dd1e5fde8abea47058f5dc990d06acd84f4",
    "packages/physics/src/layer0/index.js": "sha256:d1de030f8810621a6a0db20590aa31a24b19ade1450caeb4bdcbdcd61e3da557",
    "packages/physics/src/layer1/index.js": "sha256:ba7a15893b0d4b38ff53521f2180384b805160b313e4711740802b356cbd4e2f",
-   "packages/physics/src/model.js": "sha256:9894428be727ffbdaa952c51a41eb7671b5b04fa4441ac45b303f17e52ba6e13",
+   "packages/physics/src/model/lunar-theory.js": "sha256:f107486700ac0fdb3fc28d938fc39dc31457d21e91a55ae4f8f051cc630d4c04",
    "packages/physics/src/moon/arguments.cjs": "sha256:35494a6f1b61d413e49e7de1ba79c0b292cf0bc2a386b7ce71ba2c9688828bf7",
    "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
    "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:7e694442be5bdb9b59087c3e8587bba8d7a271f8100d022f51418bbb351d996d",
@@ -6336,8 +5942,8 @@
    "tools/lib/python/constants_scripts.py": "sha256:7c926efb773edf90bd1362b7dec77856e34926302aae75372e92b08e15180eef",
    "tools/lib/scene-graph.js": "sha256:c6f3bf95212e5859a4f81c3463e1de448cfe9eb9c8dcf503da12802b4b13deb7",
    "tools/verify/deep-secular-modes.js": "sha256:1c5d69aaeccbb305ddd842a5c19d8945b9f2747fabef3e97dfe70bdd14d57e6d",
-   "tools/verify/eclipse-audit.js": "sha256:2347432329673b5729639872023fb4778e739964f68bcbc6331132fe3479f4a5",
-   "tools/verify/obliquity-hybrid.js": "sha256:4d7e17fb9df75b68ae9bb1aaa8b155e265f0aba7e282d437f858f736f99d2d79",
+   "tools/verify/eclipse-audit.js": "sha256:67dfc472c31e19ec7128d13440dd060b21c87a5aa648999e279d35b1d469c667",
+   "tools/verify/obliquity-hybrid.js": "sha256:0fdaf3d967391a62f8fad1ad4ad75324691e743d4f50b0eade52f7c78f59b6bc",
    "tools/verify/run-suite.mjs": "sha256:e0a2e508f26c3652e0a1561f761306e2041319a84ef6108b433f14ecad136438"
   }
  }

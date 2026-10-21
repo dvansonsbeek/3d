@@ -507,8 +507,8 @@ const MASS_RATIO_EARTH_MOON = 81.30056816;
 The Sun's effect enters upstream, as the `moonOrbitalShift` distance
 correction (the Sun's tidal coupling to the Earth–Moon barycentric wobble,
 closing G(M_E+M_M) to ~3.7 ppm of DE440), so the separation is a pure mass-
-ratio split with no further divisor (`tools/lib/constants.js`,
-`packages/physics/src/model.js`):
+ratio split with no further divisor (one home: `packages/physics/src/earth/mass-chain.cjs`,
+read by `tools/lib/constants.js` and `packages/physics/src/model/derived-constants.js`):
 
 ```javascript
 // Earth's gravitational parameter: the system GM times Earth's mass fraction

@@ -109,7 +109,7 @@ T_M_iau   = moonSiderealMonthInput    = 27.32166156 days  // IAU sidereal month
 ratio     = MASS_RATIO_EARTH_MOON     = 81.30056816      // M_Earth / M_Moon (DE440 SPICE kernel)
 ```
 
-**Time inputs (IAU, used by the chain — `packages/physics/src/model.js`):**
+**Time inputs (IAU, used by the chain — `packages/physics/src/model/derived-constants.js`):**
 
 ```
 T_M       = moonSiderealMonth         = 27.32166156 days  // the IAU sidereal month input itself
