@@ -61,7 +61,7 @@ const NEVER_INJECTABLE = Object.keys(REFERENCE_DATA);
 
 /**
  * Generated at build time from `public/input/astro-reference.json` (plus the
- * deep-time block the generator assembles; model-parameters.json is deleted, plan 11)
+ * deep-time block the generator assembles)
  * (§2g) by `tools/constants/generate.mjs`. 324 values across 15 blocks.
  *
  * Free parameters and measured anchors only. Validation targets are excluded by
@@ -95,29 +95,21 @@ export { FITTED_COEFFICIENTS, COEFFICIENTS_HASH } from './constants/index.js';
 export { createEpochPrimitives } from './layer0/index.js';
 export { deriveEpochParams } from './layer0/derive-params.js';
 export { createDerivedViews } from './layer1/index.js';
-// (Plan 09 step 7a: the Phase 7 integrated-phase machinery `createPhaseMachinery`
-// — the ∫dt/H_era table and the cycle counters every comb read — and the
-// frozen cardinal record evaluator `createCardinalModel` (the §10 derived
-// form on the deleted CARDINAL_POINT_* coefficients) are DELETED; the
-// cardinal instants are createModel().cardinal, the one Sun's crossings.)
 // The deep-time calendar (year ↔ JD under the drifting year length) — ONE
-// implementation for both engines since the year/day collapse (formerly the
-// PHASE-B-DUPLICATE family). CJS on purpose: tools/lib requires the same
+// implementation for both engines. CJS on purpose: tools/lib requires the same
 // file via the exports-map subpath; re-exported here so bundled ESM
 // consumers need only the package root.
 export { createDeepCalendar } from './phase/deep-calendar.cjs';
-// Plan 13 B1: the civil calendar ↔ JD (Meeus ch. 7 with the 1582-10-15
-// reform) and the angle constants/wraps — ONE home; the browser's eighteen
-// calendar copies and 27 local D2R constants import these.
+// The civil calendar ↔ JD (Meeus ch. 7 with the 1582-10-15 reform) and the
+// angle constants/wraps — ONE home for every runtime.
 export { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS, julianCalendarToJD, jdToJulianCalendar } from './time/calendar.cjs';
 export { DEG2RAD, RAD2DEG, ARCSEC_PER_TURN, ARCSEC_PER_RAD, wrap360, wrap180, wrap180Closed, wrap2pi, wrapPi } from './math/angles.cjs';
-// Plan 13 B2: THE deep-time chain assembly — the GIA α channel, the Layer-0
-// bundle, the cited Moon-distance history, the ΔT cycle stack, |s₃|, the
-// LOD/ΔT core, the lunar month chain and the mean*AtAge family, assembled
-// ONCE from the generated constants; the Node twin and the browser destructure it.
+// THE deep-time chain assembly — the GIA α channel, the Layer-0 bundle, the
+// cited Moon-distance history, the ΔT cycle stack, |s₃|, the LOD/ΔT core, the
+// lunar month chain and the mean*AtAge family, assembled ONCE from the
+// generated constants; the Node twin and the browser destructure it.
 export { createDeepTimeChain, MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE } from './deltat/deep-time-chain.js';
-// Plan 13 B3: the J2000 mass chain and the Moon's J2000 periods (one home for
-// three copies each) and the unit constants.
+// The J2000 mass chain, the Moon's J2000 periods and the unit constants — ONE home.
 export { computeMassChainJ2000, computeMoonPeriodsJ2000 } from './earth/mass-chain.cjs';
 export { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, SECONDS_PER_JULIAN_YEAR } from './constants/units.cjs';
 // D4b: the one-source cardinal structure — the EoC layer (year lengths,
@@ -127,7 +119,6 @@ export { createCardinalStructure } from './cardinal/one-source-structure.cjs';
 // Phase 8.2 — the lunar machinery, extracted layer by layer (survey order:
 // eccentricity channel → month chain → cycle tables → arguments → series →
 // apparent). Same CJS + root re-export convention.
-// (plan 09 step 6: createMoonEccChannel — the H/3 eccentricity law — is deleted; Earth's e of date is the N-body series on every path)
 export { createMoonMonthChain } from './moon/month-chain.cjs';
 export { createChainCycleIntegrator } from './chain-cycles/index.cjs';
 export { createMoonArguments } from './moon/arguments.cjs';
@@ -137,11 +128,8 @@ export { createMoonApparent } from './moon/apparent.cjs';
 // sample) and the offset-circle wheel-angle solver: the scene twins' one placement.
 export { computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG } from './earth/frame-of-date.cjs';
 // Phase 8.3 — the planet machinery, extracted by LAW over body records
-// (survey order: geometry → channels → chains). The ψ/K amplitude laws
-// (planets/fibonacci-laws), the record-based orientation forms
-// (planets/orientation) and the ascending-node integrator
-// (planets/asc-node-integrator) are DELETED at plan 07 R5/R6: the planets'
-// elements of date have one home, the N-body chain.
+// (survey order: geometry → channels → chains). The planets' elements of date
+// have one home, the N-body chain.
 export { derivePlanetGeometry, scaffoldOrbitInputs } from './planets/geometry.cjs';
 // (plan 09 step 6: eccentricityFromCycles / computeEccentricityIntegrated — the H/16 law-of-cosines eccentricity — are deleted; no runtime read them)
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
@@ -151,16 +139,15 @@ export { computeSecularShape } from './planets/secular-shape.cjs';
 // `computeApsidalTangentDegPerYr` is the chain's ±150-yr central tangent of the perihelion
 // longitude (the panels' "Prec." cell — osculating, NOT the ±1-kyr secular stencil of the
 // "Secular" cell); `computeApsidalSecularDegPerYr` is its former name, kept as a deprecated
-// alias on the API axis (plan 14 follow-up).
+// alias on the API axis.
 export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, computeApsidalSecularDegPerYr as computeApsidalTangentDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
 export { createSecularSeriesOverride } from './planets/secular-series.cjs';
-// Plan 06 Phase 7 — the planets' spin channel (the precession constant from
-// each planet's own torques, the spin integrated on its own ζ plane history).
+// The planets' spin channel (the precession constant from each planet's own
+// torques, the spin integrated on its own ζ plane history).
 export { computePlanetPrecessionConstant, createPlanetSpinChannel, createPlanetSpinChannelFromArtifacts, computeObliquityJ2000Deg } from './planets/spin-channel.cjs';
 export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from './planets/chain-artifact.js';
-// Engine-switch Stage B, T5d-(d): the deep-time Earth-z channel (the deep
-// lunar-chain modulation rides it; era consumers stay on the H/3 channel).
+// The deep-time Earth-z channel (the deep lunar-chain modulation rides it).
 export { createDeepEccChannel } from './moon/deep-ecc-channel.cjs';
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from './moon/deep-modes-artifact.cjs';
 // Stage C-3: the ONE home of the obliquity-hybrid / deep-orbital-history
@@ -170,28 +157,25 @@ export { createDeepOrbitalHistory } from './earth/deep-orbital-history.cjs';
 export { createSiderealYearChannel } from './earth/sidereal-year-channel.cjs';
 // S2: THE ONE of-date year-length family (years + precession beats, SI seconds)
 export { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_YEARS } from './earth/year-lengths.cjs';
-// Plan 06 D6: THE ONE home of the composed lunisolar precession rate ψ̇(t)
-// (spin ω(t) × [solar torque + lunar torque on the recession history]) —
-// leg-1's physical rate; the structural H(t)/13 clock is its named diagnostic.
+// THE ONE home of the composed lunisolar precession rate ψ̇(t) (spin ω(t) ×
+// [solar torque + lunar torque on the recession history]) — falsification
+// leg 1's physical rate.
 export { computeSolarTorqueShare, createComposedPrecession } from './earth/precession-composed.cjs';
-// Plan 12 §8 option (a): the cited mean obliquity of date — the second column read from the
-// Earth–Moon history; the precession RATE of date carries its cos ε̄(t)/cos ε̄(0) on the constant.
+// The cited mean obliquity of date — the second column read from the Earth–Moon
+// history; the precession RATE of date carries its cos ε̄(t)/cos ε̄(0) on the constant.
 export { createMeanObliquityHistory } from './earth/mean-obliquity-history.cjs';
 // (planets/predict.cjs — the planet predictive-precession feature basis — was
 // retired at plan 06 R8 with PREDICT_COEFFS_PHYSICAL.)
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';
-// plan 11 step 6 — the planets' presentation names, the last leaf of the
-// deleted model-parameters.json (code, not an input: not injectable, not hashed).
+// the planets' presentation names (code, not an input: not injectable, not hashed).
 export { PLANET_DISPLAY_NAMES } from './planets/display-names.cjs';
 // Phase 8.4 — the climate/ΔT machinery, extracted layer by layer.
 export { createDeltaTCycles } from './deltat/cycles.cjs';
 export { createDeepTimeLod } from './deltat/deep-time.cjs';
-// plan 12 (option A): the Earth–Moon distance history is a CITED PHYSICAL
-// INPUT (Farhat et al. 2022, the AstroGeo22 ephemeris) read as a shape on the
-// model's J2000 anchor; the fitted quartic, the rock-fitted regime spline and
-// the solar-channel budget are deleted.
+// The Earth–Moon distance history is a CITED PHYSICAL INPUT (Farhat et al.
+// 2022, the AstroGeo22 ephemeris) read as a shape on the model's J2000 anchor.
 export { createMoonDistanceHistory } from './deltat/moon-distance-history.cjs';
 export { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH } from './deltat/moon-distance-artifact.cjs';
 export { deltaTEspenakMeeusCanonSeconds } from './deltat/historical.cjs';
@@ -203,9 +187,6 @@ export { createEclipseFinders } from './eclipse/finders.cjs';
 // (reference/published-curves MIGRATED to @essrt/reference at the 4.0.0
 // major — the published model package carries no comparison references;
 // the K2 one-way wall is package-structural.)
-// Phase 9 — S-P8: the fitted sun-longitude harmonic stack (three copies → one).
-// (plan 09 step 5a: createSunLongitudeCorrection — the Step-0 Sun comb's evaluator,
-//  retired from the Sun node at plan 06 R4 — is deleted with the comb and its fitter.)
 
 /**
  * Build a model bound to a set of constants.
@@ -274,15 +255,12 @@ export const createModel = (constants = GENERATED, opts = {}) => {
     constants: ctx,
     hash,
 
-    // Plan 09: the fit-era lattice identities H/13, H/3, H/16
-    // (`computeLatticePeriodsYears`, DEVICE tier) left this surface — the
-    // published periods are `epoch.axialPrecessionYearsAtYear` and the
+    // The published periods are `epoch.axialPrecessionYearsAtYear` and the
     // lunisolar surface's apsidal and perihelion-of-date periods; the
-    // counterfactual gate now reads the obliquity anchor through the assembly.
+    // counterfactual gate reads the obliquity anchor through the assembly.
 
     /**
-     * Earth eccentricity at a year — the Phase-6 promise, fulfilled by the
-     * §7a assembly (law-of-cosines on the integrated H/16 phase).
+     * Earth eccentricity at a year — the one-source series through the §7a assembly.
      * @param {number} year
      * @returns {number}
      */

@@ -1,4 +1,407 @@
 {
   "_comment": "Retired-vocabulary RATCHET (plan 06 D3). Counts may only go DOWN. Regenerate: node tools/check-vocabulary.mjs --write",
-  "files": {}
+  "files": {
+    "code:packages/physics/src/cardinal/one-source-structure.cjs": {
+      "deletion narrative": 1,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/chain-cycles/index.cjs": {
+      "deletion narrative": 1,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/climate/l1-orbital.cjs": {
+      "comb / lattice": 3,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/constants/units.cjs": {
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/deltat/cycles.cjs": {
+      "H-divisor label": 3,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/deltat/deep-time-chain.js": {
+      "comb / lattice": 4,
+      "plan-step label": 4
+    },
+    "code:packages/physics/src/deltat/deep-time.cjs": {
+      "comb / lattice": 1
+    },
+    "code:packages/physics/src/earth/deep-orbital-history.cjs": {
+      "comb / lattice": 2,
+      "plan-step label": 5
+    },
+    "code:packages/physics/src/earth/frame-of-date.cjs": {
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/earth/mass-chain.cjs": {
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/earth/mean-obliquity-history.cjs": {
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/earth/precession-composed.cjs": {
+      "H-divisor label": 8,
+      "comb / lattice": 1,
+      "plan-step label": 3
+    },
+    "code:packages/physics/src/earth/sidereal-year-channel.cjs": {
+      "era device / K device": 2,
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/earth/year-lengths.cjs": {
+      "era device / K device": 2,
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/eclipse/besselian.cjs": {
+      "H-divisor label": 1,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/eclipse/sun-planetary-completion.cjs": {
+      "comb / lattice": 3,
+      "plan-step label": 5
+    },
+    "code:packages/physics/src/index.js": {
+      "H-divisor label": 1,
+      "deletion narrative": 1,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/layer0/derive-params.js": {
+      "H-divisor label": 2,
+      "deletion narrative": 1,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/layer0/index.js": {
+      "H-divisor label": 2,
+      "comb / lattice": 3,
+      "deletion narrative": 3,
+      "plan-step label": 7
+    },
+    "code:packages/physics/src/layer1/index.js": {
+      "H-divisor label": 1,
+      "deletion narrative": 1,
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/math/angles.cjs": {
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/model/cardinal-instants.js": {
+      "plan-step label": 3
+    },
+    "code:packages/physics/src/model/deep-time-chain.js": {
+      "comb / lattice": 1,
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/model/lunar-theory.js": {
+      "plan-step label": 4
+    },
+    "code:packages/physics/src/model/one-source-movement.js": {
+      "comb / lattice": 1,
+      "plan-step label": 6
+    },
+    "code:packages/physics/src/model/planet-records.js": {
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/model/published-periods.js": {
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/model/sun-and-eclipses.js": {
+      "plan-step label": 3
+    },
+    "code:packages/physics/src/model/surface.js": {
+      "plan-step label": 6
+    },
+    "code:packages/physics/src/moon/apparent.cjs": {
+      "deletion narrative": 1,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/moon/deep-ecc-channel.cjs": {
+      "H-divisor label": 5
+    },
+    "code:packages/physics/src/moon/month-chain.cjs": {
+      "H-divisor label": 1,
+      "era device / K device": 1,
+      "deletion narrative": 2,
+      "plan-step label": 4
+    },
+    "code:packages/physics/src/moon/series-extension.cjs": {
+      "comb / lattice": 1,
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/moon/series.cjs": {
+      "H-divisor label": 1,
+      "comb / lattice": 2,
+      "plan-step label": 4
+    },
+    "code:packages/physics/src/phase/deep-calendar.cjs": {
+      "comb / lattice": 3,
+      "deletion narrative": 1,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/planets/display-names.cjs": {
+      "deletion narrative": 1,
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/planets/geometry.cjs": {
+      "deletion narrative": 1,
+      "plan-step label": 2
+    },
+    "code:packages/physics/src/planets/keplerian-chain.cjs": {
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/planets/model.cjs": {
+      "era device / K device": 3,
+      "comb / lattice": 2,
+      "deletion narrative": 4,
+      "plan-step label": 11
+    },
+    "code:packages/physics/src/planets/secular-shape.cjs": {
+      "era device / K device": 1,
+      "plan-step label": 1
+    },
+    "code:packages/physics/src/planets/spin-channel.cjs": {
+      "era device / K device": 1,
+      "plan-step label": 3
+    },
+    "code:packages/physics/src/time/calendar.cjs": {
+      "plan-step label": 3
+    },
+    "code:packages/api/src/app.js": {
+      "comb / lattice": 1,
+      "plan-step label": 1
+    },
+    "code:packages/api/src/mcp.js": {
+      "era device / K device": 1
+    },
+    "code:packages/api/test/api-gates.test.mjs": {
+      "H-divisor label": 1,
+      "comb / lattice": 1,
+      "deletion narrative": 1,
+      "plan-step label": 1
+    },
+    "code:packages/api/test/mcp-gates.test.mjs": {
+      "H-divisor label": 1,
+      "plan-step label": 5
+    },
+    "code:packages/fitting/src/dt-corrections-fit.cjs": {
+      "H-divisor label": 1,
+      "comb / lattice": 3,
+      "plan-step label": 4
+    },
+    "code:packages/fitting/src/export-solar-measurements.cjs": {
+      "era device / K device": 4,
+      "comb / lattice": 2,
+      "deletion narrative": 3,
+      "plan-step label": 6
+    },
+    "code:packages/fitting/src/run-pipeline.cjs": {
+      "deletion narrative": 2,
+      "plan-step label": 1
+    },
+    "code:packages/fitting/src/sun-planetary-completion-fit.cjs": {
+      "plan-step label": 2
+    },
+    "code:packages/fitting/src/verify-pipeline.cjs": {
+      "H-divisor label": 1,
+      "era device / K device": 2,
+      "comb / lattice": 2,
+      "deletion narrative": 3,
+      "plan-step label": 9
+    },
+    "code:tools/lib/constants/utils.js": {
+      "deletion narrative": 3,
+      "plan-step label": 4
+    },
+    "code:tools/lib/constants.js": {
+      "comb / lattice": 1,
+      "deletion narrative": 1,
+      "plan-step label": 3
+    },
+    "code:tools/lib/deep-orbital-history.js": {
+      "H-divisor label": 1,
+      "plan-step label": 3
+    },
+    "code:tools/lib/deep-time.js": {
+      "comb / lattice": 3,
+      "plan-step label": 1
+    },
+    "code:tools/lib/elp-mpp02.js": {
+      "plan-step label": 1
+    },
+    "code:tools/lib/orbital-engine.js": {
+      "plan-step label": 1
+    },
+    "code:tools/lib/python/constants_scripts.py": {
+      "comb / lattice": 2,
+      "deletion narrative": 2,
+      "plan-step label": 6
+    },
+    "code:tools/lib/scene-graph.js": {
+      "deletion narrative": 5,
+      "plan-step label": 13
+    },
+    "code:tools/docs/model-values.mjs": {
+      "H-divisor label": 2,
+      "comb / lattice": 4,
+      "deletion narrative": 3,
+      "plan-step label": 11
+    },
+    "code:tools/docs/render-calculation-map.mjs": {
+      "H-divisor label": 15,
+      "era device / K device": 6,
+      "comb / lattice": 14,
+      "deletion narrative": 11,
+      "plan-step label": 19
+    },
+    "code:tools/docs/render-doc92-tables.mjs": {
+      "comb / lattice": 1,
+      "plan-step label": 1
+    },
+    "code:tools/docs/render-doc99-tables.mjs": {
+      "H-divisor label": 4,
+      "era device / K device": 1,
+      "deletion narrative": 1,
+      "plan-step label": 8
+    },
+    "code:tools/constants/check-literals.mjs": {
+      "comb / lattice": 1,
+      "deletion narrative": 4,
+      "plan-step label": 10
+    },
+    "code:tools/constants/generate.mjs": {
+      "H-divisor label": 2,
+      "comb / lattice": 3,
+      "deletion narrative": 5,
+      "plan-step label": 16
+    },
+    "code:tools/constants/migrate-script-blocks.mjs": {
+      "plan-step label": 3
+    },
+    "code:tools/verify/artifact-freshness.js": {
+      "plan-step label": 5
+    },
+    "code:tools/verify/deep-secular-modes.js": {
+      "H-divisor label": 1,
+      "comb / lattice": 7
+    },
+    "code:tools/verify/deltat-slope-basis.js": {
+      "plan-step label": 1
+    },
+    "code:tools/verify/earth-osculating-offset.js": {
+      "era device / K device": 1,
+      "plan-step label": 1
+    },
+    "code:tools/verify/eclipse-audit.js": {
+      "H-divisor label": 2,
+      "comb / lattice": 1,
+      "deletion narrative": 2,
+      "plan-step label": 2
+    },
+    "code:tools/verify/equinox-vs-vondrak.js": {
+      "comb / lattice": 2,
+      "deletion narrative": 1,
+      "plan-step label": 4
+    },
+    "code:tools/verify/lunar-alignment.js": {
+      "deletion narrative": 2,
+      "plan-step label": 2
+    },
+    "code:tools/verify/measure-rms-by-epoch.js": {
+      "plan-step label": 1
+    },
+    "code:tools/verify/nbody-secular.js": {
+      "comb / lattice": 6
+    },
+    "code:tools/verify/obliquity-hybrid.js": {
+      "H-divisor label": 6,
+      "comb / lattice": 1,
+      "deletion narrative": 1
+    },
+    "code:tools/verify/paleo-anchors.js": {
+      "plan-step label": 2
+    },
+    "code:tools/verify/run-suite.mjs": {
+      "H-divisor label": 1,
+      "era device / K device": 1,
+      "comb / lattice": 1,
+      "deletion narrative": 2,
+      "plan-step label": 4
+    },
+    "code:tools/verify/scene-year-lengths.js": {
+      "deletion narrative": 1,
+      "plan-step label": 1
+    },
+    "code:tools/verify/secular-series.js": {
+      "era device / K device": 1,
+      "comb / lattice": 4,
+      "plan-step label": 3
+    },
+    "code:tools/verify/sun-vs-horizons.js": {
+      "plan-step label": 4
+    },
+    "code:tools/fit/python/_dump_constants.js": {
+      "H-divisor label": 1,
+      "era device / K device": 1,
+      "comb / lattice": 1,
+      "deletion narrative": 6,
+      "plan-step label": 10
+    },
+    "code:tools/fit/python/load_constants.py": {
+      "H-divisor label": 2,
+      "era device / K device": 2,
+      "comb / lattice": 3,
+      "deletion narrative": 5,
+      "plan-step label": 6
+    },
+    "code:tools/fixtures/record-plan06-baseline.mjs": {
+      "H-divisor label": 1,
+      "era device / K device": 2,
+      "comb / lattice": 3,
+      "deletion narrative": 2,
+      "plan-step label": 4
+    },
+    "code:tools/fixtures/record-tools-lib.mjs": {
+      "H-divisor label": 2,
+      "era device / K device": 3,
+      "deletion narrative": 5,
+      "plan-step label": 7
+    },
+    "code:test/browser/calendar-conversion.test.mjs": {
+      "comb / lattice": 3
+    },
+    "code:test/browser/epoch-consistency.test.mjs": {
+      "H-divisor label": 1,
+      "comb / lattice": 1,
+      "deletion narrative": 2,
+      "plan-step label": 1
+    },
+    "code:test/browser/perf-regression.test.mjs": {
+      "plan-step label": 1
+    },
+    "code:test/browser/perihelion-at-sun.test.mjs": {
+      "era device / K device": 1,
+      "deletion narrative": 2,
+      "plan-step label": 4
+    },
+    "code:test/browser/snapshot.test.mjs": {
+      "H-divisor label": 1,
+      "era device / K device": 2,
+      "comb / lattice": 5,
+      "deletion narrative": 3,
+      "plan-step label": 7
+    },
+    "code:test/browser/wobble-center.test.mjs": {
+      "H-divisor label": 1
+    },
+    "code:test/cross-engine.test.mjs": {
+      "comb / lattice": 1,
+      "plan-step label": 3
+    },
+    "code:test/csv-window-smoke.test.mjs": {
+      "plan-step label": 1
+    },
+    "code:tools/regen-cascade.mjs": {
+      "plan-step label": 1
+    }
+  }
 }

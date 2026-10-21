@@ -28,9 +28,9 @@
   ]
  },
  "summary": {
-  "hits": 654,
+  "hits": 447,
   "codeHits": 10,
-  "files": 88,
+  "files": 83,
   "excludedClasses": [
    "comment",
    "source",
@@ -47,13 +47,10 @@
      "comment": 2
     },
     "docs-tools": {
-     "comment": 4,
+     "comment": 2,
      "diagnostic": 1
     },
     "fitting": {
-     "comment": 2
-    },
-    "node-lib": {
      "comment": 2
     },
     "source": {
@@ -64,13 +61,7 @@
     "browser": {
      "comment": 1
     },
-    "docs-tools": {
-     "comment": 2
-    },
     "fitting": {
-     "comment": 1
-    },
-    "node-lib": {
      "comment": 1
     },
     "source": {
@@ -83,18 +74,18 @@
      "display": 5
     },
     "docs-tools": {
-     "comment": 13,
-     "diagnostic": 18
+     "comment": 3,
+     "diagnostic": 6
     },
     "explore": {
      "explore": 7,
      "comment": 8
     },
     "tests": {
-     "comment": 7
+     "comment": 5
     },
     "node-lib": {
-     "comment": 11
+     "comment": 1
     },
     "python": {
      "comment": 1
@@ -104,14 +95,10 @@
      "diagnostic": 1
     },
     "api": {
-     "comment": 3,
-     "display": 1
-    },
-    "fitting": {
      "comment": 1
     },
     "package": {
-     "comment": 7
+     "comment": 4
     },
     "other": {
      "comment": 1
@@ -127,35 +114,31 @@
      "comb": 1
     },
     "docs-tools": {
-     "comment": 38,
-     "diagnostic": 33
+     "comment": 7,
+     "diagnostic": 8
     },
     "explore": {
      "comment": 59,
      "explore": 30
     },
     "python": {
-     "comment": 3
+     "comment": 1
     },
     "tests": {
-     "comment": 14
+     "comment": 11
     },
     "node-lib": {
-     "comment": 33
+     "comment": 1
     },
     "verify": {
      "comment": 7,
      "diagnostic": 3
     },
-    "api": {
-     "comment": 4,
-     "display": 5
-    },
     "fitting": {
-     "comment": 9
+     "comment": 1
     },
     "package": {
-     "comment": 28
+     "comment": 11
     },
     "other": {
      "comment": 2
@@ -170,28 +153,22 @@
     },
     "docs-tools": {
      "diagnostic": 3,
-     "comment": 11
+     "comment": 1
     },
     "explore": {
      "explore": 12,
      "comment": 56
     },
     "fitting": {
-     "comment": 7,
+     "comment": 1,
      "display": 1
     },
     "python": {
-     "comment": 4,
+     "comment": 1,
      "analysis": 9
     },
-    "node-lib": {
-     "comment": 4
-    },
-    "api": {
-     "display": 2
-    },
     "tests": {
-     "comment": 2
+     "comment": 1
     },
     "package": {
      "comment": 3
@@ -220,10 +197,7 @@
    },
    "holisticyearLength": {
     "docs-tools": {
-     "comment": 3
-    },
-    "node-lib": {
-     "comment": 1
+     "comment": 2
     },
     "tests": {
      "comment": 1
@@ -235,14 +209,6 @@
    "earthInclinationCycleAnchor": {
     "docs-tools": {
      "comment": 1
-    }
-   },
-   "eraClockHAtAge": {
-    "docs-tools": {
-     "comment": 1
-    },
-    "package": {
-     "comment": 2
     }
    },
    "N * H": {
@@ -265,15 +231,12 @@
     "fitting": {
      "comment": 1
     },
-    "node-lib": {
-     "comment": 1
-    },
     "source": {
      "source": 2
     }
    },
-   "_phaseCycles": {
-    "node-lib": {
+   "eraClockHAtAge": {
+    "package": {
      "comment": 1
     }
    },
@@ -287,10 +250,10 @@
    }
   },
   "byClass": {
-   "comment": 471,
+   "comment": 309,
    "comb": 9,
-   "display": 25,
-   "diagnostic": 59,
+   "display": 17,
+   "diagnostic": 22,
    "explore": 57,
    "counter": 1,
    "analysis": 9,
@@ -315,7 +278,6 @@
   "docs-tools": {
    "H / N": [
     3,
-    5,
     8,
     13,
     16
@@ -333,15 +295,6 @@
    "H / N": [
     8,
     13
-   ]
-  },
-  "api": {
-   "H / N": [
-    3,
-    5,
-    8,
-    13,
-    16
    ]
   },
   "tests": {
@@ -1625,7 +1578,7 @@
   },
   {
    "file": "tools/check-vocabulary.mjs",
-   "line": 35,
+   "line": 45,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
@@ -1633,39 +1586,23 @@
   },
   {
    "file": "tools/check-vocabulary.mjs",
-   "line": 35,
+   "line": 45,
    "runtime": "docs-tools",
    "token": "8H",
    "class": "diagnostic",
    "text": "['8H as a cycle name', /(?<![A-Za-z0-9_/])8H(?![A-Za-z0-9_])/g],"
   },
   {
-   "file": "tools/constants/check-literals.mjs",
-   "line": 48,
+   "file": "tools/check-vocabulary.mjs",
+   "line": 55,
    "runtime": "docs-tools",
-   "token": "holisticyearLength",
-   "class": "comment",
-   "text": "// unit `holisticyearLength`, its lattice `stepYears` and the device's rounded"
+   "token": "8H",
+   "class": "diagnostic",
+   "text": "['H-divisor label', /(?<![A-Za-z0-9_/])(?:H\\/\\d+|\\d+\\/H|8H|H_era|H₀)(?![A-Za-z0-9_])/g],"
   },
   {
    "file": "tools/constants/check-literals.mjs",
-   "line": 62,
-   "runtime": "docs-tools",
-   "token": "earthtiltMean",
-   "class": "comment",
-   "text": "// pose: earthtiltMean, earthInvPlaneInclinationAmplitude, eccentricityAmplitude,"
-  },
-  {
-   "file": "tools/constants/check-literals.mjs",
-   "line": 62,
-   "runtime": "docs-tools",
-   "token": "earthInvPlaneInclinationAmplitude",
-   "class": "comment",
-   "text": "// pose: earthtiltMean, earthInvPlaneInclinationAmplitude, eccentricityAmplitude,"
-  },
-  {
-   "file": "tools/constants/check-literals.mjs",
-   "line": 121,
+   "line": 103,
    "runtime": "docs-tools",
    "token": "earthInclinationCycleAnchor",
    "class": "comment",
@@ -1673,7 +1610,7 @@
   },
   {
    "file": "tools/constants/check-literals.mjs",
-   "line": 265,
+   "line": 232,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "comment",
@@ -1705,111 +1642,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 295,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// `holisticYear`, `grandHolisticOctave` (8H), `periPrecYearsExact` (H/16),"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 295,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// `holisticYear`, `grandHolisticOctave` (8H), `periPrecYearsExact` (H/16),"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 299,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// family, `holisticYearFactors`, `mercuryOscillationPeriod` (H/45),"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 390,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'the solar day’s ecliptic missing-motion LOD correction at J2000 — LOD_mean/(T_s₃·mSY) on the nodal period 1,296,000/|s₃| (orbital; plan 06 T2 item — was "
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 421,
-   "runtime": "docs-tools",
-   "token": "earthtiltMean",
-   "class": "comment",
-   "text": "// (plan 11 step 4: `meanObliquity` — the K-device scaffold's earthtiltMean —"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 432,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// of the fitted anchor — H/3, H/5, H/8, H/16 read +0.18 %, −2.5 %, +1.7 %, +0.10 % off them (the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 432,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// of the fitted anchor — H/3, H/5, H/8, H/16 read +0.18 %, −2.5 %, +1.7 %, +0.10 % off them (the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 432,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// of the fitted anchor — H/3, H/5, H/8, H/16 read +0.18 %, −2.5 %, +1.7 %, +0.10 % off them (the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 432,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// of the fitted anchor — H/3, H/5, H/8, H/16 read +0.18 %, −2.5 %, +1.7 %, +0.10 % off them (the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 433,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// same class as the H/13 case of S5). Key names kept (P4); the *Formula keys (consumed by the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 433,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// same class as the H/13 case of S5). Key names kept (P4); the *Formula keys (consumed by the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 439,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'apsidal precession period at J2000, Julian years — the perihelion against the stars, the ONE movement’s own apsidal rate of date (the scene’s perihelion;"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 446,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'ecliptic (nodal) precession period — the dominant nodal mode s₃ of Earth’s orbit on the invariable plane, from the engine’s deep secular modes (the obliq"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 453,
+   "line": 399,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -1817,511 +1650,7 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 480,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// year laws' beat at 2000 (route B, 25,771.4 yr ≈ IAU 25,771.6) — never H/13 (25,793.6, the fit"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 480,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// year laws' beat at 2000 (route B, 25,771.4 yr ≈ IAU 25,771.6) — never H/13 (25,793.6, the fit"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 488,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "axialPrecFormula: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: () => 'the of-date year laws’ beat at J2000, T_sid·T_trop/((T_sid − T_trop)·365"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 488,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "axialPrecFormula: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: () => 'the of-date year laws’ beat at J2000, T_sid·T_trop/((T_sid − T_trop)·365"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 493,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'perihelion-of-date period at J2000 — the axial and apsidal rates add (the one-family route’s beat). S6: was H/16 = 20,957',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 501,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'axial precession at J2000, whole years (axialPrecYears carries 2dp) — the of-date reading, not H/13 (S5)',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 501,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "note: 'axial precession at J2000, whole years (axialPrecYears carries 2dp) — the of-date reading, not H/13 (S5)',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 624,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//  half the device's H/16 wheel period — left with the unit; nothing quoted them.)"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 627,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//  retired K eccentricity law on the H/16 beat — are deleted with the law.)"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1013,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (the device's inclination maximum near −23204 was its H/3 phase; the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1204,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// cycleAnchor), the amplitude from model-parameters, the H/3 divisor — the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1205,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// RECORD of the retired H/3 inclination law (docs 20 and 22 cite them as"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1215,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'the mean of Earth\\'s inclination to the invariable plane over the banked ±10-Myr series — the engine\\'s one-source normal (plan 11 step 2; until then the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1218,
-   "runtime": "docs-tools",
-   "token": "earthInvPlaneInclinationAmplitude",
-   "class": "comment",
-   "text": "// scaffold's earthInvPlaneInclinationAmplitude — left with the scaffold; the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1244,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// `inclinationCycleAnchorEarth`) and `earthInclD` (the retired H/3 divisor)"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1249,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/13-identity constants (kinematic day basis — meanLengthOfDay, NOT the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1249,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// H/13-identity constants (kinematic day basis — meanLengthOfDay, NOT the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1261,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// J2000 precession, 25,771.4 yr), never the counter H/13 (7 µs slow)."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1261,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// J2000 precession, 25,771.4 yr), never the counter H/13 (7 µs slow)."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1277,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "meanSiderealYearDays:  { get: () => C.meanSiderealYearDays, render: (v) => thousands(v, 7), unit: 'd', note: 'the IAU sidereal year in days (plan 09: the H/13 k"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1277,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "meanSiderealYearDays:  { get: () => C.meanSiderealYearDays, render: (v) => thousands(v, 7), unit: 'd', note: 'the IAU sidereal year in days (plan 09: the H/13 k"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1299,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "meanSolarDaySeconds:    { get: () => C.meanLengthOfDay, render: (v) => thousands(v, 6), unit: 's', note: 'LOD_mean, the H/13-identity kinematic day' },"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1299,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "meanSolarDaySeconds:    { get: () => C.meanLengthOfDay, render: (v) => thousands(v, 6), unit: 's', note: 'LOD_mean, the H/13-identity kinematic day' },"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1312,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'UNPROJECTED ecliptic-frame count — one extra sidereal day per precession period T_p (S5: the certified J2000 reading, not the counter H/13) — deliberatel"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1312,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "note: 'UNPROJECTED ecliptic-frame count — one extra sidereal day per precession period T_p (S5: the certified J2000 reading, not the counter H/13) — deliberatel"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1398,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'raw H/5 kinematic minus Layer 4 — |stackNetLodJ2000Ms|, kept in lockstep by derivation',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1403,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// ── Eclipse audit + LOD-climate + 8H cycle periods (11-2r) ──────────────"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1507,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// T5: the former 8H/n labels carry no information; layer B item 3)."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1679,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "draconicYearICRF:  { get: () => C.moonDraconicYearICRF, render: (v) => thousands(v, 10), unit: 'd', note: 'H/13-frame lattice partner' },"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1679,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "draconicYearICRF:  { get: () => C.moonDraconicYearICRF, render: (v) => thousands(v, 10), unit: 'd', note: 'H/13-frame lattice partner' },"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1796,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// per H/13 axial cycle."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1796,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// per H/13 axial cycle."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1811,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// IPO mirrors the apo family with the eccentricity BASE and the H/3"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1812,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// inclination cycle (not H/13). ψ and K come LIVE from the engine's"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1812,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// inclination cycle (not H/13). ψ and K come LIVE from the engine's"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1820,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// retired eccentricity base and the H/3 inclination cycle — is deleted;"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1874,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// ″/cy, Pluto = H exactly) and their 8H/N labels are gone; the era window"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1880,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// (The doc-109 §9 typing of the retired 8H/N descriptors — \"type A long-term"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1893,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "diagnostic",
-   "text": "out[`${planet}PeriFormula`] = { get: () => `${chainArt().g[planet].nearestLaskar.mode} + p_A`, render: (v) => String(v), note: `the leading secular apsidal mode"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1901,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Earth's perihelion-of-date period is the one-family route's beat (S6: was the device's H/16)."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1902,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "out.earthPeriRate = { get: () => 360 / oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(v, 6), unit: '°/yr', note: 'perihelion-of-date ra"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1903,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "out.earthPeriPeriod = { get: () => oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'perihelion-of-date"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1930,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// \"structural H(t)/13\" reading is the frozen era clock's counter, retired"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1965,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// J2000 — the model's one J2000 reading; S5 retired the H/13 value"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1965,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// J2000 — the model's one J2000 reading; S5 retired the H/13 value"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1991,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the lunisolar precession period T_p at J2000, JULIAN years —"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 1991,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the lunisolar precession period T_p at J2000, JULIAN years —"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2178,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// ζ-modes, ONE engine-K anchor α = (H/13 rate)/cos ε₀, zero fitted"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2178,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// ζ-modes, ONE engine-K anchor α = (H/13 rate)/cos ε₀, zero fitted"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2186,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'dε/dt at J2000 DERIVED by the hybrid (engine-D ζ-modes + the H/13 anchor, zero fitted constants; the era ζ-tier, where J2000-local quantities live) — the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2186,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "note: 'dε/dt at J2000 DERIVED by the hybrid (engine-D ζ-modes + the H/13 anchor, zero fitted constants; the era ζ-tier, where J2000-local quantities live) — the"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2196,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'the precession constant α = (H/13 rate)/cos ε₀ — the hybrid’s single engine-K anchor (literature ~54.9)',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2196,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "note: 'the precession constant α = (H/13 rate)/cos ε₀ — the hybrid’s single engine-K anchor (literature ~54.9)',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2201,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'the dominant obliquity beat |ψ̇| − |s₃| derived by the hybrid — the H/8 identity, produced natively',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2230,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/3-law record (insolStab*Model keys), never over it."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2242,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'the DEEP-source e(t) maximum over the LR04 span — matches the La2004 envelope where the H/3 line reads 0.0233',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2324,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// §18). S5 retired the former T_p·13/8 (= H/8) reading of that fork."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2344,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "[`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure precession-scaling reading \"obliquity pe"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2449,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// `earthEccCycle` stood here, publishing H/3 as \"the period of Earth's |e|"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2450,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// oscillation — the one H/3 eccentricity law\". That law was retired from"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2480,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// 8H/(n8 − 104) \"frame identity\" (the no-chain scaffolding's RA-frame"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2604,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "axialPrecExact: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(v, 2), unit: 'yr', note: 'the J2000 of-date axial precession per"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2604,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "axialPrecExact: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(v, 2), unit: 'yr', note: 'the J2000 of-date axial precession per"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2605,
+   "line": 2363,
    "runtime": "docs-tools",
    "token": "H / N",
    "class": "diagnostic",
@@ -2329,139 +1658,11 @@
   },
   {
    "file": "tools/docs/model-values.mjs",
-   "line": 2605,
+   "line": 2363,
    "runtime": "docs-tools",
    "token": "/ 13",
    "class": "diagnostic",
    "text": "siderealYearsPerAxialPrec: { get: () => Math.round(oneYL().axialPrecessionYearsAtYear(2000)) - 1, render: (v) => thousands(v), note: 'one fewer sidereal year th"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2718,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// 8H/11 — are deleted; nothing quoted them.)"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2840,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "note: 'general-relativistic advance from the model constants (a = 1 AU, e J2000) — documentation-grade beside Earth’s H/16 chain',"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2882,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Plan 07: Earth's perihelion-of-date rate is the one-family beat (S6 missed this pair — they still read the device's H/16)"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 2884,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "out.earthPeriRateEclipticOfDateArcsecCy = { get: earthOfDateArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the perihelion OF DATE (not the inert"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3020,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// chain's leading secular mode (Earth: the one-family route) — the 8H/(n8 − 104) frame"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3024,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "earthAxialPeriod: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the J2000 of-date axial pre"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3024,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "earthAxialPeriod: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the J2000 of-date axial pre"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3025,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "diagnostic",
-   "text": "earthIcrfPeriod: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'Earth’s apsidal period"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3056,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// 8H cycle counts from the engine (Earth = −H/5, the ecliptic precession)."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3056,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// 8H cycle counts from the engine (Earth = −H/5, the ecliptic precession)."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3059,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 07 sweep: `earthEccPhaseJ2000`, `earthAscNodePeriod` (−H/5),"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3061,
-   "runtime": "docs-tools",
-   "token": "8H",
-   "class": "comment",
-   "text": "// (the device's 8H/N node cycles) are deleted — retired framing with no"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3095,
-   "runtime": "docs-tools",
-   "token": "eraClockHAtAge",
-   "class": "comment",
-   "text": "// left with `eraClockHAtAge`. On the unit H(t) the same product is a"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3151,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "diagnostic",
-   "text": "out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the co"
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3154,
-   "runtime": "docs-tools",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// old table quoted H/13 there). Forward: the recession polynomial's extrapolation region."
-  },
-  {
-   "file": "tools/docs/model-values.mjs",
-   "line": 3154,
-   "runtime": "docs-tools",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// old table quoted H/13 there). Forward: the recession polynomial's extrapolation region."
   },
   {
    "file": "tools/docs/render-calculation-map.mjs",
@@ -4152,174 +3353,6 @@
    "text": "// phase; browser: integrated H/3). Pinned so the alignment commit shows"
   },
   {
-   "file": "tools/lib/constants.js",
-   "line": 68,
-   "runtime": "node-lib",
-   "token": "holisticyearLength",
-   "class": "comment",
-   "text": "// (plan 09 step 7c: the frozen era unit `holisticyearLength` (H), its lattice"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 112,
-   "runtime": "node-lib",
-   "token": "earthtiltMean",
-   "class": "comment",
-   "text": "// (plan 11 step 4: the K-device scaffold's recorded J2000 pose — earthtiltMean,"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 113,
-   "runtime": "node-lib",
-   "token": "earthInvPlaneInclinationAmplitude",
-   "class": "comment",
-   "text": "// earthInvPlaneInclinationAmplitude, kDeviceWheelPhaseAtJ2000Cycles,"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 113,
-   "runtime": "node-lib",
-   "token": "kDeviceWheelPhaseAtJ2000Cycles",
-   "class": "comment",
-   "text": "// earthInvPlaneInclinationAmplitude, kDeviceWheelPhaseAtJ2000Cycles,"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 166,
-   "runtime": "node-lib",
-   "token": "8H",
-   "class": "comment",
-   "text": "// fractionToYears helper; Mercury 8H/11 = 243,867 yr) are gone with the"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 193,
-   "runtime": "node-lib",
-   "token": "8H",
-   "class": "comment",
-   "text": "// (plan 09 step 7c: `ascendingNodeCyclesIn8H` and the −8H/N node period"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 239,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 7c: `perihelionCycleLength` = H/16 is deleted; plan 11 step 4"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 248,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// onto 1/(H/8) of a day (365.24220365, +1.2 s). `inputMeanSolarYear` stays as"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 257,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// origin — perihelionalignmentYear − 14.5 × H/16 = −302,635, the \"balanced"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 270,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// era device anchored it on its H/13 identity instead (meanSolarYearDays ×"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 270,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// era device anchored it on its H/13 identity instead (meanSolarYearDays ×"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 282,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Stellar day: the H/13 precession rate is precession in LONGITUDE (along the"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 282,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// Stellar day: the H/13 precession rate is precession in LONGITUDE (along the"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 289,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// period (axialPrecessionJ2000Years) — not per the counter H/13 (0.086 % slow;"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 289,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// period (axialPrecessionJ2000Years) — not per the counter H/13 (0.086 % slow;"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 297,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// step 3 it was meanSolarYearDays × (H/16)/(H/16 − 1), the device's identity.)"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 297,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// step 3 it was meanSolarYearDays × (H/16)/(H/16 − 1), the device's identity.)"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 368,
-   "runtime": "node-lib",
-   "token": "8H",
-   "class": "comment",
-   "text": "// The retired era device counted these cycles as eighth-integers per 8H"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 370,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/13 cycles per H) and read every period back as totalDaysInH/N — 7.8 ms"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 370,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// H/13 cycles per H) and read every period back as totalDaysInH/N — 7.8 ms"
-  },
-  {
-   "file": "tools/lib/constants.js",
-   "line": 408,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 7c: `ASTRO_REFERENCE.earthInvPlanePrecessionYears` = H/3 — a"
-  },
-  {
    "file": "tools/lib/deep-orbital-history.js",
    "line": 12,
    "runtime": "node-lib",
@@ -4336,208 +3369,8 @@
    "text": "*     lab uses; the kinematic H/13 25,793.6 is a recorded 0.09% relation"
   },
   {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 13,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// linear year-2000 node, Earth's H/3 inclination cosine, the ψ-law planet"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 34,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// and its H/3–H/8 decomposition (computeObliquityIntegrals) left this engine."
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 34,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// and its H/3–H/8 decomposition (computeObliquityIntegrals) left this engine."
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 111,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (Plan 09 step 6: `computeEccentricityEarth` — the H/3 eccentricity law"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 112,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// through the deep-time twin — and `computeEccentricity` — the H/16"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 185,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// on H-divisors, 270° + the device wheel's J2000 phase + the H/16 mean rate +"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 237,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (Plan 07 R1: computeInclinationPrecessionPeriod — Earth's H/3 and the"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 353,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*   meanStellarday = (meanSiderealday / (H / 13)) / (meanSolarYearDays + 1)"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 353,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "*   meanStellarday = (meanSiderealday / (H / 13)) / (meanSolarYearDays + 1)"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 355,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* The H/13 factor is the axial precession period in years — precession in"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 355,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "* The H/13 factor is the axial precession period in years — precession in"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 361,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "* Earlier version used `(siderealYearSec - solarYearSec) / (1/eccentricityAmplitude/13*16)`"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 362,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* which gave a divisor of ~907 instead of H/13 ≈ 25,794 — completely wrong"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 362,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "* which gave a divisor of ~907 instead of H/13 ≈ 25,794 — completely wrong"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 373,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// −14.194 ms/day + lines on H/16 and H/8, \"confirmed by the 65-epoch multiepoch"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 373,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// −14.194 ms/day + lines on H/16 and H/8, \"confirmed by the 65-epoch multiepoch"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 434,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* Formula: RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 434,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* Formula: RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]"
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 470,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* The ±46s variation comes from perihelion precession (H/16)."
-  },
-  {
-   "file": "tools/lib/orbital-engine.js",
-   "line": 505,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (Inclination — Earth's H/3 cosine, the ψ-law planet oscillation and the"
-  },
-  {
    "file": "tools/lib/python/constants_scripts.py",
-   "line": 221,
-   "runtime": "python",
-   "token": "8H",
-   "class": "comment",
-   "text": "# Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap)."
-  },
-  {
-   "file": "tools/lib/python/constants_scripts.py",
-   "line": 221,
-   "runtime": "python",
-   "token": "8H",
-   "class": "comment",
-   "text": "# Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap)."
-  },
-  {
-   "file": "tools/lib/python/constants_scripts.py",
-   "line": 222,
-   "runtime": "python",
-   "token": "8H",
-   "class": "comment",
-   "text": "# Venus/Neptune: 8H/100 (= ICRF period → two-component formula cancels → constant obliquity)."
-  },
-  {
-   "file": "tools/lib/python/constants_scripts.py",
-   "line": 227,
-   "runtime": "python",
-   "token": "H / N",
-   "class": "comment",
-   "text": "# them. Fixed at plan 07 R6. (Plan 09 step 7c: Earth's H/8 entry — the"
-  },
-  {
-   "file": "tools/lib/python/constants_scripts.py",
-   "line": 325,
-   "runtime": "python",
-   "token": "H / N",
-   "class": "comment",
-   "text": "# (plan 09 step 7c: Earth's H/3 entry — the K inclination wheel — left; Earth's"
-  },
-  {
-   "file": "tools/lib/python/constants_scripts.py",
-   "line": 350,
+   "line": 277,
    "runtime": "python",
    "token": "/ 13",
    "class": "comment",
@@ -4545,100 +3378,12 @@
   },
   {
    "file": "tools/lib/scene-graph.js",
-   "line": 34,
-   "runtime": "node-lib",
-   "token": "_phaseCycles",
-   "class": "comment",
-   "text": "//  the mode-aware `_phaseCycles` helper left with the counters, step 5c)"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 53,
-   "runtime": "node-lib",
-   "token": "8H",
-   "class": "comment",
-   "text": "// D2 derived additional-argument rates (deg/cy, J2000 8H-lattice months —"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 180,
+   "line": 162,
    "runtime": "node-lib",
    "token": "cyclesBetween",
    "class": "comb",
    "text": "return _chainCyclesT().cyclesBetween(periodFn, yearA, yearB);",
    "twin": "era-counter"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 344,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  framework H/3 fluctuation line (kills the polynomial blow-up at deep time). */"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 774,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// eccentricityAmplitude·100, H/13) is RETIRED — its partner, the second"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 774,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// eccentricityAmplitude·100, H/13) is RETIRED — its partner, the second"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 784,
-   "runtime": "node-lib",
-   "token": "earthtiltMean",
-   "class": "comment",
-   "text": "// (recorded period 25,793.6 yr, tilt earthtiltMean) no longer turns this"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 835,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the second eccentricity arm (radius A, net rotation −H/13 through the"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 835,
-   "runtime": "node-lib",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// the second eccentricity arm (radius A, net rotation −H/13 through the"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 1069,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Compute dynamic eccentricities for all planets (oscillate at H/16)"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 1075,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Unification: Earth's per-frame eccentricity is the ONE law (H/3 line);"
-  },
-  {
-   "file": "tools/lib/scene-graph.js",
-   "line": 1076,
-   "runtime": "node-lib",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the H/16 law-of-cosines form below serves only the planets' wobble laws."
   },
   {
    "file": "tools/verify/deep-secular-modes.js",
@@ -4746,151 +3491,15 @@
   },
   {
    "file": "packages/api/src/app.js",
-   "line": 114,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// at 2000 (25,771.4 yr ≈ IAU); the H/13 lattice reading (25,793.6) is the fit anchor's, retired as a period."
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 114,
-   "runtime": "api",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// at 2000 (25,771.4 yr ≈ IAU); the H/13 lattice reading (25,793.6) is the fit anchor's, retired as a period."
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 119,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "display",
-   "text": "axialPrecession: { formula: 'T_p(J2000) = sid/(sid − trop), the of-date year laws at 2000 (lattice label H/13 retired as a period)', latticeDivisor: 13, periodY"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 119,
-   "runtime": "api",
-   "token": "/ 13",
-   "class": "display",
-   "text": "axialPrecession: { formula: 'T_p(J2000) = sid/(sid − trop), the of-date year laws at 2000 (lattice label H/13 retired as a period)', latticeDivisor: 13, periodY"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 120,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "display",
-   "text": "inclinationPrecession: { formula: 'T_aps(J2000) = 360°/ϖ̇_secular — the N-body chain’s secular apsidal tangent at 2000, the perihelion against the stars (device"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 121,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "display",
-   "text": "perihelionPrecession: { formula: 'T_peri(J2000) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date beat of the one-family route at 2000 (device label H/16 retired a"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 122,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "display",
-   "text": "eclipticPrecession: { formula: 'T_s₃ = 1,296,000/|s₃| — the dominant nodal mode of Earth’s orbit from the banked deep secular modes (device label H/5 retired as"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 123,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "display",
-   "text": "obliquityCycle: { formula: 'T_obl(J2000) = 2π/(ψ̇ᵢₙ − |s₃|) — the obliquity beat of the spin axis’s inertial precession rate (the general precession plus the pl"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 164,
+   "line": 156,
    "runtime": "api",
    "token": "/ 13",
    "class": "comment",
    "text": "// equinox regression) inside ±2 Myr, the unit's secular mean H(t)/13"
   },
   {
-   "file": "packages/api/src/app.js",
-   "line": 367,
-   "runtime": "api",
-   "token": "8H",
-   "class": "display",
-   "text": "return envelope({ identity: id, inputEcho: { path, ...t.echo }, data: { years: rows, note: 'L1 orbital forcing component (permil), the 32-component 8H lattice f"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 437,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Plan 09: the fit-era lattice identities (H/13, H/3, H/16) left the"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 437,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Plan 09: the fit-era lattice identities (H/13, H/3, H/16) left the"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 437,
-   "runtime": "api",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Plan 09: the fit-era lattice identities (H/13, H/3, H/16) left the"
-  },
-  {
-   "file": "packages/api/src/app.js",
-   "line": 437,
-   "runtime": "api",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// Plan 09: the fit-era lattice identities (H/13, H/3, H/16) left the"
-  },
-  {
-   "file": "packages/api/src/mcp.js",
-   "line": 102,
-   "runtime": "api",
-   "token": "8H",
-   "class": "display",
-   "text": "description: 'L1 orbital-forcing component (permil) at epoch(s) — the 32-component 8H lattice formula.',"
-  },
-  {
    "file": "packages/api/test/api-gates.test.mjs",
-   "line": 126,
-   "runtime": "tests",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// plan 09: the J2000 day length ω₀ is the SI day (was the H/13 identity's 86,399.99968)"
-  },
-  {
-   "file": "packages/api/test/api-gates.test.mjs",
-   "line": 126,
-   "runtime": "tests",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// plan 09: the J2000 day length ω₀ is the SI day (was the H/13 identity's 86,399.99968)"
-  },
-  {
-   "file": "packages/api/test/api-gates.test.mjs",
-   "line": 137,
-   "runtime": "tests",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// 13.011 of them — plan 09 step 7b deleted the unit, the composed period is the published clock)."
-  },
-  {
-   "file": "packages/api/test/api-gates.test.mjs",
-   "line": 148,
+   "line": 143,
    "runtime": "tests",
    "token": "H / N",
    "class": "comment",
@@ -4898,35 +3507,11 @@
   },
   {
    "file": "packages/api/test/api-gates.test.mjs",
-   "line": 148,
+   "line": 143,
    "runtime": "tests",
    "token": "/ 13",
    "class": "comment",
    "text": "if (val.value !== '86,400.0012') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 09: ω₀ = the SI day removed the H/13 day's +0.32 ms/day bias from"
-  },
-  {
-   "file": "packages/api/test/api-gates.test.mjs",
-   "line": 172,
-   "runtime": "tests",
-   "token": "8H",
-   "class": "comment",
-   "text": "// device's lattice (this row pinned 243,867 = 8H/11). 232,437 yr is"
-  },
-  {
-   "file": "packages/api/test/api-gates.test.mjs",
-   "line": 195,
-   "runtime": "tests",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/3 cosine and −H/5 line. Pins: J2000 (device 1.5787 / 284.51 vs one-source"
-  },
-  {
-   "file": "packages/api/test/api-gates.test.mjs",
-   "line": 195,
-   "runtime": "tests",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// H/3 cosine and −H/5 line. Pins: J2000 (device 1.5787 / 284.51 vs one-source"
   },
   {
    "file": "packages/api/test/mcp-gates.test.mjs",
@@ -4938,127 +3523,7 @@
   },
   {
    "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 63,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "comment",
-   "text": "* free-fit values — see docs/102 § \"Companion 8H lattice harmonics\"."
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 81,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* KNOWN LIMITATION (H/5 baseline): The fit's inner `fitCycles()` subtracts a"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 88,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* With the framework's H/5 correction now inside the integrand of"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 89,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* meanDeltaTSecondsAtAge (LOD_real = LOD_mean + LOD_mean/((H/5)·mSY),"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 90,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* ~3.527 ms at J2000; was H/3 ≈ 2.117 ms before 2026-07-17), the residual"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 182,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "comment",
-   "text": "// Eddy (8H/2684 = 999.45 yr) TESTED AND ROLLED BACK 2026-07-12: the 5-cycle"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 190,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "comment",
-   "text": "// See docs/102 § \"Companion 8H lattice harmonics\" (§ Eddy rollback)."
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 191,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "comment",
-   "text": "// Emp862 (8H/3111 = 862 yr) TESTED AND ROLLED BACK 2026-07-12: the 6-cycle"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 241,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// recomputed each run against the current fitted sidereal-year anchor + H/5 constant,"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 408,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// term rides the nodal period 1,296,000/|s₃|, formerly the anchor's H/5 —"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 409,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// this fitter carried its own H/5 copy, caught by the registry's"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 794,
-   "runtime": "fitting",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the H/13-structural LOD anchor (86399.9997 ≈ the ~1870–1900 mean solar"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 794,
-   "runtime": "fitting",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// the H/13-structural LOD anchor (86399.9997 ≈ the ~1870–1900 mean solar"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 801,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "comment",
-   "text": "//   phantomAmp  — 8H/2024 line in the final residual (anchor shadow price)"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1245,
-   "runtime": "fitting",
-   "token": "8H",
-   "class": "comment",
-   "text": "// Re-fit the 8H/2024 line against the FINAL shipped-stack residual. Under"
-  },
-  {
-   "file": "packages/fitting/src/dt-corrections-fit.cjs",
-   "line": 1262,
+   "line": 1233,
    "runtime": "fitting",
    "token": "8H",
    "class": "display",
@@ -5074,7 +3539,7 @@
   },
   {
    "file": "packages/fitting/src/run-pipeline.cjs",
-   "line": 55,
+   "line": 47,
    "runtime": "fitting",
    "token": "earthtiltMean",
    "class": "comment",
@@ -5082,7 +3547,7 @@
   },
   {
    "file": "packages/fitting/src/verify-pipeline.cjs",
-   "line": 207,
+   "line": 167,
    "runtime": "fitting",
    "token": "H / N",
    "class": "comment",
@@ -5129,38 +3594,6 @@
    "token": "8H",
    "class": "comment",
    "text": "// Per-cycle derived constants — period = 8H/N, ω = 2π/period, and the"
-  },
-  {
-   "file": "packages/physics/src/deltat/deep-time.cjs",
-   "line": 5,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* mass-loss year chain, the Simpson ΔT integrator with the H/5 ecliptic"
-  },
-  {
-   "file": "packages/physics/src/deltat/deep-time.cjs",
-   "line": 73,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*   formerly the spin unit's H/5, 67,063 yr, 2.5 % off and scaling with the"
-  },
-  {
-   "file": "packages/physics/src/deltat/deep-time.cjs",
-   "line": 121,
-   "runtime": "package",
-   "token": "eraClockHAtAge",
-   "class": "comment",
-   "text": "// `eraClockHAtAge` — H_era(t) = H₀·LOD(t)/LOD₀, plan 06 D8's second named"
-  },
-  {
-   "file": "packages/physics/src/deltat/deep-time.cjs",
-   "line": 251,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* plan 06 T2 restatement, formerly the spin unit's H/5)."
   },
   {
    "file": "packages/physics/src/earth/precession-composed.cjs",
@@ -5212,75 +3645,11 @@
   },
   {
    "file": "packages/physics/src/index.js",
-   "line": 130,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// (plan 09 step 6: createMoonEccChannel — the H/3 eccentricity law — is deleted; Earth's e of date is the N-body series on every path)"
-  },
-  {
-   "file": "packages/physics/src/index.js",
-   "line": 146,
+   "line": 134,
    "runtime": "package",
    "token": "H / N",
    "class": "comment",
    "text": "// (plan 09 step 6: eccentricityFromCycles / computeEccentricityIntegrated — the H/16 law-of-cosines eccentricity — are deleted; no runtime read them)"
-  },
-  {
-   "file": "packages/physics/src/index.js",
-   "line": 163,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// lunar-chain modulation rides it; era consumers stay on the H/3 channel)."
-  },
-  {
-   "file": "packages/physics/src/index.js",
-   "line": 175,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// leg-1's physical rate; the structural H(t)/13 clock is its named diagnostic."
-  },
-  {
-   "file": "packages/physics/src/index.js",
-   "line": 277,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Plan 09: the fit-era lattice identities H/13, H/3, H/16"
-  },
-  {
-   "file": "packages/physics/src/index.js",
-   "line": 277,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Plan 09: the fit-era lattice identities H/13, H/3, H/16"
-  },
-  {
-   "file": "packages/physics/src/index.js",
-   "line": 277,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// Plan 09: the fit-era lattice identities H/13, H/3, H/16"
-  },
-  {
-   "file": "packages/physics/src/index.js",
-   "line": 277,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "// Plan 09: the fit-era lattice identities H/13, H/3, H/16"
-  },
-  {
-   "file": "packages/physics/src/index.js",
-   "line": 285,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "* §7a assembly (law-of-cosines on the integrated H/16 phase)."
   },
   {
    "file": "packages/physics/src/layer0/derive-params.js",
@@ -5358,78 +3727,6 @@
    "class": "comb",
    "text": "const mcSidereal = (a, b) => chainCycles.cyclesBetween(siderealMonthPeriodFn, a, b);",
    "twin": "era-counter"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 55,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*  5c: it was written as the era unit's twelfth, H/12, \"lattice-derived\";"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 92,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*   pKin = the KINEMATIC pair's beat (the H/13-family mean the chains"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 92,
-   "runtime": "package",
-   "token": "/ 13",
-   "class": "comment",
-   "text": "*   pKin = the KINEMATIC pair's beat (the H/13-family mean the chains"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 100,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "*   the perihelion on the H/16 chain count — sat 0.2° behind the IAU mean"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 210,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// under the SECULAR-theory ë reproduces 1/538841 at 98.8%. The H/3 line's"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 213,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// branch, which integrates the H/3 channel, loses that content (measured:"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 219,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// integrates the CURVATURE difference of e² (secular Taylor − H/3"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 239,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "// the H/3 channel's own d²(e²)/dT² — central difference at ±10 cy"
-  },
-  {
-   "file": "packages/physics/src/moon/arguments.cjs",
-   "line": 281,
-   "runtime": "package",
-   "token": "H / N",
-   "class": "comment",
-   "text": "//     day-scale would inject ~29″/cy) and applied through the H/12 cos²"
   },
   {
    "file": "packages/physics/src/moon/deep-ecc-channel.cjs",
@@ -5855,27 +4152,24 @@
  "inputs": {
   "generator": "node tools/explore/era-device-readers.mjs --write",
   "files": {
-   "data/nbody-secular-series.json": "sha256:733bfe77e209edc23475367dba48cf78ee5c15770f0254eca68cedc1532ed5fe",
-   "packages/api/src/app.js": "sha256:3569084fca6b217f1f7c7e8b4ebe4092df6d6c2681c30bf2b491c6db0166fb92",
-   "packages/api/src/mcp.js": "sha256:b1cb1ef1d7522990a6f852ec768a966cef6a6a12cfd614a3c52c6d328e626f9a",
-   "packages/api/test/api-gates.test.mjs": "sha256:b1e6219a9aeb102237746898bdfabc2a5736b152a99045bccf3df44fe5bdc750",
+   "data/nbody-secular-series.json": "sha256:77b09931968bedacf95e2bb29d260c178a38fc72a1640eb1d4b5bcc9f3f0e6cb",
+   "packages/api/src/app.js": "sha256:55559c98b510b2aaa98b336e6713d7622c83905a4fbd15143273a6ac84fe1412",
+   "packages/api/test/api-gates.test.mjs": "sha256:45979a570b51170e0aa8f6eb0de2387913816c1b277e4aa9de8ea2636928a111",
    "packages/api/test/mcp-gates.test.mjs": "sha256:c3a3f0296b8c0cae2d78ecde1126ba357ae0e242fced5d7782f0c045c40b44f9",
-   "packages/fitting/src/dt-corrections-fit.cjs": "sha256:bac7694d18b07d22b0835281344028b0e468367cfa82ca7d720ae13bd2d5dfe7",
+   "packages/fitting/src/dt-corrections-fit.cjs": "sha256:1a5f3fdbdcdd77613a70cdc824515e4d008432c29e295abaa1d78833b5ec0f10",
    "packages/fitting/src/export-solar-measurements.cjs": "sha256:85ae6c0eb95c80456dab5c0897a40134e2afb0daa85cc3938b650fba8f9fd312",
-   "packages/fitting/src/run-pipeline.cjs": "sha256:738dfdc2834f920c8893e3b9d0da823a7d5067ca768d036642f9d1ea66926472",
-   "packages/fitting/src/verify-pipeline.cjs": "sha256:a081264b66cca5e22a10c9c7e3406775e5514da5e28ea40d6889c4ae08e46a0c",
+   "packages/fitting/src/run-pipeline.cjs": "sha256:e3364ae6477dbda8790a962257813f33d0fb6a27e42b4006c523f45636388cac",
+   "packages/fitting/src/verify-pipeline.cjs": "sha256:94653055d1a8dbcf0392fd9d98468894d21aa7d36ba95511accf18b414bec990",
    "packages/physics/src/chain-cycles/index.cjs": "sha256:c9be1e2c54df874e1fe8104129058fc0f09a4d244517c3cec3fab5ef13961d8e",
    "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
-   "packages/physics/src/deltat/deep-time.cjs": "sha256:2d4d606e79985c175368bcb0d2a8429f9963962515a9175da7054ae5c9d5554d",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
    "packages/physics/src/earth/year-lengths.cjs": "sha256:ad86136a5455e5d846cee9cd03f55dc66b942edab56fa5c57f51fa2923decdb2",
    "packages/physics/src/eclipse/besselian.cjs": "sha256:f731968aa72105b31ca578f14644a5afcf228bb3a1103359414171de38baaf52",
-   "packages/physics/src/index.js": "sha256:1fcac7f2f0955332fca790ee004f7307f5d6d6517670f0e1e9ae99e210904452",
+   "packages/physics/src/index.js": "sha256:5a709ece1adb87a4ac6afb28090f8462c9a300e6de67de2cf47db4df6c25d9a7",
    "packages/physics/src/layer0/derive-params.js": "sha256:f269af7ad405eb30b56c992f8e710dd1e5fde8abea47058f5dc990d06acd84f4",
    "packages/physics/src/layer0/index.js": "sha256:d1de030f8810621a6a0db20590aa31a24b19ade1450caeb4bdcbdcd61e3da557",
    "packages/physics/src/layer1/index.js": "sha256:ba7a15893b0d4b38ff53521f2180384b805160b313e4711740802b356cbd4e2f",
    "packages/physics/src/model/lunar-theory.js": "sha256:f107486700ac0fdb3fc28d938fc39dc31457d21e91a55ae4f8f051cc630d4c04",
-   "packages/physics/src/moon/arguments.cjs": "sha256:35494a6f1b61d413e49e7de1ba79c0b292cf0bc2a386b7ce71ba2c9688828bf7",
    "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
    "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:7e694442be5bdb9b59087c3e8587bba8d7a271f8100d022f51418bbb351d996d",
    "packages/physics/test/counterfactual.test.mjs": "sha256:8d15fa561222e929a3b3a92ec7738f2b67323ead955820b4aa26370943a4c153",
@@ -5891,10 +4185,10 @@
    "test/browser/snapshot.test.mjs": "sha256:819345a46ac6876dfa5632843a0cce5ee8b539620c4fb51b413c95235d81b4ea",
    "test/browser/wobble-center.test.mjs": "sha256:456521771ea752f9112407c9f316d0dc92ec21d7b4ac90fbc5110772256ae8ad",
    "tools/check-python-physics.mjs": "sha256:677d3c65e87fcd08c29b633c2118a474444d19c2ac365095b8893a718b2cf6ae",
-   "tools/check-vocabulary.mjs": "sha256:49b37bd39baffdc860a25cd1bc021306bd360b0fe03ded8ca4d416fcd661e02a",
-   "tools/constants/check-literals.mjs": "sha256:a5998a784a36c164cb4c7e11f2e982b60593d712e9d462cf5d452afa30b7f45e",
+   "tools/check-vocabulary.mjs": "sha256:797cc3ea06923da64fb7d9fa1698f0881dbfcc231e1c1249011914f3c6a2ac18",
+   "tools/constants/check-literals.mjs": "sha256:ccddb52a109e7c5c6a7764238decf93d552bed1b882a253e4345036922e2a537",
    "tools/constants/generate.mjs": "sha256:dbcf5c1e7688ca0b421f0413bcaa832440268918bf682bf59e65ed1d0bdb93c3",
-   "tools/docs/model-values.mjs": "sha256:1625e47dd0b5d56a375781f2ebd5b765192c9abef82d8c70a8badaf56397d3fa",
+   "tools/docs/model-values.mjs": "sha256:d22808a3ff35fa22e53822e543d108da76eaab29b7a4cad8cc7a2ab1167f0aab",
    "tools/docs/render-calculation-map.mjs": "sha256:99ab8684923f018989e1b4baee658385cc43303ba1cc950639a27efdc447a5a3",
    "tools/docs/render-doc99-tables.mjs": "sha256:fa533c218632b2ebd68aa4bf6b1d1105a908d51e46f3936ec4e7f0e712f71a8f",
    "tools/explore/climate-band-phase.js": "sha256:0b81487d4cf86717265d53e7583b63e6ff7b52a5f8d9d8c3e7c21ff975e9bbe3",
@@ -5936,11 +4230,9 @@
    "tools/fit/python/load_constants.py": "sha256:61f63ee0e58ceca51c31dd8892871153699fa7b21d3f5fbcd6c45711eba9cbdc",
    "tools/fixtures/record-plan06-baseline.mjs": "sha256:5a5be582ce686604cca2ab3a2d10c8a1b55c7569a022ea1da7a070a1cc63bb9a",
    "tools/fixtures/record-tools-lib.mjs": "sha256:2c4daa7c0fcf6e07e87bf2e50da48df937274c322d3ca67fde70c3301bdd0b21",
-   "tools/lib/constants.js": "sha256:4d1c727394e89268ab570c4771dfde6987b69e71d4d8b8a80b89142054fcbad7",
    "tools/lib/deep-orbital-history.js": "sha256:965e2f2e8c1c27a3d36e70c3a66a80102cf655208b1b0729dcb9f7a857710385",
-   "tools/lib/orbital-engine.js": "sha256:ff285542740f43743057606890c0380a611abcdb59359070d410928e5cad2746",
-   "tools/lib/python/constants_scripts.py": "sha256:7c926efb773edf90bd1362b7dec77856e34926302aae75372e92b08e15180eef",
-   "tools/lib/scene-graph.js": "sha256:c6f3bf95212e5859a4f81c3463e1de448cfe9eb9c8dcf503da12802b4b13deb7",
+   "tools/lib/python/constants_scripts.py": "sha256:5f550fad264c82f676e92a162dfa9facc766955bb5a9cafce54505538eaf4641",
+   "tools/lib/scene-graph.js": "sha256:edf5ea72b4ec2604c60318c78fb55bd32f659693e3470cf3b99d18c2f304bc79",
    "tools/verify/deep-secular-modes.js": "sha256:1c5d69aaeccbb305ddd842a5c19d8945b9f2747fabef3e97dfe70bdd14d57e6d",
    "tools/verify/eclipse-audit.js": "sha256:67dfc472c31e19ec7128d13440dd060b21c87a5aa648999e279d35b1d469c667",
    "tools/verify/obliquity-hybrid.js": "sha256:0fdaf3d967391a62f8fad1ad4ad75324691e743d4f50b0eade52f7c78f59b6bc",

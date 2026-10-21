@@ -38,17 +38,13 @@ export type MoonArgsDeg = {
  *   pair powers the (d′) of-date rate completion: pDyn = the DYNAMICAL
  *   axial precession (day-form beat of the engine's sidereal/solar year
  *   evaluators — the tweakpane identity, real at J2000, epoch-valid);
- *   pKin = the KINEMATIC pair's beat (the H/13-family mean the chains
- *   embed). Absent ⇒ the completion is disabled (pre-(d′) behaviour).
- *   Plan 09: the Sun of the arguments is the engine's ONE certified Sun —
+ *   pKin = the KINEMATIC pair's beat (the mean the chains embed). Absent ⇒
+ *   the completion is disabled (pre-(d′) behaviour).
+ *   The Sun of the arguments is the engine's ONE certified Sun —
  *   sunMeanLonDegAtJdTT (the mean longitude that integrates the one-family
  *   tropical year, unwrapped) and sunPerihelionLonDegAtJdTT (the mean
  *   perihelion of date, wrapped — the arguments wrap M, and the rate anchors
- *   difference it over ±25 days wrapped to ±180°). The former "model timeline" Sun — 360° per mean solar
- *   year plus the closed-form integrals of the retired year-length combs,
- *   the perihelion on the H/16 chain count — sat 0.2° behind the IAU mean
- *   Sun at −2000 (the combs could not carry the tropical year's secular
- *   drift); measured against Meeus L0 before the move.
+ *   difference it over ±25 days wrapped to ±180°).
  */
 export function createMoonArguments({ constants, fns }: {
     constants: {
@@ -128,8 +124,6 @@ import { jdToDecimalYear } from "../time/calendar.cjs";
 /** The secular-completion taper half-width, Julian years: the cos² envelope
  *  inside which the chain's Meeus-measured rate anchors and the Lp secular
  *  completion act (full at the anchor, zero beyond). A recorded window of the
- *  completion, not a law — the anchors were measured with it (plan 09 step
- *  5c: it was written as the era unit's twelfth, H/12, "lattice-derived";
- *  the value is kept bit-identical and named for what it is). */
+ *  completion, not a law — the anchors were measured with it. */
 export const SECULAR_COMPLETION_TAPER_YEARS: 27943.083333333332;
 export { jdToDecimalYear };

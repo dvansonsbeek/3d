@@ -485,7 +485,15 @@ numpy/scipy and reports SKIP on CI's runner; fail-proven via
 `ESSRT_PY_SMOKE_PLANT=1`). `test:vocabulary` is the retired-vocabulary
 RATCHET — plan 06 §7 D3 terms may only leave presentation surfaces, never
 re-enter; `--report` prints the sweep worklist, `--root DIR` adds the
-website's EN pages. `test:fixtures` carries the `tools/lib` golden masters
+website's EN pages. Since plan 16 it ratchets a second surface, the code's
+comments and label strings (the Node tools, the packages, the tests —
+keyed `code:<path>`; the terms are the retired constructions: H-divisor
+labels, the era device and its combs, deletion narratives, plan-step
+prefixes; `tools/explore` and `src/script.js` excluded by name), born from
+the census that found ~1,900 such mentions after the docs sweeps — the
+API's derivations table still shipped `latticeDivisor` and "RETIRED"
+formulas, the registry two frozen values of retired laws. Fail-proven via
+`ESSRT_VOCAB_PLANT=2` (one phantom code hit). `test:fixtures` carries the `tools/lib` golden masters
 + the plan-06 baseline — the clock-carrying quantities on the ±26-kyr
 wander window and the deep-time anchors, bit-exact across the
 lunisolar-clock restatement. The fifth model gate, `scene-year-lengths.js`,
@@ -537,7 +545,7 @@ forcing alone 40,924, La2004's own series 40,900 on the same window; the
 general rate read 41,224) — s₃ at its dynamical value under the measured
 solar-mass history — degenerate today with the pure precession-scaling
 reading "obliquity period ∝ T_p", roughly a factor two apart at 2.46 Ga;
-registry keys `obliqBeat*Kyr` / `obliqH8Scaled*Kyr` (name kept), doc 109
+registry keys `obliqBeat*Kyr` / `obliqPrecScaled*Kyr`, doc 109
 §18.
 
 **Two named counters** (plan 06 D8) — the second DELETED at plan 09 step

@@ -52,12 +52,10 @@ const s3ArcsecPerYr = (() => {
 const C = require(join(ROOT, 'tools', 'lib', 'constants.js'));
 /** Lazy deep-time engine (loads the ΔT/LOD chain on first key that needs it). */
 const dtl = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
-// Plan 06 Phase 3 S2: THE published of-date year-length / precession family is
-// the one-family route (B) — the Node engine's instance of the package
-// factory (deep-orbital-history.js createOneSourceMovement().yearLengths,
-// the same construction as model.js and the browser). The comb family (A)
-// and the cardinal 4-mean (A′) are the frozen era clock's device: they feed
-// the kinematic-day keys below and nothing else here.
+// THE published of-date year-length / precession family is the one-family
+// route — the Node engine's instance of the package factory
+// (deep-orbital-history.js createOneSourceMovement().yearLengths, the same
+// construction as the package model and the browser).
 let _oneMovementM = null;
 const oneMovement = () => {
   if (!_oneMovementM) {
@@ -67,14 +65,12 @@ const oneMovement = () => {
   return _oneMovementM;
 };
 const oneYL = () => oneMovement().yearLengths;
-// Plan 06 Phase 3 S3b: THE published obliquity is the hybrid (the one-source
-// movement's ε). Plan 09: the K comb (the former orbital-engine
-// computeObliquityEarth) is deleted; the kinematic-day keys' mean-ε RA
-// projection rides the IAU J2000 obliquity input (STELLAR_DAY_RA_PROJECTION).
+// THE published obliquity is the hybrid (the one-source movement's ε); the
+// kinematic-day keys' mean-ε RA projection rides the IAU J2000 obliquity input
+// (STELLAR_DAY_RA_PROJECTION).
 const oneEps = (y) => oneMovement().epsDeg(y);
 // The published e's range over the last Myr (the N-body series, 500-yr samples)
-// — the insolation extremes ride it (plan 09 step 6; they rode the retired
-// one-law extremes 3·base′/2 and base′/2 before).
+// — the insolation extremes ride it.
 let _seriesERangeM = null;
 const seriesERange = () => {
   if (!_seriesERangeM) {
@@ -99,10 +95,8 @@ function balanceMachinery() {
   if (_balanceHelpersM) return _balanceHelpersM;
   let balM = null;
   const bal = () => { if (!balM) balM = rd('data/balance-presets.json'); return balM; };
-  // Plan 07 R5/R6: the weight helpers that stood here (semiMajor, dFibo,
-  // eccBase, antiPhase, eccWeightCoeff, eccWeight, inPhaseTotal) read the
-  // device — the integer divisors and the K law's base eccentricity — and
-  // went with the keys they fed. What is left is the recorded search artifact.
+  // What is left of the balance search is the recorded search artifact
+  // (data/balance-presets.json).
   _balanceHelpersM = { bal };
   return _balanceHelpersM;
 }
@@ -110,57 +104,45 @@ function balanceMachinery() {
 let _predictHelpersM = null;
 function predictiveMachinery() {
   if (_predictHelpersM) return _predictHelpersM;
-  // Plan 09 step 4: the perihelion comb (PERI_HARMONICS — the browser's ERD
-  // form and this file's private copy of the longitude) is deleted. The
-  // PUBLISHED perihelion of date is the Sun channel's — the series' ϖ plus the
-  // MEASURED osculating-mean offset EARTH_OSCULATING_MEAN_OFFSET.dPomArcsec
+  // The PUBLISHED perihelion of date is the Sun channel's — the series' ϖ plus
+  // the MEASURED osculating-mean offset EARTH_OSCULATING_MEAN_OFFSET.dPomArcsec
   // (createModel().sun.perihelionLongitudeDegAt, ecliptic of date): the
   // osculating-mean apsidal direction that Meeus's and Standish's mean
   // elements tabulate and that the eclipses and the cardinal points ride.
   // Measured: it matches Meeus at 1000/1246/2000/2500/3000 AD within 0.001°;
   // the bare series mean (createModel().earth.perihelionLongitudeDeg, the
   // N-body secular mean) sits a constant 0.0195° below it. The rate is the
-  // ±50-yr central difference in ″/cy — the quantity the retired "ERD ×
-  // 360,000" approximated with the comb's derivative (a constant offset
-  // does not enter it).
+  // ±50-yr central difference in ″/cy (a constant offset does not enter it).
   const earthPeriOfDateDeg = (year) => physModel().sun.perihelionLongitudeDegAt(year);
   const earthPeriOfDateRateArcsecCy = (year) => {
     const d = earthPeriOfDateDeg(year + 50) - earthPeriOfDateDeg(year - 50);
     return (((d + 540) % 360) - 180) * 3600;   // ° per century → ″/cy
   };
-  // Plan 06 R8 — the Earth-frame RA rate of a planet's perihelion motion IS the
-  // equatorial projection of the lattice motion (doc 13 §1.8, the kinematic
-  // identity in the lattice's own family; twin: src/script.js
+  // The Earth-frame RA rate of a planet's perihelion motion IS the equatorial
+  // projection of the chain motion (doc 13 §1.8; twin: src/script.js
   // perihelionFrameBreakdown, identical ops):
   //   α̇ = rate_ecl · dα/dλ(λ, ε) + ∂α/∂ε(λ, ε) · ε̇
-  // λ the IAU J2000 perihelion longitude advanced at the lattice rate, ε the
-  // published one-source ε and ε̇ its ±50-yr central difference. The retired
-  // device that stood here — createPredictivePrecession × PREDICT_COEFFS_PHYSICAL,
-  // ~2,421 fitted terms per planet reproducing the RETIRED geometric scene's
-  // exported RA rate (which the identity closed to a κ ≤ 1.4″/cy residual) — is
-  // retired; the function keeps its name for its
-  // callers. The chain's DYNAMICAL rate of date is a different quantity (a
-  // window rate; the outer planets' are great-inequality-dominated, Neptune's
-  // ϖ swings ~16°/cy on its near-zero e) and never rides a lattice key.
+  // λ the chain's perihelion longitude of date, ε the published one-source ε
+  // and ε̇ its ±50-yr central difference. The chain's DYNAMICAL rate of date is
+  // a different quantity (a window rate; the outer planets' are
+  // great-inequality-dominated, Neptune's ϖ swings ~16°/cy on its near-zero e).
   const D2R = Math.PI / 180;
-  // Plan 07: the motion projected is THE CHAIN'S — the sidereal rate is the
-  // 1800–2100 window rate with 1PN OFF (the NEWTONIAN window), the perihelion
-  // longitude of date is the chain's ϖ (J2000 ecliptic frame, the series
-  // handover beyond each planet's boundary). The Newtonian window is ONE base
-  // across the whole doc-13 projection family, so the paper's stated closure
-  // (projection excess + obliquity-rate term = the Earth-frame rate) holds on
-  // a single rate, and the relativistic supplement stays an explicit, stated
-  // addition rather than something already folded into the projected number.
-  // The model's TOTAL rate of date is <p>PeriRateNowArcsecCy.
-  // The retired lattice motion (the IAU J2000 ϖ advanced at H·num/den) is
-  // gone; browser twin: src/script.js perihelionFrameBreakdown, identical ops.
+  // The motion projected is THE CHAIN'S — the sidereal rate is the 1800–2100
+  // window rate with 1PN OFF (the NEWTONIAN window), the perihelion longitude
+  // of date is the chain's ϖ (J2000 ecliptic frame, the series handover beyond
+  // each planet's boundary). The Newtonian window is ONE base across the whole
+  // doc-13 projection family, so the paper's stated closure (projection excess
+  // + obliquity-rate term = the Earth-frame rate) holds on a single rate, and
+  // the relativistic supplement stays an explicit, stated addition rather than
+  // something already folded into the projected number. The model's TOTAL rate
+  // of date is <p>PeriRateNowArcsecCy. Browser twin: src/script.js
+  // perihelionFrameBreakdown, identical ops.
   const chainBaseline = (planet) => chainWindowNewton(planet);
   // The projection terms of the chain motion at year y (doc 13 §1.8
   // "projection excess + obliquity-rate term"): the Earth-frame rate minus
   // the sidereal rate. Its extremes over one secular perihelion period (the
   // `<p>FluctuationMin/Max` keys) are a property of the projection — λ
-  // against the equinox — which is what the retired device's "fluctuation"
-  // was measuring in the retired scene.
+  // against the equinox.
   const chainFluct = (y, p) => {
     const eps = oneEps(y) * D2R;
     const epsRate = (oneEps(y + 50) - oneEps(y - 50)) * 3600;
@@ -177,12 +159,10 @@ function predictiveMachinery() {
 const astro = rd('public/input/astro-reference.json');   // the ONE input file (model-parameters.json is deleted, plan 11 step 6)
 const versionInfo = rd('public/input/model-version.json');
 const dtFit = rd('data/deltaT-4flag-fit.json');
-// Plan 07 (planet channel migration) — THE CHAIN ARTIFACT as the planets' one
-// home: secular eigenfrequencies g/s (″/yr, the leading z/ζ modes of the
-// 1-Myr WH+NAFF run), the 1800–2100 window rates (1PN and Newtonian), the
-// J2000 anchor elements. Every planet key below that read the retired
-// device (H·num/den periods, the ψ/K inclination and eccentricity laws)
-// reads this instead; the key NAMES stay so the markers re-render.
+// THE CHAIN ARTIFACT as the planets' one home: secular eigenfrequencies g/s
+// (″/yr, the leading z/ζ modes of the 1-Myr WH+NAFF run), the 1800–2100 window
+// rates (1PN and Newtonian), the J2000 anchor elements. Every planet key below
+// reads it; the key NAMES stay so the markers re-render.
 const chainArt = (() => { /** @type {any} */ let a; return () => a || (a = rd('data/nbody-secular-frequencies.json')); })();
 /** Leading secular apsidal frequency, ″/yr, prograde positive. @param {string} p */
 const chainG = (p) => chainArt().g[p].arcsecPerYr;
@@ -201,7 +181,7 @@ const chainInclStats = (() => {
   return (p) => {
     if (memo[p]) return memo[p];
     // Earth's inclination to the invariable plane is the engine's own normal
-    // (model.earth.inclinationDeg, plan 07 R5); the planets' is the chain's.
+    // (model.earth.inclinationDeg); the planets' is the chain's.
     const f = p === 'earth'
       ? (/** @param {string} _ @param {number} y */ (_, y) => physModel().earth.inclinationDeg(y))
       : physModel().planets.invPlaneInclinationDeg;
@@ -214,7 +194,7 @@ const chainInclStats = (() => {
   };
 })();
 // The package model on the SERIES tier (the API's construction), built lazily
-// on the first key that reads it — plan 06 Phase 7's spin-channel keys.
+// on the first key that reads it (the spin-channel keys).
 const phys = await import('@essrt/physics');
 const physModel = (() => {
   /** @type {any} */ let m;
@@ -251,12 +231,6 @@ const thousands = (n, dp = 0) => {
   return i.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + (f ? '.' + f : '');
 };
 
-/** One named cycle of the H lattice: `<name>Years` = H/divisor and
- *  `<name>Formula` = "335,317 / divisor". `dp` undefined means the website
- *  rounds to whole years and prefixes `~`. */
-// (The former hDivisor helper — "H/n" period keys — is gone: plan 06 S5/S6 re-pointed every
-// Earth-cycle period key to the model's own J2000 dynamical value; see the keys themselves.)
-
 /** The website's scientific-notation convention: mantissa × 10 with unicode
  *  superscript exponent (e.g. -3.93 × 10⁻⁷). Replicates its fmtSci exactly. */
 const fmtSci = (n, mantissaDecimals = 1) => {
@@ -291,17 +265,6 @@ const fmtSignedPct = (n, decimals = 2) => {
  * must produce the same string for the same key.
  */
 export const VALUES = {
-  // (plan 09 step 7c: the frozen era unit's keys — `H`, `HPlain`,
-  // `holisticYear`, `grandHolisticOctave` (8H), `periPrecYearsExact` (H/16),
-  // `hDiv2/3/5/8/16`, `threeH/eightH/thirteenH`, the lattice rates
-  // `inclRateICRF/inclRateEcl/obliqRateEcl/axialRateICRF/periRate`,
-  // `periJuneSolsticeNextAD/PrevBC`, `eccPrevMinJD`, the lunar "cycles per H"
-  // family, `holisticYearFactors`, `mercuryOscillationPeriod` (H/45),
-  // `totalDaysInH`, `totalDaysInHSiderealFrame`, `inputSolarYearDays` and
-  // `inputMeanSolarYear` — are deleted with the unit. The published periods
-  // are the dynamical keys below (axialPrecYears, periPrecYears, inclPrecYears,
-  // eclPrecYears, the obliquity beat); the K-device scaffold's recorded wheel
-  // periods are a scene pose, not published.)
   deltaTStart: {
     get: () => dtFit.optimum.deltaTStart,
     render: (v) => Number(v).toFixed(2),
@@ -328,12 +291,10 @@ export const VALUES = {
   },
   // ── Layer-4 solar-day family (§12h) — engine twins of the tweakpane ─────
   // Website contract: lodRealPhysical / lodH5Only / stackNetLodJ2000Ms in
-  // model-values.compute.ts (the dayLength.ts port). Plan 09: ONE J2000 day
-  // basis — the kinematic day of date is the Layer-0 tidal mean, exactly ω₀
-  // (the SI day) at J2000, and the ΔT joint fit closes on that same day; the
-  // former "measured-anchor" basis (IAU seconds over the retired year comb's
-  // measured sidereal year, 0.32 ms apart) is gone with the comb. The gate
-  // inside lodRealPhysical holds the closure to 1e-8 s on every docs build.
+  // model-values.compute.ts (the dayLength.ts port). ONE J2000 day basis — the
+  // kinematic day of date is the Layer-0 tidal mean, exactly ω₀ (the SI day)
+  // at J2000, and the ΔT joint fit closes on that same day. The gate inside
+  // lodRealPhysical holds the closure to 1e-8 s on every docs build.
   lodRealPhysical: {
     get: () => {
       const v = dtl().computeLodRealSecondsAtEpoch(2000);
@@ -345,10 +306,6 @@ export const VALUES = {
       // linear-algebra Σ vs the runtime Σ (measured ~8e-10 s). Assumes the
       // shipped flag set: running docs under DT_*_DISABLED= envs fails here
       // by design — the doc numbers assert the shipped world.
-      // Plan 09: ONE J2000 day basis — the kinematic day of date is the
-      // Layer-0 tidal mean, exactly ω₀ (the SI day) at J2000, and the ΔT
-      // joint fit closes on that same day; the former "measured-anchor"
-      // basis spread (0.32 ms, the retired year comb's sidereal anchor) is gone.
       const target = dtFit.optimum.usno_target_lod_s;
       if (Math.abs(v - target) > 1e-8) {
         throw new Error('model-values: lodRealPhysical basis-consistency gate FAILED: '
@@ -362,20 +319,17 @@ export const VALUES = {
     note: 'Layer-4 physical solar day at J2000 (tweakpane Solar Day) — closes on usnoLodJ2000, the one J2000 day basis',
   },
   measuredMeanSolarDayJ2000Seconds: {
-    // Plan 09: ONE J2000 day basis — the SI day ω₀. The former "declared
-    // scene day basis" (D8: the measured mean solar day pinned on the retired
-    // year comb's sidereal anchor, 86,400.00032 s, with its per-type closing
-    // days) is gone with the comb. The key stays for its readers.
+    // ONE J2000 day basis — the SI day ω₀. The key stays for its readers.
     get: () => C.meanLengthOfDay,
     render: (v) => thousands(v, 6),
     unit: 's',
-    note: 'the scene day basis at J2000 — the SI day ω₀ (plan 09: one J2000 day basis; the comb-era measured day 86,400.00032 s is retired)',
+    note: 'the scene day basis at J2000 — the SI day ω₀',
   },
   lodH5Only: {
     get: () => dtl().computeLodKinematicSecondsAtEpoch(2000) + dtl().h5Correction(2000),
     render: (v) => thousands(v, 6),
     unit: 's',
-    note: 'kinematic solar day + the ecliptic missing-motion term at J2000 (no ΔT cycles) — intermediate, not the physical readout (key name kept; the term rides the nodal period since the plan 06 T2 restatement)',
+    note: 'kinematic solar day + the ecliptic missing-motion term at J2000 (no ΔT cycles) — intermediate, not the physical readout (key name kept)',
   },
   stackNetLodJ2000Ms: {
     get: () => dtl().dtCycleLodCorrectionSum(2000) * 1000,
@@ -387,7 +341,7 @@ export const VALUES = {
     get: () => dtl().h5Correction(2000) * 1000,
     render: (v) => Number(v).toFixed(3),
     unit: 'ms',
-    note: 'the solar day’s ecliptic missing-motion LOD correction at J2000 — LOD_mean/(T_s₃·mSY) on the nodal period 1,296,000/|s₃| (orbital; plan 06 T2 item — was H/5 = 3.527 ms; key name kept)',
+    note: 'the solar day’s ecliptic missing-motion LOD correction at J2000 — LOD_mean/(T_s₃·mSY) on the nodal period 1,296,000/|s₃| (orbital; key name kept)',
   },
   // Ours-only: doc 99 quotes the Layer-2-vs-Layer-4 display gap.
   layer2MinusLayer4GapMs: {
@@ -418,32 +372,24 @@ export const VALUES = {
     unit: 's',
     note: 'Layer 3 solar day at J2000: kinematic + the ecliptic term + 4-flag cycles WITHOUT the Core-mantle swing (browser solarDayLayer3 at year 2000)',
   },
-  // (plan 11 step 4: `meanObliquity` — the K-device scaffold's earthtiltMean —
-  // left with the scaffold; the published obliquity is the hybrid of date and
-  // its J2000 anchor the astro-reference input.)
-  // (plan 11 step 2: `eccentricityBase` — the retired Law-5 constant — and
-  // `correctionSun` — the scene Sun's start angle, overwritten by the
-  // engine-placed Sun — left the inputs and the registry.)
   // ── Earth's precession periods ─────────────────────────────────────────
   // The website's convention, reproduced exactly: a `~` prefix on the rounded
   // ones, and axial precession alone carried to 2dp (it is the one compared
-  // against the IAU figure).
-  // S6 (plan 06): Earth's cycle periods are the model's OWN J2000 dynamical values, never fractions
-  // of the fitted anchor — H/3, H/5, H/8, H/16 read +0.18 %, −2.5 %, +1.7 %, +0.10 % off them (the
-  // same class as the H/13 case of S5). Key names kept (P4); the *Formula keys (consumed by the
-  // website appendix) now render the derivation, not "H / n".
+  // against the IAU figure). Earth's cycle periods are the model's OWN J2000
+  // dynamical values. Key names kept (P4); the *Formula keys (consumed by the
+  // website appendix) render the derivation.
   inclPrecYears: {
     get: () => oneYL().inclinationPrecessionYearsAtYear(2000),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'apsidal precession period at J2000, Julian years — the perihelion against the stars, the ONE movement’s own apsidal rate of date (the scene’s perihelion; anom/(anom − sid) of the one family, the Prec. cell’s rate; the key keeps the historical inclPrec name). Before 2026-09 the engine-D chain’s secular tangent; S6: was H/3 = 111,772',
+    note: 'apsidal precession period at J2000, Julian years — the perihelion against the stars, the ONE movement’s own apsidal rate of date (the scene’s perihelion; anom/(anom − sid) of the one family, the Prec. cell’s rate; the key keeps the historical inclPrec name)',
   },
   inclPrecFormula: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: () => 'the beat of the one-family anomalistic and sidereal years at J2000, T_anom·T_sid/(T_anom − T_sid) — the movement’s own apsidal rate of date' },
   eclPrecYears: {
     get: () => 1296000 / s3ArcsecPerYr(),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'ecliptic (nodal) precession period — the dominant nodal mode s₃ of Earth’s orbit on the invariable plane, from the engine’s deep secular modes (the obliquity beat’s partner; the of-date tangent wanders far from it). S6: was H/5 = 67,063',
+    note: 'ecliptic (nodal) precession period — the dominant nodal mode s₃ of Earth’s orbit on the invariable plane, from the engine’s deep secular modes (the obliquity beat’s partner; the of-date tangent wanders far from it)',
   },
   eclPrecFormula: { get: () => 1296000 / s3ArcsecPerYr(), render: () => 'the N-body chain’s dominant nodal mode s₃, 1,296,000/|s₃|' },
   obliqCycleYears: {
@@ -454,9 +400,7 @@ export const VALUES = {
   },
   obliqCycleFormula: { get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()), render: () => 'the beat of the spin axis\'s inertial precession against the nodal mode s₃, 1,296,000/(ψ̇ᵢₙ − |s₃|)' },
   // The three RATES beside the three periods above — the same evaluators,
-  // 1,296,000″ per period (the website appendix's "Rate" column lost its
-  // device keys inclRateICRF / inclRateEcl / obliqRateEcl at plan 09; these
-  // are their dynamical successors, model-values 23.1.0).
+  // 1,296,000″ per period (model-values 23.1.0).
   inclPrecRateArcsecPerYr: { get: () => 1296000 / oneYL().inclinationPrecessionYearsAtYear(2000), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'apsidal precession rate at J2000 — 1,296,000″ / inclPrecYears, the one movement\'s own apsidal rate of date' },
   eclPrecRateArcsecPerYr: { get: () => Math.abs(s3ArcsecPerYr()), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'ecliptic (nodal) precession rate — |s₃|, the dominant nodal mode of Earth\'s orbit on the invariable plane (regression, quoted as a magnitude); 1,296,000″ / eclPrecYears' },
   obliqCycleRateArcsecPerYr: { get: () => physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr(), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the obliquity beat rate at J2000, ψ̇ᵢₙ − |s₃| — 1,296,000″ / obliqCycleYears (the instantaneous limit; a record sees the window mean)' },
@@ -476,21 +420,20 @@ export const VALUES = {
   obliqCycleRealizedFitLr04Years: { get: () => rd('data/obliquity-hybrid-verdict.json').verdict.realized.modelFit.periodYr, render: (v) => `~${thousands(Math.round(v))}`, unit: 'yr', note: 'the dominant obliquity line of the model\'s OWN ε(t) over the LR04 window, fitted with the full line set and one free p (obliquity-hybrid-verdict.json) — gated to the window-mean prediction within 0.1 %' },
   obliqCycleLa2004FitLr04Years: { get: () => rd('data/obliquity-hybrid-verdict.json').verdict.realized.la2004Fit.periodYr, render: (v) => `~${thousands(Math.round(v))}`, unit: 'yr', note: 'La2004\'s own obliquity series on the same fit over the same window — a THEORY reference label, never an input' },
   obliqCycleRealizedVsLa2004Pct: { get: () => 100 * (rd('data/obliquity-hybrid-verdict.json').verdict.realized.modelFit.periodYr / rd('data/obliquity-hybrid-verdict.json').verdict.realized.la2004Fit.periodYr - 1), render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '%', note: 'the model\'s realized obliquity period against La2004\'s on the same window and fit — the convergence statement, like for like' },
-  // S5 (plan 06): the axial precession period is the model's ONE J2000 reading — the certified
-  // year laws' beat at 2000 (route B, 25,771.4 yr ≈ IAU 25,771.6) — never H/13 (25,793.6, the fit
-  // anchor's reading; H₀ was fitted on the perihelion-of-date beat). Key names kept (P4).
+  // The axial precession period is the model's ONE J2000 reading — the one-family route's beat at
+  // 2000 (≈ 25,771.6 yr, the IAU p_A period). Key names kept (P4).
   axialPrecYears: {
     get: () => oneYL().axialPrecessionYearsAtYear(2000),
     render: (v) => thousands(v, 2),
     unit: 'yr',
-    note: 'axial precession period at J2000, Julian years — the of-date year laws’ beat (one-family route), the model’s one J2000 precession reading (S5); the same number as 360°/the frame’s precession rate per Julian year (2026-09: the dimensionless T_sid/(T_sid − T_trop) counted tropical years, 0.55 yr off this)',
+    note: 'axial precession period at J2000, Julian years — the of-date year laws’ beat (one-family route), the model’s one J2000 precession reading; the same number as 360°/the frame’s precession rate per Julian year',
   },
-  axialPrecFormula: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: () => 'the of-date year laws’ beat at J2000, T_sid·T_trop/((T_sid − T_trop)·365.25 d)', note: 'consumed by the website appendix; S5 retired the former "H / 13" rendering' },
+  axialPrecFormula: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: () => 'the of-date year laws’ beat at J2000, T_sid·T_trop/((T_sid − T_trop)·365.25 d)', note: 'consumed by the website appendix' },
   periPrecYears: {
     get: () => oneYL().perihelionPrecessionYearsAtYear(2000),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'perihelion-of-date period at J2000 — the axial and apsidal rates add (the one-family route’s beat). S6: was H/16 = 20,957',
+    note: 'perihelion-of-date period at J2000 — the axial and apsidal rates add (the one-family route’s beat)',
   },
   periPrecFormula: { get: () => oneYL().perihelionPrecessionYearsAtYear(2000), render: () => 'the perihelion-of-date beat of the one-family route at J2000: 1/T_peri = 1/T_p + 1/T_aps' },
   // Two cycles the website also surfaces at the other rounding.
@@ -498,17 +441,13 @@ export const VALUES = {
     get: () => oneYL().axialPrecessionYearsAtYear(2000),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'axial precession at J2000, whole years (axialPrecYears carries 2dp) — the of-date reading, not H/13 (S5)',
+    note: 'axial precession at J2000, whole years (axialPrecYears carries 2dp) — the of-date reading',
   },
-  // (plan 07 sweep: `hDiv21`, `hDiv34`, `twoH`, `grandHolisticOctaveFormula`
-  // and the per-epoch `eightHAt*` rows were deleted; plan 09 step 7c deleted
-  // the rest of the H-divisor/multiple family and the pure-lattice rates
-  // 1,296,000·d/H with the unit.)
   obliquityRateJ2000: {
     get: () => ((oneEps(2001) - oneEps(1999)) / 2) * 3600,
     render: (v) => Number(v).toFixed(4),
     unit: '″/yr',
-    note: 'central difference of the published obliquity (the hybrid, plan 06 Phase 3 S3b) at J2000 — IAU 2006: −0.46840 ″/yr',
+    note: 'central difference of the published obliquity (the hybrid) at J2000 — IAU 2006: −0.46840 ″/yr',
   },
   // J2000-instantaneous precession rates. UNITS LESSON (measured, 2026-08):
   // the engine's computeLengthOfSiderealYear counts the year in LOD-days
@@ -518,9 +457,8 @@ export const VALUES = {
   // the IAU-confirmed 50.289 (period 25,771 yr). The ratio needs ONE day
   // unit, so the sidereal term is re-based onto the IAU SI-day mean here.
   // SI days ≠ LOD days — the first naming rule, as arithmetic.
-  // Plan 06 Phase 3 S2: both J2000 rates are the one-family route's beats
-  // (one family, SI seconds throughout — the mixed-unit re-basing the comb
-  // pair needed is gone with it).
+  // Both J2000 rates are the one-family route's beats (one family, SI seconds
+  // throughout).
   axialRateJ2000: {
     get: () => 1296000 / oneYL().axialPrecessionYearsAtYear(2000),
     render: (v) => Number(v).toFixed(3),
@@ -567,7 +505,7 @@ export const VALUES = {
     render: (v) => Number(v).toFixed(8),
     note: 'the IAU/Standish MEAN element (JPL Keplerian-elements table) — a calibration input, not a fit product; the series\' secular element is earthSeriesEccJ2000',
   },
-  // ── The two J2000 conventions, labelled (plan 06 layer B finding) ────────
+  // ── The two J2000 conventions, labelled ────────────────────────────────
   // The published Earth surface reads the SECULAR element of the one-source
   // N-body series (≡ JPL's osculating J2000 seed state and La2004); the
   // Calibration Inputs carry the IAU/Standish MEAN element (the 1800–2050
@@ -611,27 +549,10 @@ export const VALUES = {
     unit: '°',
     note: 'rms of the series\' Earth inclination to the invariable plane against La2010a over the same span (the browser\'s inv-tab overlay note)',
   },
-  // (The single-line eccentricity law's keys — eccentricityDerivedMean / Min /
-  //  Max, earthEccPhaseH3J2000, earthEccDotModelJ2000, earthEccDotAgreementPct
-  //  — are retired: the published e is the N-body series on every path; the
-  //  law survives only as the scene's flag-off fallback and the Node twin.)
-  // (plan 11 step 4: `eccentricityAmplitude` — the Law-4 A input, lately only
-  // the Wobble marker's display radius — left with the scaffold; the radius is
-  // the scene literal WOBBLE_MARKER_RADIUS_SCENE_UNITS in src/script.js.)
-  // ── Derived companions (the A-closure, the one-law rate test, the day
-  //    bases). All derived — no stored literals (feedback: use value tags).
-  // (plan 09 step 7c: `periJuneSolsticeNextAD/PrevBC` — the 1246 alignment ±
-  //  half the device's H/16 wheel period — left with the unit; nothing quoted them.)
-  // (plan 09 step 6: the A-closure keys — aClosurePhaseDeg, aDerivedFrom1246,
-  //  aClosureYearAMinus5Pct / Plus5Pct, the 1246 triangle closure of the
-  //  retired K eccentricity law on the H/16 beat — are deleted with the law.)
-  // (plan 09: the closingDay* / yearResidual* / dayBasisSpreadMs keys — the
-  // retired year comb's measured-anchor day basis and its per-type closing
-  // days — are deleted; ONE J2000 day basis, the SI day.)
   lodKinematicFourierJ2000Seconds: {
     get: () => dtl().computeLodKinematicSecondsAtEpoch(2000),
     render: (v) => thousands(v, 6), unit: 's',
-    note: 'o.lodKinematic at J2000: the kinematic day of date (the Layer-0 tidal mean) at J2000 = ω₀, the SI day (plan 09; the key name is historical)',
+    note: 'o.lodKinematic at J2000: the kinematic day of date (the Layer-0 tidal mean) at J2000 = ω₀, the SI day (the key name is historical)',
   },
 
   // ── Earth–Sun distances and insolation (from the AU chain + eccentricity) ─
@@ -675,8 +596,6 @@ export const VALUES = {
     out.insolStabEccMaxModel = { get: () => stb().ecc_range_model_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'the model e(t) (N-body series) maximum over the LR04 span (0–5320 kyr)' };
     out.insolStabEccMinLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[0], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) minimum over the LR04 span' };
     out.insolStabEccMaxLaskar = { get: () => stb().ecc_range_laskar_0_5320kyr[1], render: (v) => Number(v).toFixed(4), note: 'La2004 e(t) maximum over the LR04 span' };
-    // (Plan 09 step 7e: the comb-era n = 24 attribution keys `l1N24*` left with
-    // their script and frozen result file; doc 109 §22 keeps the headline numbers.)
     // L1 line audit (every shipped physical line on the doc-94 footing) and the ~100-kyr band period scan
     const aud = () => rd('data/l1-line-audit-results.json');
     const scn = () => rd('data/ecc-period-scan-results.json');
@@ -826,8 +745,7 @@ export const VALUES = {
     unit: '%',
   },
   // The insolation extremes ride the published e's range over the last Myr —
-  // the N-body series (plan 09 step 6; before it the retired one-law extremes
-  // 3·base′/2 and base′/2).
+  // the N-body series.
   earthInsolationIncreaseMaxPct: {
     get: () => {
       const e = seriesERange().hi;
@@ -857,29 +775,14 @@ export const VALUES = {
   },
 
   // ── Per-planet eccentricities ───────────────────────────────────────────
-  // What survives here is the OBSERVATION: orbitalEccentricityJ2000, the JPL
-  // value each planet's chain is anchored on.
-  //
-  // Plan 07 R6: `<p>EccBase`, `<p>EccAmp` and `<p>EccVsJ2000` stood beside it
-  // and go with the K law that produced them — the device's System-Reset
-  // construction, base = A·cosθ + √(e² − A²sin²θ) at the J2000 phase. Measured
-  // before removal (plan 07 §9e): scaling the law's outputs by 1.10 moved no
-  // scene position and no published record field, and the three keys had no
-  // consumer in the docs, on the website or in the paper. The note that stood
-  // here called this family "a live check" of the website's own re-derivation;
-  // the website does carry a copy of the law, but nothing renders these keys,
-  // so no check was running.
+  // What is published here is the OBSERVATION: orbitalEccentricityJ2000, the
+  // JPL value each planet's chain is anchored on.
   ...Object.fromEntries(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']
     .map((p) => [`${p}EccJ2000`, {
       get: () => C.planets[p].orbitalEccentricityJ2000,
       render: (v) => Number(v).toFixed(5),
       note: 'JPL observed',
     }])),
-  // (plan 07 sweep: `earthEccBase`, `earthEccVsJ2000`, `earthEccJ2000VsBasePct`
-  // — the era device's eccentricity-line midpoint and its J2000 offsets —
-  // are deleted; the published e(t) is the N-body series, and nothing
-  // quoted them. The clock stack's own `eccentricityBase` input stays
-  // documented under the calibration inputs.)
 
   // ── Per-planet inclinations and ascending nodes ─────────────────────────
   // InclEcl: the J2000 ecliptic inclination (composed constants).
@@ -889,9 +792,8 @@ export const VALUES = {
   // OmegaDelta: the CHAIN's invariable-plane node of date at J2000, expressed
   //   in the S&S longitude origin via the DERIVED conversion (the K5c
   //   node-origin derivation; inv-plane-frame.cjs), minus the S&S reference —
-  //   the honest delta from the path that ships (formerly the legacy
-  //   Appendix-C calibrated constants). Residual is element class (chain
-  //   elements-of-date vs S&S mean elements), scaling as 1/sin(i_inv).
+  //   the honest delta from the path that ships. Residual is element class
+  //   (chain elements-of-date vs S&S mean elements), scaling as 1/sin(i_inv).
   ...(() => {
     let chainCache = null;
     const chainNodeSS = (p) => {
@@ -911,7 +813,7 @@ export const VALUES = {
     // forward. Three node sets are closed against JPL's J2000 ecliptic inclination: S&S 2012
     // as published, the closed-form VERIFIED node (astro-reference planetOrbitalElements
     // .ascendingNodeInvPlaneClosedForm, solved to close this identity — a reference
-    // derivation; plan 11 step 2 moved it from model-parameters), and the chain's own
+    // derivation), and the chain's own
     // J2000 (i, Ω) pairs on the banked plane, Earth's included (the origin cancels in ΔΩ).
     const D = Math.PI / 180;
     const iEclDeg = (ip, Wp, ie, We) => Math.acos(Math.cos(ip * D) * Math.cos(ie * D) + Math.sin(ip * D) * Math.sin(ie * D) * Math.cos((Wp - We) * D)) / D;
@@ -945,7 +847,7 @@ export const VALUES = {
           get: () => astro.planetOrbitalElements[p].ascendingNodeInvPlaneClosedForm,
           render: (v) => Number(v).toFixed(2),
           unit: '°',
-          note: 'closed-form J2000 node: Ω solved from the spherical triangle (JPL J2000 ecliptic inclination, S&S invariable-plane inclination, Earth’s S&S inclination and node) — astro-reference ascendingNodeInvPlaneClosedForm (plan 11 step 2; was model-parameters); S&S origin',
+          note: 'closed-form J2000 node: Ω solved from the spherical triangle (JPL J2000 ecliptic inclination, S&S invariable-plane inclination, Earth’s S&S inclination and node) — astro-reference ascendingNodeInvPlaneClosedForm; S&S origin',
         }],
         [`${p}EclInclSSClosureArcsec`, {
           get: () => closureArcsec(p, astro.ascendingNodesSouamiSouchay[p]),
@@ -974,12 +876,7 @@ export const VALUES = {
   // ── Obliquity family ────────────────────────────────────────────────────
   // Min/max are the envelope of the PUBLISHED obliquity — the hybrid — over
   // the last million years (100-yr samples; the La2004 comparison window,
-  // doc 109 §18). Plan 09: the envelope rode the deleted 16-term solstice-
-  // obliquity comb over one H before (a device fitted to the scene's wheel
-  // geometry, 1.27° off La2004 at −20 kyr); the published band is the
-  // hybrid's. (plan 07 sweep: `pythagoreanMeanObliquity`,
-  // `meanObliquityVsJ2000Diff`, `obliquityAmplitude`, `axialTiltMin/Max` —
-  // the device obliquity law's mean ± amplitude readings — are deleted.)
+  // doc 109 §18).
   ...(() => {
     const envelope = () => {
       let min = Infinity, max = -Infinity;
@@ -1008,11 +905,9 @@ export const VALUES = {
 
   // ── Cycle timing (phase-dependent scans) ────────────────────────────────
   // These ask WHEN, not how much — extremum searches over the runtime
-  // evaluators: the hybrid obliquity and (plan 07 R5/R9) the one-source
-  // inclination — the two published quantities, not the K device's cosines
-  // (the device's inclination maximum near −23204 was its H/3 phase; the
-  // one-source route puts the last maximum where the engine's Earth-orbit
-  // normal does).
+  // evaluators: the hybrid obliquity and the one-source inclination — the two
+  // published quantities (the one-source route puts the last inclination
+  // maximum where the engine's Earth-orbit normal does).
   ...(() => {
     let obliqScan;
     const nextObliqMin = () => {
@@ -1030,25 +925,20 @@ export const VALUES = {
     return {
       obliquityNextMin: { get: () => nextObliqMin().mn, render: (v) => Number(v).toFixed(2), unit: '°' },
       obliquityNextMinYear: { get: () => nextObliqMin().mnYr, render: (v) => thousands(v) },
-      // (plan 07 sweep: `inclinationLastMaxYear` — the year of the one-source
-      // inclination's last maximum, a 122-kyr scan — is deleted; nothing
-      // quoted it.)
     };
   })(),
-  // ── Precession family (11-2m) — the formerly deferred scan keys ─────────
-  // Plan 06 Phase 3 S2: the scans ride the ONE published family (the
-  // one-family route B — the beats of its own years, SI seconds), no longer
-  // the comb family's direct Fourier days (the frozen era clock's device,
-  // now confined to the kinematic-day keys). The history below is kept as
-  // the record. Porting these surfaced the fourth WEBSITE defect: its forecast
-  // scan used the cardinal-mean solar year + snapshot-phase sidereal Fourier
-  // and read 25,314 @ 12,411 where the simulator computes 25,312 @ 12,440
-  // (site routes corrected in dayYear.ts/precession.ts, snapshot
-  // regenerated). The full-cycle envelope and J2000 rates were robust to the
-  // route difference; only the ±35 kyr forecast extrema moved.
+  // ── Precession family (11-2m) — the scan keys ───────────────────────────
+  // The scans ride the ONE published family (the one-family route — the beats
+  // of its own years, SI seconds). Porting these surfaced the fourth WEBSITE
+  // defect: its forecast scan used the cardinal-mean solar year +
+  // snapshot-phase sidereal Fourier and read 25,314 @ 12,411 where the
+  // simulator computes 25,312 @ 12,440 (site routes corrected in
+  // dayYear.ts/precession.ts, snapshot regenerated). The full-cycle envelope
+  // and J2000 rates were robust to the route difference; only the ±35 kyr
+  // forecast extrema moved.
   ...(() => {
-    // Plan 06 Phase 3 S2: the published family is the one-family route (B) —
-    // the beats of ITS years (the scans stay inside ±2 Myr, the published window).
+    // The published family is the one-family route — the beats of ITS years
+    // (the scans stay inside ±2 Myr, the published window).
     const precAt = (y) => {
       const Y = oneYL();
       return { a: Y.axialPrecessionYearsAtYear(y), p: Y.perihelionPrecessionYearsAtYear(y), i: Y.inclinationPrecessionYearsAtYear(y) };
@@ -1070,8 +960,7 @@ export const VALUES = {
       if (!cycle) {
         let aMn = Infinity, aMx = -Infinity, pMn = Infinity, pMx = -Infinity, iMn = Infinity, iMx = -Infinity;
         // one apsidal circulation of Earth's orbit from J2000 — the span of the
-        // of-date factors' dominant modulation (plan 09 step 7c; was the
-        // retired unit's 335,317 yr)
+        // of-date factors' dominant modulation
         const span = Math.round(oneYL().inclinationPrecessionYearsAtYear(2000));
         for (let y = 2000; y <= 2000 + span; y++) {
           const r = precAt(y);
@@ -1096,9 +985,7 @@ export const VALUES = {
       axialPrecCycleMax:  { get: () => cycleScan().aMx, render: wholeYears, unit: 'yr' },
       periPrecCycleMin:   { get: () => cycleScan().pMn, render: wholeYears, unit: 'yr' },
       periPrecCycleMax:   { get: () => cycleScan().pMx, render: wholeYears, unit: 'yr' },
-      // (plan 07 sweep: `inclPrecCycleMin/Max` and `inclPrecJ2000` — the device
-      // inclination-precession period scan — are deleted; nothing quoted them.)
-      axialPrecJ2000:     { get: () => precAt(2000).a, render: wholeYears, unit: 'yr', note: 'instantaneous J2000 axial precession period — the one-family route (B), the published family (plan 06 Phase 3 S2)' },
+      axialPrecJ2000:     { get: () => precAt(2000).a, render: wholeYears, unit: 'yr', note: 'instantaneous J2000 axial precession period — the one-family route, the published family' },
       periPrecJ2000:      { get: () => precAt(2000).p, render: wholeYears, unit: 'yr' },
     };
   })(),
@@ -1199,35 +1086,27 @@ export const VALUES = {
   })(),
 
   // ── Earth invariable-plane inclination family (11-2o) ───────────────────
-  // Plan 07 R5/R9: these are the K DEVICE's inclination constants — the
-  // mean DERIVED as J2000 inclination minus amplitude·cos(perihelionLong −
-  // cycleAnchor), the amplitude from model-parameters, the H/3 divisor — the
-  // RECORD of the retired H/3 inclination law (docs 20 and 22 cite them as
-  // such). The published i_inv of date is the one-source engine reading
-  // (inclinationLastMaxYear above; the API's earth.inclinationDeg). The
-  // amplitude itself survives as a device input of the scene's J2000 pose.
-  // J2000 / node / anchor from astro-reference earthOrbital (the node is the
-  // Souami & Souchay value).
+  // The mean, minimum and maximum of Earth's inclination to the invariable
+  // plane over the banked ±10-Myr series — the engine's own normal (the API's
+  // earth.inclinationDeg); J2000 / node / anchor from astro-reference
+  // earthOrbital (the node is the Souami & Souchay value).
   earthInclMean: {
     get: () => chainInclStats('earth').mean,
     render: (v) => Number(v).toFixed(5),
     unit: '°',
-    note: 'the mean of Earth\'s inclination to the invariable plane over the banked ±10-Myr series — the engine\'s one-source normal (plan 11 step 2; until then the retired H/3 device\'s mean, inclJ2000 − A·cos(the K phase))',
+    note: 'the mean of Earth\'s inclination to the invariable plane over the banked ±10-Myr series — the engine\'s one-source normal ',
   },
-  // (plan 11 step 4: `earthInclAmplitude` / `earthInclAmp` — the K-device
-  // scaffold's earthInvPlaneInclinationAmplitude — left with the scaffold; the
-  // engine's inclination statistics are earthInclMean/Min/Max.)
   earthInclMin: {
     get: () => chainInclStats('earth').min,
     render: (v) => Number(v).toFixed(3),
     unit: '°',
-    note: 'the minimum of Earth\'s inclination to the invariable plane over the banked ±10-Myr series (plan 11 step 2; was the retired device\'s mean − amplitude)',
+    note: 'the minimum of Earth\'s inclination to the invariable plane over the banked ±10-Myr series',
   },
   earthInclMax: {
     get: () => chainInclStats('earth').max,
     render: (v) => Number(v).toFixed(3),
     unit: '°',
-    note: 'the maximum of Earth\'s inclination to the invariable plane over the banked ±10-Myr series (plan 11 step 2; was the retired device\'s mean + amplitude)',
+    note: 'the maximum of Earth\'s inclination to the invariable plane over the banked ±10-Myr series',
   },
   earthInclJ2000: {
     get: () => astro.earthOrbital.earthInclinationJ2000_deg,
@@ -1240,46 +1119,37 @@ export const VALUES = {
     unit: '°',
     note: 'Souami & Souchay invariable-plane ascending node',
   },
-  // (plan 07 sweep: `earthInclCycleAnchor` (a duplicate of
-  // `inclinationCycleAnchorEarth`) and `earthInclD` (the retired H/3 divisor)
-  // are deleted; nothing quoted them.)
 
   // ── Year/day-length family (11-2p) — the unit-trap tier ─────────────────
   // Every quantity pinned to its exact browser twin. MEAN family: the
-  // H/13-identity constants (kinematic day basis — meanLengthOfDay, NOT the
-  // SI day and NOT Layer-4 LOD_real). J2000 family: the direct Step 6d
-  // Fourier evaluations, seconds = days × lodKinematic (the tweakpane's
-  // convention, preserving the sidereal round-trip identity).
-  // stellarDayJ2000 uses OF-DATE obliquity at 2000 (script.js:56318) —
-  // porting it surfaced the fifth website defect: its J2000 constant used
-  // the MEAN-ε RA projection, one final digit below the simulator's readout
-  // (86,164.098895 vs .098896; fixed website-side, snapshot regenerated).
+  // kinematic day basis — meanLengthOfDay, NOT Layer-4 LOD_real. J2000 family:
+  // SI seconds, SI days (the one-family route at 2000).
+  // stellarDayJ2000 uses OF-DATE obliquity at 2000 — porting it surfaced the
+  // fifth website defect: its J2000 constant used the MEAN-ε RA projection,
+  // one final digit below the simulator's readout (86,164.098895 vs .098896;
+  // fixed website-side, snapshot regenerated).
   ...(() => {
     const meanSiderealDaySeconds = () =>
       (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
-    // S5: the stellar-day offset counts one equinox turn per T_p (the certified
-    // J2000 precession, 25,771.4 yr), never the counter H/13 (7 µs slow).
+    // the stellar-day offset counts one equinox turn per T_p (the certified
+    // J2000 precession period).
     const meanStellarDaySeconds = () => {
       const raProjMean = C.STELLAR_DAY_RA_PROJECTION;   // cos ε₀ on the IAU J2000 input (plan 09; the comb's fitted mean before)
       const d = meanSiderealDaySeconds();
       return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * raProjMean + d;
     };
-    // (siderealDayJ2000 / stellarDayJ2000 — the two days on the KINEMATIC day
-    // of J2000 — were deleted 2026-10-09: a "J2000 day" needs its day basis
-    // named, and the published bases are the SI day (the IAU inputs) and
-    // LOD_real (the *Physical keys below); model-values MAJOR 17.)
     return {
       meanSolarYearDays:     { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 7), unit: 'd' },
       meanSolarYearDaysFull: { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 12), unit: 'd', note: 'full-precision form for derivation contexts' },
-      // Plan 06 Phase 3 S2: the J2000 year lengths of date are the one-family route (B) — SI seconds, SI days.
+      // The J2000 year lengths of date are the one-family route — SI seconds, SI days.
       solarYearJ2000Days:    { get: () => oneYL().tropicalYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd', note: 'the one-family tropical year of date at J2000, SI days (tweakpane predictions.solarYearDays)' },
       solarYearJ2000Seconds: { get: () => oneYL().tropicalYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's', note: 'tweakpane predictions.solarYearSeconds — the one-family tropical year of date at J2000' },
-      meanSiderealYearDays:  { get: () => C.meanSiderealYearDays, render: (v) => thousands(v, 7), unit: 'd', note: 'the IAU sidereal year in days (plan 09: the H/13 kinematic construction, 1 µd above it, is deleted)' },
+      meanSiderealYearDays:  { get: () => C.meanSiderealYearDays, render: (v) => thousands(v, 7), unit: 'd', note: 'the IAU sidereal year in days' },
       meanSiderealYearDaysFull: { get: () => C.meanSiderealYearDays, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of meanSiderealYearDays' },
       siderealYearSeconds:   { get: () => C.meanSiderealYearSeconds, render: (v) => thousands(v, 2), unit: 's', note: 'IAU sidereal year in SI seconds (31,558,149.7635)' },
       siderealYearJ2000Days: { get: () => oneYL().siderealYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 8), unit: 'd', note: 'the one-family sidereal year of date at J2000 (the λ̇ channel), SI days' },
       anomalisticYearDays:   { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => thousands(v, 7), unit: 'd' },
-      anomalisticYearDaysFull: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of the J2000 anomalistic year — the one-family law of date at 2000 (plan 09 step 4d; was the Simon 1994 mean-element input 365.259636, 87 ms longer)' },
+      anomalisticYearDaysFull: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) / 86400, render: (v) => v.toFixed(9), unit: 'd', note: '9-dp render of the J2000 anomalistic year — the one-family law of date at 2000' },
       anomalisticYearSeconds: { get: () => oneYL().anomalisticYearSecondsAtYear(2000), render: (v) => thousands(v, 2), unit: 's', note: 'the J2000 anomalistic year, SI seconds — the law of date at 2000' },
       anomalisticYearSimon1994Days: { get: () => astro.knownValues.simon1994AnomalisticYearDays, render: (v) => String(v), unit: 'days', note: 'Simon et al. 1994 MEAN element — a citation (apsidal rate 11.6124 ″/yr); the model derives its own' },
       anomalisticYearSimon1994DeltaSeconds: { get: () => oneYL().anomalisticYearSecondsAtYear(2000) - astro.knownValues.simon1994AnomalisticYearDays * 86400, render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(3), unit: 's', note: 'model (the series\' secular apsidal tangent) − Simon (mean element): the secular-vs-mean-element convention, 0.0031 ″/yr of apsidal rate' },
@@ -1296,7 +1166,7 @@ export const VALUES = {
         render: (v) => thousands(v, 2),
         unit: 's',
       },
-      meanSolarDaySeconds:    { get: () => C.meanLengthOfDay, render: (v) => thousands(v, 6), unit: 's', note: 'LOD_mean, the H/13-identity kinematic day' },
+      meanSolarDaySeconds:    { get: () => C.meanLengthOfDay, render: (v) => thousands(v, 6), unit: 's', note: 'LOD_mean, the kinematic day' },
       meanSiderealDaySeconds: { get: meanSiderealDaySeconds, render: (v) => thousands(v, 7), unit: 's' },
       meanStellarDaySeconds:  { get: meanStellarDaySeconds, render: (v) => thousands(v, 7), unit: 's' },
       stellarSiderealDayDiffMs: {
@@ -1309,7 +1179,7 @@ export const VALUES = {
         get: () => (meanSiderealDaySeconds() / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * 1000,
         render: (v) => thousands(v, 2),
         unit: 'ms',
-        note: 'UNPROJECTED ecliptic-frame count — one extra sidereal day per precession period T_p (S5: the certified J2000 reading, not the counter H/13) — deliberately not the 8.37 ms projected offset',
+        note: 'UNPROJECTED ecliptic-frame count — one extra sidereal day per precession period T_p (the certified J2000 reading) — deliberately not the 8.37 ms projected offset',
       },
       // The two days on the model's PHYSICAL day of J2000 — LOD_real, the
       // tweakpane Solar Day row's day — which the simulator's Days & Years rows
@@ -1317,7 +1187,7 @@ export const VALUES = {
       // published bases are two (owner, 2026-10-09): the SI day of exactly
       // 86,400 s (the IAU inputs siderealDayInputSeconds / stellarDayInputSeconds)
       // and LOD_real (these); the stellar day's RA projection reads the
-      // published hybrid ε of date (Layer A, plan 06), not the K comb.
+      // published hybrid ε of date.
       siderealDayJ2000Physical: {
         get: () => {
           const sol = dtl().tropicalYearDaysOfDate(2000);   // plan 09: the one-family tropical year over the kinematic day of date
@@ -1395,29 +1265,29 @@ export const VALUES = {
                     - dtl().computeLodRealSecondsAtEpoch(2000)) * 1000,
         render: (v) => thousands(v, 2),
         unit: 'ms',
-        note: 'raw H/5 kinematic minus Layer 4 — |stackNetLodJ2000Ms|, kept in lockstep by derivation',
+        note: 'the kinematic day + the ecliptic term minus Layer 4 — |stackNetLodJ2000Ms|, kept in lockstep by derivation',
       },
     };
   })(),
 
-  // ── Eclipse audit + LOD-climate + 8H cycle periods (11-2r) ──────────────
+  // ── Eclipse audit + LOD-climate (11-2r) ─────────────────────────────────
   // The eclipse and correlation numbers are MEASURED CAMPAIGN RESULTS with
-  // no engine derivation; their tracked homes are the two new data/ summary
+  // no engine derivation; their tracked homes are the two data/ summary
   // JSONs (provenance in each _description — the website typed all of them
-  // as literals). The framework-vs-NASA gap keys and percentages are DERIVED
+  // as literals). The model-vs-NASA gap keys and percentages are DERIVED
   // from the artifact so a re-run flows through.
   ...(() => {
     const ecl = rd('data/eclipse-audit-summary.json');
     const clim = rd('data/lod-climate-correlation-summary.json');
     const L = ecl.lunar, S = ecl.solar;
-    // The eclipse Sun's mean-element offset (plan 06 layer B): the window
-    // mean of (osculating − secular) EMB ϖ and e from the Horizons J2000 seed
-    // integrated as a nine-body system — the generator is
-    // tools/verify/earth-osculating-offset.js (derived; no JPL fit).
+    // The eclipse Sun's mean-element offset: the window mean of (osculating −
+    // secular) EMB ϖ and e from the Horizons J2000 seed integrated as a
+    // nine-body system — the generator is tools/verify/earth-osculating-offset.js
+    // (derived; no JPL fit).
     const osc = rd('data/earth-osculating-mean-offset.json');
     return {
-      // Plan 06 I1 — the model's apparent Sun and its cardinal instants against
-      // JPL Horizons over ±3000 yr (TT cache; tools/verify/sun-vs-horizons.js).
+      // The model's apparent Sun and its cardinal instants against JPL Horizons
+      // over ±3000 yr (TT cache; tools/verify/sun-vs-horizons.js).
       ...(() => {
         const svh = rd('data/sun-vs-horizons-summary.json');
         const mil = (from) => svh.sun.perMillennium.find((m) => m.from === from);
@@ -1442,10 +1312,10 @@ export const VALUES = {
         }
         return out;
       })(),
-      // Plan 06 §9 item 10 — THE PRECESSION OF DATE against its two theory
-      // referees (tools/verify/equinox-vs-vondrak.js): the equinox vs Vondrák
-      // et al. 2011 over ±3000 yr, the obliquity vs La2004 over the last Myr,
-      // each beside the secular law alone; and the two factors themselves.
+      // THE PRECESSION OF DATE against its two theory referees
+      // (tools/verify/equinox-vs-vondrak.js): the equinox vs Vondrák et al. 2011
+      // over ±3000 yr, the obliquity vs La2004 over the last Myr, each beside
+      // the secular law alone; and the two factors themselves.
       ...(() => {
         const evv = rd('data/equinox-vs-vondrak.json');
         const row = (y) => evv.equinox.rows.find((r) => r.year === y);
@@ -1503,8 +1373,7 @@ export const VALUES = {
       signConventionTotalWindow:     { get: () => clim.signConventionTotal, render: (v) => String(v) },
       validatedWindowStartBC:        { get: () => -clim.validatedWindowStartYear, render: (v) => thousands(v), note: 'rendered as the BC year number' },
       validatedWindowEndAD:          { get: () => clim.validatedWindowEndYear, render: (v) => thousands(v) },
-      // The ΔT stack's fitted periods, STATED IN YEARS from the fit file (plan 06
-      // T5: the former 8H/n labels carry no information; layer B item 3).
+      // The ΔT stack's fitted periods, STATED IN YEARS from the fit file.
       bondYr:      { get: () => Math.round(dtFit.shipped_coefficients.bond.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted Bond period — Bond 2001 ~1470 yr N-Atlantic IRD' },
       hallstattYr: { get: () => Math.round(dtFit.shipped_coefficients.hallstatt.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted Hallstatt period — the solar-activity Hallstatt cycle' },
       joseFiveYr:  { get: () => Math.round(dtFit.shipped_coefficients.jose5.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted period — 5 × Charvátová Jose 179' },
@@ -1529,7 +1398,7 @@ export const VALUES = {
     const scanReach = () => alignment() + a26.regional + a26.dtRegional;
     return {
       alphaJ2000:         { get: () => astro.physicalConstants.earthMoiFactorJ2000, render: (v) => String(v), note: 'IERS Conventions 2010 Earth moment-of-inertia factor' },
-      alphaClimateScale:  { get: () => dtl().ALPHA_CLIMATE_SCALE, render: (v) => fmtSci(v, 2), unit: 'per ‰', note: 'the GIA channel coupling k — DERIVED at runtime so dα/dt(J2000) matches Cox & Chao on the lagged L1 (plan 06 D7); live from the engine' },
+      alphaClimateScale:  { get: () => dtl().ALPHA_CLIMATE_SCALE, render: (v) => fmtSci(v, 2), unit: 'per ‰', note: 'the GIA channel coupling k — DERIVED at runtime so dα/dt(J2000) matches Cox & Chao on the lagged L1; live from the engine' },
       alphaGiaRelaxationKyr: { get: () => phys.DEFAULT_CONSTANTS.deepTime.alphaGiaRelaxationKyr, render: (v) => String(v), unit: 'kyr', note: 'the mantle relaxation time τ of the GIA channel — MEASURED against the historical ΔT record through the joint fitter (optimum 5–6 kyr; the degree-2 Maxwell estimate 4–6 kyr)' },
       alphaGiaRateJ2000:  { get: () => phys.DEFAULT_CONSTANTS.deepTime.alphaGiaRateJ2000PerYr, render: (v) => fmtSci(v, 2), unit: '/yr', note: 'the dα/dt(J2000) the channel is anchored on — Cox & Chao dJ₂/dt ÷ the Peltier factor, DERIVED into the assembled deepTime block (plan 11 step 1)' },
       dAlphaDtJ2000:      { get: () => astro.giaCoxChaoPeltier.dJ2DtPerYr / astro.giaCoxChaoPeltier.j2ToAlphaFactor, render: (v) => fmtSci(v, 2), unit: '/yr', note: 'DERIVED: dJ₂/dt ÷ Peltier factor, so the identity auto-holds' },
@@ -1631,14 +1500,7 @@ export const VALUES = {
         unit: 's',
       },
       oneAU: { get: () => C.currentAUDistance, render: (v) => thousands(v, 6), unit: 'km', note: 'the model-derived AU' },
-      // (plan 07 sweep: `balancedYear`, `balancedYearBC`, `balancedYearOffset`,
-      // `anchorYearOffset`, `eccPrevMin`, `nextBalancedYear` and
-      // `systemResetYearBC/Plain` — the phase origin and its multiples quoted
-      // as dates or year counts — are deleted; every surface quotes t₀ as a
-      // fitted phase (§3c/§3d). The code variable C.balancedYear stays, as the
-      // combs' phase origin; `periAlignYear*` and `tempGraphMostLikely` are
-      // its disclosed inputs.)
-      periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v), note: 'the device\'s phase anchor — Meeus\'s mean-element root of ϖ_of-date = 90° (1246.1); the model\'s own series crosses later: periAlignYearSeries' },
+      periAlignYear:    { get: () => C.perihelionalignmentYear, render: (v) => String(v), note: 'the perihelion-alignment epoch — Meeus\'s mean-element root of ϖ_of-date = 90° (1246.1); the model\'s own series crosses later: periAlignYearSeries' },
       // the model's OWN perihelion–solstice alignment: the year the published
       // (series) longitude of perihelion of date crosses 90° — 2.3 yr after the
       // mean-element anchor (the series' secular element sits 70″ below the IAU
@@ -1646,8 +1508,6 @@ export const VALUES = {
       periAlignYearSeries: { get: () => { const pom = (y) => ((physModel().earth.perihelionLongitudeDeg(y) % 360) + 360) % 360; let lo = 1100, hi = 1400; for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (pom(mid) > 90) hi = mid; else lo = mid; } return (lo + hi) / 2; }, render: (v) => Number(v).toFixed(1), unit: 'AD', note: 'the year the model\'s own (series) longitude of perihelion of date = 90° — the perihelion at the December solstice by the model\'s dynamics; the device anchors at periAlignYear (Meeus)' },
       periAlignYearRound: { get: () => C.perihelionalignmentYear, render: (v) => Number(v).toFixed(2) },
       periAlignJD:      { get: () => C.perihelionalignmentJD, render: (v) => thousands(v), unit: 'JD' },
-      // (eccNextMax / eccNextMin / eccPrevMinBC / eccPrevMinJD — the single-line
-      // eccentricity law's extreme epochs — are retired: the published e is the N-body series)
       preprintDoi: { get: () => versionInfo.preprintDoi, render: (v) => String(v), note: 'canonical preprint DOI — single source: model-version.json' },
       moonDiameter:       { get: () => astro.bodyDiametersKm.moon, render: (v) => thousands(v, 1), unit: 'km' },
       moonOrbitalRadius:  { get: () => C.moonDistance, render: (v) => thousands(v, 2), unit: 'km' },
@@ -1661,22 +1521,14 @@ export const VALUES = {
     };
   })(),
 
-  // ── Sun-wobble radii + Moon precession lattice (11-2u) ──────────────────
-  // Radii: eccentricity base/amplitude × the model AU. Moon precession:
-  // the H-lattice counts N = round(8·H·mSY / precessionDaysInput)/8, with
-  // periods — all from engine constants; the ICRF/Earth day-values are the
-  // engine's month-chain outputs. (plan 09 step 7c: the device's "cycles per
-  // H" counts, the periods H/N read back from them and the "Lunar Precession
-  // Invariant" H²/N left with the unit; the of-date periods are the inputs,
-  // apsidalPrecICRF / nodalPrecICRF.)
+  // ── The Moon's precession periods (11-2u) ───────────────────────────────
+  // The of-date periods are the inputs (apsidalPrecICRF / nodalPrecICRF); the
+  // ICRF/Earth day-values are the engine's month-chain outputs.
   ...(() => {
     return {
-      // (plan 07 sweep: `wobbleCenterKm` and `perihelionPointKm` — the
-      // wobble-centre marker distances on the retired Law-4 amplitude and the
-      // eccentricity base — are deleted with the wobble centres (R6).)
       fullMoonCycleEarth:      { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 2), unit: 'd', note: 'observed supermoon cycle' },
       fullMoonCycleEarthExact: { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 10), unit: 'd' },
-      draconicYearICRF:  { get: () => C.moonDraconicYearICRF, render: (v) => thousands(v, 10), unit: 'd', note: 'H/13-frame lattice partner' },
+      draconicYearICRF:  { get: () => C.moonDraconicYearICRF, render: (v) => thousands(v, 10), unit: 'd', note: 'the lunar chain\'s fixed-frame (inertial) draconic year' },
       draconicYearEarth: { get: () => C.moonDraconicYearEarth, render: (v) => thousands(v, 10), unit: 'd', note: 'observed eclipse year' },
       apsidalPrecICRF:      { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 2), unit: 'yr' },
       apsidalPrecICRFexact: { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
@@ -1787,18 +1639,13 @@ export const VALUES = {
     };
   })(),
 
-  // ── Parallax chain + wobble-circle geometry (11-2x) ─────────────────────
+  // ── Parallax chain (11-2x) ──────────────────────────────────────────────
   // The parallax-chain members from astro physicalConstants (solarParallax is
   // the IAU 1976 defining constant; arcsecDisplacement is the historical
   // primitive the website builds its AU from — displacement × 648000/π =
-  // currentAUDistance to 0.2 mm, see the chain note). The apo family is the
-  // wobble circle: radius = eccentricity amplitude × model AU, swept once
-  // per H/13 axial cycle.
+  // currentAUDistance to 0.2 mm, see the chain note).
   ...(() => {
     const APR = () => (180 * 3600) / Math.PI;
-    // (plan 07 sweep: the apo family — the wobble-circle radius, diameter,
-    // circumference and speeds on the Law-4 amplitude — is deleted with the
-    // wobble centres; nothing quoted it.)
     return {
       arcsecPerRadian:    { get: APR, render: (v) => thousands(v, 9), note: 'structural: 180·3600/π' },
       arcsecDisplacement: { get: () => astro.physicalConstants.arcsecDisplacementKm, render: (v) => thousands(v, 12), unit: 'km', note: '1-arcsec displacement at 1 AU — the historical parallax-chain primitive' },
@@ -1807,33 +1654,14 @@ export const VALUES = {
     };
   })(),
 
-  // ── IPO circle + Fibonacci-law constants + mainstream comparisons (11-2y) ─
-  // IPO mirrors the apo family with the eccentricity BASE and the H/3
-  // inclination cycle (not H/13). ψ and K come LIVE from the engine's
-  // Fibonacci-law derivations (C.PSI, C.eccentricityAmplitudeK — Law 4's
-  // K = 3.4143e-6 is a CLAUDE.md reference value). The mainstream* family
-  // is conventional-theory literature for the comparison tables, tracked in
-  // knownValues; the invariable plane's own ecliptic node joins the Souami
-  // block.
+  // ── The invariable plane's node + mainstream comparisons (11-2y) ────────
+  // The mainstream* family is conventional-theory literature for the
+  // comparison tables, tracked in knownValues; the invariable plane's own
+  // ecliptic node joins the Souami block.
   ...(() => {
-    // (plan 07 sweep: the ipo family — the perihelion-point circle on the
-    // retired eccentricity base and the H/3 inclination cycle — is deleted;
-    // nothing quoted it. `psiFormula` / `psiDecimal` go with it; `psiValue`
-    // stays as the frozen record.)
+    // (The registry publishes live quantities only; the recorded constants of the
+    // retired integer laws, ψ and K, are doc 109's record.)
     return {
-      // Plan 07 R5: ψ was inverted from Earth's calibration at load
-      // (3·A_earth·√(m_E/m_☉)); the inclination law is retired, so there is
-      // nothing live to read. FROZEN here as the retired construction's
-      // recorded constant, exactly as kValue below — doc 20 cites it
-      // as the historical Law-2/3 ψ.
-      psiValue:   { get: () => 0.0033070432499942154, render: (v) => `${(v * 1e3).toFixed(4)} × 10⁻³`, note: 'ψ — RETIRED (plan 07 R5); the recorded value of the retired construction, no longer derived' },
-      // Plan 07 R6: K was inverted from Earth's calibration at load; the law
-      // is retired, so there is nothing live to read. The value is FROZEN
-      // here as the retired construction's recorded constant — doc 20
-      // cites it as the historical Law-4 K, and the registry's job for a
-      // retired device is to record what it was, not to pretend it still
-      // derives.
-      kValue:     { get: () => 3.4143e-6, render: (v) => `${(v * 1e6).toFixed(4)} × 10⁻⁶`, note: 'Law 4 K — RETIRED (plan 07 R6); the recorded value of the retired construction, no longer derived' },
       invPlaneAscNode: { get: () => astro.ascendingNodesSouamiSouchay.invariablePlaneOnEclipticDeg, render: (v) => String(v), unit: '°', note: 'the invariable plane\'s node on the ecliptic (Souami & Souchay 2012)' },
       mainstreamAxialPrec:  { get: () => astro.knownValues.mainstreamAxialPrecKyr, render: (v) => `~${v}k`, unit: 'yr' },
       mainstreamPeriPrec:   { get: () => astro.knownValues.mainstreamPeriPrecKyr, render: (v) => `~${v}k`, unit: 'yr' },
@@ -1852,36 +1680,24 @@ export const VALUES = {
     };
   })(),
 
-  // ── Planet perihelion lattice + J2000 eccentricities (11-2z) ────────────
-  // Everything derives from the STORED per-planet lattice fraction
-  // (model-parameters `perihelionEclipticFraction: [num, den]`, signed for
-  // ecliptic-retrograde — the same data the engine derives
-  // perihelionEclipticYears from): period = H·num/den, rate = 360/period
-  // (signed), and the formula label by one rule (|num|=1 → H/den; den=1 →
-  // numH; else numH/den, '−' prefix when retrograde). Eccentricities from
-  // the per-planet JPL DE440 J2000 elements (Earth from astro earthOrbital).
+  // ── Planet perihelion periods + J2000 eccentricities (11-2z) ────────────
+  // Periods and rates from the chain (below); eccentricities from the
+  // per-planet JPL DE440 J2000 elements (Earth from astro earthOrbital).
   ...(() => {
     const out = {};
-    // Plan 07 (planet channel migration): the perihelion period and rate of
-    // each planet are THE CHAIN'S — `<p>PeriPeriod` the perihelion period
-    // AGAINST THE EQUINOX OF DATE, 1,296,000/(g + p_A) yr (the same quantity
-    // Earth's row has always published — the of-date beat), `<p>PeriPeriodICRF`
-    // / `<p>IcrfPeriod` the inertial period 1,296,000/|g| yr, `<p>PeriRate`
-    // the of-date rate in °/yr; g the leading secular apsidal eigenfrequency
-    // (type A — bounded for every planet, the quantity the deep-time chain and
-    // the climate lines ride), p_A the J2000 general precession. The former
-    // H·num/den descriptors (the retired device; Mercury 243,867 yr = 531.4
-    // ″/cy, Pluto = H exactly) and their 8H/N labels are gone; the era window
-    // rate (1800–2100, 1PN) stays in <p>PeriRateNowArcsecCy, Newtonian in
-    // <p>ModelBaseline. The notes below say which of the two a page should
-    // quote; Neptune's window rate is ill-conditioned (e = 0.011) and its
-    // secular mode is the only bounded statement.
+    // The perihelion period and rate of each planet are THE CHAIN'S —
+    // `<p>PeriPeriod` the perihelion period AGAINST THE EQUINOX OF DATE,
+    // 1,296,000/(g + p_A) yr (the same quantity Earth's row has always
+    // published — the of-date beat), `<p>PeriPeriodICRF` / `<p>IcrfPeriod` the
+    // inertial period 1,296,000/|g| yr, `<p>PeriRate` the of-date rate in °/yr;
+    // g the leading secular apsidal eigenfrequency (type A — bounded for every
+    // planet, the quantity the deep-time chain and the climate lines ride),
+    // p_A the J2000 general precession. The era window rate (1800–2100, 1PN)
+    // is <p>PeriRateNowArcsecCy, Newtonian in <p>ModelBaseline. The notes below
+    // say which of the two a page should quote; Neptune's window rate is
+    // ill-conditioned (e = 0.011) and its secular mode is the only bounded
+    // statement.
     const PERI_NOTE = (p) => `of-date perihelion period/rate: the chain's secular g (${chainArt().g[p].nearestLaskar.mode}, ${chainG(p).toFixed(4)} ″/yr) + the J2000 general precession; inertial twin <${p}PeriPeriodICRF>, era window <${p}PeriRateNowArcsecCy>`;
-    // (The doc-109 §9 typing of the retired 8H/N descriptors — "type A long-term
-    // mean · B present-epoch rate · C window-epoch value" — and the H/den label
-    // builder stood here, kept alive by a `void` so lint would pass. Dead code is
-    // not a record: git history carries what the device published, and the
-    // live notes below say what each key is now.)
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const ofDateArcsecPerYr = () => chainG(planet) + pAJ2000ArcsecPerYr();
       out[`${planet}PeriPeriod`] = {
@@ -1890,7 +1706,7 @@ export const VALUES = {
         unit: 'yr',
         note: PERI_NOTE(planet),
       };
-      out[`${planet}PeriFormula`] = { get: () => `${chainArt().g[planet].nearestLaskar.mode} + p_A`, render: (v) => String(v), note: `the leading secular apsidal mode of the chain plus the J2000 general precession (was the 8H/N lattice label)` };
+      out[`${planet}PeriFormula`] = { get: () => `${chainArt().g[planet].nearestLaskar.mode} + p_A`, render: (v) => String(v), note: `the leading secular apsidal mode of the chain plus the J2000 general precession` };
       out[`${planet}PeriRate`] = {
         get: () => ofDateArcsecPerYr() / 3600,
         render: (v) => thousands(v, 6),
@@ -1898,9 +1714,9 @@ export const VALUES = {
         note: PERI_NOTE(planet),
       };
     }
-    // Earth's perihelion-of-date period is the one-family route's beat (S6: was the device's H/16).
-    out.earthPeriRate = { get: () => 360 / oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(v, 6), unit: '°/yr', note: 'perihelion-of-date rate at J2000 — the of-date year laws’ beat (S6; was 360/(H/16))' };
-    out.earthPeriPeriod = { get: () => oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'perihelion-of-date period at J2000 (S6; was H/16 = 20,957)' };
+    // Earth's perihelion-of-date period is the one-family route's beat.
+    out.earthPeriRate = { get: () => 360 / oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(v, 6), unit: '°/yr', note: 'perihelion-of-date rate at J2000 — the of-date year laws’ beat' };
+    out.earthPeriPeriod = { get: () => oneYL().perihelionPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'perihelion-of-date period at J2000 — the one-family route’s beat' };
     const eccSources = {
       mercury: () => C.planets.mercury.orbitalEccentricityJ2000,
       venus:   () => C.planets.venus.orbitalEccentricityJ2000,
@@ -1922,13 +1738,11 @@ export const VALUES = {
   // rate at age t is the two engines composed — engine K's spin ω(t) and
   // recession history a_m(t) carrying the lunar torque, engine D's side the
   // solar torque: ψ̇(t) = [ω(t)/ω₀]·(p_S + p_L·(a_m0/a_m(t))³) at μ = 1.
-  // Plan 06 D6/Phase 3: the composed rate IS the model's ψ̇(t), and the unit
-  // H(t) is 13 of its periods — ONE home @essrt/physics/earth/precession-
-  // composed inside the deep-time factory, read here through the Node
-  // engine (tools/lib/deep-time.js), the same evaluator the hybrid precesses
-  // on and the paleo-anchors gate's precArcsecPerYr rows check. The former
-  // "structural H(t)/13" reading is the frozen era clock's counter, retired
-  // as a precession claim, not published here. Instrument twin:
+  // The composed rate IS the model's ψ̇(t) — ONE home
+  // @essrt/physics/earth/precession-composed inside the deep-time factory,
+  // read here through the Node engine (tools/lib/deep-time.js), the same
+  // evaluator the hybrid precesses on and the paleo-anchors gate's
+  // precArcsecPerYr rows check. Instrument twin:
   // tools/explore/w3-precession-crosscoupling.mjs.
   ...(() => {
     const composedAt = (ageMa) => dtl().meanLunisolarPrecessionRateArcsecPerYrAtAge(ageMa);
@@ -1938,13 +1752,13 @@ export const VALUES = {
       // 50.2880 ″/yr (5,028.796195″/cy, P03) turns on a 0.0007 % difference, which 50.3 cannot carry —
       // the website had to hard-code the rate to state it at all.
       // The IAU 2006 (P03, Hilton et al. 2006) general precession p_A as published: per Julian century and
-      // per year — the model's J2000 input since plan 09 (astro-reference earthOrbital.generalPrecessionJ2000_arcsecPerYr),
+      // per year — the model's J2000 input (astro-reference earthOrbital.generalPrecessionJ2000_arcsecPerYr),
       // so a page quoting the standard beside the model quotes ONE number twice; the website's hand-typed
       // 50.2875 / 50.2879 were a transcription slip and a truncation (TODO 2026-10-09).
       generalPrecessionIau2006ArcsecPerCy: { get: () => 100 * astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => thousands(v, 6), unit: '″/cy', note: 'IAU 2006 general precession in longitude p_A at J2000, 5,028.796195″ per Julian century (P03; Hilton et al. 2006) — the model’s input' },
       generalPrecessionIau2006ArcsecPerYr: { get: () => astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'IAU 2006 general precession p_A per year, 50.2880 — the model’s J2000 precession rate IS this input (plan 09), so earthPrecRateJ2000ArcsecPerYr equals it exactly' },
-      earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr(), render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'the model’s J2000 axial-precession rate — 1,296,000/T_p(J2000), the certified year laws’ beat at 2000 (S5; IAU 2006 50.2880)' },
-      earthPrecSolarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the solar torque’s share of the J2000 rate, f_S · ψ̇₀ (S5 — replaces the hand split 16.8/33.4 of doc 99)' },
+      earthPrecRateJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr(), render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'the model’s J2000 axial-precession rate — 1,296,000/T_p(J2000), the certified year laws’ beat at 2000 (IAU 2006 50.2880)' },
+      earthPrecSolarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * dtl().PRECESSION_SOLAR_SHARE_J2000, render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the solar torque’s share of the J2000 rate, f_S · ψ̇₀' },
       earthPrecLunarJ2000ArcsecPerYr: { get: () => dtl().precessionRateJ2000ArcsecPerYr() * (1 - dtl().PRECESSION_SOLAR_SHARE_J2000), render: (v) => Number(v).toFixed(4), unit: '″/yr',note: 'the lunar torque’s share of the J2000 rate, (1 − f_S) · ψ̇₀' },
     };
     for (const age of [650, 1400, 2460]) {
@@ -1959,21 +1773,18 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── The lunisolar clock's ratios (plan 06 Phase 3 S3 → S5) ─────────────
-  // Spoken in periods and ratios — no unit, no integer. T_p is the
-  // PUBLISHED of-date precession period (the one-family route, 25,771.4 at
-  // J2000 — the model's one J2000 reading; S5 retired the H/13 value
-  // 25,793.6 here: it was the fit anchor's reading, not a period). T_aps/T_p
-  // (the apsidal period, from the engine-D chain's secular tangent — the
-  // SAME helper the Prec. cell and the one-family anomalistic use) and
-  // T_peri/T_p with T_peri = 1/(1/T_p + 1/T_aps) the perihelion-of-date
-  // period (frame arithmetic at every epoch). The wander keys are the
-  // owner's by-hand finding, measured: over ±26 kyr the ratio is nowhere
-  // pinned.
+  // ── The lunisolar clock's ratios ────────────────────────────────────────
+  // Spoken in periods and ratios — no unit, no integer. T_p is the PUBLISHED
+  // of-date precession period (the one-family route, ≈ 25,771.6 at J2000 —
+  // the model's one J2000 reading). T_aps/T_p (the apsidal period — the ONE
+  // movement's own apsidal rate of date, the SAME helper the Prec. cell and
+  // the one-family anomalistic use) and T_peri/T_p with
+  // T_peri = 1/(1/T_p + 1/T_aps) the perihelion-of-date period (frame
+  // arithmetic at every epoch). The wander keys are the owner's by-hand
+  // finding, measured: over ±26 kyr the ratio is nowhere pinned.
   ...(() => {
     // T_aps: the ONE movement's own apsidal period of date (anom/(anom − sid)
-    // of the one family — the scene's perihelion; the planet chain's secular
-    // tangent left this family 2026-09, year-lengths.cjs), Julian years.
+    // of the one family — the scene's perihelion; year-lengths.cjs), Julian years.
     const tApsYr = (y) => oneYL().inclinationPrecessionYearsAtYear(y);
     const tPYr = (y) => oneYL().axialPrecessionYearsAtYear(y);   // the published of-date T_p (S5), Julian years
     const apsPerPrec = (y) => tApsYr(y) / tPYr(y);
@@ -1988,12 +1799,12 @@ export const VALUES = {
       return wander;
     };
     return {
-      lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the lunisolar precession period T_p at J2000, JULIAN years — the model’s ONE J2000 precession reading (the of-date year laws’ beat ≡ 360°/the frame’s rate per Julian year ≡ the composed clock’s anchor; IAU 25,771.6). S5: the former 25,793.6 was H/13, the fit anchor’s reading' },
+      lunisolarPeriodJ2000Yr: { get: () => tPYr(2000), render: (v) => thousands(v, 1), unit: 'yr', note: 'the lunisolar precession period T_p at J2000, JULIAN years — the model’s ONE J2000 precession reading (the of-date year laws’ beat ≡ 360°/the frame’s rate per Julian year ≡ the composed clock’s anchor; IAU 25,771.6)' },
       lunisolarApsidalPerPrecessionJ2000: { get: () => apsPerPrec(2000), render: (v) => Number(v).toFixed(3), note: 'T_aps/T_p at J2000 — the perihelion’s period against the stars (the ONE movement’s own apsidal rate of date, the scene’s perihelion) in of-date precession periods; a J2000 reading, not a law' },
       lunisolarPeriOfDatePerPrecessionJ2000: { get: () => periPerPrec(2000), render: (v) => Number(v).toFixed(4), note: 'T_peri/T_p at J2000, T_peri = 1/(1/T_p + 1/T_aps) the perihelion-of-date period (equinox precession + inertial perihelion motion — frame arithmetic at every epoch)' },
       lunisolarApsidalPerPrecessionWanderMin: { get: () => wanderScan().mn, render: (v) => Number(v).toFixed(2), note: 'minimum of T_aps/T_p over ±26 kyr (500-yr scan) — the ratio is not pinned' },
       lunisolarApsidalPerPrecessionWanderMax: { get: () => wanderScan().mx, render: (v) => Number(v).toFixed(2), note: 'maximum of T_aps/T_p over ±26 kyr (500-yr scan)' },
-      lunisolarTorqueConstantJ2000ArcsecPerYr: { get: () => (1296000 / tPYr(2000)) / Math.cos((astro.earthOrbital.obliquityJ2000_deg * Math.PI) / 180), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the hybrid’s precession constant α = p₀ / cos ε₀ (p₀ = 1,296,000/T_p(J2000), the derived rate — S5); literature ≈ 54.9' },
+      lunisolarTorqueConstantJ2000ArcsecPerYr: { get: () => (1296000 / tPYr(2000)) / Math.cos((astro.earthOrbital.obliquityJ2000_deg * Math.PI) / 180), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the hybrid’s precession constant α = p₀ / cos ε₀ (p₀ = 1,296,000/T_p(J2000), the derived rate); literature ≈ 54.9' },
     };
   })(),
 
@@ -2175,15 +1986,15 @@ export const VALUES = {
   // Reads data/obliquity-hybrid-verdict.json — banked by
   // tools/verify/obliquity-hybrid.js --write from the one-home lab: ε(t)
   // from the averaged precession equation, orbit plane from engine D's deep
-  // ζ-modes, ONE engine-K anchor α = (H/13 rate)/cos ε₀, zero fitted
-  // constants. La2004 is a THEORY reference label.
+  // ζ-modes, ONE anchor α = p₀/cos ε₀, zero fitted constants. La2004 is a
+  // THEORY reference label.
   ...(() => {
     const oh = () => rd('data/obliquity-hybrid-verdict.json');
     return {
       epsHybridRateJ2000ArcsecCy: {
         get: () => oh().verdict.rateEraArcsecPerCy,
         render: (v) => Number(v).toFixed(2), unit: '″/cy',
-        note: 'dε/dt at J2000 DERIVED by the hybrid (engine-D ζ-modes + the H/13 anchor, zero fitted constants; the era ζ-tier, where J2000-local quantities live) — the quantity the shipped scene A-solve TARGETS',
+        note: 'dε/dt at J2000 DERIVED by the hybrid (engine-D ζ-modes + the p₀ anchor, zero fitted constants; the era ζ-tier, where J2000-local quantities live) — the quantity the shipped scene A-solve TARGETS',
       },
       epsHybridIauRateArcsecCy: {
         get: () => oh().verdict.iauRateArcsecPerCy,
@@ -2193,12 +2004,12 @@ export const VALUES = {
       epsHybridAlphaArcsecPerYr: {
         get: () => oh().verdict.alphaArcsecPerYr,
         render: (v) => Number(v).toFixed(3), unit: '″/yr',
-        note: 'the precession constant α = (H/13 rate)/cos ε₀ — the hybrid’s single engine-K anchor (literature ~54.9)',
+        note: 'the precession constant α = p₀/cos ε₀ — the hybrid’s single anchor (literature ~54.9)',
       },
       epsHybridBeatKyr: {
         get: () => oh().verdict.beatKyr,
         render: (v) => Number(v).toFixed(1), unit: 'kyr',
-        note: 'the dominant obliquity beat |ψ̇| − |s₃| derived by the hybrid — the H/8 identity, produced natively',
+        note: 'the dominant obliquity beat |ψ̇| − |s₃| derived by the hybrid, produced natively',
       },
       epsHybridEraRms13KyrArcsec: {
         get: () => oh().verdict.windowsEra['13'].hybridRmsArcsec,
@@ -2218,7 +2029,7 @@ export const VALUES = {
       epsHybridDeepCorr1Myr: {
         get: () => oh().verdict.windowsFull['1000'].hybridCorr,
         render: (v) => Number(v).toFixed(3),
-        note: 'hybrid-vs-La2004 correlation over the full megayear (the same hybrid on the 18-mode table reads lower there; the comb-era fitted law’s was negative)',
+        note: 'hybrid-vs-La2004 correlation over the full megayear (the same hybrid on the 18-mode table reads lower there)',
       },
     };
   })(),
@@ -2227,7 +2038,7 @@ export const VALUES = {
   // Reads data/insolation-stability-deep-results.json — the stability/null
   // instrument run on data/insolation-features-deep.csv (hybrid ε + deep
   // z/ζ + the physical of-date climatic precession). Published BESIDE the
-  // H/3-law record (insolStab*Model keys), never over it.
+  // earlier model-e(t) record (insolStab*Model keys), never over it.
   ...(() => {
     const sd = () => rd('data/insolation-stability-deep-results.json');
     return {
@@ -2239,7 +2050,7 @@ export const VALUES = {
       insolStabEccMaxDeep: {
         get: () => sd().ecc_range_model_0_5320kyr[1],
         render: (v) => Number(v).toFixed(5),
-        note: 'the DEEP-source e(t) maximum over the LR04 span — matches the La2004 envelope where the H/3 line reads 0.0233',
+        note: 'the DEEP-source e(t) maximum over the LR04 span — matches the La2004 envelope',
       },
       insolDeepMaxCvDeltaR2: {
         get: () => sd().max_model_cv_delta_r2,
@@ -2272,7 +2083,7 @@ export const VALUES = {
     };
   })(),
 
-  // ── Plan 06 Phase 7: the planets' spin channel — DERIVED ────────────────
+  // ── The planets' spin channel — DERIVED ─────────────────────────────────
   // The precession constant from each planet's OWN torques (astro-reference
   // planetSpinPhysical: J₂, C/MR², the IAU pole and spin, the regular
   // satellites; Ward & Hamilton 2004 form) on the model's OWN orbit (chain
@@ -2300,7 +2111,7 @@ export const VALUES = {
       keys[`${p}ObliquityJ2000DerivedDeg`] = { get: () => spin(p).obliquityJ2000Deg, render: (v) => Number(v).toFixed(3), unit: '°', note: `${N}'s J2000 obliquity to its own orbit, DERIVED as the angle between the IAU J2000 pole (angular-momentum sense: Venus ≈ 177°, Uranus ≈ 98°) and the chain's J2000 orbit plane — not an input` };
       if (p === 'mercury') continue;
       keys[`${p}SpinPrecDerivedArcsecPerYr`] = { get: () => spin(p).spinPrecessionRateArcsecPerYrJ2000, render: (v) => Number(v).toFixed(p === 'uranus' || p === 'neptune' ? 4 : 3), unit: '″/yr', note: `${N}'s J2000 pole precession rate about its orbit normal, ψ̇ = −α cos ε, DERIVED (negative = retrograde precession of a prograde spinner; Venus's retrograde spin precesses prograde)` };
-      keys[`${p}AxialPrecessionPeriodDerivedYr`] = { get: () => spin(p).axialPrecessionPeriodYearsJ2000, render: (v) => thousands(Math.round(v)), unit: 'yr', note: `${N}'s axial precession period at J2000 on the derived channel (2π/|ψ̇|; the retired device row read an integer fraction of the anchor unit)` };
+      keys[`${p}AxialPrecessionPeriodDerivedYr`] = { get: () => spin(p).axialPrecessionPeriodYearsJ2000, render: (v) => thousands(Math.round(v)), unit: 'yr', note: `${N}'s axial precession period at J2000 on the derived channel (2π/|ψ̇|)` };
       keys[`${p}ObliquityBandMinDeg`] = { get: () => band(p).minDeg, render: (v) => Number(v).toFixed(2), unit: '°', note: `${N}'s obliquity minimum over ±1 Myr around J2000, the spin integrated on the planet's own ζ plane history (quasi-periodic tables: the envelope, never chaotic diffusion)` };
       keys[`${p}ObliquityBandMaxDeg`] = { get: () => band(p).maxDeg, render: (v) => Number(v).toFixed(2), unit: '°', note: `${N}'s obliquity maximum over ±1 Myr around J2000 (same integration)` };
     }
@@ -2314,14 +2125,13 @@ export const VALUES = {
 
   // ── The sharpened leg-1 obliquity statement (owner-adopted) ─────────────
   // The obliquity band follows the BEAT 2π/(ψ̇(t) − |s₃|): the spin
-  // precession ψ̇(t) the COMPOSED lunisolar rate (plan 06 D6/Phase 3 → S5:
-  // on the derived J2000 anchor, 50.2883 ″/yr — the SAME scaling the
-  // shipped hybrid precesses on), s₃ at its dynamical value under the
-  // measured μ ≈ 1 (engine D). The pre-registered alternative "obliquity
-  // period ∝ T_p" (the `obliqH8Scaled*Kyr` keys, name kept, D8 (iii)) holds
+  // precession ψ̇(t) the COMPOSED lunisolar rate (on the derived J2000 anchor
+  // — the SAME scaling the shipped hybrid precesses on), s₃ at its dynamical
+  // value under the measured μ ≈ 1 (engine D). The pre-registered alternative
+  // "obliquity period ∝ T_p" (the `obliqPrecScaled*Kyr` keys, D8 (iii)) holds
   // the J2000 beat proportional to T_p(t) — identical to the beat at J2000
   // by construction, the two split at Precambrian ages (plan 02 §8; doc 109
-  // §18). S5 retired the former T_p·13/8 (= H/8) reading of that fork.
+  // §18).
   ...(() => {
     const DT = () => require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
     const s3 = () => {
@@ -2330,8 +2140,8 @@ export const VALUES = {
         .sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
       return Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;   // ″/yr
     };
-    // T_p(t) = the composed lunisolar period on the derived J2000 anchor (S5) — ONE home; since
-    // plan 12 §8 the RATE of date (the cited mean obliquity's cosine on the constant's scaling)
+    // T_p(t) = the composed lunisolar period on the derived J2000 anchor — ONE home; the RATE of
+    // date (the cited mean obliquity's cosine on the constant's scaling)
     const axialYr = (tMa) => DT().meanLunisolarPrecessionPeriodYearsAtAge(tMa);
     // The beat rides the spin axis's INERTIAL rate: the composed rate × the hybrid's self-anchor
     // factor (inertial/general at J2000, the multiplicative form the obliquity integration applies).
@@ -2341,7 +2151,9 @@ export const VALUES = {
     const h8Kyr = (tMa) => beatKyr(0.000001) * axialYr(tMa) / axialYr(0.000001);
     const mk = (name, tMa, label) => ({
       [`obliqBeat${name}Kyr`]: { get: () => beatKyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the obliquity band as the BEAT 2π/(ψ̇ᵢₙ − |s₃|) at ${label} — ψ̇ᵢₙ the spin axis's inertial rate of date (the composed lunisolar RATE — the constant's scaling × the cited mean obliquity's cos ε̄(t)/cos ε̄(0), plan 06 D6/Phase 3/S5 + plan 12 §8 — times the hybrid's self-anchor factor), s₃ dynamical under measured μ (the adopted leg-1 form)` },
-      [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure precession-scaling reading "obliquity period ∝ T_p" (the J2000 beat × T_p(t)/T_p(J2000)) at ${label} — identical to the beat at J2000, the discriminated alternative at depth (identifier keeps its historical H/8 name; S5 retired the T_p·13/8 form)` },
+      [`obliqPrecScaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `the pure precession-scaling reading "obliquity period ∝ T_p" (the J2000 beat × T_p(t)/T_p(J2000)) at ${label} — identical to the beat at J2000, the discriminated alternative at depth` },
+      // Deprecated alias (plan 16: no unit label in a published key name) — one version, for the website's pin; then it goes.
+      [`obliqH8Scaled${name}Kyr`]: { get: () => h8Kyr(tMa), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: `deprecated alias of obliqPrecScaled${name}Kyr` },
     });
     return {
       ...mk('J2000', 0.000001, 'J2000'),
@@ -2378,8 +2190,6 @@ export const VALUES = {
       tropicalYearSSJ2000Days: { get: () => y.tropicalYearSS, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
       tropicalYearAEJ2000Days: { get: () => y.tropicalYearAE, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
       tropicalYearWSJ2000Days: { get: () => y.tropicalYearWS, render: (v) => String(v), unit: 'days', note: 'Meeus & Savoie 1992' },
-      // (plan 09 step 4d: `anomalisticYearInputDays` — the Simon 1994 mean element as a model INPUT — is retired;
-      //  the citation is anomalisticYearSimon1994Days, the model's value anomalisticYearJ2000Days.)
       siderealDayInputSeconds: { get: () => y.siderealDay, render: (v) => thousands(v, 6), unit: 's', note: 'IERS input' },
       stellarDayInputSeconds: { get: () => y.stellarDay, render: (v) => thousands(v, 6), unit: 's', note: 'IERS input' },
       obliquityJ2000Arcsec: { get: () => astro.earthOrbital.obliquityJ2000_deg * 3600, render: (v) => v.toFixed(3), unit: 'arcsec', note: 'IAU 2006' },
@@ -2426,15 +2236,6 @@ export const VALUES = {
       out[`${b}AscNodeEclJ2000`] = { get: () => el.ascendingNode, render: (v) => String(v), unit: 'deg', note: 'JPL catalog input' };
       out[`${b}InvPlaneInclJ2000`] = { get: () => el.invPlaneInclinationJ2000, render: (v) => String(v), unit: 'deg', note: 'S&S 2012' };
     }
-    // (plan 11 step 2: `<p>AngleCorrectionDeg` and `<p>EocFraction` — scaffold
-    // constants with no reader left — left the inputs and the registry; plan 11
-    // step 3: `<p>StartPosDeg` — the scaffold's fitted start angle — left too,
-    // the planets' poles are placed from the spin channel.)
-    // (plan 11 step 2: moonStartposMoonDeg, correctionSunDeg and periPhaseOffsetDeg
-    // left with their constants — the Moon's start angle, the Sun's start angle
-    // and the EoC phase offset reached nothing the engine does not overwrite;
-    // plan 11 step 3: moonStartposApsidalDeg / moonStartposNodalDeg left too —
-    // the ring layers are engine-placed from the lunar arguments.)
     out.eocEccentricityValue = { get: () => C.eocEccentricity, render: (v) => v.toFixed(5), note: 'derived: e(J2000)/2 — the Sun node\'s EoC half under the one eccentricity law' };
     out.perihelionPassageJD = { get: () => astro.earthOrbital.perihelionPassageJ2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (2000 Jan 3)' };
     out.juneSolstice2000JD = { get: () => astro.earthOrbital.juneSolstice2000_JD, render: (v) => String(v), unit: 'JD', note: 'USNO (June 21, 2000)' };
@@ -2444,41 +2245,27 @@ export const VALUES = {
     for (const [cp, label] of [['VE', 'March equinox'], ['SS', 'June solstice'], ['AE', 'September equinox'], ['WS', 'December solstice']]) {
       out[`cardinalAnchor${cp}2000JD`] = { get: () => astro.cardinalPointAnchors[cp], render: (v) => String(v), unit: 'JD', note: `USNO 2000 ${label} (UTC, minute precision)` };
     }
-    // (plan 09: `iauPrecessionInputYears` — the stored key iauPrecessionJ2000, 25,770.73, the beat of two
-    //  inconsistent year inputs misnamed "IAU" — is deleted; the J2000 precession period is axialPrecYears, 1,296,000/p_A.)
-    // `earthEccCycle` stood here, publishing H/3 as "the period of Earth's |e|
-    // oscillation — the one H/3 eccentricity law". That law was retired from
-    // the physics on 2026-09-28: Earth's eccentricity is the engine's N-body
-    // series on every shipped path, and a multi-mode beat has no single period
-    // to publish. The key had NO consumer in the docs, the site or the paper —
-    // a retired claim nothing read. Deleted rather than restated (plan 07: a
-    // name whose quantity is the device itself goes with the device).
-    // The node cycle, by contrast, SURVIVES as a quantity — it is the chain's
-    // leading nodal eigenmode — so the key keeps its name and changes its
-    // getter: 1,296,000/|s| yr, the twin of <p>PeriPeriodICRF on the g side.
+    // The node cycle SURVIVES as a quantity — it is the chain's leading nodal
+    // eigenmode — so the key keeps its name: 1,296,000/|s| yr, the twin of
+    // <p>PeriPeriodICRF on the g side.
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${p}AscNodeCycleYears`] = {
         get: () => 1296000 / Math.abs(chainArt().s[p].arcsecPerYr),
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
-        note: `nodal cycle on the invariable plane — the chain's leading secular nodal mode (${chainArt().s[p].nearestLaskar.mode}, ${chainArt().s[p].arcsecPerYr.toFixed(3)} ″/yr; regression, so the period is quoted as a magnitude). Plan 07: was the device's lattice fraction of the retired unit; that input left with the unit at plan 09 step 7c and the file at plan 11 step 6`,
+        note: `nodal cycle on the invariable plane — the chain's leading secular nodal mode (${chainArt().s[p].nearestLaskar.mode}, ${chainArt().s[p].arcsecPerYr.toFixed(3)} ″/yr; regression, so the period is quoted as a magnitude)`,
       };
     }
     return out;
   })(),
 
   // ── Inertial (ICRF) perihelion periods ──────────────────────────────────
-  // Plan 07: the planets' inertial perihelion period is the chain's secular
-  // apsidal mode, 1,296,000/|g| yr, read from the governed artifact — the
-  // same number every runtime's `perihelionEclipticYears` carries (R1).
-  // (The retired device derived these from `perihelionEclipticFraction` by
-  // the "n8_ICRF = n8_ecliptic − 104" frame identity; that construction and
-  // its inputs are gone, plan 07 R8.)
+  // The planets' inertial perihelion period is the chain's secular apsidal
+  // mode, 1,296,000/|g| yr, read from the governed artifact — the same number
+  // every runtime's `perihelionEclipticYears` carries.
   ...(() => {
-    // Plan 07: the planets' inertial (vs the stars) perihelion period is the
-    // chain's secular mode, 1,296,000/|g| yr — the retired device's
-    // 8H/(n8 − 104) "frame identity" (the no-chain scaffolding's RA-frame
-    // convention) is gone, and with it the minor bodies' [1,1]-default rows.
+    // The planets' inertial (vs the stars) perihelion period is the chain's
+    // secular mode, 1,296,000/|g| yr.
     const out = {};
     for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}PeriPeriodICRF`] = {
@@ -2486,20 +2273,15 @@ export const VALUES = {
         get: () => (planet === 'earth' ? oneYL().inclinationPrecessionYearsAtYear(2000) : 1296000 / Math.abs(chainG(planet))),
         render: (v) => thousands(Math.round(v)),
         unit: 'yr',
-        note: planet === 'earth' ? 'Earth’s apsidal period vs the stars — the one-family route (S6)' : `inertial perihelion period, 1,296,000/|g| — the chain’s leading secular apsidal mode (${chainArt().g[planet].nearestLaskar.mode}); prograde`,
+        note: planet === 'earth' ? 'Earth’s apsidal period vs the stars — the one-family route' : `inertial perihelion period, 1,296,000/|g| — the chain’s leading secular apsidal mode (${chainArt().g[planet].nearestLaskar.mode}); prograde`,
       };
     }
-    // The no-chain bodies' `<body>PeriPeriodICRF` rows stood here, built from
-    // the retired device's frame identity over each body's stored
-    // perihelionEclipticFraction. All four stored the SAME [1,1] placeholder,
-    // so all four published one number — 27,943 yr — for four unrelated
-    // orbits, against Pluto's true apsidal period of order 3.7 Myr. Pluto,
-    // Halley and Eros have been removed from the model entirely; Ceres remains
-    // only as a force-only perturber in the N-body run and as reference data,
-    // neither of which needs a perihelion period. The bodies' OBSERVED values
-    // (DE440 mass ratio, J2000 node and inclination) stay — they are external
-    // measurements used in the mass-from-moon and ascending-node calibrations,
-    // independent of whether anything is drawn.
+    // Pluto, Halley and Eros are not in the model; Ceres remains only as a
+    // force-only perturber in the N-body run and as reference data, neither of
+    // which needs a perihelion period. The bodies' OBSERVED values (DE440 mass
+    // ratio, J2000 node and inclination) stay — they are external measurements
+    // used in the mass-from-moon and ascending-node calibrations, independent
+    // of whether anything is drawn.
     return out;
   })(),
 
@@ -2520,29 +2302,20 @@ export const VALUES = {
   })(),
 
   // ── Planet invariable-plane inclination family (11-2ab) ─────────────────
-  // Plan 07: mean and range of the CHAIN's inclination to the model's
-  // invariable plane over the banked ±10-Myr series (the API's
-  // invPlaneInclinationDeg, sampled every 2 kyr) — the engine's reading of
-  // what the retired ψ law (amplitude = ψ/(d·√m), anchored at an inclination
-  // cycle anchor) described. A multi-mode quantity has no single amplitude:
-  // the range is published as `<p>InclMin`/`<p>InclMax` (below); the
-  // half-range key `<p>InclAmp` was DELETED at model-values 23.0.0 — its name
-  // presented the range as a symmetric swing about the mean (Mercury's is
-  // 0.14°–10.97° about 6.69°), the ψ law's framing, and the Min/Max rows carry
-  // the range itself. The Fibonacci divisor and the cycle anchor keys
-  // (`<p>InclD`, `<p>InclCycleAnchor`) are gone with the law;
-  // `<p>OmegaJ2000` is the chain's J2000 node from the Souami & Souchay
-  // origin (the API's value); `<p>InclJ2000` stays the S&S 2012 reference.
-  // (The earlier port surfaced website defect #7, precision loss from 5-dp
-  // constants — both site tables carry the registry's full precision.)
+  // Mean and range of the CHAIN's inclination to the model's invariable plane
+  // over the banked ±10-Myr series (the API's invPlaneInclinationDeg, sampled
+  // every 2 kyr). A multi-mode quantity has no single amplitude: the range is
+  // published as `<p>InclMin`/`<p>InclMax` (below), never as a symmetric swing
+  // about the mean (Mercury's is 0.14°–10.97° about 6.69°). `<p>OmegaJ2000` is
+  // the chain's J2000 node from the Souami & Souchay origin (the API's value);
+  // `<p>InclJ2000` stays the S&S 2012 reference. (The earlier port surfaced
+  // website defect #7, precision loss from 5-dp constants — both site tables
+  // carry the registry's full precision.)
   ...(() => {
     const out = {};
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      out[`${planet}InclMean`] = { get: () => chainInclStats(planet).mean, render: (v) => Number(v).toFixed(6), unit: '°', note: 'mean inclination to the invariable plane over the banked ±10-Myr series (plan 07; was the ψ law’s mean)' };
-      out[`${planet}OmegaJ2000`] = { get: () => physModel().planets.ascendingNodeInvPlaneDeg(planet, 2000), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the chain’s J2000 ascending node on the invariable plane, S&S origin (plan 07; was the device’s verified node)' };
-      // (plan 07 R8: `<p>InclCycleAnchor` — the ψ law's phase anchor, a device
-      // INPUT — left with model-parameters inclinationCycleAnchor; doc 31
-      // keeps the recorded values as literals)
+      out[`${planet}InclMean`] = { get: () => chainInclStats(planet).mean, render: (v) => Number(v).toFixed(6), unit: '°', note: 'mean inclination to the invariable plane over the banked ±10-Myr series ' };
+      out[`${planet}OmegaJ2000`] = { get: () => physModel().planets.ascendingNodeInvPlaneDeg(planet, 2000), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the chain’s J2000 ascending node on the invariable plane, S&S origin' };
       out[`${planet}InclJ2000`] = { get: () => astro.planetOrbitalElements[planet].invPlaneInclinationJ2000, render: (v) => String(v), unit: '°', note: 'Souami & Souchay 2012 — the reference beside the chain anchor' };
     }
     return out;
@@ -2551,32 +2324,21 @@ export const VALUES = {
   // ── Pluto node + the planets' inclination envelopes (11-2ac) ───────────
   // Pluto's Ω is the model's VERIFIED closed-form node (101.06 — deliberately
   // ≠ the raw S&S 107.06; docs/32 table), astro-reference
-  // additionalBodiesReference since plan 11 step 2 (the additionalBodies block
-  // that stored it, with the device mean/amplitude, is deleted). Min/max are
-  // the series' own minimum and maximum at 2 dp (model-values 23.0.0; until
-  // then mean ∓ half-range — a SYMMETRIC construction the ψ-law framing left
-  // behind, which published Venus's minimum as −0.19° for a range that is
-  // 0.00°–3.46° about a mean of 1.54°, and Mercury's as 1.28°–12.10° for
-  // 0.14°–10.97°); the *Round keys are the 3-dp J2000 table forms.
-  // (plan 09 step 7c: holisticYearFactors — the retired unit's prime
-  // factorization — left with the unit.)
+  // additionalBodiesReference. Min/max are the series' own minimum and maximum
+  // at 2 dp (model-values 23.0.0; a symmetric mean ∓ half-range had published
+  // Venus's minimum as −0.19° for a range that is 0.00°–3.46° about a mean of
+  // 1.54°); the *Round keys are the 3-dp J2000 table forms.
   ...(() => {
     const j2000Of = (planet) => {
       if (planet === 'earth') return astro.earthOrbital.earthInclinationJ2000_deg;
       return astro.planetOrbitalElements[planet].invPlaneInclinationJ2000;
     };
     const out = {
-      // plutoInclMean / plutoInclAmp / plutoInclCycleAnchor are gone with the
-      // body: they described a device inclination OSCILLATION (a mean, an
-      // amplitude and a phase anchor) for an orbit the model no longer carries.
-      // What survives below is observed: the node the ascending-node
+      // What is published for Pluto is observed: the node the ascending-node
       // calibration compares, and the J2000 inclination it is measured against.
-      plutoOmegaJ2000: { get: () => astro.additionalBodiesReference.pluto.ascendingNodeInvPlaneClosedForm, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s VERIFIED closed-form node — deliberately ≠ raw S&S 107.06 (docs/32); astro-reference since plan 11 step 2' },
+      plutoOmegaJ2000: { get: () => astro.additionalBodiesReference.pluto.ascendingNodeInvPlaneClosedForm, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s VERIFIED closed-form node — deliberately ≠ raw S&S 107.06 (docs/32); astro-reference additionalBodiesReference' },
       plutoInclJ2000: { get: () => astro.additionalBodiesReference.pluto.invPlaneInclinationJ2000, render: (v) => String(v), unit: '°' },
-      // (plan 09 step 7c: `holisticYearFactors` — the unit's prime factorization — left with the unit.)
     };
-    // (plan 07 sweep: Pluto's rows — a device mean ± amplitude for a body the
-    // scene no longer carries — are out of both loops; nothing quoted them.)
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}InclMin`] = { get: () => chainInclStats(planet).min, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the minimum of the chain\'s inclination to the invariable plane over the banked ±10-Myr series (model-values 23.0.0; was mean − half-range)' };
       out[`${planet}InclMax`] = { get: () => chainInclStats(planet).max, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the maximum of the chain\'s inclination to the invariable plane over the banked ±10-Myr series (model-values 23.0.0; was mean + half-range)' };
@@ -2588,20 +2350,16 @@ export const VALUES = {
   })(),
 
   // ── Axial-precession identities + perihelion baselines (11-2ad) ─────────
-  // Plan 07: `<p>ModelBaseline` is the chain's NEWTONIAN era window rate
-  // (1800–2100, 1PN off) in ″/cy — the baseline Mercury's relativistic
-  // supplement sits on (gr − newton = 43.0 ″/cy, the engine's own 1PN
-  // advance); Earth's row is the one-family apsidal rate vs the stars. The
-  // lattice periods as ″/cy and Saturn's lattice/frame-identity rates
-  // (`saturnEclipticRateArcsec`, `saturnICRFRateArcsec` — the retired
-  // "anti-phase" story's numbers) are gone. (The `<p>PredTerms` counts that
-  // lived here went with the planet predict device, plan 06 R8.)
+  // `<p>ModelBaseline` is the chain's NEWTONIAN era window rate (1800–2100,
+  // 1PN off) in ″/cy — the baseline Mercury's relativistic supplement sits on
+  // (gr − newton = 43.0 ″/cy, the engine's own 1PN advance); Earth's row is
+  // the one-family apsidal rate vs the stars.
   ...(() => {
     const baselineArcsecCy = (planet) => (planet === 'earth'
       ? 1296000 * 100 / oneYL().inclinationPrecessionYearsAtYear(2000)
       : chainWindowNewton(planet));
     const out = {
-      axialPrecExact: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(v, 2), unit: 'yr', note: 'the J2000 of-date axial precession period (S5; was H/13)' },
+      axialPrecExact: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(v, 2), unit: 'yr', note: 'the J2000 of-date axial precession period' },
       siderealYearsPerAxialPrec: { get: () => Math.round(oneYL().axialPrecessionYearsAtYear(2000)) - 1, render: (v) => thousands(v), note: 'one fewer sidereal year than tropical years per axial precession period (coin rotation) — on the J2000 of-date period (S5; was round(H/13) − 1)' },
     };
     for (const planet of ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
@@ -2609,7 +2367,7 @@ export const VALUES = {
         get: () => baselineArcsecCy(planet),
         render: (v) => thousands(v, 1),
         unit: '″/cy',
-        note: planet === 'earth' ? 'apsidal rate vs the stars — the one-family route (S6)' : 'the chain’s Newtonian era window rate (1800–2100, 1PN off); with 1PN see <p>PeriRateNowArcsecCy',
+        note: planet === 'earth' ? 'apsidal rate vs the stars — the one-family route' : 'the chain’s Newtonian era window rate (1800–2100, 1PN off); with 1PN see <p>PeriRateNowArcsecCy',
       };
     }
     return out;
@@ -2617,12 +2375,10 @@ export const VALUES = {
 
   // ── Mercury anomaly + observed-rate citations (11-2ae) ──────────────────
   // The Mercury J2000 "anomaly" keys are the Earth-frame RA rate minus the
-  // lattice rate — the projection terms (predictiveMachinery, plan 06 R8; the
-  // former features·coeffs product of the retired device read 38.03″); baseline
-  // diff = |textbook Newtonian − lattice baseline|. The observed-rate family
-  // are WebGeocalc/literature citations in knownValues (see its
-  // _perihelionRatesNote). (`predTermsApprox` / `predTermsRange` — the
-  // retired device's term counts — are gone.)
+  // chain's Newtonian baseline — the projection terms (predictiveMachinery);
+  // baseline diff = |textbook Newtonian − the chain's baseline|. The
+  // observed-rate family are WebGeocalc/literature citations in knownValues
+  // (see its _perihelionRatesNote).
   ...(() => {
     const kv = () => astro.knownValues;
     return {
@@ -2634,7 +2390,7 @@ export const VALUES = {
         get: () => Math.abs(kv().mercuryNewtonianArcsecCy - chainWindowNewton('mercury')),
         render: (v) => thousands(v, 1),
         unit: '″/cy',
-        note: 'textbook Newtonian vs the chain’s Newtonian era window rate (plan 07; was the lattice baseline)',
+        note: 'textbook Newtonian vs the chain’s Newtonian era window rate',
       },
       mercuryObservedRate: { get: () => kv().mercuryObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: 'WebGeocalc 1900–2000 heliocentric trend' },
       venusObservedRate:   { get: () => kv().venusObservedRateArcsecCy, render: (v) => thousands(v), unit: '″/cy', note: '~0 — flips sign across sub-windows' },
@@ -2650,15 +2406,12 @@ export const VALUES = {
   })(),
 
   // ── Fluctuation ranges + geocentric chain (11-2af) ──────────────────────
-  // Plan 06 R8: the per-planet "fluctuation" range is the range of the
-  // PROJECTION TERMS of the chain motion (predictiveMachinery.chainFluct:
-  // projection excess + obliquity-rate term, doc 13 §1.8) over one perihelion
-  // cycle centred on J2000 — a property of the perihelion's longitude against
-  // the equinox, ε from the published one-source movement. It replaces the
-  // retired device's scan (−350k..+50k of the fitted RA-rate surrogate; the
-  // retired scene's exported "fluctuation" was 96 % the projection's own
-  // artefact for Venus, measured — doc 13). Mercury's extremes are refined
-  // to the year. Earth's row stays the ERD device (×360,000, browser form).
+  // The per-planet "fluctuation" range is the range of the PROJECTION TERMS of
+  // the chain motion (predictiveMachinery.chainFluct: projection excess +
+  // obliquity-rate term, doc 13 §1.8) over one perihelion cycle centred on
+  // J2000 — a property of the perihelion's longitude against the equinox, ε
+  // from the published one-source movement. Mercury's extremes are refined to
+  // the year. Earth's row stays the ERD form (×360,000, browser form).
   // Geocentric chain = ICRF citations + the general-precession equinox drift
   // (knownValues).
   ...(() => {
@@ -2667,7 +2420,7 @@ export const VALUES = {
     const scan = () => {
       if (!scans) {
         scans = {};
-        // one secular perihelion period, 1,296,000/|g| (plan 07: the chain's leading mode, not the lattice fraction)
+        // one secular perihelion period, 1,296,000/|g| (the chain's leading mode)
         const cycleOf = (p) => 1296000 / Math.abs(chainG(p));
         {
           const T = cycleOf('mercury');
@@ -2692,11 +2445,10 @@ export const VALUES = {
           scans[p] = { mn, mx };
         }
         {
-          // Earth (plan 09 step 4): the series' perihelion-of-date rate minus
-          // its mean over one perihelion-of-date period T_peri centred on
-          // J2000 — inside the one-family window — the analogue of the
-          // planets' scan over one secular period (was the comb's ERD scan
-          // over −350k..+50k).
+          // Earth: the series' perihelion-of-date rate minus its mean over one
+          // perihelion-of-date period T_peri centred on J2000 — inside the
+          // one-family window — the analogue of the planets' scan over one
+          // secular period.
           const T = physModel().lunisolar.periOfDatePeriodYearsAtYear(2000);
           const rates = [];
           for (let y = Math.round(2000 - T / 2); y <= 2000 + T / 2; y += 10) rates.push(earthPeriOfDateRateArcsecCy(y));
@@ -2713,10 +2465,7 @@ export const VALUES = {
       equinoxDriftRate: { get: () => 100 * astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => thousands(v, 1), unit: '″/cy', note: 'IAU 2006 general precession p_A per Julian century — the model’s J2000 input ×100 (was the rounded knownValues.generalPrecessionArcsecCy 5028.8)' },
       mercuryFluctuationMin: { get: () => scan().mercury.mn, render: fmtSignedInt, unit: '″/cy' },
       mercuryFluctuationMax: { get: () => scan().mercury.mx, render: fmtSignedInt, unit: '″/cy' },
-      // (plan 07 sweep: the Mercury extremum rows — `mercuryFluctuationMin/MaxYear`,
-      // `…Min/MaxPrecise`, `mercuryHelioAtMin/Max` on the lattice baseline
-      // 8H/11 — are deleted; nothing quoted them.)
-      earthFluctuationMin: { get: () => scan().earth.mn, render: fmtSignedInt, unit: '″/cy', note: 'the series\' perihelion-of-date rate minus its mean over one T_peri centred on J2000 (plan 09 step 4; was the comb\'s ERD × 360,000)' },
+      earthFluctuationMin: { get: () => scan().earth.mn, render: fmtSignedInt, unit: '″/cy', note: 'the series\' perihelion-of-date rate minus its mean over one T_peri centred on J2000' },
       earthFluctuationMax: { get: () => scan().earth.mx, render: fmtSignedInt, unit: '″/cy', note: 'as earthFluctuationMin' },
     };
     for (const p of ['venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
@@ -2727,8 +2476,8 @@ export const VALUES = {
   })(),
 
   // ── J2000 rates + BepiColombo projection (11-2ag) ───────────────────────
-  // All through the shared predictive machinery: J2000 rate = lattice
-  // baseline + fluctuation(2000); the Bepi chain projects MESSENGER's Park
+  // All through the shared predictive machinery: J2000 rate = the chain's
+  // Newtonian baseline + fluctuation(2000); the Bepi chain projects MESSENGER's Park
   // 2017 measurement forward 14 yr (2013→2027) with the model's own
   // per-century rate decrease, so all three values stay self-consistent by
   // derivation. Earth's row is the observed heliocentric citation (its own
@@ -2753,8 +2502,8 @@ export const VALUES = {
       },
     };
     // FRAME NOTE (doc 13 §1.8). Two coordinates carry a perihelion rate:
-    //   (a) ecliptic longitude — what observers publish (sidereal: the lattice
-    //       rate `<p>ModelBaseline`; of date: + p_A);
+    //   (a) ecliptic longitude — what observers publish (sidereal: the chain's
+    //       Newtonian baseline `<p>ModelBaseline`; of date: + p_A);
     //   (b) right ascension in the scene's equator, which co-moves with its
     //       stars — what the export and the predict basis produce
     //       (= (a) sidereal × dα/dλ + ∂α/∂ε·ε̇, gate-pinned). Nobody observes (b).
@@ -2763,7 +2512,7 @@ export const VALUES = {
     // legacy). The *EarthFrameRa* names below are the same getters, correctly
     // named; the legacy names stay for the Dutch pages.
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-      out[`${p}EarthFrameRaJ2000`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(Math.round(v)), unit: '″/cy', note: 'Earth-frame RA rate at J2000 (lattice + predict fluctuation) — the scene equator co-moves with its stars; not an observable' };
+      out[`${p}EarthFrameRaJ2000`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(Math.round(v)), unit: '″/cy', note: 'Earth-frame RA rate at J2000 (the chain’s Newtonian baseline + the projection terms) — the scene equator co-moves with its stars; not an observable' };
       out[`${p}J2000Fluct`] = { get: () => pm().fluct(2000, p), render: fmtSignedInt, unit: '″/cy', note: 'Earth-frame RA fluctuation at J2000 = projection excess + obliquity-rate term (+κ); not a longitude anomaly' };
     }
     return out;
@@ -2784,9 +2533,7 @@ export const VALUES = {
     // The equatorial projection of each planet's ecliptic perihelion advance:
     //   rate_RA = rate_ecl × dα/dλ,   dα/dλ = cos ε / (cos²λ + sin²λ cos²ε)   (β = 0)
     // at the IAU J2000 longitude of perihelion (reading A, the physical
-    // perihelion). (Reading B — at the scene marker's longitude λ +
-    // angleCorrection, the fitted inverse RA→λ conversion — left with the
-    // constant at plan 11 step 2; nothing quoted it.) The obliquity-rate term ∂α/∂ε · ε̇ is what
+    // perihelion). The obliquity-rate term ∂α/∂ε · ε̇ is what
     // separates the projection from the Earth-frame rate the export measures
     // (Mercury: 574.1 + 4.3 + ~1 = 579.9). The GR perihelion advance is
     // derived from the same constants (6π GM/(c² a (1−e²)) per orbit) so the
@@ -2797,14 +2544,13 @@ export const VALUES = {
     const raSlope = (lamDeg, epsDeg) => { const l = lamDeg * D2R, e = epsDeg * D2R; return Math.cos(e) / (Math.cos(l) ** 2 + Math.sin(l) ** 2 * Math.cos(e) ** 2); };
     const dAlphaDeps = (lamDeg, epsDeg) => { const l = lamDeg * D2R, e = epsDeg * D2R; return -Math.sin(l) * Math.cos(l) * Math.sin(e) / (Math.cos(l) ** 2 + Math.sin(l) ** 2 * Math.cos(e) ** 2); };
     const epsRateArcsecCy = () => (oneEps(2050) - oneEps(1950)) * 3600;   // the published obliquity (the hybrid)
-    // Plan 07: the ecliptic rate this family publishes is the chain's
-    // NEWTONIAN era window (1800–2100, 1PN off). The paper names this key
-    // "the chain's Newtonian rate" and builds the published identity on it —
-    // newton + the 1PN supplement = the total era window, all three read from
-    // the SAME window, so the sum is exact by construction (gr − newton). It
-    // is also the base the retired "anomaly = RA projection" claim was tested
-    // on (doc 13 §1.8): projecting the 1PN-inclusive rate would count the 43″
-    // twice. The model's TOTAL rate of date is <p>PeriRateNowArcsecCy.
+    // The ecliptic rate this family publishes is the chain's NEWTONIAN era
+    // window (1800–2100, 1PN off). The paper names this key "the chain's
+    // Newtonian rate" and builds the published identity on it — newton + the
+    // 1PN supplement = the total era window, all three read from the SAME
+    // window, so the sum is exact by construction (gr − newton). Projecting the
+    // 1PN-inclusive rate would count the 43″ twice (doc 13 §1.8). The model's
+    // TOTAL rate of date is <p>PeriRateNowArcsecCy.
     const eclRate = (p) => chainWindowNewton(p);
     const grAdvance = (p) => {   // ″/cy, 6π GM_sun / (c² a (1 − e²)) per orbit × orbits per century
       const P = C.planets[p];
@@ -2815,13 +2561,10 @@ export const VALUES = {
     };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const lamA = () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg;   // the chain's J2000 ϖ (plan 07; was the IAU input)
-      out[`${p}PeriRateEclipticArcsecCy`] = { get: () => eclRate(p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s sidereal era window rate (1800–2100, 1PN on) — the projection’s input (plan 07; was the lattice divisor)' };
-      out[`${p}PeriRaSlopeJ2000`] = { get: () => raSlope(lamA(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'dα/dλ at the chain’s J2000 perihelion longitude, IAU 2006 obliquity (plan 07; was the IAU J2000 input)' };
+      out[`${p}PeriRateEclipticArcsecCy`] = { get: () => eclRate(p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the chain’s sidereal era window rate (1800–2100, 1PN on) — the projection’s input' };
+      out[`${p}PeriRaSlopeJ2000`] = { get: () => raSlope(lamA(), epsJ2000()), render: (v) => Number(v).toFixed(5), note: 'dα/dλ at the chain’s J2000 perihelion longitude, IAU 2006 obliquity' };
       out[`${p}PeriRateRaProjectedJ2000`] = { get: () => eclRate(p) * raSlope(lamA(), epsJ2000()), render: (v) => thousands(v, 2), unit: '″/cy' };
       out[`${p}PeriProjectionExcessJ2000`] = { get: () => eclRate(p) * (raSlope(lamA(), epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy', note: 'reading A: the projected rate minus the ecliptic rate' };
-      // (plan 07 sweep: the "reading B at the scene marker" pair,
-      // `<p>PeriRaSlopeMarkerJ2000` / `<p>PeriProjectionExcessMarkerJ2000`,
-      // is deleted — no doc, page or paper quoted them.)
       out[`${p}PeriObliquityRateTermJ2000`] = { get: () => eclRate(p) === 0 ? 0 : dAlphaDeps(lamA(), epsJ2000()) * epsRateArcsecCy(), render: (v) => thousands(v, 2), unit: '″/cy', note: '∂α/∂ε · ε̇ at J2000 at the chain’s J2000 perihelion longitude (plan 11 step 2: was at the scene marker’s λ + angleCorrection, the fitted RA→λ conversion — the chain places the marker now; shipped obliquity law, ±50 yr)' };
       out[`${p}PeriRateEarthFrameMeasuredJ2000`] = { get: () => pm().totalPrecession(2000, p), render: (v) => thousands(v, 2), unit: '″/cy', note: 'the export/predict Earth-frame rate (RA) at J2000' };
       out[`${p}PeriAnomalyGrArcsecCy`] = { get: () => grAdvance(p), render: (v) => Number(v).toFixed(2), unit: '″/cy', note: 'general-relativistic advance from the model constants (GM_SUN, c, a from the period, e)' };
@@ -2837,7 +2580,7 @@ export const VALUES = {
       },
       render: (v) => Number(v).toFixed(2),
       unit: '″/cy',
-      note: 'general-relativistic advance from the model constants (a = 1 AU, e J2000) — documentation-grade beside Earth’s H/16 chain',
+      note: 'general-relativistic advance from the model constants (a = 1 AU, e J2000) — documentation-grade beside Earth’s perihelion-of-date chain',
     };
     out.mercuryPeriRateWithRelativisticArcsecCy = {
       get: () => chainWindowGr('mercury'),   // plan 07: the chain's 1PN era window — the Newtonian window PLUS the engine's own relativistic advance
@@ -2868,8 +2611,7 @@ export const VALUES = {
     };
     // The model's Newtonian rate against Park 2017's Newtonian subtotal
     // (575.31 ICRF − the GR advance): doc 13 §1.7's agreement figure, derived
-    // so it tracks the chain. On the retired lattice this read ~0.1 %; on the
-    // chain's Newtonian era window it is ~0.6 % — a weaker, honest statement.
+    // so it tracks the chain (~0.6 % on the chain's Newtonian era window).
     out.mercuryModelVsParkNewtonianDeltaPct = {
       get: () => {
         const parkNewtonian = astro.knownValues.mercuryPark2017RateArcsecCy - grAdvance('mercury');
@@ -2879,14 +2621,14 @@ export const VALUES = {
       unit: '%',
       note: 'the chain’s Newtonian era window vs Park 2017 minus the derived GR advance (<mercuryNewtonianModern>) — doc 13 §1.7',
     };
-    // Plan 07: Earth's perihelion-of-date rate is the one-family beat (S6 missed this pair — they still read the device's H/16)
+    // Earth's perihelion-of-date rate is the one-family beat.
     const earthOfDateArcsecCy = () => 1296000 * 100 / oneYL().perihelionPrecessionYearsAtYear(2000);
-    out.earthPeriRateEclipticOfDateArcsecCy = { get: earthOfDateArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the perihelion OF DATE (not the inertial advance) — the one-family beat at J2000 (was H/16)' };
+    out.earthPeriRateEclipticOfDateArcsecCy = { get: earthOfDateArcsecCy, render: (v) => thousands(v, 2), unit: '″/cy', note: 'the perihelion OF DATE (not the inertial advance) — the one-family beat at J2000' };
     out.earthPeriProjectionExcessJ2000 = { get: () => earthOfDateArcsecCy() * (raSlope(astro.earthOrbital.earthPerihelionLongitudeJ2000, epsJ2000()) - 1), render: (v) => thousands(v, 2), unit: '″/cy' };
     out.obliquityRateJ2000ArcsecCy = { get: epsRateArcsecCy, render: (v) => thousands(v, 1), unit: '″/cy', note: 'shipped obliquity law, central difference 1950–2050' };
     for (const y of [1800, 1900, 2000, 2100]) {
       out[`mercuryEarthFrameRa${y}`] = { get: () => pm().totalPrecession(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Earth-frame RA rate (scene equator co-moving with its stars); not an observable' };
-      out[`mercuryEarthFrameExcess${y}`] = { get: () => pm().fluct(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Earth-frame RA rate minus the lattice rate' };
+      out[`mercuryEarthFrameExcess${y}`] = { get: () => pm().fluct(y, 'mercury'), render: (v) => thousands(v, 2), unit: '″/cy', note: 'Earth-frame RA rate minus the chain’s Newtonian baseline' };
     }
     // Ecliptic longitude OF DATE (frame a), both reduction systems — doc 13 §1.8 / tools/explore/mercury-perihelion-frames.mjs
     out.generalPrecessionNewcombArcsecCy = { get: () => astro.knownValues.generalPrecessionNewcombArcsecCy, render: (v) => thousands(v, 3), unit: '″/cy', note: 'Newcomb general precession used in the Le Verrier→Clemence reductions — citation' };
@@ -2910,25 +2652,11 @@ export const VALUES = {
     return out;
   })(),
 
-  // The lattice-significance statistics (11-2ai) and the Law 2/3/5 balance
-  // rows (11-2aj) were retired from the registry: 38 keys — headline*, joint*,
-  // empiricalR*, fisher*, fisherLegacy*, stouffer*, sig{Test,Law,Empirical,
-  // McCombinable,Structural}Count, sigCorrelationFactor, balance*,
-  // laplaceLagrangeResidualDeg, saturnPredErr.
-  //
-  // They measured the significance of the integer-lattice and Fibonacci-Law
-  // claims, which this project has retired, and not one of the 38 was read by
-  // any surface — not the site, not the paper, not a live doc span. This block
-  // already said the right thing about its own rows: they "are the retired
-  // framing's evidence record, not a live derivation". A record belongs in the
-  // tracked artifact, which is where it stays.
-  //
-  // data/significance-results.json and data/balance-presets.json are both
-  // still tracked, so nothing is lost. balance-presets.json keeps live readers
-  // in packages/fitting and tools/verify; significance-results.json now has
-  // none, by design — it is the archive of a closed campaign.
-  // (amdAlpha* went earlier for the same reason: the α-scan claim was retired
-  // as numerology.)
+  // The significance statistics and the balance rows left the registry (38
+  // keys read by no surface); data/significance-results.json and
+  // data/balance-presets.json stay tracked as the archive of a closed campaign
+  // — balance-presets.json keeps live readers in packages/fitting and
+  // tools/verify.
 
   // ── Saturn prediction + Sci weights + Config #N + start inputs (11-2ak) ─
   // Saturn's predicted eccentricity = in-phase total / Saturn's coefficient
@@ -2940,11 +2668,8 @@ export const VALUES = {
   // 2,451,716.5).
   ...(() => {
     const { bal } = balanceMachinery();
-    // Plan 07 R5/R6: the Law-5 weight rows that stood here — saturnEccCoeff,
-    // saturnEccPredicted, the in-phase shares and the *Sci twins of the
-    // weight totals — are the scientific-notation forms of the keys removed
-    // above, and go for the same reason. The `bal()` rows that remain are the
-    // recorded configuration search, not a live device derivation.
+    // The `bal()` rows that remain are the recorded configuration search, not a
+    // live derivation.
     const out = {
       configNumber: { get: () => bal().currentConfig.rank, render: (v) => String(v) },
       configSearchSpace: { get: () => bal().searchSpace, render: (v) => thousands(v) },
@@ -2965,10 +2690,9 @@ export const VALUES = {
   // Model perihelion longitudes through the shared browser-form evaluator;
   // Meeus (1998) citations in knownValues; Laskar eccentricities DERIVED
   // from the tracked la2004 artifact (the site types them while citing that
+  // from the tracked la2004 artifact (the site types them while citing that
   // file — same pattern as the obliquity tables); calibration scalars from
-  // astro-reference (the former model-parameters foundational block: plan 11
-  // step 4 took startAngleModel and the derived earthRAAngle with the K-device
-  // scaffold, step 5 moved the scene epoch, step 6 deleted the file).
+  // astro-reference.
   ...(() => {
     const laskarEcc = (calYear) => {
       const rows = new Map(rd('public/input/la2004-orbital-solution.json').data.map((r) => [r.year, r.eccentricity]));
@@ -2980,11 +2704,9 @@ export const VALUES = {
       return rows.get(lo) + ((t - lo) / 1000) * (rows.get(hi) - rows.get(lo));
     };
     // the PUBLISHED eccentricity — the one-source N-body series (the value the
-    // Earth panel, the Sun's equation of centre and the cardinal chain read);
-    // the Node twin's computeEccentricityEarth is the retired single-line law
+    // Earth panel, the Sun's equation of centre and the cardinal chain read)
     const oeEcc = (y) => oneMovement().e(y);
     const out = {
-      // (plan 11 step 5: `correctionDays` left the registry with the constant)
       speedOfLight: { get: () => astro.physicalConstants.speedOfLight, render: (v) => thousands(v, 3), unit: 'km/s' },
       periLongJ2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000, render: (v) => Number(v).toFixed(3), unit: '°', note: 'the IAU/Standish MEAN element (JPL Keplerian-elements table, 1800–2050 fit); the series\' secular element is earthSeriesPeriLongJ2000' },
       periLongShift1246to2000: { get: () => astro.earthOrbital.earthPerihelionLongitudeJ2000 - 90, render: (v) => Number(v).toFixed(3), unit: '°', note: 'derived: J2000 longitude − the 90° alignment value' },
@@ -3004,28 +2726,24 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── Planet orientation (11-2am; plan 06 Phase 7 commit 2) ───────────────
+  // ── Planet orientation (11-2am) ─────────────────────────────────────────
   // Perihelion longitudes from the tracked elements; the AXIAL periods from
-  // the spin channel — each planet's precession constant DERIVED from its
-  // own torques on the model's own orbit (Mercury: Cassini-locked, the row
-  // is the chain's node period, as the panel shows); signed ICRF periods via
-  // the n8 − 104 frame identity (Earth alone prograde); the "mean obliquity"
-  // is the K law's input = the derived J2000 obliquity (acute). The device
-  // rows these replaced (integer axial and obliquity-cycle fractions of the
-  // anchor unit; the `<planet>ObliqCycle` keys) are retired — no obliquity
-  // CYCLE is claimed for any planet (the bands are the `<planet>ObliquityBand*`
-  // keys above).
+  // the spin channel — each planet's precession constant DERIVED from its own
+  // torques on the model's own orbit (Mercury: Cassini-locked, the row is the
+  // chain's node period, as the panel shows); the inertial perihelion periods
+  // are the chain's (below); the "mean obliquity" is the derived J2000
+  // obliquity (acute). No obliquity CYCLE is claimed for any planet (the bands
+  // are the `<planet>ObliquityBand*` keys above).
   ...(() => {
-    // Plan 07: the "ICRF" periods are the inertial perihelion periods, 1,296,000/|g| from the
-    // chain's leading secular mode (Earth: the one-family route) — the 8H/(n8 − 104) frame
-    // identity of the retired scene is gone; all prograde.
+    // The "ICRF" periods are the inertial perihelion periods, 1,296,000/|g| from the
+    // chain's leading secular mode (Earth: the one-family route); all prograde.
     const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
     const out = {
-      earthAxialPeriod: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the J2000 of-date axial precession period (S5; was H/13)' },
-      earthIcrfPeriod: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'Earth’s apsidal period vs the stars — the one-family route (S6; was the device’s H/3 = 111,772)' },
+      earthAxialPeriod: { get: () => oneYL().axialPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the J2000 of-date axial precession period' },
+      earthIcrfPeriod: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'Earth’s apsidal period vs the stars — the one-family route' },
     };
     for (const p of planets7) {
-      out[`${p}PeriLongJ2000`] = { get: () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg, render: (v) => Number(v).toFixed(3), unit: '°', note: 'the chain’s J2000 ecliptic longitude of perihelion (the API’s value; plan 07 — was the IAU input)' };
+      out[`${p}PeriLongJ2000`] = { get: () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg, render: (v) => Number(v).toFixed(3), unit: '°', note: 'the chain’s J2000 ecliptic longitude of perihelion (the API’s value)' };
       out[`${p}AxialPeriod`] = {
         get: () => (p === 'mercury'
           ? Math.abs(1296000 * 100 / rd('data/nbody-secular-frequencies.json').windowElementRates.mercury.nodeRateArcsecCy)
@@ -3047,26 +2765,14 @@ export const VALUES = {
     return out;
   })(),
 
-  // ── Eccentricity cycles + phases + ascending nodes (11-2an) ─────────────
-  // Cycle periods LIVE from the engine — since plan 06 Phase 7 commit 2 the
-  // chain's OWN g-mode beat (the `<planet>EccCycleFormula` lattice labels
-  // and the eccentricityCycleFraction field they read are retired with the
-  // device beat). Phases from the engine planet fields (Earth = perihelion
-  // longitude + 90°, the e_E-line convention); ascending-node periods and
-  // 8H cycle counts from the engine (Earth = −H/5, the ecliptic precession).
+  // ── Eccentricity cycles (11-2an) ────────────────────────────────────────
+  // Cycle periods LIVE from the engine — the chain's OWN g-mode beat
+  // (keplerian-chain computeSecularShape).
   ...(() => {
     const planets7 = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
-    // (plan 07 sweep: `earthEccPhaseJ2000`, `earthAscNodePeriod` (−H/5),
-    // `earthAscNodeN` and the per-planet `<p>AscNodePeriod` / `<p>AscNodeN`
-    // (the device's 8H/N node cycles) are deleted — retired framing with no
-    // reader; the nodes of date are the chain's, `<p>AscNodeCycleYears` is
-    // the inertial 1,296,000/|s|.)
     const out = {};
     for (const p of planets7) {
-      out[`${p}EccCycle`] = { get: () => C.planets[p].wobblePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'since Phase 7 commit 2 the chain\'s OWN g-mode beat (dominant mode × largest companion of the eccentricity vector — the panel\'s "Eccentricity Cycle (g-mode beat)" row), the period the K law rides; the device beat of its integer fractions is retired' };
-      // (plan 07 R6: `<p>EccPhaseJ2000` was the K law's J2000 phase angle,
-      // 360·t2000/wobble + 90° (270° anti-phase). It goes with the law —
-      // no consumer, and the chain's eccentricity has no single phase.)
+      out[`${p}EccCycle`] = { get: () => C.planets[p].wobblePeriod, render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the chain\'s OWN g-mode beat (dominant mode × largest companion of the eccentricity vector — the panel\'s "Eccentricity Cycle (g-mode beat)" row)' };
     }
     return out;
   })(),
@@ -3074,8 +2780,7 @@ export const VALUES = {
   // ── Deep-time epoch tables + tidal-lock + Driver-2 scalars (11-2ao) ─────
   // Everything runs LIVE through the deep-time engine at the named epochs:
   // Devonian t = 380 Ma, Hadean t = the moon-genesis age (the END of the cited
-  // distance history, 4429 Ma — plan 12 option A; it was the deleted quartic's
-  // Roche crossing, 4498 — the epochs derive from the recorded age), future
+  // distance history, 4429 Ma — the epochs derive from the recorded age), future
   // t = −200 Ma. Moon distances use the cited history's mean distance
   // (the site convention — the solar-Δa corrected engine value differs by
   // ~300 km). Lock-state values derive from the angular-momentum asymptote
@@ -3085,16 +2790,10 @@ export const VALUES = {
   // 422 — fixed site-side).
   ...(() => {
     const P = () => dtl().EPOCH_PARAMS;
-    // plan 12 option A: the raw distance is the engine's cited history (the
-    // AstroGeo22 shape on the J2000 anchor), not a polynomial copy of it.
+    // the raw distance is the engine's cited history (the AstroGeo22 shape on
+    // the J2000 anchor).
     const rawMoonKm = (tMa) => dtl().meanMoonDistanceAtAge(tMa);
     const genesisMa = () => astro.knownValues.moonGenesisAgeGa * 1000;
-    // (Plan 09 step 7a: the `driftAt*Ppm` keys — the day-count near-invariant
-    // U × days/yr on the ERA-CLOCK COUNTER U = U₀·LOD/LOD₀, measured −74 ppm at
-    // the Devonian and −999 ppm at the Hadean before the counter's deletion —
-    // left with `eraClockHAtAge`. On the unit H(t) the same product is a
-    // different quantity: it carries the lunar-torque term and read −214,009
-    // ppm at 1 Gyr, −100 % at the Roche crossing.)
     const lockLodSeconds = () => {
       const p = P();
       return 2 * Math.PI * Math.sqrt(p.moonLockDistanceM ** 3 / p.gmEarthMoonM3S2);
@@ -3111,26 +2810,14 @@ export const VALUES = {
       modernLLRRecessionCmYr: { get: () => astro.knownValues.modernLLRRecessionCmYr, render: (v) => String(v), unit: 'cm/yr', note: 'the framework α₁ anchor' },
       ageFromLinearRate: { get: () => 24 / astro.knownValues.wellsTidalRateHrPerMa / 1000, render: (v) => Number(v).toFixed(2), unit: 'Gyr', note: 'derived: 24 hr ÷ the Wells rate' },
       patternEarthAgeGyr: { get: () => astro.knownValues.patternEarthAgeGyr, render: (v) => String(v), unit: 'Gyr', note: 'Patterson 1956 citation' },
-      moonGenesisAgeGa: { get: () => astro.knownValues.moonGenesisAgeGa, render: (v) => String(v), unit: 'Ga', note: 'the end of the cited Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; lunar age 4.425 Ga) — plan 12 option A; the former rigid-Roche crossing of the deleted recession polynomial (4.498) was a construction' },
+      moonGenesisAgeGa: { get: () => astro.knownValues.moonGenesisAgeGa, render: (v) => String(v), unit: 'Ga', note: 'the end of the cited Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; lunar age 4.425 Ga)' },
       solarMassLossFracPerYr: { get: () => P().solarMassLossFracPerYear, render: (v) => fmtSci(v, 1), unit: '/yr' },
       solarSystemShrinkDevonianPpm: { get: () => P().solarMassLossFracPerYear * 380e6 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
       solarSystemShrinkHadeanPpm: { get: () => P().solarMassLossFracPerYear * astro.knownValues.patternEarthAgeGyr * 1e9 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
-      // (plan 09 step 7c: `totalDaysInH` (H × mSY, the device's day count) and
-      // `totalDaysInHSiderealFrame` left with the unit; the day-count invariant
-      // is a separate investigation topic, doc 99 keeps the record.)
-      // (Plan 09 step 7b: `dayCountInvariantAuCorrectedDriftPpm` (read 995,048.65 ppm —
-      // the "exact invariant" H·(sidYearSec/LOD)·(AU₀/AU)² holds on the ERA COUNTER
-      // H_era ∝ LOD by construction, a tautology of spin scaling ∘ Kepler, and fails
-      // on the unit H(t), which this key read) and `dayCountTropicalAuDriftAtGenesisPpm`
-      // (−995,201 ppm) left with `meanHAtAge`; the day-count identity is a device
-      // record — a separate investigation topic, owner 2026-10-14.)
-      // The formula horizon — DERIVED (plan 13 B3; it was a prose estimate, 3,
-      // in astro-reference knownValues — the deleted recession polynomial's
-      // reach): on the LLR rate held constant forward (the cited history's
-      // forward branch) the Moon reaches the tidal-lock distance at
-      // (a_lock/a_now − 1)/|α₁|; the chain's own LOD reads null beyond it.
-      // The domain runs from the cited history's END (the genesis age), not
-      // from Patterson's Earth age the pre-option-A keys used.
+      // The formula horizon — DERIVED: on the LLR rate held constant forward (the
+      // cited history's forward branch) the Moon reaches the tidal-lock distance
+      // at (a_lock/a_now − 1)/|α₁|; the chain's own LOD reads null beyond it.
+      // The domain runs from the cited history's END (the genesis age).
       essrtFormulaHorizonGyr: { get: () => (P().moonLockDistanceM / P().moonDistanceNowM - 1) / -P().alpha1PerMa / 1000, render: (v) => Number(v).toFixed(2), unit: 'Gyr', note: 'the LLR rate held constant forward reaches a_lock — a labelled extrapolation' },
       essrtEffectiveDomainGyr: { get: () => astro.knownValues.moonGenesisAgeGa + (P().moonLockDistanceM / P().moonDistanceNowM - 1) / -P().alpha1PerMa / 1000, render: (v) => Number(v).toFixed(1), unit: 'Gyr', note: 'genesis (the cited history\'s end) → the formula horizon' },
       essrtCurrentEpochPct: {
@@ -3141,17 +2828,16 @@ export const VALUES = {
         render: (v) => String(Math.round(v)),
         unit: '%',
       },
-      // (plan 09 step 7b: `hOneGyrAgoPct` and the `hAt*` keys — the unit H(t) at dated epochs — left with meanHAtAge)
       tidalLockKm: { get: () => P().moonLockDistanceM / 1000, render: (v) => thousands(Math.round(v)), unit: 'km' },
       tidalLockRE: { get: () => P().moonLockDistanceM / 1000 / astro.physicalConstants.earthParallaxRadiusKm, render: (v) => Number(v).toFixed(1), unit: 'R_E' },
     };
     for (const [key, tOf] of Object.entries(epochs)) {
       out[`lodAt${key}Hr`] = { get: () => dtl().meanLodSecondsAtAge(tOf()) / 3600, render: (v) => Number(v).toFixed(2), unit: 'hr' };
       out[`moonDistanceAt${key}`] = { get: () => rawMoonKm(tOf()), render: (v) => thousands(Math.round(v)), unit: 'km' };
-      out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at this epoch — 1,296,000/the precession RATE of date, with the cited mean obliquity’s cosine since plan 12 §8 (S5; was H(t)/13, 0.086 % slow)' };
+      out[`axialPrecAt${key}`] = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(tOf()), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at this epoch — 1,296,000/the precession RATE of date, with the cited mean obliquity’s cosine' };
     }
-    // The clock at ±1 Gyr (the website's deep-time phase table; the composed period, S5 — the
-    // old table quoted H/13 there). Forward: the recession polynomial's extrapolation region.
+    // The clock at ±1 Gyr (the website's deep-time phase table; the composed period).
+    // Forward: the cited history's extrapolation region.
     out.axialPrecAt1GyrAgo = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(1000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at −1 Gyr' };
     out.axialPrecAt1GyrFuture = { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(-1000), render: (v) => thousands(Math.round(v)), unit: 'yr', note: 'the composed lunisolar precession period at +1 Gyr (forward-extrapolation region; upper-bound reading)' };
     out.axialPrecOneGyrAgoPct = { get: () => 100 * dtl().meanLunisolarPrecessionPeriodYearsAtAge(1000) / dtl().meanLunisolarPrecessionPeriodYearsAtAge(0.000001), render: (v) => `~${Math.round(v)}`, unit: '%', note: 'the clock one billion years ago as a share of today’s (replaces hOneGyrAgoPct on the website)' };
@@ -3241,9 +2927,6 @@ export const VALUES = {
     const share = (regime, band) => 100 * reg()[regime].by_band[band].ice_share_weighted;
     const residual = (p) => bal().deepAnalysis.configs[11].bestAnchor.perPlanet[p].errArcsec;
     const kv = () => astro.knownValues;
-    // (plan 09 step 7e: the Test C invariant-manifold and libration keys —
-    // `testCInvariant*`, `testCLibrationPValue` — left with their comb-era
-    // scripts and result files; doc 109 §22 keeps the record.)
     const out = {
       charneyECS:     { get: () => ecs().overall.median, render: (v) => Number(v).toFixed(2), unit: 'K' },
       charneyECSLow:  { get: () => ecs().overall.p5, render: (v) => Number(v).toFixed(2), unit: 'K' },
@@ -3261,9 +2944,6 @@ export const VALUES = {
       mptPrecessionIceSharePre: { get: () => share('inhg_mpt', 'precession (18-26)'), render: (v) => String(Math.round(v)), unit: '%', note: 'iNHG-MPT precession-band ice-albedo share of total forcing (climate-ecs-per-regime)' },
       // doc 92 Tier A/B prose values (tables generated by scripts/generate_doc97_tables.py)
       ...(() => {
-        // (plan 09 step 7e: the comb-era Tier A/B keys — `tierA*`, `tierB*`,
-        // `tierC*`, `tierR3*` — left with their scripts and artifacts; doc 109
-        // §22 keeps the headline numbers.)
         const cf = () => rd('data/milankovitch-climate-formula.json');
         const f4 = (v) => Number(v).toFixed(4), f3 = (v) => Number(v).toFixed(3), f2 = (v) => Number(v).toFixed(2);
         const o = {};
@@ -3285,7 +2965,7 @@ export const VALUES = {
         o.canonR2Stitched = { get: () => cc().meta.stitched_lr04_r2, render: f2, note: 'three-regime stitched canonical fit evaluated over the full LR04 record (export_climate_formula_browser.py)' };
         o.canonR2CenCo2pip = { get: () => cf().cenco2pip_evaluation.r2_l1_l2_l3, render: f4, note: 'canonical formula on CenCO2PIP CO₂ (0–66 Ma)' };
         o.canonL5FloorPostMpt = { get: () => 100 * (1 - cf().regime_fits['post-mpt'].r2_l1_l2_l3), render: (v) => String(Math.round(v)), unit: '%', note: 'post-MPT L5 stochastic floor, 1 − R²' };
-        // T7 — the fixed-phase L1 test (plan 06 §4 T7; data/t7-fixed-phase-l1.json): the model's own e, ε, e·sin ϖ with one
+        // T7 — the fixed-phase L1 test (data/t7-fixed-phase-l1.json): the model's own e, ε, e·sin ϖ with one
         // coefficient each + one climate lag, against the shipped free-phase L1 — the description-vs-prediction split doc 92 quotes.
         const t7 = () => rd('data/t7-fixed-phase-l1.json');
         for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg']]) {
@@ -3358,10 +3038,7 @@ export const VALUES = {
   // ── solarOrbitalSpeed (11-2aq) ──────────────────────────────────────────
   // DERIVED as 2π·AU/T_sid in km/h (follow-up item 5 decided — the site's
   // former 9-dp hardcode sat 0.59 m/h below its own derivation; both trees
-  // now derive from one source). (The `<p>PredR2/PredRmse/PredTerms` and
-  // `<p>ObsR2/ObsRmse/ObsTerms` keys that shared this block — the retired
-  // planet predict device's self-fit statistics against the RETIRED scene's
-  // export — are gone with the device, plan 06 R8.)
+  // now derive from one source).
   ...(() => ({
     solarOrbitalSpeed: {
       get: () => 2 * Math.PI * C.currentAUDistance / C.meanSiderealYearSeconds * 3600,

@@ -1,11 +1,10 @@
 /**
  * Deep-time LOD / ΔT core — THE shared implementation (Phase 8.4, slice 3).
  *
- * The angular-momentum-conservation LOD (Layer 1/2), the H(t) identity, the
- * mass-loss year chain, the Simpson ΔT integrator with the H/5 ecliptic
- * "missing motion" integrand, the corrected-LOD composite, the Actual-LOD
- * Fourier ripple, and the dLOD/dt driver decomposition (tidal / GIA /
- * stack / resonator channels).
+ * The angular-momentum-conservation LOD (Layer 1/2), the composed precession
+ * rate, the mass-loss year chain, the Simpson ΔT integrator with the ecliptic
+ * "missing motion" integrand, the corrected-LOD composite, and the dLOD/dt
+ * driver decomposition (tidal / GIA / stack / resonator channels).
  *
  * INJECTED, by design:
  *  - moonDistanceMetresAtAge — the 8.2 moon month-chain (each engine's own
@@ -44,11 +43,11 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  * @property {number} aLockMetres - tidal-lock distance (LOD denominator → 0)
  * @property {number} aMoonNowMetres - Farhat polynomial anchor
  * @property {number} alpha1PerMa - the LLR recession rate (the J2000 slope of the cited history)
- * @property {number} lodNowH13Seconds - ω₀, the J2000 day length (the SI day since plan 09; identifier kept)
+ * @property {number} lodNowH13Seconds - ω₀, the J2000 day length (the SI day; identifier kept)
  * @property {number} meanSiderealYearJ2000Seconds
  * @property {number} solarMassLossFracPerYear
  * @property {number} precessionSolarShareJ2000 - f_S, the solar fraction of the J2000
- *   precession torque (derive-params) — the unit H(t) = 13·T_p,composed needs it
+ *   precession torque (derive-params) — the composed precession rate needs it
  */
 
 /**
@@ -59,23 +58,20 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  * @property {(year: number) => number} cycleLodSumAt - gated δLOD sum (incl. swing)
  * @property {(year: number) => number} swingLodAt - gated swing δLOD alone
  * @property {(year: number) => number} swingLodRateAt - gated analytic swing rate
- * @property {() => number} precessionPeriodJ2000YearsFn - the model's DERIVED
- *   J2000 axial precession period: the certified year-length laws' beat at
- *   2000, sid/(sid − trop) ≈ 25,771.4 yr (plan 06 S5 — one J2000 precession
- *   reading; the same anchor the hybrid obliquity self-anchors on). Read
+ * @property {() => number} precessionPeriodJ2000YearsFn - the model's J2000 axial
+ *   precession period, 1,296,000/p_A = 25,771.575 yr (the IAU 2006 general
+ *   precession; the same anchor the hybrid obliquity self-anchors on). Read
  *   LAZILY on the first composed-rate use, never at construction: every
  *   runtime's year laws read THIS factory's bases.
  * @property {() => number} nodalPeriodYearsFn - the period of Earth's orbit
  *   plane's nodal regression on the invariable plane, 1,296,000/|s₃| with s₃
  *   the dominant ζ mode of the banked deep secular modes (≈ 68,751 yr). An
  *   ORBITAL quantity (μ-tier: it does not follow Earth's spin), the reference
- *   the solar day's "ecliptic missing motion" term rides (plan 06 T2 item —
- *   formerly the spin unit's H/5, 67,063 yr, 2.5 % off and scaling with the
- *   spin at deep time). Lazy, like the precession anchor.
+ *   the solar day's "ecliptic missing motion" term rides. Lazy, like the
+ *   precession anchor.
  * @property {(tMa: number) => number} [lEmAtAgeKgm2S] - OPTIONAL time-dependent
  *   Earth-Moon angular momentum. Absent → the J2000 constant: conservation
- *   (plan 12 option A — the Driver-1½ solar-channel budget is deleted;
- *   measured: conservation on the cited history reproduces Farhat's own LOD
+ *   (measured: conservation on the cited history reproduces Farhat's own LOD
  *   to 0.01 h at 100 Ma, 0.14 h at 2.46 Ga).
  * @property {(tMa: number) => number|null} [moonDistanceSlopeMetresPerMaAtAge] -
  *   OPTIONAL analytic slope of the distance history (metres per Ma, positive
@@ -84,7 +80,7 @@ const { createComposedPrecession } = require('../earth/precession-composed.cjs')
  * @property {(tMa: number) => number|null} [meanObliquityCosRatioAtAge] -
  *   OPTIONAL cos ε̄(t)/cos ε̄(0) of the cited mean obliquity (earth/mean-
  *   obliquity-history) — the factor the precession RATE of date carries on the
- *   constant (plan 12 §8 option (a)); absent → 1, the constant alone, bit-identical.
+ *   constant; absent → 1, the constant alone, bit-identical.
  */
 
 /** @param {DeepTimeLodDeps} deps */
@@ -117,26 +113,12 @@ function createDeepTimeLod(deps) {
     return (s === null) ? null : s / 3600;
   }
 
-  // (Plan 09 step 7a deleted the FROZEN ERA CLOCK's public counter
-  // `eraClockHAtAge` — H_era(t) = H₀·LOD(t)/LOD₀, plan 06 D8's second named
-  // counter — with its year twins; step 7b deleted the unit itself, `hAtAge`
-  // = H_era/[f_S + (1 − f_S)(a₀/a_M)³] — H(t) was 13.011 composed precession
-  // periods, a fit constant's multiple of T_p(t), never a period of anything
-  // the model computes. The physics it scaled is the composed precession
-  // below: ψ̇(t) and T_p(t) = 1,296,000/ψ̇ are the published quantities.)
-  // The `…FromLod` twins take an ALREADY-COMPUTED LOD(t): the Simpson ΔT
-  // integrand below evaluated the LOD four times and the tropical year twice
-  // per node through these helpers (measured 8.8 → 4.8 ms per cardinal panel
-  // year with the model's ΔT memo). Same operations, same inputs — every
-  // value bit-identical (11,958-value sweep, 0 differences).
-
-  // The composed lunisolar precession (plan 06 D6 → Phase 3 → S5; plan 12 §8):
-  // the CONSTANT's scaling [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] and the
-  // RATE of date, that × cos ε̄(t)/cos ε̄(0) on the cited mean obliquity; p₀ the
-  // model's J2000 rate 1,296,000/axial0 (the IAU 2006 general precession since
-  // plan 09). ONE formula home: earth/precession-composed, built here on this
-  // factory's own LOD, recession and obliquity histories; the anchor resolves
-  // lazily on the first rate use.
+  // The composed lunisolar precession: the CONSTANT's scaling
+  // [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] and the RATE of date, that ×
+  // cos ε̄(t)/cos ε̄(0) on the cited mean obliquity; p₀ the model's J2000 rate
+  // 1,296,000/axial0 (the IAU 2006 general precession). ONE formula home:
+  // earth/precession-composed, built here on this factory's own LOD, recession
+  // and obliquity histories; the anchor resolves lazily on the first rate use.
   const composed = createComposedPrecession({
     p0ArcsecPerYr: () => 1296000 / deps.precessionPeriodJ2000YearsFn(),
     solarShare: K.precessionSolarShareJ2000,
@@ -148,11 +130,10 @@ function createDeepTimeLod(deps) {
     meanObliquityCosRatioAtAge: deps.meanObliquityCosRatioAtAge,
   });
 
-
   /** THE PRECESSION RATE OF DATE ψ̇(t), ″/yr — the constant's scaling
    * p₀·[ω/ω₀]·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0), ε̄ the cited mean
-   * obliquity (plan 12 §8 option (a); the chain held cos ε̄ at J2000 before —
-   * 2.5 % of rate at 2.46 Ga, 2e-7 at 10 kyr). p₀ the J2000 anchor (S5).
+   * obliquity (its factor is 2.5 % of the rate at 2.46 Ga, 2e-7 at 10 kyr);
+   * p₀ the J2000 anchor.
    * @param {number} t_Ma @returns {number|null} */
   function lunisolarPrecessionRateArcsecPerYrAtAge(t_Ma) {
     return composed.composedRateArcsecPerYrAtAge(t_Ma);
@@ -192,23 +173,18 @@ function createDeepTimeLod(deps) {
     // a(t) = a₀·(1−Δm)): T ∝ M⁻² ⇒ T(t) = T₀·(1−Δm)² — the SAME Driver-2
     // law the planet chains use (orbit-chain driver2PeriodSecondsAtAge).
     // The previous (1 − 2Δm) was this law's first-order Taylor — the one
-    // form in the model inconsistent with it (measured on the retired day-count
-    // identity of the era counter: with the product form the counter's
-    // H_era·(days/yr)·(AU₀/AU)² held exactly — a tautology of spin scaling ∘
-    // Kepler, deleted with the counter and the unit at plan 09 steps 7a/7b).
+    // form in the model inconsistent with it.
     return K.meanSiderealYearJ2000Seconds * (1 - mass_loss_fraction) * (1 - mass_loss_fraction);
   }
 
   /** Tropical year of date, seconds — the sidereal year less the equinox's
    * own motion over one year: one turn per the composed lunisolar precession
    * period T_p(t), 1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″ · Julian-year s),
-   * ψ̇(t) the RATE of date (with the cited mean obliquity's cosine, plan 12 §8).
-   * Plan 09 step 5d: it was the unit's calendar convention sid·(1 − 13/H(t))
-   * — plan 06 D2 had kept it as a named device — 0.086 % slow on the equinox
-   * term (1.0 s of year at J2000), and the deep JD↔year calendar integrates
-   * THIS. The SAME operations as layer0's tropicalYearSecondsCore (the
-   * layer0 gate holds the twins bit-identical). Past the tidal chain's domain
-   * the J2000 rate stands in. @param {number} t_Ma @returns {number} */
+   * ψ̇(t) the RATE of date (with the cited mean obliquity's cosine). The deep
+   * JD↔year calendar integrates THIS. The SAME operations as layer0's
+   * tropicalYearSecondsCore (the layer0 gate holds the twins bit-identical).
+   * Past the tidal chain's domain the J2000 rate stands in.
+   * @param {number} t_Ma @returns {number} */
   function tropicalYearSecondsAtAge(t_Ma) {
     return tropicalYearSecondsFromLod(t_Ma, lodSecondsAtAge(t_Ma));
   }
@@ -235,10 +211,6 @@ function createDeepTimeLod(deps) {
     return tropicalYearSecondsAtAge(t_Ma) / LOD_s;
   }
 
-  // (Plan 09 step 7a: the frozen era clock's year twins on H_era —
-  // T_sid·(1 − 13/H_era) and its day count, the bases the deleted cardinal
-  // record and year-length combs were fitted against — are deleted.)
-
   /**
    * The solar day's "ecliptic missing motion" correction, seconds: the mean
    * solar day is counted against the Sun on the ECLIPTIC, whose plane turns
@@ -247,8 +219,7 @@ function createDeepTimeLod(deps) {
    * (≈ 3.44 ms at J2000). T_s₃ is an orbital quantity: constant at every
    * epoch (μ-tier), so the term rides only LOD_mean and the year length at
    * deep time. ONE home for the three runtimes' `h5Correction` twins (the
-   * identifier keeps its name; the divisor is the nodal period since the
-   * plan 06 T2 restatement, formerly the spin unit's H/5).
+   * identifier keeps its historical name; the divisor is the nodal period).
    * @param {number} t_Ma @returns {number|null} seconds (null past tidal lock)
    */
   function eclipticLodCorrectionSecondsAtAge(t_Ma) {
@@ -305,10 +276,6 @@ function createDeepTimeLod(deps) {
     return tidal + deps.cycleLodSumAt(year);
   }
 
-  // (Plan 09: the "Actual LOD" — the tidal mean × the retired sidereal-year
-  // comb's ripple — is deleted with the comb; the ripple was the sidereal
-  // year's λ̇ variation misattributed to the day length.)
-
   /**
    * dLOD/dt driver decomposition, ms/century per channel.
    * tidal: Moon-recession (Farhat da/dt, LLR-anchored) · gia: α(t) numeric
@@ -331,12 +298,11 @@ function createDeepTimeLod(deps) {
     const I_E = alpha * K.mEarthAloneKg * K.rEarthMetres * K.rEarthMetres;
     const year = 2000 - t_Ma * 1e6;
 
-    // The cited history's slope (plan 12 option A): the engine's
-    // moonDistanceSlopeMetresPerMaAtAge when it provides one (the Hermite's
-    // analytic derivative — C1, smooth), else a ±1-kyr central difference on
-    // the distance itself. t_Ma > 0 = past; forward-time sign flip. At J2000
-    // the slope IS the LLR observation (the history's boundary condition):
-    // +3.82 cm/yr ✓
+    // The cited history's slope: the engine's moonDistanceSlopeMetresPerMaAtAge
+    // when it provides one (the Hermite's analytic derivative — C1, smooth),
+    // else a ±1-kyr central difference on the distance itself. t_Ma > 0 =
+    // past; forward-time sign flip. At J2000 the slope IS the LLR observation
+    // (the history's boundary condition): +3.82 cm/yr ✓
     let slopePerMa = deps.moonDistanceSlopeMetresPerMaAtAge ? deps.moonDistanceSlopeMetresPerMaAtAge(t_Ma) : null;
     if (slopePerMa === null || slopePerMa === undefined) {
       const H_MA = 1e-3;
@@ -387,19 +353,18 @@ function createDeepTimeLod(deps) {
   return {
     lodSecondsAtAge, lodSecondsAtAgeWithAlpha, lodHoursAtAge,
     lunisolarPrecessionRateArcsecPerYrAtAge, lunisolarPrecessionPeriodYearsAtAge,
-    // the constant's scaling alone (the hybrid's integrand) and the rate's obliquity factor (plan 12 §8)
+    // the constant's scaling alone (the hybrid's integrand) and the rate's obliquity factor
     lunisolarTorqueRateArcsecPerYrAtAge, lunisolarTorquePeriodYearsAtAge, precessionObliquityFactorAtAge,
-    // the composition's terms (plan 06 Phase 3 S3, the lunisolar surface): (a₀/a_M)³ and f_S + (1 − f_S)(a₀/a_M)³
+    // the composition's terms (the lunisolar surface): (a₀/a_M)³ and f_S + (1 − f_S)(a₀/a_M)³
     lunarTorqueFactorAtAge: composed.lunarTorqueFactorAtAge,
     precessionTorqueTermAtAge: composed.torqueTermAtAge,
     siderealYearSecondsAtAge, tropicalYearSecondsAtAge, tropicalYearDaysAtAge,
-    // the same law on a caller-supplied LOD (the browser's L1-α sensitivity sweep; plan 09 step 7c)
+    // the same law on a caller-supplied LOD (the browser's L1-α sensitivity sweep)
     tropicalYearSecondsFromLod,
-    // the solar day's ecliptic missing-motion term on the nodal period (plan 06 T2 item; one home)
+    // the solar day's ecliptic missing-motion term on the nodal period (one home)
     eclipticLodCorrectionSecondsAtAge,
     yearInDaysAtAge, deltaTRawSecondsAtAge, lodSecondsWithCorrectionsAtAge,
     dLodDtDecompositionAtAge,
-    // (plan 09 step 7a: the frozen era clock's counter and bases left with the last comb)
   };
 }
 

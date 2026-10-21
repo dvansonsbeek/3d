@@ -309,13 +309,6 @@ massFraction.earth = (GM_Earth / G) / M_Sun
 | Uranus | <!--v:uranusMassFraction-->4.366 × 10⁻⁵<!--/v--> |
 | Neptune | <!--v:neptuneMassFraction-->5.151 × 10⁻⁵<!--/v--> |
 
-### The retired integer laws' recorded constants (frozen in the registry)
-
-| Constant | Formula | Value |
-|----------|---------|-------|
-| ψ (psi) — the retired inclination law's recorded value | d_E × amp_E × √m_E (from Earth) | <!--v:psiValue-->3.3070 × 10⁻³<!--/v--> |
-| K | e_amp_E × √m_E / (sin(tilt_E) × √d_E) (from Earth) | <!--v:kValue-->3.4143 × 10⁻⁶<!--/v--> |
-
 ### J2000 Eccentricities (eccJ2000)
 
 All 8 planets — the observed J2000 values the chains' eccentricity of date is anchored on:

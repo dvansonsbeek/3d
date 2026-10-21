@@ -3,13 +3,8 @@
 //
 // All input data loaded from the ONE input file in public/input/:
 //   astro-reference.json        — IAU/JPL/Meeus reference data + the scene epoch
-//   (model-parameters.json — the model theory parameters — was retired leaf
-//    by leaf and DELETED at plan 11 step 6; the planets' display names are
-//    @essrt/physics planets/display-names, the deep-time block is assembled
-//    by the generator, every other leaf's fate is in that plan's record)
-//   (fitted-coefficients.json — the fitting pipeline's comb output — was
-//    emptied at plan 09 step 7a and deleted at plan 11 step 1; the shipped
-//    fits live under data/ and the deep-time block is read from the
+//   (the planets' display names are @essrt/physics planets/display-names; the
+//    shipped fits live under data/ and the deep-time block is read from the
 //    generated constants module, see the Deep-time exports below)
 //
 // Sub-modules:
@@ -22,15 +17,15 @@
 const utils = require('./constants/utils');
 const path = require('path');
 const fs = require('fs');
-// Plan 13 B3: the J2000 mass chain, the Moon's J2000 periods and the unit
-// constants have ONE home in @essrt/physics (three copies each before).
+// The J2000 mass chain, the Moon's J2000 periods and the unit constants have
+// ONE home in @essrt/physics.
 const { computeMassChainJ2000, computeMoonPeriodsJ2000 } = require('@essrt/physics/earth/mass-chain');
 const { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, J2000_JD } = require('@essrt/physics/constants/units');
 const astroRef = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'public', 'input', 'astro-reference.json'), 'utf8'));
-// The deep-time block of the generated constants module (plan 11 step 1) —
-// the ONE assembly of its three homes; require(esm) is synchronous on the
-// repo's Node 22 (the module has no top-level await).
+// The deep-time block of the generated constants module — the ONE assembly of
+// its three homes; require(esm) is synchronous on the repo's Node 22 (the
+// module has no top-level await).
 const GENERATED_DEEP_TIME = require('../../packages/physics/src/constants/generated.js').DEFAULT_CONSTANTS.deepTime;
 
 // Build ASTRO_REFERENCE object (consumed by scene-graph.js, optimizer.js, etc.)
@@ -51,44 +46,25 @@ const ASTRO_REFERENCE = {
   ...astroRef.moonMeeus,
   // Cardinal point anchors
   cardinalPointAnchors: astroRef.cardinalPointAnchors,
-  // (plan 11 step 3: the fields once attached below after the planets were
-  // defined — ascNodeTiltCorrection and <planet>PerihelionRef_JD — are
-  // deleted with the scaffold's start angles and the planet EoC branch.)
 };
 
 const yearLengthRef = astroRef.yearLengthRef;
 const knownValues = astroRef.knownValues;
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. FOUNDATIONAL MODEL CONSTANTS (the scene epoch — astro-reference.json timeReference)
 // These define the model itself. Changing any = different theory.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// (plan 09 step 7c: the frozen era unit `holisticyearLength` (H), its lattice
-// `stepYears` and the device's rounded mean tropical year input
-// `inputmeanlengthsolaryearindays` left model-parameters.json; plan 11 step 4:
-// the K-device wheels' recorded pose block left with the scaffold.)
-// Plan 11 step 5: the scene epoch's ONE home is astro-reference
-// timeReference.sceneEpochJD / sceneEpochYear (moved verbatim); correctionDays
-// — the retired scaffold Sun's fine timing — is deleted, every anchor below
-// is the epoch itself.
+// The scene epoch's ONE home is astro-reference timeReference.sceneEpochJD /
+// sceneEpochYear; every anchor below is the epoch itself.
 const startmodelJD = astroRef.timeReference.sceneEpochJD;
 const startmodelYear = astroRef.timeReference.sceneEpochYear;
-// (plan 11 step 4: startAngleModel — the browser's inclination-path loop zero,
-// with the deleted K inclination phase — left the JSON; the loop's zero is a
-// scene literal in src/script.js.)
-// Plan 11 step 2: hard-wired. The equation of centre on the scene wheels and
-// the certified Moon override ARE the scene; the toggle's false branch was a
-// 6.5°-of-Moon diagnostic nobody ran (measured by the reach audit). Kept as a
-// named constant so the mirror sites in moveModel read as before.
+// Hard-wired: the equation of centre on the scene wheels and the certified
+// Moon override ARE the scene; the toggle's false branch was a 6.5°-of-Moon
+// diagnostic nobody ran (measured by the reach audit). Kept as a named
+// constant so the mirror sites in moveModel read as before.
 const useVariableSpeed = true;
-// (plan 11 step 2: correctionSun — the scene Sun's start angle, and the
-// perihelion-phase offset derived from it — is deleted: the engine places the
-// Sun at the certified longitude every frame, so it reached nothing.)
-// (Plan 07 R10: temperatureGraphMostLikely and systemResetN — the phase
-// origin's inputs — left the JSON; the combs' phase is measured from J2000.)
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 2. PHYSICAL & ASTRONOMICAL CONSTANTS (from astro-reference.json)
@@ -104,31 +80,12 @@ const MASS_RATIO_EARTH_MOON = astroRef.physicalConstants.MASS_RATIO_EARTH_MOON;
 const massRatioDE440 = astroRef.physicalConstants.massRatioDE440;
 const perihelionalignmentYear = astroRef.earthOrbital.perihelionalignmentYear;
 
-
 // ═══════════════════════════════════════════════════════════════════════════
 // 3. EARTH PARAMETERS (derived)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// (plan 11 step 4: the K-device scaffold's recorded J2000 pose — earthtiltMean,
-// earthInvPlaneInclinationAmplitude, kDeviceWheelPhaseAtJ2000Cycles,
-// kDeviceWheelPeriodYears, kDeviceInclinationPhaseJ2000Deg, the derived
-// earthRAAngle and eccentricityAmplitude — is deleted with the scaffold. The
-// scene's world frame is the J2000 ecliptic, @essrt/physics
-// earth/frame-of-date computeSceneWorldFrameJ2000 (scene-graph.js _chainR); the
-// three precession wheels are gone and every frame of date is placed from the
-// engine through that bridge. Mirror: src/script.js A2.)
 const earthAscendingNodeInvPlane = ASTRO_REFERENCE.earthAscendingNodeInvPlane;
-// (plan 11 step 2: earthInvPlaneInclinationMean — inclJ2000 − A·cos(the K
-// phase), the invariable-plane disc's init, rewritten from the chain every
-// frame — and eccentricityBase, the retired Law-5 constant with no reader
-// left but a pre-empted fallback, are deleted.)
-// (plan 11 step 2: eccentricityBaseDerived — the perihelion wheel's offset
-// base′ = e(J2000)/(1 + cos θ₀/2) — is deleted; the wheel's offset arm is
-// placed at the series' e of date every frame (R4), and its pose before the
-// first engine frame is e(J2000). plan 07 R6: eccentricityAmplitudeK went
-// with the eccentricity law.)
 const perihelionRefJD = ASTRO_REFERENCE.perihelionPassageJ2000_JD;
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 4. MOON INPUT CONSTANTS (astro refs)
@@ -142,61 +99,35 @@ const moonEclipticInclinationJ2000 = astroRef.moonReference.moonEclipticInclinat
 const moonOrbitalEccentricity = astroRef.moonReference.moonOrbitalEccentricityBase;
 const moonObliquityEclipticJ2000 = astroRef.moonReference.moonObliquityEclipticJ2000;
 const moonTilt = astroRef.moonReference.moonTilt;
-// (plan 11 step 2: moonMeeusLpCorrection — retired to 0 at plan 06 R3 item 1 —
-// left the lunar series' parameters; moonStartposMoon — the scene Moon's start
-// angle — is deleted: the certified override sets the rendered Moon's direction
-// and distance every frame, so the angle reached only the Node twin's
-// geometric pivot. Plan 11 step 3: the ring's two fitted phases
-// moonStartposApsidal/Nodal are deleted too — scene-graph.js
-// _applyEngineEarthFrame places the ring's stack layers from the lunar
-// arguments every call.)
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 5. PLANET INPUT DATA (astro-reference.json + the chain artifact; the display
-//    names are @essrt/physics planets/display-names — plan 11 step 6)
+//    names are @essrt/physics planets/display-names)
 // Per-planet constants for the 7 non-Earth planets.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Plan 07 R1/R8: the planets' perihelion period is the N-body chain's
-// inertial apsidal period, 1,296,000/g yr (g the leading secular apsidal
-// eigenfrequency of the governed artifact, ″/yr — the quantity the API and
-// the registry publish; Mercury 232,437 yr). The H·num/den lattice
-// fractions (model-parameters perihelionEclipticFraction, the former
-// fractionToYears helper; Mercury 8H/11 = 243,867 yr) are gone with the
-// other device inputs (fibonacciD, inclinationCycleAnchor, antiPhase).
+// The planets' perihelion period is the N-body chain's inertial apsidal
+// period, 1,296,000/g yr (g the leading secular apsidal eigenfrequency of the
+// governed artifact, ″/yr — the quantity the API and the registry publish;
+// Mercury 232,437 yr).
 const CHAIN_DATA = JSON.parse(fs.readFileSync(
   path.resolve(__dirname, '..', '..', 'data', 'nbody-secular-frequencies.json'), 'utf8'));
 
 const planetAstro = astroRef.planetOrbitalElements;
 // The seven chain planets, in the one order every runtime iterates — the
-// display-name map is the key set too (plan 11 step 6).
+// display-name map is the key set too.
 const { PLANET_DISPLAY_NAMES } = require('../../packages/physics/src/planets/display-names.cjs');
 const planets = {};
 for (const key of Object.keys(PLANET_DISPLAY_NAMES)) {
   const ar = planetAstro[key];
   planets[key] = {
-    // Presentation (plan 11 step 6: the deleted JSON's last leaf, code now)
+    // Presentation (code, not an input)
     name: PLANET_DISPLAY_NAMES[key],
-    // (plan 07 R6: orbitalEccentricityBase / Amplitude / eccentricityPhaseJ2000
-    // were derived here from the balanced-year phase + K; the law is retired
-    // and the chain carries the eccentricity of date. Plan 11 step 2:
-    // eocFraction, angleCorrection and mirrorPair are deleted — no reader
-    // left, or overwritten by the chain placement every frame. Plan 11
-    // step 3: startpos — the scaffold's start angle — and type — the wheel
-    // ellipse family, now the geometry law's own taxonomy — left the record.)
     perihelionEclipticYears: 1296000 / CHAIN_DATA.g[key].arcsecPerYr,   // the chain's inertial apsidal period (R1)
     // the closed-form verified J2000 node on the invariable plane — a
-    // reference derivation, astro-reference since plan 11 step 2 (the key name
-    // stays for the Python bridge's OMEGA_J2000 and the registry)
+    // reference derivation (astro-reference; the key name stays for the Python
+    // bridge's OMEGA_J2000 and the registry)
     ascendingNodeInvPlane: ar.ascendingNodeInvPlaneClosedForm,
-    // (plan 09 step 7c: `ascendingNodeCyclesIn8H` and the −8H/N node period
-    // it set — a device count — left with the unit; a planet's node of date
-    // and its nodal period are the chain's elements and modes.)
-    // (axialPrecessionYears / obliquityCycle — the K device's integer
-    // fractions — retired with plan 06 Phase 7 commit 2: the spin channel
-    // carries the planets' precession and obliquity.)
-    // Astro references (from astro-reference.json)
     solarYearInput: ar.solarYearInput,
     orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
     axialTiltJ2000: ar.axialTiltJ2000,
@@ -217,9 +148,8 @@ for (const p of Object.values(planets)) {
 }
 
 // Additional bodies — the four no-chain minor bodies (Pluto, Halley, Eros,
-// Ceres). Plan 11 step 2: their scaffold block left model-parameters.json;
-// the observed J2000 elements in astro-reference are the only inputs. The
-// bodies are not rendered (f735c2d8); the geometry law's rows for them are
+// Ceres): the observed J2000 elements in astro-reference are the only inputs.
+// The bodies are not rendered (f735c2d8); the geometry law's rows for them are
 // the planet-model identity test's coverage of its ellipse families.
 const additionalBodies = {};
 for (const [key, ar] of Object.entries(astroRef.additionalBodiesReference)) {
@@ -230,78 +160,55 @@ for (const [key, ar] of Object.entries(astroRef.additionalBodiesReference)) {
   };
 }
 
-
 // ═══════════════════════════════════════════════════════════════════════════
 // 6. DERIVED MODEL VALUES
 // Computed from foundational constants. Order matters (dependency chain).
 // ═══════════════════════════════════════════════════════════════════════════
 
-// (plan 09 step 7c: `perihelionCycleLength` = H/16 is deleted; plan 11 step 4
-// deleted the K perihelion wheel and its recorded period block with it.)
-// Plan 09: the model's mean solar year in days — the calendar's year axis —
-// is the J2000 mean tropical year DERIVED in one home from two IAU inputs,
-// the sidereal year and the general precession p_A per Julian year
+// The model's mean solar year in days — the calendar's year axis — is the
+// J2000 mean tropical year DERIVED in one home from two IAU inputs, the
+// sidereal year and the general precession p_A per Julian year
 // (@essrt/physics earth/year-lengths computeMeanTropicalYearJ2000Days,
-// 365.242190469 d). The Meeus & Savoie 1992 input 365.2421897 (66 ms shorter;
-// its beat with the sidereal year read 25,770.7 yr against p_A's 25,771.6)
-// left the registry with it; before that the era device rounded the input
-// onto 1/(H/8) of a day (365.24220365, +1.2 s). `inputMeanSolarYear` stays as
-// the recorded foundational input.
+// 365.242190469 d). `inputMeanSolarYear` stays as the recorded foundational
+// input.
 const { computeMeanTropicalYearJ2000Days } = require('@essrt/physics/earth/year-lengths');
 const meanSolarYearDays = computeMeanTropicalYearJ2000Days(astroRef.yearLengthRef.siderealYear, astroRef.earthOrbital.generalPrecessionJ2000_arcsecPerYr);
 const meanEarthRotationsPerYear = meanSolarYearDays + 1;
-// Plan 11 step 5: ≡ startmodelYear — correctionDays is deleted; the name stays
-// as an alias for the frozen explore scripts that read it (tools/explore/u2-*).
+// ≡ startmodelYear; the name stays as an alias for the frozen explore scripts
+// that read it (tools/explore/u2-*).
 const startModelYearWithCorrection = startmodelYear;
-// Plan 07 R10: the correction combs measure their phase from J2000. The former
-// origin — perihelionalignmentYear − 14.5 × H/16 = −302,635, the "balanced
-// year" — was rotated out of every fitted (sin, cos) pair exactly
-// (tools/fit/reorigin-combs-j2000.mjs, measured bit-identical on every
-// surface over ±300 kyr) and is no longer an input. The name stays as the
-// code's phase-origin variable; it is 2000 by construction.
+// The phase-origin variable is J2000 (2000 by construction); the name stays
+// for its readers.
 const balancedYear = 2000;
 const perihelionalignmentJD = Math.round(startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - perihelionalignmentYear)));
 const balancedJD = startmodelJD - (meanSolarYearDays * (startModelYearWithCorrection - balancedYear));
 const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meanSolarYearDays;
 // IAU sidereal-year J2000 anchor (365.256363004 d).
 const meanSiderealYearDays = astroRef.yearLengthRef.siderealYear;
-// Plan 09: the J2000 day length ω₀ is the SI day (86,400 s — the IAU day the
-// year inputs are stated in), an input in astro-reference.json. The retired
-// era device anchored it on its H/13 identity instead (meanSolarYearDays ×
-// H/(H − 13) "kinematic" sidereal days → 86,399.99968 s, 0.32 ms below the
-// SI day); that construction is deleted.
+// The J2000 day length ω₀ is the SI day (86,400 s — the IAU day the year
+// inputs are stated in), an input in astro-reference.json.
 const meanLengthOfDay = astroRef.yearLengthRef.solarDay;
-// Plan 09: THE J2000 precession anchor p₀ is the IAU 2006 general precession
-// in longitude (astro-reference.json), stated as the period 1,296,000/p_A =
-// 25,771.575 Julian years. Before plan 09 it was the retired year combs' beat
-// at 2000 (25,771.395 yr). ONE home: the composed clock, the hybrid's
+// THE J2000 precession anchor p₀ is the IAU 2006 general precession in
+// longitude (astro-reference.json), stated as the period 1,296,000/p_A =
+// 25,771.575 Julian years. ONE home: the composed clock, the hybrid's
 // self-anchor, the registry and the browser read this export.
 const axialPrecessionJ2000Years = 1296000 / astroRef.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
 const axialPrecessionJ2000Days = axialPrecessionJ2000Years * DAYS_PER_JULIAN_YEAR;
 const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLengthOfDay;
-// Stellar day: the H/13 precession rate is precession in LONGITUDE (along the
+// Stellar day: the axial precession rate is precession in LONGITUDE (along the
 // ecliptic); the sidereal→stellar offset depends on precession in RIGHT
 // ASCENSION (along the equator), and m = p·cos(ε). MEAN family, so the mean
 // obliquity. Mirrors STELLAR_DAY_RA_PROJECTION in src/script.js — keep in sync.
 const STELLAR_DAY_RA_PROJECTION =
   Math.cos(ASTRO_REFERENCE.obliquityJ2000_deg * Math.PI / 180);   // plan 09: the IAU ε₀ input (the retired comb's fitted mean sat 0.03° lower; 2e-11 of the stellar day)
-// Plan 09 step 4d: the equinox regresses one turn per T_p — the certified p_A
-// period (axialPrecessionJ2000Years) — not per the counter H/13 (0.086 % slow;
-// the browser twin had already moved; this line was the Node side of a split).
+// The equinox regresses one turn per T_p — the certified p_A period
+// (axialPrecessionJ2000Years).
 const meanStellarDay = (meanSiderealDay / axialPrecessionJ2000Years) / (meanSolarYearDays + 1)
   * STELLAR_DAY_RA_PROJECTION + meanSiderealDay;
-// (Plan 09 step 4d: meanAnomalisticYearDays — the Simon 1994 mean element
-// 365.259636 as a model constant — is deleted; the J2000 anomalistic year is
-// the one-family law of date at 2000, @essrt/physics yearLengths
-// .anomalisticYearSecondsAtYear(2000), the movement's own apsidal line. Before
-// step 3 it was meanSolarYearDays × (H/16)/(H/16 − 1), the device's identity.)
-// (plan 11 step 2: eccentricityDerivedMean — the one law's base′ alias, the
-// Earth panel's "mean eccentricity" cell — is deleted with base′.)
-// (plan 09 step 7c: `totalDaysInH` = H × mSY — the device's day count — and
-// the lattice grid (`pickStepYears`, `stepYears`, `gridYear`,
-// `gridYearDeltaFromJ2000`) are deleted. Since plan 07 R10 the phase origin
-// is J2000, so the grid year WAS J2000 and its delta identically 0: the
-// cardinal anchors and the IAU obliquity below are the J2000 values.)
+// (The J2000 anomalistic year is the one-family law of date at 2000,
+// @essrt/physics yearLengths.anomalisticYearSecondsAtYear(2000) — the
+// movement's own apsidal line; no constant here. The cardinal anchors and
+// the IAU obliquity below are the J2000 values.)
 
 // Cardinal point year fractions for initial search (derived from startmodelYear offset)
 // Maps calendar event to approximate year fraction from the model epoch.
@@ -319,8 +226,8 @@ const cardinalPointYearFractions = {
   AE: 0.73 - _epochOffset,   // September equinox (≈+0.23, later-same-year)
 };
 
-// The IAU obliquity and the observed cardinal anchors at the phase origin —
-// J2000 since plan 07 R10 (the names keep their "AtGrid" suffix for their readers)
+// The IAU obliquity and the observed cardinal anchors at J2000 (the names keep
+// their "AtGrid" suffix for their readers)
 const iauObliquityAtGrid = ASTRO_REFERENCE.obliquityJ2000_deg;
 const cardinalPointAnchorsAtGrid = {};
 for (const [type, jd2000] of Object.entries(ASTRO_REFERENCE.cardinalPointAnchors)) {
@@ -335,10 +242,6 @@ const j2000JD = J2000_JD;
 const julianCenturyDays = JULIAN_CENTURY_DAYS;
 const tropicalCenturyDays = 100 * meanSolarYearDays;
 
-// (Plan 07 R1: tripleSynodicYears — the Jupiter–Saturn triple synodic period
-// on the device's lattice perihelion rates — had no reader; gone with the
-// lattice.)
-
 // Equation of center eccentricity — derived, not a free parameter. The wheel's
 // split: the geometry supplies base'·sin M, the EoC term the rest — so the
 // static (J2000) value is e(J2000) − base'/2 (unification; matches the
@@ -348,33 +251,23 @@ const tropicalCenturyDays = 100 * meanSolarYearDays;
 // this const is its J2000 value — the scene overrides it per frame.
 const eocEccentricity = ASTRO_REFERENCE.earthEccentricityJ2000 / 2;
 
-// (plan 11 step 2: perihelionPhaseOffset — the scene Sun's EoC perihelion
-// phase at the model start, built from the deleted wheel 16 and correctionSun
-// — is deleted; the engine places the Sun at the certified longitude every
-// frame, so the offset reached nothing.)
-
-
 // ═══════════════════════════════════════════════════════════════════════════
 // 7. MOON DERIVED CYCLES
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ───── The Moon's J2000 periods on the IAU inputs (plan 09) ─────
+// ───── The Moon's J2000 periods on the IAU inputs ─────
 // Three observational anchors (astro-reference.json moonReference): the
 // sidereal month and the of-date apsidal and nodal precession periods (the
 // legacy-'ICRF' input names hold EQUINOX-OF-DATE periods, 3231.50 d /
 // 6798.38 d). The star-referenced (inertial) periods follow by removing the
 // equinox's own precession: 1/T_E = 1/T_I ∓ 1/T_p (perigee advances, node
 // regresses), T_p = the J2000 precession anchor in days (Julian years).
-// The retired era device counted these cycles as eighth-integers per 8H
-// (N_sid 35,860,753; N_apsidalI 303,196; N_nodalI 144,119 — the ∓13 was
-// H/13 cycles per H) and read every period back as totalDaysInH/N — 7.8 ms
-// above the IAU sidereal month; those counts are deleted (docs/66 §1 keeps
-// the derivation record). The anomalistic and nodal months are KINEMATIC
-// consequences of sidereal + precession (1/T_ano = 1/T_M − 1/T_apsidalE,
-// 1/T_nod = 1/T_M + 1/T_nodalE); the synodic month is the beat with the
-// sidereal year, the tropical month the sidereal month seen from the
-// precessing equinox. ONE home since plan 13 B3: @essrt/physics/earth/mass-chain
-// (the browser and the deep-time chain read the same function).
+// The anomalistic and nodal months are KINEMATIC consequences of sidereal +
+// precession (1/T_ano = 1/T_M − 1/T_apsidalE, 1/T_nod = 1/T_M + 1/T_nodalE);
+// the synodic month is the beat with the sidereal year, the tropical month
+// the sidereal month seen from the precessing equinox. ONE home:
+// @essrt/physics/earth/mass-chain (the browser and the deep-time chain read
+// the same function; docs/66 §1 keeps the derivation record).
 const moonSiderealMonth = moonSiderealMonthInput;
 const moonApsidalPrecessionDaysICRF = moonApsidalPrecessionDaysInputICRF;
 const moonNodalPrecessionDaysICRF = moonNodalPrecessionDaysInputICRF;
@@ -392,34 +285,15 @@ const moonSynodicMonth = _moonPeriods.moonSynodicMonthDays;
 const moonTropicalMonth = _moonPeriods.moonTropicalMonthDays;
 const moonFullMoonCycleEarth = _moonPeriods.moonFullMoonCycleEarthDays;
 const moonFullMoonCycleICRF = _moonPeriods.moonFullMoonCycleICRFDays;
-// (plan 09 step 7c: the real-valued "cycles per anchor interval" N_apsidalI /
-// N_nodalI — the Step-0 Sun comb's divisor candidates — left with the unit.)
 const moonApsidalMeetsNodalDays = _moonPeriods.moonApsidalMeetsNodalDays;
 const moonLunarLevelingCycleDays = _moonPeriods.moonLunarLevelingCycleDays;
 const moonDraconicYearICRF = _moonPeriods.moonDraconicYearICRFDays;
 const moonDraconicYearEarth = _moonPeriods.moonDraconicYearEarthDays;
 
-
 // ═══════════════════════════════════════════════════════════════════════════
 // 8. ASTRO_REFERENCE WIRING
 // Attach planet-dependent fields to the imported ASTRO_REFERENCE object.
 // ═══════════════════════════════════════════════════════════════════════════
-
-// (plan 09 step 7c: `ASTRO_REFERENCE.earthInvPlanePrecessionYears` = H/3 — a
-// device period with no reader — is deleted; Earth's apsidal period is the
-// chain's secular tangent, `model.lunisolar` / the registry's inclPrecYears.)
-
-// (The Moon post-Meeus RA/Dec patches MOON_CORRECTION / MOON_CORRECTION_RESIDUAL
-// were retired at plan 06 R3 item 1 — @essrt/physics moon/apparent.cjs.)
-
-// (Plan 11 step 3: the planets' perihelion passage references
-// (<planet>PerihelionRef_JD, from the deleted model-parameters
-// perihelionPassageRef block) and the ascending-node tilt corrections
-// (180 − Ω for the inner planets, 2 × the scaffold start angle for the outer
-// ones — the legacy position path's frame compensation) stood here. Both are
-// deleted with the start angles: the chain places every rendered planet
-// quantity, and the planet containers take the plain node tilt.)
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 9. MASS COMPUTATION, PSI, J2000 ECCENTRICITIES
@@ -437,7 +311,7 @@ for (const [k, ratio] of Object.entries(massRatioDE440)) {
 // leading-order correction for the Sun's tidal coupling to the Earth–Moon
 // barycentric wobble (closes G(M_E + M_M) to ~3.7 ppm of JPL DE440); GM_Sun
 // (M_Sun only) is Kepler on Earth's orbit minus GM_Earth (the JPL/IAU
-// convention). ONE home since plan 13 B3: @essrt/physics/earth/mass-chain.
+// convention). ONE home: @essrt/physics/earth/mass-chain.
 const _mass = computeMassChainJ2000({
   moonDistanceKm: moonDistance, moonSiderealMonthDays: moonSiderealMonth, meanSiderealYearDays,
   meanLengthOfDaySeconds: meanLengthOfDay, massRatioEarthMoon: MASS_RATIO_EARTH_MOON,
@@ -449,12 +323,6 @@ const GM_MOON_ALONE = _mass.gmMoonAloneKm3S2;
 const GM_SUN = _mass.gmSunKm3S2;
 const M_SUN = _mass.sunMassKg;
 massFraction.earth = (GM_EARTH_ALONE / G_CONSTANT) / M_SUN;
-
-// (Plan 07 R5: PSI — ψ = 3·A_earth·√(m_E/m_☉), the inclination-amplitude
-// constant inverted from Earth's calibration — and the per-planet ψ loop
-// below it (invPlaneInclinationAmplitude / invPlaneInclinationMean) are
-// DELETED with @essrt/physics/planets/fibonacci-laws. A planet's inclination
-// of date has one home, the N-body chain.)
 
 const eccJ2000 = {
   mercury: planets.mercury.orbitalEccentricityJ2000,
@@ -469,12 +337,11 @@ const eccJ2000 = {
 
 const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
 
-// The K eccentricity law's cycle period for each carrier: the chain's OWN
-// g-mode beat (dominant mode × largest companion of the planet's eccentricity
-// vector, keplerian-chain computeSecularShape — the panel's "Eccentricity
-// Cycle (g-mode beat)" row). Plan 06 Phase 7 commit 2: this replaces the
-// device's beat of its integer axial and obliquity fractions; the scene
-// twins read the same artifact, so both wobble wheels turn on one period.
+// The eccentricity-cycle period for each planet: the chain's OWN g-mode beat
+// (dominant mode × largest companion of the planet's eccentricity vector,
+// keplerian-chain computeSecularShape — the panel's "Eccentricity Cycle
+// (g-mode beat)" row); the scene twins read the same artifact, so both
+// wobble wheels turn on one period.
 const { computeSecularShape } = require('@essrt/physics/planets/secular-shape');
 const { computeObliquityJ2000Deg } = require('@essrt/physics/planets/spin-channel');
 // (CHAIN_DATA — the governed artifact — is loaded above the planet records,
@@ -485,16 +352,9 @@ for (const [key, p] of Object.entries(planets)) {
   }
 }
 
-// Plan 07 R6/R5: the K relation, the System-Reset eccentricity construction
-// and the ψ inclination law are gone — the loop that closed
-//   PSI → incl amp → mean tilt → K → ecc amp → phase from the anchor → base
-// no longer opens. A planet's eccentricity and inclination of date have one
-// home, the N-body chain; the base/amplitude/phase and mean/amplitude
-// triples were constructions nothing rendered read (plan 07 §9e).
-//
-// The DERIVED J2000 obliquity stays: it is the spin channel's reading (the
-// IAU pole against the chain's J2000 plane, acute form), not a device value,
-// and the fixtures pin it.
+// A planet's eccentricity and inclination of date have one home, the N-body
+// chain. The DERIVED J2000 obliquity is the spin channel's reading (the IAU
+// pole against the chain's J2000 plane, acute form), and the fixtures pin it.
 for (const [key, p] of Object.entries(planets)) {
   if (!massFraction[key]) continue;   // the seven carriers (R8: the fibonacciD guard went with the divisor)
   const A = CHAIN_DATA.j2000AnchorElements[key];
@@ -506,7 +366,6 @@ for (const [key, p] of Object.entries(planets)) {
   });
   p.obliquityMean = Math.min(eps, 180 - eps);
 }
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 10. PLANET DERIVED CALCULATIONS
@@ -521,12 +380,11 @@ const _GEOM_ENV = {
   earthEccentricityJ2000: ASTRO_REFERENCE.earthEccentricityJ2000,
   earthPerihelionLongitudeJ2000Deg: ASTRO_REFERENCE.earthPerihelionLongitudeJ2000,
 };
-// Plan 09 step 7b: the seven chain planets' scaffold geometry rides the chain's
-// own J2000 elements — a from the anchor set, the period from the fitted
-// era-window mean motion (deg per Julian year) of the governed engine-D
-// artifact (the SAME JSON the browser embeds as CHAIN_ARTIFACT); the
-// device's count-per-anchor-interval quantization is gone. The no-chain
-// bodies keep their observed period input. ONE home: planets/geometry.
+// The seven chain planets' scaffold geometry rides the chain's own J2000
+// elements — a from the anchor set, the period from the fitted era-window mean
+// motion (deg per Julian year) of the governed engine-D artifact (the SAME JSON
+// the browser embeds as CHAIN_ARTIFACT). The no-chain bodies keep their
+// observed period input. ONE home: planets/geometry.
 const _CHAIN_ARTIFACT = require('../../data/nbody-secular-frequencies.json');
 
 function computePlanetDerived(key) {
@@ -534,9 +392,8 @@ function computePlanetDerived(key) {
   const g = derivePlanetGeometry({
     key,   // the ellipse family is the law's own taxonomy (plan 11 step 3)
     ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, p.solarYearInput),
-    // Plan 07 R6: the scene's ellipse geometry read the K law's System-Reset
-    // base; with the law retired it reads the OBSERVED J2000 eccentricity,
-    // the value the chain is anchored on.
+    // The scene's ellipse geometry reads the OBSERVED J2000 eccentricity, the
+    // value the chain is anchored on.
     orbitalEccentricityBase: p.orbitalEccentricityJ2000,
     longitudePerihelion: p.longitudePerihelion,
     ascendingNode: p.ascendingNode,
@@ -590,18 +447,12 @@ for (const key of Object.keys(additionalBodies)) {
   additionalDerived[key] = computeAdditionalDerived(key);
 }
 
-
 // ═══════════════════════════════════════════════════════════════════════════
 // 11. BUILD DYNAMIC VALUES
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Date utilities (jdToYear/yearToJD need model constants)
 const { jdToYear, yearToJD } = utils.createDateUtils({ startmodelYear, startmodelJD, meanSolarYearDays });
-
-// (plan 09 step 4: PERI_HARMONICS — the perihelion comb on H-divisors — is
-// deleted; Earth's perihelion of date is the series' ϖ,
-// createModel().earth.perihelionLongitudeDeg)
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // EXPORTS — All ~115 items, backward compatible
@@ -623,9 +474,9 @@ module.exports = {
   massRatioDE440,
 
   // Deep-time physics anchors (astro-reference.json physicalConstants, and the
-  // deepTime block of the GENERATED constants module — plan 11 step 1: the
-  // block is ASSEMBLED by tools/constants/generate.mjs from its three homes
-  // (astro-reference moonReference.moonRecessionAlpha1PerMa + giaCoxChaoPeltier,
+  // deepTime block of the GENERATED constants module — the block is ASSEMBLED
+  // by tools/constants/generate.mjs from its three homes (astro-reference
+  // moonReference.moonRecessionAlpha1PerMa + giaCoxChaoPeltier,
   // data/deep-time-fitted.json, data/deltaT-4flag-fit.json shipped_taper); this
   // twin reads the SAME embed the browser and the package read, so there is one
   // assembly, and `test:constants` pins the embed to its sources)
@@ -637,16 +488,13 @@ module.exports = {
   SOLAR_LUMINOSITY_W: astroRef.physicalConstants.solarLuminosityW,
   SOLAR_WIND_KG_PER_S: astroRef.physicalConstants.solarWindMassLossKgPerS,
   ALPHA_1: GENERATED_DEEP_TIME.alpha1PerMa,
-  // (plan 12 option A: ALPHA_3/ALPHA_4 and RECESSION_REGIME are deleted — the
-  // Earth–Moon distance history is the cited AstroGeo22 table the deep-time
-  // twin reads through @essrt/physics/deltat/moon-distance-artifact.)
   ALPHA_GIA_RATE_J2000_PER_YR: GENERATED_DEEP_TIME.alphaGiaRateJ2000PerYr,
   ALPHA_GIA_RELAXATION_KYR: GENERATED_DEEP_TIME.alphaGiaRelaxationKyr,
   J2_RATE_J2000_PER_YR: GENERATED_DEEP_TIME.j2RateJ2000PerYr,   // the OBSERVED dJ2/dt (Cox & Chao 2002) — the GIA channel's J2 scale (the precession of date)
   DT_STACK_TAPER_FULL_HALFWIDTH_YR: GENERATED_DEEP_TIME.dtStackTaperFullHalfwidthYr,
   DT_STACK_TAPER_TOTAL_HALFWIDTH_YR: GENERATED_DEEP_TIME.dtStackTaperTotalHalfwidthYr,
 
-  // Earth parameters (plan 11 step 4: the K-device pose constants are deleted)
+  // Earth parameters
   earthAscendingNodeInvPlane,
   perihelionRefJD,
 
@@ -708,8 +556,8 @@ module.exports = {
 
   // Mass, PSI, eccentricities
   GM_SUN,
-  // Plan 06 Phase 7: the planets' spin inputs (astro-reference planetSpinPhysical)
-  // and the chain data — the Node scene engine builds the spin channel from them.
+  // The planets' spin inputs (astro-reference planetSpinPhysical) and the
+  // chain data — the Node scene engine builds the spin channel from them.
   PLANET_SPIN_PHYSICAL: astroRef.planetSpinPhysical,
   CHAIN_DATA,
   M_SUN,
@@ -738,12 +586,6 @@ module.exports = {
   // External reference values
   yearLengthRef,
   knownValues,
-
-  // (The fitted record — SOLSTICE_JD_HARMONICS / CARDINAL_POINT_* — left at plan 09
-  //  step 7a with the frozen cardinal evaluator; the observed USNO 2000 instants
-  //  stay in ASTRO_REFERENCE.cardinalPointAnchors.
-  //  PREDICT_PLANETS / PREDICT_COEFFS — the planet predict device — retired at plan 06 R8;
-  //  PERI_HARMONICS / PERI_OFFSET — the perihelion comb — at plan 09 step 4)
 
   // Date utilities
   jdToCalendar: utils.jdToCalendar,

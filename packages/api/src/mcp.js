@@ -99,7 +99,7 @@ const TOOLS = Object.freeze({
     covers: ['/v1/derivations/{quantity}'],
   },
   essrt_climate: {
-    description: 'L1 orbital-forcing component (permil) at epoch(s) — the 32-component 8H lattice formula.',
+    description: 'L1 orbital-forcing component (permil) at epoch(s) — the climate formula’s orbital layer, the engine’s own physical line set (docs/92).',
     inputSchema: { type: 'object', properties: { ...TIME_PROPS } },
     request: (/** @type {any} */ a) => ({ method: 'GET', path: `/${API_VERSION}/climate`, query: queryOf(a) }),
     covers: ['/v1/climate'],

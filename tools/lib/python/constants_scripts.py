@@ -46,8 +46,6 @@ from load_constants import C as _C
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 J2000_YEAR = 2000
 BALANCE_YEAR = _C['balancedYear']   # plan 07 R10: 2000 — the combs' phase origin is J2000
-# (plan 11 step 4: K_DEVICE_WHEEL_PHASE_J2000_CYCLES — the K wheels' recorded
-# J2000 phase — left with the scaffold; no script read it.)
 
 # Model reference point
 _START_MODEL_JD = _C['startmodelJD']
@@ -56,27 +54,11 @@ _START_MODEL_YEAR = _C['startmodelYear']   # plan 11 step 5: the epoch itself (c
 _MEAN_SOLAR_YEAR = _C['meanSolarYearDays']
 BALANCED_JD = _C['balancedJD']
 
-# Earth parameters
-# (plan 11 step 2: EARTH_BASE_ECCENTRICITY and EARTH_INCLINATION_MEAN — the
-# retired device's Law-5 base and mean inclination — are deleted with their
-# constants; no script read them. Plan 11 step 4: EARTH_ECCENTRICITY_AMPLITUDE,
-# EARTH_OBLIQUITY_MEAN, EARTH_INCLINATION_AMPLITUDE and EARTH_RA_ANGLE — the
-# K-device scaffold's pose — are deleted with the scaffold; Earth's row of
-# AXIAL_TILT below is the J2000 obliquity anchor.)
+# Earth parameters (Earth's row of AXIAL_TILT below is the J2000 obliquity anchor)
 
-# (plan 09 step 7a: CARDINAL_POINT_ANCHORS / CARDINAL_POINT_HARMONICS /
-# SOLSTICE_JD_HARMONICS — the frozen cardinal record — are deleted with the
-# coefficients; no script imported them)
+# (the obliquity of date is the hybrid ε of the one-source movement, @essrt/physics)
 
-# Obliquity formula (fitted, from constants.js)
-# (plan 09: SOLSTICE_OBLIQUITY_MEAN / SOLSTICE_OBLIQUITY_HARMONICS retired — the
-# obliquity of date is the hybrid ε of the one-source movement, not a comb)
-
-# (plan 09 step 4: PERI_HARMONICS / PERI_OFFSET — the perihelion comb — are
-# deleted; Earth's perihelion of date is the series' ϖ in @essrt/physics,
-# createModel().earth.perihelionLongitudeDeg)
-
-# Earth inclination cycle anchor: ω̃_ICRF at max inclination (from balanced year)
+# Earth inclination cycle anchor: ω̃_ICRF at max inclination
 EARTH_INCL_CYCLE_ANCHOR = 21.77  # degrees (was 203.3195 in ascending-node-based model)
 
 # Physical & astronomical constants (from constants.js)
@@ -84,7 +66,6 @@ _AU_KM = _C['currentAUDistance']
 _SIDEREAL_YEAR_S = _C['meanSiderealYearSeconds']
 _G = _C['G_CONSTANT']
 _MASS_RATIO_EARTH_MOON = _C['MASS_RATIO_EARTH_MOON']
-# (plan 09 step 7c: the device's rounded mean-tropical-year input left the model.)
 
 # Moon input constants (from constants.js)
 _MOON_SIDEREAL_MONTH_INPUT = _C['moonSiderealMonthInput']
@@ -101,22 +82,13 @@ _MEAN_SOLAR_YEAR_DAYS = _C['meanSolarYearDays']
 _MEAN_SIDEREAL_YEAR_DAYS = _C['meanSiderealYearDays']
 _MEAN_LENGTH_OF_DAY = _SIDEREAL_YEAR_S / _MEAN_SIDEREAL_YEAR_DAYS
 _MEAN_SIDEREAL_DAY = (_MEAN_SOLAR_YEAR_DAYS / (_MEAN_SOLAR_YEAR_DAYS + 1)) * _MEAN_LENGTH_OF_DAY
-# (plan 09 step 7b: _TOTAL_DAYS_IN_H left with the device-count geometry it fed)
-# (plan 09 step 4d: the J2000 anomalistic year is the one-family law of date at
-# 2000 in @essrt/physics — no constant in the bridge; Simon 1994's mean element
-# 365.259636 is a citation, astro-reference knownValues.simon1994AnomalisticYearDays)
-# (plan 11 step 2: _ECCENTRICITY_DERIVED_MEAN — the one law's base′ alias — left
-# with the scene constant; nothing here read it.)
 
-# (plan 09: the three year-length combs TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_
-# HARMONICS are deleted — the year lengths of date are the one-family laws of
-# @essrt/physics; this mirror carries the J2000 IAU values only.)
+# The year lengths of date are the one-family laws of @essrt/physics; this
+# mirror carries the J2000 IAU values only.
 # The J2000 precession anchor p0 as a period (the IAU 2006 p_A), Julian years.
 AXIAL_PRECESSION_J2000_YEARS = _C['axialPrecessionJ2000Years']
 
-# Moon sidereal month: the IAU input itself (plan 09 — the era device's
-# integer-count read-back, totalDaysInH / round(totalDaysInH / input), was
-# 7.8 ms long and is deleted; matches constants.js / script.js).
+# Moon sidereal month: the IAU input itself (matches constants.js / script.js).
 _MOON_SIDEREAL_MONTH = _MOON_SIDEREAL_MONTH_INPUT
 
 # GM_SUN from Kepler's 3rd law
@@ -202,12 +174,8 @@ SQRT_M = {p: math.sqrt(MASS[p]) for p in PLANET_NAMES}
 ECC_J2000 = {p['name']: p['orbitalEccentricityJ2000'] for p in _C['planets'].values()}
 ECC_J2000["Earth"] = _C['ASTRO_REFERENCE']['earthEccentricityJ2000']
 
-# Plan 07 R6: ECC_BASE and ECC_AMPLITUDE_K are RETIRED with the K law. The
-# planets' base eccentricity was the K law's System-Reset construction and the
-# K constant was inverted from Earth's calibration; neither exists any more.
 # Analyses that want "the planet eccentricities" should use ECC_J2000 above —
-# the observed values the N-body chain is anchored on (Earth's Law-4 amplitude
-# and Law-5 base left at plan 11 steps 4 and 2).
+# the observed values the N-body chain is anchored on.
 
 AXIAL_TILT = {p['name']: p['axialTiltJ2000'] for p in _C['planets'].values()}
 AXIAL_TILT["Earth"] = _C['ASTRO_REFERENCE']['obliquityJ2000_deg']   # the IAU 2006 J2000 anchor (plan 11 step 4: was the K scaffold's mean tilt)
@@ -216,36 +184,21 @@ LONGITUDE_PERIHELION = {p['name']: p['longitudePerihelion'] for p in _C['planets
 LONGITUDE_PERIHELION["Earth"] = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000']  # 102.947
 PERIHELION_ECLIPTIC_YEARS = {p['name']: p['perihelionEclipticYears'] for p in _C['planets'].values()}
 
-# Obliquity cycle periods (years) — the retired device's table (its inputs left with the device; model-parameters.json is deleted, plan 11 step 6).
-# Obliquity cycle theory: obliquity = |inclination − ecliptic|; Venus/Neptune static.
-# Mercury: 8H/3 (Fibonacci decomposition). Mars: 8H/21 (= Jupiter axial, mirror swap).
-# Venus/Neptune: 8H/100 (= ICRF period → two-component formula cancels → constant obliquity).
-# The planets' obliquityCycle was retired at plan 06 Phase 7 commit 2 (the
-# device's beat of its integer axial and obliquity fractions); this dict has
-# raised KeyError on import ever since, which made the whole module — and
-# every script importing it — unrunnable, unnoticed, because no gate runs
-# them. Fixed at plan 07 R6. (Plan 09 step 7c: Earth's H/8 entry — the
-# device's obliquity wheel — left too; the obliquity period is the beat
-# 2π/(ψ̇ᵢₙ − |s₃|), a dynamical value.)
+# Obliquity cycle periods (years) — a retired table kept for the scripts that
+# still import it; the live obliquity period is the beat 2π/(ψ̇ᵢₙ − |s₃|), a
+# dynamical value (@essrt/physics lunisolar surface).
 
-# Plan 07 R6: the planets' ECC_AMPLITUDE and ECC_PHASE_J2000 went with the K
-# law too. Earth's phase stays, on the Earth side (plan 11 step 4: Earth's
-# amplitude EARTH_ECC_AMPLITUDE left with the K scaffold; no script read it).
+# Earth's eccentricity phase stays, on the Earth side.
 EARTH_ECC_PHASE_J2000 = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000'] + 90  # ω + 90°
 
-# Plan 07 R6: ECCENTRICITIES / ECC / ECC_DUAL_BALANCED all aliased ECC_BASE,
-# the retired balance construction. The eccentricity set an analysis should
-# use is ECC_J2000 — the observation, not a construction fitted to balance.
+# The eccentricity set an analysis should use is ECC_J2000 — the observation,
+# not a construction fitted to balance.
 ECCENTRICITIES = dict(ECC_J2000)
 ECC = ECCENTRICITIES
 
 # ═══════════════════════════════════════════════════════════════════════════
 # FIBONACCI DIVISORS (pure Fibonacci, mirror-symmetric)
 # ═══════════════════════════════════════════════════════════════════════════
-
-# (Plan 07 R8: D / D_INCL — the per-planet divisor assignments of the retired
-# ψ/K laws (model-parameters fibonacciD) — left with the laws' inputs; the
-# JSON no longer carries them.)
 
 # Mirror pairs across the asteroid belt
 MIRROR_PAIRS = [
@@ -260,7 +213,6 @@ MIRROR_PAIRS = [
 # ═══════════════════════════════════════════════════════════════════════════
 
 # Balance groups: Saturn is the sole anti-phase planet
-# Per-planet phase angles are in INCL_CYCLE_ANCHOR (ICRF perihelion at balanced year)
 PHASE_GROUP = {
     "Mercury": "in-phase", "Venus": "in-phase", "Earth": "in-phase", "Mars": "in-phase",
     "Jupiter": "in-phase", "Saturn": "anti-phase", "Uranus": "in-phase", "Neptune": "in-phase",
@@ -273,27 +225,12 @@ GROUP_ANTI = ["Saturn"]
 GROUP_203 = GROUP_IN_PHASE  # legacy alias
 GROUP_23 = GROUP_ANTI
 
-# ═══════════════════════════════════════════════════════════════════════════
-# (ψ-CONSTANT and INCLINATION AMPLITUDES — RETIRED, plan 07 R5)
-# PSI = 3 × amp_Earth × √m_Earth, its PSI1/PSI1_THEORY aliases, and the
-# per-planet INCL_AMP = PSI/(d×√m) (alias INCLINATION_AMPS) stood here — the
-# Python mirror of the ψ inclination law. Deleted with the law: a planet's
-# inclination of date has one home, the N-body chain (@essrt/physics
-# model.planets.inclinationDeg).
-# ═══════════════════════════════════════════════════════════════════════════
-
-# Fibonacci numbers (the retired divisor vocabulary; kept for the scripts that
-# still read FIB as a plain list)
+# Fibonacci numbers (kept for the scripts that still read FIB as a plain list)
 FIB = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597]
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ORBITAL PROPERTIES
 # ═══════════════════════════════════════════════════════════════════════════
-
-# (Plan 09 step 7b: SEMI_MAJOR / ORBITAL_PERIOD / SMA — the device-count
-# geometry, N = round(totalDaysInH / solarYearInput) orbits per anchor
-# interval, a = (H/N)^(2/3) — are deleted with the counts; no script imported
-# them. The scaffold geometry's one home is @essrt/physics planets/geometry.)
 
 # J2000 invariable plane inclinations (from constants.js invPlaneInclinationJ2000)
 INCL_J2000 = {p['name']: round(p['invPlaneInclinationJ2000'], 4) for p in _C['planets'].values()}
@@ -302,9 +239,6 @@ INCL_J2000["Earth"] = 1.5787  # Souami & Souchay 2012
 # J2000 longitude of ascending node (from constants.js ascendingNodeInvPlane)
 OMEGA_J2000 = {p['name']: p['ascendingNodeInvPlane'] for p in _C['planets'].values()}
 OMEGA_J2000["Earth"] = _C['earthAscendingNodeInvPlane']  # 284.51
-
-# (INCL_MEAN — the ψ law's per-planet mean inclinations, read from
-# constants.js invPlaneInclinationMean — left with the law at plan 07 R5.)
 
 # (Plan 07 R8: INCL_CYCLE_ANCHOR — the per-planet phase anchors of the retired
 # ψ inclination law (model-parameters inclinationCycleAnchor) — left with the
@@ -322,17 +256,10 @@ INCL_ECLIPTIC["Earth"] = 0.000
 # NOTE: absolute (positive) periods. Venus (prograde) and Saturn (retrograde) kept as abs.
 INCL_PERIOD = {p['name']: abs(round(p['perihelionEclipticYears']))
                for p in _C['planets'].values()}
-# (plan 09 step 7c: Earth's H/3 entry — the K inclination wheel — left; Earth's
-# apsidal period is the chain's secular tangent.)
 
-# ═══════════════════════════════════════════════════════════════════════════
-# (OSCILLATION PERIOD FRACTIONS — RETIRED, plan 07 R1/R8)
-# PERIOD_FRAC read model-parameters perihelionEclipticFraction directly — the
-# H·num/den lattice periods of the retired device. The JSON no longer carries
-# the pairs; a planet's perihelion period is the N-body chain's inertial
-# apsidal period, 1,296,000/g yr, which PERIHELION_ECLIPTIC_YEARS / INCL_PERIOD
-# above now carry through the bridge.
-# ═══════════════════════════════════════════════════════════════════════════
+# A planet's perihelion period is the N-body chain's inertial apsidal period,
+# 1,296,000/g yr — PERIHELION_ECLIPTIC_YEARS / INCL_PERIOD above carry it
+# through the bridge.
 
 # E–J–S period denominators (used in ψ formula)
 FIBONACCI_SLOTS = {"Earth": 3, "Jupiter": 5, "Saturn": 8}
@@ -363,14 +290,9 @@ FIB_INDEX = {1: 1, 2: 3, 3: 4, 5: 5, 8: 6, 13: 7, 21: 8, 34: 9, 55: 10, 89: 11}
 # Fibonacci set for membership testing
 FIB_SET = set(FIB_MATCH)
 
-
 # ═══════════════════════════════════════════════════════════════════════════
 # HELPER FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════
-
-# (eta(planet) — the mass-weighted ψ amplitude η = amp × √m — left with the
-# ψ law at plan 07 R5.)
-
 
 def xi(planet, use_j2000=True):
     """Mass-weighted eccentricity: ξ = e × √m
@@ -382,13 +304,11 @@ def xi(planet, use_j2000=True):
     e = ECC_J2000[planet]
     return e * SQRT_M[planet]
 
-
 def pct_err(predicted, actual):
     """Percentage error: (predicted - actual) / actual × 100"""
     if actual == 0:
         return float('inf')
     return (predicted - actual) / actual * 100
-
 
 def nearest_fib_ratio(value, fibs=None):
     """Find nearest Fibonacci ratio a/b to value.
@@ -407,13 +327,11 @@ def nearest_fib_ratio(value, fibs=None):
                 best = (a, b, r, err)
     return best
 
-
 def fib_str(n, d=1):
     """Format a fraction n/d as string."""
     if d == 1:
         return str(n)
     return f"{n}/{d}"
-
 
 def fib_n(n):
     """Return n-th Fibonacci number (F_0=0, F_1=1, F_2=1, ...)"""
@@ -424,7 +342,6 @@ def fib_n(n):
         a, b = b, a + b
     return b
 
-
 def pisano_period(m):
     """Compute Pisano period π(m) — period of Fibonacci sequence mod m"""
     a, b = 0, 1
@@ -434,26 +351,9 @@ def pisano_period(m):
             return i
     return -1
 
-
 # ═══════════════════════════════════════════════════════════════════════════
 # PRECOMPUTED MASS-WEIGHTED PARAMETERS
 # ═══════════════════════════════════════════════════════════════════════════
 
-# (ETA — the mass-weighted ψ amplitudes — left with the ψ law at plan 07 R5.)
-
 # Mass-weighted eccentricities, on the observed J2000 values
-# (plan 07 R6: XI_BASE — the same on the retired K law's base — is gone with it)
 XI = {p: xi(p) for p in PLANET_NAMES}
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# (LAW VERIFICATION FUNCTIONS — RETIRED, plan 07 R6/R8)
-# inclination_weight, eccentricity_weight, verify_law2, verify_law3 and
-# predict_saturn_eccentricity — the balance-law instruments on the divisor
-# table D — stood here. The laws went at R6, the divisor at R8; doc 109 is the
-# evidence record.
-# ═══════════════════════════════════════════════════════════════════════════
-
-
-# (compute_mean_inclination(planet) — the ψ law's J2000 constraint,
-# mean = i_J2000 − s·amp·cos(ϖ_J2000 − anchor) — left with the law at plan 07 R5.)

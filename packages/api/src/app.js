@@ -78,7 +78,6 @@ const PLANET_ELEMENT_FRAMES = Object.freeze({
   record: 'the body’s structural inputs (IAU J2000 longitude of perihelion, Souami & Souchay 2012 node and inclination, DE440 eccentricity, the orbital-period input, the axial tilt), the DERIVED J2000 obliquity, and the two secular PERIODS 1,296,000/g and 1,296,000/s from the same chain — apsidal prograde positive, nodal regression negative. R8: the retired device’s lattice descriptors are no longer served; for a value at an epoch read the at[] rows.',
 });
 
-// (plan 09 step 7b: the 'h' section — the unit H(t), a fit constant's multiple of the precession period — is deleted)
 const EPOCH_SECTIONS = Object.freeze(['lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'tropicalYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
 const CARDINAL_TYPES = Object.freeze(['SS', 'WS', 'VE', 'AE']);
 
@@ -110,21 +109,16 @@ export function createApi() {
 
   /** Derivations metadata: structural explanation per quantity (§7 "derivations"). */
   const DERIVATIONS = Object.freeze({
-    // S5 (plan 06): the PERIOD is the model's one J2000 precession reading — the certified year laws' beat
-    // at 2000 (25,771.4 yr ≈ IAU); the H/13 lattice reading (25,793.6) is the fit anchor's, retired as a period.
-    // S6: the Earth-cycle rows read the DYNAMICAL periods from the lunisolar surface (the same values the
-    // registry keys carry); `latticeDivisor` is kept as the retired device label, for the record only.
-    // `status`: current = a published period · device = a correction-basis line of the frozen era clock
-    // (plan 06 P3) · retired = a claim of the integer-law era, kept as the record.
-    axialPrecession: { formula: 'T_p(J2000) = sid/(sid − trop), the of-date year laws at 2000 (lattice label H/13 retired as a period)', latticeDivisor: 13, periodYears: model.epoch.axialPrecessionYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'axialPrecYears', status: 'current' },
-    inclinationPrecession: { formula: 'T_aps(J2000) = 360°/ϖ̇_secular — the N-body chain’s secular apsidal tangent at 2000, the perihelion against the stars (device label H/3 retired as a period)', latticeDivisor: 3, periodYears: model.lunisolar.apsidalPeriodYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'inclPrecYears', status: 'current' },
-    perihelionPrecession: { formula: 'T_peri(J2000) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date beat of the one-family route at 2000 (device label H/16 retired as a period)', latticeDivisor: 16, periodYears: model.lunisolar.periOfDatePeriodYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'periPrecYears', status: 'current' },
-    eclipticPrecession: { formula: 'T_s₃ = 1,296,000/|s₃| — the dominant nodal mode of Earth’s orbit from the banked deep secular modes (device label H/5 retired as a period)', latticeDivisor: 5, periodYears: model.lunisolar.nodalPeriodYears, doc: 'docs/110-calculation-map.md', registryKey: 'eclPrecYears', status: 'current' },
-    obliquityCycle: { formula: 'T_obl(J2000) = 2π/(ψ̇ᵢₙ − |s₃|) — the obliquity beat of the spin axis’s inertial precession rate (the general precession plus the planetary mean; the rate the hybrid obliquity integrates on) against the nodal mode, at the J2000 instant (falsification leg 1; device label H/8 retired as a period). A dated record sees the beat of the pole rate’s mean over its own window — registry obliqCycleRealized*Years (40,927 yr over the LR04 record)', latticeDivisor: 8, periodYears: model.lunisolar.obliquityBeatYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'obliqCycleYears', status: 'current' },
-    solarSystemResonanceCycle: { formula: 'RETIRED (plan 06 D3): the eight-unit interval of the fitted anchor — a device interval of the correction combs, never a cycle', latticeDivisor: null, periodYears: null, doc: 'docs/110-calculation-map.md', registryKey: 'eightH', status: 'retired' },
-    law6Lock: { formula: 'RETIRED (doc 109): the Jupiter–Saturn–Earth “lock” read at Saturn’s device ecliptic-perihelion period, a window-epoch descriptor', latticeDivisor: 65, periodYears: null, doc: 'docs/109-model-nbody-engine-and-lattice-test.md', registryKey: 'saturnPeriPeriod', status: 'retired' },
-    bondCycle: { formula: 'ΔT-stack component, period 1,466 yr stated in years (the shipped coefficients) — a fitted millennial line of the ΔT stack; its retired lattice label carried no information (plan 06 T5), the ~1.5-kyr oscillation is real', latticeDivisor: 1830, periodYears: FITTED_COEFFICIENTS.DT_STACK.bond.period_yr, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'bondYr', status: 'device' },
-    hallstattCycle: { formula: 'ΔT-stack component, period 2,430 yr stated in years (the shipped coefficients) — a fitted millennial line of the ΔT stack; its retired lattice label carried no information (plan 06 T5)', latticeDivisor: 1104, periodYears: FITTED_COEFFICIENTS.DT_STACK.hallstatt.period_yr, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'hallstattYr', status: 'device' },
+    // The Earth-cycle rows read the DYNAMICAL periods from the lunisolar surface (the same values the
+    // registry keys carry); the two ΔT-stack rows read the shipped fitted periods. `status` is 'current'
+    // for every served quantity: a period that is not published is not served (an unknown quantity is a 404).
+    axialPrecession: { formula: 'T_p(J2000) = sid/(sid − trop), the of-date year laws at 2000', periodYears: model.epoch.axialPrecessionYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'axialPrecYears', status: 'current' },
+    inclinationPrecession: { formula: 'T_aps(J2000) = 360°/ϖ̇ — the ONE movement’s own apsidal rate of date at 2000, the perihelion against the stars', periodYears: model.lunisolar.apsidalPeriodYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'inclPrecYears', status: 'current' },
+    perihelionPrecession: { formula: 'T_peri(J2000) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date beat of the one-family route at 2000', periodYears: model.lunisolar.periOfDatePeriodYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'periPrecYears', status: 'current' },
+    eclipticPrecession: { formula: 'T_s₃ = 1,296,000/|s₃| — the dominant nodal mode of Earth’s orbit from the banked deep secular modes', periodYears: model.lunisolar.nodalPeriodYears, doc: 'docs/110-calculation-map.md', registryKey: 'eclPrecYears', status: 'current' },
+    obliquityCycle: { formula: 'T_obl(J2000) = 2π/(ψ̇ᵢₙ − |s₃|) — the obliquity beat of the spin axis’s inertial precession rate (the general precession plus the planetary mean; the rate the hybrid obliquity integrates on) against the nodal mode, at the J2000 instant (falsification leg 1). A dated record sees the beat of the pole rate’s mean over its own window — registry obliqCycleRealized*Years (40,927 yr over the LR04 record)', periodYears: model.lunisolar.obliquityBeatYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'obliqCycleYears', status: 'current' },
+    bondCycle: { formula: 'ΔT-stack component, period 1,466 yr stated in years (the shipped coefficients) — a fitted millennial line of the ΔT stack; the ~1.5-kyr oscillation is real', periodYears: FITTED_COEFFICIENTS.DT_STACK.bond.period_yr, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'bondYr', status: 'current' },
+    hallstattCycle: { formula: 'ΔT-stack component, period 2,430 yr stated in years (the shipped coefficients) — a fitted millennial line of the ΔT stack', periodYears: FITTED_COEFFICIENTS.DT_STACK.hallstatt.period_yr, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'hallstattYr', status: 'current' },
   });
 
   const versionRecord = Object.freeze({
@@ -143,12 +137,10 @@ export function createApi() {
   const epochRecord = (year, sections) => {
     /** @type {Record<string, unknown>} */
     const rec = { year, jd: model.time.jdFromYear(year) };
-    // The 'lod' section names its day bases (plan 08 storyline sweep): the
-    // OBSERVABLE solar day of date LOD_real (the simulator's Solar Day row,
-    // the registry's lodRealPhysical) and the Layer-2 tidal + GIA mean day the
-    // deep-time law gives (the paleo anchors' and the ΔT integrand's day).
-    // The former single `lodSeconds` served the Layer-2 base under an
-    // unnamed basis — 1.78 ms below the observable at J2000.
+    // The 'lod' section names its day bases: the OBSERVABLE solar day of date
+    // LOD_real (the simulator's Solar Day row, the registry's lodRealPhysical)
+    // and the Layer-2 tidal + GIA mean day the deep-time law gives (the paleo
+    // anchors' and the ΔT integrand's day).
     if (sections.includes('lod')) {
       rec.lodRealSeconds = model.epoch.lodRealSecondsAtYear(year);
       rec.lodMeanSeconds = model.epoch.lodSecondsAtYear(year);
@@ -156,8 +148,8 @@ export function createApi() {
     if (sections.includes('alpha')) rec.alpha = model.epoch.alphaAtYear(year);
     if (sections.includes('deltaT')) rec.deltaTSeconds = model.epoch.deltaTSecondsAtYear(year);
     if (sections.includes('siderealYearSeconds')) rec.siderealYearSeconds = model.epoch.siderealYearSecondsAtYear(year);
-    // Plan 06 Phase 3 S2: the one-family mean tropical year of date (SI s)
-    // inside ±2 Myr, the tidal-chain mean beyond.
+    // The one-family mean tropical year of date (SI s) inside ±2 Myr, the
+    // tidal-chain mean beyond.
     if (sections.includes('tropicalYearSeconds')) rec.tropicalYearSeconds = model.epoch.tropicalYearSecondsAtYear(year);
     if (sections.includes('moonDistanceKm')) rec.moonDistanceKm = model.epoch.moonDistanceKmAtYear(year);
     // The of-date axial precession period: the one-family beat (the hybrid's
@@ -234,12 +226,11 @@ export function createApi() {
     }
 
     // ── /cardinal-structure ─────────────────────────────────────────────────
-    // D4b: the one-source cardinal STRUCTURE — the equation-of-center layer
+    // The one-source cardinal STRUCTURE — the equation-of-center layer
     // (per-point year lengths, crossing offsets, the e(t)-proportional
     // spread) on the movement's own e(t)/ϖ(t), valid at every epoch (mode
     // tier). Absolute event dates are DELIBERATELY absent — they need a
-    // per-renderer mean-sun chain; /cardinal-points remains the certified
-    // era device for those.
+    // per-renderer mean-sun chain; /cardinal-points serves those.
     if (path === `/${API_VERSION}/cardinal-structure`) {
       if (!get()) return methodNotAllowed(method, path);
       const t = epochs(query);
@@ -270,7 +261,7 @@ export function createApi() {
       if (!get()) return methodNotAllowed(method, path);
       const t = epochs(query);
       if ('problem' in t) return t.problem;
-      // Plan 12 §8.5 (owner): the hybrid obliquity is served inside the banked ζ series' span only
+      // The hybrid obliquity is served inside the banked ζ series' span only
       // (±10 Myr) — beyond it the tail carries the Quaternary mean with no tidal evolution, which is
       // not a prediction; refused as null, never extrapolated. The cited mean obliquity of date
       // (Farhat et al. 2022's column, a Myr-scale mean) is served to the history's end, 4,429 Ma.
@@ -332,7 +323,7 @@ export function createApi() {
         inputEcho: { path, body: key, ...t.echo },
         data: {
           body: key, record, at: atYears, accuracy: PLANET_ACCURACY,
-          // the elements' source and frames (v16.2: the N-body chain, as the simulator renders — formerly the record's linear rates)
+          // the elements' source and frames (the N-body chain, as the simulator renders)
           frames: PLANET_ELEMENT_FRAMES,
         },
       });
@@ -364,7 +355,7 @@ export function createApi() {
       const t = epochs(query);
       if ('problem' in t) return t.problem;
       const rows = t.years.map((y) => ({ year: y, l1OrbitalPermil: model.climate.l1OrbitalPermil(y) }));
-      return envelope({ identity: id, inputEcho: { path, ...t.echo }, data: { years: rows, note: 'L1 orbital forcing component (permil), the 32-component 8H lattice formula — docs/91.' } });
+      return envelope({ identity: id, inputEcho: { path, ...t.echo }, data: { years: rows, note: 'L1 orbital forcing component (permil) — the climate formula’s orbital layer, the engine’s own physical line set (docs/92).' } });
     }
 
     // ── /cross-validation ───────────────────────────────────────────────────
@@ -434,8 +425,7 @@ export function createApi() {
       const data = {
         overrides,
         year,
-        // Plan 09: the fit-era lattice identities (H/13, H/3, H/16) left the
-        // Model surface; the counterfactual reports the PHYSICAL periods of date.
+        // The counterfactual reports the PHYSICAL periods of date.
         periodsYears: {
           axialPrecession: cf.epoch.axialPrecessionYearsAtYear(year),
           apsidal: cf.lunisolar.apsidalPeriodYearsAtYear(year),
@@ -443,7 +433,7 @@ export function createApi() {
         },
         epoch: { lodRealSeconds: cf.epoch.lodRealSecondsAtYear(year), lodMeanSeconds: cf.epoch.lodSecondsAtYear(year), deltaTSeconds: cf.epoch.deltaTSecondsAtYear(year) },
         earth: {
-          // the hybrid inside the ζ series' span only (plan 12 §8.5); the cited mean beside it
+          // the hybrid inside the ζ series' span only; the cited mean beside it
           obliquityDeg: (!cf.earth.obliquityHybridDomainYears || (year >= cf.earth.obliquityHybridDomainYears[0] && year <= cf.earth.obliquityHybridDomainYears[1])) ? cf.earth.obliquityDeg(year) : null,
           meanObliquityCitedDeg: cf.earth.meanObliquityCitedDeg(year),
           eccentricity: cf.earth.eccentricity(year),
@@ -525,8 +515,7 @@ export function createApi() {
       // eclipse/besselian.cjs — shadow geometry on the FULL shared series
       // at the model's absolute TT; measured 6.3″ mean / 9.1″ max
       // shadow-plane against 15 NASA path-table centerline points, within
-      // every NASA path half-width — the accuracy class the former
-      // `solar-location-unavailable` refusal was waiting for).
+      // every NASA path half-width).
       const hasLat = query.lat !== undefined, hasLon = query.lon !== undefined;
       /** @type {{latDeg:number, lonDeg:number}|null} */
       let observer = null;

@@ -69,7 +69,7 @@ in order (CLAUDE.md: generate the constants LAST, run the cascade ONCE).
 | `../pipeline/import-astrogeo22.js` (`npm run import:astrogeo22`) | `data/astrogeo22-earth-moon.json` | the CITED Earth–Moon history (Farhat et al. 2022, AstroGeo22), verbatim with the source files' sha256; `--fetch` refreshes the gitignored cache. The distance column is the model's tidal history; the mean-obliquity column is its second read input. A new distributor solution is a MAJOR, never a side effect. |
 | `../constants/generate.mjs` (`npm run constants:generate`) | `packages/physics/src/constants/*`, the embedded artifacts | the generated module `src/script.js` and the Node engine import; values verbatim, no rounding; `npm run test:constants` is the same generator in check mode |
 | `run-pipeline.js` | — | the step runner (`--list`, `--from 6a2`): the live steps are 6a2, 7c, 7f, 7h, 7i, 8, 9; logs to `tools/results/pipeline.log` |
-| `verify-pipeline.js` | — | pass/fail of the pipeline targets (Step 8) |
+| `verify-pipeline.js` | — | pass/fail of the pipeline targets (the constants load, the scene graph, the planets' derived orientation, Earth's geometry) |
 | `reclassify-tiers.js`, `fetch-jpl-data.js` | `data/reference-data.json` | the JPL reference-data tiers (Step 3's successor data path) |
 | `python/_dump_constants.js`, `python/load_constants.py`, `python/artifact_inputs.py` | — | the Node→Python bridge (the Python scripts read the same constants as the Node tooling, no manual sync) and the Python inputs-block stamper |
 

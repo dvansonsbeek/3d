@@ -162,7 +162,8 @@ calendar/angle helpers against the legacy bodies), the layer gates,
 `test:constants` (the embed ≡ its sources), `test:fixtures` (the `tools/lib`
 golden masters + the plan-06 baseline), `test:literals` (script.js literals vs
 the JSON source of truth; the retired-input ratchet), `test:vocabulary` (the
-retired-vocabulary RATCHET), `test:docs-fresh`, `check:artifacts` (generated
+retired-vocabulary RATCHET — the docs and READMEs, and since plan 16 the
+code's comments and label strings; counts may only fall), `test:docs-fresh`, `check:artifacts` (generated
 artifacts vs their recorded input hashes — fails naming the exact regeneration
 command), `check:data` (every tracked dataset manifest-covered in
 PROVENANCE.md), `docs:values` / `docs:tables` (the script-written numbers in

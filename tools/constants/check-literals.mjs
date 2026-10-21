@@ -44,25 +44,9 @@ const readData = (f) => JSON.parse(readFileSync(join(ROOT, 'data', f), 'utf8'));
  * @type {string[]}
  */
 const MIGRATED = [
-  // Phase 5f block 1 — model.foundational. (plan 09 step 7c: the frozen era
-  // unit `holisticyearLength`, its lattice `stepYears` and the device's rounded
-  // mean-tropical-year input `inputmeanlengthsolaryearindays` left the JSON;
-  // their return fails this gate below.)
-  // (plan 11 step 5: startmodelJD / startmodelYear moved to
-  // astro.timeReference.sceneEpochJD / sceneEpochYear — covered by the
-  // 'astro.timeReference' prefix below; correctionDays is deleted. Their return
-  // to `foundational` fails this gate below.)
-  // (plan 11 step 2: correctionSun and useVariableSpeed left the JSON — the
-  // Sun's start angle reached nothing, the toggle is hard-wired true. Plan 11
-  // step 4: startAngleModel — the inclination loop's zero — left too.)
-  // (plan 07 R10: temperatureGraphMostLikely and systemResetN — the retired
-  // phase origin's inputs — left the JSON; their return fails this gate below.)
-
-  // (Phase 5f block 2 — model.earth, the K-device scaffold's recorded J2000
-  // pose: earthtiltMean, earthInvPlaneInclinationAmplitude, eccentricityAmplitude,
-  // the wheel periods, the wheel phase, the inclination-wheel phase — left the
-  // JSON at plan 11 step 4 with the scaffold; the block's return fails this
-  // gate below.)
+  // Phase 5f block 1 — model.foundational: every leaf left the JSON (the scene
+  // epoch is astro.timeReference.sceneEpochJD / sceneEpochYear, covered by the
+  // 'astro.timeReference' prefix below); any return fails this gate below.
 
   // Phase 5f block 3 — model.moon. This block also CORRECTED a drift:
   // script.js held moonMeeusLpCorrection = 0.010525 against the JSON's
@@ -70,10 +54,8 @@ const MIGRATED = [
   // re-running was a no-op ("0.010524 | 0.010524 | none"), and the bounded-moon
   // derivation records "bit-identical (0.8086/0.010524/0.0015), FULL GATES
   // PASSED". tools/lib always used 0.010524; only the browser copy had drifted.
-  // (plan 11 step 2: moonStartposMoon and moonMeeusLpCorrection left the JSON —
-  // the start angle reached only the Node twin's pivot, the correction was 0.
-  // Plan 11 step 3: moonStartposApsidal/Nodal — the ring's fitted phases —
-  // left too; the ring layers are engine-placed from the lunar arguments.)
+  // (The Moon's start angles and moonMeeusLpCorrection left the JSON; their
+  // return fails below.)
 
   // Phase 5f block 4 — astro.physicalConstants. Listed per-path rather than by
   // prefix: earthJ2 and earthEquatorialRadiusKm are Node-side (NOT_IN_SCRIPT)
@@ -97,7 +79,7 @@ const MIGRATED = [
   'astro.physicalConstants.earthMoiFactorJ2000',
   'astro.physicalConstants.solarLuminosityW',
   'astro.physicalConstants.solarWindMassLossKgPerS',
-  // plan 13 B3: the two display-side inputs the browser carried as literals
+  // the two display-side inputs the browser carried as literals
   // (SOLAR_CONSTANT_WM2 = 1361 in the insolation panel; EARTH_R_KM = 6371 in
   // the two eclipse-path Haversine diagnostics) — read as K.physicalConstants.*
   // under their local names (findByName sees no numeric right-hand side).
@@ -111,7 +93,7 @@ const MIGRATED = [
   // derived deg × 3600, no second literal).
   'astro.earthOrbital.obliquityJ2000_deg',
   'astro.earthOrbital.obliquityRate_arcsecPerCentury',
-  // plan 09: THE J2000 precession anchor p₀ (IAU 2006 p_A) — read as
+  // THE J2000 precession anchor p₀ (IAU 2006 p_A) — read as
   // K.earthOrbital.generalPrecessionJ2000_arcsecPerYr, never a literal.
   'astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr',
   'astro.earthOrbital.earthInclinationJ2000_deg',
@@ -137,8 +119,8 @@ const MIGRATED = [
   'astro.moonReference.moonApsidalPrecessionDaysInputICRF',
   'astro.moonReference.moonNodalPrecessionDaysInputICRF',
   'astro.moonReference.moonDistance',
-  // plan 11 step 1: the LLR-anchored α₁ (was model.deepTime.alpha1PerMa) —
-  // script.js reads it as K.deepTime.alpha1PerMa through the assembled block.
+  // the LLR-anchored α₁ — script.js reads it as K.deepTime.alpha1PerMa through
+  // the assembled block.
   'astro.moonReference.moonRecessionAlpha1PerMa',
   'astro.moonReference.moonEclipticInclinationJ2000',
   'astro.moonReference.moonOrbitalEccentricityBase',
@@ -157,9 +139,8 @@ const MIGRATED = [
 
   // Phase 5f block 7 — astro.yearLengthRef. Local names carry a `J2000` suffix
   // the JSON keys lack, marking them as the fixed anchors as opposed to the
-  // epoch-dependent values recomputeEpochAnchors produces. (plan 09:
-  // tropicalYearMean and iauPrecessionJ2000 left the registry — the J2000
-  // tropical year is DERIVED from the sidereal year and p_A in one home,
+  // epoch-dependent values recomputeEpochAnchors produces. (The J2000 tropical
+  // year is DERIVED from the sidereal year and p_A in one home,
   // @essrt/physics computeMeanTropicalYearJ2000Days.)
   'astro.yearLengthRef.tropicalYearVE',
   'astro.yearLengthRef.tropicalYearSS',
@@ -172,17 +153,13 @@ const MIGRATED = [
   'astro.yearLengthRef.stellarDay',
 
   // Phase 5f block 8 — all seven planets' observed elements. The prefix is safe
-  // here: every leaf under this root is migrated. (perihelionEclipticYears is
-  // no longer a JSON-derived value at all: since plan 07 R1 it is the chain's
-  // 1,296,000/g, read from the governed artifact; the axial and obliquity-cycle
-  // fractions retired with plan 06 Phase 7 commit 2 and the perihelion fraction
-  // with plan 07 R8. Plan 11 step 3: model.perihelionPassageRef is deleted with
-  // the planet EoC branch; step 6: the `model.*` tree itself is gone with the
-  // file — the planets' display names are @essrt/physics planets/display-names.)
+  // here: every leaf under this root is migrated (perihelionEclipticYears is the
+  // chain's 1,296,000/g, read from the governed artifact, not a JSON leaf; the
+  // planets' display names are @essrt/physics planets/display-names).
   'astro.planetOrbitalElements',
-  // Plan 06 Phase 7 — the planets' spin inputs. script.js never held them: the
-  // browser reads the derived channel through the package model
-  // (createModel().planets.spin), so every leaf is migrated by construction.
+  // The planets' spin inputs. script.js never held them: the browser reads the
+  // derived channel through the package model (createModel().planets.spin), so
+  // every leaf is migrated by construction.
   'astro.planetSpinPhysical',
 
   // Phase 5f block 9 — DE440 mass ratios, deep-time alphas and tapers, the two
@@ -196,23 +173,16 @@ const MIGRATED = [
   // appear in the file, just under the other name. Importing removes the class
   // of error entirely.
   'astro.physicalConstants.massRatioDE440',
-  // (plan 11 step 1: the model.deepTime.* rows moved with the block — its
-  // fitted leaves are the banked record data/deep-time-fitted.json, walked
-  // below as `fitted.*`; the taper rides data/deltaT-4flag-fit.json
-  // shipped_taper, the GIA rates derive from astro.giaCoxChaoPeltier.)
-  // (plan 12 option A: the regime block and the quartic's α₃/α₄ left the banked
-  // record — the distance history is the cited AstroGeo22 table, embedded as
-  // deltat/moon-distance-artifact.cjs; the record keeps the GIA τ.) Prefix:
-  // every leaf under the banked record is imported through the assembled
-  // block, none exists as a literal.
+  // (the model.deepTime.* rows: its fitted leaves are the banked record
+  // data/deep-time-fitted.json, walked below as `fitted.*`; the taper rides
+  // data/deltaT-4flag-fit.json shipped_taper, the GIA rates derive from
+  // astro.giaCoxChaoPeltier; the distance history is the cited AstroGeo22 table,
+  // embedded as deltat/moon-distance-artifact.cjs; the record keeps the GIA τ.)
+  // Prefix: every leaf under the banked record is imported through the
+  // assembled block, none exists as a literal.
   'fitted',
   'astro.earthOrbital.earthEccentricityJ2000',
   'astro.earthOrbital.earthEccentricityDotJ2000',
-  // (plan 11 step 2: the model.additionalBodies block is deleted — the four
-  // bodies' observed elements are astro.additionalBodiesReference, block 13.)
-
-  // (Phase 5f block 10 — the H-lattice fraction pairs — stood here. The pairs
-  // left the JSON at plan 07 R8; RETIRED_JSON_KEYS below fails if they return.)
 
   // Phase 5f block 11 — masses that had NO JSON source until now. The
   // planet-ALONE ratios, Pluto (system and alone, 10.85% apart because of
@@ -242,9 +212,6 @@ const MIGRATED = [
   // (model.deepTime.alpha1PerMa → astro.moonReference.moonRecessionAlpha1PerMa, block 6)
   'astro.earthOrbital.earthEccentricityDotDotJ2000',
   'astro.earthOrbital.earthPerihelionLongitudeJ2000',
-
-  // (Phase 5f block 14 — the additional bodies' angleCorrection and startpos —
-  // left with the block at plan 11 step 2.)
 
   // Phase 5f block 15 — earthAscendingNodeInvPlaneVerified. Same NUMBER as
   // ascendingNodesSouamiSouchay.earth (284.51), different ROLE: this is the node
@@ -312,11 +279,6 @@ const NOT_IN_SCRIPT = {
   'astro.physicalConstants.earthEquatorialRadiusKm': 'used by tools/lib figure-of-Earth term',
   'astro.physicalConstants.earthParallaxRadiusKm': 'AU matched pair (appendix chain); consumed by the model-values registry, not script.js',
 
-  // (The four additional bodies once carried their eccentricity TWICE —
-  // astro.additionalBodiesReference.<b>.orbitalEccentricityJ2000 and
-  // model.additionalBodies.<b>.orbitalEccentricityBase, identical values. Plan
-  // 11 step 2 collapsed the duplication: the model block is deleted and
-  // script.js imports the astro side, covered by block 13's prefix.)
 };
 
 /**
@@ -343,11 +305,9 @@ const walk = (o, p) => {
     else if (typeof v === 'number') leaves.push({ path: q, key: k, value: v });
   }
 };
-// (plan 11 step 6: the `model` tree — model-parameters.json — is deleted; its
-// return is ratcheted below.)
 walk(read('astro-reference.json'), 'astro');
-// plan 11 step 1: the banked fitted deep-time record — its knots and α₃/α₄
-// are distinctive doubles that script.js must carry ONLY through K.deepTime.
+// the banked fitted deep-time record — its knots are distinctive doubles that
+// script.js must carry ONLY through K.deepTime.
 walk(readData('deep-time-fitted.json'), 'fitted');
 
 // Short numbers (23, 0.5, 7) collide with unrelated code constantly.
@@ -370,12 +330,10 @@ const evalRhs = (rhs) => {
 
 /**
  * Keys that occur on more than one JSON object — `name` exists on all seven
- * planets (as `startpos`, `angleCorrection` and `eocFraction` did before plan
- * 11 steps 2–3 deleted them). Matching such a key by name in script.js finds
- * whichever declaration comes first (Mercury's) and compares it against every
- * planet, reporting six false divergences. Name-matching is only sound for
- * keys that are unique across the whole leaf set; the rest fall back to
- * value-presence.
+ * planets. Matching such a key by name in script.js finds whichever declaration
+ * comes first (Mercury's) and compares it against every planet, reporting six
+ * false divergences. Name-matching is only sound for keys that are unique
+ * across the whole leaf set; the rest fall back to value-presence.
  */
 const keyCount = new Map();
 for (const l of leaves) keyCount.set(l.key, (keyCount.get(l.key) ?? 0) + 1);
@@ -422,10 +380,9 @@ for (const { path, key, value } of distinctive) {
     // 2451716.5 in a test fixture. Checking by value flagged three correctly
     // migrated constants. Once migrated, `const x = K.block.x` has no numeric
     // right-hand side, so findByName can no longer resolve one.
-    // A purely NUMERIC leaf key (the retired K wheels' periods were keyed by
-    // the wheel's index, `kDeviceWheelPeriodYears.16`) cannot be a declaration
-    // name, and `16: …` would match any `…: 16` row — for those the test is
-    // whether the VALUE itself sits behind such a key.
+    // A purely NUMERIC leaf key (a table keyed by an integer index) cannot be a
+    // declaration name, and `16: …` would match any `…: 16` row — for those the
+    // test is whether the VALUE itself sits behind such a key.
     const stillLiteral = /^\d+$/.test(key) ? findByName(key) === value : findByName(key) !== null;
     rows.push({ path, key, value, kind: stillLiteral ? 'MIGRATED-BUT-STILL-LITERAL' : 'migrated' });
     continue;
@@ -522,21 +479,13 @@ for (const r of masked) {
   console.log('    different value under the same name. Remove the allowlist entry.');
 }
 
-// ── the retired input FILE — a ratchet on its RETURN (plan 11 step 6) ─────────
-// public/input/model-parameters.json is DELETED. Its leaves left one set at a
-// time, each set ratcheted here by key while the file stood: the ψ/K laws'
-// inputs (plan 07 R8 — the H·num/den perihelion fractions, the divisor table,
-// the ψ phase anchors, the anti-phase flag), the phase origin's two inputs
-// (plan 07 R10), the frozen era device's unit, lattice grid and rounded
-// tropical-year input (plan 09 step 7c), the deep-time block (plan 11 step 1 —
-// ASSEMBLED by generate.mjs from its three homes), the dead-reach pose and the
-// additional bodies (step 2), the planets' start angles, ellipse family, the
-// Moon ring's phases and the passage JDs (step 3), the K-device scaffold's
-// pose block (step 4), the scene epoch (step 5 — astro-reference
-// timeReference.sceneEpochJD / sceneEpochYear) with correctionDays deleted,
-// and the planets' display names (step 6 — code, @essrt/physics
-// planets/display-names: presentation, not a parameter). The file returning —
-// under any content — is a second source of truth re-entering and FAILS here.
+// ── the retired input FILE — a ratchet on its RETURN ──────────────────────────
+// public/input/model-parameters.json is DELETED. Its leaves moved to
+// astro-reference (the scene epoch), to data/ (the fitted deep-time block,
+// ASSEMBLED by generate.mjs from its three homes) or to code (the planets'
+// display names — presentation, not a parameter), or were retired with the
+// constructions that read them (doc 109 §23). The file returning — under any
+// content — is a second source of truth re-entering and FAILS here.
 // Fail-proven: ESSRT_LITERALS_PLANT=1 plants the hit.
 const retiredHits = [];
 if (existsSync(join(ROOT, 'public/input/model-parameters.json'))) {

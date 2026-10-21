@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ΔT correction fitting — 4-flag lattice stack + Core-mantle swing (Resonator).
+ * ΔT correction fitting — the four-cycle millennial stack + Core-mantle swing (Resonator).
  *
  * ═══ JOINT WORLD (authoritative since 2026-07-23) ═══
  * The production fit is the JOINT mode: 4 flags + the Core-mantle swing
@@ -46,9 +46,9 @@
  * stage-wise diagnostics (collinearity warnings, Stage-E phantom check, the
  * anchor-shadow-price meter) — do NOT use its --write for shipping anymore.
  *
- *   1. Set DT_CORRECTIONS_DISABLED=1 in env so framework model ΔT is pure-tidal.
+ *   1. Set DT_CORRECTIONS_DISABLED=1 in env so the model ΔT is pure-tidal.
  *   2. Load Stephenson 2016 ΔT polynomial from JSON.
- *   3. Sample residual R(y) = Stephenson(y) − framework_model(y) on a year grid.
+ *   3. Sample residual R(y) = Stephenson(y) − model(y) on a year grid.
  *   4. Cascade fit:
  *        Bond solo   → free amp/phase (unconstrained; Bond is the primary anchor)
  *        Bond+Hallstatt joint → scale Hallstatt to target amp (constrained prior)
@@ -60,7 +60,7 @@
  * The scaling is done because free-fit amplitudes for Hallstatt and Jose5 are
  * inflated by nearby-frequency collinearity with Bond. The shipped values use
  * SOLO-fit phases (least contaminated) with constrained amplitudes below the
- * free-fit values — see docs/102 § "Companion 8H lattice harmonics".
+ * free-fit values — see docs/104.
  *
  * Other diagnostic modes:
  *   DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --sweep-usno
@@ -70,28 +70,24 @@
  *       established the time-varying nature of the millennial swing.
  *
  * All fitting/write modes require DT_CORRECTIONS_DISABLED=1: this ensures
- * the residual samples reflect the raw framework model, not framework +
+ * the residual samples reflect the raw model, not the model +
  * previously-shipped corrections (which would produce a delta, not an
  * absolute fit). Note the integrator master-gate: DT_CORRECTIONS_DISABLED=1
  * also removes the resonator from the model ΔT, so no extra env is needed.
  *
- * (The former --sync-code flag is gone with the astro-reference write: every
- * consumer reads the embedded fit artifact through the generated constants.)
+ * KNOWN LIMITATION: The fit's inner `fitCycles()` subtracts a polynomial
+ * trend (1 + t + t²) before fitting the harmonic components, so the harmonic
+ * amplitudes represent the OSCILLATORY residual only. When we ship, only the
+ * harmonic coefficients are emitted — the polynomial part is discarded (the
+ * model carries no polynomial motion-model correction; see memory
+ * feedback_no_polynomial_corrections).
  *
- * KNOWN LIMITATION (H/5 baseline): The fit's inner `fitCycles()` subtracts a
- * polynomial trend (1 + t + t²) before fitting the harmonic components, so
- * the harmonic amplitudes represent the OSCILLATORY residual only. When we
- * ship, only the harmonic coefficients are emitted — the polynomial part
- * is discarded (per the framework's "no polynomial motion-model corrections"
- * rule, see memory feedback_no_polynomial_corrections).
- *
- * With the framework's H/5 correction now inside the integrand of
- * meanDeltaTSecondsAtAge (LOD_real = LOD_mean + LOD_mean/((H/5)·mSY),
- * ~3.527 ms at J2000; was H/3 ≈ 2.117 ms before 2026-07-17), the residual
- * acquires a linear-in-year secular shift. That shift lives entirely in the
- * polynomial part of the fit and is DROPPED at ship time. The
- * shipped-stack Stephenson-residual RMS therefore inherits a deep-past
- * mismatch that is a known limitation of the harmonic-only ship.
+ * With the ecliptic missing-motion term inside the integrand of
+ * meanDeltaTSecondsAtAge (LOD_real = LOD_mean + LOD_mean/(T_s₃·mSY), ~3.44 ms
+ * at J2000), the residual acquires a linear-in-year secular shift. That shift
+ * lives entirely in the polynomial part of the fit and is DROPPED at ship
+ * time. The shipped-stack Stephenson-residual RMS therefore inherits a
+ * deep-past mismatch that is a known limitation of the harmonic-only ship.
  *
  * USNO ANCHOR (legacy cascade; Stage D, from 2026-07-18): the final Stage D
  * fit adds a soft constraint `Σ cycleLodCorrection_i(2000) = TARGET_LOD_OFFSET`
@@ -111,17 +107,11 @@ const path = require('path');
 // 9-3f: moved from tools/fit (shim remains); tools/lib via the runtime bridge.
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const TOOLS_LIB = path.join(ROOT, 'tools', 'lib');
-// Governance (plan 12 §1b close-out): the two shipped artifacts carry an
-// `inputs` block like every other governed artifact, so the freshness gate
-// FAILS when the physics they were fitted on moves — the plan 11 §8.2 class
-// (a stack fitted on one engine, shipped on another, unseen for weeks).
+// Governance: the two shipped artifacts carry an `inputs` block like every
+// other governed artifact, so the freshness gate FAILS when the physics they
+// were fitted on moves (the class of a stack fitted on one engine, shipped on
+// another, unseen for weeks).
 const { buildInputsBlock } = require(path.join(TOOLS_LIB, 'artifact-inputs.js'));
-
-// (Plan 14 step 1: the former syncAstroReference — the fitter's write of deltaTStart into
-// public/input/astro-reference.json — is gone. The anchor is the fit's output and lives in
-// this artifact's `optimum.deltaTStart`; the constants generator embeds it as
-// FIT.DT_ANCHOR.deltaTStartSeconds. astro-reference.json is an INPUT file the N-body node
-// hashes wholesale: writing a µs into it cost the 26-minute N-body re-stamp per re-close.)
 
 // ─── Guard: DT_CORRECTIONS_DISABLED must be set for --write ───
 const WRITE = process.argv.includes('--write');
@@ -139,19 +129,13 @@ if (WRITE && process.env.DT_CORRECTIONS_DISABLED !== '1') {
 const DT = require(path.join(TOOLS_LIB, 'deep-time.js'));
 const C = require(path.join(TOOLS_LIB, 'constants.js'));
 
-// ─── Config: divisors, target amplitudes, taper, fit window ───
+// ─── Config: periods, target amplitudes, taper, fit window ───
 // The `structural` notes below are the HISTORICAL selection record, not
-// predictions (the T5 verdict, recorded in docs/109 §22 — its script and
-// artifact were deleted at plan 09 step 7e): every period
-// in the millennial band lies within 0.03 % of some 8·H/n, a gcd-compliant n
-// sits inside every fitted plateau by density alone, and non-compliant
-// neighbours fit identically. The periods are fitted millennial periods at
-// the canonical Bond / Hallstatt / Jose values and are STATED IN YEARS in
-// every presentation surface. Layer B item 3 (plan 06): the periods are the
-// numbers — `period_yr` below, the SAME doubles the former 8·H/n divisors
-// evaluated to (the runtimes read the fit file's `period_yr`; nothing
-// derives a period from H any more). `structural` keeps the historical
-// selection record only.
+// predictions (the T5 verdict, docs/109 §22). The periods are fitted millennial
+// periods at the canonical Bond / Hallstatt / Jose values and are STATED IN
+// YEARS in every presentation surface — `period_yr` below is what the runtimes
+// read; nothing derives a period from anything else. `structural` keeps the
+// historical selection record only.
 // The artifact's own description — ONE string for the legacy and the joint
 // writers (the joint ship refreshes `_meta` and `config` from the code, so the
 // record follows the fitter and no fossil field survives a re-close).
@@ -179,32 +163,30 @@ const CONFIG = {
       structural: '1,325.4 yr; historical selection record: the former divisor 253 = 11·23 (gcd 23), the 184th harmonic of the retired perihelion-family divisor. Identified 2026-07-22 by the L-5b §14 post-4-flag residual scan (flat ΔR² = 0.031 peak over divisors 2015–2024, the gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98 → 17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, the retired lattice scan); Steinhilber marginal (~95 % threshold); cap-only ship keeps the amplitude below the free fit.',
       fit_stage:  'frozen_residual_after_D',
       target_amp_s: 75 },
-    // Eddy (8H/2684 = 999.45 yr) TESTED AND ROLLED BACK 2026-07-12: the 5-cycle
-    // joint fit showed Bond amp inflating 375 s → 646 s (collinearity) and L-5b
-    // metrics regressed by +12 s RMS. Eddy modestly improved 1200-1300 CE
-    // (~-70 s) but regressed ancient BCE (-800 to -300) by ~70-86 s per century,
-    // net worse. At the year 990 MWP peak Eddy contributed only 0.79 s (phase
-    // near null there). Cross-archive coherence in Steinhilber Φ + EPICA CO2 is
-    // real — the 999-yr Eddy solar cycle is empirically present — but it
-    // cannot be fit against ΔT residual without hurting the ancient window.
-    // See docs/102 § "Companion 8H lattice harmonics" (§ Eddy rollback).
-    // Emp862 (8H/3111 = 862 yr) TESTED AND ROLLED BACK 2026-07-12: the 6-cycle
-    // fit was rank-deficient — Bond amp blew up to 9,898 s (from 375 s
-    // baseline) with Bond phase shifted -90°, and Emp862's own free-fit
-    // reached 29,961 s. Root cause: the beat period between Eddy (999 yr) and
-    // Emp862 (862 yr) is ~6,255 yr, unresolvable by the 2.7-kyr Stephenson
-    // window. 3-archive evidence for 862 yr remains valid but the cycle
-    // cannot be fit against ΔT residual here.
+    // Eddy (999.45 yr) TESTED AND ROLLED BACK 2026-07-12: the 5-cycle joint fit
+    // showed Bond amp inflating 375 s → 646 s (collinearity) and L-5b metrics
+    // regressed by +12 s RMS. Eddy modestly improved 1200-1300 CE (~-70 s) but
+    // regressed ancient BCE (-800 to -300) by ~70-86 s per century, net worse.
+    // At the year 990 MWP peak Eddy contributed only 0.79 s (phase near null
+    // there). Cross-archive coherence in Steinhilber Φ + EPICA CO2 is real — the
+    // 999-yr Eddy solar cycle is empirically present — but it cannot be fit
+    // against ΔT residual without hurting the ancient window. See docs/104.
+    // Emp862 (862 yr) TESTED AND ROLLED BACK 2026-07-12: the 6-cycle fit was
+    // rank-deficient — Bond amp blew up to 9,898 s (from 375 s baseline) with
+    // Bond phase shifted -90°, and Emp862's own free-fit reached 29,961 s. Root
+    // cause: the beat period between Eddy (999 yr) and Emp862 (862 yr) is
+    // ~6,255 yr, unresolvable by the 2.7-kyr Stephenson window. 3-archive
+    // evidence for 862 yr remains valid but the cycle cannot be fit against ΔT
+    // residual here.
   ],
-  // The SHIPPED application window of the stack (plan 11 step 1): the four
-  // cycles run at full strength to ±full_halfwidth_yr from J2000 and fade to
-  // zero at ±total_halfwidth_yr (@essrt/physics deltat/cycles). Written to the
-  // artifact as `shipped_taper`, assembled into DEFAULT_CONSTANTS.deepTime
+  // The SHIPPED application window of the stack: the four cycles run at full
+  // strength to ±full_halfwidth_yr from J2000 and fade to zero at
+  // ±total_halfwidth_yr (@essrt/physics deltat/cycles). Written to the artifact
+  // as `shipped_taper`, assembled into DEFAULT_CONSTANTS.deepTime
   // .dtStackTaper*HalfwidthYr by tools/constants/generate.mjs — the stack and
-  // its window are ONE artifact. (The fit window below lies deep inside it,
-  // so the taper is 1 on every fitted sample and these values do not enter
-  // the solve. The former `holocene_taper` 4,500/6,000 here was an unused
-  // fossil beside the runtime's 300/400 kyr — one value, one home now.)
+  // its window are ONE artifact. (The fit window below lies deep inside it, so
+  // the taper is 1 on every fitted sample and these values do not enter the
+  // solve.)
   shipped_taper: {
     full_halfwidth_yr:  300000,
     total_halfwidth_yr: 400000,
@@ -222,8 +204,8 @@ const CONFIG = {
   //
   // EMPIRICAL FINDING (2026-07-18): 4× weight on ≥1600 samples slightly improved
   // the 1870-1910 dip (~+17 s error at 1900 vs +28 s uniform) but destroyed the
-  // 1650-1800 fit (from +30-40 s off to −40-55 s off). The 4-cycle H-lattice
-  // stack simply cannot fit both eras simultaneously — Bond (1466 yr period)
+  // 1650-1800 fit (from +30-40 s off to −40-55 s off). The four-cycle stack
+  // simply cannot fit both eras simultaneously — Bond (1466 yr period)
   // dominates monotonically across the fit window, so any weighting just moves
   // the residual from one era to another. Left at 1 (disabled) as the honest
   // default. Non-1 values are for diagnostic exploration only.
@@ -238,9 +220,9 @@ const CONFIG = {
   //                       [derived at runtime — see computeUsnoTargetOffset() below]
   // Change `usno_target_lod_s` to explore other anchor targets (e.g. IERS ≈ 86400.001,
   // or exactly 86400 to zero out any J2000 kinematic offset). The offset value is
-  // recomputed each run against the current fitted sidereal-year anchor + H/5 constant,
-  // so upstream shifts (sidereal Fourier refit, H change, mSY change) are handled
-  // automatically without needing to hand-edit a derived value.
+  // recomputed each run against the current kinematic day + the ecliptic term, so
+  // upstream shifts (a refit, an mSY change) are handled automatically without
+  // needing to hand-edit a derived value.
   usno_anchor: {
     enabled: true,
     // usno_target_lod_s: DEFAULT/FALLBACK only. The main pipeline auto-selects
@@ -335,15 +317,15 @@ if (process.env.DT_FLAGS) {
 // DT_RESONATOR_COMPONENTS="kick1,kick2" runs the joint fit with only those
 // Core-mantle swing columns in the design matrix (kick1 · kick2 · tone; the
 // empty string = no swing at all) — "what is each component actually buying?"
-// (plan 06 D7 follow-up: the lagged GIA channel took most of the drive tone).
+// (the lagged GIA channel took most of the drive tone).
 // Refuses --write, like DT_FLAGS: the ship path writes all three by index.
 const _ALL_RES = ['kick1', 'kick2', 'tone'];
-// SHIPPED design since the D7 follow-up (plan 06, 2026-09): the two impulse
-// kicks only. The drive tone at the bond−hallstatt difference frequency was
-// measured to buy nothing once the GIA channel became the lagged response
-// (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s, Espenak /
-// full-window; tone-only 23.9 / 43.8) and ships at amplitude 0. It remains
-// available as a DIAGNOSTIC column via DT_RESONATOR_COMPONENTS="kick1,kick2,tone".
+// SHIPPED design: the two impulse kicks only. The drive tone at the
+// bond−hallstatt difference frequency was measured to buy nothing once the GIA
+// channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three
+// 12.04 / 21.34 s, Espenak / full-window; tone-only 23.9 / 43.8) and ships at
+// amplitude 0. It remains available as a DIAGNOSTIC column via
+// DT_RESONATOR_COMPONENTS="kick1,kick2,tone".
 let ACTIVE_RES = ['kick1', 'kick2'];
 if (process.env.DT_RESONATOR_COMPONENTS !== undefined) {
   const want = process.env.DT_RESONATOR_COMPONENTS.split(',').map(s => s.trim()).filter(Boolean);
@@ -392,28 +374,23 @@ function resonatorLodAtJ2000() {
 //   dtCycleLodCorrectionSum(2000) = USNO − o.lodKinematic − h5Correction(2000)
 // which is exactly the anchor target for this fit.
 function computeUsnoTargetOffset(usnoTargetLodS) {
-  // Plan 09: the kinematic day at J2000 is the model's ω₀ — the SI day
+  // The kinematic day at J2000 is the model's ω₀ — the SI day
   // (C.meanLengthOfDay = 86,400 s). The runtime's kinematic day of date is the
   // Layer-0 tidal mean LOD, exactly ω₀ at J2000, so the closure target and the
-  // runtime composite share ONE basis. (Before plan 09 the fitter read the
-  // retired year comb's measured anchor YEAR_LENGTH_J2000_ANCHOR.sidereal —
-  // 86,400.00032 s — while the runtime rode the comb's own 86,400.00011: the
-  // two-J2000-day-bases spread of doc 99, closed here.)
+  // runtime composite share ONE basis.
   const sidDays2000 = C.meanSiderealYearDays;
   const lodKinematic = C.meanLengthOfDay;
 
   // The solar day's ecliptic missing-motion term at 2000 — read from the ONE
   // runtime home (tools/lib deep-time → the shared factory), so the closure
-  // target and the runtime composite can never desync (plan 06 T2 item: the
-  // term rides the nodal period 1,296,000/|s₃|, formerly the anchor's H/5 —
-  // this fitter carried its own H/5 copy, caught by the registry's
+  // target and the runtime composite can never desync (the term rides the nodal
+  // period 1,296,000/|s₃|; a private copy here was once caught by the registry's
   // lodRealPhysical basis-consistency gate at exactly the 0.087-ms difference).
   const h5At2000 = DT.h5Correction(2000);
 
   const targetOffset = usnoTargetLodS - lodKinematic - h5At2000;
   return { targetOffset, lodKinematic, h5At2000, sidDays2000 };
 }
-
 
 // ─── Stephenson polynomial evaluator (cubic spline over 54 segments) ───
 function loadStephenson() {
@@ -682,12 +659,6 @@ function runFitQuiet(usnoTargetLodS, years, residual) {
     return 86400 * omega * (c.sin * Math.cos(omega * 2000) - c.cos * Math.sin(omega * 2000)) / MEAN_TROPICAL_YEAR_J2000_S;
   }
 
-  // (The entire Stage A/B/C no-anchor block was dead — fitA fed only the
-  // unused bondSolo — and was deleted at 9-3f when the file joined the
-  // linted scope: pure fitCycles calls whose results fed nothing; the
-  // shipped stage metrics come from the sweep below. Git history preserves
-  // the block; dry-run output proven byte-identical after removal.)
-
   // Stage D with USNO anchor
   const stageDPeriodsYr = [bondCycle.period_yr, hallCycle.period_yr, joseCycle.period_yr, jose4Cycle.period_yr];
   const derivation = computeUsnoTargetOffset(usnoTargetLodS);
@@ -790,15 +761,15 @@ function findJointOptimum(years, residual, { sweepMin = 86400.0014, sweepMax = 8
 // ─── 2D EPOCH SWEEP (2026-07-22): Layer-2 LOD trajectory offset δ × USNO ───
 // Tests the "one-century epoch offset" hypothesis: the ~730 μs/day linear
 // drift in the Stephenson residual (L-5b §15) numerically equals the
-// framework's observable dLOD/dt (0.764 ms/cy) × ~0.96 century, suggesting
-// the H/13-structural LOD anchor (86399.9997 ≈ the ~1870–1900 mean solar
-// day, the SI second's calibration epoch) is pinned one century late at
-// J2000. A constant trajectory offset δ (s/day) enters the ΔT integral
-// analytically: ΔT_δ(y) = ΔT₀(y) − δ·365.2422·(2000−y).
+// model's observable dLOD/dt (0.764 ms/cy) × ~0.96 century, suggesting
+// the LOD anchor (86399.9997 ≈ the ~1870–1900 mean solar day, the SI second's
+// calibration epoch) is pinned one century late at J2000. A constant
+// trajectory offset δ (s/day) enters the ΔT integral analytically:
+// ΔT_δ(y) = ΔT₀(y) − δ·365.2422·(2000−y).
 //
 // Metrics per (δ, USNO) grid point, after the full quiet 5-stage fit:
 //   driftSlope  — linear slope of the final shipped-stack residual (target 0)
-//   phantomAmp  — 8H/2024 line in the final residual (anchor shadow price)
+//   phantomAmp  — the ~1,326-yr line in the final residual (anchor shadow price)
 //   espenakRMS  — modern shape fit (deltaTStart free = trend-offset allowed;
 //                 ΔT(2000)_trend reported as a SOFT indicator vs observed
 //                 63.8 s — today may legitimately sit above/below trend)
@@ -1242,7 +1213,7 @@ function main() {
   }
 
   // ─── Post-closure phantom check ────────────────────────────────────────
-  // Re-fit the 8H/2024 line against the FINAL shipped-stack residual. Under
+  // Re-fit the ~1,326-yr line against the FINAL shipped-stack residual. Under
   // the old Bond-only closure this phantom measured ~73–85 s (the Bond
   // haircut leaking into the ~1,326-yr band); target after the distributed
   // closure is ≲ the Stage-E irreducible level (~12 s).
@@ -1340,10 +1311,9 @@ function main() {
     collinearity_warnings: warnings,
     optimum: (effectiveDeltaTStart !== null) ? {
       // Joint-optimum values selected by findJointOptimum() against the
-      // ESPENAK_REFERENCE year list. deltaTStart ships HERE (plan 14: the fit's
-      // own artifact, embedded as FIT.DT_ANCHOR.deltaTStartSeconds — never
-      // written into astro-reference.json); usno_target_lod_s stays inside the
-      // fit config (JSON).
+      // ESPENAK_REFERENCE year list. deltaTStart ships HERE (the fit's own
+      // artifact, embedded as FIT.DT_ANCHOR.deltaTStartSeconds);
+      // usno_target_lod_s stays inside the fit config (JSON).
       usno_target_lod_s: effectiveUsnoTarget,
       deltaTStart:       effectiveDeltaTStart,
       espenak_rms_s:     optimumRow ? optimumRow.rms : null,
@@ -1431,13 +1401,12 @@ function main() {
     const outPath = path.join(ROOT, 'data', 'deltaT-4flag-fit.json');
     fs.writeFileSync(outPath, JSON.stringify(output, null, 2) + '\n');
     console.log(`  ✓ Written to ${outPath}`);
-    // Plan 14 step 1: deltaTStart is the fit's OUTPUT and lives HERE (optimum.deltaTStart),
-    // embedded by constants:generate as FIT.DT_ANCHOR.deltaTStartSeconds. The former
-    // --sync-code write into public/input/astro-reference.json is gone: that file is an
-    // INPUT the N-body node hashes wholesale, so a µs move of the anchor cost the 26-min
-    // re-stamp. The WEBSITE consumes the published @essrt packages; a refit reaches it via
-    // values:package:write + republish, deliberately manual: a fitter must not publish
-    // across a repo boundary as a side effect of --write.
+    // deltaTStart is the fit's OUTPUT and lives HERE (optimum.deltaTStart),
+    // embedded by constants:generate as FIT.DT_ANCHOR.deltaTStartSeconds — never
+    // written into public/input/astro-reference.json (an INPUT the N-body node
+    // hashes wholesale). The WEBSITE consumes the published @essrt packages; a
+    // refit reaches it via values:package:write + republish, deliberately manual:
+    // a fitter must not publish across a repo boundary as a side effect of --write.
     console.log('  → then: npm run regen:cascade -- --run (constants LAST), npm run values:package:write, republish @essrt/model-values');
   } else {
     console.log('  (dry run — add --write to persist to data/deltaT-4flag-fit.json)');
@@ -1473,8 +1442,6 @@ function runJointMode() {
   const lam = w0 / (2 * res.Q);
   const wd = w0 * Math.sqrt(1 - 1 / (4 * res.Q * res.Q));
   const kicks = res.kick_epochs_year;
-  // (kick_coefficients_s unused here since the impulse-consistent re-ship:
-  // kicks are sin-only unit shapes — binding deleted at 9-3f.)
   const tone = res.drive_tones[0];
   const wTone = 2 * Math.PI / tone.period_yr;
 
@@ -1766,9 +1733,8 @@ function runJointMode() {
   const fitPath = path.join(ROOT, 'data', 'deltaT-4flag-fit.json');
   const fitJson = JSON.parse(fs.readFileSync(fitPath, 'utf8'));
   // The record follows the code: `_meta` and `config` are rewritten from this
-  // fitter, never patched — the legacy write's fossils (an H-lattice description,
-  // `H_yr` / `eight_H_yr`, each cycle's `lattice_n`, a deleted scan script named
-  // in a `structural` string) survived four re-closes by being left in place.
+  // fitter, never patched (fossil fields once survived four re-closes by being
+  // left in place).
   fitJson._meta = {
     description: META_DESCRIPTION,
     generator: 'tools/fit/dt-corrections-fit.js --joint',
@@ -1812,12 +1778,11 @@ function runJointMode() {
     'JOINT world (2026-07-23): closure sum includes the Core-mantle swing '
     + '(Resonator) episode; stage_a..e fit_metrics below predate the joint fit '
     + 'and are kept as historical cascade diagnostics.';
-  // the stack's application window (plan 11 step 1) — one home, this artifact;
-  // the legacy `config.holocene_taper` fossil is replaced by the shipped value
+  // the stack's application window — one home, this artifact
   fitJson.shipped_taper = CONFIG.shipped_taper;
   fitJson.config.shipped_taper = CONFIG.shipped_taper;
   delete fitJson.config.holocene_taper;
-  // a --write IS the re-close: the banked staleness note (plan 11 step 1) goes
+  // a --write IS the re-close
   delete fitJson._meta.staleness_vs_live_fitter;
   // (written LAST below — after astro-reference and the resonator artifact —
   // so its inputs block hashes those two files as THIS run left them)
@@ -1855,13 +1820,9 @@ function runJointMode() {
   rb.status = ('JOINT WORLD SHIPPED (--joint --write): the two impulse kicks from the joint '
     + 'equality-constrained fit, the drive tone retired at amplitude 0 (plan 06 D7 follow-up); '
     + 'phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.');
-  // Plan 14 step 1: the anchor deltaTStart is NOT written into astro-reference.json any more
-  // (an input file the N-body node hashes wholesale — a µs move cost the 26-min re-stamp). It
-  // ships in this artifact's `optimum.deltaTStart` (below) and reaches every runtime as
-  // FIT.DT_ANCHOR.deltaTStartSeconds through constants:generate.
   console.log(`  deltaTStart = ${best.dts.toFixed(4)} s (ships inside data/deltaT-4flag-fit.json → FIT.DT_ANCHOR)`);
 
-  // ── GOVERNANCE (plan 12 §1b close-out) ──────────────────────────────────
+  // ── GOVERNANCE ──────────────────────────────────────────────────────────
   // The inputs block: the data the fit reads (Stephenson 2016, the GIA τ,
   // the climate coefficients the GIA channel rides, the cited Earth–Moon
   // history), the physics it evaluates ΔT through (the deep-time chain and its

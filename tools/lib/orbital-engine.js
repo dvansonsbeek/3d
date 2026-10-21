@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // ORBITAL ENGINE — Time-dependent orbital element functions
-// Extracted from src/script.js for use by the optimization tools.
+// Extracted from src/script.js for the Node tools.
 //
 // All functions here compute orbital ELEMENTS (eccentricity, obliquity,
 // inclination, year lengths, perihelion longitude, precession, day length)
@@ -9,15 +9,9 @@
 // Organized by category:
 //   OBLIQUITY → ECCENTRICITY → ARGUMENT OF PERIHELION →
 //   LONGITUDE OF PERIHELION → PRECESSION → YEAR LENGTH → DAY LENGTH
-// (The ASCENDING NODE and INCLINATION sections — the node integrator, the
-// linear year-2000 node, Earth's H/3 inclination cosine, the ψ-law planet
-// oscillation and the two-normal ecliptic inclinations — and the COMPOSITE
-// computeEarthOrbitalElements left at plan 07 R5: the planets' elements of
-// date have one home, the N-body chain.)
+// (The planets' elements of date have one home, the N-body chain.)
 //
-// Consumers: the solar-measurements exporter and the verify/explore scripts
-// (the optimizer CLI tools/optimize.js that drove it is deleted, plan 11 step
-// 2; the dashboard exporter before it is retired)
+// Consumers: the solar-measurements exporter and the verify/explore scripts.
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
@@ -30,17 +24,14 @@ const _req = (p) => _modCache[p] || (_modCache[p] = require(p));
 // OBLIQUITY
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Plan 09 (2026-10-11): the 16-harmonic obliquity comb (computeObliquityEarth)
-// and its H/3–H/8 decomposition (computeObliquityIntegrals) left this engine.
 // The published obliquity of date is the hybrid ε(t) of the one-source
 // movement (deep-orbital-history.js createOneSourceMovement().epsDeg —
-// scene-graph injects it); the comb was the frozen era record, measured
-// 0.23″ off the hybrid at J2000 and 4,938″ at −26 kyr (era-device-readers).
+// scene-graph injects it).
 
-// Plan 06 Phase 7 commit 2 — the planets' obliquity rides the spin channel
-// (ONE home @essrt/physics/planets/spin-channel, the same construction the
-// package model and the browser use): α from the planet's own torques, the
-// spin integrated on its own ζ plane history from the IAU J2000 pole. Built
+// The planets' obliquity rides the spin channel (ONE home
+// @essrt/physics/planets/spin-channel, the same construction the package
+// model and the browser use): α from the planet's own torques, the spin
+// integrated on its own ζ plane history from the IAU J2000 pole. Built
 // lazily per planet from the governed artifacts.
 let _planetSpinChannels = null;
 function _planetSpin(planetName) {
@@ -87,32 +78,14 @@ function computePlanetObliquity(planetName, year) {
   return eps === null ? ch.obliquityJ2000Deg : eps;
 }
 
-// Plan 07 R5: computeInclinationTiltRelative / computeAxialTiltAbsolute /
-// computeAxialTiltRelative stood here. They were a closed cluster — each
-// called only the next — exported but called by NOTHING: no consumer in
-// src/, tools/, packages/ or test/, and no row in the 834-value tools-lib
-// golden. They built a planet's axial tilt of date as
-// obliquity(t) − [i_invPlane(t) − i_mean], with i(t) from the psi device and
-// i_mean the device's near-J2000 mean, and their own comment asserted "at
-// J2000: axialTiltJ2000 − 0" — which was never true, because the device's
-// deviation at J2000 is A·cos(ϖ − anchor), not zero.
-//
-// Measured before removal: the construction disagreed with the IAU J2000
-// axial tilts the model anchors on (Mercury 0.390° against 0.03°, Mars
-// 25.394° against 25.19°, Saturn 26.791° against 26.73°), while the model's
-// OWN spin channel — planets/spin-channel.cjs, each planet's torques on the
-// chain's orbit — reproduces them (0.0340°, 25.1916°, 26.7312°). The quantity
-// survives and has one home: `model.planets.spin(k).obliquityDegAtYear(y)`.
+// A planet's axial tilt of date has one home,
+// `model.planets.spin(k).obliquityDegAtYear(y)` — the spin channel reproduces
+// the IAU J2000 axial tilts the model anchors on (Mercury 0.0340°, Mars
+// 25.1916°, Saturn 26.7312°).
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ECCENTRICITY
 // ═══════════════════════════════════════════════════════════════════════════
-
-// (Plan 09 step 6: `computeEccentricityEarth` — the H/3 eccentricity law
-// through the deep-time twin — and `computeEccentricity` — the H/16
-// law-of-cosines form kept for the planets' wobble laws that K5 excised — are
-// deleted. Earth's eccentricity of date is the N-body series on every path:
-// `createModel().earth.eccentricity(year)`, the scene's `_chainElementsOfDate`.)
 
 /**
  * Compute perihelion and aphelion distances from eccentricity.
@@ -136,8 +109,7 @@ function computePlanetObliquity(planetName, year) {
  */
 function computeSemiMajorAxis(planetName) {
   if (planetName === 'earth') return 1.0;
-  // plan 09 step 7b: the ONE scaffold geometry (constants.js derived) — the
-  // chain's J2000 a; it was Kepler's a from the device's count-quantized period
+  // the ONE scaffold geometry (constants.js derived) — the chain's J2000 a
   const d = C.derived[planetName];
   return d ? d.orbitDistance : 0;
 }
@@ -181,21 +153,6 @@ function computeArgumentOfPerihelionInvPlane(lonPerihelion, ascNodeInvPlane) {
 // LONGITUDE OF PERIHELION
 // ═══════════════════════════════════════════════════════════════════════════
 
-// (Plan 09 step 4: calcEarthPerihelionPredictive — the 25-term perihelion comb
-// on H-divisors, 270° + the device wheel's J2000 phase + the H/16 mean rate +
-// PERI_HARMONICS + PERI_OFFSET — and calcERD, its derivative, are deleted.
-// Earth's perihelion of date is the series' ϖ in @essrt/physics,
-// createModel().earth.perihelionLongitudeDeg (ecliptic of date); the scene's
-// perihelion has followed the series since v16.0. Measured before deletion,
-// comb − series: 0.03° at 2000, −1.6° at −4000, −20° at −26 kyr, −87° at
-// −270 kyr — data/era-device-readers.json.)
-
-// (Plan 07 R1: calcPlanetPerihelionLong and calcPerihelionLongICRF — the
-// device's linear perihelion advance on the lattice period, delegating to
-// the planets/predict module retired at plan 06 R8 — had no caller; gone.
-// A planet's ϖ of date is the chain's: packages/physics model.js
-// planetPerihelionDeg / src/script.js _chainPerihelionEclLonDeg.)
-
 // ═══════════════════════════════════════════════════════════════════════════
 // PRECESSION
 // ═══════════════════════════════════════════════════════════════════════════
@@ -204,12 +161,8 @@ function computeArgumentOfPerihelionInvPlane(lonPerihelion, ascNodeInvPlane) {
  * Compute axial precession (in years per full cycle).
  *
  * Source: src/script.js `computeAxialPrecessionYears` — ONE function, the day
- * length is the argument (year/day plan §2c: the unit is not a function
- * variant; the former "RealLOD" name and the SI-hardcoded twin are gone). An
- * earlier 2-arg version here hardcoded 86400 as LOD, which gave inconsistent
- * precession when called with meanLengthOfDay-based siderealYearSec (off by
- * ~22 yr at J2000, ~488 yr at deep time). Pass LOD explicitly; defaults to
- * C.meanLengthOfDay for the non-deep-time case (matches production).
+ * length is the argument. Pass LOD explicitly; defaults to C.meanLengthOfDay
+ * for the non-deep-time case (matches production).
  *
  * @param {number} siderealYearSec - sidereal year in seconds
  * @param {number} solarYearDays - solar year in days
@@ -233,9 +186,6 @@ function computeAxialPrecessionYears(siderealYearSec, solarYearDays, lengthOfDay
 function computePerihelionPrecession(anomalisticYearSec, solarYearSec) {
   return anomalisticYearSec / (anomalisticYearSec - solarYearSec);
 }
-
-// (Plan 07 R1: computeInclinationPrecessionPeriod — Earth's H/3 and the
-// planets' lattice apsidal period — had no caller; gone with the lattice.)
 
 /**
  * Compute obliquity precession period (in years).
@@ -270,13 +220,6 @@ function computeEclipticPrecession(axialPrecession) {
 // inline `dtm()` calls exist for the same reason.
 let _dtMod = null;
 const dtm = () => (_dtMod || (_dtMod = require('./deep-time')));   // perf: the ONE lazy resolution of deep-time (every in-function use goes through dtm())
-
-// (Plan 09: the analytic deep-time year shapes, the difference-form Fourier
-// evaluator and the comb-based year-length functions —
-// computeLengthOfSimplifiedSolarYear, computeLengthOfSiderealYear,
-// computeAnomalisticYearSecondsAtDayLength, computeLengthOfAnomalisticYearDays
-// — are deleted with the three year-length combs. The year lengths of date in
-// days are deep-time.js *YearDaysOfDate; the cardinal 4-mean below stays.)
 
 /** Compute tropical year length in days as mean of 4 cardinal point year lengths.
  *  This is the physically correct definition: the mean return time to solstices/equinoxes. */
@@ -348,19 +291,14 @@ function computeSiderealDay(t_Ma) {
 }
 
 /**
- * Stellar day length in seconds. Production (src/script.js:3335,
- * constants.js:214) defines:
- *   meanStellarday = (meanSiderealday / (H / 13)) / (meanSolarYearDays + 1)
+ * Stellar day length in seconds. Production (src/script.js, constants.js) defines:
+ *   meanStellarday = (meanSiderealday / T_p) / (meanSolarYearDays + 1)
  *                    × STELLAR_DAY_RA_PROJECTION + meanSiderealday
- * The H/13 factor is the axial precession period in years — precession in
- * LONGITUDE, along the ecliptic. The sidereal→stellar offset depends on
- * precession in RIGHT ASCENSION, along the equator, so the term carries
- * cos(ε) (m = p·cos ε). Without it the offset reads ~9.12 ms instead of
- * ~8.37 ms; see docs/11 § "Stellar−Sidereal Offset".
- *
- * Earlier version used `(siderealYearSec - solarYearSec) / (1/eccentricityAmplitude/13*16)`
- * which gave a divisor of ~907 instead of H/13 ≈ 25,794 — completely wrong
- * formula, off by factor ~28×. Stellar day was ~5 ms too low vs production.
+ * T_p is the axial precession period in years — precession in LONGITUDE, along
+ * the ecliptic. The sidereal→stellar offset depends on precession in RIGHT
+ * ASCENSION, along the equator, so the term carries cos(ε) (m = p·cos ε).
+ * Without it the offset reads ~9.12 ms instead of ~8.37 ms; see docs/11
+ * § "Stellar−Sidereal Offset".
  *
  * @returns {number} stellar day in seconds
  */
@@ -368,16 +306,6 @@ function computeStellarDay(t_Ma) {
   if (t_Ma === undefined || t_Ma === 0) return C.meanStellarDay;
   return dtm().meanStellarDayAtAge(t_Ma);
 }
-
-// (Plan 09 step 5b: computeRADayOffset — the fitted RA_DAY_OFFSET_MS comb, mean
-// −14.194 ms/day + lines on H/16 and H/8, "confirmed by the 65-epoch multiepoch
-// test" — and computeMeasuredSolarDay are deleted. The comb reproduced the
-// Framework-Verification instrument's WINDOW term: 365 solar noons counted from
-// the June solstice end 0.2422 d short of the tropical year, so the mean
-// noon-to-noon interval differs from the mean solar day by −(0.2422/365)·dEoT/dt
-// at the solstice; the two lines are that slope's e·cos(90° − ϖ) and tan²(ε/2)
-// terms on the perihelion-of-date and obliquity cycles. A property of the
-// window, not of the sky. docs/11 § "The retired RA day offset".)
 
 /**
  * Compute stellar day minus sidereal day offset in seconds.
@@ -407,17 +335,6 @@ function computeStellarSiderealOffset(stellarDay, siderealDay) {
 // Anchored at IAU J2000 values. Self-correcting: exact at year 2000.
 // See docs/14-solstice-prediction.md
 
-// (Phase 7.2 moved the §10/§10g cardinal family — extracted verbatim from
-// this file — into the package's createCardinalModel, ONE implementation for
-// every engine; plan 06 R1 retired it from the runtime and plan 09 step 7a
-// deleted it with its coefficients. Doc 110 §5.2/§5.5 keep the record.)
-// Plan 06 R1: the fitted cardinal-point model (CARDINAL_POINT_* on the frozen
-// era clock) left the engines. The cardinal instants are the APPARENT
-// crossings of the one Sun the package certifies and the scene renders —
-// ONE home, `createModel().cardinal` (packages/physics/src/model.js); this
-// engine's three public functions are one-line delegates. The package model
-// is built on the shipped secular-series artifact (the API's configuration —
-// createModel() WITHOUT it is a different hybrid, the recorded 3c trap).
 let _cardinalPkgM = null;
 function _cardinalPkg() {
   if (_cardinalPkgM !== null) return _cardinalPkgM;
@@ -428,13 +345,9 @@ function _cardinalPkg() {
 }
 
 /**
- * Compute the RA (in degrees) where a cardinal point occurs.
- * Fully derived — zero fitted constants.
- *
- * Formula: RA(t) = (baseRA − earthRAAngle/sin(ε)) + (A/sin(ε)) × [−sin(H/3) + sin(H/8)]
- *   where baseRA = 90° (SS), 270° (WS), 0° (VE), 180° (AE)
- *
- * RMSE: 0.089° (0.36 min RA) against 15,953 simulation data points.
+ * The RA (in degrees) at which a cardinal point occurs — the package model's
+ * cardinal surface (createModel().cardinal.raDeg): at a crossing the RA is the
+ * target longitude by construction (λ = 0/90/180/270 ⇒ RA = 0/90/180/270).
  *
  * @param {number} year - calendar year
  * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
@@ -463,11 +376,8 @@ function computeSolsticeRA(year, type) { return _cardinalPkg().cardinal.raDeg(ye
 function computeSolsticeJD(year, type) { return _cardinalPkg().cardinal.jd(year, type); }
 
 /**
- * Compute the cardinal-point tropical year length (time between consecutive events).
- * Derivative of computeSolsticeJD() with respect to year.
- *
- * At J2000: SS=365.2417d (shortest, −46s), WS=365.2427d (longest, +45s).
- * The ±46s variation comes from perihelion precession (H/16).
+ * The cardinal-point year length — the interval between successive crossings
+ * of the one certified Sun (SI days), from the package model's cardinal surface.
  *
  * @param {number} year - calendar year
  * @param {'SS'|'WS'|'VE'|'AE'} [type='SS'] - cardinal point type
@@ -475,35 +385,18 @@ function computeSolsticeJD(year, type) { return _cardinalPkg().cardinal.jd(year,
  */
 function computeSolsticeYearLength(year, type) { return _cardinalPkg().cardinal.yearLengthDays(year, type); }
 
-// (The planet PRECESSION PREDICTION block — the @essrt/physics/planets/predict
-// feature basis, PREDICT_COEFFS × features, predictGeocentricPrecession /
-// predictPrecessionFluctuation — left this engine at plan 06 R8: it
-// reproduced the RETIRED geometric scene's exported Earth-frame RA rate. The
-// rate is now the equatorial projection of the lattice motion —
-// tools/docs/model-values.mjs predictiveMachinery and the browser's
-// perihelionFrameBreakdown, identical ops.)
-
 module.exports = {
   // Obliquity
   computePlanetObliquity,
   planetSpinChannel: _planetSpin,   // plan 11 step 3: the scene twin places each planet's pole from the channel's ŝ(t)
 
-  // Eccentricity (plan 09 step 6: the two law evaluators are deleted)
+  // Eccentricity
   computeSemiMajorAxis,
   computePerihelionAphelionDistance,
-
-  // (Ascending Node — the node integrator, the crossing finder and the linear
-  // year-2000 node — left at plan 07 R5.)
 
   // Argument of Perihelion
   computeArgumentOfPerihelion,
   computeArgumentOfPerihelionInvPlane,
-
-  // (Longitude of Perihelion — calcEarthPerihelionPredictive / calcERD, the
-  // perihelion comb — left at plan 09 step 4.)
-
-  // (Inclination — Earth's H/3 cosine, the ψ-law planet oscillation and the
-  // two-normal ecliptic inclinations — left at plan 07 R5.)
 
   // Precession
   computeAxialPrecessionYears,
@@ -511,8 +404,7 @@ module.exports = {
   computeObliquityPrecession,
   computeEclipticPrecession,
 
-  // Year Length (plan 09: the comb-based evaluators are deleted; deep-time.js
-  // *YearDaysOfDate carry the year lengths of date in days)
+  // Year Length (deep-time.js *YearDaysOfDate carry the year lengths of date in days)
   computeLengthOfSolarYear,
   computeLengthOfSolarYearSec,
   computeLengthOfSiderealYearSec,

@@ -5,33 +5,28 @@
  *
  * Extracted VERBATIM from src/script.js (_FW_MOON, the two bounded Lp
  * carriers, _fwMoonArgsDeep, _fwMoonArgs, and the pure-Meeus reference
- * polynomials), which tools/lib/scene-graph.js mirrored. Plan 09: the Sun's
- * mean longitude and perihelion of date are INJECTED from the ONE certified
- * Sun (sunMeanLonDegAtJdTT / sunPerihelionLonDegAtJdTT); the former
- * _FW_SUN_SEC / _fwSunSecularDeviations (the retired year combs' Sun
- * integrals, −695″ against the IAU mean Sun at −2000) are deleted. Mirror
- * gaps closed at extraction:
+ * polynomials), which tools/lib/scene-graph.js mirrored. The Sun's mean
+ * longitude and perihelion of date are INJECTED from the ONE certified Sun
+ * (sunMeanLonDegAtJdTT / sunPerihelionLonDegAtJdTT). Mirror gaps closed at
+ * extraction:
  *
- *  - S3: the (then) Sun secular deviations' year coordinate. The browser used
- *    the full Julian/Gregorian calendar conversion; the tools mirror used a
- *    linear approximation. The calendar conversion is EMBEDDED here as a
- *    private helper, so both engines evaluate the same coordinate.
+ *  - S3: the year coordinate. The browser used the full Julian/Gregorian
+ *    calendar conversion; the tools mirror used a linear approximation. The
+ *    calendar conversion is EMBEDDED here as a private helper, so both
+ *    engines evaluate the same coordinate.
  *  - S9: ϖ/Ω composition order in the deep branch (wrapper-composed vs
  *    use-site subtraction) — one form now, the browser's.
- *  - S10: P_DEGCY (the counter's 13/H general precession, no consumers) was
- *    kept as documentation of the frame decomposition; it left with the
- *    unit at plan 09 step 5c (the frame decomposition is WDOT = ϖ̇_ICRF + p,
- *    NDOT = Ω̇_ICRF + p with p the IAU general precession).
+ *  - S10: the frame decomposition is WDOT = ϖ̇_ICRF + p, NDOT = Ω̇_ICRF + p
+ *    with p the IAU general precession.
  *
  * Construction (docs/66 §1, abridged): linear rates are observational J2000
  * anchors; perigee/node ride the PHASE-AWARE e_E channel integral (s_ϖ
  * 2.407 / s_Ω 1.018, Meeus-effective); Lp's planetary T² remainder rides
  * the bounded e_E² carrier + the obliquity-line carrier (K_PL derived
  * lazily from the closed v4 budget — zero new constants); D and M are
- * identity-composed (D ≡ Lp − L_sun, M ≡ L_sun − ϖ_sun) with secular
- * content from the closed-form year-length-harmonic integrals. Deep time:
- * the SAME factored-law chains that phase the scene layers supply the
- * skeleton (always-chains, Stage B); snapshot keeps the certified
+ * identity-composed (D ≡ Lp − L_sun, M ≡ L_sun − ϖ_sun) on the injected
+ * Sun. Deep time: the SAME factored-law chains that phase the scene layers
+ * supply the skeleton (always-chains, Stage B); snapshot keeps the certified
  * polynomial skeleton, clamped at |T| ≤ 100 cy (unclamped, the fitted T⁴
  * tail reverses the lunar mean motion at year ≈ 1.99e6).
  */
@@ -39,9 +34,8 @@
 'use strict';
 
 // Astronomical JD → decimal year (Meeus Ch. 7 inverse, the 1582-10-15
-// reform): the S3-aligned coordinate for the Sun secular deviations. ONE
-// home since plan 13 B1 — time/calendar.cjs; re-exported here for the
-// readers that import it from the arguments module.
+// reform). ONE home — time/calendar.cjs; re-exported here for the readers
+// that import it from the arguments module.
 const { jdToDecimalYear } = require('../time/calendar.cjs');
 
 /**
@@ -51,9 +45,7 @@ const { jdToDecimalYear } = require('../time/calendar.cjs');
 /** The secular-completion taper half-width, Julian years: the cos² envelope
  *  inside which the chain's Meeus-measured rate anchors and the Lp secular
  *  completion act (full at the anchor, zero beyond). A recorded window of the
- *  completion, not a law — the anchors were measured with it (plan 09 step
- *  5c: it was written as the era unit's twelfth, H/12, "lattice-derived";
- *  the value is kept bit-identical and named for what it is). */
+ *  completion, not a law — the anchors were measured with it. */
 const SECULAR_COMPLETION_TAPER_YEARS = 27943.083333333332;
 
 /**
@@ -89,17 +81,13 @@ const SECULAR_COMPLETION_TAPER_YEARS = 27943.083333333332;
  *   pair powers the (d′) of-date rate completion: pDyn = the DYNAMICAL
  *   axial precession (day-form beat of the engine's sidereal/solar year
  *   evaluators — the tweakpane identity, real at J2000, epoch-valid);
- *   pKin = the KINEMATIC pair's beat (the H/13-family mean the chains
- *   embed). Absent ⇒ the completion is disabled (pre-(d′) behaviour).
- *   Plan 09: the Sun of the arguments is the engine's ONE certified Sun —
+ *   pKin = the KINEMATIC pair's beat (the mean the chains embed). Absent ⇒
+ *   the completion is disabled (pre-(d′) behaviour).
+ *   The Sun of the arguments is the engine's ONE certified Sun —
  *   sunMeanLonDegAtJdTT (the mean longitude that integrates the one-family
  *   tropical year, unwrapped) and sunPerihelionLonDegAtJdTT (the mean
  *   perihelion of date, wrapped — the arguments wrap M, and the rate anchors
- *   difference it over ±25 days wrapped to ±180°). The former "model timeline" Sun — 360° per mean solar
- *   year plus the closed-form integrals of the retired year-length combs,
- *   the perihelion on the H/16 chain count — sat 0.2° behind the IAU mean
- *   Sun at −2000 (the combs could not carry the tropical year's secular
- *   drift); measured against Meeus L0 before the move.
+ *   difference it over ±25 days wrapped to ±180°).
  */
 function createMoonArguments({ constants, fns }) {
   const {
@@ -144,10 +132,6 @@ function createMoonArguments({ constants, fns }) {
     const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
     return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
   })();
-
-  // (Plan 09: the "Sun secular deviations" — closed-form integrals of the
-  // retired year-length combs on the calendar coordinate — are gone; the
-  // Sun is injected, see the header.)
 
   // ── Bounded Lp carriers (K_PL / C_OBL derived lazily — zero new constants)
   /** @type {number | null} */
@@ -207,16 +191,16 @@ function createMoonArguments({ constants, fns }) {
   // ── Secular-ë completion carrier (ṅ campaign, plan §12i item 0 (c)) ──────
   // The certified snapshot's Lp T³/T⁴ tail is DERIVED physics (v4 D3,
   // tools/explore/v4-d3-tails.js): the Adams–Laplace channel's curvature
-  // under the SECULAR-theory ë reproduces 1/538841 at 98.8%. The H/3 line's
+  // under the SECULAR-theory ë reproduces 1/538841 at 98.8%. The e channel's
   // own ë is ~7× smaller with the opposite bulk effect — the documented BCE
   // drift-row divergence, sharply localized here — so the always-chains
-  // branch, which integrates the H/3 channel, loses that content (measured:
+  // branch, which integrates the e channel, loses that content (measured:
   // deep−snapshot Lp 2c = +0.91″/cy² over 27 cy = +0.68 tail + 0.22 the
   // channel's own curvature + 0.03 convention; dense DE441 confirms the
   // certified tail at ×1.0 — canon−DE441 2c = +0.11 ± 0.13″/cy², 300
   // epochs; instruments: tools/explore/u2-args-branch-isolation.mjs,
   // u2-lp-decomposition.mjs, u2-dense-de441.mjs). This third carrier
-  // integrates the CURVATURE difference of e² (secular Taylor − H/3
+  // integrates the CURVATURE difference of e² (secular Taylor − the e
   // channel) through the same K_PL conversion: zero through T² by
   // construction (the certified T² normalization is untouched), < 0.001″
   // in the modern era, the derived tail across the eclipse corpus. The
@@ -236,7 +220,7 @@ function createMoonArguments({ constants, fns }) {
       const d2Sec = 2 * (eccentricityDotJ2000 * eccentricityDotJ2000
         + eccentricityJ2000 * eccentricityDotDotJ2000);
       const d3Sec = 6 * eccentricityDotJ2000 * eccentricityDotDotJ2000;
-      // the H/3 channel's own d²(e²)/dT² — central difference at ±10 cy
+      // the e channel's own d²(e²)/dT² — central difference at ±10 cy
       /** @param {number} tCy */
       const e2 = (tCy) => { const e = eccAt(tCy * 100); return e * e; };
       const d2Ch = (e2(10) - 2 * e2(0) + e2(-10)) / 100;
@@ -271,15 +255,15 @@ function createMoonArguments({ constants, fns }) {
   //  1. pFix = ∫(p_dyn − p_kin) dy — the DYNAMICAL precession accumulation
   //     (Dennis's tweakpane identity), applied to every of-date longitude
   //     (Lp, ϖ, Ω; it cancels in D/M/Mp/F as of-date differences must).
-  //     Natively BOUNDED at deep time: p_dyn oscillates about the lattice
+  //     Natively BOUNDED at deep time: p_dyn oscillates about the kinematic
   //     mean p_kin, so the integral never runs away — no taper. Two-tier
   //     lazy cumulative Simpson table (25-yr cells to ±30 kyr, 500-yr to
   //     ±1 Myr, frozen beyond — deep-Moon display class, documented).
   //  2. Residual per-chain rate anchors, SELF-MEASURED at build (±25-yr
   //     central difference of the raw compositions vs the certified bundle
   //     rates, timeline conversion measured from jdToSIyear — assuming the
-  //     day-scale would inject ~29″/cy) and applied through the H/12 cos²
-  //     taper integral (analytic): full in the historical window, frozen
+  //     day-scale would inject ~29″/cy) and applied through the cos² taper
+  //     integral (analytic, SECULAR_COMPLETION_TAPER_YEARS): full in the historical window, frozen
   //     ≤ ~0.9° at deep time. Zero new physical constants anywhere.
   /** @type {{ok: boolean, pFix: (dyYears: number) => number, pdSlopeDegPerCy2: number} | null} */
   let rateComp = null;

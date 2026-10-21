@@ -475,59 +475,31 @@ the dynamical orbit plane of the N-body chain (zero fitted constants). The
 scene itself carries a geometric construction — two tilted wheels — that
 pose the Earth frame; the engine places the frame from the hybrid (R4).
 
-### 4.1 The K law — deleted (plan 09)
+### 4.1 The obliquity's readers — one surface
 
-The 16-harmonic solstice-obliquity comb on divisors of H (ε̄ +
-Σₖ [s_k·sin φ_k + c_k·cos φ_k]; `SOLSTICE_OBLIQUITY_MEAN_FITTED` /
-`SOLSTICE_OBLIQUITY_HARMONICS`, Ledger 3) was the frozen era device's
-obliquity — a comb fitted to the scene's own solstice Sun declination
-(4.2), RMSE 0.005″ to the wheel geometry and 1.27° off La2004 at −20 kyr.
-Plan 09 routed every reader to the hybrid and deleted the record: the
-browser's `computeObliquityEarth` and `OBLIQUITY_MEAN`, the Node engine's
-`computeObliquityEarth`, the package's `obliquityCombDeg` and the eclipse
-tier's `obliquityDegAt` (the besselian read the comb), the Python mirror's
-`calc_obliquity`, and the two JSON keys. The stellar day's RA projection
-(chain 3.3) now takes the IAU J2000 obliquity input (the comb's fitted mean
-sat 0.014° lower — 2e-11 of the day). Git history carries the comb.
-
-Phase 3 S3b routed the geometry callers that bypassed the scene target —
-the eclipse sub-solar point, the conjunction tier, the shadow machinery's
-RA/Dec conversions, the apparent Moon's RA/Dec, the RA-projection panel
-and the cardinal panel's solstice-obliquity row — through
-`_sceneEpsTargetDeg`, which is the hybrid at every epoch (the series
+The published obliquity of date is the hybrid (4.3) on every path. In the
+browser the geometry callers — the eclipse sub-solar point, the conjunction
+tier, the shadow machinery's RA/Dec conversions, the apparent Moon's RA/Dec,
+the RA-projection panel and the cardinal panel's solstice-obliquity row —
+read `_sceneEpsTargetDeg`, which is the hybrid at every epoch (the series
 loader rebuilds the one-source history and drops the ε samplers, so the
 deep mode table serves only until the series lands). In the package the
 one surface is `model.earth.obliquityDeg` (the API's earth route and
 cross-validation curves, the registry's obliquity keys, the lunar
-arguments' obliquity-rate term and the eclipse tier).
+arguments' obliquity-rate term and the eclipse tier). The stellar day's RA
+projection (chain 3.3) takes the IAU J2000 obliquity input. The fitted
+obliquity comb that preceded the hybrid, and the scene's wheel geometry it
+was fitted to, are the record of [doc 109 §23.1](109-model-nbody-engine-and-lattice-test.md).
 
-### 4.2 The scene's tilt geometry — the device the comb was fitted to (deleted, plan 11 step 4)
+### 4.2 The scene's Earth frame — engine-placed
 
-The scene's J2000 pose composed two wheels: `earthObliquityPrecession`, a
-retrograde wheel at the recorded period P₈ = 41,914.625 yr tilted by **A** =
-`earthInvPlaneInclinationAmplitude`, and `earthPerihelionPrecession1`, tilted
-by **−earthRAAngle** = −(2A − A²/ε̄), with the periods the recorded pose block
-`earth.kDeviceWheelPeriodYears` and the phase `kDeviceWheelPhaseAtJ2000Cycles`.
-Plan 11 step 4 deleted the wheels, the tilts and the block: the scene's world
-frame is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`),
-the perihelion pair hangs on Earth's pivot and is world-placed every frame, and
-the record of the retired RA formula below is text, not a live constant.
-
-The Sun's declination at the June solstice is the scene's ε; the deleted K
-comb (4.1) reproduced that declination to 0.005″, which is why its 8 and 16
-lines were the wheels' own fundamentals and the other fourteen the wheel
-composition's overtones. The in-browser "Verify Earth Parameters"
-test (`verifyEarthParameters`, deleted at plan 11 step 2 with the scene
-constants it tuned) searched the A that best matches the IAU
-tropical-year references — the A-solve is a calibration of this geometry
-against IAU, performed once, not a runtime loop. H-role: — (formerly **L**:
-the 8 and 16 wheels were the structural claim in its purest form,
-"obliquity cycle = H/8"; they are now a recorded pose).
-
-Since plan 06 R4 the engine PLACES the Earth frame (`_applyEngineEarthFrame`,
-relative to the J2000 pose `_chainDeriveFrameR`): the axis is the hybrid's ŝ(t)
-on the ecliptic of date each update; the wheels still turn underneath but
-set nothing observable.
+The scene's world frame is the J2000 ecliptic (`@essrt/physics`
+`computeSceneWorldFrameJ2000`) and the engine PLACES the Earth frame every
+update (`_applyEngineEarthFrame`, relative to the J2000 pose
+`_chainDeriveFrameR`): the axis is the hybrid's ŝ(t) on the ecliptic of
+date; the perihelion pair hangs on Earth's pivot and is world-placed every
+frame. The Sun's declination at the June solstice is the scene's ε.
+H-role: —.
 
 ### 4.3 The hybrid — one torque law on the dynamical orbit plane
 
@@ -564,7 +536,7 @@ retired unit's H(t)/13, 0.086 % apart — the 4.5 block asserts the identity
 per row). The pre-Phase-3 reading on the frozen era clock's counter H_era/13
 (pure spin scaling, missing the lunar 1/a³ growth) is retired with the
 clock. The alternative
-`obliqH8Scaled*Kyr` (name kept) is the "obliquity period ∝ T_p" reading —
+`obliqPrecScaled*Kyr` is the "obliquity period ∝ T_p" reading —
 the J2000 beat held proportional to T_p(t), identical to the beat today —
 carried for the discrimination (D8 iii); S5 retired its former T_p·13/8
 (= H/8) form.
@@ -693,65 +665,13 @@ offsets, the e(t)-spread, the anomalistic year — from the N-body movement's
 own e(t) and ϖ(t) with zero fitted constants; it deliberately carries no
 absolute dates. The scene's panel rows are a third path (5.4).
 
-### 5.1 The clock — the phase counter every comb read (DELETED, plan 09 step 7a — the record)
+### 5.1–5.2 The frozen era clock and its counter — the record
 
-The frozen era clock's counter was deleted with the last comb that read it
-(the cardinal record, below). What it was, for the record:
+The cardinal instants ride the certified Sun (5.3–5.5); the fitted cardinal
+clock that preceded them — its phase counter, its §10 derived form and the
+coefficients' coupling to the parameter set they shipped with — is the record
+of [doc 109 §23.2–23.3](109-model-nbody-engine-and-lattice-test.md).
 
-| item | definition | H-role | code (last revision, git history) |
-|---|---|---|---|
-| the ∫dt/H_era table | cumulative ∫1/H_era over 10-kyr cells, TRAPEZOID rule, LINEAR interpolation, ±500 Myr, H_era = H₀·LOD/LOD₀ under the constant-moment-of-inertia α (the climate-modulated α integrates into a linear phase drift — measured ~18 s of cardinal JD); table zero at the cell nearest `startmodelYear` 2000.5; drift reference `startModelYearWithCorrection` = 2000.5 + correctionDays/mSY = 2000.4977 (two constants half a day apart). The grid survives as the deep calendar's and the pos table's (`phase/deep-calendar.cjs`). | **P** (H_era stands for ω(t)) + **U** | `phase/index.cjs` `createPhaseMachinery` |
-| cyclesBetween(A, B, N) | N × (∫_A^B dt/H_era − j2000Drift), j2000Drift = ∫_A^{ref} dt/H_era − (ref − A)/H_J2000; the anchor identified by CALL SHAPE (R3): (anchor, movingYear, N) or (J2000, anchor, N) — the correction depends on the FIXED endpoint only, so the integrated count equalled the snapshot count at J2000 and kept its shape at depth | **U** (the count) | `phase/index.cjs`; the engines' `cyclesBetweenYears`, `model.js` `epoch.cyclesBetween` |
-| the out-of-domain fallback | N·(B − A)/H_J2000 (the snapshot count) when the table was undefined (past the tidal-lock asymptote) | **U** | `model.js` |
-| **the balanced year** | `perihelionalignmentYear` 1246.03125 − `temperatureGraphMostLikely` 14.5 × H/16 = **−302,635** — the phase origin of EVERY comb until plan 07 R10: the obliquity 16 lines, the year-length 26, the cardinal 92 sinusoids + 8 equation-of-centre orders + 26 joint sidebands, the RA-day-offset 2, the inclination line, the H/3 eccentricity line | **L** (an origin expressed as 14.5 perihelion-of-date cycles before the 1246 alignment — half-integer, so the θ₁₆ phase at 1246 is π) | `script.js` `BALANCED_YEAR_J2000_FIXED` (a scaffold pose anchor since) |
-
-Plan 07 R10 had moved the phase origin to J2000: the former origin (the
-"balanced year", −302,635) was part of the matched pair — every fitted
-coefficient was produced against it — and it was moved by rotating every
-(sin, cos) pair exactly (`tools/fit/reorigin-combs-j2000.mjs`, measured
-bit-identical on every surface over ±300 kyr, deleted at step 7a with the
-last comb), not by refitting. Plan 09 then deleted the combs family by
-family (steps 2–6) and the counter itself at step 7a: `createPhaseMachinery`,
-the engines' `cyclesBetweenYears` / `integralInverseHFromYears` /
-`phaseAdvanceSnapshot`, `epoch.cyclesBetween`, the era clock's
-`eraClockHAtAge` and its year twins, and the exporter's `Cycle` column. The
-movement counts nothing in anchor units: the wheels turn uniformly at
-recorded J2000 rates (step 5c), the Moon rides its chain, the calendar
-integrates the tropical year of date (step 5d).
-
-### 5.2 The frozen era clock — the §10 derived form (RETIRED from the runtime at plan 06 R1, DELETED with its coefficients at plan 09 step 7a — kept as the record; code columns name the last revision, git history)
-
-    JD_X(Y)  = anchor_X + ΣT_trop(Y) + δ_X(Y) − δ_X(2000)
-    ΣT_trop  = lincoef·(Y − 2000) + drift(Y) + Ih(Y)
-    drift(Y) = ∫₂₀₀₀^Y [a(t) − mSY] dt,  a(t) = T_sid,tidal(t)/86400 · (1 − 13/H(t))
-    Ih(Y)    = ∫₂₀₀₀^Y (tropical comb) dt in closed form, H(c) = h0 + h1·c INSIDE the integral
-    δ_X(Y)   = Σ [s, c]·[sin, cos](2π·div·c)                      23 sinusoids per point
-             + Σₙ e(t)ⁿ·[s, c]·[sin, cos](n·2π·16·c)              n = 1, 2 — the braid
-             + Σ [s, c]·[sin, cos](order·λ_X − 2π·div·c)          26 joint sidebands, shared
-    T_X(Y)   = the exact term-by-term derivative of JD_X (drift part in the real-LOD convention)
-
-| step | what | inputs | H-role | code |
-|---|---|---|---|---|
-| anchor_X | the shipped J2000 event JD — "adjusted" = data-anchored at the K scene's measured 2000 event nearest the IAU instant (commit 6eb144df); matches USNO to the minute; table below | `CARDINAL_POINT_ANCHORS_ADJUSTED` | — | `cardinal/index.cjs` 198–203 |
-| drift | composite Simpson on 2000-yr NODE SPACING (≥ 64 nodes) + the Euler–Maclaurin endpoint term; a(t) is the tidal-tier sidereal year with the kinematic 13/H(t) precession factor | `deep-time.cjs` T_sid(t), H(t) | **P** (H(t)) + **U/L** (the 13) | 108–127; `model.js` 459–464 |
-| Ih | the tropical comb integrated with the fit's own linear H(c) = h0 + h1·c; minus the Euler–Maclaurin half-sample | `TROPICAL_YEAR_HARMONICS` (deleted at plan 09 — the record render below passes an empty comb, Ih ≡ 0), h0, h1 | **C + P** | 129–161 |
-| sinusoids | δ_X on 2π·div·c, c = cycles since the balanced year (integrated) | `CARDINAL_POINT_HARMONICS` | **C** | 205–208 |
-| equation-of-centre orders | e(t)ⁿ·[sin, cos](n·θ₁₆), e(t) the published series in the record's render (the fit rode the H/3 line, deleted at plan 09 step 6), θ₁₆ = 2π·16·c — the perihelion-OF-DATE phase the equation of centre is seen through; {order, sin, cos}, NOT sinusoids (read as H/16 + H/32 harmonics they are wrong by the whole ~1.78 d braid) | `CARDINAL_POINT_ECC_TERMS`, e(t) | **L** (the H/16 count for T_peri(t), which wanders — chain 2) | 209–217 |
-| joint sidebands | phase order·λ_X − 2π·div·c, λ_X = 0/90/180/270° for SS/AE/WS/VE; COUNTER-rotating — the load-bearing minus sign (the co-rotating sense captures nothing, measured) | `CARDINAL_POINT_JOINT_TERMS` | **C** | 218–227 |
-| self-correction | δ_X(2000) subtracted so JD_X(2000) ≡ anchor_X exactly | — | — | 173–196, 228 |
-| T_X(Y) | the derivative: lincoef + [mSY_realLOD(t) − mSY] + comb − ½ comb′ + Σ k·(dc/dY)·[…] with dc/dY = 1/H(t); the equation-of-centre derivative rides de/dt of the one law | `meanHAtAgeMa`, `meanYearRealLodDays`, `eccentricityRateAt` | **P** | 238–298 |
-| tropical year | mean of the four T_X (Σδ_X ≡ 0 cancels the braid) — the `tropicalYearDays` of chain 3.2 (A′) | — | — | 314–321 |
-| RA of the point | base − earthRAAngle/sin ε̄ + (A/sin ε̄)·(−sin 2π·3·c + sin 2π·8·c) — zero fitted constants; describes where the SCENE puts the point | A, ε̄ | **L** (the 3 and 8 wheels) | 300–312 |
-
-What the coefficients were fitted to: the K scene's own measured events
-(Step 6a export — 335,318 events per type over the full H window, the
-scene's Sun-declination extremum/zero-crossing instrument `solsticeForYear`,
-`script.js` 36431), interior RMSE 0.23–0.37 min after the 8 %/side edge
-trim, tropical-year class 0.002 s. A refit against the one-source movement
-was MEASURED as a cross-family fit (interior RMS 8.8–16 min, equinox
-anchors ±2 h off IAU) and rejected — tools/fit README "The frozen era
-clock". FROZEN-CLOCK COUPLING: the coefficients were a certified artifact of
-the parameter set they shipped with.
 
 ### 5.3 The one-source cardinal structure — zero fitted constants
 

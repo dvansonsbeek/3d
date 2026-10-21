@@ -116,27 +116,22 @@ for (const url of SAMPLE_REQUESTS) {
   /** @param {string} url @returns {any} */
   const dataOf = (url) => { const { path, query } = parseUrl(url); return JSON.parse(handle({ method: 'GET', path, query }).body).data; };
   const ep = dataOf('/v1/epoch?year=2000').epochs[0];
-  // (plan 09 step 7b: the `h` field — the unit H, a fit constant's multiple of the precession period — left the surface)
   if ('h' in ep) failures.push('epoch still serves the unit H');
-  // The 'lod' section's two named bases (plan 08 storyline sweep): LOD_real,
-  // the observable (= the registry's lodRealPhysical, the simulator's Solar
-  // Day), and the Layer-2 tidal + GIA mean day; 1.20 ms apart at J2000 (plan 09:
-  // the mean day is the SI day ω₀, LOD_real at J2000 the joint fit's USNO trend value; was 1.78 ms).
+  // The 'lod' section's two named bases: LOD_real, the observable (= the
+  // registry's lodRealPhysical, the simulator's Solar Day), and the Layer-2
+  // tidal + GIA mean day; 1.20 ms apart at J2000 (the mean day is the SI day ω₀,
+  // LOD_real at J2000 the joint fit's USNO trend value).
   if (Math.abs(ep.lodRealSeconds - 86400.0012) > 1e-4) failures.push(`epoch lodRealSeconds@2000: ${ep.lodRealSeconds}`);
-  // plan 09: the J2000 day length ω₀ is the SI day (was the H/13 identity's 86,399.99968)
+  // the J2000 day length ω₀ is the SI day
   if (Math.abs(ep.lodMeanSeconds - 86400) > 1e-4) failures.push(`epoch lodMeanSeconds@2000: ${ep.lodMeanSeconds}`);
   if ('lodSeconds' in ep) failures.push('epoch still serves the unnamed lodSeconds');
   const dev = dataOf('/v1/epoch?year=-379998000').epochs[0];
-  // plan 06 Phase 3 S2 → S5: the published of-date family is the one-family route inside ±2 Myr
-  // (≈ IAU 25,771 yr at J2000), the composed lunisolar period on the SAME derived anchor beyond
-  // (the Devonian record: 21,235 yr at −380 Ma — 1,296,000/the precession RATE of date on the cited
-  // Earth–Moon history, Farhat et al. 2022's AstroGeo22 as the input: the distance (plan 12 option A)
-  // and, since plan 12 §8 option (a), its mean-obliquity column as cos ε̄(t)/cos ε̄(0) on the
-  // constant's scaling — the constant's scaling alone read 21,396 there; it read 21,699 on the
-  // deleted quartic, whose Moon sat 1,200 km farther out at 380 Ma; the unit H read 282,329 there,
-  // 13.011 of them — plan 09 step 7b deleted the unit, the composed period is the published clock).
-  // The J2000 value is 1,296,000/p_A, the IAU 2006 general precession input (plan 09; the retired
-  // year combs' beat read 25,771.4).
+  // the published of-date family is the one-family route inside ±2 Myr (≈ IAU 25,771 yr at
+  // J2000), the composed lunisolar period on the SAME derived anchor beyond (the Devonian record:
+  // 21,235 yr at −380 Ma — 1,296,000/the precession RATE of date on the cited Earth–Moon history,
+  // Farhat et al. 2022's AstroGeo22: the distance and its mean-obliquity column as
+  // cos ε̄(t)/cos ε̄(0) on the constant's scaling — the constant's scaling alone read 21,396 there).
+  // The J2000 value is 1,296,000/p_A, the IAU 2006 general precession input.
   if (Math.abs(ep.axialPrecessionYears - 25771.575) > 0.5) failures.push(`epoch axialPrecessionYears@2000: ${ep.axialPrecessionYears}`);
   if (Math.abs(ep.tropicalYearSeconds - 31556925.2) > 1) failures.push(`epoch tropicalYearSeconds@2000: ${ep.tropicalYearSeconds}`);
   if (Math.abs(dev.axialPrecessionYears - 21235) > 1) failures.push(`epoch axialPrecessionYears@Devonian (the composed period): ${dev.axialPrecessionYears}`);
@@ -147,7 +142,7 @@ for (const url of SAMPLE_REQUESTS) {
   const val = dataOf('/v1/values/usnoLodJ2000');
   if (val.value !== '86,400.0012') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 09: ω₀ = the SI day removed the H/13 day's +0.32 ms/day bias from the raw ΔT integrand; the joint re-close's optimum moved 0022 → 0012 (Espenak RMS 14.06 → 12.45 s). v23.0: the obliquity lines on the realized pole rate moved the GIA α(t) channel and the joint re-close's optimum to 0022 (history: 0018 after the ecc-unification 7c re-close → 0020 → 0019 with the lagged GIA channel → 0021 with the ecliptic missing-motion term on the nodal period, plan 06 T2, held through v22.0)
   const deriv = dataOf('/v1/derivations/axialPrecession');
-  if (deriv.latticeDivisor !== 13) failures.push(`derivations/axialPrecession divisor: ${deriv.latticeDivisor}`);
+  if ('latticeDivisor' in deriv) failures.push('derivations/axialPrecession must not serve a lattice divisor (no H on a published surface — plan 16)');
   if (Math.abs(deriv.periodYears - 25771.575) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);
   // S6: the Earth-cycle rows carry the DYNAMICAL periods (the registry's values), never the device H/n.
   // (inclinationPrecession ≈ 111,634: the movement's own apsidal rate of date since 2026-09 — was the chain tangent's
@@ -166,12 +161,12 @@ for (const url of SAMPLE_REQUESTS) {
     if (typeof d.periodYears !== 'number' || Math.abs(d.periodYears - expect) > tol) failures.push(`derivations/${q} period: ${d.periodYears} (expected ≈ ${expect})`);
     if (d.status !== 'current') failures.push(`derivations/${q} status: ${d.status}`);
   }
-  if (dataOf('/v1/derivations/solarSystemResonanceCycle').status !== 'retired') failures.push('derivations/solarSystemResonanceCycle must be marked retired');
+  // Plan 16: a quantity that is not published is not served — the former RETIRED rows (solarSystemResonanceCycle, law6Lock) are unknown quantities.
+  if (handle({ method: 'GET', path: '/v1/derivations/solarSystemResonanceCycle' }).status !== 404) failures.push('derivations/solarSystemResonanceCycle must be an unknown quantity (404)');
   const merc = dataOf('/v1/bodies/mercury');
-  // R8: the served record carries the CHAIN's secular periods, not the retired
-  // device's lattice (this row pinned 243,867 = 8H/11). 232,437 yr is
+  // The served record carries the CHAIN's secular periods: 232,437 yr is
   // 1,296,000/g1, the same number the registry publishes as mercuryPeriPeriodICRF
-  // — the two surfaces agreeing is the point of the change.
+  // — the two surfaces agreeing is the point.
   if (Math.round(merc.record.perihelionEclipticYears) !== 232437) failures.push(`mercury ecl period: ${merc.record.perihelionEclipticYears}`);
   // …and the device's descriptors are gone from what is served.
   for (const gone of ['fibonacciD', 'antiPhase', 'inclinationCycleAnchor', 'wobblePeriod', 'ascendingNodeCyclesIn8H', 'orbitalEccentricityBase', 'orbitalEccentricityAmplitude', 'invPlaneInclinationAmplitude']) {
@@ -189,20 +184,18 @@ for (const url of SAMPLE_REQUESTS) {
   if (!merc.frames || !/chain/.test(merc.frames.source)) failures.push('bodies/mercury: frames block must name the chain as the source');
   const marsDeep = dataOf('/v1/bodies/mars?year=-3000').at[0];
   if (Math.abs(marsDeep.perihelionLongitudeDeg - 313.23) > 0.05) failures.push(`mars ϖ(−3000) not the chain's: ${marsDeep.perihelionLongitudeDeg}`);
-  // Plan 07 R5/R9: Earth's invariable-plane elements are the ONE-SOURCE reading
-  // (the engine Earth-orbit normal of date against the banked plane, the
-  // simulator's inclInvPlaneModel / ascNodeInvPlaneModel), not the K device's
-  // H/3 cosine and −H/5 line. Pins: J2000 (device 1.5787 / 284.51 vs one-source
-  // 1.5784 / 284.03) and a deep row the device cannot produce (−100 kyr:
-  // device 1.236°, one-source 1.906°).
+  // Earth's invariable-plane elements are the ONE-SOURCE reading (the engine
+  // Earth-orbit normal of date against the banked plane, the simulator's
+  // inclInvPlaneModel / ascNodeInvPlaneModel). Pins: J2000 (1.5784° / 284.03°)
+  // and a deep row (−100 kyr: 1.906°).
   const earth2000 = dataOf('/v1/earth?year=2000').years[0];
   if (Math.abs(earth2000.inclinationDeg - 1.5784) > 0.001) failures.push(`earth i_inv(2000) off the one-source reading: ${earth2000.inclinationDeg}`);
   if (Math.abs(earth2000.ascendingNodeDeg - 284.03) > 0.05) failures.push(`earth Ω_inv(2000) off the one-source reading (S&S origin): ${earth2000.ascendingNodeDeg}`);
   const earthDeep = dataOf('/v1/earth?year=-100000').years[0];
   if (Math.abs(earthDeep.inclinationDeg - 1.906) > 0.01) failures.push(`earth i_inv(−100000) not the one-source reading: ${earthDeep.inclinationDeg}`);
-  // Plan 12 §8.5 (owner): the hybrid obliquity is served inside the banked ζ series' span only
-  // (±10 Myr) — null beyond, never extrapolated; the cited mean obliquity of date (Farhat et al.
-  // 2022's column) is served beside it to 4,429 Ma (22.23° at the Devonian).
+  // The hybrid obliquity is served inside the banked ζ series' span only (±10 Myr) — null
+  // beyond, never extrapolated; the cited mean obliquity of date (Farhat et al. 2022's column) is
+  // served beside it to 4,429 Ma (22.23° at the Devonian).
   if (!(Number.isFinite(earthDeep.obliquityDeg) && Math.abs(earthDeep.meanObliquityCitedDeg - 23.254) < 0.01)) failures.push(`earth(−100000): hybrid ${earthDeep.obliquityDeg}, cited mean ${earthDeep.meanObliquityCitedDeg}`);
   const earthDevonian = dataOf('/v1/earth?year=-379998000').years[0];
   if (earthDevonian.obliquityDeg !== null) failures.push(`earth obliquityDeg@Devonian must be null beyond the ζ series' span (the tail is not a prediction): ${earthDevonian.obliquityDeg}`);
@@ -249,8 +242,8 @@ for (const url of SAMPLE_REQUESTS) {
 
 // ── Counterfactual POST: determinism, own hash, flow, refusals ──────────────
 {
-  // plan 09 step 7b: the injected constant is the obliquity anchor (the unit H left the surface) —
-  // earth.obliquityDeg(2000) returns the context's IAU input by construction (the physics counterfactual gate)
+  // the injected constant is the obliquity anchor — earth.obliquityDeg(2000) returns the
+  // context's IAU input by construction (the physics counterfactual gate)
   const body = JSON.stringify({ overrides: { 'earthOrbital.obliquityJ2000_deg': 23.5 }, year: 2000 });
   const a = handle({ method: 'POST', path: '/v1/counterfactual', body });
   const b = handle({ method: 'POST', path: '/v1/counterfactual', body });

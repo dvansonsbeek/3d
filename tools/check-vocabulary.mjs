@@ -19,6 +19,16 @@
  * explicitly. A ratchet, not a hard gate, because the sweep (plan 06 Phases
  * 4–5) is the work; the gate makes sure no site is re-introduced while the
  * counts go to zero. Fail-proven: ESSRT_VOCAB_PLANT=1 adds one phantom hit.
+ *
+ * SECOND SURFACE (plan 16): the CODE's comments and label strings — the Node
+ * tools, the packages and their tests — ratcheted on a second term list (the
+ * retired constructions: H-divisor labels, the era device and its combs, and
+ * deletion narratives such as "is deleted" / "left the JSON"). A live rule
+ * stays as the rule; the record of a deletion is git's and doc 109's. Keyed
+ * `code:<path>` in the same ratchet. Excluded, with the reason: tools/explore
+ * (the frozen research record), src/script.js (owner-gated, plan 16 tier 6),
+ * the embedded artifacts and the generated constants (data, not prose), and
+ * this file. Fail-proven: ESSRT_VOCAB_PLANT=2 adds one phantom code hit.
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'node:fs';
@@ -38,6 +48,15 @@ const TERMS = [
   // The former project name; the model is ESSRT, the organisation holisticuniverse.com.
   ['Holistic Universe Model', /Holistic Universe Model/gi],
   ['engine K/D as a public name', /\bengine [KD]\b/gi],
+];
+
+/** The code surface's list (plan 16): the retired constructions and the deletion narrative. */
+const CODE_TERMS = [
+  ['H-divisor label', /(?<![A-Za-z0-9_/])(?:H\/\d+|\d+\/H|8H|H_era|H₀)(?![A-Za-z0-9_])/g],
+  ['era device / K device', /\b(?:era device|era clock|frozen era|K device|K law|K comb|K scene|K snapshot)\b/g],
+  ['comb / lattice', /\b(?:combs?|comb-era|lattice|System-Reset|balanced year)\b/g],
+  ['deletion narrative', /\b(?:DELETED|(?:is|are|was|were) deleted|left the JSON|left with the|(?:is|are) gone|went with the|stood here)\b/g],
+  ['plan-step label', /\b[Pp]lan (?:0[6-9]|1[0-9]) (?:step|R\d|§|S\d|D\d|T\d|I\d|B\d|A\d|Phase)/g],
 ];
 
 /** Historical records keep the old vocabulary by design. */
@@ -167,11 +186,30 @@ function scriptJsStrings() {
   return out.join('\n');
 }
 
-/** @param {string} text @returns {Record<string, number>} */
-function count(text) {
+/** The CODE surface (plan 16): the Node tools, the packages and the tests — comments and label strings. */
+function codeSurfaces() {
+  const roots = ['packages/physics/src', 'packages/api', 'packages/fitting', 'packages/model-values/src', 'packages/fixtures',
+    'tools/lib', 'tools/docs', 'tools/constants', 'tools/verify', 'tools/fit', 'tools/fixtures', 'tools/types', 'test'];
+  const EXCLUDE = [
+    /^tools\/check-vocabulary\.mjs$/,                       // this file names the terms
+    /^packages\/physics\/src\/constants\/(generated|coefficients)/,   // generated embeds — data, not prose
+    /-artifact\.c?js$/,                                     // embedded artifacts — data, not prose
+    /\.d\.c?ts$/,
+  ];
+  const out = [];
+  for (const r of roots) for (const f of walk(join(ROOT, r), /\.(?:js|mjs|cjs|py)$/)) {
+    const rel = relative(ROOT, f);
+    if (!EXCLUDE.some((x) => x.test(rel))) out.push(f);
+  }
+  out.push(join(ROOT, 'tools/regen-cascade.mjs'), join(ROOT, 'tools/check-boundaries.mjs'));
+  return out.filter(existsSync);
+}
+
+/** @param {string} text @param {Array<[string, RegExp]>} [terms] @returns {Record<string, number>} */
+function count(text, terms = TERMS) {
   /** @type {Record<string, number>} */
   const c = {};
-  for (const [label, re] of TERMS) {
+  for (const [label, re] of terms) {
     const n = (text.match(re) || []).length;
     if (n) c[label] = n;
   }
@@ -180,7 +218,7 @@ function count(text) {
 
 /** @type {Record<string, Record<string, number>>} */
 const found = {};
-const add = (key, text) => { const c = count(text); if (Object.keys(c).length) found[key] = c; };
+const add = (key, text, terms = TERMS) => { const c = count(text, terms); if (Object.keys(c).length) found[key] = c; };
 
 for (const f of surfaces()) {
   const rel = relative(ROOT, f);
@@ -191,7 +229,9 @@ add('src/script.js (user-facing strings)', scriptJsStrings());
 for (const r of extraRoots) {
   for (const f of walk(r, /\.mdx?$/)) add(relative(ROOT, f), readFileSync(f, 'utf8'));
 }
+for (const f of codeSurfaces()) add(`code:${relative(ROOT, f)}`, readFileSync(f, 'utf8'), CODE_TERMS);
 if (process.env.ESSRT_VOCAB_PLANT === '1') found['README.md'] = { ...(found['README.md'] || {}), 'Fibonacci': (found['README.md']?.Fibonacci || 0) + 1 };
+if (process.env.ESSRT_VOCAB_PLANT === '2') found['code:packages/physics/src/model.js'] = { ...(found['code:packages/physics/src/model.js'] || {}), 'H-divisor label': (found['code:packages/physics/src/model.js']?.['H-divisor label'] || 0) + 1 };
 
 const total = (c) => Object.values(c).reduce((a, b) => a + b, 0);
 const grand = Object.values(found).reduce((a, c) => a + total(c), 0);

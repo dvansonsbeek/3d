@@ -419,9 +419,9 @@ expected to mirror L-5b per-table structure if α(t) is real physics.
                                        Mean |residual| (s)    Mean |residual| (min)
 Stephenson 2016 spline polynomial:                 1211                20.2   ← fit to these data
 NASA Espenak/Meeus polynomial:                     1199                20.0   ← also fit-class
-Model (joint world: tidal + α(t) + stack + swing): 1212                20.2   ← framework, no ΔT polynomial fitting
+Model (joint world: tidal + α(t) + stack + swing): 1212                20.2   ← the model, no ΔT polynomial fitting
 
-Events where framework closer to obs than NASA: 117/267 (43.8%)
+Events where the model is closer to obs than NASA: 117/267 (43.8%)
 Framework excess over NASA on remaining events: 13 s on average
 Framework excess over Stephenson: 2 s (0.0 min — the dataset noise floor)
 ```
@@ -566,7 +566,7 @@ pinned now.
 The column reflects the CURRENT lunar-theory state — the deep branch
 with its secular-ë and of-date rate completions (doc 66 §1), under
 which the remaining theory difference is the certified skeleton's own
-residual class, not a framework-argument secular. The column is
+residual class, not a model-argument secular. The column is
 re-derived (`--rebaseline`, a conscious re-measurement) whenever the
 lunar arguments change; prior states live in git history. The Phase C
 re-reduction measures against this column as pinned.
@@ -736,7 +736,7 @@ also holds against the solar record.
 NASA Espenak/Meeus ΔT:                              672                11.2
 Model (joint world: tidal + α(t) + stack + swing):  666                11.1
 
-Events where framework closer to obs than NASA: 42/89 (47.2%)
+Events where the model is closer to obs than NASA: 42/89 (47.2%)
 Framework 0.8% closer to primary-source observations than NASA on average.
 ```
 
@@ -762,8 +762,8 @@ NASA's) because solar observations have tighter intrinsic precision —
 narrow totality paths give sharper timing. Per tradition: the ancient
 Babylonian S03 table is a statistical tie (880 vs 873 s, model
 closer on 48% of events — the deepest solar observations carry no
-framework-side excess), the Arab S08 table is markedly
-framework-favorable (326 vs 390 s, closer on 73%), and the Chinese S06
+model-side excess), the Arab S08 table is markedly
+model-favorable (326 vs 390 s, closer on 73%), and the Chinese S06
 table leans NASA (717 vs 700 s, closer on 33%). No per-tradition
 fitting is involved on the model side.
 
@@ -783,7 +783,7 @@ solar record through the medieval window:
 The model leads the 800–999 centuries (closer on 67% of events in
 each; in the 900s its mean ΔT matches the observed 0.46 hr exactly)
 and trails NASA modestly in 1000–1299, with the global balance still
-framework-favorable (666 vs 672 s). Both clocks track the observed ΔT
+model-favorable (666 vs 672 s). Both clocks track the observed ΔT
 column to ~0.1 hr throughout — per-century differences sit at the
 observation noise floor, satisfying the **type-independence
 requirement** — ΔT is a property of Earth rotation, not of eclipse
@@ -1894,7 +1894,7 @@ What this validation establishes:
    the Stephenson 2016 ΔT residual (an eclipse-timing dataset, not a
    climate record — see item 6), never against IRD, GISP2, or any
    climate proxy. Framework-vs-IRD is stronger than
-   framework-vs-GISP2 (r ≈ +0.20 in the same window) because GISP2
+   model-vs-GISP2 (r ≈ +0.20 in the same window) because GISP2
    is a local Greenland temperature signal while Bond 2001 is the
    same physical drift-ice-driven mass-redistribution signal the
    model's Bond harmonic is modelling.
@@ -1997,7 +1997,7 @@ What we are NOT claiming:
 
 1. **Stephenson 2016 observation noise** is ~20 min per observation
    (RMS), dominant at the per-event level. Neither the model nor
-   NASA can do better than this. The ~13-s framework-vs-NASA gap in
+   NASA can do better than this. The ~13-s model-vs-NASA gap in
    mean |residual| is the structural disagreement on top of the noise
    floor.
 

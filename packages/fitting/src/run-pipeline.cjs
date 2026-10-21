@@ -11,17 +11,9 @@
  * Logs all output to tools/results/pipeline.log (overwritten each run).
  * Stops on any step failure. Step 8 (verify) must pass before Step 9 (sync).
  *
- * Plan 09 (model v24.0) deleted every fitted comb this runner used to refit
- * (Steps 0, 4a-4d, 6b-6d, 7g — the perihelion, obliquity, year-length,
- * cardinal-point and Sun-longitude families and the prediction stats on
- * them) and with them the Step-3 browser export that fed 4a-4d; the ids are
- * never reused (README numbering is shared vocabulary).
- *
- * NOT INCLUDED, and must not be run:
- *  - Step 5c (moon-eclipse-optimizer.js) — RETIRED at plan 06 R3 item 1. With
- *    --write it would write a fitted non-zero moonMeeusLpCorrection back into
- *    public/input/model-parameters.json; the Moon series needs no anchor
- *    (measured against Horizons' apparent Moon). Kept only as the record.
+ * Steps 0, 3, 4a–4d, 5a–5c, 6a, 6b–6d, 6f, 7a–7b, 7g and 10 are retired with
+ * the constructions they fitted (doc 109 §23); the ids are never reused
+ * (README numbering is shared vocabulary).
  *
  * The deep regeneration cascade (the N-body pair, the secular series, the
  * verdicts and records, the T1/climate chain) is not a fitter step; its order
@@ -54,7 +46,7 @@ const args = process.argv.slice(2);
 // belief that it printed the step table, silently began refitting and had
 // rewritten the scene Sun's start angle, earthtiltMean, the eccentricity base
 // and four planets' start angles before it was noticed and killed (the Step-1
-// optimizer that did it is deleted, plan 11 step 2).
+// optimizer that did it is deleted).
 //
 // So: an unknown flag is now an ERROR, not a full run, and `--all` must be asked
 // for by name. Every other tool here makes --write opt-in; the orchestrator that
@@ -93,60 +85,13 @@ if (flag === '--from') {
 // ─── Step definitions ───────────────────────────────────────────────────────
 
 const STEPS = [
-  // (Phase 1 — Step 1, the Sun optimizer (`tools/optimize.js optimize sun
-  // correctionSun`) — DELETED at plan 11 step 2 with the scene constants it
-  // fitted: the engine places the Sun at the certified longitude, so the
-  // scene Sun's start angle reached nothing. Step 2 — the per-planet startpos
-  // alignment — was retired for the planets with the K5 legacy-chain
-  // excision: the seven planets render from the engine-D Keplerian chain,
-  // whose anchors are the governed artifact's elements, not fitted scene
-  // angles. The ids are never reused.)
-
-  // (Steps 4a-4d — the perihelion comb, its ERD verifier and the precession
-  // training — DELETED with the perihelion comb at plan 09 step 4; their
-  // scripts are gone. Steps 5a-5b — the parallax and gravitation/elongation
-  // planet-correction fitters — retired with the K5 legacy-chain excision.
-  // Step 5c — the Moon eclipse optimizer — RETIRED at plan 06 R3 item 1 and
-  // must not run: see the header. The ids are never reused.)
 
   // Phase 5: Solar measurements
-  // (Step 6a — the FULL-period export, one row per year of the anchor unit,
-  // ~2 h, 160 MB — RETIRED as a pipeline step and as a kept file: it was the
-  // C-4b-era campaign record, stale against every later movement arc, read
-  // by no gate or fitter. The exporter still writes one on demand. The id
-  // 6a is never reused — README numbering is shared vocabulary.)
-  // 6a2: the SAME exporter over −4000…+4000 — the window CSV the bit-exact
-  // smoke gate (npm run check:csv-smoke) compares against; ~25 min. The
-  // command is `npm run fit:6a2` spelled out.
+  // 6a2: the exporter over −4000…+4000 — the window CSV the bit-exact smoke
+  // gate (npm run check:csv-smoke) compares against; ~25 min. The command is
+  // `npm run fit:6a2` spelled out.
   { id: '6a2', phase: 2, name: 'Export solar measurements — the window CSV (~25 min)',
     cmd: 'node tools/fit/export-solar-measurements.js --start -4000 --end 4000 --output data/02-solar-measurements-window.csv', timeout: 60 * 60 * 1000 },
-  // (Step 6b — the obliquity-harmonics fit — RETIRED with the one-source
-  // movement, D1-revised, and its coefficients DELETED at plan 09 (the
-  // obliquity of date is the hybrid). Script retired — git history 16d7c87f
-  // carries it. The id 6b is never reused — README numbering is shared
-  // vocabulary.)
-  // (Steps 6c/6d — the year-length and cardinal-point harmonic fits —
-  // RETIRED with 6b (option A, C-4b adjudication): the shipped coefficients
-  // are FROZEN as the certified K-era clock. A harmonic re-fit against the
-  // one-source CSV is a CROSS-FAMILY fit — MEASURED: interior RMS 0.23-0.37
-  // min → 8.8-16 min, equinox J2000 anchors ±2 h off IAU, day-scale
-  // amplitudes chasing the engine's off-lattice secular spectrum (s-modes,
-  // g-modes, the 405-kyr g2−g5 beat). The movement's consumers read the
-  // one-source evaluator directly at D4. Scripts retired — git history
-  // 16d7c87f carries them (the untracked local archive keeps copies).
-  // The ids 6c/6d are never reused — README numbering
-  // is shared vocabulary. In docs written before the §10e-bis rename,
-  // "6c" = cardinal-point and "6d"/"6e" = year-length.)
-  // Step 6f (sun-longitude-harmonics) intentionally OMITTED — see header
-  // comment. It runs once as Phase 0 prerequisite, not as part of the
-  // routine cascade.
-
-  // Phase 5b (steps 7a/7b) REMOVED at plan 07 R6 with the psi/K laws. 7a
-  // (derive-eccentricity-amplitudes) was documented "verification only (no
-  // output)" and had no write path despite the --write it was invoked with;
-  // 7b ran balance-search, the generator behind data/balance-presets.json,
-  // which is now a frozen record. Both computed from the K law, which is
-  // gone; the planets' eccentricity of date comes from the N-body chain.
 
   // Phase 6: ΔT correction stack (Bond + Hallstatt + Jose5 + Jose4)
   // Fits the 4-flag sub-Milankovitch cascade against Stephenson 2016 ΔT
@@ -165,8 +110,6 @@ const STEPS = [
   // (fibonacci_significance) to manual steps the runner does not execute.
   { id: '7f', phase: 2, name: 'Cassini moontilt results (runs both labs)',
     cmd: 'node tools/verify/cassini-results.js --write', timeout: 20 * 60 * 1000 },
-  // (Step 7g — the prediction fit stats on the precession training — DELETED
-  // with Steps 4c/4d at plan 09; the id is never reused.)
   { id: '7h', phase: 2, name: 'LOD-climate correlation summary',
     cmd: 'node tools/verify/lod-climate-correlation.js --write' },
   { id: '7i', phase: 2, name: 'Eclipse audit summary (L-5b/L-7 + audit-26, ~2-4 min)',
@@ -180,8 +123,6 @@ const STEPS = [
   // cannot corrupt a source file the way a regex patcher can. Runs every time.
   { id: '9',  phase: 2, name: 'Regenerate constants module',
     cmd: 'node tools/constants/generate.mjs --write' },
-  // (Step 10, the Data Explorer dashboard export, retired with the
-  // dashboard.)
 ];
 
 // ─── Filter steps ───────────────────────────────────────────────────────────

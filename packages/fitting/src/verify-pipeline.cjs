@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Verify the fitting pipeline produces the same values as the current JSON.
- * Runs each fitting script's core computation WITHOUT writing to files,
- * then compares against the stored values in the inputs (fitted-coefficients
- * .json, the former comb home, is deleted — plan 11 step 1).
+ * Verify the pipeline's inputs against the computation engine: the constants
+ * load, the scene graph places every target, the planets' derived orientation
+ * values match their inputs, and Earth's geometry (the cardinal instants, the
+ * one-family year lengths) matches the published references. Nothing is
+ * written.
  *
  * Usage: node tools/fit/verify-pipeline.js
  */
@@ -17,8 +18,6 @@ const path = require('path');
 // unmigrated code; these collapse when tools/lib becomes adapters.
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const TOOLS_LIB = path.join(ROOT, 'tools', 'lib');
-// (plan 09 step 7a: the stored-vs-loaded comb comparison against
-//  fitted-coefficients.json left with the last comb, the cardinal record)
 
 let totalChecks = 0, totalErrors = 0;
 
@@ -74,47 +73,12 @@ try {
   totalErrors++;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 3. Verify PERI_HARMONICS (compare stored JSON values with what's loaded)
-// ═══════════════════════════════════════════════════════════════════════════
-// (plan 09 step 4: the PERI_HARMONICS / PERI_OFFSET consistency rows left with
-// the perihelion comb — Earth's perihelion of date is the series' ϖ; the
-// registry plausibility row periLongModel2000AD vs periLongJ2000 gates it.)
-console.log('═══ Step 3: (the perihelion comb is deleted — plan 09 step 4) ═══\n');
 if (!C) C = require(path.join(TOOLS_LIB, 'constants.js'));
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 4. Verify OBLIQUITY harmonics
+// 3. Verify planet derived values (orbitTilt)
 // ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 4: OBLIQUITY — the comb retired (plan 09); the obliquity of date is the hybrid ε ═══');
-// The 16-harmonic solstice-obliquity comb and its J2000-vs-IAU row left with
-// the frozen era device; the published obliquity is the one-source hybrid,
-// pinned by the obliquity-hybrid verdict (dε/dt within 1 % of IAU, the realized
-// period gate) and the API gate (obliquityJ2000 ≡ the IAU input).
-console.log('  ✓ OBLIQUITY: no comb to verify\n');
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 5. CARDINAL_POINT_HARMONICS — DELETED at plan 09 step 7a (the frozen cardinal
-//    record left the coefficients file with its evaluator; the instants are
-//    createModel().cardinal, checked against USNO 2000 below)
-// ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 5: CARDINAL_POINT_HARMONICS — no comb to verify (plan 09 step 7a) ═══\n');
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 6. Verify YEAR_LENGTH harmonics
-// ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 6: YEAR_LENGTH harmonics — the combs deleted (plan 09); the year lengths of date are the one-family laws ═══');
-console.log('  ✓ YEAR_LENGTH: no combs to verify\n');
-console.log(`  ✓ YEAR_LENGTH harmonics: all 3 types match\n`);
-
-// (Step 7 — PARALLAX corrections consistency — retired with the K5
-// legacy-chain excision: the fitted planet-correction keys no longer exist.)
-
-// ═══════════════════════════════════════════════════════════════════════════
-// 8. Verify planet derived values (orbitTilt, invPlaneInclination)
-// ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 8: Derived planet values ═══');
-// (model-parameters.json was read here for the ψ re-derivation — plan 07 R5.)
+console.log('═══ Step 3: Derived planet values ═══');
 const ar = JSON.parse(fs.readFileSync(
   path.resolve(ROOT, 'public', 'input', 'astro-reference.json'), 'utf8'));
 
@@ -126,23 +90,19 @@ for (const [key, p] of Object.entries(C.planets)) {
   const tilt = utils.computeOrbitTilt(arP.ascendingNode, arP.eclipticInclinationJ2000);
   check(`${key}.orbitTilta`, p.orbitTilta, tilt.orbitTilta, 1e-7);
   check(`${key}.orbitTiltb`, p.orbitTiltb, tilt.orbitTiltb, 1e-7);
-
-  // (Plan 07 R5: the ψ re-derivation — invPlaneInclinationAmplitude /
-  // invPlaneInclinationMean against C.PSI, and the J2000 reconstruction
-  // mean + s·amp·cos(ϖ − anchor) = i_J2000 — left with the law.)
 }
 console.log(`  ✓ All derived planet values verified\n`);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 9. Earth geometry validation
+// 4. Earth geometry validation
 // ═══════════════════════════════════════════════════════════════════════════
-console.log('═══ Step 9: Earth geometry validation ═══');
+console.log('═══ Step 4: Earth geometry validation ═══');
 
 const sg = require(path.join(TOOLS_LIB, 'scene-graph.js'));
 // The package model on the shipped series artifact (the API's / audit's
 // configuration — plan 06 R1 measured that a model built WITHOUT the
 // artifact is a different hybrid): one instance for the cardinal instants
-// below and the one-family year lengths in Step 10.
+// and the one-family year lengths below.
 const pipelineModel = (() => {
   const { createModel } = require('@essrt/physics');
   let artifact;
@@ -292,29 +252,9 @@ for (const type of ['SS', 'WS', 'VE', 'AE']) {
 // above still FAIL on their own tolerances.)
 console.log(`  ✓ Earth geometry verified\n`);
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 9a. Eccentricity J2000 conformance — RETIRED at plan 07 R6
-// ═══════════════════════════════════════════════════════════════════════════
-// The table printed each planet's K-law base against the observed J2000
-// eccentricity and asked whether the observation was "reachable" inside
-// [base − amp, base + amp]. Both inputs were the K law's, which is retired:
-// the planets' eccentricity of date is the N-body chain's, and the chain is
-// anchored ON the J2000 observation, so the conformance question answers
-// itself. Earth's base and amplitude survive on the Earth side and are
-// checked where they are used.
-console.log('\n═══ Step 9a: Eccentricity J2000 conformance — RETIRED (plan 07 R6) ═══');
-console.log('  The planets ride the N-body chain, anchored on the J2000 observation.\n');
-
-// (Step 9b — correction-stack validation — retired with the K5 legacy-chain
-// excision: the planet-correction layers are gone, and MOON_CORRECTION
-// consistency is covered by the constants-embed gate.)
-
-// (Steps 10/10b — the planets' and the Moon's RA/Dec RMS against the JPL
-// reference points through the retired optimizer's `baseline()`, compared
-// with tools/results/baselines.json — DELETED at plan 11 step 2 with the
-// optimizer. The chain-vs-JPL RMS has one home since plan 07: the governed
-// artifact data/chain-vs-jpl-rms.json (tools/verify/measure-rms-by-epoch.js);
-// the Moon's record is the eclipse-audit / lunar-alignment campaigns.)
+// (The chain-vs-JPL RMS has one home: the governed artifact
+// data/chain-vs-jpl-rms.json (tools/verify/measure-rms-by-epoch.js); the
+// Moon's record is the eclipse-audit / lunar-alignment campaigns.)
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SUMMARY
