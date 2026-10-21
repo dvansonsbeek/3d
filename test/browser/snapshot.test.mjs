@@ -125,6 +125,12 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     }
   }
 
+  // The inclination-path group is NOT engine-placed: its world orientation is
+  // its parent chain's times its own per-frame rotation. Pin the local → world
+  // azimuth map at J2000, so a change to a parent pose (the class of doc 111
+  // §1.25, "aligned once at init") cannot silently turn the visual.
+  for (const a of [0, 90]) v[`inclPathWorldAzimuthDeg@local${a}`] = T.visPathFrameProbe(a);
+
   for (const y of YEARS) {
     // Plan 09 step 7c′: the Earth panel's ϖ of date = the published Sun tier
     // (series + the osculating-mean offset, +0.0195° on the bare series).

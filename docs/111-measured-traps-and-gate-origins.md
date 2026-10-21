@@ -364,7 +364,13 @@ init, before the first placement: the sky lost 23.44° of tilt and 68.23° of
 equinox offset while every golden stayed bit-identical (goldens record
 observables, which are frame-invariant). Before deleting a pose, grep the
 top-level `matrixWorld` readers; gate the init-time alignments in the frame
-they must sit in.
+they must sit in. The same holds for a visual that is NOT engine-placed and
+rides a parent's pose: Earth's container quarter turn (the former
+`whichSolsticeOrEquinox`, the wheel scaffold's 21-June start) was invisible
+to every engine-placed frame — removing it moved 73 browser goldens at
+≤ 1.2e-13 relative and nothing else — but the inclination-path loop under it
+would have turned 90° with no gate noticing. The browser golden now pins that
+group's local → world azimuth map (`inclPathWorldAzimuthDeg@local0/90`).
 
 ### 1.26 A precession constant is not a precession rate — and a seam kicks the pole through n̂, not through its mean plane
 

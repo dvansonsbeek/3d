@@ -745,9 +745,6 @@ function buildSceneGraph() {
   };
   const earthNodes = makeObjectNodes('earth', earthDef);
 
-  // Apply the static 90° rotation to earth.container (line 4993)
-  earthNodes.container.ry = Math.PI / 2;
-
   root.addChild(earthNodes.container);
 
   // Earth precession layers (each is a "virtual" object with speed + tilt)

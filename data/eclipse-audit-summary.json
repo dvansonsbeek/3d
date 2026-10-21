@@ -459,7 +459,7 @@
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
-      "tools/lib/scene-graph.js": "sha256:edf5ea72b4ec2604c60318c78fb55bd32f659693e3470cf3b99d18c2f304bc79",
+      "tools/lib/scene-graph.js": "sha256:1e3bf68c769c96552daf67c9dacf33e89c65553e9b9c4d2df8b0c88a11501c9b",
       "tools/verify/eclipse-audit.js": "sha256:67dfc472c31e19ec7128d13440dd060b21c87a5aa648999e279d35b1d469c667"
     }
   }

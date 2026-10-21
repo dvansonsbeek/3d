@@ -554,7 +554,15 @@
  "hits": [
   {
    "file": "src/script.js",
-   "line": 653,
+   "line": 652,
+   "runtime": "browser",
+   "token": "H / N",
+   "class": "comment",
+   "text": "eccentricityDotJ2000: K.earthOrbital.earthEccentricityDotJ2000,  // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated b"
+  },
+  {
+   "file": "src/script.js",
+   "line": 652,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -563,14 +571,6 @@
   {
    "file": "src/script.js",
    "line": 653,
-   "runtime": "browser",
-   "token": "H / N",
-   "class": "comment",
-   "text": "eccentricityDotJ2000: K.earthOrbital.earthEccentricityDotJ2000,  // Earth eccentricity rate at J2000 (per Julian cy) — secular-theory coefficient corroborated b"
-  },
-  {
-   "file": "src/script.js",
-   "line": 654,
    "runtime": "browser",
    "token": "H / N",
    "class": "comment",
@@ -578,7 +578,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 2255,
+   "line": 2254,
    "runtime": "browser",
    "token": "/ 13",
    "class": "comment",
@@ -586,7 +586,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 3202,
+   "line": 3201,
    "runtime": "browser",
    "token": "cyclesBetween",
    "class": "comb",
@@ -595,7 +595,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5362,
+   "line": 5361,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -603,7 +603,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23325,
+   "line": 23318,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -611,7 +611,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23327,
+   "line": 23320,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -619,7 +619,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23383,
+   "line": 23376,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -627,7 +627,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23385,
+   "line": 23378,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -635,7 +635,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24068,
+   "line": 24061,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -643,7 +643,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32289,
+   "line": 32282,
    "runtime": "browser",
    "token": "H / N",
    "class": "comb",
@@ -652,7 +652,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37757,
+   "line": 37750,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -660,7 +660,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39371,
+   "line": 39364,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -668,7 +668,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39371,
+   "line": 39364,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -676,7 +676,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39437,
+   "line": 39430,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -684,7 +684,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39437,
+   "line": 39430,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -692,7 +692,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39438,
+   "line": 39431,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -700,7 +700,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39438,
+   "line": 39431,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -708,7 +708,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39474,
+   "line": 39467,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -716,7 +716,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39474,
+   "line": 39467,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -724,7 +724,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39490,
+   "line": 39483,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -732,7 +732,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39490,
+   "line": 39483,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -3124,7 +3124,7 @@
   },
   {
    "file": "test/browser/snapshot.test.mjs",
-   "line": 180,
+   "line": 186,
    "runtime": "tests",
    "token": "H / N",
    "class": "comment",
@@ -3366,9 +3366,9 @@
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
-   "src/script.js": "sha256:725b84d6a2acbd94ed7d8715a88225835c6dba34acdd396413f65cbf9889fa93",
+   "src/script.js": "sha256:8b867a950f9f1d48bb587f751fc1126e91a8ce06fc53b43881bbae68e2554152",
    "test/browser/epoch-consistency.test.mjs": "sha256:027b40559844497a53c6ee39fba2e0b848949a43e3ddb0e230cff9e0478a7172",
-   "test/browser/snapshot.test.mjs": "sha256:819345a46ac6876dfa5632843a0cce5ee8b539620c4fb51b413c95235d81b4ea",
+   "test/browser/snapshot.test.mjs": "sha256:28d0078f53c4ed31614477de0d66b4b035ff85063966faa33ddc90a527c3bf67",
    "test/browser/wobble-center.test.mjs": "sha256:456521771ea752f9112407c9f316d0dc92ec21d7b4ac90fbc5110772256ae8ad",
    "tools/check-python-physics.mjs": "sha256:677d3c65e87fcd08c29b633c2118a474444d19c2ac365095b8893a718b2cf6ae",
    "tools/check-vocabulary.mjs": "sha256:05b6fcb54de7f26d0e93b50dcda2ac3450d5644058e42347248aec98e49181b2",
@@ -3418,7 +3418,7 @@
    "tools/fixtures/record-tools-lib.mjs": "sha256:2c4daa7c0fcf6e07e87bf2e50da48df937274c322d3ca67fde70c3301bdd0b21",
    "tools/lib/deep-orbital-history.js": "sha256:965e2f2e8c1c27a3d36e70c3a66a80102cf655208b1b0729dcb9f7a857710385",
    "tools/lib/python/constants_scripts.py": "sha256:5f550fad264c82f676e92a162dfa9facc766955bb5a9cafce54505538eaf4641",
-   "tools/lib/scene-graph.js": "sha256:edf5ea72b4ec2604c60318c78fb55bd32f659693e3470cf3b99d18c2f304bc79",
+   "tools/lib/scene-graph.js": "sha256:1e3bf68c769c96552daf67c9dacf33e89c65553e9b9c4d2df8b0c88a11501c9b",
    "tools/verify/deep-secular-modes.js": "sha256:1c5d69aaeccbb305ddd842a5c19d8945b9f2747fabef3e97dfe70bdd14d57e6d",
    "tools/verify/eclipse-audit.js": "sha256:67dfc472c31e19ec7128d13440dd060b21c87a5aa648999e279d35b1d469c667",
    "tools/verify/obliquity-hybrid.js": "sha256:0fdaf3d967391a62f8fad1ad4ad75324691e743d4f50b0eade52f7c78f59b6bc",

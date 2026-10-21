@@ -201,7 +201,6 @@ const _siderealDaySec_J2000 = SECONDS_PER_DAY * meansolaryearlengthinDays / (mea
 // F. DISPLAY-ONLY (not in JSON files)
 // ═══════════════════════════════════════════════════════════════════════════
 
-const whichSolsticeOrEquinox = 1;                         // 0=VE, 1=SS, 2=AE, 3=WS
 // debugOn moved to A5 Research toggles (near top)
 
 // ─── A3. Moon model parameters ───────────────────────────────────────────
@@ -7137,12 +7136,6 @@ barycenterEarthAndSun.pivotObj.add(neptune.containerObj);
 // The no-chain bodies (Pluto, Halley, Eros) are not rendered: without an
 // N-body chain they had no honest orbit (nothing gated or published them).
 
-// The model starts on 21 june and not at 0 degrees (March equinox) so we need to turn it 90 degrees
-// Why 21 june 2000?
-// a) We need a solstice date
-// b) We need to be able to point to polaris + pointing to the EARTH-WOBBLE-CENTER at RA 6h
-// c) Close to J2000 values so we can check and compare all values
-earth.containerObj.rotation.y = (Math.PI/2)*whichSolsticeOrEquinox;
 
 //*************************************************************
 // The one-source spin is THE path: Earth's axis takes its world rotation from
@@ -47668,10 +47661,8 @@ function updatePositions() {
     obj.distMi = obj.distKm * KM_TO_MI;
 
     /*  EARTH → PLANET  (direction for RA/Dec)
-        We need the vector expressed in the Earth-equatorial frame, which
-        already includes axial tilt *and* the 90° spin you applied on
-        21 June (earth.containerObj.rotation.y = π/2).  The quickest way
-        is to transform the planet's world position into the local
+        We need the vector expressed in the Earth-equatorial frame (the
+        engine-placed axis of date).  The quickest way is to transform the planet's world position into the local
         coordinates of earth.rotationAxis.                                  */
     LOCAL.copy(PLANET_POS);
     earth.rotationAxis.worldToLocal(LOCAL);          // in-place
@@ -48303,9 +48294,11 @@ function moveModel(pos) {
     earthPerihelionPrecession1.containerObj.getWorldQuaternion(zodiacSigns.quaternion);
   }
 
-  // Inclination path keeps the former wheel's rotation (an independent object)
+  // Inclination path keeps the former wheel's rotation (an independent object,
+  // NOT engine-placed: its world pose is this rotation alone — the browser
+  // golden pins the local → world azimuth map, inclPathWorldAzimuthDeg@local*)
   if (typeof inclinationPathGroup !== 'undefined') {
-    inclinationPathGroup.rotation.y = -Math.PI / 3 - earthTheta;
+    inclinationPathGroup.rotation.y = Math.PI / 6 - earthTheta;
   }
   // Invariable plane also rotates with zodiac
   if (typeof invariablePlaneGroup !== 'undefined') {
