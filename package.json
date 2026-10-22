@@ -10,7 +10,7 @@
     "predev": "npm run copy:refdata:dev",
     "start": "parcel src/index.html --dist-dir dist-dev",
     "dev": "parcel src/index.html --dist-dir dist-dev",
-    "build": "parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data dist/input && cp data/nbody-secular-series.json dist/data/ && cp public/input/la2010-orbital-elements.json public/input/jpl-horizons-planet-elements.json dist/input/",
+    "build": "parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data dist/input && cp data/nbody-secular-series.json dist/data/ && cp public/input/la2010-orbital-elements.json public/input/jpl-horizons-planet-elements.json public/input/ice-core-data.json dist/input/",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p jsconfig.json && node tools/types/emit-physics-types.mjs",
     "types:physics:write": "node tools/types/emit-physics-types.mjs --write",

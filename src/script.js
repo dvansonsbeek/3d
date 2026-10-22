@@ -4593,6 +4593,8 @@ if (typeof window !== 'undefined') {
     frameworkImages: () => Object.fromEntries(FRAMEWORK_IMAGES.filter((c) => c.render).map((c) => [c.id, _fipRender(c)])),
     openFrameworkImagesPanel: (id) => { openFrameworkImagesPanel(); if (id) updateFrameworkImagesPanel(id); },
     frameworkImageIds: () => FRAMEWORK_IMAGES.filter((c) => c.render).map((c) => c.id),
+    // the chart-export gate reads the model surfaces through the figures' own reader object (J2000)
+    frameworkImagesContext: () => createFrameworkImagesContext(2000),
     vfpPIState: () => _vfpPIState,
     vfpPIRender: () => renderVFPPlanetInclinations(),
     vfpPIAfterRender: (el) => _vfpPIAfterRender(el),
@@ -20972,6 +20974,32 @@ function createFrameworkImagesContext(epochYear) {
     },
     /** The anomalistic year of date, SI seconds (the one family's perihelion-to-perihelion year). */
     anomalisticYearSeconds: (y) => _tierModelB().cardinalStructure.anomalisticYearSeconds(y),
+    /** The spin axis's inertial (lunisolar) precession rate, its MEAN over [yearFrom, yearTo], ″/yr — the realized rate a span sees (never the J2000 instant × the span). */
+    spinAxisInertialRateMeanArcsecPerYr: (yearFrom, yearTo) => _tierModelB().lunisolar.spinAxisInertialRateMeanArcsecPerYr(yearFrom, yearTo),
+    /** The NOAA ice-core records (EPICA Dome C + Vostok temperature, Vostok CO₂) and the EPICA CO₂ composite (Bereiter 2015), once loaded; else null. */
+    iceCores: () => _fipIceCores,
+    epicaCO2: () => cfmEpicaData,
+    /** The model's climate formula, δ¹⁸O ‰ at an age (kyr BP) — the shipped coefficients, stitched over the LR04 regimes; layer 'all' (L1 + L2 + L3) or 'l1' (the orbital lines alone). */
+    climateD18O: (tKyrBP, layer) => cfmEvalStitched(tKyrBP, layer || 'all'),
+    /** The bright-star catalogue (public/input/stars.json: RA/Dec J2000 strings, V), once loaded; else null. */
+    stars: () => _fipStars,
+    /** The Moon's ascending node of date Ω = L′ − F (ecliptic and equinox of date, degrees) at a JD — the scene's own lunar arguments, the node markers' value; and the Moon's mean inclination to the ecliptic (degrees). */
+    moonNodeLongitudeDeg: (jd) => wrap360(_moonOrbitFrameOfDate(jd).Om / DEG2RAD),
+    moonInclinationDeg: moonEclipticInclinationJ2000,
+    /** Julian Day of a calendar date (UT). */
+    julianDay: (y, m, d) => dateToJulianDay(y, m, d),
+    /** Earth's inclination to the invariable plane and its ascending node there, degrees (the package's earth surface). */
+    inclinationInvariableDeg: (y) => _tierModelB().earth.inclinationDeg(y),
+    ascendingNodeInvariableDeg: (y) => _tierModelB().earth.ascendingNodeDeg(y),
+    /** The ecliptic's nodal (s₃) period, years; the obliquity beat of date, years. */
+    nodalPeriodYears: () => _tierModelB().lunisolar.nodalPeriodYears,
+    obliquityBeatYears: (y) => _tierModelB().lunisolar.obliquityBeatYearsAtYear(y),
+    /** The observable day of date (LOD_real), SI seconds. */
+    lodSeconds: (y) => _tierModelB().epoch.lodRealSecondsAtYear(y),
+    /** The eccentricity's long beat (g₂ − g₅), years — the deep-modes artifact. */
+    eccentricityLongBeatYears: () => DEEP_MODES_ARTIFACT.verdict.strongestBeatPeriodKyr * 1000,
+    /** The LR04 benthic δ¹⁸O stack once loaded ({ age_kyr_BP, d18o_per_mille }), else null — the panel starts the load and redraws. */
+    lr04: () => cfmLR04Data,
     /** The obliquity of date ε(t), degrees — the hybrid (the published ε; the scene's own target). */
     obliquityDeg: (y) => _sceneEpsTargetDeg(y),
     /** The thirteen IAU constellations along the ecliptic: [name, entry longitude J2000 °] (the scene's band and the orbit picture's ring). */
@@ -20988,6 +21016,8 @@ function createFrameworkImagesContext(epochYear) {
 }
 
 let frameworkImagesPanel = null;
+let _fipStars = null;   // public/input/stars.json, loaded when the panel opens (the pole-star figure)
+let _fipIceCores = null;   // public/input/ice-core-data.json (NOAA EPICA Dome C + Vostok), loaded when the panel opens
 
 function _fipRender(item) {
   if (!item.render) return null;
@@ -21096,6 +21126,13 @@ function openFrameworkImagesPanel() {
   if (!frameworkImagesPanel) frameworkImagesPanel = createFrameworkImagesPanel();
   frameworkImagesPanel.classList.add('visible');
   updateFrameworkImagesPanel(frameworkImagesPanel._current);
+  // the cycles figure draws the LR04 record, the pole-star figure the catalogue: load each once and redraw the shown figure
+  const redraw = (d) => { if (d && frameworkImagesPanel.classList.contains('visible')) updateFrameworkImagesPanel(frameworkImagesPanel._current); };
+  if (!cfmLR04Data) loadCfmLR04Data().then(redraw);
+  if (!_fipStars) _cfmFetchJson('input/stars.json', 'public/input/stars.json').then((d) => { if (Array.isArray(d)) { _fipStars = d; redraw(d); } });
+  // the ice-core figure: the NOAA EPICA Dome C / Vostok records and the EPICA CO₂ composite
+  if (!cfmEpicaData) loadEpicaData().then(redraw);
+  if (!_fipIceCores) _cfmFetchJson('input/ice-core-data.json', 'public/input/ice-core-data.json').then((d) => { if (d) { _fipIceCores = d; redraw(d); } });
 }
 
 function closeFrameworkImagesPanel() {

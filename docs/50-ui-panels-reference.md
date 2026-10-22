@@ -27,6 +27,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Earth–Moon Genesis Analysis** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |
 | **Earth dLOD/dt Analysis** | dLOD/dt driver layers (Tidal (L1) / + GIA (L2) / + Cycles (L3) / + Core-mantle (L4)) vs named climate periods + GISP2/LR04 temperature; Σ_stack ↔ Bond 2001 IRD comparison — physics in [doc 102](102-gia-alpha-lunar-validation.md) + [doc 104](104-millennial-rotation-swing.md) |
 | **Framework Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 11 quantities) — see [doc 57](57-formula-verification.md) |
+| **Framework Images** | The website's twelve explanatory figures drawn from the model — every printed number a model surface, every date a computed crossing; exported one at a time through the standard export modal |
 
 > **Scope note (ESSRT).** Each panel is intrinsically a present-epoch UI that reads from the live simulation state — what users see at any time reflects whatever date is currently active. When users scrub the simulation date by millions of years, the panels reflect ESSRT-evolved values automatically (per `DEEP_TIME_MODE_ENABLED` in `src/script.js`). The Earth–Moon Genesis Analysis is the dedicated visualization for how the lattice divisors' literal year-counts evolve at deep time. See [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the formalism.
 
@@ -615,6 +616,40 @@ Compares the model's predictions against published closed-form formulas from cel
 ### Full Reference
 
 See [57 — Framework Verification](57-formula-verification.md) for the complete reference-formula catalogue (polynomial / trigonometric-series / N-body-tabulated classes), colour coding, interpretation at different time scales (century → 100-kyr), and code locations.
+
+---
+
+## Framework Images
+
+### Purpose
+
+The twelve explanatory figures of the website (the hand-made images in `holisticuniverse/public/img`), drawn by the simulator from the model so that a changed model number changes the figure. Each is a white paper page in the export standard: the shared header (title at y = 18, legend rows), the figure, the credit; colour carries meaning only (blue the equinox and the spin axis, green the perihelion and the orbit, magenta the stars, orange the Sun). A number on a figure is a model surface with its unit and its epoch — a period is marked "(J2000)" where the rate of date varies; a date is a computed crossing; nothing is typed.
+
+### Accessing the Panel
+
+1. Open the Tweakpane Tools folder, Analysis group
+2. Click "Framework images"
+3. Step with `‹` / `›` or pick a figure from the dropdown (two groups); "Export" opens the standard export modal (PNG / SVG / Share / Copy) for the figure shown; a sources line under the figure names the surfaces it reads
+
+### The twelve figures
+
+| Figure | What it shows | Read from |
+|---|---|---|
+| **Eccentricity vector — Earth-centred / Sun-centred** (`02_CenterAA`, `02_Center03`) | Earth's e-vector z = e·e^{iϖ} over one apsidal revolution from J2000, to scale in e: the J2000 → next-minimum stretch, the next maximum, 10-kyr ticks; the apsidal period of date at J2000, the minimum and the maximum; the J2000 values table | the scene's one-source e, the chain's J2000-ecliptic ϖ, the scene's eccentricity scan, the lunisolar periods of date |
+| **The Sun's path seen from Earth** (`02_Earth_Sun_orbit`) | the apparent ellipse to scale with the cardinal instants, mean-orbit perihelion and aphelion (dates, a(1 ∓ e)), the season lengths, the perihelion's angle past the December solstice, the Sun's speed at the apsides | the cardinal finder, the certified Sun's mean elements, the anomalistic year of date, the AU |
+| **The cycles at a glance** (`03_bigger_picture`) | eight cells, each a picture, the quantity over 350 kyr (sampled, a "now" dot), its period and its last-Myr range: eccentricity, inclination, ecliptic precession, perihelion precession, axial precession, obliquity (angles to scale), day length (no cycle: the tidal braking), the LR04 record | the one-source series, the earth surface (invariable plane), the hybrid ε, the published periods, LOD_real, LR04 |
+| **The precession cone and the pole stars** (`03_great_year_polestars_01`) | the double cone seen sideways, to scale (half-angle ε₀), with the named stars at their true directions and their computed closest approach (year · separation); an inset sky map of the northern path | the realized spin-axis precession (the window mean), `stars.json` (J2000, proper motion neglected — stated) |
+| **The seasons against perihelion** (`03_Precession_and_seasons`) | four orbits with perihelion held at the bottom, from the December-solstice passage before the epoch round one cycle: Earth at each season start, the season lengths, the two short seasons beside perihelion in green; the arrows carry each quarter's span, the epoch a dot on the first | the shared perihelion-passage scan, each year's mean elements, each year's cardinal instants |
+| **The coin rotation paradox** (`04_coin_paradox_total`) | four snapshots in the seasons frame against the IAU constellation ring: N solar years = N − 1 sidereal years per turn of the equinox, every count naming its year length; T in Julian years beside it | the published length family, the cardinal finder, the axial precession of date |
+| **Days and years** (`04_Earth_Orbit_Year`) | the sidereal, stellar and solar day and the solar and sidereal year at the June-2000 solstice, coloured by their reference; one day on the whole figure (the solar day of date), so every count checks by hand | the length family (LOD_real), the AU |
+| **Axial meets apsidal** (`04_Earth_precession_CW`) | the seasons frame with the axial (clockwise) and apsidal (anticlockwise) motions meeting in 1/T = 1/T_axial + 1/T_apsidal (J2000), the perihelion's computed passages of the four directions and each quarter's length (the rate of date varies) | the periods of date, the shared perihelion-passage scan |
+| **The lunar standstills** (`08_Moon_Lunar_Standstill`) | the Moon's node Ω = L′ − F over 1960–2060 and the band of its monthly declination extremes (the mean orbit, geocentric), the major and minor standstills as computed crossings | the scene's lunar arguments, the hybrid ε, the Moon's mean inclination |
+| **The perihelia at the June solstice** (`09_Perihelion_21062000`) | the Sun's and the seven planets' ϖ in one frame (the J2000 ecliptic), the Sun's line of apsides with T through the seasons, a ± for a ϖ that moves more than 0.5° within ±10 yr | the chain at the solstice instant |
+| **Antarctic ice cores and the model** (`15_Antarctica_ice_core`) | EPICA Dome C and Vostok temperature, the EPICA CO₂ composite and Vostok CO₂ (data only), and LR04 δ¹⁸O with the model's climate formula on it (r over 400 kyr); the warm periods shaded from the data, the Last Glacial Maximum a computed minimum | `ice-core-data.json` (NOAA), `epica-co2-data.json`, `lr04-data.json`, the shipped climate coefficients |
+
+### Code locations
+
+The renderers live in `src/framework-images.js` (no THREE; each `render(ctx) → { svg, numbers, sources }`); `src/script.js` builds the reader object (`createFrameworkImagesContext`) and the panel shell. The records the panel loads on first open: LR04, `ice-core-data.json` (built by `npm run import:ice-cores` from the three NOAA files in `data/`), the EPICA CO₂ composite and the star catalogue. The chart-export gate renders all twelve, checks the export standard and that the printed numbers are the model's ([doc 111 §2](111-measured-traps-and-gate-origins.md)).
 
 ---
 

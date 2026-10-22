@@ -595,7 +595,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 5367,
+   "line": 5369,
    "runtime": "browser",
    "token": "earthtiltMean",
    "class": "comment",
@@ -603,7 +603,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23505,
+   "line": 23542,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -611,7 +611,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23507,
+   "line": 23544,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -619,7 +619,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23563,
+   "line": 23600,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -627,7 +627,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 23565,
+   "line": 23602,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -635,7 +635,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 24248,
+   "line": 24285,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -643,7 +643,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 32469,
+   "line": 32506,
    "runtime": "browser",
    "token": "H / N",
    "class": "comb",
@@ -652,7 +652,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 37937,
+   "line": 37974,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -660,7 +660,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39551,
+   "line": 39588,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -668,7 +668,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39551,
+   "line": 39588,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -676,7 +676,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39617,
+   "line": 39654,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -684,7 +684,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39617,
+   "line": 39654,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -692,7 +692,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39618,
+   "line": 39655,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -700,7 +700,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39618,
+   "line": 39655,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -708,7 +708,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39654,
+   "line": 39691,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -716,7 +716,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39654,
+   "line": 39691,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -724,7 +724,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39670,
+   "line": 39707,
    "runtime": "browser",
    "token": "H / N",
    "class": "display",
@@ -732,7 +732,7 @@
   },
   {
    "file": "src/script.js",
-   "line": 39670,
+   "line": 39707,
    "runtime": "browser",
    "token": "/ 13",
    "class": "display",
@@ -3366,7 +3366,7 @@
    "scripts/climate_formula_mwp_check.py": "sha256:177305723579b66c9d08590f366574c05cd935aea5573614e89eddc502f72236",
    "scripts/extract_insolation_features_deep.js": "sha256:2ef7242a306cc9e34200e59c0dcbe8d5fe30dc0759b4d2ee5457875d981a50dc",
    "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
-   "src/script.js": "sha256:61d277a5a3abc55806c2071ae8c65f0e76503ca60fd4f57421eac26d5c5249ad",
+   "src/script.js": "sha256:b37a21e5a3dffccf0a4f3ce21ee2dae4f1d86eb353c2801538eeb1571182d6db",
    "test/browser/epoch-consistency.test.mjs": "sha256:027b40559844497a53c6ee39fba2e0b848949a43e3ddb0e230cff9e0478a7172",
    "test/browser/snapshot.test.mjs": "sha256:28d0078f53c4ed31614477de0d66b4b035ff85063966faa33ddc90a527c3bf67",
    "test/browser/wobble-center.test.mjs": "sha256:456521771ea752f9112407c9f316d0dc92ec21d7b4ac90fbc5110772256ae8ad",

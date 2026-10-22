@@ -427,7 +427,14 @@ The `test:snapshot` chain also carries:
   every Export button (exact pixel size, independent decode, byte floor;
   fail-proven via `ESSRT_CHART_EXPORT_PLANT=1`) and the export STANDARD on
   all fourteen forms (title + legend row above, the plot, one credit strip
-  below, no caption text — doc 57; fail-proven via `=2`).
+  below, no caption text — doc 57; fail-proven via `=2`). The twelve
+  Framework Images pass the same standard with their records loaded, and a
+  numbers row per figure re-reads each printed value from the model surface,
+  formats it as the figure does and requires that string on the page
+  (fail-proven via `=3`: one unit in the last decimal of the Days and years
+  figure's sidereal day turns its row red). Born with the panel: a figure
+  prints what the model computes, so a model move that does not reach a
+  figure is a stale reader, not a stale picture.
 - **`tools-panels`** — every Tools button opens its panel with no page
   error, three clicks within a frame leave ONE panel, and it closes again
   (born from a ReferenceError on open and the double-build race;
