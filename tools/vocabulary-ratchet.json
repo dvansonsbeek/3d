@@ -274,9 +274,6 @@
       "deletion narrative": 5,
       "plan-step label": 16
     },
-    "code:tools/constants/migrate-script-blocks.mjs": {
-      "plan-step label": 3
-    },
     "code:tools/verify/artifact-freshness.js": {
       "plan-step label": 5
     },
