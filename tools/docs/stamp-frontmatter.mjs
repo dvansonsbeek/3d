@@ -22,10 +22,16 @@
  *                   (packages/physics/src/constants/coefficients.js) — the
  *                   same identity the counterfactual gate certifies; never
  *                   recomputed here
- *   status        — current | superseded | historical (map below)
+ *   status        — current | record | superseded | historical (map below)
  *
  * Status discipline (§10a, measured lessons):
  *   - current: must track HEAD; the Phase-11 freshness check bites on these.
+ *   - record: a finished measurement record (what was found, at the model
+ *     version it was found at). Its modelVersion/coefficients are the ones it
+ *     was stamped with and are KEPT, never re-stamped, so the frontmatter
+ *     says what the record measured against; exempt from freshness. Only for
+ *     docs no generator writes into (docs 92/99/110 are script-written and
+ *     stay current).
  *   - historical: genuinely frozen research records, EXEMPT from freshness.
  *     Default ambiguous docs to CURRENT — a doc wrongly historical is
  *     silently exempted and its stale numbers never caught; wrongly current
@@ -54,6 +60,11 @@ const HOLISTIC = process.argv.includes('--holistic');
 const HISTORICAL = new Set([]);
 // No doc is superseded today (§10a survey: zero point forward to a successor).
 const SUPERSEDED = new Set([]);
+// The RECORDS — finished measurement records, stamped once at the version they
+// measured against, listed by doc NUMBER (the doc's identity; a title is not a
+// classifier). Doc 109: the N-body audit and the plan 07–11 retirement record —
+// it calls itself a record and no generator writes into it.
+const RECORD_DOC_NUMBERS = new Set(['109']);
 
 // ── Sources — read, never recompute ─────────────────────────────────────────
 const modelVersion = JSON.parse(readFileSync(
@@ -69,6 +80,7 @@ const FIELDS = ['docVersion', 'modelVersion', 'coefficients', 'status'];
 function statusOf(name) {
   if (HISTORICAL.has(name)) return 'historical';
   if (SUPERSEDED.has(name)) return 'superseded';
+  if (RECORD_DOC_NUMBERS.has(name.split('-')[0])) return 'record';
   return 'current';
 }
 
@@ -101,6 +113,11 @@ function stamp(path, name, { mdx }) {
     else kept.push(line);
   }
   want.docVersion = existing.docVersion || '1.0';
+  if (status === 'record') {
+    // a record keeps the version it was measured against (first stamp = HEAD)
+    want.modelVersion = existing.modelVersion || modelVersion;
+    want.coefficients = existing.coefficients || coefficients;
+  }
 
   const stale = status === 'current' && head !== null && (
     existing.modelVersion !== modelVersion || existing.coefficients !== coefficients);
@@ -146,7 +163,7 @@ if (HOLISTIC) {
 }
 
 // ── Report ──────────────────────────────────────────────────────────────────
-const byStatus = { current: 0, historical: 0, superseded: 0 };
+const byStatus = { current: 0, record: 0, historical: 0, superseded: 0 };
 let changed = 0, missing = 0, stale = 0;
 for (const r of results) {
   byStatus[r.status]++;
@@ -155,7 +172,7 @@ for (const r of results) {
   if (r.stale) { stale++; if (CHECK) console.log(`  STALE   ${r.tree}/${r.name}`); }
   if (r.missing && CHECK) console.log(`  MISSING ${r.tree}/${r.name}`);
 }
-console.log(`${results.length} docs — current ${byStatus.current} · historical ${byStatus.historical} · superseded ${byStatus.superseded}`);
+console.log(`${results.length} docs — current ${byStatus.current} · record ${byStatus.record} · historical ${byStatus.historical} · superseded ${byStatus.superseded}`);
 console.log(`modelVersion ${modelVersion} · coefficients ${coefficients}`);
 if (CHECK) {
   if (missing || stale) {

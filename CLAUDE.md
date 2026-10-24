@@ -61,7 +61,7 @@ skill in `.claude/skills/`.
 | Epoch parameter is always `year`, always first | argument/scene-state mismatch |
 | One verb: `compute*` for derived quantities, `get*` for lookups | — |
 | Frame in the name where ambiguous: `Geocentric`, `Ecliptic`, `ICRF`, `OfDate` | Moon frame-convention bugs |
-| `…AtEpoch` suffix when epoch-dependent; absence means J2000-fixed | the kinematic/deep-time axis |
+| Epoch-dependent quantities say so: `…AtYear(year)` (decimal year, the engine year) or `…AtAge(tMa)` (age in Myr before J2000, `tMa` the one spelling); a name without either is a J2000 constant (`…J2000…`) | the kinematic/deep-time axis — the practice the code settled on (`…AtAge` 111, `…AtYear` 40, `…AtEpoch` 4 names) |
 | Files `kebab-case`, one exported concept per file | already consistent in `tools/` |
 
 **Fitters write the SHIPPED term set, never the greedy search result.** The

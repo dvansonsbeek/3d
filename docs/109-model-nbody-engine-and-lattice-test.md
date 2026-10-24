@@ -2,7 +2,7 @@
 docVersion: 1.0
 modelVersion: v26.5
 coefficients: sha256:b2d4e64c4e6a947e
-status: current
+status: record
 ---
 
 # 109 — The model's own N-body: audit, engine, frequencies, and the lattice at its own quantity type

@@ -1,6 +1,6 @@
 {
   "name": "@essrt/reference",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Standard-model and published REFERENCE evaluators for comparison surfaces: VSOP87A (K8 overlay; series data's single home is data/vsop87a-truncated.json, tracked + PROVENANCE-covered) and the published comparison curves (Laskar 2004, Berger 1978, Vondrák 2011, Capitaine 2009, Stephenson 2016 — migrated from @essrt/physics at its 4.0.0 major). ONE-WAY BOUNDARY: nothing in the model chain (@essrt/physics, @essrt/fitting, engines, laws, fitters, artifacts) may depend on this package — comparison surfaces, gates-as-comparators and tests only; `private: true` keeps it out of npm by construction.",
   "type": "commonjs",

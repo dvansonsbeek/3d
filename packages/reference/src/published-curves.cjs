@@ -32,8 +32,15 @@
  *    the IAU 1976/1980 convention (23.4392911°, −46.8150″/cy) because
  *    the Meeus-comparison reports are checked against Meeus's own
  *    worked values; NOT the same quantity as the IAU 2006 obliquity.
+ *  - The Framework Verification panel's three Earth polynomials (moved here
+ *    from the browser — one home for every published curve): Meeus (1991)
+ *    eq. 25.4 eccentricity; the IAU 2006 mean obliquity polynomial
+ *    (Capitaine, Wallace & Chapront 2003 — kept under the browser's
+ *    historical name obliquityChapront2002); Meeus Table 31.A longitude of
+ *    perihelion in the arcsecond-per-millennium form after Simon et al.
+ *    (1994) (perihelionMeeusEarth).
  *
- * The four T-based analytic polynomials need the engine's approximate
+ * The T-based analytic polynomials need the engine's approximate
  * calendar→JD conversion — injected via createPublishedCurves.
  */
 
@@ -309,12 +316,44 @@ function meeusMeanObliquityRad(T) {
 }
 
 /**
- * The four T-based analytic polynomials, bound to the engine's approximate
+ * The T-based analytic polynomials, bound to the engine's approximate
  * calendar→JD conversion.
  * @param {{ yearToJDApprox: (year: number) => number, j2000JD: number,
  *   julianCenturyDays: number }} deps
  */
 function createPublishedCurves(deps) {
+  /** Julian centuries TT from J2000 at a calendar year, through the injected conversion. @param {number} year @returns {number} */
+  const centuriesAt = (year) => (deps.yearToJDApprox(year) - deps.j2000JD) / deps.julianCenturyDays;
+
+  /** Meeus (1991), "Astronomical Algorithms", eq. 25.4: e = 0.016708634 − 0.000042037·T − 0.0000001267·T². @param {number} year @returns {number} */
+  function eccMeeus(year) {
+    const T = centuriesAt(year);
+    return 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
+  }
+
+  /** The IAU 2006 mean obliquity polynomial (Capitaine, Wallace & Chapront 2003), degrees — the browser's
+   *  historical name is kept so its Framework Verification call sites do not change. @param {number} year @returns {number} */
+  function obliquityChapront2002(year) {
+    const T = centuriesAt(year);
+    return (84381.406 - 46.836769 * T - 0.0001831 * T * T
+      + 0.0020034 * Math.pow(T, 3) - 0.000000576 * Math.pow(T, 4)
+      - 0.0000000434 * Math.pow(T, 5)) / 3600;
+  }
+
+  /** Meeus (1991) Table 31.A after Simon et al. (1994): Earth's longitude of perihelion OF DATE with
+   *  T in Julian MILLENNIA and the coefficients in arcseconds. @param {number} year @returns {number} degrees [0, 360) */
+  function perihelionMeeusEarth(year) {
+    const T = (deps.yearToJDApprox(year) - deps.j2000JD) / 365250;  // millennia
+    const arcsecToDeg = 360 / 1296000;
+    return ((102.93734808
+      + 61900.5529 * arcsecToDeg * T
+      + 164.47797 * arcsecToDeg * Math.pow(T, 2)
+      - 0.06365 * arcsecToDeg * Math.pow(T, 3)
+      - 0.12909 * arcsecToDeg * Math.pow(T, 4)
+      + 0.00298 * arcsecToDeg * Math.pow(T, 5)
+      + 0.0002 * arcsecToDeg * Math.pow(T, 6)) % 360 + 360) % 360;
+  }
+
   /** Laskar (2004) tropical year, days. @param {number} year @returns {number} */
   function tropicalYearLaskar(year) {
     const T = (deps.yearToJDApprox(year) - deps.j2000JD) / deps.julianCenturyDays;
@@ -346,7 +385,10 @@ function createPublishedCurves(deps) {
     return 129600000 / rateArcsecPerCy;
   }
 
-  return { tropicalYearLaskar, solarDayPeters, siderealYearChapront, axialPrecessionCapitaine2009 };
+  return {
+    tropicalYearLaskar, solarDayPeters, siderealYearChapront, axialPrecessionCapitaine2009,
+    eccMeeus, obliquityChapront2002, perihelionMeeusEarth,
+  };
 }
 
 module.exports = {

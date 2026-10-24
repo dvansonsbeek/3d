@@ -733,12 +733,6 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 
 These values result from the retired optimization campaign; the campaign write-ups are archived.
 
-## Sun / Earth Tuned Parameters
-
-| Constant | Variable | Value | Description |
-|----------|----------|-------|-------------|
-| Correction Sun | (`correctionSun` — DELETED, plan 11 step 2) | was 0.49715 deg | the scene Sun's fitted start angle (the retired optimizer's Step 1); the engine places the Sun at the certified longitude every frame, so it reached nothing |
-
 ## Planet Orbital Periods (Tuned)
 
 | Planet | Variable | Value (days) |
@@ -752,41 +746,6 @@ These values result from the retired optimization campaign; the campaign write-u
 | Neptune | `solarYearInput` | <!--v:neptuneOrbitalPeriodInputDays-->59800<!--/v--> |
 
 Stored in `astro-reference.json`. These start from the JPL solar-year periods and carry small pipeline refinements (the calibration record, doc 68, is archived).
-
-## Planet Orbital Eccentricities (Base) — RETIRED (plan 07 R6)
-
-The base-eccentricity construction (the System-Reset midpoint from the balanced-year phase) was the K law's; it is deleted with the law. A planet's eccentricity of date has one home, the N-body chain ([Constants: Planet J2000 Orbital Elements](#planet-j2000-orbital-elements) carries the observed J2000 values the chains are anchored on).
-
-With it went the Law-4 amplitude construction `e_amp = K × sin(tilt) × √d / (√m × a^(3/2))` and the planets' eccentricity phase constants on the balanced-year phase — nothing in the shipped code derives them any more. The recorded K value stays frozen in the [ψ/K section](#universal-coupling-constant-ψ) above (plan 07: `kValue` is a record, not a derivation).
-
-## Per-Planet EoC Fractions — DELETED (plan 11 step 2)
-
-The per-planet `eocFraction` constants (how much of a planet's Keplerian
-variable speed the EoC formula carried against the geometric offset, see
-[Equation of Center](65-equation-of-center.md)) are deleted: since the K5
-legacy-chain excision the chain places every rendered planet, and the
-fraction's only reader was a field nothing set (measured by the plan 11 reach
-audit: a 0.25 shift in every fraction moved no position at any epoch). The
-recorded values — Mercury −0.527, Venus 0.436, Mars −0.066224, Jupiter 0.495,
-Saturn 0.54, Uranus 0.53, Neptune 0.585 — stand in git history.
-
-## Planet Start Positions (legacy scaffolding since the K5 excision)
-
-DELETED (plan 11 step 3). These were the retired pipeline Step 2's fitted
-scene start angles (Mercury 83.65°, Venus 249.29°, Mars 121.46°, Jupiter
-13.89°, Saturn 11.28°, Uranus 44.90°, Neptune 47.96° — git history carries
-the doubles). Since the K5 legacy-chain excision they positioned only the
-geometric scaffolding; their one remaining reach (plan 11 step 0b) was each
-planet's pole azimuth and Saturn's ring plane, which turned once per orbit
-with the wheel. Each planet's rotation axis is now placed in world from the
-spin channel's pole of date through the frame bridge, as Earth's axis is
-(`_chainPlacePlanetPole`; the Node twin mirrors it), and the scaffold wheels rest
-at zero. The planets' `type` (the wheel ellipse family) and the
-`perihelionPassageRef` JDs (the planet equation-of-centre branch) left with
-them; the family is a code taxonomy in `@essrt/physics` planets/geometry. The
-paired `angleCorrection` (the perihelion marker's fitted RA→λ conversion) was
-deleted at plan 11 step 2: the chain placement overwrote the marker every
-frame.
 
 ## Ascending Nodes on the Invariable Plane at J2000
 
@@ -809,43 +768,6 @@ Three node sets coexist, all in the Souami & Souchay longitude origin (the plane
 | Pluto | <!--v:plutoOmegaSS-->107.06<!--/v--> | — | <!--v:plutoOmegaJ2000-->101.06<!--/v--> | (script) | — (no-chain body) | — |
 
 The verified and chain nodes are different constructions and differ by up to a few degrees: the closed form solves for Ω from the inclination alone (hence a sign ambiguity, resolved toward S&S) on S&S's Earth, while the chain carries JPL's full J2000 element set, node included, rotated into the model's own banked plane — Earth's chain node differs from the S&S value by the same construction. Pluto's closure is reported by the verification script, not the registry.
-
-## Planet Perihelion Reference Dates (Phase-Optimized)
-
-| Planet | `perihelionRef_JD` | Notes |
-|--------|-------------------|-------|
-| Mercury | 2460335.9 | Phase-optimized |
-| Venus | 2455464.42 | Re-optimized with 42p correction |
-| Mars | 2456505.6 | Re-optimized with Dec correction |
-| Jupiter | 2464224.5 | Phase-optimized (-6 deg from 2023-Jan-21) |
-| Saturn | 2452875.9 | Phase-optimized (+1 deg from 2003-Jul-26) |
-| Uranus | 2439699.8 | Phase-optimized (+5 deg from 1966-May-20) |
-| Neptune | 2409432.4 | Phase-optimized (+17 deg from 1876-Aug-27) |
-
-## Moon Start Positions (DELETED)
-
-| Constant | Variable | Value | Description |
-|----------|----------|-------|-------------|
-| Apsidal Start | (`moonStartposApsidal` — DELETED, plan 11 step 3) | was 347.5476 deg | the orbit RING's fitted J2000 perigee phase; the apsidal layer is engine-placed every frame at ϖ − 90° from the lunar arguments (ϖ = L′ − M′) |
-| Nodal Start | (`moonStartposNodal` — DELETED, plan 11 step 3) | was 64.0435 deg | the orbit RING's fitted J2000 node phase; the nodal layer is engine-placed every frame at Ω − 180° (Ω = L′ − F) — ring ≡ markers ≡ the placed Moon ([doc 66 §4](66-moon-meeus-corrections.md)) |
-| Moon Start | (`moonStartposMoon` — DELETED, plan 11 step 2) | was 67.8443 deg | the scene Moon's start angle; the certified series override places the rendered Moon's direction and distance every frame, so it reached only the Node twin's geometric pivot |
-
-## Planet perihelion parameters (the retired predictive formula)
-
-The per-planet **predictive formula system** — `PREDICT_PLANETS` (device
-period, θ₀, lattice baseline per planet), the normalization constants and the
-`PREDICT_COEFFS_*` arrays (~2,421 fitted terms per planet) — was **retired at
-plan 06 R8**: the arrays reproduced the
-right-ascension rate of the perihelion marker in the retired geometric scene,
-a regression of the simulator against itself, and the planets now render from
-the N-body chain. What remains of the same quantities: the planets' J2000
-perihelion longitudes (`longitudePerihelion`, §4) and their inertial apsidal
-periods (`perihelionEclipticYears` — since plan 07 R1 the chain's 1,296,000/g,
-no longer a lattice fraction) give the secular rate 1,296,000/period × 100 ″/cy
-per planet (`<p>PeriRateEclipticArcsecCy` in the registry; `<p>ModelBaseline`
-is the chain's era window rate);
-the Earth-frame right-ascension rate of that motion is its equatorial
-projection (doc 13 §1.8 — one formula, no fitted constants).
 
 ---
 
