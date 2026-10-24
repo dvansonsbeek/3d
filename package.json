@@ -5,12 +5,12 @@
     "packages/*"
   ],
   "scripts": {
-    "copy:refdata:dev": "mkdir -p dist-dev/data dist-dev/input && cp data/nbody-secular-series.json dist-dev/data/ && cp public/input/la2010-orbital-elements.json public/input/jpl-horizons-planet-elements.json dist-dev/input/",
+    "copy:refdata:dev": "mkdir -p dist-dev/data && cp data/nbody-secular-series.json dist-dev/data/ && rm -rf dist-dev/public && cp -r public dist-dev/public",
     "prestart": "npm run copy:refdata:dev",
     "predev": "npm run copy:refdata:dev",
     "start": "parcel src/index.html --dist-dir dist-dev",
     "dev": "parcel src/index.html --dist-dir dist-dev",
-    "build": "parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data dist/input && cp data/nbody-secular-series.json dist/data/ && cp public/input/la2010-orbital-elements.json public/input/jpl-horizons-planet-elements.json public/input/ice-core-data.json dist/input/",
+    "build": "rm -rf dist && parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data && cp data/nbody-secular-series.json dist/data/ && cp -r public dist/public",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p jsconfig.json && node tools/types/emit-physics-types.mjs",
     "types:physics:write": "node tools/types/emit-physics-types.mjs --write",
@@ -54,7 +54,6 @@
     "check:artifacts": "node tools/verify/artifact-freshness.js",
     "check:data": "node tools/verify/data-provenance.js",
     "check:docs": "npm run lint && npm run typecheck && npm run check:boundaries && npm run test:literals && npm run test:vocabulary && npm run test:docs-fresh && npm run check:artifacts && npm run docs:values && npm run docs:tables && npm run values:package",
-    "check:engine": "npm run check:docs && npm run test:purity && npm run test:layer0 && npm run test:cited-history && npm run test:layer1 && npm run test:constants && npm run test:counterfactual && npm run test:planet-model && npm run test:sampler-purity && npm run test:spin-channel && npm run test:verify && npm run test:fixtures",
     "figures:nbody": "node tools/explore/eccentricity-shapes.mjs && node tools/explore/deep-ecc-history.mjs",
     "docs:values": "node tools/docs/render-doc-values.mjs",
     "docs:values:write": "node tools/docs/render-doc-values.mjs --write",

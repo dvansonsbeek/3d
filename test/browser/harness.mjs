@@ -82,15 +82,14 @@ export async function openSimulator({ timeout = 90_000 } = {}) {
     errors.push(`console: ${t}`);
   });
 
-  // HERMETIC. In production the app deliberately fetches its data from
-  // raw.githubusercontent.com; the same files also live in `public/`. The
-  // original `waitUntil: 'load'` therefore waited on ~45 GitHub requests, so a
-  // golden-master test of pure arithmetic depended on GitHub being reachable and
-  // fast — it passed in CI and then hung for 90 s locally.
-  //
-  // Data files are SERVED FROM public/ so the page behaves as it does in
-  // production. Images are aborted: 40-odd planet textures cannot change a year
-  // length, and fetching them only makes the test slow.
+  // HERMETIC. The build ships public/ and the banked series beside index.html,
+  // so the page reads every data file and texture from this static server (plan
+  // 18: nothing is fetched from raw.githubusercontent.com unless a local read
+  // fails — the repository is the fallback, not the source). The route below is
+  // the safety net for that fallback: before plan 18 the app fetched ~45 files
+  // from GitHub first, and a golden-master test of pure arithmetic hung for 90 s
+  // locally on GitHub being slow. Remote JSON is answered from public/, remote
+  // images are aborted (40-odd planet textures cannot change a year length).
   const PUBLIC = join(ROOT, 'public');
   await page.route('**/*', async (route) => {
     const url = route.request().url();

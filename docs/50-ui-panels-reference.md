@@ -553,7 +553,7 @@ It is the interactive home of the **Σ_stack ↔ Bond 2001 IRD comparison** — 
 - **Chart overlay (deep)** = LR04 benthic stack (Lisiecki & Raymo 2005) — derived at load from `public/input/lr04-data.json` (the Earth Climate Analysis's dataset) as inverted δ¹⁸O anomaly vs core-top (positive = warm, same sign convention as Bond IRD); 1-kyr resolution, covers the full 200,000 BC tab where GISP2 ends (~27,950 BC)
 - **Correlation target** = Bond 2001 IRD stack — Bond's *own* dataset, the most direct out-of-sample validation of the model's Bond harmonic (the IRD drift-ice signal is the same physical mass-redistribution signal the Bond harmonic (n = 1830, 1466 yr) models, which is why it correlates at +0.36 where GISP2 gives only +0.24, joint world)
 
-GISP2 + Bond live in `public/input/climate-proxy.json`; all are loaded/derived by `lcrLoadProxyData()` with GitHub raw-URL fallback.
+GISP2 + Bond live in `public/input/climate-proxy.json`; all are loaded/derived by `lcrLoadProxyData()` through `fetchRepoJson` (the copy the build ships beside the page, the repository as the fallback).
 
 ### Code Locations
 

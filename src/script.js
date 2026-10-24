@@ -27,6 +27,32 @@ import { vsop87AstrometricGeoEclipticAU, vsop87GeoEclipticAU, vsop87HelioEclipti
 // Plan 17 — the Framework images panel's figures (renderers + paper kit; no THREE, no scene).
 import { FRAMEWORK_IMAGES } from './framework-images.js';
 
+// ── The repository's static files — ONE rule ────────────────────────────────
+// Textures, the input JSON and the banked series are addressed by their
+// REPO-RELATIVE path ('public/…', 'data/…'): the build ships public/ and
+// data/nbody-secular-series.json beside index.html, so the local copy serves
+// first; on a miss the same path is read from the repository (the `main`
+// branch — the site no longer depends on GitHub's renamed-branch alias).
+const REPO_RAW_URL = 'https://raw.githubusercontent.com/dvansonsbeek/3d/main/';
+/** Fetch a repo-relative JSON file: the local copy, then the repository. Parcel's
+ *  dev server answers an unknown path with index.html (HTTP 200), so a reply
+ *  that is not JSON counts as a miss. Resolves null when every source fails.
+ *  @param {string} repoPath @returns {Promise<any|null>} */
+async function fetchRepoJson(repoPath) {
+  let lastErr = null;
+  for (const url of [repoPath, REPO_RAW_URL + repoPath]) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
+      const text = await res.text();
+      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} answered HTML, not JSON`); continue; }
+      return JSON.parse(text);
+    } catch (e) { lastErr = e; }
+  }
+  console.error(`fetchRepoJson: ${repoPath} is unavailable from every source —`, lastErr);
+  return null;
+}
+
 /*
   Expanding Solar System Resonance Theory (ESSRT) — a holistic view of our universe · holisticuniverse.com
   (model version: see MODEL_VERSION from the generated constants)
@@ -5224,67 +5250,67 @@ const renderVal = val => {
 const planetMeta = {
   earth : {
     intro : 'Earth is the third planet from the Sun and the largest terrestrial world. Formed roughly 4.5 billion years ago, it is the only planet known to harbour life, with a substantial atmosphere, active geology, vast liquid-water oceans, and diverse ecosystems that make it unique in the Solar System.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth_OLD.jpg',
+    img   : 'public/Earth_OLD.jpg',
     imgRatio : 35 / 9
   },
   sun  : {
     intro : 'The Sun (or Sol) is the star at the centre of our solar system with an average radius of 695,508 km (109.2\u00D7 Earth). A 4.5 billion-year-old yellow dwarf containing 99.86% of the Solar System\u2019s mass, it powers nearly all life on Earth through nuclear fusion of hydrogen into helium in its core.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Sun.jpg',
+    img   : 'public/Sun.jpg',
     imgRatio : 35 / 9
   },
   moon  : {
     intro : 'The Moon is Earth\u2019s only natural satellite, orbiting at a mean distance of 384,399 km. Unusually large at nearly a third Earth\u2019s width, it is tidally locked, always showing the same face. Its origin is attributed to a Mars-sized body, Theia, striking the early Earth and creating debris that coalesced into the Moon.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Moon.jpg',
+    img   : 'public/Moon.jpg',
     imgRatio : 35 / 9
   },
   mercury  : {
     intro : 'Mercury is the smallest and closest planet to the Sun. A heavily cratered, airless world, it experiences extreme temperature swings. For every two orbits it completes three rotations \u2014 until 1965 it was thought the same side always faced the Sun. Thirteen times a century Mercury transits the Sun as seen from Earth.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mercury.jpg',
+    img   : 'public/Mercury.jpg',
     imgRatio : 35 / 9
   },
   venus  : {
     intro : 'Venus is the second planet from the Sun and the brightest object in the night sky after the Moon. Often called Earth\u2019s sister planet for their similar size, its surface is hidden by sulphuric-acid clouds, a crushing pressure 90\u00D7 Earth\u2019s, and temperatures hot enough to melt lead \u2014 the result of a runaway greenhouse effect.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/VenusAtmosphere.jpg',
+    img   : 'public/VenusAtmosphere.jpg',
     imgRatio : 35 / 9
   },
   mars  : {
     intro : 'Mars is the fourth planet from the Sun and the second smallest in the solar system. Often called the \u201cRed Planet,\u201d it has a thin CO\u2082 atmosphere, massive extinct volcanoes, deep canyons, frozen polar caps, and evidence of ancient water flows, making it the most explored world beyond Earth.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mars.jpg',
+    img   : 'public/Mars.jpg',
     imgRatio : 35 / 9
   },
   jupiter  : {
     intro : 'Jupiter is the fifth planet from the Sun and two-and-a-half times more massive than all the other planets combined. This gas giant has distinctive cloud bands, a powerful magnetic field, at least 95 moons, and the Great Red Spot \u2014 an ongoing storm that has raged for centuries.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg',
+    img   : 'public/Jupiter.jpg',
     imgRatio : 35 / 9
   },
   saturn  : {
     intro : 'Saturn is the sixth planet from the Sun and the most distant visible to the naked eye. Best known for its spectacular ring system, this gas giant has a yellow-orange hue, more than 140 moons including Titan, and a persistent hexagonal cloud pattern at its north pole larger than Earth.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Saturn.jpg',
+    img   : 'public/Saturn.jpg',
     imgRatio : 35 / 9
   },
   uranus  : {
     intro : 'Uranus is the seventh planet from the Sun, not recognised as a planet until Herschel observed it by telescope in 1781. Tipped on its side with a 98\u00B0 axial tilt, it is a cold, blue-green ice giant with faint rings and at least 28 moons named after literary characters.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Uranus.jpg',
+    img   : 'public/Uranus.jpg',
     imgRatio : 35 / 9
   },
   neptune  : {
     intro : 'Neptune is the eighth and most distant planet from the Sun. This cold, windy ice giant has a vivid blue colour, powerful storms, supersonic winds reaching 2,000 km/h, a faint ring system, and 16 known moons including the geologically active Triton.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg',
+    img   : 'public/Neptune.jpg',
     imgRatio : 35 / 9
   },
   pluto  : {
     intro : 'Pluto is a dwarf planet in the Kuiper Belt beyond Neptune. Reclassified from planet status in 2006, it is made of ice and rock, roughly one-sixth the Moon\u2019s mass. Pluto has five moons; the largest, Charon, is so big the two orbit a shared centre of gravity.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalMakemake.jpg',
+    img   : 'public/FictionalMakemake.jpg',
     imgRatio : 35 / 9
   },
   halleys  : {
     intro : 'Halley\u2019s Comet is the only short-period comet reliably visible to the naked eye, returning every 74\u201379 years. Observed since 240 BC, it was Edmond Halley who in 1705 proved these were returns of the same object. Its last perihelion was in 1986; it will next appear around 2061.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalCeres.jpg',
+    img   : 'public/FictionalCeres.jpg',
     imgRatio : 35 / 9
   },
   eros  : {
     intro : '433 Eros is an S-type asteroid of the Amor group and the second-largest near-Earth object, about 16.8 km across. In 2000 NASA\u2019s NEAR Shoemaker became the first craft to orbit and land on an asteroid. Discovered in 1898 by C. G. Witt, it was named after the Greek god of love.',
-    img   : 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/FictionalEris.jpg',
+    img   : 'public/FictionalEris.jpg',
     imgRatio : 35 / 9
   },
   // …
@@ -5338,7 +5364,7 @@ const earthWobbleCenter = {
 
   size: 0.002,   // K8b-1 owner call: below Earth's rendered radius (0.00426) — the old 0.011 read as ~4× Earth
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/deathstar.png',
+  textureUrl: 'public/deathstar.png',
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5380,7 +5406,7 @@ const earth = {
   
   size: (diameters.earthDiameter/2/ currentAUDistance)*100,
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg',
+  textureUrl: 'public/Earth.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5494,7 +5520,7 @@ const earthPerihelionFromEarth = {
   
   size: 0.011,   
   color: 0xBF40BF,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lightstar.png',
+  textureUrl: 'public/lightstar.png',
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5672,7 +5698,7 @@ const moon = {
 
   size: (diameters.moonDiameter/2/ currentAUDistance)*100,
   color: 0x8b8b8b,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Moon.jpg',
+  textureUrl: 'public/Moon.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5721,7 +5747,7 @@ const mercuryPerihelionFromEarth = {
   
   size: 0.5,
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mercury_perihelion.png',
+  textureUrl: 'public/mercury_perihelion.png',
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -5768,7 +5794,7 @@ const mercury = {
 
   size: (diameters.mercuryDiameter/2/ currentAUDistance)*100,
   color: 0x868485,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mercury.jpg',
+  textureUrl: 'public/Mercury.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5794,7 +5820,7 @@ const venusPerihelionFromEarth = {
   
   size: 0.1,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/venus_perihelion.png',
+  textureUrl: 'public/venus_perihelion.png',
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -5822,7 +5848,7 @@ const venus = {
 
   size: (diameters.venusDiameter/2/ currentAUDistance)*100,
   color: 0xA57C1B,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/VenusAtmosphere.jpg',
+  textureUrl: 'public/VenusAtmosphere.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5848,7 +5874,7 @@ const marsPerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/mars_perihelion.png',
+  textureUrl: 'public/mars_perihelion.png',
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -5876,7 +5902,7 @@ const mars = {
 
   size: (diameters.marsDiameter/2/ currentAUDistance)*100,
   color: 0xFF0000,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Mars.jpg',
+  textureUrl: 'public/Mars.jpg',
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5902,7 +5928,7 @@ const jupiterPerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/jupiter_perihelion.png',
+  textureUrl: 'public/jupiter_perihelion.png',
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -5930,8 +5956,8 @@ const jupiter = {
 
   size: (diameters.jupiterDiameter/2/ currentAUDistance)*100,
   color: 0xCDC2B2,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Jupiter.jpg',
-  ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/other-rings.png',
+  textureUrl: 'public/Jupiter.jpg',
+  ringUrl: 'public/other-rings.png',
   ringSize   : 11/6*(diameters.jupiterDiameter/2/ currentAUDistance)*100,
   ringInnerMult : 1.70,
   ringOuterMult : 1.90,
@@ -5961,7 +5987,7 @@ const saturnPerihelionFromEarth = {
   
   size: 0.5,
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn_perihelion.png',
+  textureUrl: 'public/saturn_perihelion.png',
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -5989,8 +6015,8 @@ const saturn = {
 
   size: (diameters.saturnDiameter/2/ currentAUDistance)*100,
   color: 0xA79662,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Saturn.jpg',
-  ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/saturn-rings.png',
+  textureUrl: 'public/Saturn.jpg',
+  ringUrl: 'public/saturn-rings.png',
   ringSize   : 2*(diameters.saturnDiameter/2/ currentAUDistance)*100,
   ringInnerMult: 1.23,
   ringOuterMult: 2.27,
@@ -6020,7 +6046,7 @@ const uranusPerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/uranus_perihelion.png',
+  textureUrl: 'public/uranus_perihelion.png',
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -6048,8 +6074,8 @@ const uranus = {
 
   size: (diameters.uranusDiameter/2/ currentAUDistance)*100,
   color: 0xD2F9FA,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Uranus.jpg',
-  ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/other-rings.png',
+  textureUrl: 'public/Uranus.jpg',
+  ringUrl: 'public/other-rings.png',
   ringSize   : 6/5*(diameters.uranusDiameter/2/ currentAUDistance)*100,
   ringInnerMult : 1.50,
   ringOuterMult : 2.00,
@@ -6079,7 +6105,7 @@ const neptunePerihelionFromEarth = {
   
   size: 0.5,   
   color: 0x333333,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/neptune_perihelion.png',
+  textureUrl: 'public/neptune_perihelion.png',
   visible: false,
   containerObj:"",
   orbitObj:"",
@@ -6107,8 +6133,8 @@ const neptune = {
 
   size: (diameters.neptuneDiameter/2/ currentAUDistance)*100,
   color: 0x5E93F1,
-  textureUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Neptune.jpg',
-  ringUrl: 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/other-rings.png',
+  textureUrl: 'public/Neptune.jpg',
+  ringUrl: 'public/other-rings.png',
   ringSize   : 4/5*(diameters.neptuneDiameter/2/ currentAUDistance)*100,
   ringInnerMult : 1.80,
   ringOuterMult : 2.05,
@@ -9031,7 +9057,7 @@ scene.add(eccentricityPathGroup);
 //*************************************************************
 const skyGeo = new THREE.SphereGeometry(100000, 25, 25);
 const loader = new THREE.TextureLoader();
-const skyTexture = loadTexture("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/milkyway.jpg");
+const skyTexture = loadTexture("public/milkyway.jpg");
 
 // Set correct color space for color image textures
 skyTexture.colorSpace = THREE.SRGBColorSpace; // This is the correct setting for normal color images
@@ -9104,9 +9130,9 @@ sceneObjects.constellations.visible = false;
 // Add the stars, star-lables and constellations
 //*************************************************************
 // 1) Asset URLs
-const bsc5url           = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/stars.json';
-const constellationsUrl = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/constellations.json';
-const starGlowURL       = 'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png';
+const bsc5url           = 'public/input/stars.json';          // repo-relative: fetchRepoJson / loadTexture add the repository fallback
+const constellationsUrl = 'public/input/constellations.json';
+const starGlowURL       = 'public/lensflare2.png';
 
 let starTexture;
 let starSizeMaterial = null;
@@ -9205,7 +9231,7 @@ scene.add(focusRing);
 //*************************************************************
 // ADD GLOW EFFECT TO SUN
 //*************************************************************
-const sunTexture = loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/glow.png'); 
+const sunTexture = loadTexture('public/glow.png'); 
 
 // Set correct color space for color image textures
 sunTexture.colorSpace = THREE.SRGBColorSpace;
@@ -9232,7 +9258,7 @@ sun.pivotObj.add(sunGlow);
 //*************************************************************
 // ADD LENS FLARE EFFECT WHEN LOOKING AT TO SUN
 //*************************************************************
-const flareTexture = loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare.png'); 
+const flareTexture = loadTexture('public/lensflare.png'); 
 // You can use any small round bright texture or generate a quick radial white glow.
 
 // Set correct color space for color image textures
@@ -11785,39 +11811,16 @@ let wgcSelectedPlanet = 'MERCURY';
 
 async function loadWGCData() {
   if (wgcData) return wgcData;
-  try {
-    const res = await fetch('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/wgc-perihelion-data.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    wgcData = await res.json();
-    return wgcData;
-  } catch (e) {
-    console.error('Failed to load WGC data:', e);
-    return null;
-  }
+  wgcData = await fetchRepoJson('public/input/wgc-perihelion-data.json');
+  return wgcData;
 }
 
 let _stephensonDtPoly = null;
 async function loadStephensonDtPolynomial() {
   if (_stephensonDtPoly) return _stephensonDtPoly;
-  const urls = [
-    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/stephenson-2016-deltaT-polynomial.json',
-    'input/stephenson-2016-deltaT-polynomial.json',
-    './input/stephenson-2016-deltaT-polynomial.json',
-  ];
-  let lastErr;
-  for (const url of urls) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
-      const text = await res.text();
-      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
-      _stephensonDtPoly = JSON.parse(text);
-      console.log(`Loaded Stephenson 2016 ΔT polynomial: ${_stephensonDtPoly.segments.length} spline segments from ${url}`);
-      return _stephensonDtPoly;
-    } catch (e) { lastErr = e; }
-  }
-  console.error('Failed to load Stephenson ΔT polynomial from any source. Last error:', lastErr);
-  return null;
+  _stephensonDtPoly = await fetchRepoJson('public/input/stephenson-2016-deltaT-polynomial.json');
+  if (_stephensonDtPoly) console.log(`Loaded Stephenson 2016 ΔT polynomial: ${_stephensonDtPoly.segments.length} spline segments`);
+  return _stephensonDtPoly;
 }
 
 /** Evaluate the Stephenson 2016 ΔT polynomial spline at a given year.
@@ -11831,103 +11834,33 @@ function stephensonDeltaT(year, poly) {
 let _stephensonSolar = null;
 async function loadStephensonSolar() {
   if (_stephensonSolar) return _stephensonSolar;
-  const urls = [
-    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/solar-eclipses-stephenson-2016.json',
-    'input/solar-eclipses-stephenson-2016.json',
-    './input/solar-eclipses-stephenson-2016.json',
-  ];
-  let lastErr;
-  for (const url of urls) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
-      const text = await res.text();
-      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
-      _stephensonSolar = JSON.parse(text);
-      console.log(`Loaded Stephenson 2016 Solar Observations: ${_stephensonSolar.entries.length} events from ${url}`);
-      return _stephensonSolar;
-    } catch (e) { lastErr = e; }
-  }
-  console.error('Failed to load Stephenson Solar from any source. Last error:', lastErr);
-  return null;
+  _stephensonSolar = await fetchRepoJson('public/input/solar-eclipses-stephenson-2016.json');
+  if (_stephensonSolar) console.log(`Loaded Stephenson 2016 Solar Observations: ${_stephensonSolar.entries.length} events`);
+  return _stephensonSolar;
 }
 
 let _stephensonLunar = null;
 async function loadStephensonLunar() {
   if (_stephensonLunar) return _stephensonLunar;
-  const urls = [
-    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/lunar-eclipses-stephenson-2016.json',
-    'input/lunar-eclipses-stephenson-2016.json',
-    './input/lunar-eclipses-stephenson-2016.json',
-  ];
-  let lastErr;
-  for (const url of urls) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
-      const text = await res.text();
-      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
-      _stephensonLunar = JSON.parse(text);
-      console.log(`Loaded Stephenson 2016 Lunar Observations: ${_stephensonLunar.entries.length} events from ${url}`);
-      return _stephensonLunar;
-    } catch (e) { lastErr = e; }
-  }
-  console.error('Failed to load Stephenson Lunar from any source. Last error:', lastErr);
-  return null;
+  _stephensonLunar = await fetchRepoJson('public/input/lunar-eclipses-stephenson-2016.json');
+  if (_stephensonLunar) console.log(`Loaded Stephenson 2016 Lunar Observations: ${_stephensonLunar.entries.length} events`);
+  return _stephensonLunar;
 }
 
 let _documentedLunar = null;
 async function loadDocumentedLunarEclipses() {
   if (_documentedLunar) return _documentedLunar;
-  const urls = [
-    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/lunar-eclipses-documented.json',
-    'input/lunar-eclipses-documented.json',
-    './input/lunar-eclipses-documented.json',
-  ];
-  let lastErr;
-  for (const url of urls) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
-      const text = await res.text();
-      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
-      _documentedLunar = JSON.parse(text);
-      console.log(`Loaded Documented Lunar Eclipses: ${_documentedLunar.entries.length} events from ${url}`);
-      return _documentedLunar;
-    } catch (e) { lastErr = e; }
-  }
-  console.error('Failed to load Documented Lunar Eclipses from any source. Last error:', lastErr);
-  return null;
+  _documentedLunar = await fetchRepoJson('public/input/lunar-eclipses-documented.json');
+  if (_documentedLunar) console.log(`Loaded Documented Lunar Eclipses: ${_documentedLunar.entries.length} events`);
+  return _documentedLunar;
 }
 
 let _nasaLunarCanon = null;
 async function loadNasaLunarCanon() {
   if (_nasaLunarCanon) return _nasaLunarCanon;
-  // Order: GitHub raw (canonical, works in production), local Parcel paths (work
-  // in dev when public/ is symlinked or the file is copied into src/). Parcel's
-  // SPA fallback returns index.html with HTTP 200 for unknown paths, so we must
-  // also catch JSON.parse failures rather than trusting res.ok alone.
-  const urls = [
-    'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/lunar-eclipses-nasa.json',
-    'input/lunar-eclipses-nasa.json',
-    './input/lunar-eclipses-nasa.json',
-  ];
-  let lastErr;
-  for (const url of urls) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
-      const text = await res.text();
-      if (text.trimStart().startsWith('<')) { lastErr = new Error(`${url} returned HTML (SPA fallback)`); continue; }
-      _nasaLunarCanon = JSON.parse(text);
-      console.log(`Loaded NASA Lunar Canon: ${_nasaLunarCanon.entries.length} events from ${url}`);
-      return _nasaLunarCanon;
-    } catch (e) { lastErr = e; }
-  }
-  console.error('Failed to load NASA Lunar Canon from any source. Last error:', lastErr);
-  console.error('Fix: commit public/input/lunar-eclipses-nasa.json to GitHub (main branch)');
-  console.error('  or symlink it into src/ so Parcel dev server can serve it.');
-  return null;
+  _nasaLunarCanon = await fetchRepoJson('public/input/lunar-eclipses-nasa.json');
+  if (_nasaLunarCanon) console.log(`Loaded NASA Lunar Canon: ${_nasaLunarCanon.entries.length} events`);
+  return _nasaLunarCanon;
 }
 
 function wgcUnwrap(angles) {
@@ -12671,42 +12604,27 @@ function cfmEvalStitchedCenogrid(t_kyr_BP, layer) {
   return cfmEvalRaw(t_kyr_BP, 'cenogrid-d18o', layer);
 }
 
-async function _cfmFetchJson(localPath, githubRawPath) {
-  const urls = [localPath, `https://raw.githubusercontent.com/dvansonsbeek/3d/master/${githubRawPath}`];
-  for (const url of urls) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return await res.json();
-    } catch (_) { /* try next */ }
-  }
-  return null;
-}
-
 async function loadCfmLR04Data() {
   if (cfmLR04Data) return cfmLR04Data;
-  cfmLR04Data = await _cfmFetchJson('input/lr04-data.json', 'public/input/lr04-data.json');
-  if (!cfmLR04Data) console.error('Failed to load lr04-data.json');
+  cfmLR04Data = await fetchRepoJson('public/input/lr04-data.json');
   return cfmLR04Data;
 }
 
 async function loadCenogridData() {
   if (cfmCenogridData) return cfmCenogridData;
-  cfmCenogridData = await _cfmFetchJson('input/cenogrid-data.json', 'public/input/cenogrid-data.json');
-  if (!cfmCenogridData) console.error('Failed to load cenogrid-data.json');
+  cfmCenogridData = await fetchRepoJson('public/input/cenogrid-data.json');
   return cfmCenogridData;
 }
 
 async function loadEpicaData() {
   if (cfmEpicaData) return cfmEpicaData;
-  cfmEpicaData = await _cfmFetchJson('input/epica-co2-data.json', 'public/input/epica-co2-data.json');
-  if (!cfmEpicaData) console.error('Failed to load epica-co2-data.json');
+  cfmEpicaData = await fetchRepoJson('public/input/epica-co2-data.json');
   return cfmEpicaData;
 }
 
 async function loadCenco2pipData() {
   if (cfmCenco2pipData) return cfmCenco2pipData;
-  cfmCenco2pipData = await _cfmFetchJson('input/cenco2pip-data.json', 'public/input/cenco2pip-data.json');
-  if (!cfmCenco2pipData) console.error('Failed to load cenco2pip-data.json');
+  cfmCenco2pipData = await fetchRepoJson('public/input/cenco2pip-data.json');
   return cfmCenco2pipData;
 }
 
@@ -15118,11 +15036,11 @@ function lcrDetrendSeries(data, windowYr = 5000) {
   return out;
 }
 
-/** Async loader for climate proxy data. Caches on first call. Uses the same
- *  local→GitHub-raw fallback as loadCfmLR04Data (via `_cfmFetchJson`). */
+/** Async loader for climate proxy data. Caches on first call (fetchRepoJson:
+ *  the local copy, then the repository). */
 async function lcrLoadProxyData() {
   if (lcrProxyData) return lcrProxyData;
-  lcrProxyData = await _cfmFetchJson('input/climate-proxy.json', 'public/input/climate-proxy.json');
+  lcrProxyData = await fetchRepoJson('public/input/climate-proxy.json');
   if (!lcrProxyData) {
     console.error('[LCR] Failed to load climate-proxy.json (both local and GitHub fallback). Proxy overlay disabled.');
     lcrProxyData = { sources: [] };
@@ -15140,7 +15058,7 @@ async function lcrLoadProxyData() {
   // file: inverted benthic δ¹⁸O anomaly vs core-top (positive = warm), same
   // sign convention as the Bond IRD source. 1-kyr native resolution; clipped
   // to the widest LCR tab (200,000 BC) to keep the series small.
-  const lr04 = await _cfmFetchJson('input/lr04-data.json', 'public/input/lr04-data.json');
+  const lr04 = await loadCfmLR04Data();
   if (lr04 && lr04.age_kyr_BP && lr04.d18o_per_mille) {
     const ref = lr04.d18o_per_mille[0]; // core-top (0 ka BP)
     const data = [];
@@ -16236,12 +16154,8 @@ let _zetaSeriesEndYr = 0;
 // golden masters are untouched. Earth's ε/e one-source is default-on too.
 {
   (async () => {
-    const candidates = [
-      'data/nbody-secular-series.json',
-      '../data/nbody-secular-series.json',
-      'nbody-secular-series.json',
-      'https://raw.githubusercontent.com/dvansonsbeek/3d/master/data/nbody-secular-series.json',
-    ];
+    // the local copy (the build ships it to data/), then the repository
+    const candidates = ['data/nbody-secular-series.json', REPO_RAW_URL + 'data/nbody-secular-series.json'];
     for (const url of candidates) {
       try {
         const res = await fetch(url);
@@ -17315,15 +17229,8 @@ let _la2010ElementsData = null;   // La2010 Earth elements table, once fetched
 let _jplInclData = null;          // JPL Horizons osculating IN/OM/EC extract, once fetched
 {
   const _fetchRef = async (name, ok, set) => {
-    for (const url of ['input/' + name, './input/' + name,
-      'https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/' + name]) {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) continue;
-        const a = await res.json();
-        if (ok(a)) { set(a); return; }
-      } catch (e) { /* try the next candidate */ }
-    }
+    const a = await fetchRepoJson('public/input/' + name);
+    if (a && ok(a)) set(a);
   };
   _fetchRef('la2010-orbital-elements.json',
     (a) => Array.isArray(a.data) && a.data.length > 400 && Number.isFinite(a.data[0].eccentricity) && Number.isFinite(a.data[0].inclination), (a) => { _la2010ElementsData = a; });
@@ -21129,10 +21036,10 @@ function openFrameworkImagesPanel() {
   // the cycles figure draws the LR04 record, the pole-star figure the catalogue: load each once and redraw the shown figure
   const redraw = (d) => { if (d && frameworkImagesPanel.classList.contains('visible')) updateFrameworkImagesPanel(frameworkImagesPanel._current); };
   if (!cfmLR04Data) loadCfmLR04Data().then(redraw);
-  if (!_fipStars) _cfmFetchJson('input/stars.json', 'public/input/stars.json').then((d) => { if (Array.isArray(d)) { _fipStars = d; redraw(d); } });
+  if (!_fipStars) fetchRepoJson(bsc5url).then((d) => { if (Array.isArray(d)) { _fipStars = d; redraw(d); } });
   // the ice-core figure: the NOAA EPICA Dome C / Vostok records and the EPICA CO₂ composite
   if (!cfmEpicaData) loadEpicaData().then(redraw);
-  if (!_fipIceCores) _cfmFetchJson('input/ice-core-data.json', 'public/input/ice-core-data.json').then((d) => { if (d) { _fipIceCores = d; redraw(d); } });
+  if (!_fipIceCores) fetchRepoJson('public/input/ice-core-data.json').then((d) => { if (d) { _fipIceCores = d; redraw(d); } });
 }
 
 function closeFrameworkImagesPanel() {
@@ -26968,19 +26875,7 @@ function setupGUI() {
   // GMST convention; they agree to <0.01°).
   // ────────────────────────────────────────────────────────────────────────
   addTestButton('Centerlines: shadow-plane vs NASA path tables (15 pts)', async () => {
-    let cl = null;
-    for (const url of ['https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/input/solar-eclipse-centerlines-nasa.json',
-                       'input/solar-eclipse-centerlines-nasa.json',
-                       './input/solar-eclipse-centerlines-nasa.json']) {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) continue;
-        const text = await res.text();
-        if (text.trimStart().startsWith('<')) continue;
-        cl = JSON.parse(text);
-        break;
-      } catch (e) { /* try next */ }
-    }
+    const cl = await fetchRepoJson('public/input/solar-eclipse-centerlines-nasa.json');
     if (!cl) {
       console.log('Could not load input/solar-eclipse-centerlines-nasa.json — centerline references unavailable.');
       return;
@@ -41616,12 +41511,9 @@ function addWidthToggle(gui, sizes = [350, 550]) {
 function initConstellations() {
   console.log(`⏳ initConstellations() [${o.constellationLayout}] fetching…`);
 
-  fetch(constellationsUrl)
-    .then(r => {
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
-    })
+  fetchRepoJson(constellationsUrl)
     .then(data => {
+      if (!data) throw new Error('Constellations load failed from every source');
       // build raw strokes
       const strokes = [];
       let stroke = [];
@@ -41735,12 +41627,9 @@ function initConstellations() {
 
 function initStars() {
   console.log('⏳ initStars(): fetching', bsc5url);
-  fetch(bsc5url)
-    .then(r => {
-      if (!r.ok) throw new Error(`Stars load failed: ${r.status}`);
-      return r.json();
-    })
+  fetchRepoJson(bsc5url)
     .then(data => {
+      if (!data) throw new Error('Stars load failed from every source');
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error('Stars JSON is not an array or is empty');
       }
@@ -41871,9 +41760,18 @@ function loadTexture( url, onLoad ) {
     onLoad && onLoad( tex );
     return tex;
   }
-  // first time: load + store
+  // first time: load + store — the local copy (the build ships public/); on a
+  // miss the same repo-relative path from the repository, decoded into the
+  // texture object already handed out (materials hold that object)
   const tex = textureLoader.load( url, t => {
     onLoad && onLoad( t );
+  }, undefined, () => {
+    if ( !url.startsWith( 'public/' ) ) return;
+    textureLoader.load( REPO_RAW_URL + url, t => {
+      tex.image = t.image;
+      tex.needsUpdate = true;
+      onLoad && onLoad( tex );
+    });
   });
   textureCache.set( url, tex );
   return tex;
@@ -50607,13 +50505,13 @@ function makeRealisticEarth(pd){
     /* ------------------------------------------------ textures -------- */
     const TL = new THREE.TextureLoader().setCrossOrigin('anonymous');
     const tex = {
-        dayPostLGM  : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/Earth.jpg"),
-        dayLGM      : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthLGM.png"),
-        niteModern  : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthNight.png"),
-        niteClassic : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthNightClassic.png"),
-        norm        : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthNormal.png"),
-        spec        : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/EarthSpecular.png"),
-        cloud       : TL.load("https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/earthcloudmap.png"),
+        dayPostLGM  : TL.load("public/Earth.jpg"),
+        dayLGM      : TL.load("public/EarthLGM.png"),
+        niteModern  : TL.load("public/EarthNight.png"),
+        niteClassic : TL.load("public/EarthNightClassic.png"),
+        norm        : TL.load("public/EarthNormal.png"),
+        spec        : TL.load("public/EarthSpecular.png"),
+        cloud       : TL.load("public/earthcloudmap.png"),
     };
   
     // ----- colour-space assignment  ----------------------------------
@@ -51522,7 +51420,7 @@ function addConfettiParticles(spawnRadius = 5) {
 
   const mat = new THREE.PointsMaterial({
     size: 0.1,
-    map: loadTexture('https://raw.githubusercontent.com/dvansonsbeek/3d/master/public/lensflare2.png'),
+    map: loadTexture('public/lensflare2.png'),
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,

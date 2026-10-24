@@ -87,7 +87,7 @@ openWGCPanel()  in src/script.js          ← loads JSON via fetch(), renders SV
 
 The JSON contains per-planet `yrArr`, `omArr` (Ω), `wArr` (ω), `piArr` (ϖ) monthly samples plus a pre-computed `rates` block with `rawPi` and `sinPi` trend estimates and an `oscPeriod` for the dominant oscillation (used to decide whether the baseline is reliable).
 
-Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON from WebGeoCalc; this is only needed after DE441 ephemeris updates at JPL. The JSON is fetched at panel-open time from the GitHub raw URL so the simulation does not need to bundle it.
+Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates the JSON from WebGeoCalc; this is only needed after DE441 ephemeris updates at JPL. The JSON is fetched at panel-open time (`fetchRepoJson`: the copy the build ships under `public/input/`, the repository as the fallback), so it is not bundled into the script.
 
 ## UI layout
 
@@ -163,7 +163,7 @@ The red and blue curves tracking each other over 1900–2026 is the visual valid
 | SVG chart renderer | `wgcRenderChart()` in `src/script.js` |
 | Angle unwrapping | `wgcUnwrap()` in `src/script.js` |
 | Linear regression | `wgcLinearFit()` in `src/script.js` |
-| Data loader | `loadWGCData()` (fetches `public/input/wgc-perihelion-data.json` from the raw GitHub URL) |
+| Data loader | `loadWGCData()` (fetches `public/input/wgc-perihelion-data.json` — the shipped copy, the repository as the fallback) |
 | Data generator | `tools/explore/wgc-perihelion-rates.js` |
 | WebGeoCalc HTTP client | `tools/lib/webgeocalc-client.js` |
 | Committed data | `public/input/wgc-perihelion-data.json` |

@@ -771,7 +771,7 @@ npm run constants:generate
 
 `constants:generate` regenerates every fitted block at once (BALANCE_PRESETS, the ΔT stack, …); the climate formula is one of them.
 
-To push the modal to GitHub raw (where the browser fetches at runtime):
+To publish the data files (the build ships `public/input/` beside the page; the repository is the browser's fallback):
 
 ```bash
 git add public/input/climate-formula-coefficients.json \
