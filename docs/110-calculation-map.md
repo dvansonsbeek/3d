@@ -706,7 +706,7 @@ text; the two tables below no longer regenerate:
 
 | quantity | value | what it is | H-role |
 |---|---|---|---|
-| phase origin of EVERY comb | 2000 (J2000) | plan 07 R10: the former fitted origin — `perihelionalignmentYear` 1246.03125 − 14.5 × H/16 = −302,635, "obliquity cycle position 14.5 of 16" — was rotated out of every (sin, cos) pair exactly (c0 = 0.908498525276082 anchor units, `tools/fit/reorigin-combs-j2000.mjs`); its inputs left the JSON | — (no offset counted) |
+| phase origin of EVERY comb | 2000 (J2000) | plan 07 R10: the former fitted origin — `perihelionalignmentYear` 1246.03125 − 14.5 × H/16 = −302,635, "obliquity cycle position 14.5 of 16" — was rotated out of every (sin, cos) pair exactly (c0 = 0.908498525276082 anchor units, by `tools/fit/reorigin-combs-j2000.mjs`, deleted with the last comb — doc 109 §22); its inputs left the JSON | — (no offset counted) |
 | meanSolarYearDays | 365.242203646102 | the whole-days snap of chain 3.1 | **L** |
 | lincoef (d/yr) | 365.24218961601 | the fitted linear term of ΣT_trop — used VERBATIM (recomputing it from the 1-yr anchor injects a −12,276 s ramp) | — (fitted) |
 | h0, h1 | 335317.4044, 27.571083 | H inside the Ih integral as h0 + h1·c (c = cycles since J2000; h0 absorbed h1·c0 at the re-origin): the fit's own linear H(c) | **P** |

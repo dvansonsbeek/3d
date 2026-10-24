@@ -147,7 +147,7 @@ order.forEach((id, i) => {
 console.log(`\nthen (by hand — each is a judgement, not a regeneration):
   npm run test:fixtures          re-record ONLY if the change was intended, and say so in the commit
   npm run docs:values:write && npm run docs:tables:write && npm run docs:calcmap:write && npm run docs:doc99:write && npm run docs:doc92:write && node tools/docs/stamp-frontmatter.mjs --write
-                                 (docs:tables:write is the doc 97 writer alone; docs 110/99/92 have their own — the docs:tables CHECK covers all four)
+                                 (docs:tables:write is the Python doc 92 table writer; docs 110/99 and doc 92's Node blocks have their own — the docs:tables CHECK covers all of them)
   npm run values:package:write   then the version note and the package publish (owner)
   npm run fit:6a2 && npm run check:csv-smoke   if the engine's frame of date moved`);
 

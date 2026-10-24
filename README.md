@@ -150,15 +150,16 @@ npm run build
 ### Verification
 
 ```bash
-npm run check             # the full gate chain (~5 min): lint, typecheck, boundaries,
-                          # purity, layer identities, constants, counterfactual,
-                          # planet model, createModel parity, fixtures, literals, python-physics pins,
-                          # docs freshness, artifact freshness, data provenance,
+npm run check             # the full gate chain (~4.4 min): lint, typecheck, boundaries,
+                          # purity, calendar, layer identities, constants, counterfactual,
+                          # planet model, createModel parity, sampler purity, spin channel,
+                          # API, MCP, fixtures, literals, vocabulary, python-physics pins,
+                          # python smoke, docs freshness, artifact freshness, data provenance,
                           # doc values, packaged model-values, model gates, pipeline
-npm run check:docs        # scoped tier (~20 s) for docs/registry/marker edits
-npm run check:engine      # scoped tier (~2 min) for tools/lib + packages/physics edits
-npm run test:browser      # golden masters in headless Chromium (builds first)
-npm run test:verify:list  # how the 24 tools/verify scripts classify
+npm run check:docs        # scoped tier (~30 s) for docs/registry/marker edits;
+                          # tools/lib and packages/physics edits take the full chain
+npm run test:browser      # golden masters in headless Chromium (~2.5 min, builds first)
+npm run test:verify:list  # how the 18 tools/verify scripts classify (6 gates, 12 generators)
 npm run values:package    # packaged @essrt/model-values vs the live registry
 npm run check:artifacts   # campaign artifacts vs their recorded input hashes
 ```

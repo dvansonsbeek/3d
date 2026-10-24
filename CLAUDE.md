@@ -158,8 +158,14 @@ Each line names the rule; doc 111 §1.n carries the measurement.
 
 `npm run check` is the enforced chain — lint, typecheck, `check:boundaries`
 (the §2h licensing invariant), purity, `test:calendar` (the one-home
-calendar/angle helpers against the legacy bodies), the layer gates,
-`test:constants` (the embed ≡ its sources), `test:fixtures` (the `tools/lib`
+calendar/angle helpers against the legacy bodies), the layer gates
+(`test:layer0`, `test:cited-history`, `test:layer1`), `test:constants` (the
+embed ≡ its sources), `test:counterfactual` (a changed input gives a changed,
+reproducible result with its own hash), `test:planet-model` and `test:model`
+(the planet model and `createModel()` ≡ the shipped Node derivation,
+bit-exact), `test:sampler-purity` (values pure in `year`, visit-order
+independent), `test:spin-channel`, `test:api` and `test:mcp` (the published
+API and MCP server end to end), `test:fixtures` (the `tools/lib`
 golden masters + the plan-06 baseline), `test:literals` (script.js literals vs
 the JSON source of truth; the retired-input ratchet), `test:vocabulary` (the
 retired-vocabulary RATCHET — the docs and READMEs, and since plan 16 the
@@ -169,21 +175,25 @@ command), `check:data` (every tracked dataset manifest-covered in
 PROVENANCE.md), `docs:values` / `docs:tables` (the script-written numbers in
 docs), `values:package` (the published @essrt/model-values ≡ the live
 registry, plus PLAUSIBILITY rows), `test:verify` (the model gates),
+`test:py-physics` (no Python defines model physics outside the ledger),
 `test:py-smoke`, `test:pipeline`. Every gate has been shown to **fail on a
 planted violation**, not merely to pass on clean code — the fixture gates on a
 1-ULP change (~1.6e-16 relative); the plant variables are listed per gate in
 doc 111 §2. Lint and typecheck cover `packages/` and `test/`; `src/script.js`
 and `tools/` are pre-migration and join as Phase 8 extracts.
 
-**Scoped tiers** (measured after plan 13 A1: the full chain ~5 min,
-`test:fixtures` ~2.7 min, `test:verify` ~1.3 min). Pick by what the change
-touches; CI runs `npm run check` itself on every push:
+**Scoped tiers** (measured step by step, plan 18 step 0: the full chain
+4.4 min, of which `test:fixtures` 2.0 min — 1.8 of it the plan-06 baseline's
+four deep-time rows — and `test:verify` 1.1 min — 56 s of it the
+scene-sampled `scene-year-lengths` gate; the browser tier 2.5 min with no
+single hotspot). Pick by what the change touches; CI runs `npm run check`
+itself on every push:
 
 | changed | local gate | ~time |
 |---|---|---|
-| `tools/docs/`, `docs/*.md`, markers, the generated table blocks of docs 92/97/110 (`docs:tables`; doc 110 = the calculation map, values script-written) | `npm run check:docs` | ~20 s |
-| `tools/lib/`, `packages/physics/` | `npm run check:engine` | ~3 min |
-| ANY `public/input/*.json` (even a label — the constants hash embeds them wholesale and the N-body node re-stamps, ~30 min), `packages/fitting/`, `src/script.js`, `tools/constants/` | `npm run regen:cascade --run`, then full `npm run check` | ~5 min + the cascade |
+| `tools/docs/`, `docs/*.md`, markers, the generated table blocks of docs 92/110 (`docs:tables`; doc 110 = the calculation map, values script-written) | `npm run check:docs` | ~40 s |
+| `tools/lib/`, `packages/physics/` | the full `npm run check` (the former `check:engine` tier, once it carried every gate that reads the package — `test:model`, the calendar, API, MCP and Python gates it had omitted — cost as much as the chain and was dropped in plan 18) | ~4.4 min |
+| ANY `public/input/*.json` (even a label — the constants hash embeds them wholesale and the N-body node re-stamps, ~30 min), `packages/fitting/`, `src/script.js`, `tools/constants/` | `npm run regen:cascade -- --run` (the `--` is required: without it npm keeps the flag and the script prints a DRY RUN), then full `npm run check` | ~4.4 min + the cascade |
 
 `npm run test:browser` runs the `src/script.js` golden masters in headless
 Chromium — the only tier that guards Phase 8 — plus the epoch-consistency
@@ -201,10 +211,13 @@ trio (`nbody-secular.js`, `deep-secular-modes.js`, `secular-series.js`),
 `obliquity-hybrid.js` (REFUSES if the realized obliquity period parts from the
 window-mean prediction), `measure-rms-by-epoch.js` and `equinox-vs-vondrak.js`
 (write under `--write`; the latter REFUSES if a precession-of-date factor is
-missing) and the four campaign generators (cassini-results /
+missing), the four campaign generators (cassini-results /
 lod-climate-correlation / eclipse-audit / lunar-alignment — the latter two
 REFUSE on divergence; `--write --rebaseline` is the conscious re-measurement
-path). `npm run regen:cascade` lists the stale generators in regeneration order.
+path) and the two reference comparisons (`sun-vs-horizons.js`,
+`earth-osculating-offset.js`). `npm run regen:cascade` lists the stale
+generators in regeneration order; `npm run test:verify:list` the full
+classification (12 generators, 6 gates).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

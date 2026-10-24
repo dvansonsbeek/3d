@@ -109,7 +109,8 @@ engine places the Sun at the certified longitude every frame.
 The split composition (parent center-offset at magnitude e toward the
 perihelion direction, plus the sun node's 2nd-order EoC at `e − base/2`)
 differs from full Kepler by a residual that is **fully attributed**
-(instrument `tools/explore/fq3-wheel-sun-attribution.mjs`):
+(measured with the FQ3 wheel–Sun attribution instrument, since deleted with
+the wheel it measured; the attribution is recorded here):
 
 1. **Amplitudes** — the split differs from full Kepler at first order by
    exactly `e − base` (273.1″ at J2000); closure 97.7% annual / 98.9%

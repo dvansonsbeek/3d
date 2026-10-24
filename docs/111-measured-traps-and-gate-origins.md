@@ -516,6 +516,29 @@ exporter's own event definitions and pins the measured sidereal, tropical
 and anomalistic years of date to the one-family laws within 30 ms
 (fail-proven via `ESSRT_SCENE_YEARS_PLANT=1`).
 
+**The plant variables, one per fail-proven gate** (the list CLAUDE.md
+points to; each gate's header states its own plant in full):
+
+| variable | gate | what it plants |
+|---|---|---|
+| `ESSRT_CAL_PLANT=1` | `test/browser/calendar-conversion.test.mjs` | one expected calendar golden perturbed |
+| `ESSRT_CHART_EXPORT_PLANT=1/2/3` | `test/browser/chart-export.test.mjs` | the PNG width by one pixel / a caption line / one printed figure number |
+| `ESSRT_CSV_SMOKE_PLANT=1` | `test/csv-window-smoke.test.mjs` | one expected window-CSV row |
+| `ESSRT_DT_SLOPE_PLANT=1` | `tools/verify/deltat-slope-basis.js` | +0.43 ms/day on the implied ΔT slope (the historical two-bases split) |
+| `ESSRT_LITERALS_PLANT=1` | `tools/constants/check-literals.mjs` | a retired-input file re-entering |
+| `ESSRT_OBLIQ_REALIZED_PLANT=1` | `tools/verify/obliquity-hybrid.js` | the predicted realized obliquity period × 1.005 |
+| `ESSRT_PERI_SUN_PLANT=1` | `test/browser/perihelion-at-sun.test.mjs` | the expected marker distance shifted by 1 % |
+| `ESSRT_PLAN06_PLANT=1` | `tools/fixtures/record-plan06-baseline.mjs` | one fixture value by 1 ULP |
+| `ESSRT_PY_SMOKE_PLANT=1` | `tools/check-python-smoke.mjs` | one fake stage-C failure |
+| `ESSRT_SCENE_YEARS_PLANT=1` | `tools/verify/scene-year-lengths.js` | the compared sidereal law shifted by 0.1 s (the tolerance is 30 ms) |
+| `ESSRT_TOOLS_PLANT=1` | `test/browser/tools-panels.test.mjs` | one expected panel id renamed |
+| `ESSRT_VALUES_PLANT=1` | `tools/docs/export-model-values-package.mjs` | the 16.0.0 offset (167.048°) re-injected on the first plausibility row |
+| `ESSRT_VOCAB_PLANT=1/2` | `tools/check-vocabulary.mjs` | one phantom docs hit (`=1`) / one phantom code hit (`=2`) |
+| `ESSRT_WOBBLE_PLANT=1` | `test/browser/wobble-center.test.mjs` | the tolerances tightened 10,000× |
+
+(`test:perf` is tightened with `ESSRT_PERF_TIGHTEN=0.01`, above; the
+`tools/lib` golden masters fail on any 1-ULP change without a plant.)
+
 ---
 
 ## 3. The falsification criterion — the long form
