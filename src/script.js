@@ -4242,7 +4242,7 @@ if (typeof window !== 'undefined') {
     perihelionFrameBreakdown, relativisticPerihelionAdvanceArcsecCy,
     // WebGeoCalc explorer: the model curve (the chain's apsidal advance + equatorial
     // projection) and the two renderers, so the overlay can be smoke-tested headlessly
-    wgcModelCurves, wgcRenderChart, wgcPaperChartPanel,
+    wgcRenderChart, wgcPaperChartPanel,
     // f(Y) — the plan §5a "year lengths" row
     computeSolarYearDaysFromCardinals,
     siderealYearDaysOfDate,
@@ -4326,28 +4326,6 @@ if (typeof window !== 'undefined') {
     // key angles and where the orbit view puts the equinox ĝ on screen (the
     // former inspector started 90° rotated; the fix is a defined screen-up).
     jumpJD: (jd) => { jumpToJulianDay(jd); forceSceneUpdate(); },   // scene jump for probes (setEpoch* only move the f(Y) epoch)
-    // Plan 06 Phase 7 — the planet panels' spin-channel rows, evaluated at the
-    // scene's current epoch through the same row factory the panels use.
-    spinRowsProbe: (planet) => {
-      const opts = { mercury: { cassini: true }, venus: { retrograde: true }, uranus: { retrograde: true } }[planet] || {};
-      return _planetSpinRows(planet, planet, opts).map((r) => ({
-        label: r.label(),
-        value: r.value.map((p) => (typeof p.v === 'function' ? p.v() : (p.v ?? p.small))),
-        hover: typeof r.hover === 'function' ? r.hover()[0] : r.hover[0],
-      }));
-    },
-    // Phase 7 follow-up — focus a planet so the helper-label loop fills the
-    // "Elements of Date" label's dynamic spans (headless probe path). Plan 07
-    // R6: the label used to be carried by the planet's wobble centre and the
-    // probe had to make that marker visible; the label now hangs off the
-    // planet mesh, so focusing the planet is the whole of it.
-    focusPlanetLabel: (planet) => {
-      const wc = _planetElementLabels.find((w) => w.key === planet);
-      if (!wc) return false;
-      o.lookAtObj = wc.body;
-      positionChanged = true; forceSceneUpdate();
-      return true;
-    },
     inspectorProbe: () => {
       const H = hierarchyInspector;
       const f = computeInspectorOrbitFrame(H.currentPlanet);
@@ -4435,7 +4413,6 @@ if (typeof window !== 'undefined') {
     },
     // Mode toggles — mutable `let`s, flipped per probe section and restored.
     setMoonArgsFrameworkNative: (on) => { MOON_ARGS_FRAMEWORK_NATIVE = !!on; },
-    getMoonArgsFrameworkNative: () => MOON_ARGS_FRAMEWORK_NATIVE,
     setDeepTimeMode: (on) => { DEEP_TIME_MODE_ENABLED = !!on; },
 
     // ── planet probe surface ─────────────────────────────────────────────────
@@ -4527,7 +4504,6 @@ if (typeof window !== 'undefined') {
       forceSceneUpdate('light');
       return { raDeg: sun.ra * 180 / Math.PI, decDeg: 90 - sun.dec * 180 / Math.PI, epsDeg: o.obliquityEarth };
     },
-    certSunLonAt: (jd) => _tierModelB().eclipse.sunLonCompletedDegAtJD(jd + deltaTStart / SECONDS_PER_DAY),   // true-UT jd in; the bridge is the caller's (R3 item 2)
     eclFindLunar: (jdStart, jdEnd) => findLunarEclipsesInRange(jdStart, jdEnd),
     eclFindSolar: (jdStart, jdEnd) => findSolarEclipsesInRange(jdStart, jdEnd),
     eclUmbraSceneAt: (jd) => umbraFromSceneAtJd(jd),
@@ -4551,11 +4527,6 @@ if (typeof window !== 'undefined') {
     }),
     refStephensonAt: (year, poly) => stephensonDeltaT(year, poly),
     // ── VFP "Inclination of all planets" smoke surface ───────────────────────
-    // The wgcRenderChart precedent: the hermetic harness aborts external
-    // fetches, so the injector lets a headless probe supply the two tracked
-    // reference datasets and then exercise the screen render, the hover
-    // wiring, and both paper exports. Test surface, not an API.
-    vfpPISetRefData: (la, jpl) => { if (la) _la2010ElementsData = la; if (jpl) _jplInclData = jpl; },
     vfpPISeriesLoaded: () => _planetSeriesData !== null,
     // Perf-gate surface (the R9 class): force ONE resample of every chain
     // planet's orbit ring at jd — the 10-yr JD condition and the 250-ms
@@ -4588,7 +4559,6 @@ if (typeof window !== 'undefined') {
       bmp.close();
       return { type: r.blob.type, width: r.width, height: r.height, bytes: r.blob.size, decoded };
     },
-    chartExportOpen: (svgString, title) => openChartExportModal(svgString, title),
     // the export standard's gate: every paper form, rendered as the Export
     // buttons render it (data loaded first), keyed by panel
     chartExportForms: async () => {
@@ -4614,28 +4584,13 @@ if (typeof window !== 'undefined') {
         'planet orbit analysis (orbit of date)': inspectorRenderPaperSVG('jupiter'),
       };
     },
-    inspectorPaperSvg: (planetKey) => inspectorRenderPaperSVG(planetKey || hierarchyInspector.currentPlanet),
     // Plan 17: the Framework images — each built figure's { svg, numbers, sources } at J2000
     frameworkImages: () => Object.fromEntries(FRAMEWORK_IMAGES.filter((c) => c.render).map((c) => [c.id, _fipRender(c)])),
     openFrameworkImagesPanel: (id) => { openFrameworkImagesPanel(); if (id) updateFrameworkImagesPanel(id); },
-    frameworkImageIds: () => FRAMEWORK_IMAGES.filter((c) => c.render).map((c) => c.id),
     // the chart-export gate reads the model surfaces through the figures' own reader object (J2000)
     frameworkImagesContext: () => createFrameworkImagesContext(2000),
-    vfpPIState: () => _vfpPIState,
-    vfpPIRender: () => renderVFPPlanetInclinations(),
-    vfpPIAfterRender: (el) => _vfpPIAfterRender(el),
+    // the chart-export gate's rasterizer subject (the planet-inclination paper form)
     vfpPIPaperSvg: (range) => _vfpPIPaperSvg(range || _VFPPI_SCREEN_RANGE),
-    vfpPICyclesRange: () => _VFPPI_CYCLES_RANGE,
-    // the eccentricity twin's smoke surface (references shared with PI)
-    vfpPEState: () => _vfpPEState,
-    vfpPERender: () => renderVFPPlanetEccentricities(),
-    vfpPEAfterRender: (el) => _vfpPEAfterRender(el),
-    vfpPEPaperSvg: (range) => _vfpPEPaperSvg(range || _VFPPI_SCREEN_RANGE),
-    // the perihelion-precession sibling's smoke surface
-    vfpPPState: () => _vfpPPState,
-    vfpPPRender: () => renderVFPPlanetPerihelion(),
-    vfpPPAfterRender: (el) => _vfpPPAfterRender(el),
-    vfpPPPaperSvg: (range) => _vfpPPPaperSvg(range || _VFPPI_SCREEN_RANGE),
     // The panel-ORDER invariant. VFP_CATEGORIES is sorted by VFP_ORDER, so an
     // id missing from the order array scores indexOf = −1 and silently sorts
     // FIRST — it also becomes the default-open panel. Measured: the perihelion
@@ -4649,8 +4604,6 @@ if (typeof window !== 'undefined') {
     }),
     openVerificationPanel: () => openVerificationPanel(),
     updateVerificationPanel: (id) => updateVerificationPanel(id),
-    // C1 period-of-date probe surface: the two-tier composition, per factor
-    kcNOfDate: (k, y) => ({ n: _chainNOfDate(k, y), lamDot0: _chainLamDot0(k), lamRel: _chainLamRel(k, y), massRatio: _chainMassLossPeriodRatio(y) }),
     // C-VIS smoke surface: exercise both Visualization toggles headlessly
     visInvPlaneProbe: () => {
       invariablePlaneGroup.visible = true;
@@ -4969,119 +4922,6 @@ if (typeof window !== 'undefined') {
       forceSceneUpdate();
       return r;
     },
-    visNodeMarkersProbe: (name) => {
-      o.lookAtObj = { name };
-      sunCenteredInvPlane.visible = true;
-      updateSunCenteredInvPlane();
-      return { asc: sunCenteredNodeMarkers.userData.ascLabelDiv.innerHTML, desc: sunCenteredNodeMarkers.userData.descLabelDiv.innerHTML };
-    },
-    // debug/verify aid: frame the camera square onto the eccentricity
-    // overlay (down the path plane's normal, target = Earth) so a
-    // headless screenshot can check what actually renders
-    visEccOverlayFrame: (dist, focusDot) => {
-      eccentricityPathGroup.updateMatrixWorld(true);
-      const n = new THREE.Vector3(0, 0, 1)
-        .applyQuaternion(eccentricityPathGroup.quaternion).normalize();
-      const c = focusDot
-        ? eccentricityPathGroup.userData.g5Dot.getWorldPosition(new THREE.Vector3())
-        : eccentricityPathGroup.position.clone();
-      camera.position.copy(c).addScaledVector(n, dist || 12);
-      controls.target.copy(c);
-      controls.update();
-      camera.updateMatrixWorld();
-      const ud = eccentricityPathGroup.userData;
-      const px = (w) => {
-        const v = w.clone().project(camera);
-        return [Math.round((v.x + 1) / 2 * window.innerWidth), Math.round((1 - v.y) / 2 * window.innerHeight)];
-      };
-      const wp = (obj) => obj.getWorldPosition(new THREE.Vector3());
-      const armEnd = (arm, i) => {
-        const p = arm.geometry.getAttribute('position');
-        return arm.localToWorld(new THREE.Vector3(p.getX(i), p.getY(i), p.getZ(i)));
-      };
-      return {
-        cam: camera.position.toArray(), target: c.toArray(),
-        screen: {
-          earth: px(eccentricityPathGroup.position.clone()),
-          dot: px(wp(ud.g5Dot)), marker: px(wp(ud.marker)),
-          eMaxTick: px(wp(ud.eMaxTick)), eMinTick: px(wp(ud.eMinTick)),
-          g5Arm0: px(armEnd(ud.g5Arm, 0)), g5Arm1: px(armEnd(ud.g5Arm, 1)),
-          g2Arm0: px(armEnd(ud.g2Arm, 0)), g2Arm1: px(armEnd(ud.g2Arm, 1)),
-        },
-      };
-    },
-    // K8b-1 second exhibit: the Earth Eccentricity Path smoke surface
-    visEccPathProbe: () => {
-      eccentricityPathGroup.visible = true;
-      eccentricityPathGroup.userData.builtCache = null;
-      _lastEccPathUpdateYear = null;
-      updateEccentricityPathMarker();
-      const ud = eccentricityPathGroup.userData;
-      const cyc = _chainEarthEccCycle(o.currentYear);
-      const pos = ud.pathLine.geometry.getAttribute('position');
-      const anat = _eccAnatomy();
-      return {
-        nextMax: cyc.nextMax, nextMin: cyc.nextMin, lo: cyc.lo, hi: cyc.hi,
-        samples: cyc.samples.length,
-        pathPoints: pos ? pos.count : 0,
-        highLabel: ud.nextMaxLabelDiv.innerHTML, lowLabel: ud.nextMinLabelDiv.innerHTML,
-        markerLabel: ud.labelDiv.textContent,
-        eNow: _sceneEccTargetAt(o.currentYear),
-        // anatomy overlay: carrier/epicycle rates (″/yr), the ring radius,
-        // and the marker-to-dot distance (should sit NEAR the ring — the
-        // 16 minor terms are the residual)
-        anatomy: {
-          carrierArcsecPerYr: anat.carrier.omegaRadPerYr * 180 / Math.PI * 3600,
-          epicycleArcsecPerYr: anat.epicycle.omegaRadPerYr * 180 / Math.PI * 3600,
-          ringRadius: ECC_PATH_SCALE * anat.epicycleAmp,
-          markerToDot: ud.marker.position.distanceTo(ud.g5Dot.position),
-          dotVisible: ud.g5Dot.visible, ringVisible: ud.g2Ring.visible,
-          // beat-readout ticks (local to the dot; Earth = group origin, so
-          // the dot's position IS the Earth→dot vector)
-          eMaxTickLen: ud.eMaxTick.position.length(),
-          eMinTickLen: ud.eMinTick.position.length(),
-          // +1 = far side (along Earth→dot), −1 = near side
-          eMaxTickDot: Math.sign(ud.eMaxTick.position.dot(ud.g5Dot.position)),
-          eMinTickDot: Math.sign(ud.eMinTick.position.dot(ud.g5Dot.position)),
-          eMaxTickCross: Math.abs(ud.eMaxTick.position.x * ud.g5Dot.position.y
-            - ud.eMaxTick.position.y * ud.g5Dot.position.x),
-          ticksVisible: ud.eMaxTick.visible && ud.eMinTick.visible,
-          g5LabelHTML: (ud.g5LabelObj && ud.g5LabelObj.element) ? ud.g5LabelObj.element.innerHTML : '',
-          eMaxTickLabelHTML: (ud.eMaxTickLabelObj && ud.eMaxTickLabelObj.element) ? ud.eMaxTickLabelObj.element.innerHTML : '',
-          // wheels-and-arms: the dot must sit ON the carrier circle, the
-          // g₂ arm tip ON the ring, the beat arc anchored at the e-max
-          // tick with a plausible swept fraction
-          g5CircleR: ud.g5CircleR,
-          dotToCircleCenter: Math.hypot(
-            ud.g5Dot.position.x - ECC_PATH_SCALE * anat.deltaRe,
-            ud.g5Dot.position.y - ECC_PATH_SCALE * anat.deltaIm),
-          g2ArmTipLen: (() => { const p = ud.g2Arm.geometry.getAttribute('position');
-            return Math.hypot(p.getX(1), p.getY(1)); })(),
-          beatArc: (() => {
-            const p = ud.beatArc.geometry.getAttribute('position');
-            const a0 = Math.atan2(p.getY(0), p.getX(0));
-            const a1 = Math.atan2(p.getY(64), p.getX(64));
-            const tick = Math.atan2(ud.eMaxTick.position.y, ud.eMaxTick.position.x);
-            const arm = (() => { const q = ud.g2Arm.geometry.getAttribute('position');
-              return Math.atan2(q.getY(1), q.getX(1)); })();
-            const wrap = (x) => x - 2 * Math.PI * Math.floor(x / (2 * Math.PI));
-            return { startsAtTickDeg: wrap(a0 - tick) * 180 / Math.PI,
-                     endsAtArmDeg: wrap(a1 - arm) * 180 / Math.PI,
-                     sweptDeg: wrap(a1 - a0) * 180 / Math.PI,
-                     r0: Math.hypot(p.getX(0), p.getY(0)) };
-          })(),
-          wheelsVisible: ud.g5Circle.visible && ud.g5Arm.visible
-            && ud.g2Arm.visible && ud.g2Tip.visible && ud.beatArc.visible
-            && ud.g2LabelObj.visible && ud.beatLabelObj.visible,
-          // the slow hand must start AT EARTH (the group origin)
-          g5ArmStartLen: (() => { const p = ud.g5Arm.geometry.getAttribute('position');
-            return Math.hypot(p.getX(0), p.getY(0)); })(),
-          g2LabelHTML: (ud.g2LabelObj && ud.g2LabelObj.element) ? ud.g2LabelObj.element.innerHTML : '',
-          beatLabel: ud.beatDiv ? ud.beatDiv.textContent : '',
-        },
-      };
-    },
-    inclInvAt: (y) => inclInvPlaneModel(y),
     // empirical frame mapping: world azimuth of a test local azimuth in
     // the path group (derives the local→world constant, sign included)
     visPathFrameProbe: (localDeg) => {
@@ -5092,19 +4932,6 @@ if (typeof window !== 'undefined') {
       mk.getWorldPosition(w);
       mk.position.copy(save);
       return Math.atan2(w.z, w.x) * 180 / Math.PI;
-    },
-    // world azimuths of the three node-flavored markers (frame-alignment probe)
-    visWorldProbe: () => {
-      const w = new THREE.Vector3();
-      const az = (v) => Math.atan2(v.z, v.x) * 180 / Math.PI;
-      const out = {};
-      sunCenteredNodeMarkers.userData.ascMarker.getWorldPosition(w); out.sunAscAz = az(w);
-      inclinationPathGroup.userData.nextMaxMarker.getWorldPosition(w); out.nextMaxAz = az(w);
-      inclinationPathGroup.userData.marker.getWorldPosition(w); out.pathMarkerAz = az(w);
-      out.pathGroupRotY = inclinationPathGroup.rotation.y * 180 / Math.PI;
-      out.earthPivotRotY = earth.pivotObj.rotation.y * 180 / Math.PI;
-      out.nodeSFrame = o.earthAscendingNodeInvPlane;
-      return out;
     },
     // The Earth panel's ϖ of date — the PUBLISHED Sun-tier
     // value (the series + the osculating-mean offset), the ONE home of the
