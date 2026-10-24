@@ -143,9 +143,9 @@
    "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",
    "packages/physics/src/model/published-periods.js": "sha256:245e65eb1acfe27a66cad6675a8ac717d153538e7fd09e47fde38a501daa2052",
    "packages/physics/src/model/sun-and-eclipses.js": "sha256:b527052caf0a28396a60e5caedeaa1190440a3e750efd685ead1c3011a33f0cf",
-   "packages/physics/src/model/surface.js": "sha256:59babe05c7820896b1634ca9591c6012dcd3e86d12df4e33aaf701d1b4ffda74",
+   "packages/physics/src/model/surface.js": "sha256:de0b6a7030d6357e92a2811b6f80857a8d29b027aee19fb68c4a9ba60cb13ecf",
    "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
-   "packages/physics/src/model/year-day-lengths.js": "sha256:5347143671226896de6e359389b58f234fe3d389f85b0e82d112cd1cdc6d24d5",
+   "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:b1d5d59f64af940b6acc1f4c6880c7b2813566dd7099275e61e33ea1b8de5a6b",
    "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
    "tools/verify/obliquity-hybrid.js": "sha256:0fdaf3d967391a62f8fad1ad4ad75324691e743d4f50b0eade52f7c78f59b6bc"

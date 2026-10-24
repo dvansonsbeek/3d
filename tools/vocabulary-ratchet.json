@@ -238,11 +238,11 @@
     },
     "code:tools/lib/scene-graph.js": {
       "deletion narrative": 5,
-      "plan-step label": 13
+      "plan-step label": 12
     },
     "code:tools/docs/model-values.mjs": {
       "H-divisor label": 2,
-      "comb / lattice": 4,
+      "comb / lattice": 3,
       "deletion narrative": 3,
       "plan-step label": 11
     },
@@ -405,7 +405,7 @@
       "era device / K device": 7,
       "comb / lattice": 10,
       "deletion narrative": 12,
-      "plan-step label": 79
+      "plan-step label": 78
     }
   }
 }

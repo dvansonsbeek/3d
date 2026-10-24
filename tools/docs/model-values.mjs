@@ -1129,15 +1129,9 @@ export const VALUES = {
   // one final digit below the simulator's readout (86,164.098895 vs .098896;
   // fixed website-side, snapshot regenerated).
   ...(() => {
-    const meanSiderealDaySeconds = () =>
-      (C.meanSolarYearDays / (C.meanSolarYearDays + 1)) * C.meanLengthOfDay;
-    // the stellar-day offset counts one equinox turn per T_p (the certified
-    // J2000 precession period).
-    const meanStellarDaySeconds = () => {
-      const raProjMean = C.STELLAR_DAY_RA_PROJECTION;   // cos ε₀ on the IAU J2000 input (plan 09; the comb's fitted mean before)
-      const d = meanSiderealDaySeconds();
-      return (d / dtl().certifiedAxialPrecessionJ2000Years()) / (C.meanSolarYearDays + 1) * raProjMean + d;
-    };
+    // the mean sidereal and stellar day — tools/lib/constants.js's exports, the ONE home
+    const meanSiderealDaySeconds = () => C.meanSiderealDay;
+    const meanStellarDaySeconds = () => C.meanStellarDay;
     return {
       meanSolarYearDays:     { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 7), unit: 'd' },
       meanSolarYearDaysFull: { get: () => C.meanSolarYearDays, render: (v) => thousands(v, 12), unit: 'd', note: 'full-precision form for derivation contexts' },
@@ -1672,7 +1666,7 @@ export const VALUES = {
         get: () => astro.knownValues.mainstreamObliqRangeMinDeg,
         render: (v) => `~${v}° to ~${astro.knownValues.mainstreamObliqRangeMaxDeg}°`,
       },
-      mainstreamAxialPrecExact:  { get: () => 1296000 / astro.earthOrbital.generalPrecessionJ2000_arcsecPerYr, render: (v) => `~${thousands(v)}`, unit: 'yr', note: 'the mainstream axial-precession period — 1,296,000″ / the IAU 2006 general precession p_A (the model’s own J2000 input since plan 09), DERIVED here, not typed beside it (was knownValues.mainstreamAxialPrecExactYr 25771)' },
+      mainstreamAxialPrecExact:  { get: () => dtl().certifiedAxialPrecessionJ2000Years(), render: (v) => `~${thousands(v)}`, unit: 'yr', note: 'the mainstream axial-precession period — 1,296,000″ / the IAU 2006 general precession p_A (the model’s own J2000 input since plan 09), DERIVED here, not typed beside it (was knownValues.mainstreamAxialPrecExactYr 25771)' },
       mainstreamPeriPrecExact:   { get: () => astro.knownValues.mainstreamPeriPrecExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
       mainstreamObliqCycleExact: { get: () => astro.knownValues.mainstreamObliqCycleExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },
       mainstreamInclCycleExact:  { get: () => astro.knownValues.mainstreamInclCycleExactYr, render: (v) => `~${thousands(v)}`, unit: 'yr' },

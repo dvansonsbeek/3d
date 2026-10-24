@@ -54,24 +54,6 @@ export type BesselianDeps = {
         speedOfLightKmS: number;
     };
 };
-/**
- * @typedef {Object} BesselianDeps
- * @property {(dDaysTT: number) => {lonDeg: number, latDeg: number, distKm: number}} moonFullAtDaysTT
- *   full-series Moon: ecliptic-of-date longitude/latitude (deg) + distance (km), TT axis (days since J2000)
- * @property {(jdUT: number) => number} sunLonDegAt - geometric mean sun longitude (deg), JD(UT) axis with the finder's internal ΔT
- * @property {(T: number) => number} sunCompletionDeg - planetary completion (deg) at T centuries TT, SUBTRACTED from the finder sun (see eclipse/sun-planetary-completion.cjs; the finders deliberately stay without it — their fitted anchors and certified canon statistics were produced on the bare form, and elongation-class timing absorbs the omission into the fitted phases)
- * @property {(year: number) => number} sunAberrationDegAt - the Sun's derived planetary aberration κ (deg) at calendar year, SUBTRACTED from the geometric Sun longitude (the apparent Sun; see the header)
- * @property {(jd: number) => number} deltaTSecondsAt - framework ΔT (J2000-zeroed convention)
- * @property {(year: number) => number} obliquityDegAt - framework obliquity (deg) at calendar year
- * @property {(year: number) => number} eccentricityAt - framework Earth-orbit eccentricity at calendar year
- * @property {(year: number) => number} perihelionLongitudeDegAt - framework perihelion longitude (deg) at calendar year
- * @property {(jd: number) => number} yearFromJD - the model's own JD → calendar-year conversion
- * @property {{ j2000JD: number, julianCenturyDays: number, earthDiameterKm: number,
- *   moonDiameterKm: number, sunDiameterKm: number, sunDistanceKm: number,
- *   earthFlatteningInverse: number, ttBridgeSeconds: number,
- *   gmstMeanSiderealT0Deg: number, gmstMeanSiderealRateDegPerDay: number,
- *   gmstMeanSiderealT2Deg: number, speedOfLightKmS: number }} constants
- */
 /** @param {BesselianDeps} deps */
 export function createBesselian(deps: BesselianDeps): {
     umbraGroundAt: (jdUT: number) => {
@@ -96,4 +78,41 @@ export function createBesselian(deps: BesselianDeps): {
         };
         centralDurationSeconds: number | null;
     };
+    gmstDeg: (jdUT: number) => number;
 };
+/**
+ * @typedef {Object} BesselianDeps
+ * @property {(dDaysTT: number) => {lonDeg: number, latDeg: number, distKm: number}} moonFullAtDaysTT
+ *   full-series Moon: ecliptic-of-date longitude/latitude (deg) + distance (km), TT axis (days since J2000)
+ * @property {(jdUT: number) => number} sunLonDegAt - geometric mean sun longitude (deg), JD(UT) axis with the finder's internal ΔT
+ * @property {(T: number) => number} sunCompletionDeg - planetary completion (deg) at T centuries TT, SUBTRACTED from the finder sun (see eclipse/sun-planetary-completion.cjs; the finders deliberately stay without it — their fitted anchors and certified canon statistics were produced on the bare form, and elongation-class timing absorbs the omission into the fitted phases)
+ * @property {(year: number) => number} sunAberrationDegAt - the Sun's derived planetary aberration κ (deg) at calendar year, SUBTRACTED from the geometric Sun longitude (the apparent Sun; see the header)
+ * @property {(jd: number) => number} deltaTSecondsAt - framework ΔT (J2000-zeroed convention)
+ * @property {(year: number) => number} obliquityDegAt - framework obliquity (deg) at calendar year
+ * @property {(year: number) => number} eccentricityAt - framework Earth-orbit eccentricity at calendar year
+ * @property {(year: number) => number} perihelionLongitudeDegAt - framework perihelion longitude (deg) at calendar year
+ * @property {(jd: number) => number} yearFromJD - the model's own JD → calendar-year conversion
+ * @property {{ j2000JD: number, julianCenturyDays: number, earthDiameterKm: number,
+ *   moonDiameterKm: number, sunDiameterKm: number, sunDistanceKm: number,
+ *   earthFlatteningInverse: number, ttBridgeSeconds: number,
+ *   gmstMeanSiderealT0Deg: number, gmstMeanSiderealRateDegPerDay: number,
+ *   gmstMeanSiderealT2Deg: number, speedOfLightKmS: number }} constants
+ */
+/** Mean sidereal time at Greenwich, degrees (mean equinox — pairs with the
+ *  mean-of-date body longitudes; coefficients single-sourced from
+ *  astro-reference.json physicalConstants). THE ONE GMST of the model: the
+ *  eclipse location tier, the API's observer tier, the eclipse and lunar
+ *  audits and the browser's diagnostics all read it. Meeus 12.4's
+ *  cubic term (−T³/38,710,000) is deliberately absent: it is 0.9″ in the
+ *  eclipse canon and at most 93″ (6 s of time) at the edge of the observer
+ *  era, and every recorded eclipse and lunar value was measured without it.
+ *  @param {number} jdUT
+ *  @param {{ j2000JD: number, julianCenturyDays: number, gmstMeanSiderealT0Deg: number, gmstMeanSiderealRateDegPerDay: number, gmstMeanSiderealT2Deg: number }} K
+ *  @returns {number} */
+export function computeGmstDeg(jdUT: number, K: {
+    j2000JD: number;
+    julianCenturyDays: number;
+    gmstMeanSiderealT0Deg: number;
+    gmstMeanSiderealRateDegPerDay: number;
+    gmstMeanSiderealT2Deg: number;
+}): number;

@@ -526,11 +526,11 @@
       "data/rspa20160404supp2/Table-S12.txt": "sha256:f8f24b020db4af857c184cc164212e07d5109efda2a9c6da7551130022f1abc6",
       "data/rspa20160404supp2/Table-S13.txt": "sha256:515a56e47aeec316f35f509ab699187a3ed8f0b220ad131c34133ec34dddc7ce",
       "data/rspa20160404supp2/Table-S14.txt": "sha256:67485e0c349f5c2e7ec3aa4f7952e93832fc1d6728f4bd8f4bfbcd26f7c6a6e6",
-      "packages/api/src/app.js": "sha256:55559c98b510b2aaa98b336e6713d7622c83905a4fbd15143273a6ac84fe1412",
+      "packages/api/src/app.js": "sha256:5664841ccb1b5cd8e0e101205c901f98dbff00b0eba80f2994268ddb1449a3d0",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:9ef39bf53a66a5ddbcb79b34d0442c322aa2fc0e4edced3ec11394c7ae1de8dc",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
-      "packages/physics/src/earth/year-lengths.cjs": "sha256:ad86136a5455e5d846cee9cd03f55dc66b942edab56fa5c57f51fa2923decdb2",
+      "packages/physics/src/earth/year-lengths.cjs": "sha256:e61f895cded7dbf61754628196c4ddf8a1e0f15d056bdabca696f77864ff94d6",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
       "packages/physics/src/model/cardinal-instants.js": "sha256:66caad766e1a3fd80f52a2d235166a558d6eb2c15188463a76ef96f2e27449d3",
@@ -548,9 +548,9 @@
       "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",
       "packages/physics/src/model/published-periods.js": "sha256:245e65eb1acfe27a66cad6675a8ac717d153538e7fd09e47fde38a501daa2052",
       "packages/physics/src/model/sun-and-eclipses.js": "sha256:b527052caf0a28396a60e5caedeaa1190440a3e750efd685ead1c3011a33f0cf",
-      "packages/physics/src/model/surface.js": "sha256:59babe05c7820896b1634ca9591c6012dcd3e86d12df4e33aaf701d1b4ffda74",
+      "packages/physics/src/model/surface.js": "sha256:de0b6a7030d6357e92a2811b6f80857a8d29b027aee19fb68c4a9ba60cb13ecf",
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
-      "packages/physics/src/model/year-day-lengths.js": "sha256:5347143671226896de6e359389b58f234fe3d389f85b0e82d112cd1cdc6d24d5",
+      "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
       "packages/physics/src/moon/arguments.cjs": "sha256:69f7a7f8a6204645b6c83338333115f95aeada925a03eb68ac77d8435934236d",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
@@ -565,7 +565,7 @@
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
-      "tools/verify/lunar-alignment.js": "sha256:1e9d2671d6292955c95486ee2eeebd255709e3e257b8cf158485265f2b4394e8"
+      "tools/verify/lunar-alignment.js": "sha256:f97c2032ae8cd8e08439919ce6ab7a49c12634d6abf7a8dae74a2db9e65a7338"
     }
   }
 }

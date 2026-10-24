@@ -42,6 +42,7 @@
 //   • The frozen era clock stays the certified era device (opt-out /
 //     era-certification record), not a member of this family.
 
+const { wrap180 } = require('../math/angles.cjs');
 const { createCardinalStructure } = require('../cardinal/one-source-structure.cjs');
 const { createSiderealYearChannel } = require('./sidereal-year-channel.cjs');
 
@@ -64,7 +65,7 @@ function createYearLengths({ sampleAt, massLossSiderealSecondsAtYearFn }) {
   if (typeof sampleAt !== 'function' || typeof massLossSiderealSecondsAtYearFn !== 'function') {
     throw new Error('createYearLengths: sampleAt and massLossSiderealSecondsAtYearFn are required');
   }
-  const w180 = (/** @type {number} */ d) => ((d + 540) % 360) - 180;
+  const w180 = wrap180;   // math/angles — bit-identical to the former inline form for the sub-degree differences wrapped here
   const chan = createSiderealYearChannel({ massLossSiderealSecondsAtYearFn });
   /** A year length from a longer year and a retrograde angular rate of the
    *  reference point, RATE form: 1/T = 1/T_long + p/(360°·JY) — exact (the

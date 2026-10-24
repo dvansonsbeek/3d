@@ -69,6 +69,8 @@
 
 'use strict';
 
+const { wrap180 } = require('../math/angles.cjs');
+
 /**
  * @typedef {Object} BesselianDeps
  * @property {(dDaysTT: number) => {lonDeg: number, latDeg: number, distKm: number}} moonFullAtDaysTT
@@ -88,6 +90,23 @@
  *   gmstMeanSiderealT2Deg: number, speedOfLightKmS: number }} constants
  */
 
+/** Mean sidereal time at Greenwich, degrees (mean equinox — pairs with the
+ *  mean-of-date body longitudes; coefficients single-sourced from
+ *  astro-reference.json physicalConstants). THE ONE GMST of the model: the
+ *  eclipse location tier, the API's observer tier, the eclipse and lunar
+ *  audits and the browser's diagnostics all read it. Meeus 12.4's
+ *  cubic term (−T³/38,710,000) is deliberately absent: it is 0.9″ in the
+ *  eclipse canon and at most 93″ (6 s of time) at the edge of the observer
+ *  era, and every recorded eclipse and lunar value was measured without it.
+ *  @param {number} jdUT
+ *  @param {{ j2000JD: number, julianCenturyDays: number, gmstMeanSiderealT0Deg: number, gmstMeanSiderealRateDegPerDay: number, gmstMeanSiderealT2Deg: number }} K
+ *  @returns {number} */
+function computeGmstDeg(jdUT, K) {
+  const T = (jdUT - K.j2000JD) / K.julianCenturyDays;
+  return ((K.gmstMeanSiderealT0Deg + K.gmstMeanSiderealRateDegPerDay * (jdUT - K.j2000JD)
+    + K.gmstMeanSiderealT2Deg * T * T) % 360 + 360) % 360;
+}
+
 /** @param {BesselianDeps} deps */
 function createBesselian(deps) {
   const K = deps.constants;
@@ -97,14 +116,8 @@ function createBesselian(deps) {
   const R_MOON_KM = K.moonDiameterKm / 2;
   const F = 1 / K.earthFlatteningInverse;
 
-  /** Mean sidereal time at Greenwich, degrees (mean equinox — pairs with the
-   *  mean-of-date body longitudes; coefficients single-sourced from
-   *  astro-reference.json physicalConstants). @param {number} jdUT @returns {number} */
-  function gmstDeg(jdUT) {
-    const T = (jdUT - K.j2000JD) / K.julianCenturyDays;
-    return ((K.gmstMeanSiderealT0Deg + K.gmstMeanSiderealRateDegPerDay * (jdUT - K.j2000JD)
-      + K.gmstMeanSiderealT2Deg * T * T) % 360 + 360) % 360;
-  }
+  /** @param {number} jdUT @returns {number} */
+  const gmstDeg = (jdUT) => computeGmstDeg(jdUT, K);
 
   /** Ecliptic-of-date → equatorial-of-date vector (km).
    *  @param {number} lonDeg @param {number} betDeg @param {number} distKm
@@ -150,7 +163,7 @@ function createBesselian(deps) {
     const moon = deps.moonFullAtDaysTT(dTT);
     const H_DAYS = 0.02;
     const dLon = deps.moonFullAtDaysTT(dTT + H_DAYS).lonDeg - deps.moonFullAtDaysTT(dTT - H_DAYS).lonDeg;
-    const moonRateDegPerDay = (((dLon + 540) % 360) - 180) / (2 * H_DAYS);
+    const moonRateDegPerDay = wrap180(dLon) / (2 * H_DAYS);
     const tauDays = moon.distKm / K.speedOfLightKmS / 86400;
     return {
       S: eclToEq(sunLon, 0, sunDistanceKm(year, sunLon), eps),
@@ -310,7 +323,7 @@ function createBesselian(deps) {
     return { kind, magnitude: Math.max(0, atMax.magnitude), maxJd, contacts, centralDurationSeconds };
   }
 
-  return { umbraGroundAt, shadowStateAt, localCircumstances };
+  return { umbraGroundAt, shadowStateAt, localCircumstances, gmstDeg };
 }
 
-module.exports = { createBesselian };
+module.exports = { createBesselian, computeGmstDeg };

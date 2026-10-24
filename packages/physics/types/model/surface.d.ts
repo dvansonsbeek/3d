@@ -227,6 +227,8 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
             latDeg: number;
             lonDeg: number;
         } | null;
+        /** THE ONE GMST — mean sidereal time at Greenwich, degrees, at a UT JD (eclipse/besselian.cjs computeGmstDeg; the observer tier's hour angle). @param {number} jdUT @returns {number} */
+        gmstDegAtJD: (jdUT: number) => number;
         solarLocalCircumstances: (jdGreatest: number, latDeg: number, lonDeg: number) => {
             kind: "none" | "partial" | "annular" | "total";
             magnitude: number;

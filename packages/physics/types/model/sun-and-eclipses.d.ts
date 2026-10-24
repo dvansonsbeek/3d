@@ -23,6 +23,7 @@ export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
             };
             centralDurationSeconds: number | null;
         };
+        gmstDeg: (jdUT: number) => number;
     };
     eclipseFinders: {
         sunLonDegAt: (jd: number) => number;

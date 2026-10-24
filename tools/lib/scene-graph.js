@@ -730,8 +730,8 @@ function buildSceneGraph() {
     orbitTilta: 0, orbitTiltb: 0,
     orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
     // The Earth wobble circle has radius 0: the wobble centre IS Earth, so every
-    // instrument that reads "from the wobble centre" (getWobbleSunDistAU, the
-    // Step-6a export, the report's Method B) is Earth-frame by construction
+    // instrument that reads "from the wobble centre" (the Step-6a export, the
+    // report's Method B) is Earth-frame by construction
     // (measured: a non-zero radius advanced the perihelion 8 % too fast —
     // anomalistic year 365.2611 d vs IAU 365.2596 — while from Earth the scene
     // reproduces IAU, 365.25962 d).
@@ -1125,24 +1125,6 @@ function getGraph() {
   return _graph;
 }
 
-/** Invalidate cached scene graph (forces rebuild on next use). */
-function _invalidateGraph() {
-  _graph = null;
-  // §12g-5: the moon-series factory captures C.moonMeeusLpCorrection BY VALUE
-  // at creation (measured: moon-eclipse-optimizer's mutations never reached
-  // the series — the "after Lp" RMS line could not move and consecutive
-  // --write runs oscillated between two Lp values instead of converging).
-  // Dropping the series here re-wires it with the live constant; creation is
-  // closure-only (the Meeus term arrays are module-level, not rebuilt).
-  //
-  // ONLY the series is dropped, deliberately. The other singletons capture no
-  // fit-mutated values (the Moon's RA/Dec conversion has none since R3 item 1)
-  // and _chainCyclesM memoizes Float64Array integral
-  // tables: a blanket reset here was measured to turn the ~1-min optimizer
-  // step into a >10-min run by rebuilding those tables every iteration.
-  _moonSeriesMTools = null;
-}
-
 /**
  * Compute geocentric RA/Dec for a planet or the Moon at a given Julian Day.
  *
@@ -1446,14 +1428,6 @@ function thetaToRaDeg(theta) {
 }
 
 /**
- * Convert Three.js spherical RA (theta) to hours [0, 24).
- */
-function thetaToRaHours(theta) {
-  if (theta < 0) theta += 2 * Math.PI;
-  return theta * 12 / Math.PI;
-}
-
-/**
  * Get Sun's world-space angle (for sidereal year measurement).
  * Returns atan2(z, x) in degrees [0, 360).
  */
@@ -1465,21 +1439,6 @@ function getSunWorldAngle(jd) {
   const sunWP = graph.sunNodes.pivot.getWorldPosition();
   let angle = Math.atan2(sunWP[2], sunWP[0]) * 180 / Math.PI;
   return ((angle % 360) + 360) % 360;
-}
-
-/**
- * Get WobbleCenter-Sun distance in AU (for perihelion/aphelion detection).
- * Uses the fixed wobble center (scene origin) → Sun, NOT Earth → Sun.
- * This measures the true anomalistic orbit without axial-precession noise.
- */
-function getWobbleSunDistAU(jd) {
-  const graph = getGraph();
-  _syncEpochForJD(jd);
-  const pos = _posFromJDTools(jd);
-  moveModel(graph, pos);
-  // WobbleCenter is at the scene origin (0,0,0)
-  const sunWP = graph.sunNodes.pivot.getWorldPosition();
-  return Math.sqrt(sunWP[0]*sunWP[0] + sunWP[1]*sunWP[1] + sunWP[2]*sunWP[2]) / 100;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1561,23 +1520,14 @@ module.exports = {
   computePlanetPosition,
   computeSunPositionFast,
   getSunWorldAngle,
-  getWobbleSunDistAU,
   phiToDecDeg,
   thetaToRaDeg,
-  thetaToRaHours,
-  buildSceneGraph,
   moveModel,
-  _invalidateGraph,
   // Expose internals for testing
-  Mat4,
   Node,
-  cartesianToSpherical,
   _getGraphForProbe: () => getGraph(),   // research probes: the internal graph AFTER a computePlanetPosition call
   _injectKeplerChains: (chains) => { _chainChains = chains; },   // research probes (K4.5 acceptance): override the flag path's chains (null → reload from the artifact)
-  _chainDebugR: () => _chainR,   // research probes (K4b parity): the J2000 pose bridge (R4: the one frame)
   _moonSeriesForProbe: () => _moonSeriesM(),   // research probes: the shared Meeus series (incl. the truncated eclipse-finder forms)
-  _moonArgsForProbe: () => _moonArgsM(),   // research probes (plan 06 R5, the Moon twin split): this engine's argument factory
-  _moonChainForProbe: () => ({ tropical: _mcTropical, apsidalOfDate: _mcApsidalOfDate, nodalOfDate: _mcNodalOfDate, epsDeg: (y) => _oneSourceM().epsDeg(y) }),   // research probes: the injected chain wrappers
   // The Moon SERIES inputs at a UT JD (lon/lat deg, dist km) — the cross-engine
   // gate's Moon rows.
   moonSeriesInputsAt: (jd) => { computePlanetPosition('moon', jd); const n = getGraph().moonNodes; return { lonDeg: n._meeusLonDeg, latDeg: n._meeusLatDeg, distKm: n._meeusDistKm }; },

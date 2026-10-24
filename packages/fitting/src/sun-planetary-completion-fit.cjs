@@ -47,6 +47,7 @@
 const { join } = require('node:path');
 const { readFileSync } = require('node:fs');
 const { createSunPlanetaryCompletion } = require('@essrt/physics/eclipse/sun-planetary-completion');
+const { wrap180 } = require('@essrt/physics/math/angles');
 // Frozen dev-record values of the derived EMB wobble (a_M·μ/AU) and — since
 // the N3 carrier swap — the framework carrier rates (deg/cy TT, computed
 // live from the records by the model wiring; frozen here at the N3-landing
@@ -72,7 +73,7 @@ const D2R = Math.PI / 180;
 const BRIDGE = FITTED_COEFFICIENTS.DT_ANCHOR.deltaTStartSeconds / 86400;   // the joint fit's anchor (plan 14: its own artifact)
 const LP = 0;   // the fitted mean-longitude anchor, retired to 0 at plan 06 R3 item 1; its key left the inputs at plan 11 step 2
 const N = C.physicalConstants.nutationLeadingTermsArcsec;
-const wrap = (d) => ((d + 540) % 360) - 180;
+const wrap = wrap180;   // math/angles — the residuals wrapped here are arcsecond-class
 
 // deterministic all-phase epochs (same LCG/seed as the shipping run)
 const J0 = model.time.jdFromYear(1970), J1 = model.time.jdFromYear(2050);
@@ -198,8 +199,7 @@ console.log(`\n3. SYZYGY (n ${SROWS.length}): raw mean ${e0.m.toFixed(1)}″ RMS
 const CL = JSON.parse(readFileSync(join(ROOT, 'public/input/solar-eclipse-centerlines-nasa.json'), 'utf8'));
 const R_E = C.bodyDiametersKm.earth / 2;
 const efUnit = (la, lo) => [-Math.cos(la * D2R) * Math.cos(lo * D2R), Math.sin(la * D2R), Math.cos(la * D2R) * Math.sin(lo * D2R)];
-const K2 = C.physicalConstants;
-const gmst = (jd) => { const T = (jd - 2451545.0) / 36525; return ((K2.gmstMeanSiderealT0Deg + K2.gmstMeanSiderealRateDegPerDay * (jd - 2451545.0) + K2.gmstMeanSiderealT2Deg * T * T) % 360 + 360) % 360; };
+const gmst = (jd) => model.eclipse.gmstDegAtJD(jd);   // the ONE GMST (bit-identical to the former inline copy)
 console.log('\n4. CENTERLINES (shadow-plane ″ through the shipped tier):');
 const all = [];
 for (const ev of CL.events) {

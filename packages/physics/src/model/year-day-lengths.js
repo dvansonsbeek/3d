@@ -7,7 +7,7 @@ import { ONE_FAMILY_WINDOW_YEARS } from '../earth/year-lengths.cjs';
 
 /** @param {import('./earth-scalars.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleYearDayLengths(ctx) {
-  const { C, late, deepLod, meanLengthOfDay, yearToTMa } = ctx;
+  const { chain, late, deepLod, meanLengthOfDay, yearToTMa } = ctx;
   // The year lengths of date in DAYS are the published SI year lengths over
   // the kinematic day of date; the kinematic day of date is the Layer-0 tidal
   // mean LOD, exactly ω₀ (the SI day) at J2000.
@@ -19,7 +19,7 @@ export function assembleYearDayLengths(ctx) {
    * surface all read it (the identifier predates the anchor's move onto the
    * IAU input). @returns {number} */
   function certifiedAxialPrecessionJ2000Years() {
-    return 1296000 / C.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
+    return chain.certifiedAxialPrecessionJ2000Years();   // the ONE home: the deep-time chain's export (1,296,000 / p_A on the same constants)
   }
   /** Kinematic day of date (Layer 0 tidal mean LOD; ω₀ at J2000). Past the
    *  tidal-lock asymptote the chain is null — the J2000 day stands in.

@@ -183,6 +183,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
             latDeg: number;
             lonDeg: number;
         } | null;
+        gmstDegAtJD: (jdUT: number) => number;
         solarLocalCircumstances: (jdGreatest: number, latDeg: number, lonDeg: number) => {
             kind: "none" | "partial" | "annular" | "total";
             magnitude: number;

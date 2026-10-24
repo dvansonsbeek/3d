@@ -312,6 +312,8 @@ export function assembleSurface(ctx) {
       }),
       // 20.3g location tier (see eclipse/besselian.cjs):
       umbraGroundAtJD: /** @param {number} jd @returns {{latDeg: number, lonDeg: number} | null} */ (jd) => besselian.umbraGroundAt(jd),
+      /** THE ONE GMST — mean sidereal time at Greenwich, degrees, at a UT JD (eclipse/besselian.cjs computeGmstDeg; the observer tier's hour angle). @param {number} jdUT @returns {number} */
+      gmstDegAtJD: (jdUT) => besselian.gmstDeg(jdUT),
       solarLocalCircumstances: /** @param {number} jdGreatest @param {number} latDeg @param {number} lonDeg */ (jdGreatest, latDeg, lonDeg) => besselian.localCircumstances(jdGreatest, latDeg, lonDeg),
     }),
     climate: Object.freeze({

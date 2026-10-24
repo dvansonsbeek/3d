@@ -263,6 +263,10 @@ const NOT_IN_SCRIPT = {
     + 'registry (obliqChapront* keys) for the Model-vs-literature tables; the browser '
     + 'never quotes them',
   'astro.knownValues': 'validation targets for the model-values registry (the comb-era moon-cycles.js reader was deleted at plan 09 step 7e)',
+  'astro.physicalConstants.gmstMeanSiderealT0Deg': 'the GMST polynomial has ONE home, eclipse/besselian.cjs computeGmstDeg; '
+    + 'script.js reads createModel().eclipse.gmstDegAtJD (the five diagnostics that carried inline copies, two with a cubic term).',
+  'astro.physicalConstants.gmstMeanSiderealRateDegPerDay': 'see gmstMeanSiderealT0Deg — the ONE GMST.',
+  'astro.physicalConstants.gmstMeanSiderealT2Deg': 'see gmstMeanSiderealT0Deg — the ONE GMST.',
   'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2': 'ELP W1 T^2 budget — analysis only, tools/explore/v4-kpl-budget.js',
   'astro.cardinalPointAnchors': 'the observed USNO 2000 cardinal instants (UTC, minute precision) — reference data, '
     + 'no runtime reader (the cardinal instants are createModel().cardinal); quoted by the pipeline verifier\'s '

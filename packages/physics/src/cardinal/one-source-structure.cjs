@@ -40,6 +40,8 @@
  * like createDeepOrbitalHistory injects its surfaces.
  */
 
+const { wrap180 } = require('../math/angles.cjs');
+
 const D2R = Math.PI / 180;
 
 /** Cardinal longitudes, equinox of date. @type {Record<string, number>} */
@@ -134,7 +136,7 @@ function createCardinalStructure({ sampleAt, tropicalYearSecondsAtYearFn }) {
   function anomalisticYearSeconds(year) {
     const p0 = sampleAt(year).periOfDateDeg;
     const p1 = sampleAt(year + 1).periOfDateDeg;
-    const dPeriDeg = ((p1 - p0 + 540) % 360) - 180;   // wrapped, prograde +
+    const dPeriDeg = wrap180(p1 - p0);   // wrapped, prograde + (math/angles; a one-year step, far below 180°)
     return tropicalYearSecondsAtYearFn(year + 0.5) * 360 / (360 - dPeriDeg);
   }
 

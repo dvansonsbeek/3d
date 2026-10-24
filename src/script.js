@@ -2252,7 +2252,7 @@ function dLodDtDecompositionAtAge(t_Ma) {
 // 1,296,000/p_A = 25,771.575 Julian years; twin of the chain's
 // certifiedAxialPrecessionJ2000Years.
 function _certifiedAxialPrecessionJ2000Years() {
-  return 1296000 / K.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
+  return _dtc().certifiedAxialPrecessionJ2000Years();   // the ONE home: the deep-time chain's export (1,296,000 / p_A)
 }
 /** The J2000 anomalistic year, DAYS — the one-family law of date at 2000: the
  *  sidereal year and the series' own apsidal rate (11.609 ″/yr), the movement
@@ -23423,9 +23423,7 @@ function setupGUI() {
       const dec = Math.asin(sinDec) * _r2d;
       let ra = Math.atan2(Math.cos(eps) * Math.sin(λ), Math.cos(λ)) * _r2d;
       if (ra < 0) ra += 360;
-      const T_UT = (jd_UT - j2000JD) / julianCenturyDays;
-      let gmst = (280.46061837 + 360.98564736629 * (jd_UT - j2000JD)
-                + 0.000387933 * T_UT * T_UT - T_UT ** 3 / 38710000) % 360;
+      let gmst = _tierModelB().eclipse.gmstDegAtJD(jd_UT);   // the ONE GMST
       if (gmst < 0) gmst += 360;
       let lon = ra - gmst;
       while (lon > 180)  lon -= 360;
@@ -23568,8 +23566,7 @@ function setupGUI() {
     const sun_dec = Math.asin(Math.sin(eps) * Math.sin(meeus_sun_lon * _d2r)) * _r2d;
     let sun_RA = Math.atan2(Math.cos(eps) * Math.sin(meeus_sun_lon * _d2r), Math.cos(meeus_sun_lon * _d2r)) * _r2d;
     if (sun_RA < 0) sun_RA += 360;
-    const T_UT = (JD_135 - j2000JD) / julianCenturyDays;
-    let gmst = (280.46061837 + 360.98564736629 * (JD_135 - j2000JD) + 0.000387933 * T_UT * T_UT) % 360;
+    let gmst = _tierModelB().eclipse.gmstDegAtJD(JD_135);   // the ONE GMST
     if (gmst < 0) gmst += 360;
     let ss_lon = sun_RA - gmst;
     while (ss_lon > 180)  ss_lon -= 360;
@@ -23700,10 +23697,8 @@ function setupGUI() {
     //   sub_solar_lon_east = α_sun − GMST  →  GMST = α_sun − sub_solar_lon
     const sun_scene_ra_deg = ((_sun_alpha * 180 / Math.PI) + 360) % 360;
     const framework_GMST_deg = ((sun_scene_ra_deg - fw_subsolar_nasaUT.lon) % 360 + 360) % 360;
-    // IAU standard (Meeus eq. 12.4)
-    const _d_j2000 = NASA_UT_greatest_JD - j2000JD;
-    const _Tcen = _d_j2000 / julianCenturyDays;
-    const iau_GMST_deg = wrap360(280.46061837 + 360.98564736629 * _d_j2000 + 0.000387933 * _Tcen * _Tcen - _Tcen * _Tcen * _Tcen / 38710000);
+    // IAU standard (Meeus eq. 12.4 without its cubic term — the model's ONE GMST)
+    const iau_GMST_deg = _tierModelB().eclipse.gmstDegAtJD(NASA_UT_greatest_JD);
     const gmst_diff_deg = ((framework_GMST_deg - iau_GMST_deg + 540) % 360) - 180;
     console.log('    (C) GMST (Earth rotation angle) at NASA-UT:');
     console.log(`        Framework implicit: ${framework_GMST_deg.toFixed(4)}°`);
@@ -23781,8 +23776,7 @@ function setupGUI() {
       const sun_dec_e = Math.asin(Math.sin(eps_e) * Math.sin(meeus_sun_lon_e * _d2r)) * _r2d;
       let sun_RA_e = Math.atan2(Math.cos(eps_e) * Math.sin(meeus_sun_lon_e * _d2r), Math.cos(meeus_sun_lon_e * _d2r)) * _r2d;
       if (sun_RA_e < 0) sun_RA_e += 360;
-      const T_UT_e = (jd - j2000JD) / julianCenturyDays;
-      let gmst_e = (280.46061837 + 360.98564736629 * (jd - j2000JD) + 0.000387933 * T_UT_e * T_UT_e) % 360;
+      let gmst_e = _tierModelB().eclipse.gmstDegAtJD(jd);   // the ONE GMST
       if (gmst_e < 0) gmst_e += 360;
       let ssLon_e = sun_RA_e - gmst_e;
       while (ssLon_e > 180)  ssLon_e -= 360;
@@ -23877,8 +23871,7 @@ function setupGUI() {
       const sunDec = Math.asin(Math.sin(eps_pu) * Math.sin(sunLon * _d2r)) * _r2d;
       let sunRA_pu = Math.atan2(Math.cos(eps_pu) * Math.sin(sunLon * _d2r), Math.cos(sunLon * _d2r)) * _r2d;
       if (sunRA_pu < 0) sunRA_pu += 360;
-      const T_UT_pu = (jd_UT - j2000JD) / julianCenturyDays;
-      let gmst_pu = (280.46061837 + 360.98564736629 * (jd_UT - j2000JD) + 0.000387933 * T_UT_pu * T_UT_pu) % 360;
+      let gmst_pu = _tierModelB().eclipse.gmstDegAtJD(jd_UT);   // the ONE GMST
       if (gmst_pu < 0) gmst_pu += 360;
       let ssLon_pu = sunRA_pu - gmst_pu;
       while (ssLon_pu > 180)  ssLon_pu -= 360;

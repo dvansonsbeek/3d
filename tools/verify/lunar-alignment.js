@@ -468,10 +468,7 @@ async function main() {
   const D2R = Math.PI / 180;
   const pcObs = steph.entries.filter((e) =>
     /^S0[124]$/.test(e.source_table) && e.year >= -800 && e.year <= -301 && e.dt_observed_sec != null);
-  const pcGmst = (jd) => {
-    const T = (jd - 2451545.0) / 36525;
-    return ((280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T) % 360 + 360) % 360;
-  };
+  const pcGmst = (jd) => model.eclipse.gmstDegAtJD(jd);   // the ONE GMST (bit-identical to the former inline copy)
   const pcSunAlt = (jdUT) => {
     const lam = model.eclipse.sunLonDegAtJD(jdUT) * D2R;
     const eps = model.earth.obliquityDeg(model.time.yearFromJD(jdUT)) * D2R;

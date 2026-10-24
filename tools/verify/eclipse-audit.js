@@ -546,8 +546,7 @@ function sunGeomAt(jd, latDeg, lonDeg) {
   const eps = TIER.earth.obliquityDeg(year) * D2R;
   const lam = TIER.eclipse.sunLonDegAtJD(jb) * D2R;
   const T = (jd - 2451545.0) / 36525;
-  const gmst = ((K2.gmstMeanSiderealT0Deg + K2.gmstMeanSiderealRateDegPerDay * (jd - 2451545.0)
-    + K2.gmstMeanSiderealT2Deg * T * T) % 360 + 360) % 360;
+  const gmst = TIER.eclipse.gmstDegAtJD(jd);   // the ONE GMST (bit-identical to the former inline copy)
   const ra = Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam));
   const dec = Math.asin(Math.sin(lam) * Math.sin(eps));
   const H = ((gmst + lonDeg) * D2R) - ra;

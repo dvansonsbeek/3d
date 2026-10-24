@@ -465,8 +465,7 @@ export function createApi() {
       const eps = model.earth.obliquityDeg(model.time.yearFromJD(jd)) * D2R;
       const dec = Math.asin(Math.sin(bet) * Math.cos(eps) + Math.cos(bet) * Math.sin(eps) * Math.sin(lon));
       const ra = Math.atan2(Math.sin(lon) * Math.cos(eps) - Math.tan(bet) * Math.sin(eps), Math.cos(lon));
-      const T = (jd - 2451545.0) / 36525;
-      const gmstDeg = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T - T * T * T / 38710000;
+      const gmstDeg = model.eclipse.gmstDegAtJD(jd);   // the ONE GMST (the cubic term it lacks is ≤ 93″ in this era; measured: no recorded value moves)
       const hourAngle = ((gmstDeg + lonDeg) * D2R) - ra;
       const lat = latDeg * D2R;
       const sinAlt = Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(hourAngle);
