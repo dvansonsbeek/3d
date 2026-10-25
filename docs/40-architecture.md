@@ -37,7 +37,7 @@ status: current
 The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astronomical visualization tool that implements the Expanding Solar System Resonance Theory (ESSRT). It provides accurate planetary positions, precession cycles, and orbital mechanics calculations spanning hundreds of thousands of years.
 
 **Key Statistics:**
-- Single monolithic script.js (~39,000 lines since plan 18 retired the console-test folder)
+- Single monolithic script.js (~37,000 lines since plan 18 retired the console-test folder and plan 20 the dead code)
 - 10 rendered bodies (Sun, Earth, Moon and the seven chain planets)
 - 50+ astronomical calculation functions
 - Real-time 3D visualization at 60 FPS
@@ -171,7 +171,7 @@ The repository's layout — the browser monolith, the Node engine in `tools/lib/
 
 ### script.js Organization
 
-The monolithic script.js (~39,000 lines) is organized into logical sections. Constants are grouped by source (A = the scene epoch, the research toggles and the two display literals — the former model-parameters.json, retired leaf by leaf and deleted at plan 11 step 6, B = the shipped fit artifacts under data/ — the former fitted-coefficients.json, deleted at plan 11 step 1, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
+The monolithic script.js (~37,000 lines) is organized into logical sections. Constants are grouped by source (A = the scene epoch, the research toggles and the two display literals — the former model-parameters.json, retired leaf by leaf and deleted at plan 11 step 6, B = the shipped fit artifacts under data/ — the former fitted-coefficients.json, deleted at plan 11 step 1, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐

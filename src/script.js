@@ -1,5 +1,4 @@
 import * as THREE        from 'three';
-import Stats             from 'three/examples/jsm/libs/stats.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Pane } from 'tweakpane';
@@ -11,10 +10,10 @@ import { Pane } from 'tweakpane';
 //
 // Generated at build time, not fetched at runtime — the model parameters are
 // read at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createDeepCalendar, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, MOON_DISTANCE_ARTIFACT, deltaTEspenakMeeusCanonSeconds, evalClimateL1OrbitalPermil, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createDeepCalendar, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, MOON_DISTANCE_ARTIFACT, deltaTEspenakMeeusCanonSeconds, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
   // plan 13 B1/B3 — the one-home helpers (time/calendar, math/angles, earth/mass-chain, constants/units)
-  calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS, julianCalendarToJD, jdToJulianCalendar,
-  DEG2RAD, RAD2DEG, wrap360, wrap180, wrap180Closed,
+  calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS,
+  DEG2RAD, RAD2DEG, wrap360, wrap180,
   computeMassChainJ2000, computeMoonPeriodsJ2000, SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR,
   // plan 13 B2 — THE deep-time chain (the six browser factories it replaces: the GIA α channel,
   // the Layer-0 primitives, the recession history, the ΔT cycles, the deep e, the month chain)
@@ -115,7 +114,6 @@ const startmodelYear = K.timeReference.sceneEpochYear;     // the epoch's year l
 // below reference those source-of-truth locations. This section collects the
 // declarations at the top of the file for discoverability.
 const useVariableSpeed           = true;   // plan 11 step 2: hard-wired in both twins — the equation of centre and the certified Moon override ARE the scene (the toggle's false branch was a 6.5°-of-Moon diagnostic nobody ran; measured by the reach audit). Mirror: tools/lib/constants.js.
-const debugOn                    = false;  // Debug button flag (developer only)
 let   DEEP_TIME_MODE_ENABLED     = true;   // H/LOD/mSY evolve with age — see setEpochByAge
 let   BOND_DT_CORRECTION_ENABLED = true;  // Bond 1,466-yr ΔT correction (Option B research toggle) — rationale + constants at the BOND_PERIOD_YR block
 let   HALLSTATT_DT_CORRECTION_ENABLED = true;  // Hallstatt 2,430-yr ΔT correction (research toggle) — rationale + constants at the HALLSTATT_PERIOD_YR block
@@ -221,7 +219,6 @@ function _chainLamDot0(k) {
 function _chainNOfDate(k, year) { return _chainLamDot0(k) * _chainLamRel(k, year) / _chainMassLossPeriodRatio(year); }
 const j2000JD = K.timeReference.j2000JD;                    // Standard J2000.0 epoch: Jan 1.5, 2000 TT (JD 2451545.0)
 const julianCenturyDays = K.timeReference.julianCenturyDays; // IAU Julian century (365.25 × 100 days)
-const tropicalCenturyDays = 100 * meansolaryearlengthinDays;  // 100 model tropical years
 // Sidereal day at J2000 (≈ 86164.09 s). Derived from `solarDay × N/(N+1)` where
 // N = tropical days per year — this is the standard relationship between mean
 // solar and mean sidereal day (Earth completes N sidereal rotations per year
@@ -286,12 +283,7 @@ const G_CONSTANT = K.physicalConstants.G_CONSTANT;               // km³/(kg·s�
 const EARTH_MOI_FACTOR = K.physicalConstants.earthMoiFactorJ2000; // IERS Conventions 2010 — α at J2000
 const L_SUN_W = K.physicalConstants.solarLuminosityW;            // IAU 2015 nominal solar luminosity (W)
 const SOLAR_WIND_KG_PER_S = K.physicalConstants.solarWindMassLossKgPerS;  // Ulysses/ACE/Wind measurements
-const ALPHA_1 = K.deepTime.alpha1PerMa;           // /Ma  — Moon recession, LLR-anchored (3.82 cm/yr): the J2000 slope of the cited distance history
-// (the Moon distance history is the cited AstroGeo22 input, MOON_DISTANCE_ARTIFACT — plan 12 option A)
-const ALPHA_GIA_RATE_J2000_PER_YR = K.deepTime.alphaGiaRateJ2000PerYr;  // Cox-Chao/2.0 — the rate the channel's k is derived from
 const ALPHA_GIA_RELAXATION_KYR   = K.deepTime.alphaGiaRelaxationKyr;    // τ, measured against the historical ΔT record (plan 06 D7)
-const BOND_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;   // 4-flag ΔT stack taper: full strength
-const BOND_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;  // 4-flag ΔT stack taper: zero beyond
 
 // ─── A4. Planet input constants ──────────────────────────────────────────
 // Per-planet J2000 orbital elements and the chain's perihelion precession
@@ -576,78 +568,8 @@ const diameters = {
   erosDiameter     : K.bodyDiametersKm.eros,
 };
 
-// --- C4. Ascending nodes on invariable plane ---
-// Ascending nodes on invariable plane (from Souami & Souchay 2012, Table 9)
-// These are DIFFERENT from <planet>AscendingNode which is on the ecliptic!
-// Units: degrees at J2000.0 epoch
-// From REFERENCE_DATA, not DEFAULT_CONSTANTS: these are what the model is
-// COMPARED AGAINST, so they are single-sourced but deliberately not injectable —
-// createModel refuses them (§2d). Same for the LL bounds and JPL trends below.
-const earthAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.earth;  // Regresses on the chain's nodal mode s₃ in the invariant frame (the ecliptic precession period)
-const mercuryAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.mercury;
-const venusAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.venus;
-const marsAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.mars;
-const jupiterAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.jupiter;
-const saturnAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.saturn;
-const uranusAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.uranus;
-const neptuneAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.neptune;
-const plutoAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.pluto;
-const halleysAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.halleys; // Approximation from ecliptic value
-const erosAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.eros;       // Approximation from ecliptic value
-const ceresAscendingNodeInvPlaneSouamiSouchay = R.ascendingNodesSouamiSouchay.ceres;     // From Souami & Souchay (2012) Table 2
 
-// ─── C5. INCLINATION REFERENCE DATA ──────────────────────────────────────────────
-// Laplace-Lagrange bounds, inclination means/amplitudes/phase angles,
-// JPL ecliptic inclination trend rates, and eigenmode phase angles.
-// ─────────────────────────────────────────────────────────────────────────
 
-// --- C5a. Laplace-Lagrange bounds & eigenmode phases ---
-// Theoretical bounds from Farside Table 10.4 (Brouwer & van Woerkom)
-// Source: https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
-// JSON stores each as a [min, max] pair. Saturn's is the bound the model fails
-// in verify-laws (44/45) — precisely why it must not be injectable.
-const mercuryLLBoundsMin = R.laplaceLagrangeBounds.mercury[0];
-const mercuryLLBoundsMax = R.laplaceLagrangeBounds.mercury[1];
-const venusLLBoundsMin = R.laplaceLagrangeBounds.venus[0];
-const venusLLBoundsMax = R.laplaceLagrangeBounds.venus[1];
-const earthLLBoundsMin = R.laplaceLagrangeBounds.earth[0];
-const earthLLBoundsMax = R.laplaceLagrangeBounds.earth[1];
-const marsLLBoundsMin = R.laplaceLagrangeBounds.mars[0];
-const marsLLBoundsMax = R.laplaceLagrangeBounds.mars[1];
-const jupiterLLBoundsMin = R.laplaceLagrangeBounds.jupiter[0];
-const jupiterLLBoundsMax = R.laplaceLagrangeBounds.jupiter[1];
-const saturnLLBoundsMin = R.laplaceLagrangeBounds.saturn[0];
-const saturnLLBoundsMax = R.laplaceLagrangeBounds.saturn[1];
-const uranusLLBoundsMin = R.laplaceLagrangeBounds.uranus[0];
-const uranusLLBoundsMax = R.laplaceLagrangeBounds.uranus[1];
-const neptuneLLBoundsMin = R.laplaceLagrangeBounds.neptune[0];
-const neptuneLLBoundsMax = R.laplaceLagrangeBounds.neptune[1];
-
-// Laplace-Lagrange inclination eigenmode phase angles (degrees)
-// Source: Farside Table 10.1 (Brouwer & van Woerkom refinement)
-// https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html
-// f₅ = 0 (invariable plane, no evolution) is excluded — 7 active modes remain
-const EIGENMODE_PHASES = [
-  // Per-planet phase angles (ICRF perihelion)
-  { value: 99.52,    label: '99.52° (Me)', group: 'model' },
-  { value: 79.82,    label: '79.82° (Ve)', group: 'model' },
-  { value: 21.77,    label: '21.77° (Ea)', group: 'model' },
-  { value: 96.95,    label: '96.95° (Ma)', group: 'model' },
-  { value: 291.18,   label: '291.18° (Ju)', group: 'model' },
-  { value: 120.38,   label: '120.38° (Sa)', group: 'model' },
-  { value: 21.33,    label: '21.33° (Ur)', group: 'model' },
-  { value: 354.04,   label: '354.04° (Ne)', group: 'model' },
-  // Laplace-Lagrange eigenmode phase angles (Farside Table 10.1), from
-  // R.eigenmodePhasesLaplaceLagrange — labels render the same values as text.
-  { value: R.eigenmodePhasesLaplaceLagrange.gamma8, label: `γ₈ = ${R.eigenmodePhasesLaplaceLagrange.gamma8}°` },
-  { value: R.eigenmodePhasesLaplaceLagrange.gamma1, label: `γ₁ = ${R.eigenmodePhasesLaplaceLagrange.gamma1}°` },
-  { value: R.eigenmodePhasesLaplaceLagrange.gamma3, label: `γ₃ = ${R.eigenmodePhasesLaplaceLagrange.gamma3}°` },
-  { value: R.eigenmodePhasesLaplaceLagrange.gamma4, label: `γ₄ = ${R.eigenmodePhasesLaplaceLagrange.gamma4}°` },
-  { value: R.eigenmodePhasesLaplaceLagrange.gamma6, label: `γ₆ = ${R.eigenmodePhasesLaplaceLagrange.gamma6}°` },
-  { value: R.eigenmodePhasesLaplaceLagrange.gamma7, label: `γ₇ = ${R.eigenmodePhasesLaplaceLagrange.gamma7}°` },
-  { value: R.eigenmodePhasesLaplaceLagrange.gamma2, label: `γ₂ = ${R.eigenmodePhasesLaplaceLagrange.gamma2}°` },
-  { value: 'custom', label: 'Custom...' }
-];
 
 // --- C5b. JPL ecliptic inclination trend rates (°/century) ---
 // Source: JPL Approximate Positions — https://ssd.jpl.nasa.gov/planets/approx_pos.html
@@ -661,7 +583,6 @@ const jupiterEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.jupite
 const saturnEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.saturn;    // degrees/century (INCREASING)
 const uranusEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.uranus;    // degrees/century (DECREASING)
 const neptuneEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.neptune;  // degrees/century (INCREASING)
-const plutoEclipticInclinationTrendJPL = R.jplEclipticInclinationTrends.pluto;      // degrees/century (estimated)
 
 // ─── C6. Astronomical reference object (ASTRO_REFERENCE) ─────────────────
 // J2000 epoch values, year/day lengths, perihelion reference, Meeus
@@ -763,29 +684,12 @@ const ASTRO_REFERENCE = {
 
 };
 
-// The J2000 precession period is _certifiedAxialPrecessionJ2000Years(); the
-// tropical year is DERIVED from the sidereal year and p_A, so sid/(sid − trop)
-// = T_p counted in tropical years (25,772.13 — the same period as 25,771.58
-// Julian years) closes by construction.
-
-// ─── E. DERIVED CONSTANTS ───────────────────────────────────────────────
-// Computed from foundational constants. Time units, EoC parameters,
-// Moon cycles, speeds, and orbital distances.
-// ─────────────────────────────────────────────────────────────────────────
-
-// --- 9a. Time units & year lengths ---
-let   meanearthRotationsinDays = meansolaryearlengthinDays+1;  // Phase 6: mutable (Tier 2)
-// The phase origin is J2000 (plan 07 R10): balancedYear is 2000 by construction
-// in all four runtimes; the variable name stays as the code's phase-origin.
-let   balancedYear = 2000;   // Phase 6: mutable in name only — the dormant epoch updater re-sets it to 2000
-const balancedJD = startmodelJD-(meansolaryearlengthinDays*(startmodelYear-balancedYear));
 const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDays * (startmodelYear - perihelionalignmentYear)));   // plan 11 step 5: on the epoch itself (the rounded day-0 moved one day with the correction's deletion)
 // Perihelion-calendar walk-start hint (shared by dayToPerihelionCalendarDate
 // and dateToPerihelionJulianDay — see the docstring there). Declared HERE
 // because module-init code calls the converters long before their own
 // declarations run (the C1 hover-TDZ class).
 let _periCalHintYear = 0, _periCalHintDays = 0;
-const yearsFromBalancedToJ2000 = (startmodelJD - balancedJD) / meansolaryearlengthinDays;
 // Sidereal year in days at J2000 — the IAU input (365.256363004); the same
 // value as meansiderealyearlengthinDays_kinematic below.
 let   meansiderealyearlengthinDays = ASTRO_REFERENCE.siderealYearJ2000;  // Phase 1: mutable for deep-time mode
@@ -828,39 +732,10 @@ let   meanStellarday = NaN;  // Phase 6: mutable (Tier 2) — set by recomputeDe
 let   axialCoinRotationMs = NaN;  // Phase 6: mutable (Tier 2)
 let   axialCoinRotationYearlySeconds = NaN;  // Phase 6: mutable (Tier 2)
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CANONICAL MEAN/REAL YEAR & DAY VARIABLES
-//
-// Three-dimensional disambiguation:
-//   1. Value type:  MEAN (structural)  vs  REAL (measured, year-specific)
-//   2. Time unit:   SEC (SI seconds)  vs  86400DAYS (SI-days)  vs  MEANLODDAYS  vs  REALLODDAYS
-//   3. Time domain: year-invariant (MEAN)  vs  year-dependent (REAL, functions)
-//
-// Convention:
-//   • MEAN_*_SEC = the J2000 constant in SI seconds (the IAU input × 86400).
-//   • MEAN_*_86400DAYS = MEAN_*_SEC / 86400 (SI-day count, IAU convention).
-//   • MEAN_*_MEANLODDAYS = MEAN_*_SEC / MEAN_LOD_SEC — ≡ the 86400DAYS form since
-//     plan 09 (MEAN_LOD_SEC is the SI day); kept for its readers.
-//   • real*86400Days(year), real*RealLodDays(year) = derived by division.
-//   • realLodSec(year) = MEAN_LOD_SEC + tidal + GIA + ΔT residual (Bond+Hallstat).
-//
-// At J2000:
-//   • MEAN_LOD_SEC              = 86,400 s (IAU sec / IAU days — plan 09, ONE J2000 day)
-//   • MEAN_TROPICAL_YEAR_SEC    = 31,556,925.19 (= the IAU tropical mean × 86400)
-//   • MEAN_SIDEREAL_YEAR_SEC    = 31,558,149.7635 (IAU × 86400, physical orbital period)
-//   • MEAN_SIDEREAL_YEAR_86400DAYS = 365.256363 (IAU)
-// ═══════════════════════════════════════════════════════════════════════════
-
-const MEAN_TROPICAL_YEAR_SEC = meansolaryearlengthinDays * SECONDS_PER_DAY;                             // = 31,556,925.19 s (the IAU tropical mean × 86400)
 const MEAN_SIDEREAL_YEAR_SEC = ASTRO_REFERENCE.siderealYearJ2000 * SECONDS_PER_DAY;                    // = 31,558,149.7635 s (IAU physical)
 const MEAN_LOD_SEC = MEAN_SIDEREAL_YEAR_SEC / meansiderealyearlengthinDays_kinematic;         // = 86,400 s (IAU sec / IAU days, plan 09)
 
-const MEAN_TROPICAL_YEAR_86400DAYS = MEAN_TROPICAL_YEAR_SEC / SECONDS_PER_DAY;                          // = the IAU tropical mean
-const MEAN_TROPICAL_YEAR_MEANLODDAYS = MEAN_TROPICAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≡ MEAN_TROPICAL_YEAR_86400DAYS (plan 09)
-const MEAN_SIDEREAL_YEAR_86400DAYS = MEAN_SIDEREAL_YEAR_SEC / SECONDS_PER_DAY;                          // ≈ 365.256363 (IAU)
-const MEAN_SIDEREAL_YEAR_MEANLODDAYS = MEAN_SIDEREAL_YEAR_SEC / MEAN_LOD_SEC;                 // ≡ MEAN_SIDEREAL_YEAR_86400DAYS (plan 09)
 
-const MEAN_PRECESSION = MEAN_SIDEREAL_YEAR_SEC / (MEAN_SIDEREAL_YEAR_SEC - MEAN_TROPICAL_YEAR_SEC); // the J2000 axial precession period, years
 
 // --- 9b. Equation of center (EoC) derived parameters ---
 // Equation of center eccentricity — derived, not a free parameter.
@@ -873,8 +748,6 @@ const MEAN_PRECESSION = MEAN_SIDEREAL_YEAR_SEC / (MEAN_SIDEREAL_YEAR_SEC - MEAN_
 // other half); this const is its J2000 value — moveModel overrides it per frame.
 const eocEccentricity = K.earthOrbital.earthEccentricityJ2000 / 2;
 
-// --- 9c. Speeds & distances ---
-const speedofSuninKM = (currentAUDistance*2*Math.PI)/(meansiderealyearlengthinSeconds/60/60);
 
 // Deep-time mode helpers. When DEEP_TIME_MODE_ENABLED is OFF (production parity),
 // cardinal-scan approxJDs and the sidereal-day-LOD factor revert to pre-Phase-9
@@ -882,9 +755,6 @@ const speedofSuninKM = (currentAUDistance*2*Math.PI)/(meansiderealyearlengthinSe
 // these helper bodies resolve the flag at call time, so the forward reference is fine.
 function _phase9YearToJDDays() {
   return DEEP_TIME_MODE_ENABLED ? SI_TROPICAL_YEAR_DAYS : meansolaryearlengthinDays;
-}
-function _phase9SiderealDayLODFactor() {
-  return DEEP_TIME_MODE_ENABLED ? meanlengthofday : SECONDS_PER_DAY;
 }
 
 // --- 9d. Simulation time steps (fractions of a tropical year) ---
@@ -900,19 +770,7 @@ let   sHour = sDay/24;                            // Phase 6.7: mutable
 let   sMinute = sHour/60;                         // Phase 6.7: mutable
 let   sSecond = sMinute/60;                       // Phase 6.7: mutable
 
-// Phase 6.7 J2000 snapshots — used by speed-comparison logic at lines 7975-7997
-// where dropdown options were captured at tweakpane construction (J2000 values).
-// Each speed-button comparison checks `speedFact === SYEAR_J2000 * N` to stay
-// consistent with the dropdown's frozen numeric values. The dropdown labels
-// like "1 year/sec" semantically mean "1 modern tropical year" — the J2000
-// snapshot preserves that intent at any epoch.
-const SDAY_J2000    = sDay;
 const SYEAR_J2000   = sYear;
-const SMONTH_J2000  = sMonth;
-const SWEEK_J2000   = sWeek;
-const SHOUR_J2000   = sHour;
-const SMINUTE_J2000 = sMinute;
-const SSECOND_J2000 = sSecond;
 
 const lightYear = speedOfLight*meanlengthofday*meansolaryearlengthinDays;
 const sunOrbitPeriod = (lightYear*milkywayDistance*Math.PI*2)/(sunSpeed/60/60*meanlengthofday*meansolaryearlengthinDays);
@@ -953,10 +811,8 @@ let   moonTropicalMonth = _MOON_PERIODS_J2000.moonTropicalMonthDays;  // Phase 2
 let   moonFullMoonCycleEarth = _MOON_PERIODS_J2000.moonFullMoonCycleEarthDays;  // Phase 6.5: mutable
 let   moonFullMoonCycleICRF = _MOON_PERIODS_J2000.moonFullMoonCycleICRFDays;  // Phase 6.5: mutable — the precessing-frame partner (the OBSERVED supermoon cycle is the Earth-named 411.784 d)
 let   moonApsidalMeetsNodalindays = _MOON_PERIODS_J2000.moonApsidalMeetsNodalDays;  // Phase 6.5: mutable
-let   moonLunarLevelingCycleindays = _MOON_PERIODS_J2000.moonLunarLevelingCycleDays;  // Phase 6.5: mutable
 let   moonDraconicYearICRF = _MOON_PERIODS_J2000.moonDraconicYearICRFDays;  // Phase 6.5: mutable — the mixed-frame partner (346.607 d; NOT the observable)
 let   moonDraconicYearEarth = _MOON_PERIODS_J2000.moonDraconicYearEarthDays;  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; removing one equinox turn compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
-let   moonSpeed = (moonDistance*Math.PI*2)/(meansolaryearlengthinDays*(1/(meansolaryearlengthinDays/moonSiderealMonth)))/24;  // Phase 6.5: mutable
 
 // ─── E2. Mass calculations ──────────────────────────────────────────────
 // GM and mass for Sun, Earth, Moon, and all planets. Derived from
@@ -1007,12 +863,7 @@ const _MASS_CHAIN_J2000 = computeMassChainJ2000({
   massRatioEarthMoon: MASS_RATIO_EARTH_MOON, currentAUDistanceKm: AU_J2000_KM,
   gravitationalConstantKm3KgS2: G_CONSTANT,
 });
-let   moonOrbitalShift = _MASS_CHAIN_J2000.moonOrbitalShiftKm;  // Phase 2: mutable
-let   moonDistanceCorrected = _MASS_CHAIN_J2000.moonDistanceCorrectedKm;  // Phase 2: mutable
 
-// Earth-Moon SYSTEM gravitational parameter from Kepler on the Moon's orbit
-const GM_EARTH_MOON_SYSTEM = _MASS_CHAIN_J2000.gmEarthMoonSystemKm3S2;
-const GM_EARTH_SYSTEM = GM_EARTH_MOON_SYSTEM;  // alias for naming consistency
 // Result: ~403,505 km³/s² (DE440 BODY3: 403,503.24, residual ~3.7 ppm)
 
 // Earth ALONE (split from system via Earth/Moon mass ratio)
@@ -1039,7 +890,6 @@ const M_SUN = _MASS_CHAIN_J2000.sunMassKg;
 
 // Mass ratios Sun/Earth — both variants
 const MASS_RATIO_SUN_EARTH_ALONE  = M_SUN / M_EARTH_ALONE;    // ~332,945 (planet alone)
-const MASS_RATIO_SUN_EARTH_SYSTEM = M_SUN / M_EARTH_SYSTEM;   // ~328,899 (Earth+Moon)
 
 // --- E2b. Planetary mass ratios — DE440 SPICE kernel gm_de440.tpc ---
 //
@@ -1105,24 +955,14 @@ const M_NEPTUNE_ALONE   = GM_NEPTUNE_ALONE / G_CONSTANT;
 
 // Pluto (Charon binary — ALONE differs from SYSTEM by 10.85%, visible in panel)
 const MASS_RATIO_SUN_PLUTO_SYSTEM = K.physicalConstants.massRatioDE440.pluto;
-const MASS_RATIO_SUN_PLUTO_ALONE  = K.physicalConstants.massRatioDE440Alone.pluto;
 const GM_PLUTO_SYSTEM = GM_SUN / MASS_RATIO_SUN_PLUTO_SYSTEM;
-const GM_PLUTO_ALONE  = GM_SUN / MASS_RATIO_SUN_PLUTO_ALONE;
 const M_PLUTO_SYSTEM  = GM_PLUTO_SYSTEM / G_CONSTANT;
-const M_PLUTO_ALONE   = GM_PLUTO_ALONE / G_CONSTANT;
 
 // Ceres: Mass from Dawn spacecraft (2015-2018)
 const GM_CERES = K.physicalConstants.smallBodyMasses.ceresGmKm3PerS2;  // km³/s² (Dawn radiometric tracking)
 const M_CERES = GM_CERES / G_CONSTANT;               // ~9.38 × 10²⁰ kg
 
-// Halley's Comet: Mass estimated from size (~11×8×8 km) and density (~0.6 g/cm³)
-// No spacecraft has orbited it, so mass is approximate
-const M_HALLEYS = K.physicalConstants.smallBodyMasses.halleysMassKg;   // ~2.2 × 10¹⁴ kg (estimated)
-const GM_HALLEYS = M_HALLEYS * G_CONSTANT;           // ~1.47 × 10⁻⁵ km³/s²
 
-// 433 Eros: Mass precisely measured by NEAR Shoemaker spacecraft (2000-2001)
-const M_EROS = K.physicalConstants.smallBodyMasses.erosMassKg;         // 6.687 × 10¹⁵ kg (measured)
-const GM_EROS = M_EROS * G_CONSTANT;                 // ~4.46 × 10⁻⁴ km³/s²
 
 // ─── E2c. (a planet's inclination of date has one home, the N-body chain,
 // _chainElementsOfDate; the SYSTEM/ALONE mass convention is doc 24's) ──────────
@@ -1811,80 +1651,57 @@ for (const _k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'ne
 
 // Planet calculations TYPE I (the scaffold reads `_planetGeom.<k>.periodYears`)
 let   mercuryOrbitDistance = _planetGeom.mercury.orbitDistance;  // Phase 2.5: mutable
-const mercuryRealOrbitalEccentricity = _planetGeom.mercury.realOrbitalEccentricity;
 const mercuryPerihelionDistance = _planetGeom.mercury.perihelionDistance;
 const mercuryElipticOrbit = _planetGeom.mercury.elipticOrbit;
-const mercurySpeed = _planetGeom.mercury.speedKmh;
 let   mercuryRotationPeriod = _planetGeom.mercury.rotationPeriodHours;  // Phase 3.5: mutable (Mercury 3:2 spin-orbit lock)
-const mercuryEccentricityPerihelion = _planetGeom.mercury.eccentricityPerihelion;
-const mercuryLowestPoint = _planetGeom.mercury.lowestPoint;
 
 let   venusOrbitDistance = _planetGeom.venus.orbitDistance;  // Phase 2.5: mutable
-const venusRealOrbitalEccentricity = _planetGeom.venus.realOrbitalEccentricity;
 const venusPerihelionDistance = _planetGeom.venus.perihelionDistance;
 const venusElipticOrbit = _planetGeom.venus.elipticOrbit;
-const venusSpeed = _planetGeom.venus.speedKmh;
 const venusRotationPeriod = _planetGeom.venus.rotationPeriodHours;
-const venusEccentricityPerihelion = _planetGeom.venus.eccentricityPerihelion;
-const venusLowestPoint = _planetGeom.venus.lowestPoint;
 
 // Planet calculations TYPE II
 let   marsOrbitDistance = _planetGeom.mars.orbitDistance;  // Phase 2.5: mutable
-const marsRealOrbitalEccentricity = _planetGeom.mars.realOrbitalEccentricity;
 const marsElipticOrbit = _planetGeom.mars.elipticOrbit;
 const marsPerihelionDistance = _planetGeom.mars.perihelionDistance;
-const marsSpeed = _planetGeom.mars.speedKmh;
 const marsRotationPeriod = _planetGeom.mars.rotationPeriodHours;
 
 const erosOrbitDistance = _planetGeom.eros.orbitDistance;
-const erosRealOrbitalEccentricity = _planetGeom.eros.realOrbitalEccentricity;
 const erosElipticOrbit = _planetGeom.eros.elipticOrbit;
 const erosPerihelionDistance = _planetGeom.eros.perihelionDistance;
-const erosSpeed = _planetGeom.eros.speedKmh;
 const erosRotationPeriod = _planetGeom.eros.rotationPeriodHours;
 
 // Planet calculations TYPE III (geocentric elipticOrbit — Earth-eccentricity
 // parallax, sin(ω_Earth − ω_planet), factor 2 from off-centre geometry —
 // now inside the shared law)
 let   jupiterOrbitDistance = _planetGeom.jupiter.orbitDistance;  // Phase 2.5: mutable
-const jupiterRealOrbitalEccentricity = _planetGeom.jupiter.realOrbitalEccentricity;
 const jupiterElipticOrbit = _planetGeom.jupiter.elipticOrbit;
 const jupiterPerihelionDistance = _planetGeom.jupiter.perihelionDistance;
-const jupiterSpeed = _planetGeom.jupiter.speedKmh;
 const jupiterRotationPeriod = _planetGeom.jupiter.rotationPeriodHours;
 
 let   saturnOrbitDistance = _planetGeom.saturn.orbitDistance;  // Phase 2.5: mutable
-const saturnRealOrbitalEccentricity = _planetGeom.saturn.realOrbitalEccentricity;
 const saturnElipticOrbit = _planetGeom.saturn.elipticOrbit;
 const saturnPerihelionDistance = _planetGeom.saturn.perihelionDistance;
-const saturnSpeed = _planetGeom.saturn.speedKmh;
 const saturnRotationPeriod = _planetGeom.saturn.rotationPeriodHours;
 
 let   uranusOrbitDistance = _planetGeom.uranus.orbitDistance;  // Phase 2.5: mutable
-const uranusRealOrbitalEccentricity = _planetGeom.uranus.realOrbitalEccentricity;
 const uranusElipticOrbit = _planetGeom.uranus.elipticOrbit;
 const uranusPerihelionDistance = _planetGeom.uranus.perihelionDistance;
-const uranusSpeed = _planetGeom.uranus.speedKmh;
 const uranusRotationPeriod = _planetGeom.uranus.rotationPeriodHours;
 
 let   neptuneOrbitDistance = _planetGeom.neptune.orbitDistance;  // Phase 2.5: mutable
-const neptuneRealOrbitalEccentricity = _planetGeom.neptune.realOrbitalEccentricity;
 const neptuneElipticOrbit = _planetGeom.neptune.elipticOrbit;
 const neptunePerihelionDistance = _planetGeom.neptune.perihelionDistance;
-const neptuneSpeed = _planetGeom.neptune.speedKmh;
 const neptuneRotationPeriod = _planetGeom.neptune.rotationPeriodHours;
 
 const plutoOrbitDistance = _planetGeom.pluto.orbitDistance;
 const plutoPerihelionDistance = _planetGeom.pluto.perihelionDistance;
 const plutoElipticOrbit = _planetGeom.pluto.elipticOrbit;
-const plutoSpeed = _planetGeom.pluto.speedKmh;
 const plutoRotationPeriod = _planetGeom.pluto.rotationPeriodHours;
 
 const halleysOrbitDistance = _planetGeom.halleys.orbitDistance;
-const halleysRealOrbitalEccentricity = _planetGeom.halleys.realOrbitalEccentricity;
 const halleysElipticOrbit = _planetGeom.halleys.elipticOrbit;
 const halleysPerihelionDistance = _planetGeom.halleys.perihelionDistance;
-const halleysSpeed = _planetGeom.halleys.speedKmh;
 const halleysRotationPeriod = _planetGeom.halleys.rotationPeriodHours;
 
 // ═════════════════════════════════════════════════════════════════
@@ -1903,7 +1720,6 @@ const halleysRotationPeriod = _planetGeom.halleys.rotationPeriodHours;
 // ───── Earth physical constants ─────
 // EARTH_MOI_FACTOR (α at J2000) lives in section C3 "Deep-time physics anchors" near the top.
 const R_EARTH_M        = (diameters.earthDiameter / 2) * 1000;        // km → m
-const I_EARTH          = EARTH_MOI_FACTOR * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
                        // ≈ 8.034 × 10³⁷ kg·m² — anchor value of Earth's polar moment at J2000.
                        // Used for the L_TOTAL_EM angular-momentum anchor below; the time-
                        // varying value for LOD evolution is iEarthAtAge(t_Ma).
@@ -2036,28 +1852,6 @@ function _alphaGia() { return _dtc().alphaGia; }
 function _withLatticeAlpha(build) { return _dtc().withLatticeAlpha(build); }
 function earthMoiFactorAtAge(t_Ma) { return _dtc().earthMoiFactorAtAge(t_Ma); }
 
-// ─── Mantle-core electromagnetic coupling: NOT included as a constant LOD term ───
-//
-// Mantle-core coupling is a real physical channel (EM + topographic torques at the
-// CMB; decadal LOD oscillations of ±1-2 ms; secular trend estimated at -0.1 to
-// -0.3 ms/century from Holme 1998 / Mound & Buffett 2003). It WAS implemented
-// here as a constant LOD secular offset, but the L-5b/L-7 cross-validation
-// definitively showed that the modern Holme value, when extrapolated linearly
-// over 2720 years into the past, OVER-CORRECTS the BCE-era ΔT by ~2700 s.
-//
-// This is itself a scientific finding: the historical eclipse record proves
-// the mantle-core secular rate has NOT been constant over millennia. A proper
-// time-varying model is required (cf. Stephenson & Morrison 2004 piecewise
-// polynomial fit, which exists precisely because of this) but is out of scope
-// for a first-principles literature-constant treatment. We therefore omit the
-// term entirely rather than introduce a phenomenological time profile.
-//
-// See doc 102 § "Mantle-core coupling: a positive null result" for details.
-
-/** I_Earth(t) = α(t) · M · R² */
-function iEarthAtAge(t_Ma) {
-  return earthMoiFactorAtAge(t_Ma) * M_EARTH_ALONE * R_EARTH_M * R_EARTH_M;
-}
 
 // ───── Solar physics constants (Driver 2 — mass loss) ─────
 // L_SUN_W and SOLAR_WIND_KG_PER_S live in section C3 "Deep-time physics anchors" near the top.
@@ -2071,36 +1865,13 @@ const SOLAR_MASS_LOSS_FRAC_PER_YR =
 // IAU sidereal year in days = the SI day (the identifier is historical) ─────
 const LOD_NOW_H13_S = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays_kinematic;
 
-// ───── J2000 anchor snapshots (frozen at module load) ─────
-// Captured BEFORE Phase 1 converts the script.js globals
-// meanlengthofday, meansolaryearlengthinDays,
-// meansiderealyearlengthinDays, and meansiderealyearlengthinSeconds from
-// `const` to `let`. The mean*AtAge() functions in this block reference
-// these frozen J2000 anchors (never the live globals) so they continue
-// to compute deep-time values FROM J2000 even after Phase 4's setEpoch()
-// starts mutating the globals via recomputeEpochAnchors().
-const MEAN_SIDEREAL_YEAR_J2000_S = meansiderealyearlengthinSeconds;          // 31,558,149.764 s
 const MEAN_TROPICAL_YEAR_J2000_S = meansolaryearlengthinDays * meanlengthofday;
-                                                                             // ≈ 31,556,926.28 s
-const MEAN_SOLAR_YEAR_J2000_DAYS = meansolaryearlengthinDays;                // ≈ 365.242204 d
 // Frozen J2000 mSY, captured before the deep-time mutation.
 // SI tropical year in 86400-s Julian days: the sDay time-unit anchor, so scene
 // orbital periods in JD are Kepler-invariant across epochs (they do not scale
 // with the epoch-local day count).
 const SI_TROPICAL_YEAR_DAYS      = MEAN_TROPICAL_YEAR_J2000_S / SECONDS_PER_DAY;   // ≈ 365.24189
-// AU_J2000_KM defined alongside currentAUDistance (line ~57); kept early for use in physical-constant derivations.
-const MOON_DISTANCE_J2000_KM     = moonDistance;                             // 384,399.07 km
 
-// Per-planet AU ratio anchors, frozen at module load: the mean*SemiMajorAxisAtAge()
-// functions below MUST reference these snapshots, never the epoch-mutable
-// `*OrbitDistance` globals.
-const MERCURY_ORBIT_DISTANCE_J2000 = mercuryOrbitDistance;   // ≈ 0.387 AU ratio
-const VENUS_ORBIT_DISTANCE_J2000   = venusOrbitDistance;     // ≈ 0.723
-const MARS_ORBIT_DISTANCE_J2000    = marsOrbitDistance;      // ≈ 1.524
-const JUPITER_ORBIT_DISTANCE_J2000 = jupiterOrbitDistance;   // ≈ 5.204
-const SATURN_ORBIT_DISTANCE_J2000  = saturnOrbitDistance;    // ≈ 9.582
-const URANUS_ORBIT_DISTANCE_J2000  = uranusOrbitDistance;    // ≈ 19.229
-const NEPTUNE_ORBIT_DISTANCE_J2000 = neptuneOrbitDistance;   // ≈ 30.103
 
 // Per-planet J2000 orbital period in seconds — used as input to
 // meanPlanetOrbitalPeriodAtAge() and to recomputePlanetCountsForEpoch().
@@ -2116,27 +1887,11 @@ const NEPTUNE_PERIOD_J2000_S = planets.neptune.orbitalPeriodInputDays * SECONDS_
 // chain's 1,296,000/g, a quantity of the governed artifact that scales with the
 // solar mass — Driver 2 — so the epoch recompute has nothing to rescale)
 const PLANET_KEYS = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
-// Lunar precession period anchors at J2000 — pre-computed once so the
-// per-call functions don't re-evaluate them every frame.
-// The apsidal/nodal periods come directly from their observational anchors
-// (of-date values in the legacy-'ICRF'-named inputs; the *Earth variables hold
-// the star-referenced periods, the equinox's precession removed).
-const MOON_APSIDAL_J2000_S = moonApsidalPrecessionindaysEarth * LOD_NOW_H13_S;  // ≈ 8.85 yr
-const MOON_NODAL_J2000_S   = moonNodalPrecessionindaysEarth   * LOD_NOW_H13_S;  // ≈ 18.60 yr
-const MOON_NODAL_OFDATE_J2000_S = moonNodalPrecessionindaysICRF * LOD_NOW_H13_S;  // 6798.3303 d — of-date node regression (scene rate)
-const MOON_APSIDAL_OFDATE_J2000_S = moonApsidalPrecessionindaysICRF * LOD_NOW_H13_S;  // ≈ 8.8475 yr — of-date perigee advance (scene rate; the deep-time invariant chain keeps the star-referenced MOON_APSIDAL_J2000_S)
 const MOON_NODAL_MONTH_J2000_S  = moonNodalMonth * LOD_NOW_H13_S;                 // 27.2122209 d — draconitic clock for the moon layer
-const MOON_SIDEREAL_MONTH_J2000_S = moonSiderealMonth * LOD_NOW_H13_S;   // the IAU sidereal month in SI seconds
                                                                              // ≈ 2,360,591 s
 
 // ───── Layer-1 / Layer-2 constants (Architecture α proper physics) ─────
 const A_MOON_NOW_M    = moonDistance * 1000;        // km → m
-const E_FACTOR_MOON   = Math.sqrt(1 - moonOrbitalEccentricityBase * moonOrbitalEccentricityBase);
-const GM_EM_M3S2      = GM_EARTH_MOON_SYSTEM * 1e9; // km³/s² → m³/s²
-const L_TOTAL_EM_KGM2_S = (I_EARTH * 2 * Math.PI / LOD_NOW_H13_S)
-                        + (M_MOON_ALONE * Math.sqrt(GM_EM_M3S2 * A_MOON_NOW_M) * E_FACTOR_MOON);
-                       // ≈ 3.473 × 10³⁴ kg·m²/s (Earth-Moon total angular momentum)
-const A_LOCK_M        = (L_TOTAL_EM_KGM2_S / (M_MOON_ALONE * Math.sqrt(GM_EM_M3S2) * E_FACTOR_MOON)) ** 2;
                        // ≈ 555,623 km (tidal-lock asymptote, 87.1 R_E, reached ~50 Gyr ahead)
 
 // ── Layer 0 — the shared epoch chain (@essrt/physics) ────────────────────────
@@ -2158,23 +1913,6 @@ const PRECESSION_SOLAR_SHARE_J2000 = computeSolarTorqueShare({
 // to them, so the constants above stay as the panels' readers' J2000 anchors).
 function _L0get() { return _dtc().l0; }
 
-// The Moon distance history is the CITED INPUT (plan 12 option A): Farhat et al.
-// 2022's AstroGeo22 solution, read as the ratio a(t)/a(0) on the J2000 distance
-// with ALPHA_1 — modern LLR direct observation, da/dt(J2000) = 3.82 cm/yr
-// (Dickey 1994 / Chapront 2002) — as its J2000 slope; forward of J2000 the LLR
-// rate is held (a labelled extrapolation); null beyond the history's end,
-// 4,429 Ma. Nothing in the chain is fitted to the rock record: the paleo gate
-// reads every row as a test (Wells 1963 within ±1.4 %, the Zhou 2024
-// precession constants the stated open discrepancy).
-
-// ───── LAYER 2 — Moon distance evolution ─────
-// The cited Earth–Moon distance history lives ONCE in
-// @essrt/physics/deltat/moon-distance-history (monotone cubic Hermite on the
-// AstroGeo22 ratio table embedded as MOON_DISTANCE_ARTIFACT; J2000 end-slope
-// = ALPHA_1; forward = the LLR rate held; null beyond 4,429 Ma). The LOD is
-// angular-momentum conservation on it with the J2000 L_EM constant — no solar
-// channels. The chain's instance.
-function _recessionHistory() { return _dtc().recession; }   // B2: the chain's
 
 /** Moon semi-major axis at given geological age (METRES). t_Ma > 0 = past. */
 function meanMoonDistanceMetresAtAge(t_Ma) { return _moonChain().distanceMetresAtAge(t_Ma); }
@@ -2204,8 +1942,6 @@ function meanLodSecondsAtAgeMeanAlpha(t_Ma) {
   return _deepLod().lodSecondsAtAgeWithAlpha(t_Ma, alpha_mean);
 }
 
-/** LOD in hours at given age. */
-function meanLodHoursAtAge(t_Ma) { return _deepLod().lodHoursAtAge(t_Ma); }
 
 /** dLOD/dt decomposition at given age, in ms/century.
  *
@@ -2343,34 +2079,6 @@ function meanSiderealYearSecondsAtAge(t_Ma) { return _deepLod().siderealYearSeco
  *  recession). ONE home: @essrt/physics deltat/deep-time. */
 function meanTropicalYearSecondsAtAge(t_Ma) { return _deepLod().tropicalYearSecondsAtAge(t_Ma); }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// Bond-scale ΔT correction (1,465.87 yr; research toggle, default ON in the 4-flag stack)
-//
-// The Stephenson 2016 ΔT residual (Stephenson − our framework) over −720 to
-// +2016 CE has a dominant Bond-scale component in the 500–5000 yr band (the
-// paleoclimate Bond period ~1470 yr; ~74 × the Jupiter–Saturn synodic).
-//
-// The correction is a POST-INTEGRATION term on meanDeltaTSecondsAtAge with the
-// offset zeroed at J2000: meanLodSecondsAtAge stays pure physics and the J2000
-// LOD anchor is preserved (integrating Bond into the LOD moved the anchor to
-// 86399.9956 s — the measured reason for this form). Deep-time predictions are
-// untouched (the taper).
-//
-// CAVEAT: the amplitude/phase coefficients are fitted to the Stephenson ΔT
-// residual, not to independent paleoclimate data — turning this ON VIOLATES
-// the paper's "zero coefficients fitted to eclipse data" claim; kept as a
-// research toggle. See doc 102 "Bond cycle".
-//
-// Source: data/deltaT-4flag-fit.json (the shipped cascaded fit). The period is
-// STATED IN YEARS (the fit file's period_yr) — the number, not a divisor.
-// ═════════════════════════════════════════════════════════════════════════════
-// BOND_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const BOND_PERIOD_YR              = FIT.DT_STACK.bond.period_yr;
-const BOND_OMEGA                  = 2 * Math.PI / BOND_PERIOD_YR;
-// These cite the 4-flag fit (Jose5 and Jose4 are a coupled pair — a 3-channel
-// file cannot describe this stack).
-const BOND_COS_COEFF_S            = FIT.DT_STACK.bond.cos_coeff_s;
-const BOND_SIN_COEFF_S            = FIT.DT_STACK.bond.sin_coeff_s;
 // Cyclic-correction taper: full to ±300 kyr, fading to zero at ±400 kyr.
 //
 // The width is a SAFETY CHOICE, not a value derived from data, and it is not
@@ -2408,27 +2116,6 @@ function bondCycleDeltaTCorrection(year) {
   return _dtCycles().cycleDeltaTSecondsAt('bond', year);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// HALLSTATT CYCLE ΔT CORRECTION (research toggle) — 2,429.83 yr
-// ═════════════════════════════════════════════════════════════════════════════
-// The well-established Hallstatt cycle (~2200–2500 yr) of the cosmogenic
-// isotope records (Damon & Sonett 1991; Steinhilber et al. 2012, PNAS):
-// long-term solar activity modulation, coupled to Earth rotation via the
-// atmospheric mass-distribution response to solar EUV/UV variability. The two
-// archives that resolve it (Steinhilber solar Φ: peak 2293 yr; EPICA CO₂: peak
-// 2404 yr) show a band-peak near the shipped period; Cheng speleothem is a
-// null. Same taper and the same caveat as Bond (fitted to the Stephenson ΔT
-// residual). Records: doc 102, doc 109 §22.
-// ═════════════════════════════════════════════════════════════════════════════
-// HALLSTATT_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const HALLSTATT_PERIOD_YR              = FIT.DT_STACK.hallstatt.period_yr;  // 2,429.83 yr, stated in years (T5)
-const HALLSTATT_OMEGA                  = 2 * Math.PI / HALLSTATT_PERIOD_YR;
-const HALLSTATT_COS_COEFF_S            = FIT.DT_STACK.hallstatt.cos_coeff_s;  // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
-const HALLSTATT_SIN_COEFF_S            = FIT.DT_STACK.hallstatt.sin_coeff_s;  // pair-fit free amp 272 s (phase 96.6°) scaled to 80-sec target
-// "same as Bond" is now enforced rather than asserted: all four ΔT channels read
-// the single JSON pair, so widening the taper moves them together.
-const HALLSTATT_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
-const HALLSTATT_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
 /** Anchored Hallstatt cycle ΔT correction at calendar year (CE), in seconds.
  *  Same structure as bondCycleDeltaTCorrection: returns 0 when flag OFF,
  *  exactly 0 at year 2000, and 0 outside the taper window (8.4-2: shared
@@ -2439,24 +2126,6 @@ function hallstattCycleDeltaTCorrection(year) {
   return _dtCycles().cycleDeltaTSecondsAt('hallstatt', year);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// JOSE5 CYCLE ΔT CORRECTION (research toggle) — 897.47 yr
-// ═════════════════════════════════════════════════════════════════════════════
-// ≈ 5 × the Jose period (5 × 179 yr = 895 yr; Charvátová 2000's solar
-// inertial motion period, Jupiter–Uranus dynamics) ≈ 45 × the Jupiter–Saturn
-// synodic. The strongest residual signal after Bond in the lunar eclipse
-// channel (the ~897-yr band's ΔR² 0.0026 in the L-5b scan; the triple fit's
-// free amplitude 74 s, phase +164.76°). Collinear with Hallstatt in a joint
-// fit, so the amplitudes are not isolated contributions. Same taper and the
-// same caveat as Bond. Records: doc 102, doc 109 §22.
-// ═════════════════════════════════════════════════════════════════════════════
-// JOSE5_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const JOSE5_PERIOD_YR              = FIT.DT_STACK.jose5.period_yr;  // 897.47 yr, stated in years (T5)
-const JOSE5_OMEGA                  = 2 * Math.PI / JOSE5_PERIOD_YR;
-const JOSE5_COS_COEFF_S            = FIT.DT_STACK.jose5.cos_coeff_s;  // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
-const JOSE5_SIN_COEFF_S            = FIT.DT_STACK.jose5.sin_coeff_s;  // triple-fit free amp 75.9 s (phase −165.8°) scaled to 50-sec target
-const JOSE5_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
-const JOSE5_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
 /** Anchored Jose5 cycle ΔT correction at calendar year (CE), in seconds.
  *  Same structure as Bond and Hallstatt: returns 0 when flag OFF, exactly
  *  0 at year 2000 by construction, 0 outside the taper window (8.4-2:
@@ -2466,21 +2135,6 @@ function jose5CycleDeltaTCorrection(year) {
   return _dtCycles().cycleDeltaTSecondsAt('jose5', year);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// JOSE4 correction — 715.53 yr (4 × Jose)
-// ═════════════════════════════════════════════════════════════════════════════
-// 4 × Jose 179 yr = 715.5 yr (also degenerate with Bond/2 ≈ 733 yr at ~2.5 %;
-// the 4 × Jose anchor is tighter, 0.083 %). The cross-archive scan found 715 yr
-// coherent in BOTH Steinhilber solar Φ (~41 MV) and EPICA CO₂ (~11 ppm), each
-// at permutation p < 5 % — no other Jose multiple shows this. Adding it to the
-// 3-flag stack dropped the fit's RMS 19.4 → 13.9 s. See docs/102 § Jose4.
-// JOSE4_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-const JOSE4_PERIOD_YR              = FIT.DT_STACK.jose4.period_yr;  // 715.53 yr, stated in years (T5)
-const JOSE4_OMEGA                  = 2 * Math.PI / JOSE4_PERIOD_YR;
-const JOSE4_COS_COEFF_S            = FIT.DT_STACK.jose4.cos_coeff_s;  // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
-const JOSE4_SIN_COEFF_S            = FIT.DT_STACK.jose4.sin_coeff_s;  // quad-fit free amp 35.3 s (phase −46.2°); below 50-s prior so kept at free-fit
-const JOSE4_TAPER_FULL_HALFWIDTH_YR  = K.deepTime.dtStackTaperFullHalfwidthYr;
-const JOSE4_TAPER_TOTAL_HALFWIDTH_YR = K.deepTime.dtStackTaperTotalHalfwidthYr;
 /** Anchored Jose4 cycle ΔT correction at calendar year (CE), in seconds.
  *  Same structure as Bond/Hallstatt/Jose5: returns 0 when flag OFF, exactly
  *  0 at year 2000 by construction, 0 outside the taper window (8.4-2:
@@ -2490,55 +2144,6 @@ function jose4CycleDeltaTCorrection(year) {
   return _dtCycles().cycleDeltaTSecondsAt('jose4', year);
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
-// CORE-MANTLE SWING (Resonator driver) — 5th ΔT component, DEFAULT ON (joint world)
-// ═════════════════════════════════════════════════════════════════════════════
-// NEW functional class: a 2-kick EPISODE — windowed damped oscillation of the
-// core's eigenmode (T₀ = 3,916 yr, Q = 1.80, inside the published axiMC
-// eigenmode range, Dumberry, Gerick & Gillet 2025) plus one drive tone at the
-// bond−hallstatt difference frequency (3,695 yr) with phase LOCKED
-// to the quadratic-mixing prediction φ_bond − φ_hallstatt. Exactly zero
-// before the excitation kick (−800); actively terminated by the counter-kick
-// (+1600 — the push-pull independently recovered by the excitation
-// inversion); decayed thereafter. Anchored to 0 at J2000 (raw_at_j2000
-// subtraction) and wrapped in the same ±300/400-kyr taper as the flags.
-//
-// Constants synced from data/core-mantle-resonator-stage1.json (variant V5,
-// physical-consistency selection rule — shipped T₀ must be the physically
-// determined eigenperiod). That artifact IS the provenance and ships here;
-// the stage-1 derivation script does not — it ran against the pre-joint
-// world and cannot reproduce these numbers. Narrative: docs/104 §6/§8.
-//
-// JOINT world (2026-07-23): amplitudes come from the joint equality-
-// constrained fit (dt-corrections-fit.js --joint) — the USNO closure
-// includes this component by construction (Σ δLOD(2000) of flags+resonator
-// = the derived −1.34 ms offset that closes the USNO 86400.0021 target exactly). The component ALONE carries δLOD(2000)
-// ≈ +0.786 ms/day (kick2 ≈ 0 — no termination kick in the joint world; the
-// medieval shutdown is carried by flag interference); only the TOTAL is
-// anchor-clean, which is what the closure constrains.
-// RESONATOR_DT_CORRECTION_ENABLED (feature flag) declared in A5 Research toggles at top of file
-// Scalar constants — imported from the generated constants module, sourced
-// from data/core-mantle-resonator-stage1.json (the website reads the same
-// values through the published @essrt/physics package).
-// The eigenperiod T₀ = 3,916 yr is read in years (FIT.DT_RESONATOR.T0_yr): the shipped
-// resonator is the combined effect of the millennial cycles (the tone is the
-// bond−hallstatt beat). Physical caveat, recorded once: the bare axiMC
-// eigenmode is core-material physics; the fitted T₀ is the shipped
-// component's convention.
-// The fourth ΔT driver, from data/core-mantle-resonator-stage1.json via the
-// generated module. Its own file and its own fitter, so its own export —
-// FIT.DT_RESONATOR rather than a fifth channel under DT_STACK.
-const RES_T0_YR       = FIT.DT_RESONATOR.T0_yr;   // the eigenperiod in years (3,916 yr)
-const RES_Q           = FIT.DT_RESONATOR.Q;
-const RES_KICK1_T_YR  = FIT.DT_RESONATOR.kick_epochs_year[0];
-const RES_KICK1_COS_S = FIT.DT_RESONATOR.kick_coefficients_s[0].cos;
-const RES_KICK1_SIN_S = FIT.DT_RESONATOR.kick_coefficients_s[0].sin;
-const RES_KICK2_T_YR  = FIT.DT_RESONATOR.kick_epochs_year[1];
-const RES_KICK2_COS_S = FIT.DT_RESONATOR.kick_coefficients_s[1].cos;
-const RES_KICK2_SIN_S = FIT.DT_RESONATOR.kick_coefficients_s[1].sin;
-const RES_TONE1_PERIOD_YR = FIT.DT_RESONATOR.drive_tones[0].period_yr;   // the bond−hallstatt beat, in years
-const RES_TONE1_PHI_RAD = FIT.DT_RESONATOR.drive_tones[0].phi_locked_rad;
-const RES_TONE1_AMP_S = FIT.DT_RESONATOR.drive_tones[0].amp_s;
 
 // 8.4-2: the resonator episode (derived constants, raw/prime/second,
 // impulse-consistent tone compensation, J2000 anchor) lives in
@@ -2932,24 +2537,6 @@ const FW_A2_RATE = 2 * (360 * julianCenturyDays / moonTropicalMonth)
                  - 2 * (360 * julianCenturyDays / planets.jupiter.orbitalPeriodInputDays);
 const FW_A3_RATE = 360 * julianCenturyDays / moonSiderealMonth;
 
-/** Deep-time secular phases for the five arguments — ALWAYS-CHAINS (Stage B):
- *  the same factored-law integrator chains that phase the scene layers
- *  (_dtMoonIntegrator wiring, ~L9440) supply the argument skeleton, so the
- *  override Moon rides the visible ring at every epoch BY CONSTRUCTION.
- *  Conventions mirrored from the layer branch (moveModel ~L57423): SI-year
- *  coordinate _jdToSIyear (UT basis), of-date chains, signs apsidal +/nodal −.
- *  Anchored at J2000 (chains = 0 there → Meeus anchors exact). The Meeus Lp
- *  T³/T⁴ tails are OMITTED here (the chains carry the tidal content); the
- *  planetary Lp remainder rides the bounded e_E²-channel carrier
- *  _fwLpPlanetaryCarrier (its J2000 Taylor truncation is the old
- *  (T2_LP−T2_LP_TIDAL)·T² polynomial); snapshot mode keeps the certified
- *  polynomial skeleton, bit-equivalent at J2000 by construction. The Sun of
- *  the arguments is the ONE certified Sun (its mean longitude and mean
- *  perihelion of date, injected). Known accepted in-window deltas of
- *  the chain anchors vs Meeus rates (docs/66 §1): M′ ≈ −0.9° at −584,
- *  dominated by the framework's kinematically-derived anomalistic month
- *  being 0.171 s shorter than Meeus's MPR-implied value. */
-function _fwMoonArgsDeep(jd) { return _moonArgsM().fwArgsDeep(jd); }
 
 /** Lunar fundamental arguments {Lp, D, M, Mp, F} (degrees, of-date) at JD_TT,
  *  source-switched: the framework-native secular skeleton by
@@ -3138,10 +2725,6 @@ function meanTropicalYearDaysAtAge(t_Ma) { return _deepLod().tropicalYearDaysAtA
 /** Diagnostic: days/year at epoch (tropical year ÷ LOD at epoch). */
 function meanYearInDaysAtAge(t_Ma) { return _deepLod().yearInDaysAtAge(t_Ma); }
 
-// ───── Moon distance correction + Kepler month ─────
-// The bodies live in @essrt/physics/moon/month-chain (see _moonChain).
-/** Solar Δa correction (km) for Moon's apparent semi-major axis (doc 24). */
-function meanSolarDeltaAAtAge(t_Ma, a_apparent_km) { return _moonChain().solarDeltaAKmAtAge(t_Ma, a_apparent_km); }
 
 /** Moon apparent distance in km (Layer-2 output, geometric Earth-Moon). */
 function meanMoonDistanceAtAge(t_Ma) { return _moonChain().distanceKmAtAge(t_Ma); }
@@ -3158,17 +2741,6 @@ function meanSynodicMonthAtAge(t_Ma) { return _moonChain().synodicMonthSecondsAt
 /** Moon tropical month in seconds (equinox-referenced). */
 function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSecondsAtAge(t_Ma); }
 
-// ═════════════════════════════════════════════════════════════════════════
-// Deep-time lunar precession — the perigee and node periods of date are the
-// month chain's Brouwer–Clemence m² scaling × the e_E-channel modulation
-// (@essrt/physics moon/month-chain, the chain's instance; the of-date
-// perigee/node are the count compositions meanMoon*OfDateCyclesBetween). Doc 99.
-// ═════════════════════════════════════════════════════════════════════════
-
-// ───── Moon-chain mean-longitude integrators for deep time ─────
-// Moon tropical month at J2000 (SI seconds): the sidereal month less one
-// equinox turn per T_p — the same relation moonTropicalMonth (days) is built from.
-const MOON_TROPICAL_MONTH_J2000_S = 1 / (1 / MOON_SIDEREAL_MONTH_J2000_S + 1 / (AXIAL_PRECESSION_J2000_DAYS * SECONDS_PER_DAY));
 // ≈ 2,360,584.7 s (≈ 27.32158 d × 86400 s/d)
 
 /** Derived period helpers in seconds, mirroring the in-days formulas at
@@ -3207,8 +2779,6 @@ function _moonChainCycles(periodFnSeconds, yearA, yearB) {
 function meanMoonOrbitsBetweenYears(yearA, yearB)         { return _moonChainCycles(meanTropicalMonthAtAge, yearA, yearB); }
 function meanMoonApsidalCyclesBetween(yearA, yearB)        { return _moonChainCycles(meanLunarPerigeePrecessionAtAge, yearA, yearB); }
 function meanMoonNodalCyclesBetween(yearA, yearB)          { return _moonChainCycles(meanLunarNodePrecessionAtAge, yearA, yearB); }
-function meanMoonApsidalMeetsNodalCyclesBetween(yearA, yearB) { return _moonChainCycles(meanApsidalMeetsNodalAtAge, yearA, yearB); }
-function meanMoonLunarLevelingCyclesBetween(yearA, yearB)  { return _moonChainCycles(meanLunarLevelingCycleAtAge, yearA, yearB); }
 // Draconitic composition wrappers.
 function meanMoonDraconicOrbitsBetween(yearA, yearB)       { return _moonChainCycles(meanNodalMonthAtAge, yearA, yearB); }
 /** Of-date node cycles between years = draconic orbits − tropical orbits
@@ -3243,51 +2813,8 @@ const _deepEcc = () => _dtc().deepEcc;   // B2: the chain's
  *  centuries), step ≤ ~4,000 yr at deep time. Bounded at every epoch. */
 function _fwChannelIntegral(T, s) { return _deepEcc().channelIntegral(T, s); }   // decision (ii): the ONE deep e
 
-/** Bounded planetary Lp carrier: the record's planetary T² remainder
- *  (T2_LP − T2_LP_TIDAL, +7.247″/cy²) is the J2000 Taylor truncation of
- *      K_PL · ∫₀ᵀ (e_E²(t′) − e_E²(J2000)) dt′
- *  — the Moon's mean motion responds to the SOLAR eccentricity channel
- *  (the Laplace/Adams planetary acceleration). CHANNEL-ONLY normalization
- *  (v4 carrier split): K_PL is derived lazily from the channel part of the
- *  record remainder (planetary +5.8665″ + the 0.077″ Meeus-tidal gap;
- *  k = −2332 °/cy per e², inside the adiabatic −2370 ± 40) — the
- *  figure+frame part (+1.30363″) lives in _fwLpObliquityCarrier below. No
- *  new constants. Bounded at every epoch (the T² parabola reaches 7,892°
- *  of spurious longitude at +200 kyr; this carrier stays bounded). Same
- *  Simpson scheme as _fwChannelIntegral.
- *  v4 BUDGET ATTRIBUTION (closed to 0.1″ with primary sources —
- *  astro-reference.json elpW1T2Decomposition_arcsecPerCy2, runnable at
- *  tools/explore/v4-kpl-budget.js): the remainder = true planetary +5.8665″
- *  (the e_E²-channel part; Chapront et al. 2002) + Earth-figure J2 +0.1925″
- *  + frame ṗ_A T² +1.11113″ + 0.077″ Meeus-era tidal-convention gap —
- *  the frame part now DERIVED at 104% by the ṗ composition chain
- *  (tools/explore/v4-pdot-composer3.js). E5 RESOLVED (adiabatic-ramp lab,
- *  tools/explore/v4-e5-adiabatic-ramp.js): the convention-free k measured
- *  by slowly ramping e_S inside one integration is −2370 ± 40 °/cy per e²,
- *  confirming the ELP-implied −2320 at ~2% and exposing the fixed-mean-a
- *  scan value (−2704) as a held-quantity protocol artifact (mean osculating
- *  a vs the conserved action — an m²-order bookkeeping difference, the same
- *  order as k itself). Direct planetary+J2 terms measured small (+0.47″/cy²,
- *  tools/explore/v4-e5-direct-planetary.js). */
-function _fwLpPlanetaryCarrier(T) { return _moonArgsM().planetaryCarrier(T); }
 
-/** v4 carrier split — bounded OBLIQUITY-LINE carrier for the non-channel Lp
- *  remainder (Earth-figure J2 +0.1925″ + frame ṗ_A +1.11113″ = +1.30363″/cy²,
- *  the ~18% of the T² remainder that is NOT solar-eccentricity physics; K_PL
- *  budget, astro-reference elpW1T2Decomposition_arcsecPerCy2). Both parts
- *  respond to the obliquity/ecliptic motion, so the rate perturbation rides
- *  the published obliquity of date (bounded):
- *      Lp_obl(T) = C_OBL · ∫₀ᵀ (ε(t′) − ε₀) dt′,   C_OBL = 2·T2_OBL/ε̇₀
- *  J2000 Taylor = T2_OBL·T² exactly (ε̇₀ measured from the published curve,
- *  ≈ −46.8″/cy); bounded at every epoch because ε is. Zero new fitted
- *  values — amplitude from documented constants, shape from the model's own
- *  obliquity. Same Simpson scheme as the channel carrier (finer step: the
- *  obliquity's 41-kyr line needs ~2 kyr resolution). */
-function _fwLpObliquityCarrier(T) { return _moonArgsM().obliquityCarrier(T); }
 
-/** e_E-channel rate modulation [g(t)/g₀]^s at age t_Ma (positive = past). ≡ 1 at J2000.
- *  Rides the ONE deep e. */
-function _eCompModulation(t_Ma, s) { return _deepEcc().modulation(t_Ma, s); }
 
 // The month/precession chain lives ONCE in @essrt/physics/moon/month-chain —
 // the chain's instance (B2).
@@ -3320,45 +2847,9 @@ function meanAnomalisticMonthAtAge(t_Ma) { return _moonChain().anomalisticMonthS
 /** Moon nodal (draconic) month in seconds. */
 function meanNodalMonthAtAge(t_Ma) { return _moonChain().nodalMonthSecondsAtAge(t_Ma); }
 
-// ───── Stellar/sidereal days ─────
-// (the anomalistic year of date has ONE home — the year-lengths factory's
-// construction on the movement's own apsidal line, _yearLengthsM())
 
-/** Stellar day in seconds (Earth rotation vs fixed stars). */
-function meanStellarDayAtAge(t_Ma) {
-  const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
-  const LOD_s   = meanLodSecondsAtAge(t_Ma);
-  if (LOD_s === null) return null;
-  return T_sid_s / (T_sid_s / LOD_s + 1);
-}
 
-/** Sidereal day in seconds (Earth rotation vs precessing equinox). */
-function meanSiderealDayAtAge(t_Ma) {
-  const T_sid_s = meanSiderealYearSecondsAtAge(t_Ma);
-  const LOD_s   = meanLodSecondsAtAge(t_Ma);
-  if (LOD_s === null) return null;
-  // the equinox's turn is one per T_p(t)
-  return T_sid_s / (T_sid_s / LOD_s + 1 + 1 / _axialPrecessionPeriodYearsAtAge(t_Ma));
-}
 
-// ───── Per-planet semi-major axes + Earth-planet distances (Driver 2) ─────
-function meanMercurySemiMajorAxisAtAge(t_Ma) { return MERCURY_ORBIT_DISTANCE_J2000 * meanAuAtAge(t_Ma); }
-function meanVenusSemiMajorAxisAtAge(t_Ma)   { return VENUS_ORBIT_DISTANCE_J2000   * meanAuAtAge(t_Ma); }
-function meanEarthSemiMajorAxisAtAge(t_Ma)   { return meanAuAtAge(t_Ma); }
-function meanMarsSemiMajorAxisAtAge(t_Ma)    { return MARS_ORBIT_DISTANCE_J2000    * meanAuAtAge(t_Ma); }
-function meanJupiterSemiMajorAxisAtAge(t_Ma) { return JUPITER_ORBIT_DISTANCE_J2000 * meanAuAtAge(t_Ma); }
-function meanSaturnSemiMajorAxisAtAge(t_Ma)  { return SATURN_ORBIT_DISTANCE_J2000  * meanAuAtAge(t_Ma); }
-function meanUranusSemiMajorAxisAtAge(t_Ma)  { return URANUS_ORBIT_DISTANCE_J2000  * meanAuAtAge(t_Ma); }
-function meanNeptuneSemiMajorAxisAtAge(t_Ma) { return NEPTUNE_ORBIT_DISTANCE_J2000 * meanAuAtAge(t_Ma); }
-
-function _earthPlanetDist(a_E, a_P) { return Math.sqrt(a_E*a_E + a_P*a_P); }
-function meanEarthMercuryDistanceAtAge(t_Ma) { return _earthPlanetDist(meanAuAtAge(t_Ma), meanMercurySemiMajorAxisAtAge(t_Ma)); }
-function meanEarthVenusDistanceAtAge(t_Ma)   { return _earthPlanetDist(meanAuAtAge(t_Ma), meanVenusSemiMajorAxisAtAge(t_Ma)); }
-function meanEarthMarsDistanceAtAge(t_Ma)    { return _earthPlanetDist(meanAuAtAge(t_Ma), meanMarsSemiMajorAxisAtAge(t_Ma)); }
-function meanEarthJupiterDistanceAtAge(t_Ma) { return _earthPlanetDist(meanAuAtAge(t_Ma), meanJupiterSemiMajorAxisAtAge(t_Ma)); }
-function meanEarthSaturnDistanceAtAge(t_Ma)  { return _earthPlanetDist(meanAuAtAge(t_Ma), meanSaturnSemiMajorAxisAtAge(t_Ma)); }
-function meanEarthUranusDistanceAtAge(t_Ma)  { return _earthPlanetDist(meanAuAtAge(t_Ma), meanUranusSemiMajorAxisAtAge(t_Ma)); }
-function meanEarthNeptuneDistanceAtAge(t_Ma) { return _earthPlanetDist(meanAuAtAge(t_Ma), meanNeptuneSemiMajorAxisAtAge(t_Ma)); }
 
 /** Planet orbital period in seconds at given age (Kepler with mass loss). */
 function meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s) {
@@ -3366,17 +2857,7 @@ function meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s) {
   return _POC.driver2PeriodSecondsAtAge(t_Ma, T_p_J2000_s, SOLAR_MASS_LOSS_FRAC_PER_YR);
 }
 
-/** Earth-planet synodic period in seconds. */
-function meanEarthPlanetSynodicPeriodAtAge(t_Ma, T_p_J2000_s) {
-  return _POC.synodicPeriodSeconds(meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s),
-                                   meanSiderealYearSecondsAtAge(t_Ma));
-}
 
-/** Planet rotation period in seconds. Earth follows LOD(t); others constant. */
-function meanPlanetRotationPeriodAtAge(planetName, t_Ma, T_rot_J2000_s = null) {
-  if (planetName === 'Earth') return meanLodSecondsAtAge(t_Ma);
-  return T_rot_J2000_s;
-}
 
 // ───── Per-planet orbital-cycle integrators ─────
 // Each planet's orbital cycle count between two SI-year inputs, integrated under
@@ -3448,10 +2929,8 @@ function recomputeEpochAnchors(t_Ma) {
 // source globals already reflect the new epoch.
 function recomputeDerivedAnchorsForEpoch(t_Ma) {
   // Tier 1 — math-critical (ordered by dependency)
-  balancedYear          = 2000;   // plan 07 R10: J2000 by construction
 
   // Tier 2 — display-only re-derivations
-  meanearthRotationsinDays  = meansolaryearlengthinDays + 1;
   meanSiderealday           = (meansolaryearlengthinDays / (meansolaryearlengthinDays + 1)) * meanlengthofday;
   // The equinox regresses one turn per T_p(t) — the composed lunisolar period
   // (its J2000 anchor 1,296,000/p_A).
@@ -3777,13 +3256,10 @@ function recomputeMoonDerivedForEpoch(t_Ma) {
   // Apsidal-meets-nodal: beat of anomalistic + nodal months
   moonApsidalMeetsNodalindays    = (moonNodalMonth / (moonAnomalisticMonth - moonNodalMonth)) * moonAnomalisticMonth;
   // Lunar leveling: beat of nodal + apsidal precessions
-  moonLunarLevelingCycleindays   = (moonNodalPrecessionindaysEarth / (moonNodalPrecessionindaysEarth - moonApsidalPrecessionindaysEarth)
-                                    * (moonApsidalPrecessionindaysEarth / days)) * days;
   // Draconic year: harmonic sum of year + nodal precession
   moonDraconicYearICRF           = 1 / ((1 / days) + (1 / moonNodalPrecessionindaysEarth));
   moonDraconicYearEarth          = 1 / (1 / moonDraconicYearICRF - 1 / Tp_days);
   // Moon orbital speed in km/h
-  moonSpeed                      = (moonDistance * Math.PI * 2) / (days * (1 / (days / moonSiderealMonth))) / 24;
   return true;
 }
 
@@ -3800,7 +3276,6 @@ function recomputeMoonAndAuForEpoch(t_Ma) {
     console.warn(`recomputeMoonAndAuForEpoch(${t_Ma}): past tidal-lock asymptote — Moon/AU anchors unchanged`);
     return false;
   }
-  const a_corr_km  = meanMoonDistanceCorrectedAtAge(t_Ma);
   const T_sm_s     = meanMoonSiderealMonthAtAge(t_Ma);
   const T_anom_s   = meanAnomalisticMonthAtAge(t_Ma);
   const T_nod_s    = meanNodalMonthAtAge(t_Ma);
@@ -3809,8 +3284,6 @@ function recomputeMoonAndAuForEpoch(t_Ma) {
   const LOD_s      = meanLodSecondsAtAge(t_Ma);
 
   moonDistance           = a_app;
-  moonDistanceCorrected  = a_corr_km;
-  moonOrbitalShift       = a_corr_km - a_app;
   currentAUDistance      = meanAuAtAge(t_Ma);
 
   // Months expressed in current-epoch days (consistent with how script.js
@@ -4030,25 +3503,6 @@ function _engineYearOfSceneYear(sceneYear) {
   const jd0 = dateToJulianDay(y, 1, 1), jd1 = dateToJulianDay(y + 1, 1, 1);
   return _engineYearTT(jd0 + (sceneYear - y) * (jd1 - jd0));
 }
-// = startmodelyearwithCorrection by construction (≈ 2000.4977 at the
-// canonical startmodelJD = 2451716.5). All chain-cycle callers that
-// reference STARTMODEL_YEAR_SI as anchor are automatically consistent with
-// the calendar-year drift correction.
-
-/** Year coordinate to feed a FITTED-HARMONIC formula, given an instant as JD.
- *
- *  A formula fitted on the SI-year axis (the axis the scene's rotations ran
- *  on, hence the axis on which the measured signal is periodic) must be fed
- *  that axis: a CALENDAR year is silently wrong at deep time (Julian 365.25 vs
- *  SI 365.24189 diverge; re-fitting on the calendar axis was measured 63×
- *  worse because the basis spends harmonics absorbing a calendar artifact).
- *  The two axes agree at J2000, so this is invisible near the epoch.
- *
- *  Gated on the deep-time toggle to match the `_currentYearSI` idiom below:
- *  under snapshot mode the formulas stay on the calendar axis they always used.
- */
-const _formulaYearFromJD = (jd) =>
-  DEEP_TIME_MODE_ENABLED ? _jdToSIyear(jd) : julianDateToDecimalYear(jd);
 
 // ───── Meeus arguments vs integrator-derived (verification) ─────
 // Compares Meeus Ch. 47 polynomial values (Lp, D, M, M', F) to our
@@ -4225,18 +3679,7 @@ function resetEpochToJ2000() {
   return true;
 }
 
-/** Enable auto-sync of setEpoch to o.currentYear via the animation-loop hook. */
-function enableDeepTimeMode() {
-  DEEP_TIME_MODE_ENABLED = true;
-  console.log("Deep-time mode ENABLED. setEpoch will auto-sync to o.currentYear every frame.");
-}
 
-/** Disable auto-sync AND reset all deep-time globals to J2000. */
-function disableDeepTimeMode() {
-  DEEP_TIME_MODE_ENABLED = false;
-  resetEpochToJ2000();
-  console.log("Deep-time mode DISABLED. All globals reset to J2000.");
-}
 
 function isDeepTimeMode()  { return DEEP_TIME_MODE_ENABLED; }
 function currentEpochTMa() { return currentEpoch_t_Ma; }
@@ -5634,18 +5077,6 @@ const mercuryPerihelionFromEarth = {
   isNotPhysicalObject: true,
 };
 
-// Ascending node lookup by planet name (for post-hoc RA/Dec correction)
-// Static J2000 values used as fallback; dynamic values from o.<planet>AscendingNode preferred
-const _planetAscNodeLookup = {
-  Mercury: planets.mercury.ascendingNode, Venus: planets.venus.ascendingNode, Mars: planets.mars.ascendingNode,
-  Jupiter: planets.jupiter.ascendingNode, Saturn: planets.saturn.ascendingNode,
-  Uranus: planets.uranus.ascendingNode, Neptune: planets.neptune.ascendingNode,
-};
-const _planetAscNodeDynKey = {
-  Mercury: 'mercuryAscendingNode', Venus: 'venusAscendingNode', Mars: 'marsAscendingNode',
-  Jupiter: 'jupiterAscendingNode', Saturn: 'saturnAscendingNode',
-  Uranus: 'uranusAscendingNode', Neptune: 'neptuneAscendingNode',
-};
 
 // (The planet containers hang on barycenterEarthAndSun directly; the chain
 // places every rendered planet quantity and the orbit-plane grid is a scene
@@ -6137,8 +5568,6 @@ const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, mercuryPerihe
 // ADD ALL CALENDAR CONSTANTS
 //*************************************************************
 const GREGORIAN_START = { year: 1582, month: 10, day: 15};
-// Start of the Gregorian Calendar
-const GREGORIAN_START_JD = K.timeReference.gregorianStartJD;
 // Start of the Gregorian Calendar in Juliandate (2299160.5)
 const REVISION_START_JD = perihelionalignmentJD;
 // Start of the Revised Julian Calendar in Juliandate
@@ -6393,10 +5822,6 @@ let o = {
   'Axis helpers': false,
   Orbits: true,
   Time: "00:00:00",
-  Zoom: 0,
-  worldCamX: '0',
-  worldCamY: '0',
-  worldCamZ: '0',
   worldCamDist: '0',
   worldCamDistKm: '0',
   worldCamRa: '0',
@@ -6412,17 +5837,8 @@ let o = {
   distanceUnit : 'AU',
   RA_Display : '',
   Dec_Display : '',
-  perihelionDate : "",
-
-  'Line trace': true,
-  'Camera Lat': 0,
-  'Camera Long': 0,
   'Polar line': false,
   polarLineLength: 1,
-  Performance: false,
-  camX: 0,
-  camY: 0,
-  camZ: 0,
   Size: 1,
   traceSize: 1,
   traceLength: sYear * 18,
@@ -6448,9 +5864,6 @@ let o = {
   saturnElongation: 0.01,
   uranusElongation: 0.01,
   neptuneElongation: 0.01,
-  plutoElongation: 0.01,
-  halleysElongation: 0.01,
-  erosElongation: 0.01,
 
   // Earth-frame perihelion (equatorial RA - fluctuates with Earth's precession)
   mercuryPerihelion: 0,
@@ -6462,9 +5875,6 @@ let o = {
   saturnPerihelion: 0,
   uranusPerihelion: 0,
   neptunePerihelion: 0,
-  plutoPerihelion: 0,
-  halleysPerihelion: 0,
-  erosPerihelion: 0,
 
   // Ecliptic-frame perihelion (J2000 ecliptic - stable, true heliocentric value)
   mercuryPerihelionEcliptic: 0,
@@ -6474,10 +5884,7 @@ let o = {
   saturnPerihelionEcliptic: 0,
   uranusPerihelionEcliptic: 0,
   neptunePerihelionEcliptic: 0,
-  plutoPerihelionEcliptic: 0,
-  halleysPerihelionEcliptic: 0,
-  erosPerihelionEcliptic: 0,
-  
+
   mercuryArgumentOfPeriapsis: 0,
   venusArgumentOfPeriapsis: 0,
   marsArgumentOfPeriapsis: 0,
@@ -6485,10 +5892,7 @@ let o = {
   saturnArgumentOfPeriapsis: 0,
   uranusArgumentOfPeriapsis: 0,
   neptuneArgumentOfPeriapsis: 0,
-  plutoArgumentOfPeriapsis: 0,
-  halleysArgumentOfPeriapsis: 0,
-  erosArgumentOfPeriapsis: 0,
-  
+
   mercuryAscendingNode: 0,
   venusAscendingNode: 0,
   marsAscendingNode: 0,
@@ -6496,9 +5900,6 @@ let o = {
   saturnAscendingNode: 0,
   uranusAscendingNode: 0,
   neptuneAscendingNode: 0,
-  plutoAscendingNode: 0,
-  halleysAscendingNode: 0,
-  erosAscendingNode: 0,
 
   mercuryDescendingNode: 0,
   venusDescendingNode: 0,
@@ -6507,9 +5908,6 @@ let o = {
   saturnDescendingNode: 0,
   uranusDescendingNode: 0,
   neptuneDescendingNode: 0,
-  plutoDescendingNode: 0,
-  halleysDescendingNode: 0,
-  erosDescendingNode: 0,
 
   mercuryMeanAnomaly: 0,
   mercuryTrueAnomaly: 0,
@@ -6532,15 +5930,6 @@ let o = {
   neptuneMeanAnomaly: 0,
   neptuneTrueAnomaly: 0,
   neptuneEccentricAnomaly: 0,
-  plutoMeanAnomaly: 0,
-  plutoTrueAnomaly: 0,
-  plutoEccentricAnomaly: 0,
-  halleysMeanAnomaly: 0,
-  halleysTrueAnomaly: 0,
-  halleysEccentricAnomaly: 0,
-  erosMeanAnomaly: 0,
-  erosTrueAnomaly: 0,
-  erosEccentricAnomaly: 0,
 
   // Earth anomalies (calculated from Sun's position)
   earthMeanAnomaly: 0,
@@ -6557,7 +5946,6 @@ let o = {
   saturnHeightAboveInvPlane: 0,
   uranusHeightAboveInvPlane: 0,
   neptuneHeightAboveInvPlane: 0,
-  plutoHeightAboveInvPlane: 0,
 
   // Boolean flags for above/below invariable plane
   mercuryAboveInvPlane: true,
@@ -6568,11 +5956,6 @@ let o = {
   saturnAboveInvPlane: true,
   uranusAboveInvPlane: true,
   neptuneAboveInvPlane: true,
-  plutoAboveInvPlane: true,
-  halleysHeightAboveInvPlane: 0,
-  halleysAboveInvPlane: true,
-  erosHeightAboveInvPlane: 0,
-  erosAboveInvPlane: true,
 
   // Dynamic ascending nodes on invariable plane - J2000-verified values (primary, precess over time)
   mercuryAscendingNodeInvPlane: 0,
@@ -6583,9 +5966,6 @@ let o = {
   saturnAscendingNodeInvPlane: 0,
   uranusAscendingNodeInvPlane: 0,
   neptuneAscendingNodeInvPlane: 0,
-  plutoAscendingNodeInvPlane: 0,
-  halleysAscendingNodeInvPlane: 0,
-  erosAscendingNodeInvPlane: 0,
 
   // ICRF perihelion longitude (J2000 epoch coordinates, linear precession at ICRF rate)
 
@@ -6599,9 +5979,6 @@ let o = {
   saturnAscendingNodeInvPlaneEcliptic: 0,
   uranusAscendingNodeInvPlaneEcliptic: 0,
   neptuneAscendingNodeInvPlaneEcliptic: 0,
-  plutoAscendingNodeInvPlaneEcliptic: 0,
-  halleysAscendingNodeInvPlaneEcliptic: 0,
-  erosAscendingNodeInvPlaneEcliptic: 0,
 
   // Ecliptic inclination OF DATE — the chain's orbit plane against the engine
   // Earth-orbit normal of date (updateDynamicInclinations; the visual
@@ -6678,22 +6055,6 @@ let o = {
   runYearAnalysisToggle  : false,
   _yearAnalysisBusy      : false,
 
-  // Obliquity Calibration Test state
-  runCalibrationTest    : false,
-  runFindOptimalRA      : false,
-  runTropicalYearAnalysis : false,
-  runDecemberSolsticeAnalysis : false,
-  runInvestigateParams  : false,
-  runVerifyPerihelionRate: false,
-  runEquinoxAnalysis    : false,
-  runAnoministicAnalysis: false,
-  runSiderealYearAnalysis: false,
-  runAllAlignments      : false,
-  runSiderealDayAnalysis : false,
-  runSolarDayAnalysis   : false,
-  runStellarDayAnalysis : false,
-  runDayDiagnostics     : false,
-  runRADiagnostics      : false,
   solarDayReportYear    : 2000,
   _solarDayBusy         : false
 };
@@ -6869,17 +6230,12 @@ document.body.appendChild(labelRenderer.domElement);
 
     // 5) Traverse and append only those labels that are both visible
     //    and in front of the camera
-    let totalLabels   = 0;
-    let wantVisible   = 0;
-    let actuallyShown = 0;
 
     scene.traverse(obj => {
     if (!(obj instanceof CSS2DObject)) return;
-    totalLabels++;
 
     // skip labels you’ve explicitly hidden
     if (!obj.visible) return;
-    wantVisible++;
 
     //  a) get its world‐position
     worldV.setFromMatrixPosition(obj.matrixWorld);
@@ -6900,17 +6256,13 @@ document.body.appendChild(labelRenderer.domElement);
     el.style.display   = '';
 
     dom.appendChild(el);
-    actuallyShown++;
     });
-
-    // console.log(`Labels — total: ${totalLabels}, wanted: ${wantVisible}, shown: ${actuallyShown}`);
   };
 })(labelRenderer, baseCamDistance);
 
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.5; // Try adjusting this
-renderer.useLegacyLights = false
 
 document.body.appendChild(renderer.domElement);
 
@@ -6921,9 +6273,7 @@ const textureCache = new Map();
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; // for smoother motion, optional
 controls.dampingFactor = 0.5;  // Lower = smoother, higher = snappier
-controls.enableKeys = false;
 controls.zoomSpeed = 8.0;
-controls.dollySpeed = 8.0;
 
 // Per-planet minimum distance multipliers (distance = radius * multiplier)
 // Doubled (2026-06-23) after halving the body-size formulas to real radii — the
@@ -7048,9 +6398,8 @@ barycenterEarthAndSun.pivotObj.add(neptune.containerObj);
 // live with the other hybrid machinery below.
 const HYBRID_SPIN_REQUESTED = true;
 // Scratch vectors/quaternions for the engine placement:
-const _HTC_A = new THREE.Vector3(), _HTC_N = new THREE.Vector3(), _HTC_U = new THREE.Vector3();
-const _HTC_Q1 = new THREE.Quaternion(), _HTC_Q2 = new THREE.Quaternion(),
-      _HTC_Q3 = new THREE.Quaternion(), _HTC_Q4 = new THREE.Quaternion();
+const _HTC_A = new THREE.Vector3(), _HTC_U = new THREE.Vector3();
+const _HTC_Q3 = new THREE.Quaternion(), _HTC_Q4 = new THREE.Quaternion();
 const _HTC_M4 = new THREE.Matrix4();
 
 //*************************************************************
@@ -7328,10 +6677,6 @@ sunLight.shadow.mapSize.set(1024, 1024);
 sunLight.shadow.bias = -0.0001;
 sunLight.shadow.radius = 1;
 sunLight.shadow.camera.far = 1000; // Increase only if necessary
-
-// Optional: helper for debugging shadow frustum
-//const shadowCameraHelper = new THREE.CameraHelper(sunLight.shadow.camera);
-//scene.add(shadowCameraHelper);
 
 // Add the light to the scene
 scene.add(sunLight);
@@ -8396,10 +7741,6 @@ let _invPlaneDebugEnabled = false; // Set to true to enable debug logging
 // Cached objects to prevent garbage collection (reused every frame)
 const _invPlane_tiltAxis = new THREE.Vector3();
 const _invPlane_quaternion = new THREE.Quaternion();
-const _invPlane_localPos = new THREE.Vector3();
-const _invPlane_tubeDir = new THREE.Vector3();
-const _invPlane_tubeQuat = new THREE.Quaternion();
-const _invPlane_yAxis = new THREE.Vector3(0, 1, 0);
 
 function updateInvariablePlanePosition() {
   if (!invariablePlaneGroup || !invariablePlaneGroup.visible) return;
@@ -8774,9 +8115,7 @@ function updateSunCenteredInvPlane() {
 
   // Get planet's orbit data
   const planetObj = planetData.obj;
-  const inclinationDeg = typeof planetData.inclination === 'function' ? planetData.inclination() : planetData.inclination;
   const ascNodeDeg = planetData.ascNode();  // ICRF value for marker positioning
-  const ascNodeEclipticDeg = planetData.ascNodeEcliptic();  // Ecliptic value for labels
   const heightAU = planetData.height() || 0;
 
   // Get planet's world position
@@ -8824,9 +8163,7 @@ function updateSunCenteredInvPlane() {
   const ascNodeRad = -ascNodeDeg * Math.PI / 180;
 
   const ascMarker = sunCenteredNodeMarkers.userData.ascMarker;
-  const ascLabel = sunCenteredNodeMarkers.userData.ascLabel;
   const descMarker = sunCenteredNodeMarkers.userData.descMarker;
-  const descLabel = sunCenteredNodeMarkers.userData.descLabel;
 
   // Calculate position in plane-local coordinates (on the plane, Y=0)
   // These are positions relative to the orbit center
@@ -8930,7 +8267,6 @@ scene.add(eccentricityPathGroup);
 // CREATE MILKYWAY SKYDOME
 //*************************************************************
 const skyGeo = new THREE.SphereGeometry(100000, 25, 25);
-const loader = new THREE.TextureLoader();
 const skyTexture = loadTexture("public/milkyway.jpg");
 
 // Set correct color space for color image textures
@@ -9009,8 +8345,6 @@ const constellationsUrl = 'public/input/constellations.json';
 const starGlowURL       = 'public/lensflare2.png';
 
 let starTexture;
-let starSizeMaterial = null;
-let starsMesh;
 
 let needsLabelUpdate = true;
 let cameraMoved = true; // Force first update
@@ -9032,8 +8366,6 @@ for (const evName of ['click', 'change', 'input', 'keydown', 'pointerup']) {
 controls.addEventListener('change', () => { needsLabelUpdate = true; });
 //    • On user interaction start (wakes render loop from idle for controls.update):
 controls.addEventListener('start', () => { positionChanged = true; });
-//    • On zoom (if separate):
-camera.addEventListener('zoom',   () => { needsLabelUpdate = true; });
 
 // 3) One dashed‐line material for all constellations
 const constellationMaterial = new THREE.LineDashedMaterial({
@@ -9167,19 +8499,14 @@ window.addEventListener('resize', () => {
 });
 onWindowResize();                            // initial call
 
-let pause = true;
 
 planetObjects.forEach(obj => {
   showHideObject(obj)
 });
 showHideAxisHelpers();
 
-// Create reusable geometries and materials
-const bGeometry = new THREE.SphereGeometry( 1, 32, 16 );
-const unlitMaterial = new THREE.MeshBasicMaterial({ color: 0x777777 });
 
 o.lookAtObj = earth;
-let currPos; 
 
 let lastFrameTime = 0;
 let smoothedFps   = 60;
@@ -9190,7 +8517,7 @@ let lastCameraX   = 0, lastCameraY = 0, lastCameraZ = 0;
 // drawing buffer (a stall and a resolution pop), so a rate hovering around the
 // thresholds must not toggle it.
 const PR_DWELL_MS = 2000, PR_MIN_GAP_MS = 10000;
-let _prOutOfBandSince = 0, _prLastSwitchMs = -Infinity;
+let _prOutOfBandMs = 0, _prLastSwitchMs = -Infinity;   // the dwell counts ACTIVE frame time
 // The SMOOTHED frame time the simulation advances by (an exponential moving
 // average of the real frame gaps, α = 0.1 ≈ a 0.3-s memory at 60 Hz). Measured
 // on the owner's machine (3840×1822 buffer, 60 fps median): one frame in every
@@ -9202,10 +8529,6 @@ let _prOutOfBandSince = 0, _prLastSwitchMs = -Infinity;
 // longer jumps the scene.
 let smoothedDeltaMs = 1000 / 60;
 
-// At the top of your file, create reusable vectors
-const centerPosVec = new THREE.Vector3();
-const starPosVec  = new THREE.Vector3();
-const scaleVec = new THREE.Vector3();
 const _tempVec = new THREE.Vector3();
 
 /* scratch vectors – avoid per-frame allocations */
@@ -9213,7 +8536,6 @@ const tmp1 = new THREE.Vector3();
 const tmp2 = new THREE.Vector3();
 const tmp3 = new THREE.Vector3();
 
-let cameraWorldPos = new THREE.Vector3();
 
 const tmpVec = new THREE.Vector3();
 
@@ -9239,12 +8561,9 @@ const WOBBLE_POS  = new THREE.Vector3();          // WOBBLE   centre (world)
 const PERIHELION_OF_EARTH_POS  = new THREE.Vector3();   // PERIHELION-OF-EARTH   centre (world)
 const DELTA        = new THREE.Vector3();         // reusable difference-vector
 const LOCAL        = new THREE.Vector3();         // world-to-Earth local
-const DIRECTION    = new THREE.Vector3();         // direction vector for RA/Dec (wobble-corrected)
-const ROT_MATRIX   = new THREE.Matrix4();         // rotation matrix for RA/Dec calculation
 const CAM_LOCAL    = new THREE.Vector3();         // camera in Earth local
 const CAMERA_POS   = new THREE.Vector3();
 const PLANET_POS   = new THREE.Vector3();
-const LOOK_DIR     = new THREE.Vector3();
 const SPHERICAL    = new THREE.Spherical();
 
 // Reusable vectors for updateFlares()
@@ -9262,26 +8581,13 @@ const _elSunPos = new THREE.Vector3();
 const _elEarthPos = new THREE.Vector3();
 const _elTargetPos = new THREE.Vector3();
 
-// Pooled vectors for dynamic inclination calculations (updateDynamicInclinations
-// dots plain [x, y, z] triples in the J2000 ecliptic frame)
 
-const world = new THREE.Vector3();
-const ndc   = new THREE.Vector3();
 
-const _pos        = new THREE.Vector3();
-const _camPos     = new THREE.Vector3();
-const _starPos    = new THREE.Vector3();
-const _linePos    = new THREE.Vector3();
 
-const starsArr = sceneObjects.stars.children;
-const constArr = sceneObjects.constellations.children;
-
-let tlapsed = 0;
 let posElapsed =0;
 let domElapsed =0;  // Separate throttle for DOM label updates (5 Hz)
 let uiElapsed =0;
 let lightElapsed =0;
-let updatePredictionElapsed = 0;
 let astroCalcElapsed = 0;  // Throttle for heavy astronomical calculations (10 Hz)
 let visualElapsed = 0;  // Throttle for visual effects (30 Hz)
 let labelElapsed = 0;   // Throttle for CSS2D label updates during playback (30 Hz)
@@ -9289,15 +8595,10 @@ let labelElapsed = 0;   // Throttle for CSS2D label updates during playback (30 
 // above: showHideObject sets positionChanged and runs at module scope before
 // this point — a dev bundle keeps `let` in place and threw the TDZ error)
 let _needsInitialSceneUpdate = true; // Force forceSceneUpdate() on first render frame
-let eggTriggered = false;
 
 const DEG = Math.PI / 180;
 const KM_TO_MI = 0.62137119;   // 1 kilometre  → 0.621 371 miles
 
-const state = {
-  prevJD  : startmodelJD,     // JD at previous animation tick
-  deltaT  : deltaTStart    // accumulated ΔT (seconds)
-};
 
 // create the golden-spiral line (returns { line, update })
 const golden = goldenspiralPerihelionObjects(
@@ -9351,13 +8652,7 @@ const scalableObjects = [
   inclinationPathGroup
 ];
 
-//const baseCamDistance = camera.position.length(); // distance that feels “100 %” size
-const zoomFactor = 1.0;   // identical to your star-label code
-const minScale   = 0.01;   // clamp values to taste
-const maxScale   = 0.9;
 
-const label        = document.getElementById('planetLabel');
-const labelContent = label.querySelector('.labelContent');
 
 //*************************************************************
 // PLANET HIERARCHY INSPECTOR
@@ -11722,10 +11017,6 @@ function stephensonDeltaT(year, poly) {
   return _PC.stephensonDeltaT(year, poly);
 }
 
-let _stephensonSolar = null;
-let _stephensonLunar = null;
-let _documentedLunar = null;
-let _nasaLunarCanon = null;
 function wgcUnwrap(angles) {
   const out = [angles[0]];
   for (let i = 1; i < angles.length; i++) {
@@ -11782,12 +11073,6 @@ function wgcRenderChart(title, yrArr, values, color, label, modelValues, omitRat
   for (let i = 0; i < yrArr.length; i++) {
     pathPoints += (i === 0 ? 'M' : 'L') + sx(yrArr[i]).toFixed(1) + ',' + sy(unwrapped[i]).toFixed(1) + ' ';
   }
-
-  // Trend line
-  const trendY0 = fit.slope * xmin + fit.intercept;
-  const trendY1 = fit.slope * xmax + fit.intercept;
-  const trendStart = { x: sx(xmin), y: sy(trendY0) };
-  const trendEnd   = { x: sx(xmax), y: sy(trendY1) };
 
   const rateArcSecCy = fit.slope * 3600 * 100;  // "/century
   const startVal = values[0];
@@ -11856,8 +11141,6 @@ function wgcRenderPlanet(planetKey) {
   const piFit = wgcLinearFit(d.yrArr, wgcUnwrap(d.piArr));
   const rateRawCy = piFit.slope * 3600 * 100;                   // raw OLS trend
   const rateSinCy = (d.rates && d.rates.sinPi != null) ? d.rates.sinPi : rateRawCy;
-  const ratePiCy = rateSinCy;                                   // prefer sin-fit for period estimate
-  const periodYr = ratePiCy !== 0 ? Math.abs(360 * 3600 * 100 / ratePiCy) : Infinity;
 
   const baselineYr = d.yrArr[d.yrArr.length - 1] - d.yrArr[0];
   const oscPeriod = d.oscPeriod || 10;
@@ -11879,7 +11162,6 @@ function wgcRenderPlanet(planetKey) {
   // The two model curves (A: the chain's advance in ecliptic longitude; B: + the
   // equatorial projection, the projection hypothesis) — see wgcModelCurves.
   const model = wgcModelCurves(planetKey, d);
-  const diffStr = (rate) => undeterminedTrend ? '—' : `${(rateSinCy - rate) >= 0 ? '+' : ''}${(rateSinCy - rate).toFixed(1)}`;
 
   return `
     <div class="wgc-planet-content">
@@ -12722,7 +12004,6 @@ function cfmRenderChart(tabKey) {
   const dataPath  = buildPath(dT, dV);
   const totalPath = buildPath(fT, totalV);
   const l1Path    = buildPath(fT, l1V);
-  const l3Path    = buildPath(fT, l3V);
 
   // Y-axis ticks
   const yticks = [];
@@ -13097,7 +12378,6 @@ function cfmRenderPaperChart(tabKey, opts) {
   const layers = opts.layers || ['total'];
   // SVG/XML entity escaping — proxy labels contain '&' (e.g. "Lisiecki & Raymo")
   // which would break the SVG parser if inserted raw into text elements.
-  const xmlEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   // Tab → window + title (mirrors cfmRenderChart switch)
   let t_lo, t_hi, title, isCenogrid = false, isEpica = false, isCenco2pip = false;
@@ -13923,7 +13203,6 @@ function essrtRenderChart(qtyKey, rangeKey) {
     let labelHtml = '';
     if (labelKept.has(m)) {
       const labelY = margin.top - 6;
-      const labelText = isJ2000 ? 'J2000 (now)' : m.label;
       const labelColor = isJ2000 ? '#ffce4b' : isGen ? '#e07070' : '#b6b6b6';
       const labelWeight = isJ2000 ? '600' : isGen ? '500' : '400';
       labelHtml = `<text x="${x}" y="${labelY}" font-size="9" fill="${labelColor}" font-weight="${labelWeight}" text-anchor="middle">${m.label}</text>`;
@@ -14351,7 +13630,6 @@ async function createEssrtPanel() {
     const hoverLine = svg.querySelector('.essrt-hover-line');
     const hoverDot  = svg.querySelector('.essrt-hover-dot');
     const tooltip   = svg.querySelector('.essrt-hover-tooltip');
-    const bg        = svg.querySelector('.essrt-hover-bg');
     const yearTxt   = svg.querySelector('.essrt-hover-year');
     const valueTxt  = svg.querySelector('.essrt-hover-value');
 
@@ -15327,7 +14605,7 @@ function lcrRenderChart(rangeKey) {
       // Compute proxy Y range from all active sources (with 10% padding).
       let pMin = +Infinity, pMax = -Infinity;
       for (const { filtered } of activeSources) {
-        for (const [_, t] of filtered) {
+        for (const [, t] of filtered) {
           if (t < pMin) pMin = t;
           if (t > pMax) pMax = t;
         }
@@ -16296,7 +15574,6 @@ function _vfpSolarDayLongTermMeanSeconds(year) {
  *  Predictions panel, the report and the API); the smooth secular mean
  *  when the one-source movement is opted out. */
 const _vfpTropicalYearDaysOfDate = (() => {
-  let a = null;
   return (year) => {
     if (_hybridSpinActive()) return _yearLengthsM().tropicalYearSecondsAtYear(year) / SECONDS_PER_DAY;
     // The composed lunisolar precession period of date T_p(t) — the same
@@ -17102,7 +16379,6 @@ const _vfpPIState = {
 // we like to show") — change the two numbers below and nothing else;
 // sampling stays 1-kyr steps whatever the span.
 const _VFPPI_SCREEN_RANGE = [-250000, 100000];
-const _VFPPI_CYCLES_RANGE = [-1000000, 1000000];
 const _vfpPICacheByRange = {};   // static samples — once per session per range
 function _vfpPISamples(range) {
   const r = range || _vfpCurrentTabFor('planet-inclinations').range;
@@ -17316,7 +16592,6 @@ function renderVFPPlanetInclinations() {
   // (the paper notes use the same one) — no Earth text unless Earth is
   // drawn, no reference text unless the overlay is drawn
   const P = _vfpPINoteParts(tab, on, core);
-  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   return '<div class="vfp-chart-block">' +
     controls +
     legendHtml +
@@ -17638,7 +16913,6 @@ function renderVFPPlanetEccentricities() {
   for (const en of core.entries) legendHtml += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="' + swatchCss(en) + '"></span>' + en.name + '</div>';
   legendHtml += '</div>';
   const P = _vfpPENoteParts(on, core);
-  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   return '<div class="vfp-chart-block">' +
     controls +
     legendHtml +
@@ -18525,7 +17799,6 @@ function renderVFPAllPrecession() {
   for (const en of core.entries) legendHtml += '<div class="vfp-legend-item"><span class="vfp-legend-swatch" style="' + swatchCss(en) + '"></span>' + en.name + '</div>';
   legendHtml += '</div>';
   const P = _vfpAPNoteParts(on, log, core, showEcc);
-  const fmtY = (y) => y === 0 ? '0' : Math.abs(y).toLocaleString('en-US') + (y < 0 ? ' BC' : ' AD');
   return '<div class="vfp-chart-block">' +
     controls +
     legendHtml +
@@ -18631,16 +17904,6 @@ function _vfpAPAfterRender(bodyEl) {
   });
 }
 
-// ── Moon: the Meeus Ch. 47 mean-argument RATES → precession periods of date ──
-// The Meeus (1998, Ch. 47; Chapront ELP-2000/82) polynomials of the Moon's
-// mean longitude L′, mean anomaly M′ and argument of latitude F (degrees, T
-// in Julian centuries from J2000) — the coefficients the Moon's longitude
-// evaluator carries inline. The perigee advances at d(L′ − M′)/dT, the node
-// regresses at d(L′ − F)/dT, both against the equinox of date; a period of
-// date is 36,000° over the rate (Julian years). Offered on the canon's
-// −2000 → 3000 range: the T² terms are a fit centred on J2000 (the tidal
-// secular acceleration among them), not deep-time physics.
-const JULIAN_YEAR_SECONDS = DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY;
 const _MEEUS47_LP = [218.3164477, 481267.88123421, -0.0015786, 1 / 538841, -1 / 65194000];
 const _MEEUS47_MP = [134.9633964, 477198.8675055, 0.0087414, 1 / 69699, -1 / 14712000];
 const _MEEUS47_F = [93.2720950, 483202.0175233, -0.0036539, -1 / 3526000, 1 / 863310000];
@@ -19782,7 +19045,6 @@ function _vfpCaptionHtml(blocks) {
   }
   return s + '</div>';
 }
-const _vfpPlainText = (t) => String(t).replace(/<[^>]+>/g, '').replace(/&rarr;/g, '→').replace(/&mdash;/g, '—').replace(/&nbsp;/g, ' ').replace(/&plusmn;/g, '±').replace(/&asymp;/g, '≈').replace(/&Delta;/g, 'Δ').replace(/&middot;/g, '·').replace(/&minus;/g, '−').replace(/&deg;/g, '°').replace(/&varpi;/g, 'ϖ').replace(/&thinsp;/g, ' ').replace(/&amp;/g, '&');
 /** The legend under a paper export's title — ONE renderer for every form
  *  (owner: "standardize the export legend"): centred rows that WRAP at the
  *  page width (a single row overran the 1000-px page with five long names
@@ -20952,8 +20214,6 @@ function setInvGaugeProps(el, value, maxH) {
 }
 o.Time           = posToTime(o.pos);
 o.julianDay      = dateTimeToJulianDay(o.Date, o.Time);
-const pInit      = dayToDateNew(o.julianDay, 'julianday', 'perihelion-calendar');
-o.perihelionDate = `${pInit.date} ${pInit.time}`;
 
 // Well-known historical solar eclipses — consumed by the Solar & Lunar Eclipses
 // tweakpane folder constructed inside setupGUI() below. Must be declared BEFORE
@@ -21482,7 +20742,6 @@ function setupGUI() {
       _rootUpdating = true;
       updatePosition();
       jdCtrl.refresh();
-      periCtrl.refresh();
       blurActiveInput();
       _rootUpdating = false;
     });
@@ -21493,7 +20752,6 @@ function setupGUI() {
       _rootUpdating = true;
       updatePosition();
       jdCtrl.refresh();
-      periCtrl.refresh();
       blurActiveInput();
       _rootUpdating = false;
     });
@@ -21515,27 +20773,21 @@ function setupGUI() {
       // −2,972 d and showed the sun 17° from the equinox).
       o.pos = posFromJD(newJD);
       o.Day = posToDays(o.pos);
-      const p = dayToDateNew(newJD, 'julianday', 'perihelion-calendar');
-      o.perihelionDate = `${p.date}`;
       positionChanged = true;
       dateCtrl.refresh();
       timeCtrl.refresh();
-      periCtrl.refresh();
       blurActiveInput();
       _rootUpdating = false;
     });
 
-  const periCtrl = gui.addBinding(o, 'perihelionDate', { label: 'Perihelion Date', readonly: true });
-  periCtrl.element.style.display = 'none'; // Hidden: no longer aligned to solstice
-
   // Store root controls for selective render-loop refresh
-  o._rootCtrls = { dateCtrl, timeCtrl, jdCtrl, periCtrl };
+  o._rootCtrls = { dateCtrl, timeCtrl, jdCtrl };
 
   // Make root controls visually prominent
-  [dateCtrl, timeCtrl, jdCtrl, periCtrl].forEach(c => {
+  [dateCtrl, timeCtrl, jdCtrl].forEach(c => {
     c.element.classList.add('root-control');
   });
-  periCtrl.element.classList.add('root-control-last', 'root-control-readonly');
+  jdCtrl.element.classList.add('root-control-last');
 
   // ── Simulation Controls ──
   const ctrlFolder = gui.addFolder({ title: 'Simulation Controls' });
@@ -22816,7 +22068,6 @@ function setupGUI() {
     if (!isFinite(startJD) || !isFinite(endJD) || endJD <= startJD) return null;
     const range    = endJD - startJD;
     const dist     = J2000_JD - startJD;
-    const ratio    = dist / range;
     const targetN  = Math.round(range / (50 * meansolaryearlengthinDays)) + 1;
     const lo = Math.max(2, targetN - 2000);
     const hi = targetN + 2000;
@@ -23011,21 +22262,6 @@ function setupGUI() {
 }  
 
 //*************************************************************
-// USE STATISTICS (WHEN NEEDED)
-//*************************************************************
-const stats = new Stats()
-//stats.showPanel(2); // 0: fps, 1: ms, 2: MB
-document.body.appendChild( stats.dom )
-if (!o.Performance) stats.dom.style.display = 'none';
-//if (!o.Performance) stats.dom.style.display = 'visible';
-//stats.dom.style.display = 'none';    // completely removes it from layout
-// OR
-//stats.dom.style.visibility = 'hidden'; // hides but still takes up space
-//stats.dom.style.display = 'block';   // or '' if you want default style
-// OR
-//stats.dom.style.visibility = 'visible';
-
-//*************************************************************
 // SCENE OVERLAYS: watermark, date HUD, keyboard hint
 //*************************************************************
 
@@ -23168,9 +22404,6 @@ function render(now) {
   if (!active) return;
   _wake.active++;
 
-  //stats.begin();
-  //stats.update();
-
   const forceAllUpdates = positionChanged;
   positionChanged = false;
   // A forced scene update moves objects (epoch steps, GUI jumps, toggles) —
@@ -23182,23 +22415,27 @@ function render(now) {
   // this loop pass, after the scene has moved.
   if (forceAllUpdates) needsLabelUpdate = true;
 
-  // 4) FPS smoothing + adaptive pixel ratio
-  const fps = 1000 / deltaMs;
+  // 4) FPS smoothing + adaptive pixel ratio. The frame delta is clamped to
+  // [4, 100] ms as for the simulation step: the first active frame after an
+  // idle pause spans the whole pause and would otherwise read as ~0 fps.
+  const fps = 1000 / Math.min(Math.max(deltaMs, 4), 100);
   smoothedFps = smoothedFps * 0.9 + fps * 0.1;
   // Out of band = below 30 fps at full ratio, or above 40 fps in LOW mode. A
-  // switch needs the condition to hold for PR_DWELL_MS and PR_MIN_GAP_MS since
-  // the last one; the restore goes to the CAPPED start-up ratio
-  // (getOptimizedPixelRatio, ≤ 2), not the raw device ratio — on a ratio-3
-  // display the raw restore left the scene heavier than it started.
+  // switch needs the condition to hold for PR_DWELL_MS of ACTIVE frame time
+  // (not wall time — smoothedFps only moves on active frames, so a paused
+  // page's wall clock must not count as dwell; plan 20 §1b.17) and
+  // PR_MIN_GAP_MS since the last one; the restore goes to the CAPPED start-up
+  // ratio (getOptimizedPixelRatio, ≤ 2), not the raw device ratio — on a
+  // ratio-3 display the raw restore left the scene heavier than it started.
   // ?dpr= pins the ratio for an A/B reading: no adaptive switch while it is set.
   const outOfBand = !URL_FLAGS.has('dpr') && (lowPerformanceMode ? smoothedFps > 40 : smoothedFps < 30);
-  if (!outOfBand) _prOutOfBandSince = 0;
-  else if (!_prOutOfBandSince) _prOutOfBandSince = now;
-  else if (now - _prOutOfBandSince >= PR_DWELL_MS && now - _prLastSwitchMs >= PR_MIN_GAP_MS) {
+  if (!outOfBand) _prOutOfBandMs = 0;
+  else _prOutOfBandMs += Math.min(deltaMs, 100);
+  if (outOfBand && _prOutOfBandMs >= PR_DWELL_MS && now - _prLastSwitchMs >= PR_MIN_GAP_MS) {
     const ratio = lowPerformanceMode ? getOptimizedPixelRatio() : 1;
     renderer.setPixelRatio(ratio);
     lowPerformanceMode = !lowPerformanceMode;
-    _prLastSwitchMs = now; _prOutOfBandSince = 0;
+    _prLastSwitchMs = now; _prOutOfBandMs = 0;
     if (PERF_HUD) { _perf.switches++; console.info(`[perf] pixel ratio → ${ratio} (smoothed ${smoothedFps.toFixed(1)} fps) at t=${(now / 1000).toFixed(1)} s`); }
   }
 
@@ -23270,8 +22507,6 @@ function render(now) {
     o.Date          = daysToDate(o.Day);
     o.Time          = posToTime(o.pos);
     o.julianDay     = dateTimeToJulianDay(o.Date, o.Time);
-    const p         = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
-    o.perihelionDate = `${p.date} ${p.time}`;
     o.currentYear = julianDateToDecimalYear(o.julianDay)
 
     // ───── deep-time auto-sync (gated on DEEP_TIME_MODE_ENABLED) ─────
@@ -23285,18 +22520,14 @@ function render(now) {
       }
     }
 
-    o.worldCamX = Math.round(x);
-    o.worldCamY = Math.round(y);
-    o.worldCamZ = Math.round(z);
-
-    // Refresh root controls (date/time/JD/perihelion) for live updating.
+    // Refresh root controls (date/time/JD) for live updating.
     // _renderLoopRefreshing prevents the change handlers from running
     // blurActiveInput() which would close open dropdowns elsewhere in the GUI.
     if (o._rootCtrls) {
       const ae = document.activeElement;
       const ctrls = o._rootCtrls;
       o._renderLoopRefreshing = true;
-      [ctrls.dateCtrl, ctrls.timeCtrl, ctrls.jdCtrl, ctrls.periCtrl].forEach(c => {
+      [ctrls.dateCtrl, ctrls.timeCtrl, ctrls.jdCtrl].forEach(c => {
         if (c && !c.element.contains(ae)) c.refresh();
       });
       o._renderLoopRefreshing = false;
@@ -23354,7 +22585,7 @@ function render(now) {
   if (posElapsed >= 0.1 || forceAllUpdates) {
     posElapsed = 0;
     updateElongations();
-    golden.update();
+    if (golden.goldenLine.visible) golden.update();   // a hidden spiral rebuilt its CatmullRom curve at 10 Hz (plan 20 §2); the toggle rebuilds it on show
   }
 
   // 8e) Throttle DOM label updates (5 Hz)
@@ -23806,13 +23037,6 @@ function sunRACrossingForYear(year, targetRA, prevJD = null, debug = false) {
   };
 }
 
-/**
- * Legacy wrapper for equinoxForYear - calls sunRACrossingForYear
- */
-function equinoxForYear(year, which = 0, prevEquinoxJD = null, debug = false) {
-  const targetRA = which === 0 ? 0 : 180;
-  return sunRACrossingForYear(year, targetRA, prevEquinoxJD, debug);
-}
 
 /**
  * Detect perihelion passage for a given year
@@ -24660,12 +23884,6 @@ async function runYearAnalysisExport(years) {
   const meanTropicalYear = (cardinalData.VE.mean + cardinalData.SS.mean +
     cardinalData.AE.mean + cardinalData.WS.mean) / 4;
 
-  // Get orbital parameters at middle year from our collected data
-  const midYearIndex = Math.floor(yearlyOrbitalParams.length / 2);
-  const midYear = yearlyOrbitalParams[midYearIndex]?.year || Math.floor((startYear + endYear) / 2);
-  const obliquity = yearlyOrbitalParams[midYearIndex]?.obliquity || 0;
-  const eccentricity = yearlyOrbitalParams[midYearIndex]?.eccentricity || 0;
-
   /* E · Build Excel sheets */
   await ensureSheetJs();
 
@@ -25146,18 +24364,6 @@ async function runYearAnalysisExport(years) {
   console.log(`Year Analysis Report finished – ${requestedYears.length} years analyzed`);
 }
 
-/* ----------------------------------------------------------------------
-   fracDayToTimeStr() helper  (unchanged)
----------------------------------------------------------------------- */
-function fracDayToTimeStr(frac) {
-  const totalSec = Math.round(frac * SECONDS_PER_DAY);
-  const hh = Math.floor(totalSec / 3600);
-  const mm = Math.floor((totalSec % 3600) / 60);
-  const ss = totalSec % 60;
-  return `${String(hh).padStart(2,'0')}:` +
-         `${String(mm).padStart(2,'0')}:` +
-         `${String(ss).padStart(2,'0')}`;
-}
 
 /* ----------------------------------------------------------------------
    Build array of integer years according to the current GUI mode.
@@ -25213,24 +24419,6 @@ function buildYearAnalysisArray() {
   return yrs;
 }
 
-/* ══════════════════════════════════════════════════════════════════════════
-   OBLIQUITY CALIBRATION TEST FUNCTIONS
-   These functions test the model's obliquity and solstice alignment against
-   astronomical reference data (IAU 2006, Laskar 1986, USNO ephemeris).
-   ══════════════════════════════════════════════════════════════════════════ */
-
-// Reference June solstice Julian Dates (Source: astropixels.com, Jean Meeus algorithms)
-// JD convention: JD X.5 = midnight UTC, JD X.0 = noon UTC
-// Example: JD 2451716.5 = June 21, 2000 00:00 UTC
-// Single-sourced from astro-reference.json (R.juneSolsticeReference); reshaped
-// to the {jd, time} form the consumers read. The JSON leaf is `solsticeRefJD`
-// because check-literals.mjs name-matches leaf keys, and both `jd:` and
-// `solsticeJD` occur as numeric declarations elsewhere in this file.
-const JUNE_SOLSTICE_REFERENCE = Object.fromEntries(
-  Object.entries(R.juneSolsticeReference).map(
-    ([year, v]) => [year, { jd: v.solsticeRefJD, time: v.timeUTC }],
-  ),
-);
 
 /** Calculate mean obliquity using IAU 2006 formula (P03 model) */
 function meanObliquityIAU2006(year) {
@@ -25253,599 +24441,7 @@ function meanObliquityLaskar1986(year) {
   return eps_arcsec / 3600;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// DAY LENGTH DETECTION FUNCTIONS
-// ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * Diagnostic function to log key rotation/position values over time
- * Helps understand what's happening with Earth rotation, Sun RA, and derived angles
- *
- * @param {number} startJD - Starting Julian Day
- * @param {number} hours - Number of hours to sample (default 25 for just over one day)
- */
-function diagnoseDayRotation(startJD, hours = 25) {
-  console.log('╔══════════════════════════════════════════════════════════════════════════╗');
-  console.log('║           DAY ROTATION DIAGNOSTICS                                       ║');
-  console.log('╚══════════════════════════════════════════════════════════════════════════╝');
-  console.log(`Starting from JD ${startJD.toFixed(6)}`);
-  console.log('');
-
-  const savedJD = o.julianDay;
-  const savedRun = o.Run;
-  o.Run = false;
-
-  const sunPos = new THREE.Vector3();
-  const samples = [];
-
-  // Vectors for comparing old vs new RA calculation
-  const LOCAL = new THREE.Vector3();
-  const DIRECTION = new THREE.Vector3();
-  const ROT_MATRIX = new THREE.Matrix4();
-  const SPHERICAL = new THREE.Spherical();
-  const WOBBLE_POS = new THREE.Vector3();
-
-  // Sample every hour
-  console.log('Hour | Earth rot.y (°) | sun.ra (°) | sun.ra OLD (°) | sun World (°) | RA diff (°)');
-  console.log('-----|-----------------|------------|----------------|---------------|------------');
-
-  for (let h = 0; h <= hours; h++) {
-    const jd = startJD + h / 24;
-    jumpToJulianDay(jd);
-    forceSceneUpdate();
-
-    // Get Earth's rotation angle (this is what we use for sidereal day)
-    const earthRotY = earth.planetObj.rotation.y;
-
-    // Get Sun's RA (computed from updatePositions - should be NEW method now)
-    const sunRA = sun.ra;
-
-    // Compute OLD method RA for comparison (worldToLocal)
-    sun.planetObj.getWorldPosition(sunPos);
-    LOCAL.copy(sunPos);
-    earth.rotationAxis.worldToLocal(LOCAL);
-    SPHERICAL.setFromVector3(LOCAL);
-    const sunRA_OLD = SPHERICAL.theta;
-
-    // Compute Sun's world angle (for Method C comparison)
-    const sunWorldAngle = Math.atan2(sunPos.z, sunPos.x);
-
-    // Compute hour angle (Earth rotation - Sun RA)
-    let hourAngle = earthRotY - sunRA;
-    // Normalize to [-π, π] for display
-    let hourAngleNorm = hourAngle % (2 * Math.PI);
-    while (hourAngleNorm > Math.PI) hourAngleNorm -= 2 * Math.PI;
-    while (hourAngleNorm < -Math.PI) hourAngleNorm += 2 * Math.PI;
-
-    // RA difference (new - old)
-    const raDiff = sunRA - sunRA_OLD;
-
-    samples.push({
-      h,
-      jd,
-      earthRotY,
-      sunRA,
-      sunRA_OLD,
-      sunWorldAngle,
-      hourAngle,
-      hourAngleNorm,
-      raDiff
-    });
-
-    console.log(
-      `${String(h).padStart(4)} | ` +
-      `${(earthRotY * 180 / Math.PI).toFixed(4).padStart(15)} | ` +
-      `${(sunRA * 180 / Math.PI).toFixed(4).padStart(10)} | ` +
-      `${(sunRA_OLD * 180 / Math.PI).toFixed(4).padStart(14)} | ` +
-      `${(sunWorldAngle * 180 / Math.PI).toFixed(4).padStart(13)} | ` +
-      `${(raDiff * 180 / Math.PI).toFixed(6).padStart(11)}`
-    );
-  }
-
-  // Calculate rates of change
-  console.log('');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('RATES OF CHANGE (per 24 hours):');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-
-  const first = samples[0];
-  const last24h = samples[24] || samples[samples.length - 1];
-
-  const earthRotChange = last24h.earthRotY - first.earthRotY;
-  const sunRAChange = last24h.sunRA - first.sunRA;
-  const sunRA_OLD_Change = last24h.sunRA_OLD - first.sunRA_OLD;
-  const sunWorldChange = last24h.sunWorldAngle - first.sunWorldAngle;
-  const hourAngleChange = last24h.hourAngle - first.hourAngle;
-
-  console.log(`  Earth rotation.y change: ${(earthRotChange * 180 / Math.PI).toFixed(6)}° = ${(earthRotChange / (2 * Math.PI)).toFixed(6)} rotations`);
-  console.log(`  Sun RA change (NEW):     ${(sunRAChange * 180 / Math.PI).toFixed(6)}° = ${(sunRAChange / (2 * Math.PI)).toFixed(6)} rotations`);
-  console.log(`  Sun RA change (OLD):     ${(sunRA_OLD_Change * 180 / Math.PI).toFixed(6)}° = ${(sunRA_OLD_Change / (2 * Math.PI)).toFixed(6)} rotations`);
-  console.log(`  Sun World angle change:  ${(sunWorldChange * 180 / Math.PI).toFixed(6)}° = ${(sunWorldChange / (2 * Math.PI)).toFixed(6)} rotations`);
-  console.log(`  Hour angle change:       ${(hourAngleChange * 180 / Math.PI).toFixed(6)}° = ${(hourAngleChange / (2 * Math.PI)).toFixed(6)} rotations`);
-  console.log('');
-  console.log(`  Expected Sun RA change:    ~0.9856°/day (360°/365.24)`);
-  console.log(`  Expected for sidereal day: 360° per ~86164.1s = ${(360 * 86400 / 86164.1).toFixed(6)}° per 24h`);
-  console.log(`  Expected for solar day:    360° per 86400s exactly`);
-  console.log('');
-  console.log(`  RA difference (NEW - OLD): ${((sunRAChange - sunRA_OLD_Change) * 180 / Math.PI).toFixed(6)}° per day`);
-  console.log(`  If NEW = OLD, my fix is NOT being applied!`);
-  console.log('');
-
-  // Find when hour angle increases by 360° (one solar day)
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('SOLAR DAY DETECTION:');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-
-  const targetHourAngle = first.hourAngle + 2 * Math.PI;
-  console.log(`  Starting hour angle: ${(first.hourAngle * 180 / Math.PI).toFixed(6)}°`);
-  console.log(`  Target hour angle:   ${(targetHourAngle * 180 / Math.PI).toFixed(6)}° (start + 360°)`);
-
-  for (let i = 1; i < samples.length; i++) {
-    if (samples[i].hourAngle >= targetHourAngle && samples[i - 1].hourAngle < targetHourAngle) {
-      // Linear interpolation
-      const t = (targetHourAngle - samples[i - 1].hourAngle) / (samples[i].hourAngle - samples[i - 1].hourAngle);
-      const solarNoonJD = samples[i - 1].jd + t * (samples[i].jd - samples[i - 1].jd);
-      const solarDaySeconds = (solarNoonJD - startJD) * SECONDS_PER_DAY;
-      console.log(`  Solar noon found between hour ${samples[i - 1].h} and ${samples[i].h}`);
-      console.log(`  Interpolated JD: ${solarNoonJD.toFixed(6)}`);
-      console.log(`  Solar day length: ${solarDaySeconds.toFixed(3)} seconds`);
-      break;
-    }
-  }
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-
-  jumpToJulianDay(savedJD);
-  o.Run = savedRun;
-
-  return samples;
-}
-
-/**
- * Diagnose the Sun's RA rate at different seasonal points throughout the year.
- * This helps identify whether the 44ms solar day bias is consistent or varies seasonally.
- *
- * The expected RA rate varies due to the equation of time:
- * - Faster around perihelion (January) and solstices
- * - Slower around aphelion (July) and equinoxes
- * - Annual average should match 360°/365.2422 days ≈ 0.9856°/day
- *
- * Call from console: diagnoseRARate()
- */
-function diagnoseRARate() {
-  const savedJD = o.julianDay;
-  const savedRun = o.Run;
-  o.Run = false;
-
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-  console.log('                    SUN RA RATE SEASONAL DIAGNOSTIC                         ');
-  console.log('═══════════════════════════════════════════════════════════════════════════');
-
-  // Expected mean RA rate
-  const expectedMeanRARate = 360 / meansolaryearlengthinDays;  // ~0.9856°/day
-  console.log(`Expected mean RA rate: ${expectedMeanRARate.toFixed(6)}°/day`);
-  console.log(`Expected mean solar day: ${meanlengthofday.toFixed(6)} seconds`);
-  console.log('');
-
-  // Seasonal test points - 2000 dates (same year for consistency)
-  const testPoints = [
-    { name: 'March Equinox',     jd: 2451623.5 },   // March 20, 2000
-    { name: 'June Solstice',     jd: 2451716.5 },   // June 21, 2000 (model start)
-    { name: 'September Equinox', jd: 2451809.5 },   // September 22, 2000
-    { name: 'December Solstice', jd: 2451899.5 },   // December 21, 2000
-    { name: 'January Perihelion', jd: 2451550.5 },  // January 4, 2000 (near perihelion)
-    { name: 'July Aphelion',     jd: 2451733.5 },   // July 4, 2000 (near aphelion)
-  ];
-
-  // Vectors for RA calculation
-  const sunPos = new THREE.Vector3();
-  const LOCAL = new THREE.Vector3();
-  const SPHERICAL = new THREE.Spherical();
-
-  // Store results for summary
-  const results = [];
-
-  console.log('Measuring RA rate at each seasonal point over 24 hours...');
-  console.log('────────────────────────────────────────────────────────────────────────────');
-
-  for (const point of testPoints) {
-    // Measure at start of day
-    jumpToJulianDay(point.jd);
-    forceSceneUpdate();
-
-    sun.planetObj.getWorldPosition(sunPos);
-    LOCAL.copy(sunPos);
-    earth.rotationAxis.worldToLocal(LOCAL);
-    SPHERICAL.setFromVector3(LOCAL);
-    const raStart = SPHERICAL.theta;
-    const sunWorldStart = Math.atan2(sunPos.z, sunPos.x);
-    const earthRotStart = earth.planetObj.rotation.y;
-
-    // Measure at end of day (24 hours later)
-    jumpToJulianDay(point.jd + 1.0);
-    forceSceneUpdate();
-
-    sun.planetObj.getWorldPosition(sunPos);
-    LOCAL.copy(sunPos);
-    earth.rotationAxis.worldToLocal(LOCAL);
-    SPHERICAL.setFromVector3(LOCAL);
-    const raEnd = SPHERICAL.theta;
-    const sunWorldEnd = Math.atan2(sunPos.z, sunPos.x);
-    const earthRotEnd = earth.planetObj.rotation.y;
-
-    // Calculate rates (handle wrap-around)
-    let raChange = raEnd - raStart;
-    if (raChange < -Math.PI) raChange += 2 * Math.PI;
-    if (raChange > Math.PI) raChange -= 2 * Math.PI;
-
-    let worldChange = sunWorldEnd - sunWorldStart;
-    if (worldChange < -Math.PI) worldChange += 2 * Math.PI;
-    if (worldChange > Math.PI) worldChange -= 2 * Math.PI;
-
-    const earthRotChange = earthRotEnd - earthRotStart;
-
-    // Convert to degrees
-    const raRateDeg = raChange * 180 / Math.PI;
-    const worldRateDeg = worldChange * 180 / Math.PI;
-    const earthRotDeg = earthRotChange * 180 / Math.PI;
-
-    // Hour angle change (this determines solar day length)
-    const haChange = earthRotChange - raChange;
-    const solarDaySeconds = (2 * Math.PI / haChange) * SECONDS_PER_DAY;
-
-    // Deviation from expected
-    const raDeviation = raRateDeg - expectedMeanRARate;
-    const solarDayDeviation = solarDaySeconds - meanlengthofday;
-
-    results.push({
-      name: point.name,
-      raRate: raRateDeg,
-      worldRate: worldRateDeg,
-      earthRot: earthRotDeg,
-      solarDay: solarDaySeconds,
-      raDeviation,
-      solarDayDeviation
-    });
-
-    console.log(`\n${point.name}:`);
-    console.log(`  Sun RA rate:         ${raRateDeg.toFixed(6)}°/day (deviation: ${raDeviation >= 0 ? '+' : ''}${raDeviation.toFixed(6)}°)`);
-    console.log(`  Sun World rate:      ${worldRateDeg.toFixed(6)}°/day`);
-    console.log(`  Earth rotation:      ${earthRotDeg.toFixed(4)}° (should be ~360.986°)`);
-    console.log(`  Implied solar day:   ${solarDaySeconds.toFixed(3)}s (deviation: ${solarDayDeviation >= 0 ? '+' : ''}${solarDayDeviation.toFixed(3)}s)`);
-  }
-
-  console.log('\n════════════════════════════════════════════════════════════════════════════');
-  console.log('                              SUMMARY                                        ');
-  console.log('════════════════════════════════════════════════════════════════════════════');
-
-  // Calculate averages
-  const avgRARate = results.reduce((sum, r) => sum + r.raRate, 0) / results.length;
-  const avgWorldRate = results.reduce((sum, r) => sum + r.worldRate, 0) / results.length;
-  const avgSolarDay = results.reduce((sum, r) => sum + r.solarDay, 0) / results.length;
-
-  console.log(`\nAverage RA rate:       ${avgRARate.toFixed(6)}°/day`);
-  console.log(`Expected RA rate:      ${expectedMeanRARate.toFixed(6)}°/day`);
-  console.log(`RA rate bias:          ${(avgRARate - expectedMeanRARate).toFixed(6)}°/day`);
-  console.log(`\nAverage solar day:     ${avgSolarDay.toFixed(3)}s`);
-  console.log(`Expected solar day:    ${meanlengthofday.toFixed(3)}s`);
-  console.log(`Solar day bias:        ${(avgSolarDay - meanlengthofday).toFixed(3)}s`);
-
-  // The key insight
-  console.log('\n────────────────────────────────────────────────────────────────────────────');
-  console.log('KEY COMPARISON:');
-  console.log('  RA rate (from worldToLocal): measures in Earth\'s equatorial frame');
-  console.log('  World rate (atan2 in XZ):    measures in fixed world frame');
-  console.log(`  Difference:                  ${(avgRARate - avgWorldRate).toFixed(6)}°/day`);
-  console.log('');
-  console.log('  If RA rate > World rate, RA is picking up extra motion from Earth\'s wobble');
-  console.log('────────────────────────────────────────────────────────────────────────────');
-
-  // Also test over a full year to get true mean
-  console.log('\n════════════════════════════════════════════════════════════════════════════');
-  console.log('                    FULL YEAR RA ACCUMULATION TEST                          ');
-  console.log('════════════════════════════════════════════════════════════════════════════');
-
-  const yearStartJD = j2000JD;  // J2000 epoch
-  const yearDays = ASTRO_REFERENCE.tropicalYearMeanJ2000;
-
-  // Test OLD method (worldToLocal)
-  jumpToJulianDay(yearStartJD);
-  forceSceneUpdate();
-  sun.planetObj.getWorldPosition(sunPos);
-  LOCAL.copy(sunPos);
-  earth.rotationAxis.worldToLocal(LOCAL);
-  SPHERICAL.setFromVector3(LOCAL);
-  const yearRAStart_OLD = SPHERICAL.theta;
-  const yearWorldStart = Math.atan2(sunPos.z, sunPos.x);
-  const yearSunRA_Start = sun.ra;  // The actual value used by solarNoonForJD
-
-  jumpToJulianDay(yearStartJD + yearDays);
-  forceSceneUpdate();
-  sun.planetObj.getWorldPosition(sunPos);
-  LOCAL.copy(sunPos);
-  earth.rotationAxis.worldToLocal(LOCAL);
-  SPHERICAL.setFromVector3(LOCAL);
-  const yearRAEnd_OLD = SPHERICAL.theta;
-  const yearWorldEnd = Math.atan2(sunPos.z, sunPos.x);
-  const yearSunRA_End = sun.ra;  // The actual value used by solarNoonForJD
-
-  // Calculate changes for OLD method (worldToLocal)
-  let yearRAChange_OLD = yearRAEnd_OLD - yearRAStart_OLD;
-  if (yearRAChange_OLD < -Math.PI) yearRAChange_OLD += 2 * Math.PI;
-  if (yearRAChange_OLD > Math.PI) yearRAChange_OLD -= 2 * Math.PI;
-
-  // Calculate changes for sun.ra (the actual value used)
-  let yearSunRAChange = yearSunRA_End - yearSunRA_Start;
-  if (yearSunRAChange < -Math.PI) yearSunRAChange += 2 * Math.PI;
-  if (yearSunRAChange > Math.PI) yearSunRAChange -= 2 * Math.PI;
-
-  let yearWorldChange = yearWorldEnd - yearWorldStart;
-  if (yearWorldChange < -Math.PI) yearWorldChange += 2 * Math.PI;
-  if (yearWorldChange > Math.PI) yearWorldChange -= 2 * Math.PI;
-
-  console.log(`\nAfter exactly 1 tropical year (${yearDays} days):`);
-  console.log(`  OLD method (worldToLocal) net change: ${(yearRAChange_OLD * 180 / Math.PI).toFixed(6)}°`);
-  console.log(`  sun.ra (actual used) net change:      ${(yearSunRAChange * 180 / Math.PI).toFixed(6)}°`);
-  console.log(`  World angle net change:               ${(yearWorldChange * 180 / Math.PI).toFixed(6)}°`);
-  console.log(`  (All should be ~0° for a perfect tropical year)`);
-
-  // Daily excess for each method
-  const dailyExcess_OLD = (yearRAChange_OLD * 180 / Math.PI) / yearDays;
-  const dailyExcess_sunRA = (yearSunRAChange * 180 / Math.PI) / yearDays;
-
-  console.log(`\nDaily excess:`);
-  console.log(`  OLD method:  ${dailyExcess_OLD.toFixed(8)}°/day → ${(dailyExcess_OLD * 86400 / 360).toFixed(3)}s per solar day`);
-  console.log(`  sun.ra:      ${dailyExcess_sunRA.toFixed(8)}°/day → ${(dailyExcess_sunRA * 86400 / 360).toFixed(3)}s per solar day`);
-  console.log(`  Observed bias:                          ~0.044s per solar day`);
-
-  // Test hour angle accumulation over 365 days
-  console.log('\n════════════════════════════════════════════════════════════════════════════');
-  console.log('                    HOUR ANGLE ACCUMULATION TEST                             ');
-  console.log('════════════════════════════════════════════════════════════════════════════');
-  console.log('Testing if hour angle accumulates 365×360° = 131400° over 365 solar days...');
-
-  const haTestStart = yearStartJD;
-  jumpToJulianDay(haTestStart);
-  forceSceneUpdate();
-  const haStart = earth.planetObj.rotation.y - sun.ra;
-  const earthRotStart = earth.planetObj.rotation.y;
-  const sunRAStart = sun.ra;
-
-  // After 365 mean solar days (using the MODEL's mean solar day length)
-  const testDays = 365;
-  const expectedHAChange = testDays * 2 * Math.PI;  // 365 × 360° in radians
-  // NOTE: meanlengthofday is the MODEL's expected mean solar day (~86400s at mean phase)
-  // One JD = 86400 seconds exactly
-  const testEndJD = haTestStart + testDays * (meanlengthofday / SECONDS_PER_DAY);
-
-  console.log(`  meanlengthofday = ${meanlengthofday.toFixed(6)}s`);
-  console.log(`  Test duration = ${testDays} × ${meanlengthofday.toFixed(6)}s = ${(testDays * meanlengthofday).toFixed(3)}s`);
-  console.log(`  Test duration in JD = ${(testEndJD - haTestStart).toFixed(9)} days`);
-
-  jumpToJulianDay(testEndJD);
-  forceSceneUpdate();
-  const haEnd = earth.planetObj.rotation.y - sun.ra;
-  const earthRotEnd = earth.planetObj.rotation.y;
-  const sunRAEnd = sun.ra;
-
-  const actualHAChange = haEnd - haStart;
-  const earthRotChange = earthRotEnd - earthRotStart;
-  const sunRAChange = sunRAEnd - sunRAStart;
-
-  // Wrap sunRA change to be positive (should accumulate ~360°)
-  let sunRAChangeDeg = sunRAChange * 180 / Math.PI;
-  if (sunRAChangeDeg < 0) sunRAChangeDeg += 360;
-
-  const haExcess = actualHAChange - expectedHAChange;
-  const haExcessDeg = haExcess * 180 / Math.PI;
-  const haExcessSec = haExcessDeg * (SECONDS_PER_DAY / 360);  // Convert to time
-
-  console.log(`\nAfter ${testDays} mean solar days (${(testEndJD - haTestStart).toFixed(6)} JD):`);
-  console.log(`  Earth rotation:      ${(earthRotChange * 180 / Math.PI).toFixed(4)}° (expected: ${(testDays * 360.9856).toFixed(4)}°)`);
-  console.log(`  Sun RA change:       ${sunRAChangeDeg.toFixed(4)}° (expected: ~${(testDays * 0.9856).toFixed(4)}°)`);
-  console.log(`  Hour angle change:   ${(actualHAChange * 180 / Math.PI).toFixed(4)}° (expected: ${(expectedHAChange * 180 / Math.PI).toFixed(4)}°)`);
-  console.log(`  Hour angle excess:   ${haExcessDeg.toFixed(6)}° = ${haExcessSec.toFixed(3)} seconds`);
-
-  // The excess is ~360° which is 1 full day - this reveals a conceptual issue!
-  // Let's check what we ACTUALLY need:
-  // In N mean solar days, hour angle should increase by exactly N × 360°
-  // HA = Earth_rot - Sun_RA
-  // So: Earth_rot should increase by N × 360° + (Sun_RA increase)
-  // Sun_RA increases by N/365.2422 × 360° over N solar days
-  // So Earth_rot should increase by N × 360° × (1 + 1/365.2422) = N × 360.9856°
-
-  const expectedEarthRot = testDays * 360.9856;  // Sidereal rotation rate
-  const actualEarthRotDeg = earthRotChange * 180 / Math.PI;
-  const earthRotError = actualEarthRotDeg - expectedEarthRot;
-
-  console.log(`\n  Earth rotation error: ${earthRotError.toFixed(6)}° over ${testDays} days`);
-  console.log(`  Per day: ${(earthRotError / testDays).toFixed(8)}°`);
-  console.log(`  As time: ${(earthRotError / testDays * 86400 / 360).toFixed(6)}s per day`);
-
-  // Direct test: measure exactly when HA increases by 360° from a known starting point
-  console.log('\n════════════════════════════════════════════════════════════════════════════');
-  console.log('                 DIRECT SOLAR DAY LENGTH MEASUREMENT                         ');
-  console.log('════════════════════════════════════════════════════════════════════════════');
-
-  // Use binary search to find exact JD when HA = startHA + 2π
-  const directTestStartJD = yearStartJD;
-  jumpToJulianDay(directTestStartJD);
-  forceSceneUpdate();
-  const directStartHA = earth.planetObj.rotation.y - sun.ra;
-  const directTargetHA = directStartHA + 2 * Math.PI;
-
-  // Binary search for the crossing point
-  let lo = directTestStartJD + 0.99;  // Slightly less than 1 day
-  let hi = directTestStartJD + 1.01;  // Slightly more than 1 day
-
-  for (let iter = 0; iter < 50; iter++) {  // 50 iterations = ~1e-15 precision
-    const mid = (lo + hi) / 2;
-    jumpToJulianDay(mid);
-    forceSceneUpdate();
-    const midHA = earth.planetObj.rotation.y - sun.ra;
-
-    if (midHA < directTargetHA) {
-      lo = mid;
-    } else {
-      hi = mid;
-    }
-  }
-
-  const directSolarDayJD = (lo + hi) / 2;
-  const directSolarDaySeconds = (directSolarDayJD - directTestStartJD) * SECONDS_PER_DAY;
-
-  // Verify
-  jumpToJulianDay(directSolarDayJD);
-  forceSceneUpdate();
-  const finalHA = earth.planetObj.rotation.y - sun.ra;
-  const haError = (finalHA - directTargetHA) * 180 / Math.PI;
-
-  console.log(`\nBinary search result at JD ${directTestStartJD.toFixed(4)} (J2000 epoch):`);
-  console.log(`  Solar day length:    ${directSolarDaySeconds.toFixed(9)} seconds`);
-  console.log(`  Expected (model):    ${meanlengthofday.toFixed(9)} seconds`);
-  console.log(`  Difference:          ${((directSolarDaySeconds - meanlengthofday) * 1000).toFixed(6)} ms`);
-  console.log(`  HA error at end:     ${haError.toFixed(12)}° (should be ~0)`);
-
-  // Also test at June Solstice for comparison
-  const solsticeJD = 2451716.5;  // June 21, 2000
-  jumpToJulianDay(solsticeJD);
-  forceSceneUpdate();
-  const solsticeStartHA = earth.planetObj.rotation.y - sun.ra;
-  const solsticeTargetHA = solsticeStartHA + 2 * Math.PI;
-
-  lo = solsticeJD + 0.99;
-  hi = solsticeJD + 1.01;
-
-  for (let iter = 0; iter < 50; iter++) {
-    const mid = (lo + hi) / 2;
-    jumpToJulianDay(mid);
-    forceSceneUpdate();
-    const midHA = earth.planetObj.rotation.y - sun.ra;
-
-    if (midHA < solsticeTargetHA) {
-      lo = mid;
-    } else {
-      hi = mid;
-    }
-  }
-
-  const solsticeSolarDayJD = (lo + hi) / 2;
-  const solsticeSolarDaySeconds = (solsticeSolarDayJD - solsticeJD) * SECONDS_PER_DAY;
-
-  console.log(`\nBinary search result at June Solstice (JD ${solsticeJD}):`);
-  console.log(`  Solar day length:    ${solsticeSolarDaySeconds.toFixed(9)} seconds`);
-  console.log(`  Expected (EoT ~+17s): ~86417 seconds`);
-  console.log(`  Difference from mean: ${((solsticeSolarDaySeconds - meanlengthofday) * 1000).toFixed(3)} ms`);
-
-  // Now measure the MEAN over a full year using binary search for each day
-  // Use cumulative sun.ra to avoid wrap-around issues
-  console.log('\n════════════════════════════════════════════════════════════════════════════');
-  console.log('              FULL YEAR MEAN SOLAR DAY (HIGH PRECISION)                      ');
-  console.log('════════════════════════════════════════════════════════════════════════════');
-  console.log('Measuring 365 consecutive solar days with binary search precision...');
-
-  const fullYearStartJD = yearStartJD;
-  let currentJD = fullYearStartJD;
-  const solarDayLengths = [];
-
-  // Track cumulative sun.ra to avoid wrap-around issues
-  let cumulativeSunRA = 0;
-  let lastSunRA = null;
-
-  // Helper to get cumulative hour angle (handles sun.ra wrap-around)
-  const getCumulativeHA = (jd) => {
-    jumpToJulianDay(jd);
-    forceSceneUpdate();
-
-    // Track cumulative sun.ra
-    if (lastSunRA !== null) {
-      let deltaRA = sun.ra - lastSunRA;
-      // Handle wrap-around: if delta is large negative, sun.ra wrapped from ~2π to ~0
-      if (deltaRA < -Math.PI) deltaRA += 2 * Math.PI;
-      // If delta is large positive, sun.ra wrapped from ~0 to ~2π (shouldn't happen going forward)
-      if (deltaRA > Math.PI) deltaRA -= 2 * Math.PI;
-      cumulativeSunRA += deltaRA;
-    }
-    lastSunRA = sun.ra;
-
-    return earth.planetObj.rotation.y - cumulativeSunRA;
-  };
-
-  // Initialize cumulative tracking
-  const initHA = getCumulativeHA(currentJD);
-
-  for (let day = 0; day < 365; day++) {
-    // Reset to current position and get starting HA
-    const savedCumulativeRA = cumulativeSunRA;
-    const savedLastRA = lastSunRA;
-
-    const dayStartHA = getCumulativeHA(currentJD);
-    const dayTargetHA = dayStartHA + 2 * Math.PI;
-
-    // Binary search for next crossing
-    let dayLo = currentJD + 0.99;
-    let dayHi = currentJD + 1.01;
-
-    for (let iter = 0; iter < 40; iter++) {
-      const mid = (dayLo + dayHi) / 2;
-
-      // Reset cumulative tracking for each probe
-      cumulativeSunRA = savedCumulativeRA;
-      lastSunRA = savedLastRA;
-      getCumulativeHA(currentJD);  // Re-establish baseline
-
-      const midHA = getCumulativeHA(mid);
-
-      if (midHA < dayTargetHA) {
-        dayLo = mid;
-      } else {
-        dayHi = mid;
-      }
-    }
-
-    const nextJD = (dayLo + dayHi) / 2;
-    const dayLength = (nextJD - currentJD) * SECONDS_PER_DAY;
-
-    // Sanity check
-    if (dayLength < 86300 || dayLength > 86500) {
-      console.warn(`  Day ${day}: Anomalous length ${dayLength.toFixed(1)}s`);
-    }
-
-    solarDayLengths.push(dayLength);
-
-    // Move to next day - update cumulative tracking properly
-    cumulativeSunRA = savedCumulativeRA;
-    lastSunRA = savedLastRA;
-    getCumulativeHA(currentJD);
-    getCumulativeHA(nextJD);
-    currentJD = nextJD;
-
-    if (day % 50 === 0) {
-      console.log(`  Progress: ${day}/365...`);
-    }
-  }
-
-  const yearMeanSolarDay = solarDayLengths.reduce((a, b) => a + b, 0) / solarDayLengths.length;
-  const yearMinSolarDay = Math.min(...solarDayLengths);
-  const yearMaxSolarDay = Math.max(...solarDayLengths);
-
-  // Count anomalies
-  const anomalies = solarDayLengths.filter(d => d < 86300 || d > 86500).length;
-
-  console.log(`\nFull year results (365 days with binary search):`);
-  console.log(`  Mean solar day:      ${yearMeanSolarDay.toFixed(9)} seconds`);
-  console.log(`  Expected (model):    ${meanlengthofday.toFixed(9)} seconds`);
-  console.log(`  BIAS:                ${((yearMeanSolarDay - meanlengthofday) * 1000).toFixed(6)} ms`);
-  console.log(`  Min solar day:       ${yearMinSolarDay.toFixed(3)} seconds`);
-  console.log(`  Max solar day:       ${yearMaxSolarDay.toFixed(3)} seconds`);
-  console.log(`  Range (EoT):         ${(yearMaxSolarDay - yearMinSolarDay).toFixed(3)} seconds`);
-  console.log(`  Anomalies:           ${anomalies} days outside ±50s range`);
-
-  console.log('\n═══════════════════════════════════════════════════════════════════════════');
-
-  jumpToJulianDay(savedJD);
-  o.Run = savedRun;
-}
 
 /**
  * Detect the next solar noon after a given JD
@@ -26493,7 +25089,6 @@ function showSolarDayChart(year, results, cumulDrifts, numDays, xlsxBlobUrl, xls
   // Monthly dots with labels
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   // First noon is at the RA=0° crossing (~Mar 20). Calculate approximate day-of-year offsets for month starts
-  const firstNoonJD = analemmaResult.noonJDs[0];
   for (let i = 0; i < numDays; i += 10) {
     const x = eotToX(analemmaEoT[i]);
     const y = decToY(analemmaDec[i]);
@@ -26761,9 +25356,6 @@ function jumpToJulianDay (jd) {
   // (Fixed: removed "+ timeToPos(o.Time)" which caused double-counting of time)
   o.Day = o.julianDay - startmodelJD;
   o.pos = posFromJD(o.julianDay);
-
-  const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
-  o.perihelionDate = `${p.date}`;
 
   positionChanged = true; // Signal animation loop to update scene
 }
@@ -27211,9 +25803,6 @@ async function runRATest() {
     const neptuneArg   = o.neptuneArgumentOfPeriapsis;
     const neptuneAppIncl = neptuneEl.inclEclipticDeg;
 
-    const plutoPer     = o.plutoPerihelion;
-    const halleysPer   = o.halleysPerihelion;
-    const erosPer      = o.erosPerihelion;
     
     const sunRA         = (sun.ra   * 180 / Math.PI + 360) % 360;
     const sunDec        = 90-(sun.dec * 180 / Math.PI);
@@ -27682,27 +26271,6 @@ function buildReportHeader(planetKey) {
   return `POSITION REPORT: ${planetLabel}\n${'='.repeat(50)}\n\n`;
 }
 
-/**
- * Compare calculated Dec with reference Dec and determine match status
- * Returns: 'match' if within 1 degree, 'mismatch' otherwise, or 'none' if no reference
- */
-function compareDecValues(calculatedDecRad, refDecStr) {
-  if (!refDecStr) return 'none';
-
-  // Convert calculated Dec from radians to degrees (same as decToDMSFromRadians)
-  let rad = calculatedDecRad;
-  rad = (rad <= 0) ? rad + Math.PI / 2 : Math.PI / 2 - rad;
-  const calculatedDeg = rad * 180 / Math.PI;
-
-  // Parse reference Dec (it's in decimal degrees as a string like "-14.68" or "15.61")
-  const refDeg = parseFloat(refDecStr);
-
-  if (isNaN(refDeg)) return 'none';
-
-  // Compare - within 1 degree is a match
-  const diff = Math.abs(calculatedDeg - refDeg);
-  return diff <= 1.0 ? 'match' : 'mismatch';
-}
 
 /**
  * Compare Planet RA vs Sun RA (for NASA transit dates)
@@ -27727,32 +26295,6 @@ function compareRAToSun(planetRARad, sunRARad) {
   return 'red';
 }
 
-/**
- * Compare Planet RA vs Sun RA for Opposition (should be 12 hours / 720 minutes apart)
- * Returns: 'green' if within 5 minutes of 12h, 'amber' if 5-15 minutes, 'red' if > 15 minutes
- */
-function compareRAOpposition(planetRARad, sunRARad) {
-  // Convert both to total minutes (0-1440 for 24 hours)
-  let planetMinutes = (planetRARad * 12 / Math.PI) * 60;
-  let sunMinutes = (sunRARad * 12 / Math.PI) * 60;
-
-  // Normalize to 0-1440 range
-  if (planetMinutes < 0) planetMinutes += 1440;
-  if (sunMinutes < 0) sunMinutes += 1440;
-
-  // Calculate difference in minutes, accounting for wrap-around at 24h
-  let diffMinutes = Math.abs(planetMinutes - sunMinutes);
-  if (diffMinutes > 720) diffMinutes = 1440 - diffMinutes;
-
-  // For opposition, we expect 720 minutes (12 hours) difference
-  // Calculate how far from 720 minutes we are
-  const deviationFromOpposition = Math.abs(diffMinutes - 720);
-
-  // Return status based on thresholds (deviation from perfect 12h opposition)
-  if (deviationFromOpposition <= 5) return 'green';
-  if (deviationFromOpposition <= 15) return 'amber';
-  return 'red';
-}
 
 /**
  * Compare Planet RA vs Reference RA (for model validation dates)
@@ -27781,31 +26323,6 @@ function compareRAToReference(planetRARad, refRA) {
   return 'red';
 }
 
-/**
- * Convert ecliptic longitude (degrees) to RA (radians)
- * Uses proper ecliptic-to-equatorial coordinate transformation
- * Assumes ecliptic latitude ≈ 0 (appropriate for Jupiter-Saturn conjunctions near the ecliptic)
- * @param {number|string} longitudeDeg - Ecliptic longitude in degrees
- * @param {number} obliquityDeg - Obliquity of the ecliptic in degrees (defaults to o.obliquityEarth)
- */
-function longitudeToRARad(longitudeDeg, obliquityDeg) {
-  const lon = parseFloat(longitudeDeg);
-  if (isNaN(lon)) return null;
-
-  // Use provided obliquity or get from global o object
-  const obliquity = obliquityDeg !== undefined ? obliquityDeg : (o.obliquityEarth || ASTRO_REFERENCE.obliquityJ2000_deg);
-  const obliquityRad = obliquity * Math.PI / 180;
-  const lonRad = lon * Math.PI / 180;
-
-  // For a point on the ecliptic (ecliptic latitude = 0):
-  // tan(RA) = sin(λ) * cos(ε) / cos(λ)
-  // RA = atan2(sin(λ) * cos(ε), cos(λ))
-  let raRad = Math.atan2(Math.sin(lonRad) * Math.cos(obliquityRad), Math.cos(lonRad));
-
-  // Normalize to [0, 2π)
-  if (raRad < 0) raRad += 2 * Math.PI;
-  return raRad;
-}
 
 /**
  * Convert ecliptic longitude (degrees) to RA in HMS format string
@@ -27836,49 +26353,7 @@ function longitudeToRAHMS(longitudeDeg, obliquityDeg) {
   return `${h}h ${m.toString().padStart(2, '0')}m ${s.toFixed(2).padStart(5, '0')}s`;
 }
 
-/**
- * Compare Planet RA vs Longitude-derived RA (for Occultation dates)
- * Uses proper ecliptic-to-equatorial coordinate transformation
- * @param {number} planetRARad - Planet RA in radians
- * @param {number|string} longitudeDeg - Ecliptic longitude in degrees (e.g., 55.77)
- * @param {number} obliquityDeg - Obliquity of the ecliptic in degrees (defaults to o.obliquityEarth)
- * @returns {'green'|'amber'|'red'|'none'} - Status based on difference thresholds
- */
-function compareRAToLongitude(planetRARad, longitudeDeg, obliquityDeg) {
-  if (longitudeDeg === undefined || longitudeDeg === null) return 'none';
 
-  // Convert planet RA from radians to minutes
-  let planetMinutes = (planetRARad * 12 / Math.PI) * 60;
-  if (planetMinutes < 0) planetMinutes += 1440;
-
-  // Convert ecliptic longitude to RA using proper transformation
-  const refRARad = longitudeToRARad(longitudeDeg, obliquityDeg);
-  if (refRARad === null) return 'none';
-
-  // Convert reference RA to minutes
-  let refMinutes = (refRARad * 12 / Math.PI) * 60;
-  if (refMinutes < 0) refMinutes += 1440;
-
-  // Calculate difference in minutes, accounting for wrap-around at 24h
-  let diffMinutes = Math.abs(planetMinutes - refMinutes);
-  if (diffMinutes > 720) diffMinutes = 1440 - diffMinutes;
-
-  // Return status based on thresholds
-  if (diffMinutes <= 5) return 'green';
-  if (diffMinutes <= 15) return 'amber';
-  return 'red';
-}
-
-/**
- * Get companion planet RA for Occultation comparison
- * Returns the RA in radians of the specified planet at current simulation state
- */
-function getCompanionPlanetRA(companionKey) {
-  const planetGetter = PLANET_OBJECTS[companionKey];
-  if (!planetGetter) return null;
-  const planet = planetGetter();
-  return planet.ra;
-}
 
 /**
  * Build a date section for screen display (HTML format with color coding)
@@ -28322,94 +26797,7 @@ function secondsExcessPerDay () {
   return computeLodRealSecondsAtEpoch(o.currentYear) - SECONDS_PER_DAY;
 }
 
-// ---------------------------------------------------------------------------
-//  CALL THIS ONCE *EACH* SIMULATION STEP *AFTER* YOU ADVANCE YOUR CLOCK
-//  (`currentJD` must be the new Julian Day number for the model)
-// ---------------------------------------------------------------------------
-function updateDeltaT() {
-  const currentJD = o.julianDay;                       // use your existing value
-  const daysElapsed = currentJD - state.prevJD;
-  // Layer 4 LOD — same value as tweakpane Solar Day = REAL, via the shared
-  // computeLodRealSecondsAtEpoch composite.
-  const excess = computeLodRealSecondsAtEpoch(o.currentYear) - SECONDS_PER_DAY;
 
-  if (isNaN(excess) || isNaN(daysElapsed)) {
-    console.warn("Bad input to updateDeltaT", { excess, daysElapsed });
-    return;
-  }
-
-  state.deltaT += excess * daysElapsed;
-  state.prevJD = currentJD;
-}
-
-function resetDeltaTForJump() {
-  /* ------------------------------------------------------------------ */
-  const BASE_YEAR          = startmodelYear;
-  const SUBSTEPS_PER_YEAR  = 10; 
-  /* ------------------------------------------------------------------ */
-
-  const targetYear = o.currentYear;
-  const startYear  = Math.min(BASE_YEAR, targetYear);
-  const endYear    = Math.max(BASE_YEAR, targetYear);
-
-  let deltaTsum = 0;           // total change to apply to deltaTStart
-
-  /* ── integrate whole years, sampling “one-year-before” each slice ── */
-  for (let y = startYear; y < endYear; y++) {
-    for (let i = 0; i < SUBSTEPS_PER_YEAR; i++) {
-
-      /* sample ***one year earlier*** than the slice we are adding   */
-      const subYear    = y + i / SUBSTEPS_PER_YEAR;
-      const sourceYear = subYear - 1;
-
-      const lod = _lodKinematicSecondsOfDate(sourceYear);   // the Layer-0 tidal mean
-
-      const solarYear = computeSolarYearDaysFromCardinals(sourceYear);
-
-      // Raw kinematic LOD + the ecliptic-precession "missing motion" term
-      // (~3.4 ms at J2000; ONE home — h5Correction rides the nodal period
-      // 1,296,000/|s₃|). This is the raw-physics integrand for the ΔT accumulator;
-      // it is NOT the Layer 4 physical LOD_real (which further adds the calibrated
-      // 4-flag stack + Core-mantle swing to close the USNO anchor — 86400.0021 s in the fit's measured-day basis, joint world).
-      const lodH5Raw = lod + h5Correction(sourceYear);
-      const dTchangePerYr = (lodH5Raw - 86_400) * solarYear;   // seconds/yr
-      deltaTsum += dTchangePerYr / SUBSTEPS_PER_YEAR;         // fraction
-    }
-  }
-
-  /* ── fractional part of the final calendar year (if any) ─────────── */
-  const frac = targetYear - Math.floor(targetYear);           // 0 … <1
-  if (frac !== 0) {
-    const y = Math.floor(targetYear);
-    const slices = Math.round(SUBSTEPS_PER_YEAR * frac);
-
-    for (let i = 0; i < slices; i++) {
-      const subYear    = y + i / SUBSTEPS_PER_YEAR;
-      const sourceYear = subYear - 1;
-
-      const lod = _lodKinematicSecondsOfDate(sourceYear);   // plan 09: the Layer-0 tidal mean
-
-      const solarYear = computeSolarYearDaysFromCardinals(sourceYear);
-
-      // Raw kinematic LOD + the ecliptic-precession "missing motion" term
-      // (~3.4 ms at J2000; ONE home — h5Correction rides the nodal period
-      // 1,296,000/|s₃|). This is the raw-physics integrand for the ΔT accumulator;
-      // it is NOT the Layer 4 physical LOD_real (which further adds the calibrated
-      // 4-flag stack + Core-mantle swing to close the USNO anchor — 86400.0021 s in the fit's measured-day basis, joint world).
-      const lodH5Raw = lod + h5Correction(sourceYear);
-      const dTchangePerYr = (lodH5Raw - 86_400) * solarYear;
-      deltaTsum += dTchangePerYr / SUBSTEPS_PER_YEAR;
-    }
-  }
-
-  /* ── final ΔT: add for future, subtract for past ─────────────────── */
-  const deltaT = (targetYear >= BASE_YEAR)
-    ? deltaTStart + deltaTsum   // stepping FORWARD  → grows
-    : deltaTStart - deltaTsum;  // stepping BACKWARD → shrinks
-
-  state.deltaT = deltaT;
-  state.prevJD = o.julianDay;     // avoid monster step on next frame
-}
 
 // ---------------------------------------------------------------------------
 //  CONVENIENCE GETTERS — call whenever you need to *display* the values
@@ -28420,21 +26808,7 @@ function getDeltaTChangePerYear () {
   return secondsExcessPerDay() * o.solarYearDays;  // seconds / yr
 }
 
-// total accumulated ΔT (seconds) since 2000-06-21
-function getDeltaT () {
-  return state.deltaT;
-}
 
-function detectAndUpdateDeltaT() {
-  const currentJD = o.julianDay;
-  const jumpThreshold = 5; // days – tune this as needed
-
-  if (Math.abs(currentJD - state.prevJD) > jumpThreshold) {
-    resetDeltaTForJump();
-  } else {
-    updateDeltaT();
-  }
-}
 
 function focusPlanet(pd, pad = 1.01) {
   if (!pd?.planetObj) {
@@ -28490,7 +26864,7 @@ function switchToPlanet(name) {
 /**
  * Jump to an indexed entry in ECLIPSE_PRESETS and update the displayed
  * Moon planetStats. Reuses the existing jumpToJulianDay (which sets
- * julianDay/Day/pos/perihelionDate + positionChanged), then refreshes
+ * julianDay/Day/pos + positionChanged), then refreshes
  * the Date/Time/JD root controls so the displayed values update too.
  */
 function jumpToEclipsePreset(idx) {
@@ -28506,7 +26880,6 @@ function jumpToEclipsePreset(idx) {
     o._rootCtrls.dateCtrl?.refresh();
     o._rootCtrls.timeCtrl?.refresh();
     o._rootCtrls.jdCtrl?.refresh();
-    o._rootCtrls.periCtrl?.refresh();
   }
 }
 
@@ -28526,7 +26899,6 @@ function jumpToLunarEclipsePreset(idx) {
     o._rootCtrls.dateCtrl?.refresh();
     o._rootCtrls.timeCtrl?.refresh();
     o._rootCtrls.jdCtrl?.refresh();
-    o._rootCtrls.periCtrl?.refresh();
   }
 }
 
@@ -28813,7 +27185,6 @@ function initStars() {
         vertexColors: true
       });
       // optional: expose for GUI tweaks
-      starSizeMaterial = mat;
 
       // 8) Create & insert the Points mesh
       const points = new THREE.Points(geo, mat);
@@ -32978,7 +31349,6 @@ function updateDomLabel () {
 
   /* 5 — DATA GRID ------------------------------------------------------------ */
   const cache = staticValueCache[selName];
-  let _debugCacheHits = 0, _debugCacheMisses = 0, _debugDynamic = 0;
 
   /* tab filtering — always active, every planet has 4 tabs */
   const { tabForRow, groupForRow } = computeTabRanges(stats, selName);
@@ -33089,10 +31459,8 @@ function updateDomLabel () {
     /* Check if this row is marked as static and we have a cached value */
     if ((row.static || row.constant) && cache[rowIdx] !== undefined) {
       nextHTML += cache[rowIdx];
-      _debugCacheHits++;
       continue;
     }
-    if (row.static || row.constant) _debugCacheMisses++; else _debugDynamic++;
 
     /* regular data row ------------------------------------------------------- */
     let labelTxt, rawVal, rawHover;
@@ -33162,9 +31530,6 @@ function updateDomLabel () {
 
   nextHTML += '</div></div>';   // close .pl-grid and .scrollBox
 
-  // DEBUG: Log cache performance (uncomment to enable)
-  // console.log(`[${selName}] Cache hits: ${_debugCacheHits}, Misses: ${_debugCacheMisses}, Dynamic: ${_debugDynamic}`);
-
   /* 6 — inject only if changed ---------------------------------------------- */
   if (nextHTML !== labelPrevHTML) {
     // Preserve scroll position before updating innerHTML
@@ -33201,28 +31566,6 @@ function updateSunGlow() {
   sunGlow.scale.set(glowSize, glowSize, 10);
 }
 
-function updateStarSizes() {
-  sceneObjects.stars.children.forEach(function(starPos) {
-    const star = starPos.children[0]; // First child = star Sprite
-
-    if (star && star instanceof THREE.Sprite) {
-      const magnitude = star.userData.magnitude; // Saved during creation
-      let starsize;
-
-      if (magnitude < 1) {
-        starsize = o.starsizeBase * 1.5;
-      } else if (magnitude >= 1 && magnitude < 3) {
-        starsize = o.starsizeBase * 1.0;
-      } else if (magnitude >= 3 && magnitude < 5) {
-        starsize = o.starsizeBase * 0.6;
-      } else {
-        starsize = o.starsizeBase * 0.3;
-      }
-
-      star.scale.set(starsize, starsize, 1);
-    }
-  });
-}
 
 function updateFocusRing() {
 
@@ -33379,11 +31722,6 @@ function updateSunlightForPlanet(planetMesh, pad = 1.1) {
   cam.near = 0.1;                 // a fixed, small value near the Sun
   cam.far  = -_lsBox.min.z;       // always positive and > near
   cam.updateProjectionMatrix();
-
-  /* 8. helper (for debugging) ------------------------------------ */
-  if (typeof shadowCameraHelper !== 'undefined') {
-    shadowCameraHelper.update();
-  }
 }
 
 function updateLightingForFocus() {
@@ -33439,9 +31777,6 @@ function createEarthPolarLine() {
   return line;
 }
 
-function changeSphereScale() {
-      celestialSphere.scale.set(o.cSphereSize, o.cSphereSize, o.cSphereSize);    
-}
   
 function changeZodiacScale() {
       zodiac.scale.set(o.zodiacSize, o.zodiacSize, o.zodiacSize);
@@ -33455,26 +31790,10 @@ function updatePosition() {
   o.julianDay = dateTimeToJulianDay(o.Date, o.Time);
   o.pos = posFromJD(o.julianDay);
   o.Day = posToDays(o.pos);
-  const p = dayToDateNew(o.julianDay,'julianday','perihelion-calendar');
-  o.perihelionDate = `${p.date} ${p.time}`;
   positionChanged = true; // Signal animation loop to update scene
 }
 
-function changeTraceScale(){
-    tracePlanets.forEach(obj => {
-    if (obj.traceLine) {
-        obj.traceLine.material.size = obj.size*10 * o.traceSize
-    }
-  });  
-}
 
-function changePlanetScale(){
-    planetObjects.forEach(obj => {
-      obj.planetObj.scale.x = o.Size
-      obj.planetObj.scale.y = o.Size
-      obj.planetObj.scale.z = o.Size
-  });  
-}
 
 function auToKm(au) { return au * currentAUDistance; }  // live conversion
 
@@ -33869,9 +32188,6 @@ const _CHAIN_IP_Y = [
   _CHAIN_IP_Z[2] * _CHAIN_IP_X[0] - _CHAIN_IP_Z[0] * _CHAIN_IP_X[2],
   _CHAIN_IP_Z[0] * _CHAIN_IP_X[1] - _CHAIN_IP_Z[1] * _CHAIN_IP_X[0],
 ];
-// The planet-family bodies the inv-plane machinery reads from the chain
-// (option A: Earth's DISPLAY rides the chain with the other seven).
-const _CHAIN_IP_BODY_KEYS = new Set(['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
 // P5/K5b — the VISIBLE perihelion markers ("PERIHELION MERCURY" …): under
 // the flag their DIRECTION is the chain's ϖ(t) while the PRESENTATION stays
 // the established device convention — a direction indicator at the legacy
@@ -34553,7 +32869,7 @@ function _k8EnsureGhosts() {
 // extrapolation deforming honestly — that divergence is the product.
 const _K8_ORBIT_SEGS = 192;
 const _K8_SUNPOS = new THREE.Vector3();
-function _k8UpdateGhostOrbit(name, ghost) {
+function _k8UpdateGhostOrbit(name, ghost, jdTT) {
   let line = ghost._k8Orbit;
   if (!line) {
     const geom = new THREE.BufferGeometry();
@@ -34565,8 +32881,14 @@ function _k8UpdateGhostOrbit(name, ghost) {
     scene.add(line);
     ghost._k8Orbit = line;
   }
-  const jd = o.julianDay;
-  if (line._k8SampleJD === undefined || Math.abs(jd - line._k8SampleJD) > _CHAIN_ORBIT_RESAMPLE_DAYS) {
+  // the standard side runs on TT (the caller's Stephenson ΔT), as the ghost
+  // bodies do; and the chain rings' 250-ms wall-clock floor — above ~10 yr/frame
+  // the JD condition alone resampled 7 × 193 VSOP87A evaluations EVERY frame
+  // with the overlay on (plan 20 §1b.14)
+  const jd = jdTT;
+  const nowMs = performance.now();
+  if (line._k8SampleJD === undefined || (Math.abs(jd - line._k8SampleJD) > _CHAIN_ORBIT_RESAMPLE_DAYS && nowMs - (line._k8SampleMs ?? 0) >= 250)) {
+    line._k8SampleMs = nowMs;
     const r0 = vsop87HelioEclipticAU(name, jd);
     let p = DAYS_PER_JULIAN_YEAR * Math.pow(Math.hypot(r0[0], r0[1], r0[2]), 1.5);   // first-pass span from |r|
     let rMin = Infinity, rMax = 0;
@@ -34675,7 +32997,7 @@ function _k8UpdateStandardOverlayInner() {
     // the standard Sun anchors the ghost orbit rings; each planet ghost
     // then carries the standard theory's own orbit path
     if (name === 'sun') _K8_SUNPOS.copy(_K8_V);
-    else if (name !== 'moon') _k8UpdateGhostOrbit(name, ghost);
+    else if (name !== 'moon') _k8UpdateGhostOrbit(name, ghost, jdTT);
     // the model side: the rendered body's geocentric direction
     if (body === sun) _K8_W.copy(SUN_POS); else body.planetObj.getWorldPosition(_K8_W);
     _K8_W.sub(EARTH_POS).normalize();
@@ -35187,10 +33509,6 @@ function tracePlanet(obj, pos) {
   obj.traceLine.visible = true;
 }
 
-function getZodiacRotationSpeed() {
-  const earth = planetObjects.find(obj => obj.name === "Earth");
-  return earth ? -earth.speed : 0;
-}
 
 function moveModel(pos) {
 
@@ -35276,71 +33594,17 @@ function moveModel(pos) {
       θ = obj.speed * pos - obj.startPos * (Math.PI / 180);
     }
 
-    // ─── TEMPORARILY DISABLED 2026-06 (Sun T² correction) ───────────────
-    // Bug investigation: Sun-only angular corrections shift visible Sun but
-    // leave planets at their original angles, so planets visibly orbit a
-    // "black spot" while the Sun has drifted. Flip `false → true` once
-    // corrections are propagated to all planet scene-graph nodes too.
-    if (false) {
-      // Sun mean longitude quadratic correction — root-cause fix for slow drift.
-      // Scene moves Sun at a constant rate; the real Sun has a T² acceleration
-      // in mean longitude from planetary perturbations on Earth's orbit
-      // (Meeus Ch.25: +0.0003032°/T², T = Julian centuries from J2000 TT). At
-      // J2000 (T=0): no change. At deep time (|T| ≈ 10-20): cumulative correction
-      // reaches arcminutes, capturing the long-period structure that linear
-      // scene motion can't represent.
-      if (obj === sun) {
-        const T_jc = (o.julianDay - j2000JD) / julianCenturyDays;
-        θ += 0.0003032 * T_jc * T_jc * (Math.PI / 180);
-      }
-    }
-
-    // Apply equation of center (Kepler's 2nd Law: faster at perihelion, slower at aphelion)
-    if (useVariableSpeed && obj.eccentricity && obj.perihelionPhaseJ2000 !== undefined) {
-      let e;
-      // Eccentricity is computed INLINE from the year, not read back from
-      // o[_eccentricityKey]. Those o.* fields are written by updatePredictions(),
-      // which runs AFTER moveModel() inside forceSceneUpdate — so reading them
-      // here fed moveModel the PREVIOUS call's value. Consequences, all measured
-      // via the "Scene vs Step-6a Engine Diff" tool:
-      //   • not idempotent — a second update at the same JD moved dec by 0.0039"
-      //   • path-dependent — reaching a JD from 20 yr away vs 0.5 h away differed
-      //     by 0.272", i.e. ~16 s of event time
-      //   • worst of all, forceSceneUpdate('light') never calls updatePredictions,
-      //     so the report's cardinal-point SEARCH ran every one of its samples on
-      //     an eccentricity frozen from before the search began — a different
-      //     stale epoch per cardinal point.
-      // Only the equinoxes revealed it: eccentricity enters through the equation
-      // of centre, a pure LONGITUDE term, and declination is stationary (blind to
-      // longitude) at the solstices.
-      // computeEccentricityEarth is a pure function of the year with J2000-FIXED
-      // anchors, so computing it here is exactly equivalent — minus the staleness.
-      // This is what tools/lib/scene-graph.js has always done (computeSunPositionFast
-      // derives earthEcc inline), which is why Step 6a was immune.
-      // Year derived from o.julianDay exactly as updatePredictions' `engineYear`
-      // does — NOT from _currentYearSI, whose non-deep-time branch is o.currentYear,
-      // which forceSceneUpdate also sets after moveModel and so is stale as well.
-      const _eccYear = DEEP_TIME_MODE_ENABLED
-        ? _jdToSIyear(o.julianDay)
-        : (o.julianDay - startmodelJD) / meansolaryearlengthinDays + startmodelYear;
-      const _eccNow = obj._eccentricityKey ? _eccentricityInline(obj._eccentricityKey, _eccYear) : undefined;
-      if (_eccNow !== undefined) {
-        // the Sun (the only object with an eccentricity key): eoc = e(t)/2 — the
-        // geometric offset e(t)·û(ϖ) supplies the other half (unification;
-        // mirror tools/lib/scene-graph.js).
-        e = _eccNow / 2;
-      } else {
-        e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
-      }
-      // perihelionPrecessionRate × pos is the snapshot form of the perihelion
-      // phase (the Sun's angle is the engine's, R4).
+    // Apply equation of center (Kepler's 2nd Law: faster at perihelion, slower
+    // at aphelion) — the Moon and any no-chain body. NOT the Sun: its wheel
+    // angle is set from the certified longitude in _applyEngineEarthFrame after
+    // this loop, so its EoC here (the inline e(t)/2 on the SI-year axis) was
+    // computed and overwritten every frame (plan 20 §2, the thrown-away work).
+    if (useVariableSpeed && obj !== sun && obj.eccentricity && obj.perihelionPhaseJ2000 !== undefined) {
+      const e = typeof obj.eccentricity === 'number' ? obj.eccentricity : (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000);
+      // perihelionPrecessionRate × pos is the snapshot form of the perihelion phase
       const perihelionPhase = obj.perihelionPhaseJ2000 + (obj.perihelionPrecessionRate || 0) * pos;
       const M = θ - perihelionPhase;  // mean anomaly measured from current perihelion direction
       θ += 2 * e * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M);
-      obj._meanAnomaly = M; // Store for parallax correction (BR-CA terms)
-      // (the Sun's wheel angle is set from the certified longitude in
-      // _applyEngineEarthFrame — this EoC branch serves the Moon and the
-      // no-chain bodies only)
     }
 
     // (the Sun's angle comes from the certified longitude in
@@ -35406,43 +33670,11 @@ function moveModel(pos) {
       obj._meeusDistKm = _sr.distKm * _aRatio;   // the series distance on the recession (1 at J2000; matches _meeusMoonDistance / eclipse dispatchers there)
     }
 
-    // Dynamic geocentric elipticOrbit for Type II + III planets
-    // earthPerihelionPrecession1 is earlier in planetObjects, so its rotation.y is already current
-    if (obj.eclipticPrecLayer) {
-      const earthPeriEcl = perihelionLongitudeEcliptic(earthPerihelionPrecession1, ASTRO_REFERENCE.perihelionLongitudeJ2000_deg);
-      const planetPeriEcl = perihelionLongitudeEcliptic(obj.eclipticPrecLayer, obj.longitudePerihelion);
-      const dw = (earthPeriEcl - planetPeriEcl) * Math.PI / 180;
-      let eo = 2 * (o.eccentricityEarth || ASTRO_REFERENCE.eccentricityJ2000) * 100 * Math.sin(dw);
-      if (obj.planetType === 'II') {
-        // Type II: Mars orbit center offset + half Earth geocentric correction
-        const dynEcc = obj._eccentricityKey ? (o[obj._eccentricityKey] || obj._orbitalEccentricity) : obj._orbitalEccentricity;
-        const eccDist = dynEcc * obj._orbitDistance * 100;
-        eo = eccDist / 2 - eo / 2;
-      } else {
-        eo = (obj.signFlip || 1) * eo;
-      }
-      obj.orbitRadius = eo;
-      obj.pivotObj.position.x = eo;
-      obj.rotationAxis.position.x = eo;
-    }
-
-    const a = obj.a ?? obj.orbitRadius;   // semi-major (or radius)
-    const b = obj.b ?? obj.orbitRadius;   // semi-minor (or radius)
-    const isEllipse = a !== b;            // true only when the axes differ
-
-    if (isEllipse) {
-      // -------- analytic curve --------
-      const x = Math.cos(θ) * a;
-      const z = Math.sin(θ) * b;
-
-      obj.pivotObj.position.set(x, 0, z);
-      obj.rotationAxis.position.set(x, 0, z);   // planet + rings
-
-      obj.orbitObj.rotation.y = 0;              // keep the path still
-    } else {
-      // -------- orbitradius circular logic ----
-      obj.orbitObj.rotation.y = θ;
-    }
+    // every orbit is a circle about its pivot offset (createPlanet: a = b = orbitRadius,
+    // no object sets orbitSemiMajor/Minor; the chain planets are overridden in
+    // updatePositions and the Sun placed by the engine) — the former
+    // elliptical branch and the Type-II/III eclipticPrecLayer offset never ran
+    obj.orbitObj.rotation.y = θ;
 
     // planet's own day-night spin (every rotationSpeed takes the constant-rate form)
     if (obj.rotationSpeed) {
@@ -35499,10 +33731,9 @@ function moveModel(pos) {
   if (typeof inclinationPathGroup !== 'undefined') {
     inclinationPathGroup.rotation.y = Math.PI / 6 - earthTheta;
   }
-  // Invariable plane also rotates with zodiac
-  if (typeof invariablePlaneGroup !== 'undefined') {
-    invariablePlaneGroup.rotation.y = -Math.PI / 3 - earthTheta;
-  }
+  // (the invariable-plane group is posed by updateInvariablePlanePosition's
+  // quaternion alone — the per-frame rotation.y write here re-decomposed and
+  // overwrote that quaternion's yaw every frame between the 10-Hz ticks; plan 20 §1b.3)
 }
 
 function getOptimizedPixelRatio() {
@@ -35547,20 +33778,6 @@ function onWindowResize() {
   try { positionChanged = true; } catch(e) {} // trigger a render after resize (safe during init)
 }
 
-function addPolarGridHelper(inplanet, planetSize = 10) {
-  const polarGridHelper = new THREE.PolarGridHelper(
-    planetSize * 1.1,  // slightly bigger than the planet
-    12,                // 12 radial lines (for zodiac / months / seasons)
-    6,                 // 6 circles
-    32,                // fewer segments per circle (performance)
-    0x0000ff,          // radial line color (blue)
-    0x808080           // circle line color (gray)
-  );
-  polarGridHelper.material.opacity = 0.5;
-  polarGridHelper.material.transparent = true;
-  polarGridHelper.rotation.x = Math.PI / 2; // flat
-  inplanet.add(polarGridHelper);
-}
 
 function posToDays(pos) {
   return Math.floor(jdFromPos(pos) - startmodelJD);  // REMOVE +12h shift
@@ -35596,349 +33813,25 @@ function timeToPos(value) {
   return pos;
 }
 
-/**
- * Computes the apparent RA of pdB as seen from pdA in Earth's equatorial frame,
- * then returns the 180°-opposite of that angle.
- *
- * COORDINATE SYSTEM: Earth's Equatorial Frame
- * The .ra values are computed by transforming world positions into earth.rotationAxis
- * local coordinates (see updatePositions). This is Earth's equatorial frame, which
- * includes axial tilt (~23.4°), axial precession, and other Earth orientation effects.
- *
- * PROJECTION: each body is projected onto the equatorial plane with its
- * declination — ρ = r·sin(φ), where φ is the .dec THREE polar angle measured
- * from the rotation axis (so sin φ = cos δ):
- *   x = ρ * cos(ra),  z = ρ * sin(ra)
- * The apparent RA is then the RA of the 3D vector A → B, exactly.
- *
- * The former form used r itself (declination ignored). Measured on the
- * Step-3 export (Node scene mirror, snapshot mode): the reference point A
- * (perihelion-of-Earth, e·AU ≈ 0.017 AU) and a planet's perihelion marker
- * (~0.3–30 AU) sit at very different declinations, and the omission
- * generated 96% of Venus's exported "precession fluctuation" (std 513 →
- * 20 ″/cy; Mercury 96 → 35 ″/cy) as harmonics of the equatorial rotation.
- *
- * @param {object} pdA - Reference object with .ra, .dec (radians) and .distKm
- * @param {object} pdB - Target object with .ra, .dec (radians) and .distKm
- * @returns {number} Opposite apparent RA in degrees [0, 360)
- * @throws {TypeError} If ra, dec or distKm values are invalid
- * @throws {RangeError} If objects share identical coordinates
- */
-function apparentRaFromPdA(pdA, pdB) {
-  const TWO_PI  = 2 * Math.PI;
 
-  // 1) Pull raw RA in radians from each object (computed in Earth's equatorial frame)
-  const ra1 = Number(pdA.ra);
-  const ra2 = Number(pdB.ra);
 
-  if (!Number.isFinite(ra1)) {
-    throw new TypeError(`ra for ${pdA.name} is invalid: ${pdA.ra}`);
-  }
-  if (!Number.isFinite(ra2)) {
-    throw new TypeError(`ra for ${pdB.name} is invalid: ${pdB.ra}`);
-  }
 
-  // 2) Normalize each input RA into [0, 2π)
-  let θ1 = ra1 % TWO_PI;
-  if (θ1 < 0) θ1 += TWO_PI;
 
-  let θ2 = ra2 % TWO_PI;
-  if (θ2 < 0) θ2 += TWO_PI;
 
-  // 3) Pull & validate distances from Earth (km)
-  const r1 = Number(pdA.distKm);
-  const r2 = Number(pdB.distKm);
 
-  if (!Number.isFinite(r1) || r1 < 0) {
-    throw new TypeError(`distKm for ${pdA.name} is invalid: ${pdA.distKm}`);
-  }
-  if (!Number.isFinite(r2) || r2 < 0) {
-    throw new TypeError(`distKm for ${pdB.name} is invalid: ${pdB.distKm}`);
-  }
 
-  // 4) Project each body's position onto the equatorial plane WITH its
-  //    declination: ρ = r·sin(φ), φ = .dec (THREE polar angle from the axis).
-  const φ1 = Number(pdA.dec);
-  const φ2 = Number(pdB.dec);
-  if (!Number.isFinite(φ1)) {
-    throw new TypeError(`dec for ${pdA.name} is invalid: ${pdA.dec}`);
-  }
-  if (!Number.isFinite(φ2)) {
-    throw new TypeError(`dec for ${pdB.name} is invalid: ${pdB.dec}`);
-  }
-  const ρ1 = r1 * Math.sin(φ1);
-  const ρ2 = r2 * Math.sin(φ2);
-  const x1 = ρ1 * Math.cos(θ1);
-  const z1 = ρ1 * Math.sin(θ1);
-  const x2 = ρ2 * Math.cos(θ2);
-  const z2 = ρ2 * Math.sin(θ2);
 
-  // 5) Vector from A → B in the equatorial plane
-  const dx = x2 - x1;
-  const dz = z2 - z1;
 
-  // If they coincide exactly, the apparent RA is undefined
-  if (dx === 0 && dz === 0) {
-    throw new RangeError(
-      `${pdA.name} and ${pdB.name} share identical equatorial coords`
-    );
-  }
 
-  // 6) Apparent RA = atan2(dz, dx), normalized into [0, 2π)
-  let aparRad = Math.atan2(dz, dx);
-  if (aparRad < 0) {
-    aparRad += TWO_PI;
-  }
-
-  // 7) Return the opposite direction (add π and re-wrap)
-  let oppRad = aparRad + Math.PI;
-  if (oppRad >= TWO_PI) {
-    oppRad -= TWO_PI;
-  }
-
-  // 8) Convert to degrees [0, 360)
-  return oppRad * RAD2DEG;
-}
-
-// ================================================================
-// PERIHELION LONGITUDE CALCULATION METHODS
-// ================================================================
-//
-// There are TWO different ways to measure perihelion longitude:
-//
-// ┌─────────────────────────────────────────────────────────────────────────────┐
-// │ METHOD 1: EARTH-FRAME (apparentRaFromPdA)                                   │
-// ├─────────────────────────────────────────────────────────────────────────────┤
-// │ Reference frame: Earth's equatorial coordinate system                       │
-// │ Measures: Apparent RA of perihelion as seen from Earth                      │
-// │ Includes: Earth's axial tilt, precession, nutation, daily rotation          │
-// │ Use case: What an observer on Earth would measure in RA coordinates         │
-// │ Expected rate: ~532 arcsec/century mean (fluctuating ±100 around mean)      │
-// │ Fluctuation period: ~6,500 years (harmonic of Earth precession cycles)      │
-// │ Note: Over long periods (~300,000 years), averages to the Ecliptic value    │
-// └─────────────────────────────────────────────────────────────────────────────┘
-//
-// ┌─────────────────────────────────────────────────────────────────────────────┐
-// │ METHOD 2: ECLIPTIC (perihelionLongitudeEcliptic)                            │
-// ├─────────────────────────────────────────────────────────────────────────────┤
-// │ Reference frame: J2000 Ecliptic plane (heliocentric)                        │
-// │ Measures: Pure precession angle from the model's precession layer           │
-// │ Includes: Only the configured precession rate, nothing else                 │
-// │ Use case: The "true" heliocentric precession rate                           │
-// │ Expected rate: Exactly 534.94 arcsec/century for Mercury (stable)           │
-// │ Fluctuation: NONE - perfectly stable by definition                          │
-// └─────────────────────────────────────────────────────────────────────────────┘
-//
-// COMPARISON:
-// - Ecliptic: Reads directly from precession layer rotation (perfectly stable)
-// - Earth-frame: Uses equatorial RA transformation (fluctuates due to Earth)
-//
-// ================================================================
-
-/**
- * ECLIPTIC-FRAME Perihelion Longitude
- * Computes the perihelion longitude in J2000 ecliptic coordinates.
- *
- * Reads directly from the precession layer's rotation.y, which represents
- * the precession angle in the ecliptic plane (rotation around world Y-axis).
- * This gives the "true" heliocentric precession, unaffected by Earth's
- * reference frame transformations.
- *
- * @param {object} precessionLayer - The precession duration layer (e.g., mercuryPerihelionDurationEcliptic1)
- * @param {number} longitudePerihelion - The J2000 longitude of perihelion in degrees
- * @returns {number} Perihelion longitude in degrees [0, 360)
- */
-function perihelionLongitudeEcliptic(precessionLayer, longitudePerihelion) {
-  const TWO_PI = 2 * Math.PI;
-
-  // Get the precession angle directly from the layer's orbitObj rotation
-  // The rotation.y represents precession in the ecliptic plane
-  let precessionAngle = precessionLayer.orbitObj.rotation.y;
-
-  // Add the base longitude of perihelion (J2000 starting position)
-  let totalAngle = precessionAngle + (longitudePerihelion * Math.PI / 180);
-
-  // Normalize to [0, 2π)
-  totalAngle = totalAngle % TWO_PI;
-  if (totalAngle < 0) totalAngle += TWO_PI;
-
-  return totalAngle * RAD2DEG;
-}
-
-// ================================================================
-// MISSING PERIHELION ADVANCE CALCULATION (Generic Implementation)
-//
-// Calculates the "missing advance" of perihelion by comparing:
-// - Earth-frame perihelion advance (o.mercuryPerihelion, etc.)
-// - Ecliptic-frame perihelion advance (o.mercuryPerihelionEcliptic, etc.)
-//
-// The difference reveals the portion of observed precession that cannot
-// be explained by the model's ecliptic-frame calculations.
-//
-// Key dates:
-// - JD 2415191.5 = ~January 1, 1900
-// - JD 2451716.5 = June 21, 2000 (model start)
-// - JD 2488069.5 = ~January 1, 2100
-//
-// ================================================================
-
-const JD_1800 = K.timeReference.jd1800;  // ~January 1, 1800
-const JD_1900 = K.timeReference.jd1900;  // ~January 1, 1900
-// JD_2000 is the model start, i.e. the same quantity as the scene epoch
-// (astro-reference timeReference.sceneEpochJD).
-const JD_2000 = startmodelJD;  // June 21, 2000 (model start)
-const JD_2100 = K.timeReference.jd2100;  // ~January 1, 2100
-
-// Cache for perihelion values by Julian Day (calculated once on demand per JD)
-const perihelionCache = {};
-
-/**
- * Fetch perihelion values at a specific Julian Day for all planets.
- * Uses save/jump/restore pattern like generatePlanetReport.
- * Results are cached by JD since values at a specific date never change.
- *
- * @param {number} jd - Julian Day to fetch values for
- * @returns {Object} Object with planet names as keys, each containing {earth, ecliptic} values
- */
-function getPerihelionValuesAtDate(jd) {
-  // Return cached values if available
-  if (perihelionCache[jd]) return perihelionCache[jd];
-
-  // Save current state
-  const savedState = {
-    run: o.Run,
-    julianDay: o.julianDay,
-    time: o.Time,
-    pos: o.pos
-  };
-  o.Run = false;
-
-  // Jump to requested Julian Day
-  jumpToJulianDay(jd);
-  forceSceneUpdate();
-
-  // Read values for all planets
-  perihelionCache[jd] = {
-    mercury: { earth: o.mercuryPerihelion, ecliptic: o.mercuryPerihelionEcliptic },
-    venus:   { earth: o.venusPerihelion,   ecliptic: o.venusPerihelionEcliptic },
-    mars:    { earth: o.marsPerihelion,    ecliptic: o.marsPerihelionEcliptic },
-    jupiter: { earth: o.jupiterPerihelion, ecliptic: o.jupiterPerihelionEcliptic },
-    saturn:  { earth: o.saturnPerihelion,  ecliptic: o.saturnPerihelionEcliptic },
-    uranus:  { earth: o.uranusPerihelion,  ecliptic: o.uranusPerihelionEcliptic },
-    neptune: { earth: o.neptunePerihelion, ecliptic: o.neptunePerihelionEcliptic },
-    pluto:   { earth: o.plutoPerihelion,   ecliptic: o.plutoPerihelionEcliptic },
-    halleys: { earth: o.halleysPerihelion, ecliptic: o.halleysPerihelionEcliptic },
-    eros:    { earth: o.erosPerihelion,    ecliptic: o.erosPerihelionEcliptic }
-  };
-
-  // Restore state
-  o.Run = savedState.run;
-  jumpToJulianDay(savedState.julianDay);
-  o.Time = savedState.time;
-  o.pos = savedState.pos;
-  forceSceneUpdate();
-
-  return perihelionCache[jd];
-}
-
-// Wrapper functions for backwards compatibility
-function getPerihelion1900Values() { return getPerihelionValuesAtDate(JD_1900); }
-function getPerihelion2000Values() { return getPerihelionValuesAtDate(JD_2000); }
-function getPerihelion2100Values() { return getPerihelionValuesAtDate(JD_2100); }
-
-/**
- * Calculate the "missing advance" of perihelion for a planet between two dates.
- * Compares Earth-frame advance vs Ecliptic-frame advance.
- *
- * Missing advance = (Earth-frame advance) - (Ecliptic-frame advance)
- *
- * @param {string} planetName - Planet key (mercury, venus, mars, etc.)
- * @param {number} jdStart - Starting Julian Day
- * @param {number} jdEnd - Ending Julian Day
- * @returns {number} Missing advance in arcseconds
- */
-function calculateMissingPerihelionAdvanceBetween(planetName, jdStart, jdEnd) {
-  const valStart = getPerihelionValuesAtDate(jdStart)[planetName];
-  const valEnd = getPerihelionValuesAtDate(jdEnd)[planetName];
-
-  if (!valStart || !valEnd) return 0;
-
-  // Calculate advances in degrees
-  const advanceEarthDeg = valEnd.earth - valStart.earth;
-  const advanceEclipticDeg = valEnd.ecliptic - valStart.ecliptic;
-
-  // Convert to arcseconds: degrees / 360 * 1296000
-  const advanceEarthArcsec = advanceEarthDeg / 360 * 1296000;
-  const advanceEclipticArcsec = advanceEclipticDeg / 360 * 1296000;
-
-  // Missing advance = Earth-frame advance - Ecliptic-frame advance
-  return advanceEarthArcsec - advanceEclipticArcsec;
-}
-
-/**
- * Calculate the "missing advance" of perihelion for a planet (1900 to 2000).
- * Wrapper for backwards compatibility.
- *
- * @param {string} planetName - Planet key (mercury, venus, mars, etc.)
- * @returns {number} Missing advance in arcseconds
- */
-function calculateMissingPerihelionAdvance(planetName) {
-  return calculateMissingPerihelionAdvanceBetween(planetName, JD_1900, JD_2000);
-}
-
-/**
- * Calculate the predicted "missing advance" of perihelion for Mercury (2000 to 2100).
- *
- * @returns {number} Predicted missing advance in arcseconds
- */
-function calculatePredictedMissingAdvance() {
-  return calculateMissingPerihelionAdvanceBetween('mercury', JD_2000, JD_2100);
-}
-
-/**
- * Calculate the "missing advance" of perihelion for Mercury during Einstein's century (1800 to 1900).
- *
- * @returns {number} Missing advance in arcseconds
- */
-function calculateEinsteinCenturyMissingAdvance() {
-  return calculateMissingPerihelionAdvanceBetween('mercury', JD_1800, JD_1900);
-}
-
-/**
- * Calculate the perihelion precession as seen from Earth for a planet.
- * This is the Earth-frame advance from 1900 to 2000.
- *
- * @param {string} planetName - Planet key (mercury, venus, mars, etc.)
- * @returns {number} Earth-frame precession in arcseconds
- */
-function calculateEarthFramePrecession(planetName) {
-  const val1900 = getPerihelion1900Values()[planetName];
-  const val2000 = getPerihelion2000Values()[planetName];
-
-  if (!val1900 || !val2000) return 0;
-
-  // Calculate advance in degrees (2000 - 1900)
-  const advanceEarthDeg = val2000.earth - val1900.earth;
-
-  // Convert to arcseconds: degrees / 360 * 1296000
-  return advanceEarthDeg / 360 * 1296000;
-}
 
 function updatePerihelion() {
   // ═══════════════════════════════════════════════════════════════════════════
-  // EARTH-FRAME (Equatorial RA)
-  // What an observer on Earth measures in Right Ascension coordinates
-  // Includes Earth's axial tilt, precession cycles, and equatorial transformation
-  // Shows fluctuations due to Earth's reference frame - averages to Ecliptic value
+  // EARTH-FRAME (Equatorial RA) — Earth's own perihelion marker as the scene
+  // reads it (RA of date). The seven planets' RA rows are set below from the
+  // chain (the former apparentRaFromPdA values here were overwritten there
+  // every call — plan 20 §2, the thrown-away work).
   // ═══════════════════════════════════════════════════════════════════════════
-  o["mercuryPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, mercuryPerihelionFromEarth);
-  o["venusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, venusPerihelionFromEarth) % 360;
   o["earthPerihelion"] = (earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360;
-  o["marsPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, marsPerihelionFromEarth);
-  o["jupiterPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, jupiterPerihelionFromEarth);
-  o["saturnPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, saturnPerihelionFromEarth);
-  o["uranusPerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, uranusPerihelionFromEarth);
-  o["neptunePerihelion"] = apparentRaFromPdA(earthPerihelionFromEarth, neptunePerihelionFromEarth);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // ECLIPTIC-FRAME (J2000 Ecliptic Coordinates)
@@ -36067,8 +33960,6 @@ function updateOrbitalPlaneRotations() {
 const _ANOM_CHAIN_KEYS = new Set(['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
 // Reusable vectors for updatePlanetAnomalies (declared beside their user since R10)
 const _anomalySunPos = new THREE.Vector3();
-const _anomalyPPos = new THREE.Vector3();
-const _anomalyPlanetPos = new THREE.Vector3();
 function updatePlanetAnomalies() {
   // Get Sun position (common for all planets) - using pooled vector
   sun.pivotObj.getWorldPosition(_anomalySunPos);
@@ -36234,7 +34125,7 @@ function updateMoonOrbitalElements() {
   // regression + the static tilt.
   const m = moon.containerObj.matrixWorld.elements;
   // Extract local Y direction (orbit normal) in world space: column 1 of 4×4 matrix
-  const nx = m[4], ny = m[5], nz = m[6];
+  const nx = m[4], nz = m[6];
 
   // Line of nodes direction: ecliptic_normal × orbit_normal = (0,1,0) × (nx,ny,nz) = (nz, 0, -nx)
   // The ascending node is where the Moon goes south→north (increasing Y).
@@ -36719,7 +34610,6 @@ function addOrbitPlaneHelper(pd, parent, size, divs = 90) {
 function goldenspiralPerihelionObjects(...args) {
 
   /* ---------- 0. unpack parameters ---------------------------------- */
-  const camera = args[args.length - 2];
   const scene  = args[args.length - 1];
   const pds    = args.slice(0, -2);
 
@@ -36748,8 +34638,6 @@ function goldenspiralPerihelionObjects(...args) {
   scene.add(goldenTube);
 
   /* ---------- 3. updater -------------------------------------------- */
-  const world = new THREE.Vector3();
-  const ndc   = new THREE.Vector3();
   // Pre-allocate Vector3 array (one per perihelion point) - avoids clone() allocations
   const visiblePts = [];
   for (let i = 0; i < pds.length; i++) {
@@ -36821,99 +34709,8 @@ function goldenspiralPerihelionObjects(...args) {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/*  1.  LAST PERIHELION BEFORE A GIVEN JD                             */
-/*      (≈ 1″ accuracy over ±150 000 yr)                              */
-/* ------------------------------------------------------------------ */
 
-/**
- * Return the Julian Day of the *last* perihelion preceding `JD`.
- * Uses the *current* sidereal-year length supplied in `o`.
- *
- * @param  {number} JD  – target epoch
- * @return {number} JD  of the most recent perihelion
- */
-function lastPerihelionJD(JD) {
-  const cycles       = Math.floor((JD - perihelionalignmentJD) / o.siderealYearDays);
-  return perihelionalignmentJD + cycles * o.siderealYearDays;
-}
 
-/* ------------------------------------------------------------------ */
-/*  2.  EQUATION–OF–CENTRE  (series, pre-compressed)                  */
-/*      good to < 0.01″ for e ≤ 0.08                                  */
-/* ------------------------------------------------------------------ */
-
-/**
- * Fast series for C = ν − M  (rad) up to e⁵.
- * M must be in **radians**.
- */
-function equationOfCentre(e, M) {
-
-  const e2 =  e * e;
-  const e3 =  e2 * e;
-  const e4 =  e2 * e2;
-  const e5 =  e4 * e;
-
-  const sinM  = Math.sin(M);
-  const sin2M = Math.sin(2*M);
-  const sin3M = Math.sin(3*M);
-  const sin4M = Math.sin(4*M);
-  const sin5M = Math.sin(5*M);
-
-  /* Laskar / Sterne series through e⁵, but written with
-     numeric coefficients only – no iterations needed              */
-  return (  (2*e      - 0.25*e3      + (5/96)*e5) * sinM
-          + (1.25*e2  - (11/24)*e4 ) * sin2M
-          + ((13/12)*e3 - (43/64)*e5) * sin3M
-          +  (103/96)*e4             * sin4M
-          + (1097/960)*e5            * sin5M     );
-}
-
-/* ------------------------------------------------------------------ */
-/*  3.  MAIN ROUTINE – TRUE SOLAR LONGITUDE                           */
-/* ------------------------------------------------------------------ */
-
-/**
- * True ecliptic longitude of the Sun (deg, 0-360) in the **ecliptic of date**.
- *
- * Inputs taken from global `o`:
- *   • o.eccentricityEarth        (unitless, 0.0 … 0.1)
- *   • o.longitudePerihelion      (deg, ecliptic-of-date)
- *   • o.siderealYearDays     (days)
- *
- * The function is kepler-exact, but the mean anomaly is built from a single
- * anchor perihelion (14 Dec 1245) plus the *current* sidereal-year length.
- * Accuracy:  better than 1″ for |JD − current JD| ≲ 50 000 yr provided
- *            you keep `o.*` values self-consistent with that JD.
- *
- * @param  {number} JD  – barycentric dynamical time Julian Day
- * @return {number} λ   – true longitude (deg 0-360)
- */
-function solarLongitudeDegLong(JD) {
-
-  /* --- orbital elements for *this* JD ---------------------------- */
-  const e     = o.eccentricityEarth;        // current eccentricity
-  const omega = wrap360(o.longitudePerihelion);   // deg
-
-  /* mean motion (deg/day) from the *sidereal* year ---------------- */
-  const nDegPerDay   = 360 / o.siderealYearDays;
-
-  /* time since the last perihelion preceding JD ------------------- */
-  const JDp  = lastPerihelionJD(JD);        // JD of most recent perihelion
-  const dt   = JD - JDp;                    // days
-
-  /* mean anomaly --------------------------------------------------- */
-  const Mdeg = wrap360(nDegPerDay * dt);    // deg
-  const Mrad = Mdeg * DEG;                  // rad
-
-  /* equation of centre (rad) -------------------------------------- */
-  const C    = equationOfCentre(e, Mrad);   // rad
-  const Cdeg = C / DEG;                     // deg
-
-  /* true longitude ------------------------------------------------- */
-  const lambda = wrap360(omega + Mdeg + Cdeg);
-  return lambda;
-}
 
 //Returns the angle from the sun to targetPlanet as viewed from earth using the cosine rule.
 function getElongationFromSun(targetPlanet) {
@@ -37400,38 +35197,6 @@ function computeAxialPrecessionYears(
          (siderealYearSeconds - (solarYearDays * lengthofDay));
 }
 
-/**
- * Compute Earth's orbital eccentricity for a given year.
- *
- * @param {number} currentYear
- * @param {number} balancedYear
- * @param {number} perihelionCycleLength
- * @param {number} eccentricityBase
- * @param {number} eccentricityAmplitude
- * @returns {number}
- */
-/** Eccentricity for an `_eccentricityKey` ('eccentricityEarth', 'eccentricityMars', …)
- *  computed DIRECTLY from the year — the same call updatePredictions() makes, with
- *  the same J2000-FIXED anchors.
- *
- *  Exists so moveModel() does not have to read back o.eccentricityEarth etc.
- *  Those are written after moveModel runs, so reading them made the scene
- *  non-idempotent and path-dependent, and left the report's event search running
- *  on a frozen value (forceSceneUpdate('light') never reaches updatePredictions).
- *  See the note at the equation-of-centre block in moveModel.
- *
- *  Returns undefined for an unknown key so the caller can fall back. */
-function _eccentricityInline(key, year) {
-  if (key === 'eccentricityEarth') {
-    // Earth's e of date is the N-body series (one source): the SAME function
-    // that drives the geometric offset and the scalar also feeds the sun's
-    // equation of center — the scene's e is one value everywhere.
-    return _sceneEccTargetAt(year);
-  }
-  // A planet's eccentricity of date is `_chainElementsOfDate(key, jd).e` (the
-  // meshes are placed from the N-body chain).
-  return undefined;
-}
 
 /**
  * Compute dynamic obliquity (axial tilt) for a non-Earth planet.
@@ -38185,75 +35950,7 @@ function createStarfield() {
   scene.add(particles);
 }
 
-function setStarDistance() {
-  stars.forEach(obj => {
-    obj.starObj.position.x = obj.dist * o['Star distance'];
-  })
-}
 
-function getCircularText(
-  text, diameter, startAngle, align, textInside, inwardFacing, 
-  fName, fSize, kerning
-  ) {
-    align = align.toLowerCase();
-    const mainCanvas = document.createElement('canvas');
-    const resolutionFactor = 3;
-    const ctxRef = mainCanvas.getContext('2d');
-    const clockwise = align === "right" ? 1 : -1;
-    startAngle = startAngle * (Math.PI / 180);
-    
-    // Font height measurement
-    const div = document.createElement("div");
-    div.innerHTML = text;
-    div.style.position = 'absolute';
-    div.style.top = '-10000px';
-    div.style.left = '-10000px';
-    div.style.fontFamily = fName;
-    div.style.fontSize = fSize;
-    div.style.fontWeight = 'bold';
-    document.body.appendChild(div);
-    const textHeight = div.offsetHeight;
-    document.body.removeChild(div);
-
-    if (!textInside) diameter += textHeight * 2;
-
-    const canvasSize = diameter * resolutionFactor;
-    mainCanvas.width = canvasSize;
-    mainCanvas.height = canvasSize;
-
-    ctxRef.scale(resolutionFactor, resolutionFactor);
-    ctxRef.translate(diameter / 2, diameter / 2);
-    ctxRef.font = `bold ${fSize} ${fName}`;
-    ctxRef.fillStyle = '#ffffff';
-    ctxRef.textBaseline = 'middle';
-    ctxRef.textAlign = 'center';
-    ctxRef.shadowColor = 'black';
-    ctxRef.shadowBlur = 4;
-
-    if (((["left", "center"].includes(align)) && inwardFacing) || (align == "right" && !inwardFacing)) {
-        text = text.split("").reverse().join("");
-    }
-
-    startAngle += (Math.PI * !inwardFacing);
-
-    if (align == "center") {
-        for (let j = 0; j < text.length; j++) {
-            const charWid = ctxRef.measureText(text[j]).width;
-            startAngle += ((charWid + (j === text.length - 1 ? 0 : kerning)) / (diameter / 2 - textHeight)) / 2 * -clockwise;
-        }
-    }
-
-    ctxRef.rotate(startAngle);
-
-    for (let j = 0; j < text.length; j++) {
-        const charWid = ctxRef.measureText(text[j]).width;
-        ctxRef.rotate((charWid / 2) / (diameter / 2 - textHeight) * clockwise);
-        ctxRef.fillText(text[j], 0, (inwardFacing ? 1 : -1) * (0 - diameter / 2 + textHeight / 2));
-        ctxRef.rotate((charWid / 2 + kerning) / (diameter / 2 - textHeight) * clockwise);
-    }
-  
-  return mainCanvas;
-}
 
 function colorTemperature2rgb(kelvin) {
   let temperature = kelvin / 100.0;
@@ -38369,107 +36066,10 @@ function longitudeToDateTime(lonDeg, currentYear) {
   return `${date} ${time}`;
 }
 
-/**
- * Check whether a given day (JD or Perihelion-day) falls on a
- * Perihelion-calendar “cycle” date: Year % cycleYears === 0, Month=1, Day=1.
- *
- * @param {number} day           — input day count (JD if julianday, or perihelion-day)
- * @param {'julianday'|'perihelionday'} inputKind
- * @param {number} cycleYears    — length of one cycle in Perihelion years (default: the J2000 perihelion-of-date period T_peri)
- * @returns {boolean}
- */
-function isPerihelionCycle(day, inputKind, cycleYears = _periOfDatePeriodYearsJ2000()) {
-  // 1) get the Perihelion‐calendar date
-  const p = dayToDateNew(day, inputKind, 'perihelion-calendar');
-  // p.date is "YYYY-MM-DD" or "-YYYY-MM-DD"
-  
-  // 2) extract Y/M/D via regex
-  const m = /^(-?\d+)-(\d{2})-(\d{2})$/.exec(p.date);
-  if (!m) {
-    console.warn('Unexpected perihelion date format:', p.date);
-    return false;
-  }
-  const year  = parseInt(m[1], 10);
-  const month = parseInt(m[2], 10);
-  const dayOfM= parseInt(m[3], 10);
 
-  // 3) check for Jan 1 of a positive multiple of cycleYears
-  return (
-    month === 1 &&
-    dayOfM === 1 &&
-    year > 0 &&
-    year % cycleYears === 0
-  );
-}
 
-function triggerPerihelionEasterEgg() {
-  // a) Play your chime
-  //const audio = new Audio('sounds/celestial-chime.mp3');
-  //audio.play();
 
-  // b) Golden glow: animate a bloom post-process or add a sprite/ Needs Bloompass addpass
-  //addGoldenGlow(); 
 
-  // c) Cosmic confetti: particle system of little star/comet sprites
-  addConfettiParticles( camera.position.distanceTo(scene.position) );
-}
-
-function addConfettiParticles(spawnRadius = 5) {
-  const geom = new THREE.BufferGeometry();
-  const count = 200;
-  const pos = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    // random direction in a sphere
-    const v = new THREE.Vector3(
-      (Math.random()*2-1),
-      (Math.random()*2-1),
-      (Math.random()*2-1)
-    ).normalize().multiplyScalar(spawnRadius);
-    pos.set([v.x, v.y, v.z], i*3);
-  }
-  geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-
-  const mat = new THREE.PointsMaterial({
-    size: 0.1,
-    map: loadTexture('public/lensflare2.png'),
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  });
-  const pts = new THREE.Points(geom, mat);
-  scene.add(pts);
-
-  // animate them shooting outward and fading
-  new TWEEN.Tween({ t: 0 })
-    .to({ t: 1 }, 3000)
-    .onUpdate(({ t }) => {
-      geom.attributes.position.array.forEach((_, idx, arr) => {
-        arr[idx] *= 1 + 2 * (t);  // move outward
-      });
-      geom.attributes.position.needsUpdate = true;
-      mat.opacity = 1 - t;
-    })
-    .onComplete(() => {
-      scene.remove(pts);
-      geom.dispose(); mat.dispose();
-    })
-    .start();
-}
-
-function addGoldenGlow() {
-  const initial = bloomPass.strength;
-  new TWEEN.Tween({ str: initial })
-    .to({ str: initial * 2 }, 1000)
-    .yoyo(true)
-    .repeat(1)
-    .onUpdate(({ str }) => bloomPass.strength = str)
-    .start();
-}
-
-// helper
-function isPowerOfTwo(v) {
-  return (v & (v - 1)) === 0;
-}
 
 //*************************************************************
 // RA and Degree Functions
@@ -38586,79 +36186,6 @@ function radiansToDecDecimal(rad) {
   return (rad * 180 / Math.PI).toFixed(4);
 }
 
-/**
- * raToDeg                                           v2 · MIT
- * ---------------------------------------------------------
- * Convert Right Ascension → ecliptic longitude (degrees)
- *
- * Accepts …
- *   •  "12h34m56.7s"
- *   •  "12:34:56.7"
- *   •  "12 34 56.7"
- *   •  "12.5824h"           (decimal hours)
- *   •  12.5824             ← number ⇒ decimal hours
- *   •  "189.785°" / "189.785 deg"
- *   •  189.785              ← number ≥ 24 ⇒ degrees
- *
- * Throws TypeError on anything it can’t parse.
- * Always returns a finite number 0 ≤ λ < 360
- */
-function raToDeg(ra) {
-  /* 0 — blank & NaN guards -------------------------------------------- */
-  if (ra == null || (typeof ra === 'string' && !ra.trim())) {
-    throw new TypeError('raToDeg: value is blank or nullish');
-  }
-
-  /* 1 — purely numeric input ------------------------------------------ */
-  if (typeof ra === 'number') {
-    if (!Number.isFinite(ra)) {
-      throw new TypeError(`raToDeg: number is not finite: ${ra}`);
-    }
-    // 0–24  ⇒ hours,  others ⇒ degrees
-    return ((ra < 24 ? ra * 15 : ra) % 360 + 360) % 360;
-  }
-
-  /* 2 — normalise string ---------------------------------------------- */
-  const s = ra.trim().toLowerCase();
-
-  /* 2a — explicit degree string (“deg” or “°”) ------------------------ */
-  if (/[°d]/.test(s)) {
-    const deg = parseFloat(s.replace(/[^\d.+-eE]/g, ''));
-    if (!Number.isFinite(deg)) {
-      throw new TypeError(`raToDeg: cannot parse degree string: "${ra}"`);
-    }
-    return wrap360(deg);
-  }
-
-  /* 2b — split into [h, m, s] ----------------------------------------- */
-  const parts = s
-    .replace(/[hms]/g, ' ')
-    .replace(/:/g, ' ')
-    .split(/\s+/)
-    .filter(Boolean)
-    .map(Number);
-
-  if (parts.some(n => !Number.isFinite(n))) {
-    throw new TypeError(`raToDeg: cannot parse RA string: "${ra}"`);
-  }
-
-  const [h, m = 0, sec = 0] = parts;
-
-  /* Accept decimal-hour forms like "12.345" or "12.345h" -------------- */
-  if (parts.length === 1) {
-    if (h < 0) throw new RangeError(`raToDeg: negative hour value: "${ra}"`);
-    return ((h * 15) % 360 + 360) % 360;
-  }
-
-  /* ---- validation (only negatives are forbidden) -------------------- */
-  if (h < 0 || m < 0 || sec < 0) {
-    throw new RangeError(`raToDeg: negative H M S value: "${ra}"`);
-  }
-
-  /* ---- convert, allowing overflow ----------------------------------- */
-  const totalHours = h + m / 60 + sec / 3600;   // 60 s ⇒ +1 min, 60 min ⇒ +1 h
-  return ((totalHours * 15) % 360 + 360) % 360; // wrap to 0–360°
-}
 
 // === Utilities ===
 /** return a colour brightened toward white by `f` (0–1) */
@@ -38669,46 +36196,11 @@ function brighten(hex, f = 0.5) {
   return (Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(b);
 }
 
-function addInfoButton ( ctrl, url ) {
-  const labelEl =
-        ctrl.$name ||                                        // lil-gui
-        ( ctrl.element &&                                    // Tweakpane
-          ctrl.element.querySelector('.tp-fldv_t') ) ||
-        ( ctrl.element &&                                    // Tweakpane blade
-          ctrl.element.querySelector('.tp-lblv_l') ) ||
-        ( ctrl.domElement &&                                 // dat.gui \u22650.7
-          ctrl.domElement.querySelector('.property-name') ) ||
-        ( ctrl.__li &&
-          ctrl.__li.querySelector('.property-name') );
-
-  if ( !labelEl || labelEl.querySelector('.gui-info') ) return;
-
-  const a = document.createElement('a');
-  a.className     = 'gui-info';
-  a.href          = url;
-  a.target        = '_blank';
-  a.rel           = 'noopener';
-  a.title         = 'Background information';
-  a.textContent   = ' \u24D8';                  // NBSP + circled-I
-  a.style.cssText = 'margin-left:4px; text-decoration:none; ' +
-                    'cursor:pointer; user-select:none; font-weight:600;';
-
-  labelEl.appendChild( a );
-}
 
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function leadZero(n, plus){
-    let sign;
-    n < 0 ? sign = "-": sign = "";
-    if (sign === "" && plus) {
-      sign = "+"
-    }
-    n = Math.abs(n);
-    return n > 9 ? sign + n: sign + "0" + n;
-}
 
 function isValidTime(value) {
   const parts = value.split(':');
@@ -38809,22 +36301,7 @@ function addYears(sDate, year) {
   return date
 }
 
-// === Perihelion Calendar Conversions ===
 
-function perihelionDayToJulianDay(pd) {
-  if (typeof pd !== 'number' || !Number.isFinite(pd)) {
-    throw new Error(`Invalid perihelion day: ${pd}`);
-  }
-  // Simple offset
-  return pd + (startmodelJD-perihelionalignmentJD);
-}
-
-function julianDayToPerihelionDay(jd) {
-  if (typeof jd !== 'number' || !Number.isFinite(jd)) {
-    throw new Error(`Invalid Julian Day: ${jd}`);
-  }
-  return jd - (startmodelJD-perihelionalignmentJD);
-}
 
 /**
  * Convert a Julian Day Number to a UTC calendar date + time.
@@ -39144,52 +36621,6 @@ function dayToPerihelionCalendarDate(jd) {
   };
 }
 
-/**
- * Convert a calendar date/time → either Julian Day or Perihelion Day.
- *
- * @param {string} dateStr
- *   – in "YYYY-MM-DD" or "-YYYY-MM-DD" (astronomical year 0 = 1 BC)
- * @param {string} timeStr
- *   – in "hh:mm:ss" or "24:00:00"
- * @param {'julian-gregorian-date'|'perihelion-date'} inputKind
- * @param {'julianday'|'perihelionday'} outputKind
- * @returns {number}  the desired day (may be fractional)
- * @throws {TypeError} on bad args
- */
-function dateToDayNew(dateStr, timeStr, inputKind, outputKind) {
-  // 1) validate flags
-  if (inputKind !== 'julian-gregorian-date'
-   && inputKind !== 'perihelion-date') {
-    throw new TypeError(
-      `dateToDayNew: inputKind must be `
-      +`'julian-gregorian-date' or 'perihelion-date'`
-    );
-  }
-  if (outputKind !== 'julianday'
-   && outputKind !== 'perihelionday') {
-    throw new TypeError(
-      `dateToDayNew: outputKind must be 'julianday' or 'perihelionday'`
-    );
-  }
-
-  // 2) get a single Julian Day Number (JD) from the input calendar
-  let jd;
-  if (inputKind === 'julian-gregorian-date') {
-    // uses the dateTimeToJulianDay we built earlier
-    jd = dateTimeToJulianDay(dateStr, timeStr);
-  } else {
-    // perihelion-date → JD via our reverse‐perihelion helper
-    jd = dateToPerihelionJulianDay(dateStr, timeStr);
-  }
-
-  // 3) dispatch to the desired output
-  if (outputKind === 'julianday') {
-    return jd;
-  } else {
-    // perihelionday = JD – perihelionalignmentJD
-    return julianDayToPerihelionDay(jd);
-  }
-}
 
 /*––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
   Helper: calendar‐date (perihelion) → Julian Day Number
@@ -39416,24 +36847,4 @@ function daysToDate(g) {
   return `${y}-${pad2(m)}-${pad2(d)}`;
 }
 
-// Same as above, but include the fractional day in the last field for display
-function daysToDateWithFraction(g, precision = 9) {
-  const JD = startmodelJD + g;
-  const JDNint = Math.floor(JD + 0.5);
-  const fracFromMidnight = JD - (JDNint - 0.5);  // ∈ [0,1)
 
-  const useJulian = JDNint < GREG_START_JDN;
-  const { y, m, d } = useJulian ? julianFromJdn(JDNint) : gregorianFromJdn(JDNint);
-
-  const dayWithFrac = (d + fracFromMidnight).toFixed(precision)
-    .replace(/0+$/,'').replace(/\.$/,'');
-  return `${y}-${pad2(m)}-${dayWithFrac}`;
-}
-
-// Keep this name if other code calls it; returns a Julian-calendar date (no fraction)
-function julianCalDayToDate(g) {
-  const JD = startmodelJD + g;
-  const JDNint = Math.floor(JD + 0.5);
-  const { y, m, d } = julianFromJdn(JDNint);
-  return `${y}-${pad2(m)}-${pad2(d)}`;
-} 

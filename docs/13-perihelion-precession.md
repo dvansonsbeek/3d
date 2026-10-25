@@ -31,29 +31,19 @@ apart"):
 
 **(a) Ecliptic longitude of date** — what every published perihelion rate
 is (Le Verrier, Newcomb, Clemence, WebGeoCalc). In the model this is the
-stable analytic quantity: the scene's `perihelionLongitudeEcliptic()`
-reads the pure precession angle directly from the precession layer's
-rotation (bypassing all Earth-frame effects), and the perihelion markers
-carry the model's own N-body longitude of perihelion of date from the
-governed element chain.
+stable analytic quantity: the chain's longitude of perihelion of date
+(`_chainPerihelionEclLonDeg`), which the perihelion markers and the
+ecliptic-frame panel rows carry from the governed element chain.
 
 **(b) Right ascension in the scene's equatorial frame** — the RA of the
-perihelion direction in `earth.rotationAxis`, measured from the
-perihelion-of-Earth point. No observer publishes this quantity. It
-fluctuates because the projection slope dα/dλ and the obliquity move with
-Earth's precession cycles; over full precession and obliquity cycles its
-average returns to the ecliptic value. Two implementations exist:
+perihelion direction in `earth.rotationAxis`. No observer publishes this
+quantity. It fluctuates because the projection slope dα/dλ and the
+obliquity move with Earth's precession cycles; over full precession and
+obliquity cycles its average returns to the ecliptic value. The panel rows
+carry the chain's ϖ to the engine frame's equinox of date and project it
+with ε at the engine year (`eclipticJ2000LongitudeToRaOfDateDeg` — RA of
+date, the frame Earth's own row reads from the scene); the rate form:
 
-- **Scene measurement** (`apparentRaFromPdA`): transforms the perihelion
-  markers' world positions into Earth's equatorial frame and reads the
-  apparent angle. The projection carries each body's declination
-  (ρ = r·sin φ with φ the polar angle from the rotation axis) — this term
-  is load-bearing: projecting with the full distance instead of ρ was
-  measured to generate 96 % of Venus's exported "precession fluctuation"
-  (std 513 → 20 ″/cy with the term; Mercury 96 → 35 ″/cy), as harmonics
-  8–15 of the axial-precession (equatorial) rotation with sidebands on the
-  inclination and obliquity cycles — a
-  property of the projection, not of the orbits.
 - **The projection** (`perihelionFrameBreakdown`, plan 06 R8): the
   Earth-frame RA rate is §1.8's identity applied to the chain's ecliptic motion
   (rate × dα/dλ + ∂α/∂ε·ε̇), evaluated at any year for all seven planets —

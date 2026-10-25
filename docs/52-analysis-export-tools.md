@@ -561,18 +561,6 @@ Finds the aphelion (farthest point from Sun) for a given year.
 
 **Returns**: Object with `jd` and `distance` properties
 
-### apparentRaFromPdA(pdA, pdB)
-
-Calculates the apparent Right Ascension of `pdB` as seen from `pdA` in Earth's equatorial frame (each body projected onto the equatorial plane with its declination, ρ = r·sin φ), returned as the 180°-opposite direction.
-
-**Parameters**:
-- `pdA` - Reference object (`.ra`, `.dec` in radians, `.distKm`)
-- `pdB` - Target object (`.ra`, `.dec` in radians, `.distKm`)
-
-**Returns**: Angle in degrees [0, 360)
-
-**Usage**: Used for perihelion longitude calculations. See [13-perihelion-precession.md](13-perihelion-precession.md) for details.
-
 ---
 
 ## Utility Functions
@@ -604,9 +592,7 @@ Where l = ecliptic longitude, e = obliquity
 | Function | Line | Description |
 |----------|------|-------------|
 | `compareRAToSun(planetRARad, sunRARad)` | ~20283 | NASA transit validation |
-| `compareRAOpposition(planetRARad, sunRARad)` | ~20306 | Opposition alignment check |
 | `compareRAToReference(planetRARad, refRA)` | ~20334 | Reference data comparison |
-| `compareRAToLongitude(planetRARad, longitudeDeg, obliquityDeg)` | ~20419 | Occultation validation |
 | `compareDecValues(calculatedDecRad, refDecStr)` | ~20261 | Declination within 1 deg |
 
 ---
