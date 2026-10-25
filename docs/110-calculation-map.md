@@ -5,7 +5,7 @@ coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
-# 110 — The calculation map: every published quantity, traced to its formula, its code and its live value
+# The calculation map: every published quantity, traced to its formula, its code and its live value
 
 **Purpose.** The model became hard for its own author to check. This document
 is the audit's instrument: for each published quantity — chain by chain —
@@ -20,7 +20,7 @@ the owner reproduces its values in a spreadsheet from this page alone.
 fitted unit (13.011 × the J2000 luni-solar precession period) once entered
 each formula — as a unit (**U**), as a proxy for the tidal spin history
 (**P**), as a comb basis (**C**) or as a lattice claim (**L**). Since plan 09
-(model v24.0) no formula carries it; the dispositions are [doc 109 §23](109-model-nbody-engine-and-lattice-test.md).
+(model v24.0) no formula carries it; the dispositions are [doc 109 §23](109-model-nbody-engine.md).
 
 
 Types follow plan 02 D1: **A** long-term frequency/mean · **B** present-epoch
@@ -385,7 +385,7 @@ cross-validation curves, the registry's obliquity keys, the lunar
 arguments' obliquity-rate term and the eclipse tier). The stellar day's RA
 projection (chain 3.3) takes the IAU J2000 obliquity input. The fitted
 obliquity comb that preceded the hybrid, and the scene's wheel geometry it
-was fitted to, are the record of [doc 109 §23.1](109-model-nbody-engine-and-lattice-test.md).
+was fitted to, are the record of [doc 109 §23.1](109-model-nbody-engine.md).
 
 ### 4.2 The scene's Earth frame — engine-placed
 
@@ -517,7 +517,7 @@ absolute dates. The scene's panel rows are a third path (5.4).
 The cardinal instants ride the certified Sun (5.3–5.5); the fitted cardinal
 clock that preceded them — its phase counter, its §10 derived form and the
 coefficients' coupling to the parameter set they shipped with — is the record
-of [doc 109 §23.2–23.3](109-model-nbody-engine-and-lattice-test.md).
+of [doc 109 §23.2–23.3](109-model-nbody-engine.md).
 
 
 ### 5.3 The one-source cardinal structure — zero fitted constants
@@ -547,7 +547,7 @@ both anchor sets are deleted (plan 09 step 7a).
 
 ### 5.5 Live values — the spreadsheet check
 
-The retired device's last-render constants and its June-solstice decomposition — the static tables that stood here — are archived out of the tree; the device and its coefficients were deleted at plan 09 step 7a and the record is [doc 109 §23.2–23.3](109-model-nbody-engine-and-lattice-test.md). The shipped `cardinal.jd` is the apparent crossing of the one Sun.
+The retired device's last-render constants and its June-solstice decomposition — the static tables that stood here — are archived out of the tree; the device and its coefficients were deleted at plan 09 step 7a and the record is [doc 109 §23.2–23.3](109-model-nbody-engine.md). The shipped `cardinal.jd` is the apparent crossing of the one Sun.
 
 
 The four events and the year lengths (live, generated):

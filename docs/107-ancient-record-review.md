@@ -48,7 +48,7 @@ completions).
 | Record | Window | Traditional date | Verdict |
 |---|---|---|---|
 | Lu −708 (Chunqiu, total, day *renchen*) | ±30 yr | −708-07-17, **total, mag 1.019** | **UNIQUE** — ganzhi + totality filter |
-| Babylon −135 (diary, "stars visible") | ±25 yr | −135-04-15, mag 0.986 (matcher run; current local-circumstance instrument: 0.988) | Best in window; no total candidate exists — the date stands ([doc 103](103-135-babylonian-case-study.md)) |
+| Babylon −135 (diary, "stars visible") | ±25 yr | −135-04-15, mag 0.986 (matcher run; current local-circumstance instrument: 0.988) | Best in window; no total candidate exists — the date stands ([doc 103](103-babylon-eclipse-bce135.md)) |
 | Thales −584 (Herodotus) | ±30 yr | −584-05-28, mag 0.975 | Clearly best (next: −587 annular 0.955) |
 | Thucydides −430 (crescent + stars, Athens) | ±10 yr | −430-08-03, mag 0.870 | Near-tie with −435 (0.861), traditional marginally ahead — an honest ambiguity historians also debate |
 | Plutarch +71 (near-total, Aegean) | ±15 yr | +71-03-20, **mag 1.000 (totality boundary)** | Clearly best |
@@ -154,7 +154,7 @@ confirms.
 
 ## Cross-references
 
-- [Doc 103 — −135 Babylonian case study](103-135-babylonian-case-study.md) — the full −135 identification cascade and residual decomposition
+- [Doc 103 — −135 Babylonian case study](103-babylon-eclipse-bce135.md) — the full −135 identification cascade and residual decomposition
 - [Doc 102 — GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) — the timed lunar corpus, the differential re-reduction, the dense-target cycle discrimination
-- [Doc 66 — Moon Meeus corrections](66-moon-meeus-corrections.md) — audit-26 aggregate and the DE441 cross-check showing the Cairo cluster is not a Moon problem
+- [Doc 66 — Moon Meeus corrections](66-derived-moon.md) — audit-26 aggregate and the DE441 cross-check showing the Cairo cluster is not a Moon problem
 - Sources: Stephenson 1997 *Historical Eclipses and Earth's Rotation* Ch. 8; Said al-Andalusi / Ibn Yunus records via Stephenson, Morrison & Hohenkerk 2016

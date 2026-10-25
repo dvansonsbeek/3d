@@ -15,7 +15,7 @@ for the classification and counts).
 
 **The measurements behind every rule below live in [doc 111](docs/111-measured-traps-and-gate-origins.md)**
 (traps §1, the browser tier's gates §2, the falsification criterion's long
-form §3) and [doc 109 §23](docs/109-model-nbody-engine-and-lattice-test.md)
+form §3) and [doc 109 §23](docs/109-model-nbody-engine.md)
 (the planet-channel and era-device retirements). This file carries the rules;
 doc 111 carries the numbers — they are a matched pair: move a rule and its
 measurement together.

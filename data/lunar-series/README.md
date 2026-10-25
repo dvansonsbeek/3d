@@ -3,7 +3,7 @@
 Reference lunar theories used by the framework's derivation laboratories. These
 are **external scientific data**, not framework outputs: they exist so the
 model's own lunar theory (the Meeus Ch. 47 form documented in
-[docs/66](../../docs/66-moon-meeus-corrections.md) and the public "Derived Moon"
+[docs/66](../../docs/66-derived-moon.md) and the public "Derived Moon"
 document) can be checked against, and decomposed against, the published
 classical series.
 

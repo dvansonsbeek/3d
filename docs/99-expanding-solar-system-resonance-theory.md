@@ -5,7 +5,7 @@ coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
-# Doc 99 — The Expanding Solar System Resonance Theory (ESSRT)
+# The Expanding Solar System Resonance Theory (ESSRT)
 
 ## Status
 Active theory draft — Expanding Solar System Resonance Theory (ESSRT). Full scope: the two expansions — Earth's spin tier on the tidal history (the composed lunisolar precession clock), every orbit on the solar-mass history across all 8 planets. Builds on doc 92 (the climate formula; its predecessors 91 and 98 are archived out of the tree), 102 (historical lunar eclipse timing test + α(t) GIA derivation), and 103 (-135 Babylonian case study).
@@ -297,7 +297,7 @@ The inertial chain and its composition with the precession of date:
   e_E-channel modulation below — `meanLunarPerigeePrecessionAtAge` /
   `meanLunarNodePrecessionAtAge`, the factored law period = invariant mean /
   rate modulation; the seconds-frame derivation is in
-  [Moon-Kepler Derivation](24-moon-kepler-derivation.md);
+  [Moon-Kepler Derivation](24-delta-a-mass-derivation.md);
 - **the of-date perigee and node** — the count compositions N_trop − N_anom
   and N_drac − N_trop of the chain's months
   (`meanMoonApsidalOfDateCyclesBetween`, `meanMoonNodalOfDateCyclesBetween`):
@@ -1825,7 +1825,7 @@ Devonian (380 Ma) obliquity beat 2π/(ψ̇ − |s₃|) at **31.7 kyr** (vs moder
 
 ### Withdrawn or resolved predictions
 
-Three former entries are no longer on this list: the short-eccentricity periods expanding with the clock (resolved AGAINST by measurement — only the ψ̇-carrying lines scale, see "Why the climate formula keeps its J2000 line periods"); the Saturn–Jupiter resonance lock at one ecliptic period (retired with the integer laws, plan 07; the chain's own Great-Inequality reading is [doc 109](109-model-nbody-engine-and-lattice-test.md)); and the Earth–Moon genesis at the rigid Roche limit (withdrawn at plan 12 option A — the genesis is the cited history's end, an input, not a result). Their text is archived.
+Three former entries are no longer on this list: the short-eccentricity periods expanding with the clock (resolved AGAINST by measurement — only the ψ̇-carrying lines scale, see "Why the climate formula keeps its J2000 line periods"); the Saturn–Jupiter resonance lock at one ecliptic period (retired with the integer laws, plan 07; the chain's own Great-Inequality reading is [doc 109](109-model-nbody-engine.md)); and the Earth–Moon genesis at the rigid Roche limit (withdrawn at plan 12 option A — the genesis is the cited history's end, an input, not a result). Their text is archived.
 
 ### 3. Earth's precession period lengthens with the clock
 Devonian precession period at **<!--v:axialPrecAtDevonian-->21,235<!--/v--> yr** (vs modern <!--v:earthAxialPeriod-->25,772<!--/v--> yr), i.e. ψ̇ ≈ 59.7 ″/yr.
@@ -1891,7 +1891,7 @@ All values written by the engine (`npm run docs:doc99:write`). Epochs chosen to 
 
 ## Scripts and supporting docs
 
-- the live deep-time instruments: the API's epoch tools, `tools/verify/paleo-anchors.js` and the Python bridge; retired instruments are recorded in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
+- the live deep-time instruments: the API's epoch tools, `tools/verify/paleo-anchors.js` and the Python bridge; retired instruments are recorded in [doc 109 §22](109-model-nbody-engine.md)
 - Test C series (validation in deep time) — the first-pass ECS decomposition is archived; doc 92 carries the current climate results
 - Doc 98 (action-angle closure as the underlying mechanism, written in the retired integer-label framing) — archived
 

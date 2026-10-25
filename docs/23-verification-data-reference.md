@@ -283,7 +283,7 @@ The data spans thousands of years (some entries date to ~2000 BC) to verify:
 
 Larger errors at ancient dates are acceptable because:
 - Source data has inherent uncertainty
-- The planets ride the N-body chain's elements of date (secular modes to 0.1–1 %, [doc 109](109-model-nbody-engine-and-lattice-test.md)); the short-period perturbations are not in the chain
+- The planets ride the N-body chain's elements of date (secular modes to 0.1–1 %, [doc 109](109-model-nbody-engine.md)); the short-period perturbations are not in the chain
 
 ---
 
@@ -345,4 +345,4 @@ To add new verification entries:
 ---
 
 **Previous**: [22 - Coordinate Frames](22-coordinate-frames.md)
-**Next**: [24 - Moon Kepler Derivation](24-moon-kepler-derivation.md)
+**Next**: [24 - Moon Kepler Derivation](24-delta-a-mass-derivation.md)

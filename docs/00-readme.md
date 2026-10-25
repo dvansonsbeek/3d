@@ -39,7 +39,7 @@ If you read nothing else: [00](00-readme.md) this index → [99](99-expanding-so
 | # | Document | Description |
 |---|----------|-------------|
 | 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The theory: the two expansions — Earth's spin tier on the tidal history (the composed lunisolar precession clock: the day lengthens, the Moon recedes, the precession period grows), every orbit on the solar-mass history; the two-tier scaling split (the precession band moves with the clock, the 405-kyr metronome does not) confirmed at 1.4 and 2.46 Ga; the deep-time predictions and the falsification criteria |
-| 109 | [The model's own N-body: engine, frequencies, the retirement record](109-model-nbody-engine-and-lattice-test.md) | The re-evaluation record: the Wisdom–Holman engine reproduces every planet's rates from Newton + the measured masses (Mercury's −43″/cy closed by the 1PN term alone); the secular g/s to 0.1–1%; the lattice tested at its own quantity type (divisors retyped as means / present-epoch / window values); the bound experiments (§12) that showed the retired eccentricity law was only the epoch-local tangent of Earth's free eccentricity vector; §22 the record table of the comb-era research deleted at plan 09; §23 the planet-channel and era-device retirement record (plans 07–11) |
+| 109 | [The model's own N-body: engine, frequencies, the retirement record](109-model-nbody-engine.md) | The re-evaluation record: the Wisdom–Holman engine reproduces every planet's rates from Newton + the measured masses (Mercury's −43″/cy closed by the 1PN term alone); the secular g/s to 0.1–1%; the lattice tested at its own quantity type (divisors retyped as means / present-epoch / window values); the bound experiments (§12) that showed the retired eccentricity law was only the epoch-local tangent of Earth's free eccentricity vector; §22 the record table of the comb-era research deleted at plan 09; §23 the planet-channel and era-device retirement record (plans 07–11) |
 | 110 | [The calculation map](110-calculation-map.md) | The audit's instrument: every published quantity traced to its inputs, formula, engine/type, code location and LIVE value (script-written, freshness-gated) with the audit's record of which quantities once rode the retired unit — the spreadsheet-checkable statement of what the model computes; chain 1 = Earth's eccentricity into the lunar chain |
 | 111 | [Measured traps and gate origins](111-measured-traps-and-gate-origins.md) | The record behind CLAUDE.md's one-line rules: each trap's measurement (numbers, commits, the gate that pins it), the browser tier's gates and the owner reports they were born from, and the falsification criterion's long form |
 
@@ -48,21 +48,21 @@ If you read nothing else: [00](00-readme.md) this index → [99](99-expanding-so
 | # | Document | Description |
 |---|----------|-------------|
 | 11 | [Day & Year Length Formulas](11-length-day-year-formulas.md) | Tropical year and day length: measurement methods, validation, the one-source year lengths and the three day bases |
-| 13 | [Perihelion Precession](13-mercury-precession-breakdown.md) | The two perihelion coordinates and their methods, the Earth-frame projection account (§1.8, gate-pinned for all seven planets), and the Laplace–Lagrange comparison |
+| 13 | [Perihelion Precession](13-perihelion-precession.md) | The two perihelion coordinates and their methods, the Earth-frame projection account (§1.8, gate-pinned for all seven planets), and the Laplace–Lagrange comparison |
 
 ### The planets
 
 | # | Document | Description |
 |---|----------|-------------|
-| 04 | [Orbital Elements: the Chain and the Devices](04-dynamic-elements-overview.md) | The three tiers: the Keplerian chain (THE planet path — source-of-truth doctrine, elements of date, secular shapes), the engine-K hierarchy (Earth/Moon/Sun), and the no-chain bodies |
+| 04 | [Orbital Elements: the Chain and the Devices](04-orbital-elements.md) | The three tiers: the Keplerian chain (THE planet path — source-of-truth doctrine, elements of date, secular shapes), the engine-K hierarchy (Earth/Moon/Sun), and the no-chain bodies |
 | 05 | [The Invariable Plane](05-invariable-plane-overview.md) | The plane the model banks from its own chain artifact (K5c s-frame + derived Souami & Souchay origin conversion), heights, nodes, crossings, and the two live self-checks |
 
 ### The Moon
 
 | # | Document | Description |
 |---|----------|-------------|
-| 66 | [Moon Meeus Corrections](66-moon-meeus-corrections.md) | The Derived Moon: the framework-native fundamental arguments, the full Ch. 47 series + derived extension tails, the Cassini tilt derivation, and the current accuracy gates |
-| 24 | [The Δa Mass Derivation](24-moon-kepler-derivation.md) | GM_Earth/GM_Moon from the Moon's orbit via Δa; the universal mass-from-moon formula for all moon-bearing planets; the exact symmetric Sun-side Δa identity and the Sun-SSB chart |
+| 66 | [Moon Meeus Corrections](66-derived-moon.md) | The Derived Moon: the framework-native fundamental arguments, the full Ch. 47 series + derived extension tails, the Cassini tilt derivation, and the current accuracy gates |
+| 24 | [The Δa Mass Derivation](24-delta-a-mass-derivation.md) | GM_Earth/GM_Moon from the Moon's orbit via Δa; the universal mass-from-moon formula for all moon-bearing planets; the exact symmetric Sun-side Δa identity and the Sun-SSB chart |
 
 ### Deep time & validation
 
@@ -72,7 +72,7 @@ If you read nothing else: [00](00-readme.md) this index → [99](99-expanding-so
 | 102 | [Pure-tidal + GIA α(t) vs the historical lunar record](102-gia-alpha-lunar-validation.md) | 267 primary-source lunar observations (Stephenson 2016): model mean \|residual\| **20.2 min** vs NASA's fitted polynomial at 20.0 min — a 2-s excess over Stephenson's own fit, with zero ΔT-polynomial fitting; the α(t) GIA channel from independent satellite gravimetry; the 4-flag ΔT stack; the full hypothesis-testing and residual-decomposition record |
 | 104 | [The Millennial Rotation Swing](104-millennial-rotation-swing.md) | The core–mantle identification of the post-stack residual: one aperiodic swing, independently confirmed against archeomagnetic core-flow ΔLOD (r = +0.91), the lattice closed under difference tones, and the low-Q Magneto-Coriolis eigenmode reading |
 | 105 | [ΔT stack: what each flag buys](105-dt-stack-flag-audit.md) | Audit of the four ΔT correction flags under pre-fixed criteria: the shipped set is optimal in- and out-of-sample (Espenak RMS <!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s); the two measurement traps (stage_* metrics rank backwards; Jose5/Jose4 are a coupled pair) |
-| 103 | [-135 Babylonian solar eclipse case study](103-135-babylonian-case-study.md) | The flagship ancient event: BestGap <!--v:babylon135BestGapKm-->152<!--/v--> km (off-peak verdict), documented UT matched to 9 minutes, local magnitude 0.988, the ΔT-free cascade selecting the traditional date uniquely — plus the component decomposition and the α(t) sensitivity proof |
+| 103 | [-135 Babylonian solar eclipse case study](103-babylon-eclipse-bce135.md) | The flagship ancient event: BestGap <!--v:babylon135BestGapKm-->152<!--/v--> km (off-peak verdict), documented UT matched to 9 minutes, local magnitude 0.988, the ΔT-free cascade selecting the traditional date uniquely — plus the component decomposition and the α(t) sensitivity proof |
 | 107 | [Ancient-record review — identification adjudication](107-ancient-record-review.md) | Local-circumstance re-testing of the audit's ancient rows: every first-hand record validates at its traditional date; the "geographic" verdicts are identification errors in second-hand chains; the Lu −708 record identified uniquely by the chronology-free ganzhi filter |
 
 ### Climate

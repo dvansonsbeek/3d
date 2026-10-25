@@ -240,7 +240,7 @@ conventions).
 **Testable prediction from the frame distinction.** Standard secular theory
 says Saturn's ecliptic retrograde rate is a transient phase of the
 Great-Inequality oscillation (~900-yr period) and will reverse within
-~450 yr. Saturn's window retrograde is the chain's own reading ([doc 109](109-model-nbody-engine-and-lattice-test.md)):
+~450 yr. Saturn's window retrograde is the chain's own reading ([doc 109](109-model-nbody-engine.md)):
 the chain's 1800–2100 window rate is <!--v:saturnPeriRateEclipticArcsecCy-->-1,576.66<!--/v--> ″/cy
 while its secular g₆ is prograde. Long-baseline JPL DE441 integrations
 (13 000 BC → 17 000 AD) can in principle time the reversal.
@@ -437,7 +437,7 @@ device's periods fail. The body-local slot is empty; a proposal is scored by def
 rate with the model's own integrator, the Wisdom–Holman engine, the
 frequency analysis, the lattice tested at its own quantity type, the beat
 null test and the derived-orbit-vector attempt are recorded in
-[109-model-nbody-engine-and-lattice-test.md](109-model-nbody-engine-and-lattice-test.md).
+[109-model-nbody-engine.md](109-model-nbody-engine.md).
 Its results that bear on this section: Newton + the measured masses
 reproduce every rate except Mercury's (−43.0 in both windows, closed by the
 1PN term alone); the masses cannot carry the 43 (a joint mass set that fits
@@ -488,7 +488,7 @@ subject of §1.8's projection analysis and transit test.
 
 ## Related Documents
 
-- [109-model-nbody-engine-and-lattice-test.md](109-model-nbody-engine-and-lattice-test.md) — the model's own N-body: audit, engine, frequencies, the lattice at its own quantity type, divisor restatement
+- [109-model-nbody-engine.md](109-model-nbody-engine.md) — the model's own N-body: audit, engine, frequencies, the lattice at its own quantity type, divisor restatement
 - [50-ui-panels-reference.md](50-ui-panels-reference.md) § Perihelion of Planets Verification — the observed-rate panel this document's comparisons cite
 - [41-scene-graph-hierarchy.md](41-scene-graph-hierarchy.md) — why Earth-frame measurements inherit the precession layers
 - [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — ESSRT: deep-time scaling of the precession period T_p(t)

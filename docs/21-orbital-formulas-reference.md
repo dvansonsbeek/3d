@@ -12,7 +12,7 @@ status: current
 This document provides a complete reference for all orbital calculation functions available in the solar system simulation, including input variables, the `OrbitalFormulas` helper library, and implementation details.
 
 **Related Documents:**
-- [Dynamic Orbital Elements Overview](04-dynamic-elements-overview.md) - How dynamic systems work together
+- [Dynamic Orbital Elements Overview](04-orbital-elements.md) - How dynamic systems work together
 
 ---
 
@@ -85,7 +85,7 @@ const GM_SUN = GM_SUN_PLUS_EARTH - GM_EARTH_ALONE;
 // Result: ~1.32712 × 10¹¹ km³/s²  (matches JPL DE440 to ~0.07 ppm)
 ```
 
-For the full derivation including the physical interpretation of the Δa correction, see [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md).
+For the full derivation including the physical interpretation of the Δa correction, see [24 — Moon Kepler Derivation](24-delta-a-mass-derivation.md).
 
 **Advantages of deriving GM:**
 - Self-consistent with simulation's orbital mechanics
@@ -270,7 +270,7 @@ These formulas calculate fundamental properties of celestial bodies.
 | `keplerPeriod(a_km)` | P = 2π√(a³/GM) | Orbital period from semi-major axis (days) |
 | `synodicPeriod(P1_days, P2_days)` | P_syn = \|P₁ × P₂ / (P₁ - P₂)\| | Synodic period between two planets (days) |
 
-**Implementation Note:** Mass (M) and gravitational parameter (GM) for planets are derived from orbital mechanics rather than direct measurement. The chain is Moon → Earth → Sun: `GM_Earth` from the Moon's orbit (with the `Δa = a_M·μ·m` solar-tidal correction, see [doc 24](24-moon-kepler-derivation.md)), then `GM_Sun` from Earth's orbit minus `GM_Earth`. Planet GMs follow from `GM_Sun / massRatio_DE440`.
+**Implementation Note:** Mass (M) and gravitational parameter (GM) for planets are derived from orbital mechanics rather than direct measurement. The chain is Moon → Earth → Sun: `GM_Earth` from the Moon's orbit (with the `Δa = a_M·μ·m` solar-tidal correction, see [doc 24](24-delta-a-mass-derivation.md)), then `GM_Sun` from Earth's orbit minus `GM_Earth`. Planet GMs follow from `GM_Sun / massRatio_DE440`.
 
 ---
 
@@ -457,13 +457,13 @@ The `secularPrecessionContribution` function implements Lagrange-Laplace secular
 
 ## A.5–A.8 The formula appendices — removed
 
-Three appendices restated every Part 2 formula with the code of the `OrbitalFormulas` object copied in (about 850 lines, three homes for one formula). The formulas live once, in `src/script.js` (`OrbitalFormulas`); the GM chain is [doc 24](24-moon-kepler-derivation.md) (one home `@essrt/physics` `earth/mass-chain`); the frame transforms are [doc 22](22-coordinate-frames.md); the shipped periods are the registry's ([doc 20](20-constants-reference.md)). The appendices are archived out of the tree.
+Three appendices restated every Part 2 formula with the code of the `OrbitalFormulas` object copied in (about 850 lines, three homes for one formula). The formulas live once, in `src/script.js` (`OrbitalFormulas`); the GM chain is [doc 24](24-delta-a-mass-derivation.md) (one home `@essrt/physics` `earth/mass-chain`); the frame transforms are [doc 22](22-coordinate-frames.md); the shipped periods are the registry's ([doc 20](20-constants-reference.md)). The appendices are archived out of the tree.
 
 ## A.6 Part 3 Formulas - Gravitational Influence & Surface Properties
 
 ### A.6.1 Current GM and Mass Values (Implemented)
 
-For the derivation of `GM_Earth`, `GM_Moon`, and `GM_Sun` from the Moon's and Earth's orbits — including the `Δa = a_M · μ · m` correction that closes the Earth-Moon-Sun three-body residual — see [24 — Moon Kepler Derivation](24-moon-kepler-derivation.md).
+For the derivation of `GM_Earth`, `GM_Moon`, and `GM_Sun` from the Moon's and Earth's orbits — including the `Δa = a_M · μ · m` correction that closes the Earth-Moon-Sun three-body residual — see [24 — Moon Kepler Derivation](24-delta-a-mass-derivation.md).
 
 #### 8.1.1 Derived from Kepler's 3rd Law
 

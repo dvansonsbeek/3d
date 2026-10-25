@@ -5,7 +5,7 @@ coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
-# Doc 104 — The Millennial Rotation Swing: Core–Mantle Identification and the Difference-Tone Structure
+# The Millennial Rotation Swing: Core–Mantle Identification and the Difference-Tone Structure
 
 ## Status
 

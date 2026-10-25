@@ -81,7 +81,7 @@ The window CSV (Step 6a2) is the measurement export the laws are checked against
 
 ### Tropical Year
 
-The tropical year is measured at the actual solstices and equinoxes (declination extrema and zero-crossings), NOT at RA crossings. The mean tropical year is the average of 4 cardinal point intervals: SS-to-SS, WS-to-WS, VE-to-VE, AE-to-AE — `computeSolarYearDaysFromCardinals(year)`, the intervals between successive APPARENT crossings of the one certified Sun (`createModel().cardinal.yearLengthDays`, whose mean longitude integrates the one-source tropical year; plan 06 R1 — the fitted cardinal-point harmonic formula, CARDINAL_POINT_* with 23 harmonics per type plus the ECC/JOINT/DERIVED families, left the runtime at plan 06 R1; the record is [doc 109 §23](109-model-nbody-engine-and-lattice-test.md)). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
+The tropical year is measured at the actual solstices and equinoxes (declination extrema and zero-crossings), NOT at RA crossings. The mean tropical year is the average of 4 cardinal point intervals: SS-to-SS, WS-to-WS, VE-to-VE, AE-to-AE — `computeSolarYearDaysFromCardinals(year)`, the intervals between successive APPARENT crossings of the one certified Sun (`createModel().cardinal.yearLengthDays`, whose mean longitude integrates the one-source tropical year; plan 06 R1 — the fitted cardinal-point harmonic formula, CARDINAL_POINT_* with 23 harmonics per type plus the ECC/JOINT/DERIVED families, left the runtime at plan 06 R1; the record is [doc 109 §23](109-model-nbody-engine.md)). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
 
 ### Sidereal Year
 

@@ -5,7 +5,7 @@ coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
-# 111 — Measured traps and gate origins: the record behind CLAUDE.md
+# Measured traps and gate origins: the record behind CLAUDE.md
 
 **Purpose.** CLAUDE.md states the project's rules in one line each. This
 document carries the MEASUREMENTS those lines were learned from — the
@@ -636,6 +636,6 @@ with its record (doc 109 §23).
 ## Related documents
 
 - [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — the theory, the braid law, the deep-time predictions
-- [109-model-nbody-engine-and-lattice-test.md](109-model-nbody-engine-and-lattice-test.md) — the re-evaluation record; §18 the obliquity hybrid; §23 the planet-channel and era-device retirements
+- [109-model-nbody-engine.md](109-model-nbody-engine.md) — the re-evaluation record; §18 the obliquity hybrid; §23 the planet-channel and era-device retirements
 - [110-calculation-map.md](110-calculation-map.md) — every published quantity traced to its formula, code and live value
 - [40-architecture.md](40-architecture.md) — the two-engine architecture and the gate chain

@@ -17,7 +17,7 @@ This glossary defines the key terms used throughout the documentation. For a com
 The Expanding Solar System Resonance Theory as one integrated account of the solar system: the planets on the model's own N-body chain, and Earth's spin and time on one derived clock with two counter-rotating reference points (axial precession clockwise, apsidal precession counter-clockwise). Published at holisticuniverse.com; the simulator and this documentation call it ESSRT.
 
 ### The N-body chain
-The planets' orbits of date, from a Newtonian N-body integration with the first-order relativistic correction of one cited J2000 state (JPL Horizons vectors, DE440 mass ratios) with zero fitted constants. It supplies every planet's elements of date, the secular modes, the <!--v:earthDeepBeatPeriodKyr-->405.6<!--/v-->-kyr eccentricity metronome, and Earth's own eccentricity, inclination, node and perihelion of date ([doc 04](04-dynamic-elements-overview.md), [doc 109](109-model-nbody-engine-and-lattice-test.md)).
+The planets' orbits of date, from a Newtonian N-body integration with the first-order relativistic correction of one cited J2000 state (JPL Horizons vectors, DE440 mass ratios) with zero fitted constants. It supplies every planet's elements of date, the secular modes, the <!--v:earthDeepBeatPeriodKyr-->405.6<!--/v-->-kyr eccentricity metronome, and Earth's own eccentricity, inclination, node and perihelion of date ([doc 04](04-orbital-elements.md), [doc 109](109-model-nbody-engine.md)).
 
 ### The lunisolar precession clock
 The mean lunisolar precession period — Earth's spin clock, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> years at J2000: the period of the composed torque rate, Earth's spin carrying the solar and lunar torques, derived as the beat of the model's own sidereal and tropical year laws. Earth's other long cycles are stated as periods and ratios against it (the simulator's Lunisolar Clock panel shows them live; the ratios are J2000 readings that wander, not laws). Under [ESSRT](#expanding-solar-system-resonance-theory-essrt) the period evolves at deep time with the tidal history.
@@ -26,7 +26,7 @@ The mean lunisolar precession period — Earth's spin clock, <!--v:lunisolarPeri
 The ONE evaluator of Earth's orbit of date — eccentricity, longitude of perihelion, obliquity and the orbit's normal at any epoch: the N-body chain's banked secular series inside its ±10-Myr span, the anchored mode sums beyond it, with the obliquity integrated on that orbit plane. Every surface that shows one of these quantities — the scene, the API, the registry, the panels — reads this movement, which is why it is called one-source (`@essrt/physics` slice `one-source-movement`; [doc 110](110-calculation-map.md) chain 1).
 
 ### The hybrid obliquity
-The model's obliquity of date: the precession equation integrated on the one-source orbit plane — the banked series' plane inside its span, the mode-tail plane beyond, joined continuously at the span's edges (hence "hybrid"). It replaced the fitted obliquity law in plan 09 and is the one obliquity every surface reads ([doc 109 §18](109-model-nbody-engine-and-lattice-test.md)).
+The model's obliquity of date: the precession equation integrated on the one-source orbit plane — the banked series' plane inside its span, the mode-tail plane beyond, joined continuously at the span's edges (hence "hybrid"). It replaced the fitted obliquity law in plan 09 and is the one obliquity every surface reads ([doc 109 §18](109-model-nbody-engine.md)).
 
 ### The one family (year lengths)
 All of-date year lengths — sidereal, tropical, anomalistic and the four cardinal-point years — and the lunisolar precession period derived from the one movement, so that their beats are identities rather than separately fitted numbers: the precession period is the sidereal and tropical years' beat, the anomalistic year rides the movement's own apsidal rate ([doc 110 §3.2](110-calculation-map.md)).
@@ -63,7 +63,7 @@ The slow wobble of Earth's rotational axis, causing the celestial poles to trace
 The perihelion's revolution against the fixed stars — for Earth the one-source movement's own apsidal rate, for a planet the N-body chain's secular rate g (period 1,296,000″/g). Earth's period at J2000: <!--v:inclPrecYears-->~111,635<!--/v--> years, <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods, a reading of the orbit's own motion that wanders. The scene draws it as PERIHELION-OF-EARTH moving around the Sun — a construction of the picture, not a force. Scene nodes and code identifiers keep the historical name "inclination precession".
 
 ### Perihelion Precession
-Two usages, both in the simulator. **For Earth** (the climate sense): the advance of the perihelion point through the seasons — the perihelion-of-date cycle, the beat of the two motions above: 1/T_peri = 1/T_p + 1/T_aps, <!--v:periPrecYears-->~20,938<!--/v--> years at J2000, the carrier of the climatic-precession band. **For a planet** (the standard planetary sense, as in "Mercury's perihelion precession"): the apsidal advance itself, quoted as a rate in arcseconds per century — the Perihelion of Planets Verification panel compares the chain's rate with the JPL WebGeoCalc observations in this sense ([doc 13](13-mercury-precession-breakdown.md)).
+Two usages, both in the simulator. **For Earth** (the climate sense): the advance of the perihelion point through the seasons — the perihelion-of-date cycle, the beat of the two motions above: 1/T_peri = 1/T_p + 1/T_aps, <!--v:periPrecYears-->~20,938<!--/v--> years at J2000, the carrier of the climatic-precession band. **For a planet** (the standard planetary sense, as in "Mercury's perihelion precession"): the apsidal advance itself, quoted as a rate in arcseconds per century — the Perihelion of Planets Verification panel compares the chain's rate with the JPL WebGeoCalc observations in this sense ([doc 13](13-perihelion-precession.md)).
 
 ### Lunar Nodal Precession
 The westward drift of the Moon's orbital nodes (where its orbit crosses the ecliptic), one revolution in <!--v:nodalPrecICRFexact-->18.61335<!--/v--> years (equinox of date; an input of the month chain).
@@ -204,4 +204,4 @@ For the complete glossary with detailed explanations, visit:
 ---
 
 **Previous**: [User Guide](02-user-guide.md) - How to use the simulation
-**Next**: [Dynamic Elements Overview](04-dynamic-elements-overview.md) - How orbital elements change over time
+**Next**: [Dynamic Elements Overview](04-orbital-elements.md) - How orbital elements change over time

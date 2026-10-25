@@ -2977,7 +2977,7 @@ function _moonArgsAt(jd_tt) {
 // discrepancy vs NASA. Doc 103's earlier attribution (~440 km to Moon β
 // polynomial residual) is empirically incorrect; the residual comes from
 // elsewhere (Sun polynomial, ΔT convention, or ray-trace geometry).
-// See: docs/103-135-babylonian-case-study.md (updated 2026-07).
+// See: docs/103-babylon-eclipse-bce135.md (updated 2026-07).
 //
 // Both wrappers accept JD_UT and internally convert to JD_TT via
 // `jd + _eclDeltaT(jd)/86400`.

@@ -53,7 +53,7 @@ engines, and its numbers fall into three ledgers. No single "N free
 parameters" headline is published — the ledgers are the accounting. Other
 documents (and the simulator's About panel) should reference this section
 rather than carrying their own counts. (The former "6 DOF / Config #7"
-accounting is retired; [doc 109](109-model-nbody-engine-and-lattice-test.md)
+accounting is retired; [doc 109](109-model-nbody-engine.md)
 is the evidence record, and git history carries the old section.)
 
 ### Ledger 1 — the orbital dynamics engine's inputs (the planets — cited, not fitted)
@@ -380,7 +380,7 @@ Newtonian plus the derived relativistic supplement:
 <!--v:mercuryPeriAnomalyGrArcsecCy-->42.98<!--/v--> =
 <!--v:mercuryPeriRateWithRelativisticArcsecCy-->572.0<!--/v--> ″/cy
 (design choice A — additive and stated, never folded into a divisor; see
-[doc 13 §1.8](13-mercury-precession-breakdown.md)).
+[doc 13 §1.8](13-perihelion-precession.md)).
 
 ## Moon Derived Cycles
 
@@ -523,7 +523,7 @@ These offsets arise from the coin rotation paradox — precessing reference fram
 | Sun Mean Anomaly J2000 | `sunMeanAnomalyJ2000_deg` | <!--v:sunMeanAnomalyJ2000Deg-->357.5291<!--/v--> deg |
 | Sun Mean Anomaly Rate | `sunMeanAnomalyRate_degPerDay` | <!--v:sunMeanAnomalyRateDegPerDay-->0.98560028<!--/v--> |
 
-The per-day rates are used for EoC phase computation; the per-century rates are used for the Meeus Ch. 47 ecliptic latitude correction (see [Moon Meeus Corrections](66-moon-meeus-corrections.md)).
+The per-day rates are used for EoC phase computation; the per-century rates are used for the Meeus Ch. 47 ecliptic latitude correction (see [Moon Meeus Corrections](66-derived-moon.md)).
 
 ## Planet J2000 Orbital Elements
 
@@ -555,7 +555,7 @@ The per-day rates are used for EoC phase computation; the per-century rates are 
 
 ### Ecliptic Inclination Trend Rates
 
-JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic and equinox of J2000"). They are the catalogue's values, kept here as the reference beside the chain: the rendered planets' inclination of date is the N-body chain's element, gated against Horizons over 1800–2100 ([doc 109](109-model-nbody-engine-and-lattice-test.md)).
+JPL publishes these trends in the **J2000-fixed** ecliptic frame ("mean ecliptic and equinox of J2000"). They are the catalogue's values, kept here as the reference beside the chain: the rendered planets' inclination of date is the N-body chain's element, gated against Horizons over 1800–2100 ([doc 109](109-model-nbody-engine.md)).
 
 | Planet | Rate (deg/century) | Direction |
 |--------|------------------|-----------|

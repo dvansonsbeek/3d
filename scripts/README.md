@@ -60,7 +60,7 @@ These write artifacts that `npm run check` re-checks against their recorded inpu
 | `milankovitch_ecc_period_scan.py` | Which period the climate record prefers in the ~100-kyr band, against the shipped lines (doc 94 §9.2) |
 | `climate_formula_mwp_check.py` | Does the formula coincidentally place a peak at the Medieval Warm Period? |
 
-**The comb-era research scripts are gone.** The variance-budget decomposition that led to the physical line set, the Laskar-eigenmode and invariant-manifold comparisons, the cross-domain and paleo comb tests and the pre-registered comb tests T1 and T5 were deleted with their result files at plan 09 step 7e — git history carries them, and [doc 109 §22](../docs/109-model-nbody-engine-and-lattice-test.md) records each script's headline numbers. What stays: `nbody_50myr_backward.py` (the backward N-body ground truth; needs `rebound`, see [data/PROVENANCE.md](../data/PROVENANCE.md)) and `test_evolving_clock_climate_formula.py` (the p-carrying lines on the composed clock of date, with the warp-scale, sign and frequency-offset controls — [doc 99](../docs/99-expanding-solar-system-resonance-theory.md)).
+**The comb-era research scripts are gone.** The variance-budget decomposition that led to the physical line set, the Laskar-eigenmode and invariant-manifold comparisons, the cross-domain and paleo comb tests and the pre-registered comb tests T1 and T5 were deleted with their result files at plan 09 step 7e — git history carries them, and [doc 109 §22](../docs/109-model-nbody-engine.md) records each script's headline numbers. What stays: `nbody_50myr_backward.py` (the backward N-body ground truth; needs `rebound`, see [data/PROVENANCE.md](../data/PROVENANCE.md)) and `test_evolving_clock_climate_formula.py` (the p-carrying lines on the composed clock of date, with the warp-scale, sign and frequency-offset controls — [doc 99](../docs/99-expanding-solar-system-resonance-theory.md)).
 
 ---
 
@@ -81,7 +81,7 @@ Charney-ECS decomposition across paleoclimate eras on the L1 lines, cross-valida
 
 ---
 
-## Eclipse data pipeline ([doc 102](../docs/102-gia-alpha-lunar-validation.md), [doc 103](../docs/103-135-babylonian-case-study.md))
+## Eclipse data pipeline ([doc 102](../docs/102-gia-alpha-lunar-validation.md), [doc 103](../docs/103-babylon-eclipse-bce135.md))
 
 | Script | Description |
 |--------|-------------|

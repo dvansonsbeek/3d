@@ -22,7 +22,7 @@ two tiers, and knowing which body sits on which tier answers most
    interface; the historical gate suite is calibrated on it.
 
 The geometric elements device that once carried the no-chain bodies was
-deleted at plan 07 R5 (the record: [doc 109 §23](109-model-nbody-engine-and-lattice-test.md)).
+deleted at plan 07 R5 (the record: [doc 109 §23](109-model-nbody-engine.md)).
 
 ---
 
@@ -71,7 +71,7 @@ artifact — terms and evaluation form ship together. The epoch anchor is
 J2000.0 (JD 2451545.0, TT); calendar mapping goes through the model's own
 JD→year machinery (a half-day slip is 2° of Mercury mean longitude).
 
-The engine's record: [doc 109](109-model-nbody-engine-and-lattice-test.md)
+The engine's record: [doc 109](109-model-nbody-engine.md)
 (the model's own N-body engine, the measured planetary frequencies, and
 the retirements).
 
@@ -116,7 +116,7 @@ earth.pivotObj
 E, distance, phase angle, elongation, descending node) — extracted
 geometrically from `matrixWorld` rather than analytically. See
 [doc 21 §1.4.2](21-orbital-formulas-reference.md) for the full list and
-[doc 66](66-moon-meeus-corrections.md) for the Moon's correction
+[doc 66](66-derived-moon.md) for the Moon's correction
 model.
 
 ## The no-chain bodies
@@ -142,7 +142,7 @@ Two rules keep element comparisons honest across both tiers:
   rate differ by the general precession (p_A, the model's J2000 input); the scene's equatorial
   frame co-moves with its star field, so scene measurements cannot
   separate the two — the conversion is a formula applied outside the
-  scene ([doc 13 §1.5a/§1.8](13-mercury-precession-breakdown.md)).
+  scene ([doc 13 §1.5a/§1.8](13-perihelion-precession.md)).
 
 ## Code Locations
 
@@ -158,6 +158,6 @@ Two rules keep element comparisons honest across both tiers:
 ## References
 
 1. [05 - The Invariable Plane](05-invariable-plane-overview.md)
-2. [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md)
+2. [109 - The Model's Own N-body](109-model-nbody-engine.md)
 3. [20 - Constants Reference](20-constants-reference.md)
 4. Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133

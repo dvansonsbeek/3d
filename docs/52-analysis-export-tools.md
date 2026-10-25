@@ -500,7 +500,7 @@ recorded generator in `npm run check`, which fails when the number moves:
 The research one-offs among the buttons (predictions beyond the canon, the
 37-event Ω/γ signal test, the residual-investigation hypotheses, the
 chronology searches) left with the folder; their findings are the records in
-[doc 102](102-gia-alpha-lunar-validation.md), [doc 103](103-135-babylonian-case-study.md)
+[doc 102](102-gia-alpha-lunar-validation.md), [doc 103](103-babylon-eclipse-bce135.md)
 and [doc 107](107-ancient-record-review.md).
 
 ---
@@ -571,7 +571,7 @@ Calculates the apparent Right Ascension of `pdB` as seen from `pdA` in Earth's e
 
 **Returns**: Angle in degrees [0, 360)
 
-**Usage**: Used for perihelion longitude calculations. See [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) for details.
+**Usage**: Used for perihelion longitude calculations. See [13-perihelion-precession.md](13-perihelion-precession.md) for details.
 
 ---
 
@@ -676,4 +676,4 @@ Reports compare against these reference sources:
 ---
 
 **Previous**: [51 - Planet Orbit Analysis Reference](51-planet-inspector-reference.md)
-**Next**: [66 - The Derived Moon](66-moon-meeus-corrections.md)
+**Next**: [66 - The Derived Moon](66-derived-moon.md)

@@ -63,7 +63,7 @@ never to the fossil data it is tested against.
   the Devonian-window precession constants of Wu et al. 2024, 59.5–61.5 ″/yr,
   which the composed clock reads to 2–3 %). (The frozen era clock's
   day-count invariant this bullet once cited is deleted with its counter,
-  plan 09 step 7a — [doc 109 §23](109-model-nbody-engine-and-lattice-test.md).)
+  plan 09 step 7a — [doc 109 §23](109-model-nbody-engine.md).)
 - Full tables and the per-anchor discussion: [doc 99 §Validation](99-expanding-solar-system-resonance-theory.md#validation-against-published-paleontological-measurements)
 - The Hadean endpoint is the input's: the cited history ends at 4,429 Ma
   (Farhat et al. 2022's lunar-age input, 4.425 Ga) with the Moon at
@@ -78,7 +78,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 - **Cenogrid spectral evidence** — MTM F-tests and windowed spectra of the
   Westerhold 2020 CENOGRID stack against the comb-era line set:
   the archived doc 91; its scripts and result files were deleted at plan 09
-  step 7e ([doc 109 §22](109-model-nbody-engine-and-lattice-test.md) is the record).
+  step 7e ([doc 109 §22](109-model-nbody-engine.md) is the record).
 - **Devonian obliquity beat** — the composed clock's beat 2π/(ψ̇ − |s₃|)
   reads 31.7 kyr at 380 Ma (vs 41.2 today), consistent with Berger, Loutre &
   Laskar 1992's deep-time solution (29 kyr at 500 Ma) and with the Devonian
@@ -104,7 +104,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   ΔUT <!--v:babylon135BestDeltaUT-->-0h52<!--/v--> (model
   <!--v:babylon135FrameworkUT-->06:06<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
-  [doc 103](103-135-babylonian-case-study.md), eclipse-audit artifacts under
+  [doc 103](103-babylon-eclipse-bce135.md), eclipse-audit artifacts under
   freshness guard.
 - **ΔT vs Stephenson 2016** — the model ΔT stack against the published
   polynomial, served live as an api cross-validation endpoint
@@ -152,7 +152,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   <!--v:sunVsHorizonsMeanArcsec-->2.50<!--/v-->″ mean / <!--v:sunVsHorizonsSdArcsec-->2.26<!--/v-->″ sd
   (modern sd <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″); the Babylon −135 umbra
   track sits <!--v:babylon135BestGapKm-->152<!--/v--> km from the documented
-  station — [doc 103](103-135-babylonian-case-study.md). The era-device
+  station — [doc 103](103-babylon-eclipse-bce135.md). The era-device
   Sun assembly this bullet once described (the fitted eccentricity channel
   and inclination coupling on the retired device's periods, the cos-ε
   torque term on the two-component obliquity law) is retired.
@@ -164,11 +164,11 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 | Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+7.26<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate. Williams conflicts with Wu's 650 Ma anchor on the cited history (the regime fitter that once tried alternatives was deleted at plan 12 option A) | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
 | The mid-Precambrian window (Driver 1½ retired) | the model carries NO thermal-tide pump and no fitted recession regime since plan 12 option A: the distance history is Farhat 2022's ocean-model solution, whose authors' own review concludes the day-length lock "is not supported" once the questionable stromatolite points are dropped. On it the derived precession reads Joffre −1.8 %, Xiamaling −1.0 %, and Zhou 2024's older two sites −6.5 % / −7.2 % (2.5–3.6σ) — the OPEN discrepancy, asserted as bands: either the solution lacks the Mesoproterozoic dissipation peak Zhou suspect or the inferred constants are biased; the model states the gap and does not fit it | [doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-cited-history-and-the-record) |
 | Wu 2024 Pangea interval (200–500 Ma Moon rows) | the cited Farhat 2022 history (a globally averaged ocean-tide solution) does not carry the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
-| Saturn Laplace–Lagrange bound | the retired law model's documented physical-constraint failure — recorded at the integer-law retirement; its instrument is deleted | [doc 109](109-model-nbody-engine-and-lattice-test.md), CLAUDE.md §falsification |
+| Saturn Laplace–Lagrange bound | the retired law model's documented physical-constraint failure — recorded at the integer-law retirement; its instrument is deleted | [doc 109](109-model-nbody-engine.md), CLAUDE.md §falsification |
 | LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 102](102-gia-alpha-lunar-validation.md) item 7 |
 | Fixed vs clock-rescaled lattice discrimination (retired framing; record) | 2.4σ — the 66-Ma record cannot decide | doc 98 (archived) |
 | Uniform secular solar drift | bounded at r = −0.13 ± 0.09 ms/cy; a uniform −0.5 is disfavoured ~4σ | fit-anchor documentation |
-| The former Config-#7 falsification criterion | RETIRED with the integer-law restatement (its instrument is deleted; doc 109 is the evidence record). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine-and-lattice-test.md) |
+| The former Config-#7 falsification criterion | RETIRED with the integer-law restatement (its instrument is deleted; doc 109 is the evidence record). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine.md) |
 
 ## E. The μ partition of the anchors — which rows may calibrate, which may only test
 

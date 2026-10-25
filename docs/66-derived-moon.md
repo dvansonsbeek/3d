@@ -5,7 +5,7 @@ coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
-# Moon Meeus Corrections — Implementation Reference
+# The Derived Moon — the framework-native lunar theory in Meeus Ch. 47's form
 
 **Status**: Complete (full Meeus Ch. 47: 60L+60B terms + the 46-term Σr distance column + the derived model extension tails, RA+Dec override, JPL-verified; Σr derived-validated at 100.0% weighted by the Stage-D1 laboratory)
 

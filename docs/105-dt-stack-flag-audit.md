@@ -5,7 +5,7 @@ coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
-# 105 — ΔT stack: what each flag buys
+# ΔT stack: what each flag buys
 
 Audit of the four ΔT correction flags (Bond 1466 yr, Hallstatt 2430 yr,
 Jose5 897 yr, Jose4 716 yr — identified in the coefficient file by their
@@ -164,7 +164,7 @@ refit and a reship. **The taper width is a safety choice, not a derived value.**
 ### Per-flag archive support
 
 From the retired cross-archive scan at the four shipped periods (the script
-was deleted at plan 09 step 7e; [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
+was deleted at plan 09 step 7e; [doc 109 §22](109-model-nbody-engine.md)
 is its record; ✓ = amplitude exceeds the 95th-percentile permutation threshold):
 
 | flag | Steinhilber 9.4 kyr | EPICA 803 kyr | Cheng 639 kyr | LR04 | Stephenson ΔT |
@@ -208,6 +208,6 @@ Does **not** establish:
 
 - `tools/fit/README.md` — the fit pipeline and Step 7c
 - `tools/fit/dt-corrections-fit.js` — `--joint`, `DT_FLAGS`, `DT_FIT_WINDOW`, `DT_FIT_DUMP`
-- the unconstrained-OLS CV of the shipped periods and the cross-archive permutation scan — deleted at plan 09 step 7e, record in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
+- the unconstrained-OLS CV of the shipped periods and the cross-archive permutation scan — deleted at plan 09 step 7e, record in [doc 109 §22](109-model-nbody-engine.md)
 - `docs/102` § "Defensible scientific position" item 7 — the climate correspondence
 - `docs/104` — the Core-mantle swing

@@ -5,7 +5,7 @@ coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
-# 109 — The model's own N-body: audit, engine, frequencies, and the lattice at its own quantity type
+# The model's own N-body: engine, frequencies, and the retirement record
 
 This record collects what the model established about the perihelion and
 node rates once it integrated the solar system with **its own instruments**
@@ -964,7 +964,7 @@ the parameter set they shipped with.
 
 ## Related documents
 
-- [13-mercury-precession-breakdown.md](13-mercury-precession-breakdown.md) — §1.8: the projection identity, the transit test, the candidate slot
+- [13-perihelion-precession.md](13-perihelion-precession.md) — §1.8: the projection identity, the transit test, the candidate slot
 - Doc 108 — the first-order Laplace–Lagrange derivation this doc supersedes with the model's own engine (archived)
 - the 8H/N period table the restatement applies to is archived
 - [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — ESSRT

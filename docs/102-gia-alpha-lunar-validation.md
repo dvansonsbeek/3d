@@ -51,7 +51,7 @@ integer divisions of eight times H (period = 8·H/n), resting on two
 arguments: each period is such a division, and each divisor shares a
 prime factor with H (gcd 23 or 61). The pre-registered test T5 (its script
 and artifact deleted at plan 09 step 7e; the verdict is in the record table,
-[doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) measured both
+[doc 109 §22](109-model-nbody-engine.md)) measured both
 arguments at chance level: every period in the 500–5000 yr band lies within 0.03 % of some
 comb member; H = 23·61·239, so 6 % of the integers in the band share a
 factor with it and a compliant integer sits inside every fitted plateau
@@ -826,7 +826,7 @@ A full divisor scan (period = 8·H/n) across the sub-Milankovitch band (n ∈
 [500, 5000], periods ~500 to ~5000 yr) — run as §14 of the L-5b
 console diagnostic, which now scans 894–5365 yr directly in years (the
 Python twin was deleted at plan 09 step 7e; its
-headline is in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) —
+headline is in [doc 109 §22](109-model-nbody-engine.md)) —
 identifies a **broad peak in the ~1400–1500 yr range** with fit quality
 essentially indistinguishable across n=1817..1863 (all R² 0.974–0.975,
 well within the ~370-yr Fourier resolution of the training window).
@@ -1020,7 +1020,7 @@ physical prior); phase preserved from the joint fit and scaled
 proportionally.
 
 **Research infrastructure**:
-- the three Hallstatt proxy tests (Steinhilber solar Φ, the Cheng 640-kyr null, the EPICA 800-kyr CO₂ record) and the Bond + Hallstatt pair joint fit — scripts and artifacts deleted at plan 09 step 7e; headline numbers in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
+- the three Hallstatt proxy tests (Steinhilber solar Φ, the Cheng 640-kyr null, the EPICA 800-kyr CO₂ record) and the Bond + Hallstatt pair joint fit — scripts and artifacts deleted at plan 09 step 7e; headline numbers in [doc 109 §22](109-model-nbody-engine.md)
 - `HALLSTATT_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
 - the Hallstatt ΔT-correction toggle console-test button
 
@@ -1060,7 +1060,7 @@ constraint to minimize inter-cycle collinearity when all three flags
 are simultaneously enabled); phase preserved from triple fit.
 
 **Research infrastructure**:
-- the Bond + Hallstatt + Jose5 triple joint fit — script and artifact deleted at plan 09 step 7e; record in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
+- the Bond + Hallstatt + Jose5 triple joint fit — script and artifact deleted at plan 09 step 7e; record in [doc 109 §22](109-model-nbody-engine.md)
 - `JOSE5_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
 - the Jose5 ΔT-correction toggle console-test button
 
@@ -1081,7 +1081,7 @@ the signal to the SIM family.
 
 **Empirical identification — cross-archive coherence test**:
 The universal cross-archive scan (deleted at plan 09 step 7e; record in
-[doc 109 §22](109-model-nbody-engine-and-lattice-test.md)) enumerated all
+[doc 109 §22](109-model-nbody-engine.md)) enumerated all
 gcd-compliant divisors in a period band and fits each against multiple
 paleoclimate archives simultaneously (Steinhilber ¹⁰Be solar Φ,
 Stephenson ΔT, Cheng speleothem δ¹⁸O, EPICA CO2, LR04 δ¹⁸O). Jose4
@@ -1121,7 +1121,7 @@ cap; Jose4 ships at the 50 s prior with free-fit 47.1 s). This prevents inflatin
 signal above what the joint fit actually finds.
 
 **Research infrastructure**:
-- the universal cross-archive scan and its outputs — deleted at plan 09 step 7e; record in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md)
+- the universal cross-archive scan and its outputs — deleted at plan 09 step 7e; record in [doc 109 §22](109-model-nbody-engine.md)
 - `data/deltaT-4flag-fit.json` — 4-cycle joint fit output
 - `JOSE4_DT_CORRECTION_ENABLED` flag in `src/script.js` (default `true`)
 - the Jose4 ΔT-correction toggle console-test button
@@ -1151,7 +1151,7 @@ not ship — the record that the 4-flag stack sits at the empirical limit:
 
 The artifacts for all three (the scan outputs, the quad fit, the Jupiter-92
 isolated refit) were deleted at plan 09 step 7e — their headline numbers are
-in [doc 109 §22](109-model-nbody-engine-and-lattice-test.md), git history
+in [doc 109 §22](109-model-nbody-engine.md), git history
 carries the files, and the CONFIG rollback notes stay in the fit tool. The shared rule they establish: empirical
 coherence in paleoclimate records is necessary but not sufficient — a
 shipped cycle must also be numerically well-conditioned against the
@@ -1205,7 +1205,7 @@ What this validation establishes:
    A/B tested by toggling each cycle off.
 
    *Empirical sensitivity confirmation:* the
-   [doc 103](103-135-babylonian-case-study.md) -135 Babylonian case
+   [doc 103](103-babylon-eclipse-bce135.md) -135 Babylonian case
    study includes a direct α(t) tuning sweep that scales
    `EARTH_MOI_FACTOR_RATE_YR` across the Peltier ICE-6G literature
    uncertainty range and measures the resulting historical-eclipse
@@ -1629,7 +1629,7 @@ URLs / files.
   (Independent confirmation of the Holme mantle-core secular-rate
   range from a separate geomagnetic-secular-variation inversion.)
 
-- Doc 103: `docs/103-135-babylonian-case-study.md` — the -135 Babylonian
+- Doc 103: `docs/103-babylon-eclipse-bce135.md` — the -135 Babylonian
   focused case study (off-peak verdict under the certified
   framework-native chain), and the direct empirical sensitivity test of
   this document's GIA α(t) constants under the Peltier ICE-6G defaults.

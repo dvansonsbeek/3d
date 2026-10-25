@@ -88,7 +88,7 @@ Meeus Ch. 47's Delaunay arguments (`D`, `M`) internally reference Meeus's own Su
 | −556 May 19 | −1629" | −74" | 2.3 |
 | −762 Jun 15 | −1918" | +23" | 0.7 |
 
-The Moon shift is 20–500× smaller than the Sun drift it stems from (the D-dependent terms enter as `sin(k·D + …)` with bounded derivatives and largely cancelling phases). The framework-native fundamental arguments are the shipped default ([doc 66 §1](66-moon-meeus-corrections.md)), so no structural asymmetry remains; the numerical effect of the coupling is ≤ ~39 km at −135 — not a closable component.
+The Moon shift is 20–500× smaller than the Sun drift it stems from (the D-dependent terms enter as `sin(k·D + …)` with bounded derivatives and largely cancelling phases). The framework-native fundamental arguments are the shipped default ([doc 66 §1](66-derived-moon.md)), so no structural asymmetry remains; the numerical effect of the coupling is ≤ ~39 km at −135 — not a closable component.
 
 ---
 
@@ -122,7 +122,7 @@ At NASA-UT the two land ~5,000 km apart for this event. The spread is definition
 | Component | State at −135 | Assessment |
 |---|---|---|
 | Scene umbra frame | The scene rides the certified of-date series for both bodies; the scene ground track matches the scaffold-free Besselian tier to ~20 km at the −135 instant | Closed by construction |
-| Deep-branch lunar argument secular | The deep branch sits +8.9″ from the certified skeleton at this instant ([doc 66 §1](66-moon-meeus-corrections.md)) | Closed |
+| Deep-branch lunar argument secular | The deep branch sits +8.9″ from the certified skeleton at this instant ([doc 66 §1](66-derived-moon.md)) | Closed |
 | Linear-rate Sun drift at antiquity | Along-track/dial component — absorbed by BestΔUT within the scan (degenerate with the ΔT dial); the ΔT-free matcher measures the pair jointly and lands inside Stephenson's window | Design position |
 | ΔT (model vs NASA/Stephenson) | Model sits between the references; ~3.3 km per 100 s | Exonerated |
 | Moon arguments (D/M coupling) | ≤ 0.0061° / ~39 km | Exonerated |
@@ -161,7 +161,7 @@ At this high-γ presentation the model computes deep-totality-boundary circumsta
 
 - [Doc 102 — GIA α(t) lunar validation](102-gia-alpha-lunar-validation.md) — the α(t) formulation, 4-flag lattice stack, lunar and solar validation infrastructure
 - [Doc 107 — Ancient-record review](107-ancient-record-review.md) — the identification adjudication of the audit's ancient rows
-- [Doc 66 — Moon Meeus corrections](66-moon-meeus-corrections.md) — the lunar series, the framework-native arguments, polynomial accuracy across lunar theories at antiquity
+- [Doc 66 — Moon Meeus corrections](66-derived-moon.md) — the lunar series, the framework-native arguments, polynomial accuracy across lunar theories at antiquity
 - [Doc 104 — Millennial rotation swing](104-millennial-rotation-swing.md) — the Core-mantle ΔT channel
 - Diary attribution: Stephenson & Steele 2006 *JHA*; Sachs & Hunger *ADART* Vol. III; Huber & De Meis 2004, *Babylonian Eclipse Observations from 750 BC to 1 BC*
 

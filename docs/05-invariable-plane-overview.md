@@ -32,7 +32,7 @@ The **ecliptic** (Earth's orbital plane), by contrast, precesses around the inva
 
 ## The Plane the Model Uses
 
-The model's working invariable plane is **the engine's own**: the plane banked in the governed chain artifact (`CHAIN_ARTIFACT.invariablePlane`), computed from the model's own N-body dynamics — not an imported constant. Its working basis is the **s-frame**: ẑ = the banked plane normal, x̂ = ecliptic-X projected into the plane, ŷ = ẑ × x̂. This one basis serves everything downstream: the heights above the plane, the per-planet node fields, the mass-weighted balance gauge, and the Sun-SSB offset ([doc 24](24-moon-kepler-derivation.md) Part III).
+The model's working invariable plane is **the engine's own**: the plane banked in the governed chain artifact (`CHAIN_ARTIFACT.invariablePlane`), computed from the model's own N-body dynamics — not an imported constant. Its working basis is the **s-frame**: ẑ = the banked plane normal, x̂ = ecliptic-X projected into the plane, ŷ = ẑ × x̂. This one basis serves everything downstream: the heights above the plane, the per-planet node fields, the mass-weighted balance gauge, and the Sun-SSB offset ([doc 24](24-delta-a-mass-derivation.md) Part III).
 
 ### External reference: Souami & Souchay (2012)
 
@@ -65,7 +65,7 @@ For the **chain bodies** (the seven planets and Earth), each frame:
 
 Implementation: `updatePlanetInvariablePlaneHeights()` in [src/script.js](../src/script.js), fed by the Keplerian chain (`@essrt/physics/planets/keplerian-chain`).
 
-The **no-chain bodies** (Pluto, Halley, Eros) used the geometric construction below and have since been removed — see [doc 04](04-dynamic-elements-overview.md). It is kept here as the record of how a body without an element chain was placed:
+The **no-chain bodies** (Pluto, Halley, Eros) used the geometric construction below and have since been removed — see [doc 04](04-orbital-elements.md). It is kept here as the record of how a body without an element chain was placed:
 
 ```
 height = sin(i_inv) × sin(angleFromNode) × distance
@@ -109,7 +109,7 @@ Each orbital plane has **two distinct angles** evolving at different rates — a
 - **Inclination** `i(t)` — the "nodding" of the orbital plane. Changes **how far** above/below the plane the planet gets; it does not change the fact of two crossings per orbit.
 - **Ascending node** `Ω(t)` — the "spinning" of the line of nodes. Shifts **where/when** the crossings happen.
 
-For the planets both angles are **dynamical outputs of the chain** (elements of date; the long-term curves are the orbital dynamics engine's own secular modes). For Earth both angles are the **one-source engine reading** (plan 07 R5/R9): the engine's own Earth-orbit normal of date against the banked invariable plane gives the inclination, and that normal's node on the plane — expressed in the Souami & Souchay origin through the same derived conversion the planets use — gives Ω. The retired device's kinematic identities agreed with the engine at J2000 by construction and parted with distance (0.67° of inclination and 18° of node at −100 kyr); the record is [doc 109 §23](109-model-nbody-engine-and-lattice-test.md).
+For the planets both angles are **dynamical outputs of the chain** (elements of date; the long-term curves are the orbital dynamics engine's own secular modes). For Earth both angles are the **one-source engine reading** (plan 07 R5/R9): the engine's own Earth-orbit normal of date against the banked invariable plane gives the inclination, and that normal's node on the plane — expressed in the Souami & Souchay origin through the same derived conversion the planets use — gives Ω. The retired device's kinematic identities agreed with the engine at J2000 by construction and parted with distance (0.67° of inclination and 18° of node at −100 kyr); the record is [doc 109 §23](109-model-nbody-engine.md).
 
 Earth's charted model inclination `i_inv(t)` is the **one-source** reading: the engine's own Earth-orbit normal (secular series inside ±10 Myr, mode tail beyond) against the artifact's invariable plane — it matches La2010 at rms 0.003° over −500 kyr.
 
@@ -174,8 +174,8 @@ Enable via **Reference Planes › Invariable plane**: a translucent disc centere
 
 ## Related Documents
 
-- [04 - Orbital Elements Overview](04-dynamic-elements-overview.md) — the chain (the only planet path) and the no-chain bodies
+- [04 - Orbital Elements Overview](04-orbital-elements.md) — the chain (the only planet path) and the no-chain bodies
 - [20 - Constants Reference](20-constants-reference.md) — all invariable-plane constants
 - [22 - Coordinate Frames](22-coordinate-frames.md) — frame transformations
-- [24 - The Δa Mass Derivation](24-moon-kepler-derivation.md) — Part III: the Sun-SSB chart served from the same s-frame basis
+- [24 - The Δa Mass Derivation](24-delta-a-mass-derivation.md) — Part III: the Sun-SSB chart served from the same s-frame basis
 - [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time scaling of the precession clock T_p(t) and the solar-mass history
