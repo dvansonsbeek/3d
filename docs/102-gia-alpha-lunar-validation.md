@@ -46,16 +46,15 @@ stack — four fitted millennial cycles (Bond 1466 yr dominant) whose periods
 come from the record and the canonical paleoclimate values.
 
 **Status of the period claims (T5, plan 06).** The four periods were
-long described here as "zero-fit structural predictions" of a comb of
-integer divisions of eight times H (period = 8·H/n), resting on two
-arguments: each period is such a division, and each divisor shares a
-prime factor with H (gcd 23 or 61). The pre-registered test T5 (its script
+long described here as "zero-fit structural predictions" of the retired
+unit's integer comb, resting on two arguments: each period was a comb
+member, and each divisor passed a prime-factor rule. The pre-registered test T5 (its script
 and artifact deleted at plan 09 step 7e; the verdict is in the record table,
 [doc 109 §22](109-model-nbody-engine.md)) measured both
 arguments at chance level: every period in the 500–5000 yr band lies within 0.03 % of some
-comb member; H = 23·61·239, so 6 % of the integers in the band share a
-factor with it and a compliant integer sits inside every fitted plateau
-by density alone (the Bond band n = 1817…1863 holds four); the shipped
+comb member; 6 % of the integers in the band passed the rule, so a
+compliant integer sits inside every fitted plateau by density alone (the
+Bond band held four); the shipped
 four periods fit the residual no better than random four-period
 millennial combs (p = 0.36), the canonical external periods fit
 identically, and moving any divisor to a non-compliant neighbour changes
@@ -424,7 +423,7 @@ expected to mirror L-5b per-table structure if α(t) is real physics.
                                        Mean |residual| (s)    Mean |residual| (min)
 Stephenson 2016 spline polynomial:                 1211                20.2   ← fit to these data
 NASA Espenak/Meeus polynomial:                     1199                20.0   ← also fit-class
-Model (joint world: tidal + α(t) + stack + swing): 1212                20.2   ← the model, no ΔT polynomial fitting
+Model (joint world: tidal + α(t) + stack + swing): <!--v:lunarResidualMeanAbsSeconds-->1,214<!--/v-->               <!--v:lunarResidualMinutes-->20.2<!--/v-->   ← the model, no ΔT polynomial fitting
 
 Events where the model is closer to obs than NASA: 117/267 (43.8%)
 Framework excess over NASA on remaining events: 13 s on average
@@ -762,7 +761,7 @@ Per-table:
 | S08 | Arab timed | 22 | 829…1004 | 390 | **326** | **73%** |
 
 The absolute residuals are smaller than L-5b lunar (NASA 672 vs 1199 s,
-model 666 vs 1212 s — the solar model residual sits below
+model 666 vs <!--v:lunarResidualMeanAbsSeconds-->1,214<!--/v--> s — the solar model residual sits below
 NASA's) because solar observations have tighter intrinsic precision —
 narrow totality paths give sharper timing. Per tradition: the ancient
 Babylonian S03 table is a statistical tie (880 vs 873 s, model
@@ -813,16 +812,16 @@ Eight hypotheses, Path A (the solar-activity → LOD coupling) and Test 5 (the J
 After the eight hypothesis tests left the medieval residual characterized
 but not causally explained by any per-observation mechanism, a follow-up
 investigation tested whether the residual could be absorbed by **a single
-millennial-scale harmonic** drawn from the comb of integer divisions of
-eight times H (period = 8·H/n), on the scale of hundreds to thousands of
+millennial-scale harmonic** drawn from the retired unit's integer comb,
+on the scale of hundreds to thousands of
 years. Unlike the Lomb-Scargle test (hypothesis 6) which scanned literature
 periods at arbitrary frequencies, this test restricted candidates to that
 comb — a restriction T5 later measured as empty (any period in the band
 is within 0.03 % of a comb member).
 
-### Finding — a broad Bond-band peak; n=1830 selected
+### Finding — a broad Bond-band peak
 
-A full divisor scan (period = 8·H/n) across the sub-Milankovitch band (n ∈
+A full scan of the retired comb across the sub-Milankovitch band (n ∈
 [500, 5000], periods ~500 to ~5000 yr) — run as §14 of the L-5b
 console diagnostic, which now scans 894–5365 yr directly in years (the
 Python twin was deleted at plan 09 step 7e; its
@@ -830,7 +829,7 @@ headline is in [doc 109 §22](109-model-nbody-engine.md)) —
 identifies a **broad peak in the ~1400–1500 yr range** with fit quality
 essentially indistinguishable across n=1817..1863 (all R² 0.974–0.975,
 well within the ~370-yr Fourier resolution of the training window).
-Among the candidates in this band, **n=1830** — `gcd(1830, H) = 61`, the
+Among the candidates in this band, the divisor label 1830 — passing the retired prime-factor rule, the
 selection filter of the time — is closest to the
 canonical Bond period from paleoclimate (~1470 yr, only 4 yr off):
 
@@ -843,17 +842,15 @@ canonical Bond period from paleoclimate (~1470 yr, only 4 yr off):
 
 All three planetary interpretations converge on the Bond-scale period; the
 J-S synodic count of 74 anchors it in Charvátová's Solar Inertial Motion
-theory. The divisor 1830 = 2·3·5·61 shares H's 61-factor, as Jose5 does
-(2989 = 7²·61). **This sharing is a label, not a prediction** (T5): H =
-23·61·239, so 6 % of the integers in the band share a factor with it,
-and the flat band n = 1817…1863 holds four such integers (1817, 1830,
-1840, 1863) — n = 1830 was selected as the compliant one nearest the
-canonical Bond value. The period is the record's and the canonical
-value's; the lattice arithmetic did not predict it.
+theory. The divisor label passed the retired prime-factor rule, as Jose5's did.
+**That is a label, not a prediction** (T5): 6 % of the integers in the
+band passed the rule, and the flat Bond band held four of them — the one
+nearest the canonical Bond value was selected. The period is the record's
+and the canonical value's; the comb arithmetic did not predict it.
 
 ### Structural significance — three convergent physical mechanisms
 
-The n=1830 period admits multiple concurrent physical readings, none
+The Bond period admits multiple concurrent physical readings, none
 mutually exclusive:
 
 **Reading 1 — Solar Inertial Motion (Charvátová, Wilson, Scafetta)**:
@@ -875,9 +872,9 @@ within the same Fourier-resolved band. These readings tie the observed
 feature to Earth-external planetary orbital mechanics rather than
 Earth-perihelion sub-harmonics.
 
-**Selection-rule note (T5)**: n=1830, 1104, 2989 and 3749 were selected
-under the gcd rule the Sun-longitude harmonic runtime filter enforced
-(the filter and its comb are deleted) — each shared a prime factor with the retired unit.
+**Selection-rule note (T5)**: the four divisor labels were selected under
+the prime-factor rule the Sun-longitude harmonic runtime filter enforced
+(the filter and its comb are deleted).
 The T5 null shows a compliant integer sits inside every fitted plateau by
 density alone: the rule selected divisors, it did not predict periods.
 
@@ -902,8 +899,8 @@ Espenak/Meeus polynomial — the numbers reported in the L-5b Result
 section above.
 
 **Philosophical status — the zero-fit claim**: Bond's amplitude
-and phase (shipped: 360.1 s, +66.2° in the artifact's cos/sin
-convention — `data/deltaT-4flag-fit.json`) come from fitting
+and phase (shipped: the artifact's cos/sin pair in
+`data/deltaT-4flag-fit.json` — read the values there, never here) come from fitting
 `Stephenson_residual = polynomial_detrend + cos_A · cos(ωy) +
 sin_A · sin(ωy)` at n=1830. The shipped coefficients now come from
 `tools/fit/dt-corrections-fit.js` (Node, cascaded LSQ with the three
@@ -969,25 +966,22 @@ empirical validation that motivated the full 4-flag stack.
 ## Companion millennial harmonics: Hallstatt (2430 yr), Jose5 (897 yr), and Jose4 (716 yr)
 
 After Bond, three further millennial periods were investigated as
-companion ΔT corrections. All four shipped divisors were selected under
-the gcd rule (they share prime factors with H = 23·61·239: 1830 → 61,
-1104 → 23, 2989 → 61, 3749 → 23) — a selection filter, not a prediction
+companion ΔT corrections. All four shipped periods were selected under
+the retired prime-factor rule — a selection filter, not a prediction
 (T5). Each corresponds to established sub-Milankovitch cycles in
 independent paleoclimate proxies.
 
 The four-cycle stack (Bond + Hallstatt + Jose5 + Jose4) is shipped
 default-ON in `src/script.js`, with each individually toggleable. The
-gcd rule (`gcd(divisor, H) > 1`), enforced at the time in the Sun-longitude
-runtime filter (commit `6d87173`; deleted with the comb at plan 09), was the
+prime-factor rule, enforced at the time in the Sun-longitude
+runtime filter (deleted with the comb at plan 09), was the
 selection filter; T5 measured it as
 carrying no information about the periods.
 
 ### Hallstatt harmonic (~2430 yr) — solar-activity coupling
 
-**Period 2429.83 yr** (the former divisor 1104 — a selection record). The divisor
-1104 = 2⁴·3·23 shares H's 23 prime factor — the selection filter (T5);
-equivalently 138 = 6·23 places the harmonic at the sixth sub-harmonic of
-the ~14.6-kyr period H/23 = 14,579 yr.
+**Period 2429.83 yr** (a fitted period stated in years; its former divisor
+label is a selection record — T5).
 
 **Physical interpretation**: matches the well-established **Hallstatt
 cycle** (~2200–2500 yr) in cosmogenic isotope records
@@ -1026,8 +1020,8 @@ proportionally.
 
 ### Jose5 harmonic (~897 yr, 5×Jose) — planetary resonance
 
-**Period 897.47 yr** (the former divisor 2989, a selection record). Divisor 2989 = 7²·61
-shares H's 61 prime factor — the selection filter (T5).
+**Period 897.47 yr** (a fitted period stated in years; its former divisor
+label is a selection record — T5).
 
 **Physical interpretation**: closest match to **5 × Jose period**
 (5 × 179 yr = 895 yr, offset 0.28%). The Jose cycle (Charvátová 2000)
@@ -1066,9 +1060,8 @@ are simultaneously enabled); phase preserved from triple fit.
 
 ### Jose4 harmonic (~716 yr, 4×Jose) — cross-archive coherent
 
-**Period 715.53 yr** (the former divisor 3749, a selection record). Divisor 3749 = 23 × 163
-shares H's 23 prime factor — the selection filter (T5), same family as
-Hallstatt.
+**Period 715.53 yr** (a fitted period stated in years; its former divisor
+label is a selection record — T5, the same family as Hallstatt).
 
 **Physical interpretation**: closest match to **4 × Jose period**
 (4 × 178.735 yr = 714.94 yr, offset **0.083%** — the tightest period
@@ -1082,7 +1075,7 @@ the signal to the SIM family.
 **Empirical identification — cross-archive coherence test**:
 The universal cross-archive scan (deleted at plan 09 step 7e; record in
 [doc 109 §22](109-model-nbody-engine.md)) enumerated all
-gcd-compliant divisors in a period band and fits each against multiple
+rule-compliant divisors of the retired comb in a period band and fitted each against multiple
 paleoclimate archives simultaneously (Steinhilber ¹⁰Be solar Φ,
 Stephenson ΔT, Cheng speleothem δ¹⁸O, EPICA CO2, LR04 δ¹⁸O). Jose4
 was the top-ranked candidate in the 600–800 yr band by cross-dataset
@@ -1103,9 +1096,9 @@ behind solar forcing. Within the Jose-family preset scan (2×–8× Jose),
 significance in both solar AND climate archives.
 
 **Amplitude — 50 s shipped**: the current 4-cycle joint fit (Bond +
-Hallstatt + Jose5 + Jose4) gives Jose4 free-fit amplitude 47.1 s at
-phase −39.6°; the shipped artifact carries 50 s at that phase
-(`data/deltaT-4flag-fit.json`). Note the stage_* RMS metrics do NOT
+Hallstatt + Jose5 + Jose4) gives Jose4 free-fit amplitude 47.1 s;
+the shipped artifact carries 50 s at the fitted phase
+(`data/deltaT-4flag-fit.json` — read the phase there, never here). Note the stage_* RMS metrics do NOT
 rank the stages (Stage C rms_post 19.7 s vs Stage D 21.2 s — the
 doc-105 trap: they are fit-internal residuals, not comparable model
 quality); Jose4 earns its place via the L-5b MWP improvement below,
@@ -1353,7 +1346,7 @@ What this validation establishes:
 What we are NOT claiming:
 
 - **That NASA's polynomial is comprehensively "beaten."** The model
-  matches NASA within 13 s on average across L-5b lunar (1212 s vs
+  matches NASA within 13 s on average across L-5b lunar (<!--v:lunarResidualMeanAbsSeconds-->1,214<!--/v--> s vs
   1199 s), beats NASA on 117/267 lunar events (43.8%), and edges past
   NASA on L-7 solar (666 s vs 672 s, 42/89 events beating).
   NASA's polynomial is FIT to this dataset; ours PREDICTS it. The
@@ -1408,7 +1401,7 @@ What we are NOT claiming:
    claim.
 
 4. **Greek (S07) is an outlier** with 11 observations and a
-   detrended mean residual of −795 s. Small sample; the per-table
+   detrended mean residual of −794 s. Small sample; the per-table
    means for S01/S02/S04/S05/S09 are all within ±400 s. We treat S07
    as observation-bias dominated, not model-bias.
 

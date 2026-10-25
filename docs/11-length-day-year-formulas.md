@@ -250,7 +250,7 @@ The coin rotation paradox manifests at every timescale:
 | Years | Axial (T_p) | 1 fewer sidereal year than tropical years | ~20 min/year |
 | Years | Perihelion (one turn of the perihelion of date) | 1 fewer anomalistic year than tropical years | ~15 min/year |
 | Days | Orbital (1 year) | 1 fewer solar day than sidereal days | ~3m 56s/day |
-| Days | Axial (T_p) | 1 fewer sidereal day than stellar days | ~9.1 ms/day |
+| Days | Axial (T_p) | 1 fewer sidereal day than stellar days | <!--v:axialCoinRotationMs-->9.13<!--/v--> ms/day |
 
 
 ## J2000 Reference Values

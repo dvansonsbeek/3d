@@ -284,7 +284,7 @@ linear Milankovitch features (ε, e, e·sin ϖ, e·cos ϖ) because:
    review of Milankovitch theory.
 2. Higher-order terms are products and harmonics of the same primitives —
    if the linear quartet adds < 0.5% R², no realistic higher-order
-   expansion will close the gap to the 0.87 set by L1.
+   expansion will close the gap to the <!--v:canonPostMptL1Only-->0.780<!--/v--> set by L1 on the post-MPT window.
 
 ### 6.3 Window/regime dependence
 

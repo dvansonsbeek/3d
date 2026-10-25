@@ -312,12 +312,12 @@ re-closed, Step 7c).
 
 **Second measurement (v23.0): a RECORD sees the pole rate's mean over its
 own window, not the J2000 instant.** The dominant obliquity line of the
-model's own ε(t) over the LR04 window sits at 40,922 yr (La2004's series:
+model's own ε(t) over the LR04 window sits at <!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v--> yr (La2004's series:
 40,900; the two agree at every window), not at the J2000 beat 41,098: the
 pole turned faster in the past (tidal spin +0.06 ″/yr over 5 Myr, lower
 mean obliquity +0.05, higher mean eccentricity +0.015 — the three of-date
 factors the spin integration already multiplies), and the window mean
-50.515 predicts the fitted period to 0.02 % (40,930). The records'
+<!--v:spinAxisInertialRateMeanLr04ArcsecPerYr-->50.517<!--/v--> predicts the fitted period to 0.02 % (<!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v-->). The records'
 "+0.12…+0.20 ″/yr on the obliquity lines" was this mean. ONE home
 `lunisolar.spinAxisInertialRateMeanArcsecPerYr` /
 `obliquityPeriodRealizedYears`; the obliquity lines ride the LR04-window

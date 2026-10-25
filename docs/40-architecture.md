@@ -498,7 +498,7 @@ The pane's folder tree is the code's — `setupGUI()`, the `addFolder` titles; [
 | CPU Idle (paused, camera still) | <5% | ~3% ✅ |
 | Initial Load | <3s | ~2.5s ✅ |
 | Bundle Size | <3MB | ~2.7MB ✅ |
-| Memory (Desktop) | <500MB | ~400MB ✅ |
+| Memory (Desktop) | <500MB | not re-measured since the texture set changed |
 
 ---
 
@@ -565,10 +565,10 @@ The balance calculation lives inside `updateInvariablePlaneBalance()`, summing `
 
 ### Known Limitations
 
-1. **Mobile Performance** - FPS drops below 30 on some devices
-2. **Memory Usage** - High-resolution textures consume ~400MB
-3. **No Persistence** - State is lost on page refresh
-4. **Single Thread** - All calculations on main thread
+1. **GPU-bound frame rate** — on a large high-ratio display the draw, not the loop's JavaScript, sets the frame rate; the adaptive pixel ratio drops to 1 under 30 fps, and `index.html?perf=1` measures it ([doc 52](52-analysis-export-tools.md) Part 4b)
+2. **Memory** — the textures are the bulk of the page's memory
+3. **No persistence** — state is lost on page refresh
+4. **Single thread** — a jump to a deep epoch integrates Earth's spin axis from J2000 on the main thread (65 s to −200 Myr headless); the decisions that would make it instant are plan 19's in the private repo
 
 ---
 

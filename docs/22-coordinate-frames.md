@@ -99,8 +99,8 @@ The invariable plane is the most fundamental reference for the solar system.
 **Key constants:**
 | Constant | Value | Description |
 |----------|-------|-------------|
-| Inclination to ecliptic | 1.578° | At J2000 |
-| Ascending node on ecliptic | 107.58° | At J2000 (where invariable plane crosses up through ecliptic) |
+| Inclination to ecliptic | <!--v:invPlaneInclEngineDeg-->1.57851<!--/v-->° | At J2000 (the model's own banked plane) |
+| Ascending node on ecliptic | <!--v:invPlaneAscNode-->107.582<!--/v-->° | At J2000 (where invariable plane crosses up through ecliptic) |
 
 ### 1.5 Heliocentric Coordinates
 

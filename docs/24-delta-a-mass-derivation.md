@@ -340,7 +340,7 @@ What may be original here, honestly bounded:
 2. **The closed-form derivation of the textbook 384,748 km value** — published references state it; the `Δa = 349 km` bridge from the geometric LLR value appears to be original.
 3. **The unified formula demonstrated across 22 moons of 7 planets** in the DE440 frame — each term is classical; the synthesis and verification sweep is not in textbook or review form we have found.
 
-This is calibration/derivation work — it produces the mass inputs the rest of the model consumes. It is **not** a new law of physics and not part of the model's cycle-structure claims. Suggested framing: a pedagogical/synthesizing contribution (e.g., *American Journal of Physics* class).
+This is calibration/derivation work — it produces the mass inputs the rest of the model consumes. It is **not** a new law of physics and not part of the model's cycle-structure claims.
 
 ---
 

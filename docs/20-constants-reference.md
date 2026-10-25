@@ -144,7 +144,7 @@ they anchor per-planet geometry but carry no model freedom.
 | Perihelion-solstice alignment | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
 | Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v-->° — the IAU/Standish MEAN element; the series' secular element at J2000 is <!--v:earthSeriesPeriLongJ2000-->102.918<!--/v-->°, <!--v:earthConventionGapPeriArcsec-->105<!--/v-->″ lower (two conventions, labelled not reconciled) |
 | Obliquity (J2000) | `obliquityJ2000_arcsec` | <!--v:obliquityJ2000Arcsec-->84381.406<!--/v-->" (<!--v:obliquityJ2000Deg-->23.439279<!--/v-->°) |
-| Obliquity rate (J2000) | `obliquityRate_arcsecPerCentury` | −46.836769"/cy |
+| Obliquity rate (J2000) | `obliquityRate_arcsecPerCentury` | <!--v:obliquityRateArcsecPerCy-->-46.836769<!--/v-->"/cy |
 | Obliquity range | — | <!--v:mainstreamObliqRange-->~22.1° to ~24.5°<!--/v--> |
 | Earth incl. (J2000) | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v-->° |
 | Eccentricity (J2000) | `eccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> — the IAU/Standish MEAN element; the series' secular element at J2000 is <!--v:earthSeriesEccJ2000-->0.01670244<!--/v-->, <!--v:earthConventionGapEcc-->7.8e-6<!--/v--> lower (two conventions) |
@@ -457,7 +457,7 @@ These come from external astronomical sources and do not change with the model.
 |----------|----------|-------|--------|
 | Obliquity | `obliquityJ2000_arcsec` | <!--v:obliquityJ2000Arcsec-->84381.406<!--/v-->" (<!--v:obliquityJ2000Deg-->23.439279<!--/v--> deg) | IAU 2006 (Capitaine et al. 2003) |
 | Obliquity rate | `obliquityRate_arcsecPerCentury` | <!--v:obliquityRateArcsecPerCy-->-46.836769<!--/v-->"/cy | IAU 2006 |
-| Obliquity range | - | ~22.1 deg to ~24.5 deg | Laskar 1993 |
+| Obliquity range | - | <!--v:mainstreamObliqRange-->~22.1° to ~24.5°<!--/v--> | Laskar 1993 |
 | Earth inclination | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v--> deg | Astronomical Almanac |
 | Earth inclination rate | `earthInclinationRate_arcsecPerCentury` | -18"/cy | Astronomical Almanac |
 | Eccentricity | `earthEccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | JPL Keplerian-elements table (Standish & Williams) — the IAU MEAN element; the N-body series' secular element is <!--v:earthSeriesEccJ2000-->0.01670244<!--/v--> (≡ JPL's osculating seed state, La2004) |

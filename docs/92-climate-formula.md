@@ -13,7 +13,7 @@ status: current
 >
 > **Canonical formula measurements** (`scripts/milankovitch_climate_formula.py`, the 28-line L1 — 25 orbital lines + the 405-kyr family — + up to 6 L3 steps, sequential ridge λ=1):
 > - **LR04 regime split is the biggest single jump**: pre-iNHG (2.7–5.32 Ma) R² = **<!--v:canonR2PreInhg-->0.4547<!--/v-->**, iNHG-MPT (1.0–2.7 Ma) R² = **<!--v:canonR2InhgMpt-->0.6090<!--/v-->**, post-MPT (0–1.0 Ma) R² = **<!--v:canonR2PostMpt-->0.7804<!--/v-->** — the lines explain ~78% of post-MPT LR04 variance once the MPT regime change is removed.
-> - **CENOGRID δ¹⁸O** (0–67 Ma) R² = **0.6177** (L1+L2+L3); δ¹³C R² = **0.3514**. L3 step components carry the dominant CENOGRID variance (Cenozoic secular cooling captured by 6 Heavisides at PETM/EOT/Mi-1/MMCT/iNHG/MPT).
+> - **CENOGRID δ¹⁸O** (0–67 Ma) R² = **<!--v:canonCenogridD18oTotal-->0.617<!--/v-->** (L1+L2+L3); δ¹³C R² = **<!--v:canonCenogridD13cTotal-->0.349<!--/v-->**. L3 step components carry the dominant CENOGRID variance (Cenozoic secular cooling captured by 6 Heavisides at PETM/EOT/Mi-1/MMCT/iNHG/MPT).
 >
 > **The comb-era variance budget** (Tier A and the three Tier B rounds on the 33-integer comb — the sidebands, the 4.36-Myr libration, the harmonic and δ¹³C/δ¹⁸O-ratio diagnostics, the CENOGRID step components, the phase-coherence and forward-prediction tests, the sliding-window amplitudes) was deleted from this document with its scripts and result files at plan 09 step 7e. What those rounds established and still stands in the live formula — the 405-kyr family as the one deployed L2, the six L3 steps, the per-regime fits, the honest negative that the formula is descriptive within regimes and not predictive across them — is carried by §§3–5 and §9; the headline numbers of each retired measurement are the record table in [doc 109 §22](109-model-nbody-engine.md).
 >
@@ -232,7 +232,7 @@ Per-regime fits with the canonical L1 + 3-line L2 + 6-step L3 pipeline:
 - **iNHG-MPT (1.0–2.7 Ma) R² = <!--v:canonR2InhgMpt-->0.6090<!--/v-->**
 - **Pre-iNHG (2.7–5.32 Ma) R² = <!--v:canonR2PreInhg-->0.4547<!--/v-->**
 - **EPICA CO₂ (0–806 kyr) R² = <!--v:canonR2Epica-->0.7238<!--/v-->**
-- **CenCO2PIP (0–66 Ma) R² = 0.7626**
+- **CenCO2PIP (0–66 Ma) R² = <!--v:canonCenco2pipTotal-->0.692<!--/v-->**
 
 The full-record R² = <!--v:canonR2Full-->0.3329<!--/v--> suppresses the formula's explanatory power because forcing one set of component amplitudes to fit physically distinct climate regimes (pre-MPT obliquity-dominated, post-MPT 100-kyr-dominated) is over-constrained.
 
@@ -298,12 +298,12 @@ There is a *second*, distinct collinearity problem — **L1↔L1 collinearity** 
 
 Each LR04 window fitted independently using `regime="post-mpt"` / `"inhg-mpt"` / `"pre-inhg"` / `"lr04-full"`. Current totals are in the generated **canonical-r2** block (§9.2 above); the L1/L2/L3 decomposition below is the fit report's split at the 32-integer stage — the n=24 admission lifts the totals, most in pre-iNHG (+0.02, the regime where it is admitted):
 
-| Regime | Window | R² L1 alone | ΔR² L2 unique | ΔR² L3 unique | Total R² (32-integer stage) |
+| Regime | Window | R² L1 alone | ΔR² L2 unique | ΔR² L3 unique | Total R² (shipped) |
 |--------|--------|-------------|---------------|---------------|----------|
-| **post-mpt** | 0–1 Ma | **0.8702** | +0.0033 | +0.0000 (no transition in window) | **0.8735** |
-| **inhg-mpt** | 1.0–2.7 Ma | 0.7216 | +0.0073 | +0.0000 | 0.7289 |
-| **pre-inhg** | 2.7–5.3 Ma | 0.3813 | **+0.0484** | +0.0000 | 0.4298 |
-| **lr04-full** | 0–5.3 Ma | 0.2385 | +0.0090 | **+0.0078** (iNHG + MPT inside window) | 0.2553 |
+| **post-mpt** | 0–1 Ma | **<!--v:canonPostMptL1Only-->0.780<!--/v-->** | <!--v:canonPostMptDeltaL2-->+0.000<!--/v--> | <!--v:canonPostMptDeltaL3-->+0.000<!--/v--> (no transition in window) | **<!--v:canonPostMptTotal-->0.780<!--/v-->** |
+| **inhg-mpt** | 1.0–2.7 Ma | <!--v:canonInhgMptL1Only-->0.609<!--/v--> | <!--v:canonInhgMptDeltaL2-->+0.000<!--/v--> | <!--v:canonInhgMptDeltaL3-->+0.000<!--/v--> | <!--v:canonInhgMptTotal-->0.609<!--/v--> |
+| **pre-inhg** | 2.7–5.3 Ma | <!--v:canonPreInhgL1Only-->0.455<!--/v--> | <!--v:canonPreInhgDeltaL2-->+0.000<!--/v--> | <!--v:canonPreInhgDeltaL3-->+0.000<!--/v--> | <!--v:canonPreInhgTotal-->0.455<!--/v--> |
+| **lr04-full** | 0–5.3 Ma | <!--v:canonLr04FullL1Only-->0.325<!--/v--> | <!--v:canonLr04FullDeltaL2-->+0.000<!--/v--> | <!--v:canonLr04FullDeltaL3-->+0.008<!--/v--> (iNHG + MPT inside window) | <!--v:canonLr04FullTotal-->0.333<!--/v--> |
 
 (L1 fit uses ridge λ=1 — see §9.5. The ridge is a no-op for the three longer regimes because their design matrices are already well-conditioned; the post-MPT total drops 0.006 vs. plain OLS in exchange for forward-projection stability.)
 
@@ -428,7 +428,7 @@ state = f.to_dict()         # serializable fitted coefficients + window + L3 tra
 
 The formula's predictive power is **honest about its limits**:
 
-- **Within the current (post-MPT) regime**: high confidence, R² = 0.87 baseline + L2/L3 refinements
+- **Within the current (post-MPT) regime**: high confidence, R² = <!--v:canonPostMptTotal-->0.780<!--/v--> (the shipped per-regime fit)
 - **Forward 0–250 kyr from now**: stays in post-MPT regime, no scheduled boundary-condition shift — projection is in-scope. With the ridge fix in §9.5, the predicted forward range stays inside the LR04 data range (peak-to-peak ≈ 4.8 ‰ in the full canonical projection — §9.7's table; §9.5's ridge-diagnostic figure alone reads 2.2 ‰); plain OLS would extrapolate to peak-to-peak ≈ 23.7 ‰, which is unphysical.
 - **Forward >250 kyr or backward across MPT/iNHG**: out of scope — the C5/R3-3 forward-prediction tests showed R² goes catastrophically negative when crossing regime boundaries
 
@@ -561,10 +561,10 @@ Sequential ridge regression on detrended + normalized CO₂ over 0–66 Ma:
 
 | Layer | Cumulative R² | ΔR² |
 |---|---:|---:|
-| L1 (32-integer comb) only | 0.1611 | 0.1611 |
-| + L2 (405k + 202k + 135k) | 0.1610 | +0.0000 |
-| + L3 (6 Cenozoic transitions inside window) | **0.7626** | **+0.6016** |
-| **Total** | **0.7626** | |
+| L1 (the 28 physical lines) only | <!--v:canonCenco2pipL1Only-->0.047<!--/v--> | <!--v:canonCenco2pipL1Only-->0.047<!--/v--> |
+| + L2 (the 405-kyr family) | — | <!--v:canonCenco2pipDeltaL2-->+0.000<!--/v--> |
+| + L3 (6 Cenozoic transitions inside window) | **<!--v:canonCenco2pipTotal-->0.692<!--/v-->** | **<!--v:canonCenco2pipDeltaL3-->+0.644<!--/v-->** |
+| **Total** | **<!--v:canonCenco2pipTotal-->0.692<!--/v-->** | |
 
 Different signature from EPICA: at 66-Myr scale **L3 carries 60% of the variance**. The orbital L1 oscillations time-average toward zero across many cycles; the Cenozoic CO₂ story is the discrete step-changes at major transitions.
 
@@ -589,9 +589,9 @@ The structural claim of doc 92 — that the **same L1 line set + L2 thermostat +
 
 | Dataset | Window | Proxy | R² breakdown | Total R² |
 |---|---|---|---|---:|
-| LR04 (Lisiecki & Raymo 2005) | 0–1 Ma (post-MPT) | benthic δ¹⁸O | L1 = 0.8702, +L2 = +0.0033, +L3 = +0 | **0.8735** |
-| EPICA (Bereiter 2015) | 0–800 kyr | atmospheric CO₂ | L1 = 0.8336, +L2 = +0.0115, +L3 = +0 | **0.8452** |
-| CenCO2PIP (Consortium 2023) | 0–66 Ma | atmospheric CO₂ (multi-proxy) | L1 = 0.1611, +L2 = +0.0000, +L3 = +0.6016 | **0.7626** |
+| LR04 (Lisiecki & Raymo 2005) | 0–1 Ma (post-MPT) | benthic δ¹⁸O | L1 = <!--v:canonPostMptL1Only-->0.780<!--/v-->, +L2 = <!--v:canonPostMptDeltaL2-->+0.000<!--/v-->, +L3 = <!--v:canonPostMptDeltaL3-->+0.000<!--/v--> | **<!--v:canonPostMptTotal-->0.780<!--/v-->** |
+| EPICA (Bereiter 2015) | 0–800 kyr | atmospheric CO₂ | L1 = <!--v:canonEpicaCo2L1Only-->0.724<!--/v-->, +L2 = <!--v:canonEpicaCo2DeltaL2-->+0.000<!--/v-->, +L3 = <!--v:canonEpicaCo2DeltaL3-->+0.000<!--/v--> | **<!--v:canonEpicaCo2Total-->0.724<!--/v-->** |
+| CenCO2PIP (Consortium 2023) | 0–66 Ma | atmospheric CO₂ (multi-proxy) | L1 = <!--v:canonCenco2pipL1Only-->0.047<!--/v-->, +L2 = <!--v:canonCenco2pipDeltaL2-->+0.000<!--/v-->, +L3 = <!--v:canonCenco2pipDeltaL3-->+0.644<!--/v--> | **<!--v:canonCenco2pipTotal-->0.692<!--/v-->** |
 
 (Breakdowns are the 32-integer-stage fit reports; current canonical totals: post-MPT <!--v:canonR2PostMpt-->0.7804<!--/v-->, EPICA <!--v:canonR2Epica-->0.7238<!--/v-->, CenCO2PIP 0.7626 — the generated canonical-r2 block in §9.)
 
