@@ -16,11 +16,11 @@ runs (so a number here can never be stale; `npm run docs:tables` fails if
 it is). The acceptance test is external: a chain counts as understood when
 the owner reproduces its values in a spreadsheet from this page alone.
 
-**The H-role column** is the audit's record: it classified where the retired
-fitted unit (13.011 × the J2000 luni-solar precession period) once entered
-each formula — as a unit (**U**), as a proxy for the tidal spin history
-(**P**), as a comb basis (**C**) or as a lattice claim (**L**). Since plan 09
-(model v24.0) no formula carries it; the dispositions are [doc 109 §23](109-model-nbody-engine.md).
+The tables once carried an **H-role column** — the audit's classification of
+where the retired fitted unit (13.011 × the J2000 luni-solar precession
+period) entered each formula, as a unit, a proxy for the tidal spin history,
+a comb basis or a lattice claim. Since plan 09 (model v24.0) no formula
+carries it, and the column is gone; the dispositions are [doc 109 §23](109-model-nbody-engine.md).
 
 
 Types follow plan 02 D1: **A** long-term frequency/mean · **B** present-epoch
@@ -395,7 +395,6 @@ update (`_applyEngineEarthFrame`, relative to the J2000 world frame
 `computeSceneWorldFrameJ2000`): the axis is the hybrid's ŝ(t) on the ecliptic of
 date; the perihelion pair hangs on Earth's pivot and is world-placed every
 frame. The Sun's declination at the June solstice is the scene's ε.
-H-role: —.
 
 ### 4.3 The hybrid — one torque law on the dynamical orbit plane
 
@@ -594,8 +593,8 @@ on the recession history. Chain 6 is the same question for the seven
 planets: the precession constant from each planet's OWN quadrupole and spin
 with its regular satellites, on the model's OWN orbit and orbit-plane
 history. Engine: the orbital dynamics engine's chain and ζ tables + the
-cited spin inputs. H-role: **—** (H does not enter; the retired device rows
-were **L**).
+cited spin inputs. The retired unit never entered this chain (its device
+rows were lattice claims, deleted).
 
 ### 6.1 The formula and its inputs
 
