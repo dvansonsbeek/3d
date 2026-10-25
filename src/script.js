@@ -34,6 +34,11 @@ import { FRAMEWORK_IMAGES } from './framework-images.js';
 // first; on a miss the same path is read from the repository (the `main`
 // branch — the site no longer depends on GitHub's renamed-branch alias).
 const REPO_RAW_URL = 'https://raw.githubusercontent.com/dvansonsbeek/3d/main/';
+// The page's opt-in flags (index.html?perf=1&dpr=1.5&aa=0&shadows=0): `perf`
+// the frame-time readout, `dpr` a fixed pixel ratio, `aa` / `shadows` the two
+// GPU levers off — the A/B switches for a frame-rate report (doc 52 Part 4b).
+// Nothing changes without them.
+const URL_FLAGS = new URLSearchParams(window.location.search);
 /** Fetch a repo-relative JSON file: the local copy, then the repository. Parcel's
  *  dev server answers an unknown path with index.html (HTTP 200), so a reply
  *  that is not JSON counts as a miss. Resolves null when every source fails.
@@ -6718,8 +6723,8 @@ const baseCamDistance = camera.position.length();
 const scene = new THREE.Scene();
 scene.background = new THREE.Color( o.background );
 
-const renderer = new THREE.WebGLRenderer({antialias: true});
-renderer.shadowMap.enabled = true;
+const renderer = new THREE.WebGLRenderer({ antialias: URL_FLAGS.get('aa') !== '0' });
+renderer.shadowMap.enabled = URL_FLAGS.get('shadows') !== '0';
 renderer.shadowMap.type = THREE.PCFShadowMap;
 
 // —– setup once —–
@@ -22952,7 +22957,7 @@ document.body.appendChild(dateHUD);
 // and the normal page are untouched. Headless profiling put the loop's JS at
 // ~5 ms a frame with 96 % of the frame outside JavaScript (the draw), which a
 // software GPU cannot speak for — this readout is how the owner's GPU speaks.
-const PERF_HUD = new URLSearchParams(window.location.search).has('perf');
+const PERF_HUD = URL_FLAGS.has('perf');
 const _perf = { gaps: [], js: [], longFrames: 0, switches: 0, lastHud: 0, el: null, line: '' };
 if (PERF_HUD) {
   _perf.el = document.createElement('div');
@@ -22986,7 +22991,8 @@ function _perfRecord(gapMs, jsMs) {
     `${(1000 / gapMed).toFixed(0)} fps · frame ${gapMed.toFixed(1)} ms (p95 ${q(_perf.gaps, 0.95).toFixed(1)}) · ` +
     `JS ${q(_perf.js, 0.5).toFixed(1)} ms (p95 ${q(_perf.js, 0.95).toFixed(1)}) · long frames ${_perf.longFrames} · ` +
     `pixel ratio ${renderer.getPixelRatio().toFixed(2)} (device ${(window.devicePixelRatio || 1).toFixed(2)}${lowPerformanceMode ? ', LOW mode' : ''}, switches ${_perf.switches}) · ` +
-    `${c.width}×${c.height} px · ${info.calls} draw calls · ${(info.triangles / 1000).toFixed(0)}k tri · step ${smoothedDeltaMs.toFixed(1)} ms · ${o.Run ? 'playing' : 'paused'}`;
+    `${c.width}×${c.height} px · ${info.calls} draw calls · ${(info.triangles / 1000).toFixed(0)}k tri · step ${smoothedDeltaMs.toFixed(1)} ms · ` +
+    `aa ${URL_FLAGS.get('aa') === '0' ? 'off' : 'on'} · shadows ${URL_FLAGS.get('shadows') === '0' ? 'off' : 'on'} · ${o.Run ? 'playing' : 'paused'}`;
   _perf.el.textContent = _perf.line;
 }
 
@@ -23333,7 +23339,8 @@ function render(now) {
   // 10) Draw
   renderer.render(scene, camera);
   if (needsLabelUpdate) {
-    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    // (the label layer's size follows the window in onWindowResize; setting it
+    // here on every label pass re-styled the layer 30× a second for nothing)
     labelRenderer.render(scene, camera);
     needsLabelUpdate = false;
   }
@@ -35364,6 +35371,8 @@ function moveModel(pos) {
 }
 
 function getOptimizedPixelRatio() {
+  const forced = Number(URL_FLAGS.get('dpr'));
+  if (forced > 0) return Math.min(Math.max(forced, 0.5), 3);   // the A/B flag: a fixed ratio
   const dpr = window.devicePixelRatio || 1;
   const smallScreen = Math.min(window.innerWidth, window.innerHeight) < 768;
 
@@ -37119,7 +37128,10 @@ function updatePredictions() {
       }
       _cpPanelCache.year = cpYear;
       _cpPanelCache.vals = vals;
-      _cpPanelCache.holdMs = Math.max(300, 10 * (performance.now() - nowMs));
+      // floor 1 s (was 300 ms): at 1,000 yr/s the year changes every frame and the
+      // four cardinal solves re-ran three times a second — 9 % of the frame
+      // budget at deep time for display rows that change in the fourth digit
+      _cpPanelCache.holdMs = Math.max(1000, 10 * (performance.now() - nowMs));
     }
   }
   for (const cp of ['SS', 'WS', 'VE', 'AE']) {

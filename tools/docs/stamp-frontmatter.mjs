@@ -62,9 +62,11 @@ const HISTORICAL = new Set([]);
 const SUPERSEDED = new Set([]);
 // The RECORDS — finished measurement records, stamped once at the version they
 // measured against, listed by doc NUMBER (the doc's identity; a title is not a
-// classifier). Doc 109: the N-body audit and the plan 07–11 retirement record —
-// it calls itself a record and no generator writes into it.
-const RECORD_DOC_NUMBERS = new Set(['109']);
+// classifier). Empty today: doc 109 held the status for a day (plan 18) and left
+// it again — it carries 14 live value tags and its §23 retirement record keeps
+// growing with the model, so a stamp frozen at v26.5 under current text misled
+// the owner. A document joins this set only when nothing in it moves any more.
+const RECORD_DOC_NUMBERS = new Set([]);
 
 // ── Sources — read, never recompute ─────────────────────────────────────────
 const modelVersion = JSON.parse(readFileSync(

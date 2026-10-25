@@ -145,8 +145,46 @@ function createMoonArguments({ constants, fns }) {
     }
     return kPl;
   }
+  // ── Deep-time carrier tables ────────────────────────────────────────────────
+  // In the era (|T| ≤ CARRIER_DENSE_CY = 250 kyr) each carrier is the Simpson
+  // sum below, untouched — the certified numbers. Beyond, the integral
+  // continues from the dense edge on a cumulative table of CARRIER_CELL_CY
+  // cells (1 kyr; per-cell 3-point Simpson, a 3-point Simpson over the
+  // partial last cell), grown in CARRIER_CHUNK cells in the direction asked
+  // for. The former form re-integrated the whole span from J2000 on EVERY
+  // call with N ∝ |T| nodes — 77 evaluations of the e channel at 300 kyr,
+  // 2,500 at 10 Myr, per lunar argument set and frame — the deep-time
+  // playback cost the owner measured (the loop's JS at 190 ms a frame).
+  const CARRIER_DENSE_CY = 2500, CARRIER_CELL_CY = 10, CARRIER_CHUNK = 2500;
+  /** @param {(t: number) => number} f the SCALED integrand per century
+   *  @param {(T: number) => number} dense the in-era Simpson (its value at ±CARRIER_DENSE_CY seeds the table)
+   *  @returns {(T: number) => number} */
+  function makeDeepCarrier(f, dense) {
+    /** @type {{ fwd: number[] | null, bwd: number[] | null }} */
+    const sides = { fwd: null, bwd: null };
+    return (T) => {
+      if (Math.abs(T) <= CARRIER_DENSE_CY) return dense(T);
+      const dir = T > 0 ? 1 : -1;
+      let cum = dir === 1 ? sides.fwd : sides.bwd;
+      if (!cum) { cum = [dense(dir * CARRIER_DENSE_CY)]; if (dir === 1) sides.fwd = cum; else sides.bwd = cum; }
+      const dist = Math.abs(T) - CARRIER_DENSE_CY;
+      const k = Math.floor(dist / CARRIER_CELL_CY);
+      let target = cum.length;
+      while (target < k + 2) target += CARRIER_CHUNK;
+      for (let i = cum.length; i < target; i++) {
+        const t0 = dir * (CARRIER_DENSE_CY + (i - 1) * CARRIER_CELL_CY), t1 = t0 + dir * CARRIER_CELL_CY;
+        cum.push(cum[i - 1] + dir * (f(t0) + 4 * f((t0 + t1) / 2) + f(t1)) * (CARRIER_CELL_CY / 6));
+      }
+      const ta = dir * (CARRIER_DENSE_CY + k * CARRIER_CELL_CY);
+      const hp = T - ta;
+      return cum[k] + (f(ta) + 4 * f(ta + hp / 2) + f(T)) * (hp / 6);
+    };
+  }
+
+  /** The planetary carrier's SCALED integrand, k_PL · (e² − e0²), per century. @param {number} t */
+  const planetaryIntegrand = (t) => { const e = eccAt(t * 100); return kPlValue() * (e * e - eccE0 * eccE0); };
   /** @param {number} T @returns {number} */
-  function planetaryCarrier(T) {
+  function planetaryCarrierDense(T) {
     if (T === 0) return 0;
     const k = kPlValue();
     // The channel's e0 anchor CONST — not eccAt(0), which under integrated
@@ -160,12 +198,12 @@ function createMoonArguments({ constants, fns }) {
     for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
     return k * sum * h / 3;
   }
+  const planetaryCarrier = makeDeepCarrier(planetaryIntegrand, planetaryCarrierDense);
 
   /** @type {{eps0: number, C: number} | null} */
   let obl = null;
-  /** @param {number} T @returns {number} */
-  function obliquityCarrier(T) {
-    if (T === 0) return 0;
+  /** The obliquity carrier's normalization, once. @returns {{eps0: number, C: number}} */
+  function oblInit() {
     if (obl === null) {
       // (d′): when the of-date rate completion is live, its ∫(p_dyn − p_kin)
       // carries the model-native share of the precession ACCELERATION
@@ -179,14 +217,23 @@ function createMoonArguments({ constants, fns }) {
       const epsDot = computeObliquityEarth(2050) - computeObliquityEarth(1950);
       obl = { eps0, C: 2 * T2_OBL / epsDot };
     }
+    return obl;
+  }
+  /** The obliquity carrier's SCALED integrand, C · (ε − ε0), per century. @param {number} t */
+  const obliquityIntegrand = (t) => { const O = oblInit(); return O.C * (computeObliquityEarth(2000 + t * 100) - O.eps0); };
+  /** @param {number} T @returns {number} */
+  function obliquityCarrierDense(T) {
+    if (T === 0) return 0;
+    const O = oblInit();
     /** @param {number} t */
-    const f = (t) => computeObliquityEarth(2000 + t * 100) - /** @type {{eps0: number, C: number}} */ (obl).eps0;
+    const f = (t) => computeObliquityEarth(2000 + t * 100) - O.eps0;
     const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 2000));
     const h = T / N;
     let sum = f(0) + f(T);
     for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-    return /** @type {{eps0: number, C: number}} */ (obl).C * sum * h / 3;
+    return O.C * sum * h / 3;
   }
+  const obliquityCarrier = makeDeepCarrier(obliquityIntegrand, obliquityCarrierDense);
 
   // ── Secular-ë completion carrier (ṅ campaign, plan §12i item 0 (c)) ──────
   // The certified snapshot's Lp T³/T⁴ tail is DERIVED physics (v4 D3,
@@ -234,6 +281,10 @@ function createMoonArguments({ constants, fns }) {
       const env = Math.cos(Math.PI / 2 * q) ** 2;
       return (0.5 * S.dd2 * t * t + S.d3Sec * t * t * t / 6) * env;
     };
+    // Beyond the era the envelope has long closed (|t| ≥ Tq ≈ 279 cy → 0): the
+    // integral is the constant to ±Tq, so integrate exactly that span instead of
+    // N ∝ |T| nodes of zeros (in-era calls untouched).
+    if (Math.abs(T) > CARRIER_DENSE_CY) T = Math.sign(T) * S.Tq;
     const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 2000));
     const h = T / N;
     let sum = f(0) + f(T);
@@ -374,7 +425,18 @@ function createMoonArguments({ constants, fns }) {
    *  (the anchors are measured against exactly this).
    *  @param {number} jd
    *  @returns {{Lp: number, w: number, om: number, Lsun: number, ws: number, dy: number} | null} */
+  /** @type {number} */ let _partsJd = NaN;
+  /** @type {ReturnType<typeof fwArgsDeepPartsAt>} */ let _partsLast = null;
+  /** The parts at a JD — memoized on the exact JD: a frame asks the same instant for
+   *  the Moon, the umbra disc and the element rows. @param {number} jd */
   function fwArgsDeepParts(jd) {
+    if (jd === _partsJd && _partsLast !== null) return _partsLast;
+    const P = fwArgsDeepPartsAt(jd);
+    _partsJd = jd; _partsLast = P;
+    return P;
+  }
+  /** @param {number} jd */
+  function fwArgsDeepPartsAt(jd) {
     const A = bundle;
     if (argsY0 === null) argsY0 = jdToSIyear(j2000JD);
     const y = jdToSIyear(jd);

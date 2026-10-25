@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.6
+modelVersion: v26.7
 coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
@@ -476,7 +476,12 @@ its average equals the average gap, so the clock still tracks wall time), and
 whether the scene is playing.
 Clicking the line copies it, with the browser's user-agent string appended,
 to the clipboard and to the console, ready to paste into a report. It is off
-without the flag and runs nothing then. Reading it: JavaScript time
+without the flag and runs nothing then. Three more flags are the A/B levers
+for a GPU-bound frame rate, each a fixed setting for that page load:
+`dpr=1.5` a fixed pixel ratio (the default caps the device's at 2), `aa=0`
+antialiasing off, `shadows=0` shadow maps off; the readout names the
+antialiasing and shadow state so a pasted line says which configuration it
+measured. Reading it: JavaScript time
 near the frame gap means the model is the cost; JavaScript at a few
 milliseconds with a long frame gap means the draw is; a rising switch count
 means the pixel-ratio hysteresis is oscillating.
