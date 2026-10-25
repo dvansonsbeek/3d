@@ -2959,6 +2959,17 @@ export const VALUES = {
         o.canonR2Stitched = { get: () => cc().meta.stitched_lr04_r2, render: f2, note: 'three-regime stitched canonical fit evaluated over the full LR04 record (export_climate_formula_browser.py)' };
         o.canonR2CenCo2pip = { get: () => cf().cenco2pip_evaluation.r2_l1_l2_l3, render: f4, note: 'canonical formula on CenCO2PIP CO₂ (0–66 Ma)' };
         o.canonL5FloorPostMpt = { get: () => 100 * (1 - cf().regime_fits['post-mpt'].r2_l1_l2_l3), render: (v) => String(Math.round(v)), unit: '%', note: 'post-MPT L5 stochastic floor, 1 − R²' };
+        // The lunar finder's completeness over the NASA Five Millennium Canon (data/lunar-canon-recall.json,
+        // tools/verify/lunar-canon-recall.js): −1999…+3000, UT axis, ±3 h and same type = matched; the former
+        // console-test L-4, promoted in the third maintenance round.
+        const lcr = () => rd('data/lunar-canon-recall.json');
+        // (the `lunarCanon*` keys above are lunar-alignment's 1600–2200 geometry; these are the full-canon recall)
+        o.lunarCanonRecallEvents = { get: () => lcr().canonEvents, render: (v) => Number(v).toLocaleString('en-US'), note: 'NASA Five Millennium Lunar Canon events in −1999…+3000 the recall is scored on' };
+        o.lunarCanonRecallPercent = { get: () => lcr().recallPercent, render: f2, unit: '%', note: 'canon lunar eclipses the model finder finds within ±3 h (any type)' };
+        o.lunarCanonRecallMissed = { get: () => lcr().nasaOnly, render: (v) => String(v), note: 'canon lunar eclipses the model finder does NOT find within ±3 h' };
+        o.lunarCanonRecallTypeAccuracyPercent = { get: () => lcr().typeAccuracyPercent, render: f2, unit: '%', note: 'matched canon eclipses whose type (penumbral / partial / total) the finder reproduces' };
+        o.lunarCanonRecallTightPercent = { get: () => lcr().tightRecallPercent, render: f2, unit: '%', note: 'canon eclipses matched within ±15 min of NASA\'s UT — the ΔT-agreement sub-statistic' };
+        o.lunarCanonRecallModelOnly = { get: () => lcr().modelOnly, render: (v) => String(v), note: 'finder events with no canon counterpart within ±3 h (penumbral grazers at the limit)' };
         // T7 — the fixed-phase L1 test (data/t7-fixed-phase-l1.json): the model's own e, ε, e·sin ϖ with one
         // coefficient each + one climate lag, against the shipped free-phase L1 — the description-vs-prediction split doc 92 quotes.
         const t7 = () => rd('data/t7-fixed-phase-l1.json');
