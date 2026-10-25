@@ -80,7 +80,7 @@ the lattice tested at its own quantity type).
 Earth's own motion — spin, the composed precession clock T_p(t), tides, the cardinal
 points, the one-source movement — stays on the engine-K hierarchy and is
 documented where it lives: [doc 11](11-length-day-year-formulas.md)
-(years and days), [doc 65](65-equation-of-center.md) (the Sun wheel),
+(years and days), [doc 41](41-scene-graph-hierarchy.md) (the Sun's placement),
 [doc 40](40-architecture.md) (the one-source movement),
 [doc 99](99-expanding-solar-system-resonance-theory.md) (ESSRT).
 

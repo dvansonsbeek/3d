@@ -150,18 +150,9 @@ The Bond flag is what the eclipse window shows it to be — the periodic part of
 
 Evidence: `data/deltaT-swing-difference-tones.json`.
 
-### Beat closure (measured in the retired lattice framing)
+### Beat closure — archived
 
-The beat of two tones P₁, P₂ is 1/|1/P₁ − 1/P₂|. This study ran in the lattice framing, where the stack's periods carried labels Y₈/n (Y₈ eight intervals of the retired unit) and the beat read **beat(Y₈/n₁, Y₈/n₂) = Y₈/(n₁−n₂)** — "lattice closure". The labels carry no physics (T5 measured them at chance level) and the unit left the model at plan 09; the Δn column below is the record of that framing, and the periods are the same doubles stated in years (the fit file's `period_yr`). The shipped pairs give:
-
-| Pair | Δn | Period |
-|---|---|---|
-| bond − hallstatt | 726 | 3,695 yr |
-| jose4 − jose5 | 760 | 3,530 yr |
-| bond − jose4 | 1919 | 1,398 yr |
-| hallstatt − jose5 | 1885 | 1,423 yr |
-| bond − jose5 | 1159 | 2,315 yr |
-| hallstatt − jose4 | 2645 | 1,014 yr |
+The closure of the eigenperiod under difference tones was measured in the retired lattice framing and is archived; the eigenperiod is a period stated in years (`T0_yr`, below).
 
 ### Findings
 
@@ -196,42 +187,6 @@ Three formula candidates were fitted to the post-stack residual with the H/46-gu
 | A2 free ring-down (transient) | T₀, Q, a, b | 53 s | T₀ = 3,800 yr, Q = 1.75 | yes |
 
 Two structurally different models independently select **T₀ ≈ 3.8–3.9 kyr** — inside the published axiMC eigenmode range they were not told about — while the flat rectifier fails: **the frequency selection of a resonance is required**, not passive low-passing. A2's Q = 1.75 gives a decay time ~2,100 yr (right order for "full-strength in antiquity, faded by the telescope era"). Both variants nevertheless fail the modern-window guards (constant or insufficiently decayed amplitude), which motivates the channel-4 form below. Five independent arrows now point at one object: the blind two-tone scan (~3.7–3.8 kyr), the bond−hallstatt difference tone (3,695 yr), the CFF core-flow spectrum (3,020–3,330 yr), and both resonator fits.
-
-### The interaction network: Δn = 34 phase-locking
-
-Evidence: `data/deltaT-swing-interaction-network.json`.
-
-All four flags interact — cooperatively, not democratically. Weighting each pair's forcing (AᵢAⱼ/2) by the eigenmode gain |H| at its beat frequency (T₀ = 3,900 yr, Q = 8):
-
-| Pair | Beat | Share of response |
-|---|---|---|
-| bond × hallstatt | 3,695 yr | 86.9% |
-| jose5 × jose4 | 3,530 yr | 6.1% |
-| bond × jose5 | 2,315 yr | 5.1% |
-| bond × jose4 | 1,398 yr | 1.3% |
-| hallstatt × jose5 | 1,423 yr | 0.4% |
-| hallstatt × jose4 | 1,014 yr | 0.2% |
-
-The key structural fact: the difference-tone spectrum self-organizes into **locked bands**. bond−hallstatt (Δn 726) and jose4−jose5 (Δn 760) are split by only Δn = 34 → their relative phase turns once per 78,898 yr (the retired lattice's 34th line of its eight-unit interval) — rigidly phase-locked over any Holocene window, forming **one coherent ~3.6-kyr band carrying 93% of the response that requires all four flags to build**. The same Δn = 34 splitting locks hall−jose5 (1885) with bond−jose4 (1919) at ~1.4 kyr. Roles separate cleanly: the locked ~3.6-kyr band is the *engine* (power); the fast hallstatt×jose4 envelope (1,014 yr) is the *timer* (it sets the in-window forcing-extremum epochs). Driving-side correlations indicate the coupling is selective (pair-dependent efficiency/sign; uniform F² does worse than individual pairs), though with ~6 effective dof in-window no single-pair attribution is decisive.
-
-### Excitation: the recovered driving history
-
-Evidence: `data/core-mantle-excitation-inversion.json`.
-
-Because the oscillator equation is known, the forcing is recoverable by deconvolution: f(t) = ÿ + (ω₀/Q)ẏ + ω₀²y. Applied to the observed LOD residual and the CFF core-flow ΔLOD: (a) the driving is **smooth, not impulsive** (kurtosis within phase-randomized surrogates — continuous envelope-modulated forcing, not discrete kicks); (b) in the well-measured window the forcing reverses sign across the ~900 CE turnaround — a push centered at 730 CE and a pull at 1220 CE — landing **7–10 yr from consecutive extrema of the hallstatt×jose4 envelope** (deterministic max 723 / min 1230, zero free parameters); (c) a third appearance of the low-pass signature: the recovered *forcing* correlates with pair products containing sum tones (bond×hall's 914-yr component) while the *response* contains none (|H| at 914 yr ≈ 0.06). Statistical weight of the timing link: p = 0.02 uncorrected, ~0.06 after multiplicity, n = 2 events, partial circularity (stack phases fitted to the same eclipse record) — **suggestive, not established; "as-if" status**.
-
-### Channel-4 feasibility: the first guard-passing model
-
-Evidence: `data/core-mantle-channel4-feasibility.json`.
-
-Two implementation routes tested:
-
-- **5th stack cycle (constant amplitude): architecturally dead.** The modern window caps a persistent 1,014-yr tone at 18.5 s (the free fit wants 59 s); at that ceiling it absorbs 1.7 s of RMS. Constant-amplitude cycles cannot carry a decayed signal — the same wall the h253 experiment hit, now understood physically.
-- **4th force (transient resonator): feasible.** The fully decaying composite — eigenmode ring-down + hallstatt×jose4 drive tone at the *locked* predicted phase (φ_hall − φ_jose4 = +103.3°), all sharing one episodic decay envelope — reaches **RMS 118.8 s (80% of the swing's variance) with ALL guards passing** (modern 0.151 ms/day, shape 0.79 s, δLOD(2000) = 0.098) at T₀ = 4,000 yr, Q = 0.55, decay ~700 yr. Caveats: Q sits at the near-critical grid edge (in-window the "oscillation" is effectively one aperiodic arc), and the launch epoch is pinned at −720 (record start) for want of a physical excitation convention.
-
-**The formula as it stands:**
-
-> **channel 4 = env(t; T₀, Q, t_launch) × [eigenmode ringing + locked drive-tone response], driven by the Δn = 34-locked four-cycle beat band through quadratic (low-pass) coupling** — T₀ ≈ 3.8–4.0 kyr and low Q externally corroborated (axiMC); drive-phase attribution as-if (n = 2).
 
 ### The shipped form (joint world)
 

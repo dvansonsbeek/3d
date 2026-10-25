@@ -141,58 +141,7 @@ WebGL Render (60 FPS target)
 
 ## Project Structure
 
-```
-3d/
-├── src/
-│   ├── index.html              # Entry point (minimal HTML wrapper)
-│   ├── script.js               # Main application (~39,000 lines)
-│   └── style.css               # GUI and label styling
-│
-├── public/
-│   ├── *.jpg, *.png            # Planetary textures, flat in public/ (Earth day/night/clouds/specular/bump,
-│   │                           #   Mercury–Neptune, the Sun, the Moon, the starfield)
-│   │
-│   └── input/
-│       ├── astro-reference.json       # IAU/JPL reference values (J2000 elements, periods) + the scene epoch — the ONE input file (model-parameters.json deleted, plan 11)
-│       ├── meeus-lunar-tables.json    # Meeus Ch.47 lunar correction tables
-│       ├── constellations.json        # 88 IAU constellation line patterns
-│       └── stars.json                 # Yale Bright Star Catalog (~9,000 stars)
-│
-├── data/
-│   ├── 01-holistic-year-objects-data.xlsx  # Record: the retired device's full-window export (untracked)
-│   ├── 02-solar-measurements-window.csv   # Cardinal points, year lengths, −4000…+4000 (gitignored; npm run fit:6a2)
-│   ├── reference-data.json                # JPL-enriched verification data
-│   └── balance-presets.json               # 15 deep-analysis balance presets (96 candidates → 15 survivors)
-│
-├── packages/                   # Published npm workspace (@essrt scope)
-│   ├── physics/                # @essrt/physics — the full analytic model incl. the
-│   │                           #   certified eclipse chain (framework-native Sun,
-│   │                           #   full-series Moon, besselian umbra) and MCP/api
-│   │   └── src/model.js        #   createModel()'s assembly: a composer of the named
-│   │       + src/model/        #   slices (derived-constants → deep-time-chain → … →
-│   │                           #   lunar-theory → sun-and-eclipses → surface)
-│   ├── model-values/           # @essrt/model-values — the rendered value registry
-│   ├── api/                    # the published API + MCP server (test:api, test:mcp)
-│   ├── reference/              # @essrt/reference — VSOP87 / MPP02 ghosts, published curves (comparison only)
-│   ├── data/, analysis/, render/, simulator/   # the datasets, the analysis helpers, the headless renderers, the simulator package
-│   ├── fitting/                # Fitter implementations (tools/fit are CLI shims)
-│   └── fixtures/               # Golden masters for the regression gates
-│
-├── tools/
-│   ├── fit/                    # Pipeline CLI shims (implementations in packages/fitting)
-│   ├── verify/                 # the gates and the artifact generators — every script fails or writes (`npm run test:verify:list`)
-│   ├── explore/                # Exploratory analysis scripts (~110 tracked one-offs — a script stays while something names it; closed-campaign instruments live in the untracked archive/, git history is the record)
-│   ├── constants/              # generate.mjs — the generated-constants pipeline
-│   ├── docs/                   # Doc machinery (marker renderer, frontmatter stamper)
-│   ├── lib/                    # Shared libraries (constants, scene-graph, orbital-engine, deep-time)
-│   └── results/                # Baseline records (chain-era comparisons live in data/chain-vs-jpl-rms.json)
-│
-├── docs/                       # Documentation (36 docs; the numbers are stable identifiers, with gaps — docs/00 is the index)
-│
-├── package.json                # Dependencies and scripts
-├── .gitignore
-└── README.md
-```
+The repository's layout — the browser monolith, the Node engine in `tools/lib/`, the published packages, the gates and generators in `tools/verify/`, the fitters, the shipped artifacts — is stated once in [CLAUDE.md § Key paths](../CLAUDE.md); `npm run test:verify:list` prints the gate/generator classification and `npm run regen:cascade` the artifact order. (The tree that stood here drifted on every count it carried.)
 
 ---
 
@@ -299,81 +248,7 @@ The monolithic script.js (~39,000 lines) is organized into logical sections. Con
 
 ### The `o` State Object
 
-The global state object `o` contains all simulation state:
-
-```javascript
-let o = {
-  // ═══════════════════════════════════════════════════════════════
-  // TIME & SIMULATION CONTROL
-  // ═══════════════════════════════════════════════════════════════
-  pos: 0,                        // Current position in time (years from epoch)
-  Run: false,                    // Simulation running flag
-  speed: 1,                      // Speed multiplier (-5 to +5)
-
-  // ═══════════════════════════════════════════════════════════════
-  // DATE/TIME DISPLAY
-  // ═══════════════════════════════════════════════════════════════
-  Date: "",                      // Current date string (set dynamically)
-  Time: "00:00:00",              // Current time string (GUI bound)
-  julianDay: "",                 // Julian Day Number (set dynamically)
-
-  // ═══════════════════════════════════════════════════════════════
-  // EARTH ORBITAL PARAMETERS (computed at runtime by updatePredictions)
-  // ═══════════════════════════════════════════════════════════════
-  eccentricityEarth: 0,          // Current orbital eccentricity
-  obliquityEarth: 0,             // Current axial tilt (degrees)
-  earthInvPlaneInclinationDynamic: 0,  // Inclination to invariable plane
-
-  // ═══════════════════════════════════════════════════════════════
-  // PLANET ANOMALIES (Per-planet calculations)
-  // ═══════════════════════════════════════════════════════════════
-  mercuryMeanAnomaly: 0,         mercuryTrueAnomaly: 0,
-  venusMeanAnomaly: 0,           venusTrueAnomaly: 0,
-  earthMeanAnomaly: 0,           earthTrueAnomaly: 0,
-  marsMeanAnomaly: 0,            marsTrueAnomaly: 0,
-  jupiterMeanAnomaly: 0,         jupiterTrueAnomaly: 0,
-  saturnMeanAnomaly: 0,          saturnTrueAnomaly: 0,
-  uranusMeanAnomaly: 0,          uranusTrueAnomaly: 0,
-  neptuneMeanAnomaly: 0,         neptuneTrueAnomaly: 0,
-
-  // ═══════════════════════════════════════════════════════════════
-  // INVARIABLE PLANE SYSTEM
-  // ═══════════════════════════════════════════════════════════════
-  mercuryHeightAboveInvPlane: 0,
-  venusHeightAboveInvPlane: 0,
-  earthHeightAboveInvPlane: 0,
-  // ... all planets ...
-  massWeightedBalance: 0,        // Mass-weighted height balance
-  planetsAboveInvPlane: 0,       // Count above plane
-  planetsBelowInvPlane: 0,       // Count below plane
-
-  // ═══════════════════════════════════════════════════════════════
-  // BALANCE TREND ANALYSIS
-  // ═══════════════════════════════════════════════════════════════
-  balanceTrackingActive: false,
-  balanceTrackingStartYear: 0,
-  balanceYearsTracked: 0,
-  balanceSampleCount: 0,
-  balanceCumulativeSum: 0,
-  balanceLifetimeAverage: 0,
-  balanceMinSeen: 0,
-  balanceMaxSeen: 0,
-
-  // ═══════════════════════════════════════════════════════════════
-  // VALIDATION (Option A vs B)
-  // ═══════════════════════════════════════════════════════════════
-  calculatedPlaneTilt: 0,
-  calculatedAscendingNode: 0,
-  jupiterAngularMomentumPercent: 0,
-  saturnAngularMomentumPercent: 0,
-  optionABDifference: 0,
-
-  // ... additional properties ...
-};
-
-// Visual settings are on a separate params object:
-const params = { sizeBoost: 0 };   // Planet size multiplier
-```
+`let o = {` in `src/script.js` is the global state object — the GUI bindings, the time (`o.pos`, `o.julianDay`, `o.Date`, `o.Time`, `o.currentYear`), the flags. The Tweakpane bindings read and write it directly, and any code that changes it sets `positionChanged = true` so the throttled sub-systems run once more (see the render loop below). The field list is the code's; a copy here drifted.
 
 ### State Update Flow
 
@@ -593,102 +468,7 @@ ten-body convention; Ceres remains a force-only perturber in the N-body run.
 
 ### Main Panel Organization
 
-The GUI is built with Tweakpane v4, using `addBinding()` for data-bound controls,
-`addButton()` for actions, and `addFolder()` for collapsible sections.
-
-```
-Tweakpane Root ("Expanding Solar System Resonance Theory")
-│
-├─▼ About                          (collapsed)
-│  ├─▼ Parameter Accounting       (custom DOM: two engines, three ledgers)
-│  ├─▼ Calibration Inputs (75)    (from astro-reference.json: Earth & Time 26, Moon 14, Planets 5×7)
-│  └─ Website link                (holisticuniverse.com)
-│
-├─ Date                          [binding: text input]
-├─ Time                          [binding: text input]
-├─ JD                            [binding: numeric]
-├─ Perihelion Date               [hidden]
-│
-├─▼ Simulation Controls
-│  ├─ Run                        [binding: toggle]
-│  ├─ 1 second equals            [binding: dropdown]
-│  ├─ Speed                      [binding: slider -5 to +5]
-│  ├─ Step Forward               [button]
-│  ├─ Step Backward              [button]
-│  ├─ Reset                      [button]
-│  ├─ Now                        [button]
-│  ├─ Enable Tracing             [binding: toggle]
-│  │  └─▼ Trace Selection
-│  │     ├─ Mercury              [binding: checkbox]
-│  │     ├─ Venus                [binding: checkbox]
-│  │     └─ ... all planets
-│  └─ Look At                    [binding: planet dropdown]
-│
-├─▼ Model Predictions               (compact inline Δ format, 1 row per prediction)
-│  ├─ Day Lengths                Model value  Δ IAU (inline)
-│  ├─ Solar Year                 Model value  Δ IAU (inline)
-│  ├─ Sidereal Year              Model value  Δ IAU (inline)
-│  ├─ Anomalistic Year           Model value  Δ IAU (inline)
-│  ├─ Precession Periods         Model value  Δ IAU (inline)
-│  └─ Orbital Elements           Model value  Δ ref (inline)
-│
-├─▼ Observed Positions               (3D scene measurements)
-│  ├─▼ Perihelion Angles          Geocentric / Heliocentric pairs
-│  ├─▼ Elongations
-│  ├─▼ [Planet subfolders]        RA, Dec, distances
-│  ├─▼ Helper Objects
-│  └─▼ Invariable Plane Analysis
-│     ├─ Mercury–Neptune (AU)       [live values]
-│     ├─ Mass Balance (AU)          [live value]
-│     ├─ Planets Above / Below      [counts]
-│     │
-│     ├─▼ Validate position (Option A vs B)
-│     │  ├─ Calc. Tilt (°)          [~1.5787°]
-│     │  ├─ Calc. Asc.Node (°)      [~107°]
-│     │  ├─ Jupiter L (%)           [~60%]
-│     │  ├─ Saturn L (%)            [~25%]
-│     │  └─ A vs B Diff (°)         [<0.1°]
-│     │
-│     └─▼ Balance Trend Analysis
-│        ├─ Start/Stop Tracking     [button]
-│        ├─ Tracking Active         [binding: toggle]
-│        ├─ Started (year)          [binding: value]
-│        ├─ Years Tracked           [binding: value]
-│        ├─ Sample Count            [binding: value]
-│        ├─ Cumulative Sum          [binding: value]
-│        ├─ Lifetime Avg (AU)       [KEY METRIC]
-│        ├─ Min Seen (AU)           [binding: value]
-│        ├─ Max Seen (AU)           [binding: value]
-│        └─ Reset Tracking          [button]
-│
-├─▼ Visualization                    (visual toggles)
-│  ├─ Zodiac                     [binding: toggle]
-│  ├─ Stars                      [binding: toggle]
-│  ├─ Constellations             [binding: toggle]
-│  ├─ Celestial Sphere           [binding: toggle]
-│  ├─ Ecliptic                   [binding: toggle]
-│  ├─ Invariable Plane           [binding: toggle]
-│  ├─▼ Tracing                  (chip-grid toggles by planet)
-│  └─▼ Show / Hide              (chip-grid toggles by planet)
-│
-├─▼ Reports                       [observed category]
-│  ├─▼ Planet Positions, Perihelion & Inclination
-│  ├─▼ Days & Years (combined solstice/equinox + year lengths)
-│  └─▼ Solar Day (analemma + day length by starting angle)
-│
-└─▼ Tools
-   ├─ [tab] Verification         (the model against references — "observed" colour)
-   │   ├─ Framework Verification            [button]
-   │   └─ Perihelion of Planets Verification [button]
-   ├─ [tab] Analysis             (the model's own predictions — "calculated" colour)
-   │   ├─ Planet Orbit Analysis             [button]
-   │   ├─ Earth–Moon Genesis Analysis       [button]
-   │   ├─ Earth Climate Analysis            [button]
-   │   └─ Earth dLOD/dt Analysis            [button]
-   └─▼ Standard Model overlay (VSOP87 · MPP02)  (ghost-body overlay)
-```
-
----
+The pane's folder tree is the code's — `setupGUI()`, the `addFolder` titles; [doc 50](50-ui-panels-reference.md) is the panel reference and [doc 02](02-user-guide.md) the user's walkthrough. A copy of the tree here drifted on every folder rename.
 
 ## Performance Optimizations
 
@@ -782,15 +562,6 @@ The balance calculation lives inside `updateInvariablePlaneBalance()`, summing `
 ---
 
 ## Future Considerations
-
-### Potential Improvements
-
-1. **Modularization** - Split monolithic script.js into ES6 modules
-2. **TypeScript** - Add type safety for orbital parameters
-3. **Testing** - Unit tests for astronomical calculations
-4. **Web Workers** - Offload heavy calculations from main thread
-5. **Texture Compression** - Use KTX2 for smaller downloads
-6. **Code Splitting** - Lazy load optional celestial bodies
 
 ### Known Limitations
 

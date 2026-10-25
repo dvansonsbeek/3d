@@ -489,6 +489,6 @@ subject of §1.8's projection analysis and transit test.
 ## Related Documents
 
 - [109-model-nbody-engine-and-lattice-test.md](109-model-nbody-engine-and-lattice-test.md) — the model's own N-body: audit, engine, frequencies, the lattice at its own quantity type, divisor restatement
-- [56-webgeocalc-explorer.md](56-webgeocalc-explorer.md) — the observed-rate explorer this document's comparisons cite
+- [50-ui-panels-reference.md](50-ui-panels-reference.md) § Perihelion of Planets Verification — the observed-rate panel this document's comparisons cite
 - [41-scene-graph-hierarchy.md](41-scene-graph-hierarchy.md) — why Earth-frame measurements inherit the precession layers
 - [99-expanding-solar-system-resonance-theory.md](99-expanding-solar-system-resonance-theory.md) — ESSRT: deep-time scaling of the precession period T_p(t)

@@ -39,7 +39,7 @@ If you read nothing else: [00](00-readme.md) this index → [99](99-expanding-so
 | # | Document | Description |
 |---|----------|-------------|
 | 99 | [Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | The theory: the two expansions — Earth's spin tier on the tidal history (the composed lunisolar precession clock: the day lengthens, the Moon recedes, the precession period grows), every orbit on the solar-mass history; the two-tier scaling split (the precession band moves with the clock, the 405-kyr metronome does not) confirmed at 1.4 and 2.46 Ga; the deep-time predictions and the falsification criteria |
-| 109 | [The model's own N-body: audit, engine, frequencies, lattice test](109-model-nbody-engine-and-lattice-test.md) | The re-evaluation record: the Wisdom–Holman engine reproduces every planet's rates from Newton + the measured masses (Mercury's −43″/cy closed by the 1PN term alone); the secular g/s to 0.1–1%; the lattice tested at its own quantity type (divisors retyped as means / present-epoch / window values); the bound experiments (§12) that showed the retired eccentricity law was only the epoch-local tangent of Earth's free eccentricity vector; §22 the record table of the comb-era research deleted at plan 09; §23 the planet-channel and era-device retirement record (plans 07–11) |
+| 109 | [The model's own N-body: engine, frequencies, the retirement record](109-model-nbody-engine-and-lattice-test.md) | The re-evaluation record: the Wisdom–Holman engine reproduces every planet's rates from Newton + the measured masses (Mercury's −43″/cy closed by the 1PN term alone); the secular g/s to 0.1–1%; the lattice tested at its own quantity type (divisors retyped as means / present-epoch / window values); the bound experiments (§12) that showed the retired eccentricity law was only the epoch-local tangent of Earth's free eccentricity vector; §22 the record table of the comb-era research deleted at plan 09; §23 the planet-channel and era-device retirement record (plans 07–11) |
 | 110 | [The calculation map](110-calculation-map.md) | The audit's instrument: every published quantity traced to its inputs, formula, engine/type, code location and LIVE value (script-written, freshness-gated) with an H-role column (the audit's record of which quantities rode the retired unit, and how) — the spreadsheet-checkable statement of what the model computes; chain 1 = Earth's eccentricity into the lunar chain |
 | 111 | [Measured traps and gate origins](111-measured-traps-and-gate-origins.md) | The record behind CLAUDE.md's one-line rules: each trap's measurement (numbers, commits, the gate that pins it), the browser tier's gates and the owner reports they were born from, and the falsification criterion's long form |
 
@@ -48,7 +48,6 @@ If you read nothing else: [00](00-readme.md) this index → [99](99-expanding-so
 | # | Document | Description |
 |---|----------|-------------|
 | 11 | [Day & Year Length Formulas](11-length-day-year-formulas.md) | Tropical year and day length: measurement methods, validation, the one-source year lengths and the three day bases |
-| 65 | [Equation of Center](65-equation-of-center.md) | The Sun wheel's variable-speed construction: the geometric/analytic split, the derived exact-Kepler corrector (default path), the certified-Sun δ overlay, and the registry-resident legacy harmonic layer |
 | 13 | [Perihelion Precession](13-mercury-precession-breakdown.md) | The two perihelion coordinates and their methods, the Earth-frame projection account (§1.8, gate-pinned for all seven planets), and the Laplace–Lagrange comparison |
 
 ### The planets
@@ -98,13 +97,9 @@ If you read nothing else: [00](00-readme.md) this index → [99](99-expanding-so
 |---|----------|-------------|
 | 40 | [Architecture](40-architecture.md) | Code structure, file organization, module responsibilities, and the one-source movement |
 | 41 | [Scene Graph Hierarchy](41-scene-graph-hierarchy.md) | Three.js nested rotation layers — the engine-K hierarchy and the chain rendering path |
-| 50 | [UI Panels Reference](50-ui-panels-reference.md) | Tweakpane control panel and sidebar implementations |
+| 50 | [UI Panels Reference](50-ui-panels-reference.md) | Every panel: the Planet Info sidebar, the invariable-plane panels, and the Tools-menu modals (Perihelion of Planets Verification, Earth Climate Analysis, Earth–Moon Genesis Analysis, Earth dLOD/dt Analysis, Framework Verification, Framework Images) with their code locations |
 | 51 | [Planet Orbit Analysis Reference](51-planet-inspector-reference.md) | Planet Orbit Analysis — the orbit of date from the N-body chain: sources, visual, camera, readouts |
 | 52 | [Analysis & Export Tools](52-analysis-export-tools.md) | Report generation, data export, the frame-time readout, and the map from the former console tests to their gates |
-| 56 | [Perihelion of Planets Verification](56-webgeocalc-explorer.md) | Tools-menu modal showing observed perihelion-precession history (JPL NAIF WebGeoCalc) per planet — tests the chain's own ϖ(t) against observation |
-| 57 | [Framework Verification](57-formula-verification.md) | Tools-menu modal comparing the model's predictions against published analytical formulas (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray) across the 11 verification categories |
-| 58 | [Earth Climate Analysis](58-climate-formula-explorer.md) | Tools-menu modal visualizing the climate formula against LR04 / CENOGRID / EPICA / CenCO2PIP |
-| 59 | [Earth–Moon Genesis Analysis](59-essrt-explorer.md) | Tools-menu modal for the deep-time evolution of the clock, LOD, year length and Moon distance under ESSRT |
 
 ---
 

@@ -127,8 +127,8 @@ the test dates and restores the epoch). Its longitude rows still read the
 ## 7. Export
 
 One **Export** button in the header prints the orbit picture of the selected
-planet at the scene date as the standard export page (doc 57, "The export
-standard"): the Orbit view drawn flat — the frame of §2 projected onto the
+planet at the scene date as the standard export page (the one every Tools
+panel prints — [doc 50](50-ui-panels-reference.md)): the Orbit view drawn flat — the frame of §2 projected onto the
 ecliptic of date, equinox to the right, longitude counter-clockwise — with
 the orbit split by its side of the ecliptic (green above, red below, the
 halves lightly shaded), the ecliptic ring at the semi-major axis, the line

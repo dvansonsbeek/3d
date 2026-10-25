@@ -6,7 +6,7 @@ across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
 **Scale:** `src/script.js` ~39,000 lines (the console-test folder, 13,000 lines, retired in plan 18 — its checks are gates) · `tools/` ~185 tracked scripts
-across 12 directories (plus the untracked local archives) · ~40 Python files · 36 docs (the retired docs are archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs) · one web UI (the simulator; the Data Explorer dashboard is retired).
+across 12 directories (plus the untracked local archives) · ~40 Python files · 31 docs (the retired docs and the record sections cut from the live ones are archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs) · one web UI (the simulator; the Data Explorer dashboard is retired).
 **`npm run check` is the enforced gate chain — the ONE list in package.json;
 CI runs it plus a headless-browser job and auto-deploys the simulator to
 GitHub Pages on green main.** Golden masters live in `packages/fixtures/`.

@@ -316,6 +316,10 @@ the 2000 equinoxes, browser ≡ Node to 0.000″. The Node fast Sun path
 
 ---
 
+### 7.3 The equation-of-centre split — historical note
+
+Before R4 the Sun's wheel realized Kepler's equation itself, and the retired doc 65 derived why the wheel needed only HALF the eccentricity: the scene draws the orbit as a circle whose centre is offset from Earth by e(t)·100 units, and that off-centre viewing position already supplies half of the first-order Keplerian speed variation (apparent angle ≈ M + e·sin M against the true anomaly's M + 2e·sin M), so an explicit equation-of-centre on top had to carry eoc = e − e/2 = e/2 — a double count with the full value made the seasons too asymmetric (measured: 14.7 h rms over the four cardinal points). Since R4 the engine places the Sun's wheel angle from the certified longitude every frame (`_applyEngineEarthFrame`, Part 7.2), so no equation-of-centre is evaluated for the Sun; the geometric offset arm (the −e(t)·100 position of the Perihelion Precession 2 centre) remains the one place the eccentricity enters the scene's geometry.
+
 ## Part 8: Moon Hierarchy
 
 The Moon has its own set of precession cycles nested within Earth's frame:
@@ -401,25 +405,9 @@ mirrors this wiring. Each planet's perihelion period is the chain's inertial aps
 
 ---
 
-## Part 10: How Rotations Compose
+## Part 10: How Rotations Compose — superseded
 
-### 10.1 The Transformation Chain
-
-To find any object's world position, the engine computes the product of all parent transformation matrices:
-
-```
-WorldMatrix = M_earth × M_inclinationPrecession × M_eclipticPrecession
-            × M_obliquityPrecession × M_perihelion1 × M_perihelion2
-            × M_barycenter × M_planet
-```
-
-### 10.2 Reference Frame Implications
-
-**When measuring from Earth's equatorial frame:** All precession layers apply, causing apparent fluctuations in measurements.
-
-**When measuring from ecliptic frame:** Bypass Earth's precession layers by reading directly from the planet's `precessionLayer.orbitObj.rotation.y`.
-
-This is why Mercury's perihelion precession appears to fluctuate when measured from Earth but is constant in the ecliptic frame (see [13 - Perihelion Precession](13-mercury-precession-breakdown.md)).
+The transformation chain of the former precession layers is archived. Since R4 the Earth frame is PLACED from the engine every frame (`_applyEngineEarthFrame`, Part 5) and the planets from the N-body chain (Part 9); nothing composes a pose from nested wheels any more.
 
 ---
 
@@ -449,27 +437,6 @@ For current values, see [Constants Reference](20-constants-reference.md).
 | Obliquity of date | the hybrid integration (`@essrt/physics` earth/deep-orbital-history) | its J2000 anchor the astro-reference input; the axis is engine-placed |
 | Eccentricity of date | the N-body series | the offset arm carries e(t)·û(ϖ) every frame; the rest pose before the first frame is e(J2000) |
 | Wobble marker radius | `WOBBLE_MARKER_RADIUS_SCENE_UNITS` | display only — nothing reads it |
-
----
-
-## Part 13: Key Composition Principles
-
-### 13.1 Balancing Counter-Motions
-
-The perihelion precession layers demonstrate a key principle: "Both have complete opposite values for 'Startpos' and 'Speed' because the movement of Axial precession and Inclination precession are balancing out in both ways."
-
-This applies throughout the model:
-- Axial precession (clockwise) vs. Inclination precession (counter-clockwise)
-- Ecliptic tilt (-amplitude) vs. Obliquity tilt (+amplitude)
-- Perihelion 1 (forward) vs. Perihelion 2 (reverse)
-
-### 13.2 Nested Rotation Benefits
-
-1. **Composability** - Each cycle is independent; changing one doesn't affect others
-2. **Accuracy** - Rotations compose mathematically correctly via matrix multiplication
-3. **Performance** - GPU handles matrix multiplication efficiently
-4. **Flexibility** - Easy to add new precession cycles
-5. **Reference Frames** - Can measure from any frame by choosing hierarchy depth
 
 ---
 

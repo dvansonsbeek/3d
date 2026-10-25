@@ -22,11 +22,11 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Invariable Plane Analysis** | View planet heights above/below the invariable plane |
 | **Balance Trend Analysis** | Track mass-weighted balance over time |
 | **Standard Model (VSOP87 · MPP02)** | K8 reference overlay: pale-blue ghost bodies (Sun, Moon + seven planets) at the standard theory's positions + live per-body Δ readout (″, astrometric both sides). Planets/Sun: truncated VSOP87A, measured 0.3–3.6″ RMS vs JPL 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era. One-way reference — nothing in the model consumes it |
-| **Perihelion of Planets Verification** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — see [doc 56](56-webgeocalc-explorer.md) |
-| **Earth Climate Analysis** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
-| **Earth–Moon Genesis Analysis** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |
+| **Perihelion of Planets Verification** | Observed perihelion-precession history from JPL WebGeoCalc (1900–2026) per planet — its section below |
+| **Earth Climate Analysis** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — its section below; the formula is [doc 92](92-climate-formula.md) |
+| **Earth–Moon Genesis Analysis** | Deep-time evolution of the precession clock, LOD, year length, the AU and the Moon's distance under Expanding Solar System Resonance Theory — its section below; the theory is [doc 99](99-expanding-solar-system-resonance-theory.md) |
 | **Earth dLOD/dt Analysis** | dLOD/dt driver layers (Tidal (L1) / + GIA (L2) / + Cycles (L3) / + Core-mantle (L4)) vs named climate periods + GISP2/LR04 temperature; Σ_stack ↔ Bond 2001 IRD comparison — physics in [doc 102](102-gia-alpha-lunar-validation.md) + [doc 104](104-millennial-rotation-swing.md) |
-| **Framework Verification** | Model vs published celestial-mechanics formulas — 26 categories in six groups on four standard windows (1000–2500 AD to ±1 Myr) — see [doc 57](57-formula-verification.md) |
+| **Framework Verification** | Model vs published celestial-mechanics formulas — 26 categories in six groups on four standard windows (1000–2500 AD to ±1 Myr) — its section below |
 | **Framework Images** | The website's twelve explanatory figures drawn from the model — every printed number a model surface, every date a computed crossing; exported one at a time through the standard export modal |
 
 > **Scope note (ESSRT).** Each panel is intrinsically a present-epoch UI that reads from the live simulation state — what users see at any time reflects whatever date is currently active. When users scrub the simulation date by millions of years, the panels reflect ESSRT-evolved values automatically (per `DEEP_TIME_MODE_ENABLED` in `src/script.js`). The Earth–Moon Genesis Analysis is the dedicated visualization for how the lattice divisors' literal year-counts evolve at deep time. See [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the formalism.
@@ -453,9 +453,33 @@ Shows the actual observed perihelion-precession history of each planet from JPL 
 | **Resolvability flag** | Venus, Jupiter, Saturn, Uranus, Neptune are flagged as un-determined: Venus/Jupiter/Uranus/Neptune because their oscillation period exceeds the 126-year baseline (apparent slope flips sign across sub-windows); Saturn because its magnitude varies by ~2× across plausible windows even though direction stays retrograde |
 | **Frame note** | Reminder that all angles are in the ECLIPJ2000 frame (Earth's mean ecliptic at J2000), with the period of Earth's orbit-plane precession on the dominant nodal mode s₃ |
 
-### Full Reference
+### Frame note
 
-See [56 — Perihelion of Planets Verification](56-webgeocalc-explorer.md) for the complete observed-rate table, the data pipeline (`tools/explore/wgc-perihelion-rates.js` → `public/input/wgc-perihelion-data.json`), and why only Mercury and Mars have reliably resolvable trends from the 1900–2026 window. Saturn's direction stays retrograde across windows but its magnitude varies by ~2× (sliding-window range −1,800 to −3,600 ″/cy), so it is also flagged as un-determined.
+All three angles are measured in **ECLIPJ2000** — Earth's mean ecliptic and equinox of J2000, a FIXED frame. The WebGeoCalc queries request it (`tools/lib/webgeocalc-client.js`, `referenceFrame = 'ECLIPJ2000'`; every cached entry carries it) and the model overlay reads the chain's J2000-frame ϖ (`_chainPerihelionEclLonDeg`). Rates in this frame are therefore already star-referenced: no general-precession term enters the comparison. The same motion referred to the moving equinox of date runs faster by the general precession, to first order (the ecliptic's own slow turn aside): ω_of-date ≈ ω_ECLIPJ2000 + p_A (p_A = 50.288 ″/yr, the IAU 2006 general precession, the model's J2000 input). The panel's model line is the N-body chain's ϖ(t) in the plotted frame — nothing is calibrated to the observations; agreement (Mercury: observed 572.0 vs the engine's 572.0 ″/cy window rate, relativity inside as a derived term) is the measurement. [Doc 13 §1.5a](13-mercury-precession-breakdown.md) has the full frame discussion. Only Mercury and Mars have reliably resolvable trends from the 1900–2026 window; Saturn's direction stays retrograde across windows but its magnitude varies by ~2× (sliding-window range −1,800 to −3,600 ″/cy), so it is flagged as un-determined.
+
+### Data pipeline
+
+```
+tools/lib/webgeocalc-client.js            ← HTTP client for WebGeoCalc REST API
+        ▼
+tools/explore/wgc-perihelion-rates.js     ← queries Ω, ω, ϖ monthly 1800–2100; raw OLS + sin+lin fits
+        ▼
+public/input/wgc-perihelion-data.json     ← committed JSON of per-planet time series
+        ▼
+openWGCPanel()  in src/script.js          ← loads JSON via fetch(), renders SVGs
+```
+
+The JSON carries per-planet `yrArr`, `omArr` (Ω), `wArr` (ω), `piArr` (ϖ) monthly samples plus a pre-computed `rates` block (`rawPi`, `sinPi`, `oscPeriod`). Re-running `node tools/explore/wgc-perihelion-rates.js` regenerates it from WebGeoCalc — only needed after a JPL ephemeris update. The JSON is fetched at panel-open time (`fetchRepoJson`: the shipped copy under `public/input/`, the repository as the fallback).
+
+### Code Locations
+
+| Component | Location |
+|-----------|----------|
+| Panel modal | `createWGCPanel()` / `openWGCPanel()` / `closeWGCPanel()` in `src/script.js` |
+| Per-planet content · SVG chart · angle unwrapping · linear regression | `wgcRenderPlanet()` · `wgcRenderChart()` · `wgcUnwrap()` · `wgcLinearFit()` in `src/script.js` |
+| Data loader | `loadWGCData()` (fetches `public/input/wgc-perihelion-data.json`) |
+| Data generator · HTTP client | `tools/explore/wgc-perihelion-rates.js` · `tools/lib/webgeocalc-client.js` |
+| CSS | `.wgc-*` classes in `src/style.css` |
 
 ---
 
@@ -484,9 +508,20 @@ Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](9
 | **Forward projection tab** | Predicts climate forcing forward — Holocene correctly identified as interglacial; next natural glaciation predicted ~58 kyr ahead |
 | **Hover tooltips** | Per-layer breakdown at any timestamp with detailed L1 line composition |
 
+### Code locations
+
+| Component | Location |
+|-----------|----------|
+| Panel modal | `createClimateFormulaPanel()` / `openClimateFormulaPanel()` / `closeClimateFormulaPanel()` in `src/script.js` |
+| Chart renderer · evaluators | `cfmRenderChart()` · `cfmEvalStitched()` / `cfmEvalRaw()` in `src/script.js` |
+| Coefficient block | `CLIMATE_FORMULA_COEFFS` (embedded from `public/input/climate-formula-coefficients.json`, the governed fit artifact) |
+| Lazy proxy-data loaders | `loadCfmLR04Data()`, `loadCenogridData()`, `loadEpicaData()`, `loadCenco2pipData()` |
+| Extrema detection (forward tab) | `cfmFindExtrema()` in `src/script.js` |
+| CSS | `.cfm-*` classes in `src/style.css` |
+
 ### Full Reference
 
-See [doc 58 — Earth Climate Analysis](58-climate-formula-explorer.md) for the complete panel reference (tab list, layer toggles, Y-axis conventions, R² breakdown, forward-projection markers, code locations). The underlying L1+L2+L3 architecture, per-regime ridge-fit R² values, 28 L1 lines + Berger/Holistic dual attribution, and variance-decomposition Tier B analyses live in [doc 92 — Climate Formula: Architecture, Variance & Implementation](92-climate-formula.md).
+The formula itself — the L1+L2+L3 architecture, the per-regime ridge fits, the 28 L1 lines, the reproducing pipeline (§14) — is [doc 92](92-climate-formula.md).
 
 ---
 
@@ -513,9 +548,32 @@ Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** �
 | **Export button** | One "Export" — renders the quantity and range tab on screen as the standard export page (title, legend row, the plot with its axes, the credit) in the chart-export modal: Download PNG / Download SVG / Share / Copy |
 | **Validation references** | Curves pass through anchored data points from cyclostratigraphy (Wu 2024, Boulila 2018), tidal-rhythmite measurements (Williams 2000), Devonian coral growth bands (Wells 1963), and the Patterson 1956 Pb-Pb age constraint |
 
+### Era markers
+
+| t_cal (Ma) | Era | Style |
+|---|---|---|
+| −4429 | Earth–Moon genesis (the cited distance history's end) | dashed, reddish |
+| −541 | Cambrian | dashed |
+| −380 | Devonian | dashed |
+| −250 | Pangea (mid) | dashed |
+| 0 | **J2000 (now)** | solid, gold |
+
+Era labels render rotated below the chart, with overlap avoidance that keeps the most significant markers visible.
+
+### Code locations
+
+| Component | Location |
+|-----------|----------|
+| Panel modal | `createEssrtPanel()` / `openEssrtPanel()` / `closeEssrtPanel()` in `src/script.js` |
+| Tab configs | `ESSRT_QTY_TABS` (6 quantities: axial, obliqCycle, lod, year, au, moon) · `ESSRT_RANGE_TABS` (full, phanero) · `ESSRT_QTY_SPECS` (title, subtitle, compute, yFmt, Wu overlay, footnote) |
+| Era markers · Wu 2024 anchors | `ESSRT_ERA_MARKERS` · `WU_ANCHORS` (7 entries with LOD / Moon / axial values + per-quantity ±2σ) |
+| Chart · paper export · ticks · sampler | `essrtRenderChart()` · `essrtRenderPaperChart()` · `essrtNiceTicks()` · `essrtComputeSeries()` |
+| Underlying physics | the browser's `mean*AtAge` delegates to `createDeepTimeChain` (`meanLodSecondsAtAge`, `lunisolarPrecessionPeriodYearsAtAge`, `meanSiderealYearSecondsAtAge`, `meanTropicalYearSecondsAtAge`, `meanMoonDistanceMetresAtAge`, `meanAuAtAge`, `meanPlanetOrbitalPeriodAtAge`) |
+| CSS | `.cfm-*` classes shared with Earth Climate Analysis + ESSRT-specific overrides |
+
 ### Full Reference
 
-See [doc 59 — Earth–Moon Genesis Analysis](59-essrt-explorer.md) for the complete panel reference (6 quantity tabs, 2 range tabs, era markers, Wu 2024 anchor overlay, hover tooltip, the Export, code locations). The underlying theory — Driver 1 (Farhat polynomial + angular-momentum conservation), Driver 2 (Kepler scaling under solar mass loss), the T_p(t) / LOD(t) / year(t) parameterizations, validation against the published cyclostratigraphy record (sub-percent agreement Hadean → present), and the per-frame integrator architecture (`_dtMoonIntegrator`, `_dtPlanetIntegrator`) — lives in [doc 99 — Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md).
+The theory — Driver 1 (the cited Earth–Moon distance history + angular-momentum conservation), Driver 2 (Kepler scaling under solar mass loss), the T_p(t) / LOD(t) / year(t) laws and the validation against the cyclostratigraphic record — is [doc 99](99-expanding-solar-system-resonance-theory.md); the anchors and their tolerances are [doc 106](106-deep-time-validation-dossier.md).
 
 ---
 
@@ -612,9 +670,9 @@ Compares the model's predictions against published closed-form formulas from cel
 | **Earth clock · Anomalistic Year** | Perihelion to perihelion, of date, in SI days beside the Tropical and Sidereal Year panels: the model line is the year-lengths factory's construction on the movement's own apsidal line (1/T_anom = 1/T_trop − ϖ̇_eq/(360°·365.25 d), ϖ̇_eq the year-over-year advance of the series' perihelion of date against the equinox — the scene's perihelion passages read it to milliseconds, the scene-sampled gate; the rate family the Precession Periods panel and Earth's Prec. cell show, λ̇-corrected — one home), so the curve swings by minutes with the eccentricity cycle (slow perihelion motion near eccentricity maxima, fast near the minima); NaN before the series has loaded; the witness is "Meeus (1998), derived" — Chapront's sidereal year with the Table 31.B perihelion rate in the J2000 ecliptic frame (the sidereal motion the definition needs), valid ±10 kyr; the IAU anomalistic year (365.259636 d) is the J2000 anchor |
 | **Earth-only elsewhere** | The sixteen Earth formula categories describe Earth's orbit + spin axis (+ ΔT), the two Moon panels its satellite's precession cycles; per-planet observational validation lives in the Perihelion of Planets Verification and the two all-planet panels |
 
-### Full Reference
+### Reference formulas and code
 
-See [57 — Framework Verification](57-formula-verification.md) for the complete reference-formula catalogue (polynomial / trigonometric-series / N-body-tabulated classes), colour coding, interpretation at different time scales (century → 100-kyr), and code locations.
+The reference curves are three classes: the published polynomials (Meeus, Capitaine, Vondrák — valid for a few millennia around J2000), the trigonometric series (Berger 1978, Laskar — ±250 kyr), and the tabulated N-body integrations (La2004 / La2010, fetched from `public/input/la2010-orbital-elements.json` and interpolated). Each category names its default reference and its frame in `VFP_CATEGORIES` (`src/script.js`); the panel is `createVerificationPanel()` / `openVerificationPanel()`, the CSS prefix `.vfp-`. The `chart-export` snapshot gate covers its exports.
 
 ---
 
@@ -698,10 +756,6 @@ This 99.994% agreement validates that our orbital elements are consistent with p
 | [51 - Planet Orbit Analysis Reference](51-planet-inspector-reference.md) | Planet inspector calculations |
 | [05 - The Invariable Plane](05-invariable-plane-overview.md) | Height calculation formulas |
 | [20 - Constants Reference](20-constants-reference.md) | Planet masses and orbital elements |
-| [56 - Perihelion of Planets Verification](56-webgeocalc-explorer.md) | Observed perihelion-precession (JPL NAIF, 1900–2026) |
-| [57 - Framework Verification](57-formula-verification.md) | Model vs published celestial-mechanics formulas (±12 k yr) |
-| [58 - Earth Climate Analysis](58-climate-formula-explorer.md) | Dedicated panel reference for the Earth Climate Analysis modal |
-| [59 - Earth–Moon Genesis Analysis](59-essrt-explorer.md) | Dedicated panel reference for the Earth–Moon Genesis Analysis modal |
 | [92 - Climate Formula](92-climate-formula.md) | L1+L2+L3 architecture for the Earth Climate Analysis |
 | [99 - Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) | Deep-time scaling model for the Earth–Moon Genesis Analysis |
 

@@ -349,60 +349,11 @@ precession clock and the lunar periods of date are movements — the inertial
 lunar chain composed with T_p(t), the day by angular-momentum conservation on
 the cited distance history.
 
-## The cardinal-point braid law — one rotating vector, including its spectrum
+## The cardinal-point braid law — retired
 
-> **Record.** This law was measured on a fitted cardinal-point model
-> (per-point eccentricity terms plus shared sidebands on a fixed period
-> basis). That fit is not in the runtime: the cardinal instants are the
-> apparent crossings of the certified Sun (§ below), which computes the
-> rotating perihelion vector directly. The basis labels below are the fit's,
-> kept as measured.
+The braid law was the frozen era device's cardinal-point form; it is retired with the device (plan 09) and its record is archived out of the tree. The cardinal points ride the one-source movement — the composed precession clock and the N-body series' elements of date ([doc 110](110-calculation-map.md) chain 5).
 
-The four cardinal points (solstices and equinoxes) do not carry independent
-physics. Their event-time offsets from the mean tropical year are **one
-complex function read through four fixed rotations**:
-
-```
-T_X = T_trop + δ_X          with  Σ_X δ_X ≡ 0
-δ_X(t) = Im[ e^(i·n·λ_X) · W_n(t) ]        λ = 0°/90°/180°/270°  (SS→AE→WS→VE)
-```
-
-W₁(t) is the perihelion-of-date vector (the fit carried it as the retired
-unit's H/16 cycle) as seen in event time — the equation-of-centre braid,
-with e(t) the law of cosines. The law held at three levels, each measured
-independently:
-
-1. **The carrier** (order 1): the four fitted e·sin(M) terms sit in 90°
-   quadrature with equal amplitudes to **0.08° / 0.29% spread** — a property
-   the fit does not enforce, so it cannot be faked by extra freedom.
-2. **Order 2**: the e²·sin(2M) terms repeat the pattern at phase 2λ_X
-   (pairs: SS/WS vs VE/AE).
-3. **The modulation spectrum** (the §10g result): the residual mid-band
-   content (divisors H/20–H/37) is captured by coefficients **shared across
-   all four points** — 52 numbers with zero per-point freedom explain the
-   residual down to **0.28–0.37 min** over ±270 kyr, and generalize
-   perfectly out of sample.
-4. **The symmetry test**: the law requires the four points to be
-   *statistically identical*. When one point (WS) read 2× the others, the
-   cause was traced to the fit basis, not the physics: each point's excess
-   sat exactly at the divisors missing from its own historically-frozen
-   sinusoid set (WS carried a 72.7 s line at H/23 — the one divisor it
-   lacked). Symmetrizing the basis (one identical divisor set for all four
-   points) equalized the residuals at 0.28/0.28/0.36/0.37 min and
-   *tightened* the carrier quadrature from 0.22° to 0.08° — the asymmetric
-   basis had been leaking into the ecc terms. The anomaly was ours, not the
-   law's.
-
-**The sign experiment is what makes this evidence rather than curve
-fitting.** The carrier is e^(i(λ_X − θ₁₆)), so its sidebands must carry
-point-phase +n·λ_X against time-phase −θ_d — counter-rotating. Both senses
-were fitted with identical freedom: the counter-rotating lock captured the
-residual (1.65 → 0.36 min at SS); the co-rotating lock captured **nothing**
-(RMSE unchanged). A wrong geometry would have failed both senses; an
-overfitting basis would have passed both. Exactly one sense passing is
-structure detection — the model's seasonal asymmetries, from the ±50 s
-per-point year lengths at J2000 down to the sub-minute sideband comb, are a
-single geometric object: the rotating perihelion vector.
+---
 
 ## The framework-native Sun (E4/E5) — the certified apparent solar longitude
 
@@ -1070,20 +1021,6 @@ The Phanerozoic rows sit within ±1.4 % of the coral counts with nothing fitted 
 
 ---
 
-## Predicted planetary perihelion precession periods through time
-
-The planetary perihelion divisors are TYPED DESCRIPTORS of era-local
-quantities (doc 109 §9), not scaling laws: the true long-term planetary
-apsidal motions are the secular g-modes, which do not scale with Earth's spin (they
-drift only ∝ M_Sun on the mass-loss tier). Only the EARTH rows (the apsidal and
-perihelion-of-date tangents) carry deep-time content, as epoch-local laws of the present era.
-
-**Note on Law 6 (restated)**: Law 6 is an **Earth-frame beat identity at J2000** — Saturn's ecliptic perihelion and Jupiter's ICRF perihelion coincide at one ecliptic-frame period (the former integer label) in the model's frames at the present epoch, and the striking 0.04/0.12 % Laskar matches of the Law-6 family are matches against |s₃| and k+s₃ (Earth-frame beats), not against Jupiter's or Saturn's own secular frequencies. The identity is exact where stated; a claim that it persists across all epochs is retired (the planetary g-modes do not scale with H).
-
-**Note on solar mass loss**: planetary orbital periods *themselves* (sidereal years, not their perihelion precession) drift by Driver 2 (~71 ppm at Devonian, ~845 ppm at Hadean) — all by the same fraction, so the ratios of the planetary orbital periods stay invariant.
-
----
-
 ## Predicted planetary semi-major axes & Earth-planet distances (Driver 2)
 
 Under Driver 2, each planet's semi-major axis drifts via the adiabatic invariant `a × M_Sun = const` — going to past, the Sun was more massive, so every orbit was tighter. **The entire solar system shrinks uniformly** (same fractional amount for every planet), preserving relative geometry.
@@ -1134,18 +1071,6 @@ This mirrors Driver 1's effect on the spin tier: there, Earth's spin-tier period
 ## When did the clock start? — the Moon's history
 
 If the precession clock has been lengthening with the tidal history, we can extrapolate backward to the "genesis" of the Earth–Moon system. The proper-physics formula naturally produces this answer.
-
-### Interpretation 1: Linear extrapolation (canonical Wells rate)
-
-The model's canonical Wells rate (`dLOD/dt = 0.00526 hr/Ma`) gives:
-```
-LOD(t) = 24 hr − (0.00526 hr/Ma) × t_Ma
-LOD = 0 at t = 24 / 0.00526 = 4,563 Ma  =  4.56 Gyr ago
-```
-
-**Linear extrapolation: LOD → 0 at ~4.56 Gyr.** Strikingly, this is within 0.5 % of **Patterson 1956's Pb-Pb Earth age (4.54 Gyr)** — within measurement precision. But LOD = 0 is physically unrealistic (Earth would not be rotating), so we need a better model.
-
-(The modern observed total LOD rate of 2.3 ms/century — a mixed lunar+solar+PGR rate — would extrapolate to 3.76 Gyr instead. The canonical Wells lunar-only rate is the right choice for the structural identity `24 hr / 4.56 Gyr ≈ Wells rate` — it isolates the tidal channel that drives the model's long-term evolution.)
 
 ### Interpretation 2: the cited history's end — the genesis is an input, not a result
 
@@ -1774,178 +1699,9 @@ observed dJ₂/dt, and the one measured constant is the relaxation time τ
 
 ---
 
-## Why the climate formula keeps its J2000 line periods — measured
+## Why the climate formula keeps its J2000 line periods
 
-Two of the three L1 line families carry the precession rate p: the obliquity
-lines (p + s_i) and the climatic-precession lines (p + g_i). On the composed
-lunisolar clock p was faster in the past — Earth spun faster and the Moon was
-closer — so a p-line's phase accumulates extra cycles,
-Δ(t) = ∫₀ᵗ (1/T_p(t′) − 1/T_p(2000)) dt′, the same count for every p-line. The
-eccentricity lines (g_i − g_j) and the 405-kyr family carry no p and ride the
-solar-mass tier. The window means of T_p(t)/T_p(2000) on the composed clock
-(`createModel().lunisolar.meanPeriodYearsAtYear`):
-
-| Climate window | kyr | mean T_p(t)/T_p(2000) | period correction | extra precession cycles |
-|:---|---:|---:|---:|---:|
-| post-MPT (LR04) | 0–1,000 | <!--v:evolvingClockMeanRatioPostMpt-->0.99978<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctPostMpt-->−0.02<!--/v--> % | <!--v:evolvingClockExtraCyclesPostMpt-->0.01<!--/v--> |
-| Pleistocene | 0–3,000 | <!--v:evolvingClockMeanRatioPleistocene-->0.99933<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctPleistocene-->−0.07<!--/v--> % | <!--v:evolvingClockExtraCyclesPleistocene-->0.08<!--/v--> |
-| LR04 full | 0–5,320 | <!--v:evolvingClockMeanRatioLr04Full-->0.99881<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctLr04Full-->−0.12<!--/v--> % | <!--v:evolvingClockExtraCyclesLr04Full-->0.25<!--/v--> |
-| EPICA CO₂ | 0–800 | <!--v:evolvingClockMeanRatioEpica-->0.99982<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctEpica-->−0.02<!--/v--> % | <!--v:evolvingClockExtraCyclesEpica-->0.01<!--/v--> |
-| iNHG-MPT | 1,000–2,700 | <!--v:evolvingClockMeanRatioInhgMpt-->0.99917<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctInhgMpt-->−0.08<!--/v--> % | <!--v:evolvingClockExtraCyclesInhgMpt-->0.05<!--/v--> |
-| CENOGRID Cenozoic | 0–66,000 | <!--v:evolvingClockMeanRatioCenogrid-->0.98532<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctCenogrid-->−1.47<!--/v--> % | <!--v:evolvingClockExtraCyclesCenogrid-->38.35<!--/v--> |
-| Mesozoic | 0–250,000 | <!--v:evolvingClockMeanRatioMesozoic-->0.94583<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctMesozoic-->−5.42<!--/v--> % | <!--v:evolvingClockExtraCyclesMesozoic-->566.43<!--/v--> |
-| Phanerozoic (the model's domain) | 0–500,000 | <!--v:evolvingClockMeanRatioPhanerozoic-->0.89503<!--/v--> | <!--v:evolvingClockPeriodCorrectionPctPhanerozoic-->−10.50<!--/v--> % | <!--v:evolvingClockExtraCyclesPhanerozoic-->2368.92<!--/v--> |
-
-Over LR04 the correction is a tenth of a percent — a quarter of a precession
-cycle at 5.3 Myr; over CENOGRID 1.5 % and 38 cycles; at the Phanerozoic 10 %.
-Anyone fitting pre-Cenozoic spectra with the formula evaluates the p-lines on
-the composed clock per epoch.
-
-### The measured verdict — the clock buys nothing; the records resolve p instead
-
-`scripts/test_evolving_clock_climate_formula.py` fits each window twice with
-the shipped fitter — every line at its J2000 period, and the p-carrying lines
-on their own warped time τ = t + Δ(t)·P — and runs three controls: the warp
-scaled by k (k = 1 the model's clock, k = −1 the counter-rotating sign), the
-two halves of each window fitted alone, and a constant frequency offset δp on
-the p-lines ("which p does the record want?"), with the clock's gain
-re-measured on top of the preferred δp.
-
-| Window | ΔR² total, clock alone | sign control (k = −1) | preferred δp | ΔR² at that δp | clock on top of it |
-|:---|---:|---:|---:|---:|---:|
-| LR04 post-MPT (0–1 Myr) | <!--v:evolvingClockDeltaR2TotalPostMpt-->+0.00049<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePostMpt-->−0.00052<!--/v--> | <!--v:evolvingClockPreferredDeltaPPostMpt-->+0.22<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPostMpt-->+0.00564<!--/v--> | <!--v:evolvingClockGainAtPreferredPPostMpt-->−0.00010<!--/v--> |
-| LR04 iNHG-MPT (1–2.7 Myr) | <!--v:evolvingClockDeltaR2TotalInhgMpt-->+0.00085<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneInhgMpt-->−0.00207<!--/v--> | <!--v:evolvingClockPreferredDeltaPInhgMpt-->+0.04<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPInhgMpt-->+0.00060<!--/v--> | <!--v:evolvingClockGainAtPreferredPInhgMpt-->−0.00032<!--/v--> |
-| LR04 pre-iNHG (2.7–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalPreInhg-->+0.00862<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOnePreInhg-->−0.03141<!--/v--> | <!--v:evolvingClockPreferredDeltaPPreInhg-->+0.08<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPPreInhg-->+0.00856<!--/v--> | <!--v:evolvingClockGainAtPreferredPPreInhg-->−0.01389<!--/v--> |
-| LR04 full (0–5.3 Myr) | <!--v:evolvingClockDeltaR2TotalLr04Full-->−0.03114<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneLr04Full-->−0.01302<!--/v--> | <!--v:evolvingClockPreferredDeltaPLr04Full-->−0.02<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPLr04Full-->+0.00332<!--/v--> | <!--v:evolvingClockGainAtPreferredPLr04Full-->−0.01735<!--/v--> |
-| CENOGRID (0–66 Myr) | <!--v:evolvingClockDeltaR2TotalCenogrid-->+0.00055<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCenogrid-->−0.00008<!--/v--> | <!--v:evolvingClockPreferredDeltaPCenogrid-->+0.04<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCenogrid-->+0.00028<!--/v--> | <!--v:evolvingClockGainAtPreferredPCenogrid-->−0.00054<!--/v--> |
-| Cheng 2016 (0–640 kyr, U-Th, untuned) | <!--v:evolvingClockDeltaR2TotalCheng-->+0.00023<!--/v--> | <!--v:evolvingClockDeltaR2AtScaleMinusOneCheng-->−0.00024<!--/v--> | <!--v:evolvingClockPreferredDeltaPCheng-->+0.40<!--/v--> ″/yr | <!--v:evolvingClockDeltaR2AtPreferredPCheng-->+0.00791<!--/v--> | <!--v:evolvingClockGainAtPreferredPCheng-->−0.00013<!--/v--> |
-
-Reading:
-
-1. **The clock alone looks like a gain** in the older LR04 regimes, with the
-   right sign (the counter-rotating warp loses) and in both halves of each
-   window — but the warp-scale scan does not peak at the model's clock: it
-   keeps rising past k = 3. The record wants far more phase drift than the
-   composed clock carries.
-2. **A constant frequency offset explains it.** With the p-lines evaluated at
-   p + δp, every LR04 window prefers δp =
-   <!--v:evolvingClockPreferredDeltaPMinLr04-->−0.02<!--/v-->…<!--v:evolvingClockPreferredDeltaPMaxLr04-->+0.22<!--/v--> ″/yr,
-   and on top of that offset the clock of date subtracts in every window
-   (largest gain <!--v:evolvingClockGainAfterPreferredPMax-->−0.00010<!--/v-->).
-   The "clock gain" was a frequency offset in disguise: inside one window a
-   phase drift and a frequency offset both raise a line's mean frequency.
-3. **Two rates, two families.** An obliquity line p + s_i is the spin axis
-   precessing in the inertial frame against one of the ecliptic's nodal
-   modes, so it carries the spin axis's inertial rate (the self-anchored rate
-   the hybrid obliquity integration runs on — the general precession plus the
-   planetary mean the N-body ecliptic's motion carries,
-   <!--v:spinAxisInertialRateArcsecPerYrJ2000-->50.385<!--/v--> ″/yr at J2000;
-   the +0.097 above the general precession is IAU's planetary precession
-   ψ_A − p_A); a climatic-precession line p + g_i is the perihelion measured
-   from the equinox along the ecliptic of date, so it carries the general
-   precession in longitude (<!--v:evolvingClockArtifactPArcsecPerYr-->50.288<!--/v--> ″/yr,
-   the model's J2000 precession reading, 1,296,000 ″ over
-   <!--v:evolvingClockTpJ2000Yr-->25771<!--/v--> yr). With the obliquity lines
-   on the J2000 inertial rate (model v22.0) the per-family scan still wanted
-   +0.12…+0.20 ″/yr on the obliquity family alone, nothing resolvable on the
-   precession family.
-4. **A record sees the window mean, not the J2000 instant.** The spin
-   integration turns the pole at α(t)·cos ε(t) with the solar torque at the
-   eccentricity of date and J₂(t) from the GIA channel — three factors of
-   date, each 1 at J2000, each larger in the past (faster spin, lower mean
-   obliquity, higher mean eccentricity). Averaged over the LR04 record that
-   rate reads <!--v:spinAxisInertialRateMeanLr04ArcsecPerYr-->50.517<!--/v--> ″/yr
-   (the realized pole rate; one home
-   `createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr`), and the
-   dominant obliquity line of the model's OWN ε(t) fitted over the record
-   sits exactly there: <!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v--> yr
-   against the window-mean prediction
-   <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> (gated to 0.1 % in the
-   obliquity-hybrid verdict), with La2004's own series on the same fit at
-   <!--v:obliqCycleLa2004FitLr04Years-->~40,900<!--/v-->
-   (<!--v:obliqCycleRealizedVsLa2004Pct-->+0.05<!--/v--> %) — and the J2000
-   beat 2π/(ψ̇ᵢₙ − |s₃|) = <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr is the
-   instantaneous limit of that mean. The records' preferred offset WAS this
-   mean. The shipped obliquity lines now carry it — on the orbital forcing
-   alone (model v23.0:
-   <!--v:evolvingClockArtifactPInertialArcsecPerYr-->50.519<!--/v--> ″/yr, the
-   same mean without the ice-driven J₂(t) factor, because that factor rides
-   the climate formula's own post-MPT layer and a forcing line must not
-   contain the climate response; 2–3 yr of period from the full physics), and
-   scanned one family at a time on them the obliquity lines want δp =
-   <!--v:evolvingClockPreferredDeltaPObliquityInhgMpt-->+0.04<!--/v--> ″/yr
-   (iNHG-MPT), <!--v:evolvingClockPreferredDeltaPObliquityPreInhg-->+0.06<!--/v-->
-   (pre-iNHG) and <!--v:evolvingClockPreferredDeltaPObliquityLr04Full-->−0.02<!--/v-->
-   (full record) for gains of
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityInhgMpt-->+0.00057<!--/v-->,
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityPreInhg-->+0.00828<!--/v-->,
-   <!--v:evolvingClockDeltaR2AtPreferredPObliquityLr04Full-->+0.00414<!--/v-->
-   (were +0.009 / +0.059 / +0.069 on the J2000 rate); the pre-iNHG remainder
-   is the regime's own window mean sitting
-   above the record-wide one
-   (<!--v:spinAxisInertialRateMeanPreInhgArcsecPerYr-->50.564<!--/v--> ″/yr —
-   a per-regime line set would carry it; the shipped set carries ONE window,
-   the record's, the rule "derive over the window the rows are used in"). The
-   climatic-precession lines alone want
-   <!--v:evolvingClockPreferredDeltaPPrecessionInhgMpt-->+0.02<!--/v--> ″/yr in
-   the one window that resolves them (iNHG-MPT, ΔR²
-   <!--v:evolvingClockDeltaR2AtPreferredPPrecessionInhgMpt-->+0.00004<!--/v-->)
-   and poorly determined offsets elsewhere. Laskar's precession frequency
-   (50.476 ″/yr) is a long-window frequency of his solution, not a J2000
-   rate: compare a realized period with a realized period, never a J2000
-   beat with it.
-
-**Conclusion.** The composed clock's drift is below what any available
-record resolves — the formula keeps fixed line periods, measured on the
-right physics (only the p-carrying lines warp) — and the obliquity lines
-carry the window mean of the pole rate over the record they are fitted to,
-<!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr for the p+s₃ line,
-with the published J2000 beat <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr as its
-instantaneous limit.
-
----
-
-## The non-coincidence: why the linear rate matches Earth's age
-
-The Phanerozoic-averaged Wells rate (`dLOD/dt = 0.00526 hr/Ma` from Wells 1963 corals) gives an extrapolated `LOD = 0` at **4.563 Gyr ago — within 0.5 % of Patterson 1956's Pb-Pb Earth age (4.54 Gyr)**.
-
-It is a signature of averages, not of the model: the Phanerozoic coral rate happens to equal the mean rate over Earth's whole history, because the eras of faster and slower recession in the ocean-model solution (Farhat 2022) average to it. The derived chain on the cited history reads the Wells corals within ±1.4 % across the Phanerozoic (the flagship 380 Ma row +0.71 %, a documented band) with nothing fitted to them. The former sentence here — that "the same formula naturally places the Moon at the rigid Roche limit at 4.498 Gyr with no Hadean constraint used in the fit" — is withdrawn (plan 12 option A): that crossing was the deleted spline's pinned endpoint; the genesis is the input's lunar age, <!--v:moonGenesisAgeGa-->4.429<!--/v--> Gyr.
-
-### Two independent derivations agree to 0.5 %
-
-| Derivation | Calculation | Result |
-|:---|:---|:---|
-| **Phanerozoic fossil-coral rate** (Wells 1963, 0–500 Ma) | Linear regression on Wells coral counts | **<!--v:wellsTidalRate-->0.00526<!--/v--> hr/Ma** |
-| **Earth-age inverse** (purely mathematical) | 24 hr / 4.563 Gyr | **<!--v:wellsTidalRate-->0.00526<!--/v--> hr/Ma** |
-
-These come from *entirely* independent measurements: paleontological day counts from 65–500 Ma Phanerozoic fossils on one side, Patterson Pb-Pb radiometric chronology on the other. They agree to within published precision (~0.5 %).
-
-### What the agreement tells us
-
-**The Wells rate is the characteristic long-term-stable rate of Earth-Moon tidal evolution.** The match to Earth's age is *consistent* with — and the proper-physics formula now *demonstrates* — that this rate held across most of Earth's history in some effective average sense.
-
-Earth-Moon evolution is NOT actually piecewise linear at Wells rate — Farhat 2022's full ocean-tidal model, the chain's input, shows the rate has varied across geological history (faster in late Proterozoic ~7 ms/century at 600–1000 Ma, slower in mid-Proterozoic ~3 ms/century at 1–2.5 Gyr, close to Wells in the Archean ~4 ms/century at 2.5–4.4 Gyr). The match to Earth's age happens because these variations time-average to ~Wells rate over the solution's 4.43 Gyr; the modern LLR anchor is the history's J2000 slope.
-
-### What "non-coincidence" means structurally
-
-The math `24 hr / 4.56 Gyr = Wells rate` reveals that:
-
-> **The Phanerozoic rate is the time-averaged characteristic rate of Earth-Moon tidal evolution since genesis.** Modern observation (Wells rate, fitted to last 500 Ma) and total elapsed time (Patterson Earth age, ~4.5 Gyr) are connected by physics — not as a fitting coincidence, but as the integral of a smoothly-varying rate that averages to the modern observed value.
-
-### Connection to the proper-physics formula
-
-The two-layer chain has α₁ from LLR (3.82 cm/yr Moon recession at J2000, Dickey 1994 / Chapront 2002) as the J2000 slope of the cited history and no other free quantity. It reads:
-- **Modern lunar recession = 3.82 cm/yr** (LLR anchor, direct observation)
-- **Modern LOD = 24 hr exactly** (anchored)
-- **Phanerozoic days/yr within ±1.4 % of Wells 1963's corals** (the flagship 380 Ma row <!--v:anchorWellsFlagship380DeltaPct-->+0.71<!--/v--> %, a documented band) with nothing fitted to them
-- **The genesis at the input's lunar age, <!--v:moonGenesisAgeGa-->4.429<!--/v--> Gyr** (the former Roche-limit "self-validation" is withdrawn — it was a construction)
-- **Farhat 2022's day length reproduced by conservation on his distance** to 0.01 h at 100 Ma and 0.24 h at 4.4 Ga
-
-Three independent measurements still meet here: LLR (modern instantaneous), Wells (Phanerozoic average) and Patterson (the Earth's age); the fourth, Farhat's solution, is now the input rather than a fourth calibration.
-
-### On the Proterozoic stall
-
-The model carries no Proterozoic thermal-tide-lock stall (Bartlett-Stevenson 2016; Mitchell-Kirscher 2023) and no fitted regime: the Wells-rate agreement is a property of the cited history's long-term mean. The stall hypothesis is contested in the literature (Laskar, Farhat, Lantink et al.'s review finds it "not supported" once the questionable stromatolite points are dropped); if a dated section ever requires it, it enters as physics in the input's successor, not as a fitted term here.
+Measured: the precession band moves with the clock while the eccentricity bands stay fixed, and each climate record resolves the precession rate p of its own epoch — so the shipped formula keeps its J2000 line periods, and the deep-time lines of the sections above are predictions, not fitted terms. The measurement record is [doc 92](92-climate-formula.md), the section of the same name.
 
 ---
 
@@ -2068,9 +1824,9 @@ If ESSRT is correct, the following predictions should hold. All values from the 
 Devonian (380 Ma) obliquity beat 2π/(ψ̇ − |s₃|) at **31.7 kyr** (vs modern 41.2 kyr; generated tables above).
 **Status**: Consistent. Berger, Loutre & Laskar 1992's deep-time solution (29 kyr and 61 ″/yr at 500 Ma; theory) and Wu et al. 2024's inferred precession constants (59.5–64.5 ″/yr across 300–500 Ma; cyclostratigraphic inference) both sit within 2–8 % of the composed clock, which reads 2–3 % low in the Pangea window — the residual attributed to the recession history there (Wu's Moon-distance anchors are closer than the smooth polynomial; the "Pangea interval" section above), not to the composition law. A Devonian obliquity gate row waits for a period with a stated 1σ verified from the primary paper (the Zeeden et al. 2023 class). The former "confirmed against 36–38 kyr (Meyers 2008, Boulila 2018)" was a mis-citation of Cretaceous and Eocene records, and the retired spin-only clock (37.7 kyr) matched them by that error — withdrawn (plan 06 D6/Phase 4b).
 
-### 2. Deep-time short-eccentricity periods expand with the clock (view 2) — RESOLVED AGAINST
-Devonian short-eccentricity peaks would have been at **87.5, 98.0, 111.3 kyr** under view 2 (vs modern 95.8, 107.3, 121.9 kyr).
-**Status**: RESOLVED AGAINST view 2. The deeper record decided it: at 1.4 and 2.46 Ga the precession band moves with the clock T_p(t) while the eccentricity bands stay at their modern classes (Meyers & Malinverno 2018; Lantink et al. 2022), and the model's own N-body derives the eccentricity beats from the fixed planetary g-modes (doc 109). The Devonian datum (Da Silva 98 kyr) never discriminated — it fits the unscaled band at 2 %. The e-band's only true drift is the mass-loss tier's ∝ 1/M_Sun.
+### Withdrawn or resolved predictions
+
+Three former entries are no longer on this list: the short-eccentricity periods expanding with the clock (resolved AGAINST by measurement — only the ψ̇-carrying lines scale, see "Why the climate formula keeps its J2000 line periods"); the Saturn–Jupiter resonance lock at one ecliptic period (retired with the integer laws, plan 07; the chain's own Great-Inequality reading is [doc 109](109-model-nbody-engine-and-lattice-test.md)); and the Earth–Moon genesis at the rigid Roche limit (withdrawn at plan 12 option A — the genesis is the cited history's end, an input, not a result). Their text is archived.
 
 ### 3. Earth's precession period lengthens with the clock
 Devonian precession period at **<!--v:axialPrecAtDevonian-->21,235<!--/v--> yr** (vs modern <!--v:earthAxialPeriod-->25,772<!--/v--> yr), i.e. ψ̇ ≈ 59.7 ″/yr.
@@ -2079,16 +1835,6 @@ Devonian precession period at **<!--v:axialPrecAtDevonian-->21,235<!--/v--> yr**
 ### 4. Future climate cycles will be slightly longer than modern
 In 200 Myr, Earth's ~41-kyr obliquity beat should be ~47.8 kyr (+16 %; generated tables above — the lunar torque weakens as the Moon recedes, so the beat stretches faster than the day).
 **Status**: Not yet testable empirically; ESSRT prediction.
-
-### 5. Saturn-Jupiter resonance lock at one ecliptic period persists across epochs — RETIRED, replaced
-The former prediction (the Law-6 identity holds in all epochs) is RETIRED with view 2: the planetary g-modes do not scale with the clock, so the identity is an exact Earth-frame statement at J2000, not an eternal lock (see the Law 6 restatement above).
-**Replacement prediction (the two-tier split itself, already twice confirmed and forward-testable)**: every newly dated Precambrian cyclostratigraphic section must show the precession band at the T_p(t)-predicted period (spin tier scales) while the long-eccentricity band stays at its modern class scaled only by 1/μ (mass tier) — the Kuruman count-bracket already reads μ(2.48 Ga) = 1.00 ± 0.07. A section violating either half falsifies the corresponding tier.
-
-**The obliquity band, sharpened (the two tiers meeting in one observable)**: the obliquity band is the beat of the two tiers — **2π/(ψ̇(t) − |s₃|)**, with the spin precession ψ̇ the composed lunisolar rate of date of the table above (plan 06 D6; plan 12 §8: the constant's scaling times the cited mean obliquity's cos ε̄(t)/cos ε̄(0) — the tilt was lower in the deep past, so the rate runs above the constant's scaling, 0.75 % at the Devonian, 2.45 % at 2.46 Ga) and s₃ at its dynamical value under the measured μ (doc 109 §18: the hybrid derives exactly this structure). Today the beat and pure precession-scaling are degenerate (ψ̇ ≫ |s₃| — <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> vs <!--v:obliqH8ScaledJ2000Kyr-->41.1<!--/v--> kyr, which is why the retired lattice's "H/8" label always fit; a dated section reads the beat of the WINDOW-MEAN pole rate, not the instant — the pole's tidal spin, obliquity and eccentricity of date all enter, and over the LR04 record that mean reads <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr where the J2000 instant reads 41,098: the model's own ε(t) fitted over the record gives <!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v-->, La2004's series on the same fit <!--v:obliqCycleLa2004FitLr04Years-->~40,900<!--/v-->, agreeing to <!--v:obliqCycleRealizedVsLa2004Pct-->+0.05<!--/v--> %); at 2.46 Ga they split to <!--v:obliqBeat2460MaKyr-->14.3<!--/v--> vs <!--v:obliqH8Scaled2460MaKyr-->18.9<!--/v--> kyr (the latter read as "obliquity period ∝ T_p", the pure precession-scaling alternative; the registry key keeps its H8 name) — a level cyclostratigraphy can discriminate. The existing confirmations are precession-band/LOD anchors; the deep-time obliquity PERIOD itself is undiscriminated, so this beat form is the pre-registered prediction, stated before any such measurement is compared. A precisely dated Precambrian obliquity band tests it head-on.
-
-### 6. (withdrawn) Earth-Moon genesis at the rigid Roche limit at the giant-impact age
-This prediction claimed that the recession polynomial, run backwards, crossed the rigid Roche limit at ~4.498 Ga with no Hadean constraint in the fit. Plan 12 (option A) withdrew it: the crossing was the deleted regime spline's PINNED endpoint (`genesisMa: 4498`), and before that the extrapolation of a quartic fitted to Farhat 2022's curve — an echo of the input's lunar age, not a derivation. The genesis is the cited history's end, <!--v:moonGenesisAgeGa-->4.429<!--/v--> Ga, with the Moon at <!--v:moonDistanceAtHadean-->39,509<!--/v--> km.
-**Status**: Withdrawn. The LLR anchor's correctness rests on the Phanerozoic rows and the historical-era gates, not on this construction.
 
 ### 7. LOD oscillates with Milankovitch orbital forcing
 Because α(t) is bound to the same L1 orbital layer that fits δ¹⁸O (see the climate-driven α(t) refinement section above), Earth's length-of-day should carry an **observable ~100-kyr oscillation** in phase with the glacial-interglacial ice-volume signal. Peak-to-peak LOD swing ≈ 250 ms across a full glacial cycle. The oscillation extrema align with LR04 Marine Isotope Stages: LOD peaks at MIS 6 (~140 ka), MIS 2 / LGM (~22 ka), and the projected next-glacial (~60,500 AD, matching the Climate Formula's next-glacial onset); LOD troughs at MIS 7e (~215 ka), MIS 5e Eemian (~125 ka), and today's Holocene interglacial (J2000).
