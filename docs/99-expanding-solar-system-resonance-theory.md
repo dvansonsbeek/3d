@@ -306,8 +306,7 @@ The inertial chain and its composition with the precession of date:
   18.5994 yr from the of-date 8.848 /
   <!--v:nodalPrecICRFexact-->18.61335<!--/v--> yr);
 - **the tropical month** — the sidereal month less one equinox turn per
-  T_p(t). It read 13 turns per the counter H(t): the unit is 13.011
-  precession periods, so the equinox term ran 0.086 % slow and the chain's
+  T_p(t). The retired counter made the equinox term run 0.086 % slow and the chain's
   J2000 tropical month sat 5.85 ms above the IAU input; on T_p(t) it is within
   0.1 ms of it.
 

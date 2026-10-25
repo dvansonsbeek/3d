@@ -45,17 +45,9 @@ Reports (observed category)
 ├── Days, Years & Precession
 └── Solar Day
 
-Tools
-├── [tab] Verification                [the model against references — the "observed" colour]
-│   ├── Framework Verification
-│   └── Perihelion of Planets Verification
-├── [tab] Analysis                    [the model's own predictions — the "calculated" colour]
-│   ├── Planet Orbit Analysis         [orbit of date + orbit picture + position report]
-│   ├── Earth–Moon Genesis Analysis
-│   ├── Earth Climate Analysis
-│   └── Earth dLOD/dt Analysis
-└── Standard Model overlay (VSOP87 · MPP02)   [ghost-body overlay sub-folder]
 ```
+
+The Tools folder (two tabs of panel buttons — Verification and Analysis — and the Standard Model overlay) is the subject of [doc 50](50-ui-panels-reference.md); its Planet Orbit Analysis carries the Planet Position Reports of Part 4.
 
 ---
 
@@ -321,9 +313,7 @@ Combined view of all measurements per year:
 
 ### Technical Implementation
 
-**Source**: `script.js` line ~14499
-
-**Function**: `runYearAnalysisExport(years)`
+**Function**: `runYearAnalysisExport(years)` in `src/script.js`
 
 **Algorithm**:
 1. Collects all measurements in a single pass through the year range
@@ -553,8 +543,6 @@ Finds the Julian Day when the Sun crosses a specific Right Ascension value. Used
 
 Finds the perihelion (closest approach to Sun) for a given year.
 
-**Location**: line ~14109
-
 **Parameters**:
 - `year` - Calendar year
 - `verbose` - Boolean for console logging
@@ -565,8 +553,6 @@ Finds the perihelion (closest approach to Sun) for a given year.
 ### aphelionForYearMethodB(year, verbose, prevJD)
 
 Finds the aphelion (farthest point from Sun) for a given year.
-
-**Location**: line ~14209
 
 **Parameters**:
 - `year` - Calendar year

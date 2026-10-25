@@ -192,8 +192,7 @@ See § "The ecliptic missing-motion LOD Correction" below for the distinction be
 The model maintains two distinct LOD values that differ by a small correction on the nodal period of Earth's orbit plane (see below):
 
 **LOD_mean** — the kinematic baseline, the SI day (plan 09; the retired era
-device anchored it on its H/13 identity, siderealYearSeconds / (mSY × H/(H−13))
-= 86,399.99968 s):
+device had anchored it on its integer identity, 86,399.99968 s):
 ```
 LOD_mean = ω₀ = 86,400 s at J2000 (yearLengthRef.solarDay)
 ```
@@ -206,7 +205,7 @@ where:
   o.lodKinematic     = the Layer-0 tidal mean LOD of date = ω₀ = 86,400 s at J2000
   h5Correction(year) = LOD_mean / (T_s₃ × mSY)        ≈ <!--v:h5LodCorrectionMs-->3.441<!--/v--> ms
                        (T_s₃ = the nodal period 1,296,000/|s₃| = <!--v:eclPrecYears-->~68,751<!--/v--> yr;
-                        the identifier keeps its historical H/5 name)
+                        the identifier keeps its historical name)
   dtCycleLodCorrectionSum = Bond/Hallstatt/Jose5/Jose4 cyclic δLOD + Core-mantle
                             swing (≈ −1.85 ms at J2000)
 ```
@@ -218,7 +217,7 @@ The correction represents Earth's need to rotate slightly MORE per solar day to 
 δ_LOD = LOD_mean × δ_rev = LOD_mean / (T_s₃ × mSY)       ≈ <!--v:h5LodCorrectionMs-->3.441<!--/v--> ms per solar day
 ```
 
-**Why the nodal period (not the apsidal one, and not the anchor's H/5):** the correction's reference frame must be the Sun's apparent motion, which follows the ecliptic; the ecliptic's turn on the invariable plane is the nodal mode s₃ — an ORBITAL quantity, constant at every epoch (μ-tier). The apsidal precession is a fixed-frame (ICRF) construction, not the ecliptic-of-date reference used for the solar-day counting. Until the plan 06 T2 restatement the divisor was the anchor's H(t)/5 (67,063 yr at J2000, 2.5 % short of the nodal period) and it scaled with Earth's SPIN at deep time — the wrong tier for an orbital reference. Measured on the change (plan 06 record): the term moved 3.527 → 3.441 ms, the joint ΔT-stack re-closed at USNO 86400.0021 (measured-day basis; the display-basis LOD_real moved from 86400.001580 to 86400.001693 s, toward the observed 86400.0017), the eclipse record stayed flat (lunar mean residual 1213 → 1211 s, events beating NASA 119 → 121; solar 665 → 669 s), while the closeness to the Espenak/Stephenson polynomials — theory references, not observations — loosened (Espenak-window RMS 11.9 → 13.4 s, full window 21.0 → 27.0 s).
+**Why the nodal period (not the apsidal one):** the correction's reference frame must be the Sun's apparent motion, which follows the ecliptic; the ecliptic's turn on the invariable plane is the nodal mode s₃ — an ORBITAL quantity, constant at every epoch (μ-tier). The apsidal precession is a fixed-frame (ICRF) construction, not the ecliptic-of-date reference used for the solar-day counting. Until the plan 06 T2 restatement the divisor was the retired anchor's fifth (67,063 yr at J2000, 2.5 % short of the nodal period) and it scaled with Earth's SPIN at deep time — the wrong tier for an orbital reference. Measured on the change (plan 06 record): the term moved 3.527 → 3.441 ms, the joint ΔT-stack re-closed at USNO 86400.0021 (measured-day basis; the display-basis LOD_real moved from 86400.001580 to 86400.001693 s, toward the observed 86400.0017), the eclipse record stayed flat (lunar mean residual 1213 → 1211 s, events beating NASA 119 → 121; solar 665 → 669 s), while the closeness to the Espenak/Stephenson polynomials — theory references, not observations — loosened (Espenak-window RMS 11.9 → 13.4 s, full window 21.0 → 27.0 s).
 
 **Where each is used:**
 

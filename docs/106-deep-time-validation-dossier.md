@@ -153,9 +153,9 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   (modern sd <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″); the Babylon −135 umbra
   track sits <!--v:babylon135BestGapKm-->152<!--/v--> km from the documented
   station — [doc 103](103-135-babylonian-case-study.md). The era-device
-  Sun assembly this bullet once described (the H/16 eccentricity
-  channel, the H/3 coupling and the cos-ε torque term on the
-  two-component obliquity law) is retired.
+  Sun assembly this bullet once described (the fitted eccentricity channel
+  and inclination coupling on the retired device's periods, the cos-ε
+  torque term on the two-component obliquity law) is retired.
 
 ## D. The honesty ledger — what does NOT validate, asserted anyway
 

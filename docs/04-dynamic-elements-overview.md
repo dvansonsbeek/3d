@@ -5,10 +5,10 @@ coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
 
-# Orbital Elements: the Chain and the Devices
+# Orbital Elements: the Chain and the Engine-K Hierarchy
 
 How every body in the simulator gets its orbital elements. There are
-three tiers, and knowing which body sits on which tier answers most
+two tiers, and knowing which body sits on which tier answers most
 "where does this number come from?" questions:
 
 1. **The seven planets — the Keplerian chain.** The model's own
@@ -20,9 +20,9 @@ three tiers, and knowing which body sits on which tier answers most
    certified historical-era devices: Earth's spin/tides/precession-clock machinery
    and the Moon's 3D precession hierarchy. This is the two-engine
    interface; the historical gate suite is calibrated on it.
-3. **The geometric elements device — DELETED (plan 07 R5).** Ceres's
-   reference constants remain as data; Earth's inclination and node of date
-   are the one-source engine reading ([doc 05](05-invariable-plane-overview.md)).
+
+The geometric elements device that once carried the no-chain bodies was
+deleted at plan 07 R5 (the record: [doc 109 §23](109-model-nbody-engine-and-lattice-test.md)).
 
 ---
 
@@ -71,9 +71,9 @@ artifact — terms and evaluation form ship together. The epoch anchor is
 J2000.0 (JD 2451545.0, TT); calendar mapping goes through the model's own
 JD→year machinery (a half-day slip is 2° of Mercury mean longitude).
 
-The re-evaluation record: [doc 109](109-model-nbody-engine-and-lattice-test.md)
+The engine's record: [doc 109](109-model-nbody-engine-and-lattice-test.md)
 (the model's own N-body engine, the measured planetary frequencies, and
-the lattice tested at its own quantity type).
+the retirements).
 
 ## Tier 2: The Engine-K Hierarchy (Earth, Moon, Sun)
 
@@ -84,9 +84,9 @@ documented where it lives: [doc 11](11-length-day-year-formulas.md)
 [doc 40](40-architecture.md) (the one-source movement),
 [doc 99](99-expanding-solar-system-resonance-theory.md) (ESSRT).
 
-Earth's engine-K orbital-plane devices (the H/3 inclination oscillation
-and −H/5 node regression) were deleted at plan 07 R5/R9 with the geometric
-device; Earth's invariable-plane
+Earth's former orbital-plane wheels (the inclination oscillation and the
+node regression on the retired device's periods) were deleted at plan 07
+R5/R9 with the geometric device; Earth's invariable-plane
 inclination and node of date are the one-source engine reading on every
 surface (the panel, the API's `earth.inclinationDeg`/`ascendingNodeDeg`,
 the registry).
@@ -119,28 +119,19 @@ geometrically from `matrixWorld` rather than analytically. See
 [doc 66](66-moon-meeus-corrections.md) for the Moon's correction
 model.
 
-## Tier 3: What remains of the geometric elements device
+## The no-chain bodies
 
-Pluto, Halley's Comet and Eros rendered from this device — the inclination
-oscillation law, the two-normal ecliptic inclination, and the tilt-derived
-ecliptic node. They are gone: there was no element chain behind them, and
-all four no-chain bodies shared one placeholder perihelion fraction, so all
-four published a single 27,943-yr period for four unrelated orbits (Pluto's
-true apsidal period is of order 3.7 Myr). Nothing gated them and nothing
-published them.
-
-What the device carried: Ceres's reference constants — it is
-a force-only perturber in the N-body run — Earth's engine-K devices, and the
-probe-pinned reference implementations; the device itself was deleted at
-plan 07 R5. Pluto's observed mass and node also
-survive as INPUTS to the invariable-plane angular-momentum sum, which follows
-Souami & Souchay's ten-body convention.
+Pluto, Halley's Comet and Eros are not rendered: there was no element chain
+behind them, and the device that drew them is deleted (plan 07 R5). Ceres is
+a force-only perturber in the N-body run (its reference constants remain as
+data), and Pluto's observed mass and node are INPUTS to the invariable-plane
+angular-momentum sum, which follows Souami & Souchay's ten-body convention.
 
 ---
 
 ## Frame Discipline
 
-Two rules keep element comparisons honest across all three tiers:
+Two rules keep element comparisons honest across both tiers:
 
 - **J2000-fixed vs of-date.** JPL's published `dI/dt` values are against
   the mean ecliptic of J2000, a fixed plane; the ecliptic of date moves
@@ -159,8 +150,8 @@ Two rules keep element comparisons honest across all three tiers:
 |----------|----------|---------|
 | `keplerian-chain.cjs` | `packages/physics/src/planets/` | THE chain implementation (elements of date, positions, secular evaluation) |
 | `_chainElementsOfDate()` / `_chainHelioAU()` | [script.js](../src/script.js) | Scene bindings of the chain |
-| `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Chain projections (heights, nodes); legacy construction for no-chain bodies |
-| `updateDynamicInclinations()` | [script.js](../src/script.js) | Legacy device inclinations (no-chain bodies, engine-K) |
+| `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Chain projections (heights, nodes) |
+| `updateDynamicInclinations()` | [script.js](../src/script.js) | The panels' inclination rows of date |
 | `updateAscendingNodes()` / `updateOrbitalPlaneRotations()` | [script.js](../src/script.js) | Ecliptic nodes and 3D plane orientation |
 | `updateMoonOrbitalElements()` | [script.js](../src/script.js) | Moon Ω, ϖ, anomalies, phase (Earth as focus) |
 
@@ -169,4 +160,4 @@ Two rules keep element comparisons honest across all three tiers:
 1. [05 - The Invariable Plane](05-invariable-plane-overview.md)
 2. [109 - The Model's Own N-body](109-model-nbody-engine-and-lattice-test.md)
 3. [20 - Constants Reference](20-constants-reference.md)
-5. Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133
+4. Souami, D. & Souchay, J. (2012), "The solar system's invariable plane", A&A 543, A133

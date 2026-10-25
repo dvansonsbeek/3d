@@ -223,7 +223,7 @@ The comb-era estimate of the L5 floor (from the retired 33-component fit) is arc
 | pre-iNHG (2.7–5.32 Ma) L1+L2+L3 | **0.4547** |
 <!-- /generated:canonical-r2 -->
 
-The canonical formula deploys only the three-line 405-kyr family in L2; the comb-era 13H and 9-Myr candidates were rejected by the Round-3 cross-window stability test and are not in the deployed formula ([doc 109 §22](109-model-nbody-engine-and-lattice-test.md)).
+The canonical formula deploys only the three-line 405-kyr family in L2; the comb-era long-period and 9-Myr candidates were rejected by the Round-3 cross-window stability test and are not in the deployed formula ([doc 109 §22](109-model-nbody-engine-and-lattice-test.md)).
 
 ### 6.2 Reachable ceiling — and what it does NOT mean
 

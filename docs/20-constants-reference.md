@@ -13,11 +13,7 @@ This document is the **single source of truth** for all constants used in the ES
 
 ### Code organization
 
-Constants in `src/script.js` are organized into 11 numbered sections with sub-headers:
-
-1. Foundational Model Constants — 2. Model Start & Physical Constants — 3. Sun & Moon Input Constants — 4. Planet Input Constants (4a. major planets, 4b. minor bodies, 4c. ascending nodes) — 5. Inclination System (5a–5d) — 6. Predictive Formula System — 7. Body Diameters — 8. Astronomical Reference Values / ASTRO_REFERENCE (8a–8g) — 9. Derived Constants (9a–9e) — 10. Mass Calculations (10a–10b) — 11. Orbital Formulas (11a–11c)
-
-The shared tools module `tools/lib/constants.js` mirrors these with its own 14-section structure.
+The constants have ONE home: the generated module of `@essrt/physics` (`DEFAULT_CONSTANTS`, `REFERENCE_DATA`, `FITTED_COEFFICIENTS` — `npm run constants:generate` from the JSON inputs under `public/input/` and the fit artifacts under `data/`; `npm run test:constants` fails if stale). `src/script.js` binds them in four banners — A (the scene epoch and the research toggles), C (astro references), F (display-only literals), B (fitted coefficients) — and `tools/lib/constants.js` keeps its export names while re-sourcing every value from the package's one-home helpers (plan 13).
 
 ### How other documents should reference constants
 
@@ -44,7 +40,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 | Planet orbital periods (Part 4 `orbitalPeriodInputDays`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
 | α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
 
-The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr. (The unit H(t) that scaled with it — 13.011 periods, a fit constant's multiple — left the model at plan 09 step 7b.) The K-device wheel periods are a J2000 pose and do not scale; no observable rides them.
+The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr. (The fitted unit that once scaled with it left the model at plan 09; the device wheels that carried its periods as a J2000 pose were deleted at plan 11.)
 
 For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family — ONE home since plan 13 B2, `@essrt/physics/deltat/deep-time-chain` (`createDeepTimeChain`; `tools/lib/deep-time.js` and the package model are its consumers). (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived.)
 
@@ -90,7 +86,7 @@ behind fail-proven gates. None is a free parameter:
 
 | Constant | Status | Value | Source |
 |---|---|---|---|
-| Precession anchor p₀ | cited input | <!--v:axialPrecExact-->25,771.58<!--/v--> yr | 1,296,000 / p_A with p_A the IAU 2006 general precession in longitude, 50.28796195 ″/yr (`generalPrecessionJ2000_arcsecPerYr`; plan 09 — before it, the retired year combs' beat at 2000, 25,771.395 yr, 8 ppm faster). The deep-time rate composes ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] |
+| Precession anchor p₀ | cited input | <!--v:axialPrecExact-->25,771.58<!--/v--> yr | 1,296,000 / p_A with p_A the IAU 2006 general precession in longitude, 50.28796195 ″/yr (`generalPrecessionJ2000_arcsecPerYr`; plan 09). The deep-time rate composes ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] |
 | Solar torque share f_S | derived at runtime | <!--v:earthPrecSolarShareJ2000Pct-->31.6<!--/v--> % | GM☉, the lunar constants and the J2000 obliquity (`precession-composed` `computeSolarTorqueShare`) |
 | Lunar recession history | CITED INPUT + the LLR slope, paleo-TESTED | `data/astrogeo22-earth-moon.json` (the shape), `alpha1PerMa` (the J2000 slope) | plan 12 option A: the Earth–Moon distance history is Farhat, Auclair-Desrotour, Boué & Laskar 2022's published solution (the AstroGeo22 ephemeris, 0–4,429 Ma), read as the ratio a(t)/a(0) on the model's observed J2000 distance; the J2000 slope is the LLR rate <!--v:modernLLRRecessionCmYr-->3.82<!--/v--> cm/yr (Dickey 1994 / Chapront 2002, cited). Nothing is fitted to the rock record: the 45-anchor paleo gate tests the derived day length, distance and precession on it, every band naming its cause (the former quartic's α₃/α₄ and the rock-fitted regime knots are deleted) |
 | GIA channel | k derived, τ measured | τ = <!--v:alphaGiaRelaxationKyr-->6<!--/v--> kyr | the polar moment's lagged response to the climate formula's L1 ice proxy: k derived at runtime from the Cox & Chao 2002 dJ₂/dt; τ measured against the historical ΔT record through the joint fitter (plan 06 D7) |
@@ -347,15 +343,15 @@ multi-mode quantity has no single amplitude); the period is the chain's
 
 ## Planet Orbital Distances & Periods
 
-| Planet | Orbit Count in H | Distance (AU) | Period (years) |
-|--------|-----------------|---------------|----------------|
-| Mercury | 1,392,228 | <!--v:mercurySemiMajor-->0.3871<!--/v--> | 0.2408 |
-| Venus | 545,059 | <!--v:venusSemiMajor-->0.7233<!--/v--> | 0.6152 |
-| Mars | 178,289 | <!--v:marsSemiMajor-->1.5237<!--/v--> | 1.8808 |
-| Jupiter | 28,281 | <!--v:jupiterSemiMajor-->5.1996<!--/v--> | 11.8566 |
-| Saturn | 11,396 | <!--v:saturnSemiMajor-->9.5310<!--/v--> | 29.4243 |
-| Uranus | 4,004 | <!--v:uranusSemiMajor-->19.1408<!--/v--> | 83.7417 |
-| Neptune | 2,048 | <!--v:neptuneSemiMajor-->29.9282<!--/v--> | 163.7270 |
+| Planet | Distance (AU) | Period (years) |
+|--------|---------------|----------------|
+| Mercury | <!--v:mercurySemiMajor-->0.3871<!--/v--> | 0.2408 |
+| Venus | <!--v:venusSemiMajor-->0.7233<!--/v--> | 0.6152 |
+| Mars | <!--v:marsSemiMajor-->1.5237<!--/v--> | 1.8808 |
+| Jupiter | <!--v:jupiterSemiMajor-->5.1996<!--/v--> | 11.8566 |
+| Saturn | <!--v:saturnSemiMajor-->9.5310<!--/v--> | 29.4243 |
+| Uranus | <!--v:uranusSemiMajor-->19.1408<!--/v--> | 83.7417 |
+| Neptune | <!--v:neptuneSemiMajor-->29.9282<!--/v--> | 163.7270 |
 
 ## Perihelion Precession Periods (Ecliptic)
 
@@ -388,7 +384,7 @@ Newtonian plus the derived relativistic supplement:
 
 ## Moon Derived Cycles
 
-All Moon cycles derive from the IAU inputs — the sidereal month and the two equinox-of-date precession periods (apsidal, nodal) — and the certified J2000 precession period T_p (plan 09). The retired era device rounded the months onto whole counts over eight anchor intervals (`totalDaysInH / ceil(totalDaysInH / input)`, "exact cycle closure over the anchor interval") and counted the precession periods as eighth-integers over the same span; those counts are gone, and the counts a fitter still needs (the Step-0 Sun harmonics' lunar divisors) are real-valued.
+All Moon cycles derive from the IAU inputs — the sidereal month and the two equinox-of-date precession periods (apsidal, nodal) — and the certified J2000 precession period T_p (plan 09). The retired era device had rounded the months onto whole counts over its anchor interval; those counts are gone, and the counts a fitter still needs (the Step-0 Sun harmonics' lunar divisors) are real-valued.
 
 | Cycle | Variable | Formula | Value (days) |
 |-------|----------|---------|-------------|
@@ -665,20 +661,6 @@ Theoretical orbital inclination ranges from secular perturbation theory.
 **Source**: [Farside physics textbook (Brouwer & van Woerkom)](https://farside.ph.utexas.edu/teaching/celestial/Celestial/node91.html)
 
 
-The `EIGENMODE_PHASES` array in `script.js` provides Laplace-Lagrange reference values:
-
-| Value | Label | Source |
-|-------|-------|--------|
-| 202.8° | γ₈ | Farside Table 10.1 |
-| 20.23° | γ₁ | Farside Table 10.1 |
-| 255.6° | γ₃ | Farside Table 10.1 |
-| 296.9° | γ₄ | Farside Table 10.1 |
-| 127.3° | γ₆ | Farside Table 10.1 |
-| 315.6° | γ₇ | Farside Table 10.1 |
-| 318.3° | γ₂ | Farside Table 10.1 |
-
-f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagrange modes remain.
-
 ## Minor Bodies
 
 ### Pluto
@@ -728,11 +710,11 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 
 ---
 
-# Part 4 — Tuned/Optimized Parameters
+# Part 4 — Period inputs and the node sets
 
-These values result from the retired optimization campaign; the campaign write-ups are archived.
+These values are cited inputs (`astro-reference.json`); the optimization campaign that once refined some of them is retired and its write-ups are archived.
 
-## Planet Orbital Periods (Tuned)
+## Planet Orbital Period Inputs
 
 | Planet | Variable | Value (days) |
 |--------|----------|-------------|
@@ -744,7 +726,7 @@ These values result from the retired optimization campaign; the campaign write-u
 | Uranus | `orbitalPeriodInputDays` | <!--v:uranusOrbitalPeriodInputDays-->30586<!--/v--> |
 | Neptune | `orbitalPeriodInputDays` | <!--v:neptuneOrbitalPeriodInputDays-->59800<!--/v--> |
 
-Stored in `astro-reference.json`. These start from the JPL solar-year periods and carry small pipeline refinements (the calibration record, doc 68, is archived).
+Stored in `astro-reference.json` as inputs; they descend from the JPL periods with the small refinements of a retired calibration campaign (its record is archived).
 
 ## Ascending Nodes on the Invariable Plane at J2000
 

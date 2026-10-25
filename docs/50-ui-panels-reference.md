@@ -250,7 +250,7 @@ Drawn under CYCLES for Earth and each chain planet
 For Mercury through Neptune the perihelion rate is shown in two coordinates
 (doc 13 §1.8), every term computed live by `perihelionFrameBreakdown()`:
 the chain's Newtonian era-window rate (the `lattice` property, a name kept for
-its callers — the H·num/den lattice it once held left at plan 07 R1),
+its callers — the integer-ratio lattice it once held left at plan 07 R1),
 the equatorial projection excess and obliquity-rate term at the IAU J2000
 perihelion longitude, and — plan 06 R8 — the Earth-frame right-ascension rate
 as their sum (a kinematic identity; the chain's secular rate of date lives
