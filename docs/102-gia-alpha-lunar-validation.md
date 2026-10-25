@@ -622,24 +622,28 @@ The full timed corpus (the gate's `denseTargets` section:
 S01/S02/S04 Babylonian + S05 Chinese + S09 Arab, −800..+1280;
 S07 excluded pending per-row lunar/solar typing — the 364 trio is
 Theon's SOLAR eclipse) runs through the same differential machinery:
-**244 of 256 observations identified**, with per-century MAD-SEs
-reaching **122–215 s in the dense centuries** (+1000: ±122 s,
-n = 38; −400: ±164 s, n = 27) — below the cycle contributions
+**<!--v:lunarDenseIdentified-->244<!--/v--> of <!--v:lunarDenseTotal-->257<!--/v--> observations identified**, with per-century MAD-SEs
+of order 120–220 s in the dense centuries (+1000: ±<!--v:lunarDenseSePlus1000Seconds-->121<!--/v--> s,
+n = <!--v:lunarDenseNPlus1000-->38<!--/v-->; −400: ±<!--v:lunarDenseSeMinus400Seconds-->146<!--/v--> s, n = <!--v:lunarDenseNMinus400-->27<!--/v-->) — below the cycle contributions
 (200–550 s), so the eclipse record genuinely discriminates the ΔT
 stack, out of sample (the cycle fit window is 1650–2017). The
-per-cycle ablation χ² (13 centuries with n ≥ 5), under the certified
-framework-native Sun with the derived torque term: full stack 46.0
+per-cycle ablation χ² (<!--v:lunarDenseCenturies-->13<!--/v--> centuries with n ≥ 5), under the certified
+framework-native Sun with the derived torque term, all from the governed
+artifact's `denseTargets.ablationChi2`: full stack <!--v:lunarDenseChi2FullStack-->55.7<!--/v-->
 (the Meeus-basis class, as it must be, since the torque term restores
-Meeus-class BCE timing); **minus resonator 135.8 and
-minus bond 59.3 — the Core-mantle swing and the Bond cycle are
-independently confirmed by the eclipse record**; no cycles 95.4
-(the stack halves the misfit); minus
-jose5/hallstatt/jose4 = 45.0/45.9/40.6 — the Joses and Hallstatt
-receive no independent support from this corpus (for the Joses,
-consistent with their ~179-yr period averaging out in century bins;
-for Hallstatt this stands in open tension with the canon-based
-ablation above, which validated it — different dataset, different
-centuries; recorded as tension, not verdict). Residual structure
+Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->121.1<!--/v--> — the
+Core-mantle swing is confirmed outright by the eclipse record (removing
+it more than doubles the misfit)**; minus bond <!--v:lunarDenseChi2MinusBond-->61.7<!--/v--> — the
+Bond cycle is supported, not confirmed (removing it raises the misfit by
+about a tenth over those centuries); no cycles <!--v:lunarDenseChi2NoCycles-->81.0<!--/v-->
+(the stack takes a third off the misfit); minus
+jose5/hallstatt/jose4 = <!--v:lunarDenseChi2MinusJose5-->56.7<!--/v-->/<!--v:lunarDenseChi2MinusHallstatt-->54.6<!--/v-->/<!--v:lunarDenseChi2MinusJose4-->48.7<!--/v--> — the Joses and Hallstatt
+receive no independent support from this corpus (removing Hallstatt or
+Jose4 even lowers the misfit; for the Joses, consistent with their
+~179-yr period averaging out in century bins; for Hallstatt this stands
+in open tension with the canon-based ablation above, which validated it
+— different dataset, different centuries; recorded as tension, not
+verdict). Residual structure
 remains at full-stack χ²/dof ≈ 3.5 (e.g. −300 at −1,245 ± 1,184 s)
 — characterized in the next section: it is not Earth rotation, and
 the stack stays as shipped.

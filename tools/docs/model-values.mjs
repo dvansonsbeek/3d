@@ -1468,6 +1468,27 @@ export const VALUES = {
     keys.lunarPhaseCTotal = { get: () => la.phaseC.identified + la.phaseC.viaYearStraddle + la.phaseC.ambiguous + la.phaseC.dropped, render: (v) => String(v), note: 'Phase C: the corpus size the re-reduction worked through (identified + via year straddle + ambiguous + dropped)' };
     keys.lunarPhaseCChi2 = { get: () => la.phaseC.chi2, render: (v) => Number(v).toFixed(1), note: 'Phase C: χ² of the per-century medians against the pre-registered column' };
     keys.lunarPhaseCCenturies = { get: () => la.phaseC.chi2Centuries, render: (v) => String(v), note: 'Phase C: the number of centuries the χ² runs over' };
+    // The dense-target corpus — the full timed record (S01/S02/S04/S05/S09, −800..+1280) through the
+    // same differential machinery, and the per-cycle ablation χ² (lunar-alignment.js denseTargets;
+    // doc 102 § The dense-target corpus). Doc 102 had typed these by hand from an earlier run
+    // (full stack 46.0, minus resonator 135.8, minus Bond 59.3 against the artifact's 55.7 /
+    // 121.1 / 61.7) — the keys make the artifact the one home.
+    const dt = la.denseTargets;
+    keys.lunarDenseIdentified = { get: () => dt.identified, render: (v) => String(v), note: 'Dense-target corpus: timed observations identified by the differential re-reduction (S01/S02/S04 Babylonian + S05 Chinese + S09 Arab, −800..+1280)' };
+    keys.lunarDenseTotal = { get: () => dt.identified + dt.viaYearStraddle + dt.ambiguous + dt.dropped, render: (v) => String(v), note: 'Dense-target corpus: the corpus size the re-reduction worked through (identified + via year straddle + ambiguous + dropped)' };
+    keys.lunarDenseCenturies = { get: () => dt.chi2CenturiesUsed.length, render: (v) => String(v), note: 'Dense-target corpus: the number of centuries (n ≥ 5) the ablation χ² runs over' };
+    keys.lunarDenseSePlus1000Seconds = { get: () => dt.perCentury['1000'].seSeconds, render: (v) => String(v), unit: 's', note: 'Dense-target corpus: the +1000 century median\'s MAD-derived standard error' };
+    keys.lunarDenseNPlus1000 = { get: () => dt.perCentury['1000'].n, render: (v) => String(v), note: 'Dense-target corpus: observations in the +1000 century' };
+    keys.lunarDenseSeMinus400Seconds = { get: () => dt.perCentury['-400'].seSeconds, render: (v) => String(v), unit: 's', note: 'Dense-target corpus: the −400 century median\'s MAD-derived standard error' };
+    keys.lunarDenseNMinus400 = { get: () => dt.perCentury['-400'].n, render: (v) => String(v), note: 'Dense-target corpus: observations in the −400 century' };
+    const abl = (/** @type {string} */ k, /** @type {string} */ what) => ({ get: () => dt.ablationChi2[k], render: (/** @type {number} */ v) => Number(v).toFixed(1), note: `Dense-target corpus: the per-century ablation χ² ${what}` });
+    keys.lunarDenseChi2FullStack = abl('fullStack', 'of the full ΔT stack (the certified Sun with the derived torque term)');
+    keys.lunarDenseChi2MinusResonator = abl('minus_resonator', 'with the Core-mantle swing removed');
+    keys.lunarDenseChi2MinusBond = abl('minus_bond', 'with the Bond cycle removed');
+    keys.lunarDenseChi2MinusHallstatt = abl('minus_hallstatt', 'with the Hallstatt cycle removed');
+    keys.lunarDenseChi2MinusJose5 = abl('minus_jose5', 'with the Jose5 cycle removed');
+    keys.lunarDenseChi2MinusJose4 = abl('minus_jose4', 'with the Jose4 cycle removed');
+    keys.lunarDenseChi2NoCycles = abl('noCycles', 'with every cycle removed');
     // theoryDrift: the framework-vs-ELP-class secular drift and the
     // pre-registered re-reduction prediction (doc 102 §lunar-theory drift).
     const signedMin = (/** @type {number} */ v) => (v < 0 ? '−' : v > 0 ? '+' : '') + Math.abs(v).toFixed(1);
