@@ -308,8 +308,8 @@ Each LR04 window fitted independently using `regime="post-mpt"` / `"inhg-mpt"` /
 (L1 fit uses ridge λ=1 — see §9.5. The ridge is a no-op for the three longer regimes because their design matrices are already well-conditioned; the post-MPT total drops 0.006 vs. plain OLS in exchange for forward-projection stability.)
 
 **Observations on the L1/L2/L3 split**:
-1. **L1 does the heavy lifting in every regime**. At the 32-integer stage L1 explained 87% of post-MPT variance alone.
-2. **L2's unique contribution is largest in pre-iNHG (+0.049)**. This is counterintuitive but physically sensible: pre-iNHG had no Northern Hemisphere ice sheets so L1 ice-sheet amplification is weak, and the silicate-weathering thermostat is *more uniquely visible* relative to L1.
+1. **L1 does the heavy lifting in every regime**. L1 alone explains R² = <!--v:canonPostMptL1Only-->0.780<!--/v--> of post-MPT variance.
+2. **L2's separate contribution is zero in the shipped formula**: the 405-kyr family is folded into L1 (TL;DR), so the former "L2 unique" column reads +0.000 in every regime. This is counterintuitive but physically sensible: pre-iNHG had no Northern Hemisphere ice sheets so L1 ice-sheet amplification is weak, and the silicate-weathering thermostat is *more uniquely visible* relative to L1.
 3. **L3 only contributes when the fit window spans a known transition** (full-LR04 picks up iNHG and MPT step components).
 
 ### 9.4 Per-regime fits — CENOGRID
@@ -505,14 +505,12 @@ Sequential ridge regression on detrended + normalized CO₂ over 0–800 kyr:
 
 | Layer | Cumulative R² | ΔR² |
 |---|---:|---:|
-| L1 (32-integer comb) only | **0.8336** | 0.8336 |
-| + L2 (405k + 202k + 135k) | 0.8452 | +0.0115 |
-| + L3 (no transition inside window; MPT at 1000 kyr is the boundary) | 0.8452 | 0.0000 |
-| **Total** | **0.8452** | |
+| L1 (the 28 physical lines) only | **<!--v:canonEpicaCo2L1Only-->0.724<!--/v-->** | <!--v:canonEpicaCo2L1Only-->0.724<!--/v--> |
+| + L2 (the 405-kyr family, folded into L1) | — | <!--v:canonEpicaCo2DeltaL2-->+0.000<!--/v--> |
+| + L3 (no transition inside window; MPT at 1000 kyr is the boundary) | — | <!--v:canonEpicaCo2DeltaL3-->+0.000<!--/v--> |
+| **Total** | **<!--v:canonEpicaCo2Total-->0.724<!--/v-->** | |
 
-(32-integer-stage decomposition; the current canonical EPICA total is <!--v:canonR2Epica-->0.7238<!--/v-->.)
-
-At that stage L1 alone explained **83 %** of CO₂ variance over 800 kyr — strong cross-proxy validation: the same orbital lines that drive ice volume also drive atmospheric carbon-cycle dynamics.
+L1 alone explains R² = <!--v:canonEpicaCo2L1Only-->0.724<!--/v--> of CO₂ variance over 800 kyr — strong cross-proxy validation: the same orbital lines that drive ice volume also drive atmospheric carbon-cycle dynamics.
 
 ### 10.3 Carbon-amplification ratios
 
@@ -566,7 +564,7 @@ Sequential ridge regression on detrended + normalized CO₂ over 0–66 Ma:
 | + L3 (6 Cenozoic transitions inside window) | **<!--v:canonCenco2pipTotal-->0.692<!--/v-->** | **<!--v:canonCenco2pipDeltaL3-->+0.644<!--/v-->** |
 | **Total** | **<!--v:canonCenco2pipTotal-->0.692<!--/v-->** | |
 
-Different signature from EPICA: at 66-Myr scale **L3 carries 60% of the variance**. The orbital L1 oscillations time-average toward zero across many cycles; the Cenozoic CO₂ story is the discrete step-changes at major transitions.
+Different signature from EPICA: at 66-Myr scale **L3 carries almost all of the explained variance** (ΔR² <!--v:canonCenco2pipDeltaL3-->+0.644<!--/v--> of the <!--v:canonCenco2pipTotal-->0.692<!--/v--> total). The orbital L1 oscillations time-average toward zero across many cycles; the Cenozoic CO₂ story is the discrete step-changes at major transitions.
 
 ### 11.3 L3 step amplitudes — Cenozoic CO₂ history
 
@@ -585,7 +583,7 @@ The PETM (−393 ppm older-than-PETM) and EOT (+392 ppm older-than-EOT) signs ar
 
 ### 11.4 Cross-proxy convergence
 
-The structural claim of doc 92 — that the **same L1 line set + L2 thermostat + L3 step terms explain three independent climate proxies** — has three confirming fits (comb-era breakdowns; the current totals follow the table):
+The structural claim of doc 92 — that the **same L1 line set + L2 thermostat + L3 step terms explain three independent climate proxies** — has three confirming fits (the shipped per-regime fits):
 
 | Dataset | Window | Proxy | R² breakdown | Total R² |
 |---|---|---|---|---:|
@@ -593,7 +591,7 @@ The structural claim of doc 92 — that the **same L1 line set + L2 thermostat +
 | EPICA (Bereiter 2015) | 0–800 kyr | atmospheric CO₂ | L1 = <!--v:canonEpicaCo2L1Only-->0.724<!--/v-->, +L2 = <!--v:canonEpicaCo2DeltaL2-->+0.000<!--/v-->, +L3 = <!--v:canonEpicaCo2DeltaL3-->+0.000<!--/v--> | **<!--v:canonEpicaCo2Total-->0.724<!--/v-->** |
 | CenCO2PIP (Consortium 2023) | 0–66 Ma | atmospheric CO₂ (multi-proxy) | L1 = <!--v:canonCenco2pipL1Only-->0.047<!--/v-->, +L2 = <!--v:canonCenco2pipDeltaL2-->+0.000<!--/v-->, +L3 = <!--v:canonCenco2pipDeltaL3-->+0.644<!--/v--> | **<!--v:canonCenco2pipTotal-->0.692<!--/v-->** |
 
-(Breakdowns are the 32-integer-stage fit reports; current canonical totals: post-MPT <!--v:canonR2PostMpt-->0.7804<!--/v-->, EPICA <!--v:canonR2Epica-->0.7238<!--/v-->, CenCO2PIP 0.7626 — the generated canonical-r2 block in §9.)
+(Breakdowns and totals are the shipped per-regime fits; the generated canonical-r2 block in §9 carries the same totals.)
 
 The Quaternary fits (LR04 + EPICA) emphasize L1; the Cenozoic-scale fit (CenCO2PIP) emphasizes L3. The L1 line set is the same in all three.
 

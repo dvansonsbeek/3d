@@ -16,11 +16,10 @@ runs (so a number here can never be stale; `npm run docs:tables` fails if
 it is). The acceptance test is external: a chain counts as understood when
 the owner reproduces its values in a spreadsheet from this page alone.
 
-The tables once carried an **H-role column** — the audit's classification of
-where the retired fitted unit (13.011 × the J2000 luni-solar precession
-period) entered each formula, as a unit, a proxy for the tidal spin history,
-a comb basis or a lattice claim. Since plan 09 (model v24.0) no formula
-carries it, and the column is gone; the dispositions are [doc 109 §23](109-model-nbody-engine.md).
+The tables once carried an **H-role column**, the audit's record of where the
+retired fitted unit entered each formula; since plan 09 (model v24.0) no
+formula carries it and the column is gone — the dispositions are
+[doc 109 §23](109-model-nbody-engine.md).
 
 
 Types follow plan 02 D1: **A** long-term frequency/mean · **B** present-epoch
@@ -43,13 +42,10 @@ series term that carries the solar anomaly M.
 | evaluator | formula | anchor | engine · type | consumers | code |
 | --- | --- | --- | --- | --- | --- |
 | **deep-mode channel** | z(t) = Σₖ (reₖ + i·imₖ)·e^{iωₖt} + R, e = \ | z\ | ; R = z_J2000 − Σₖ(reₖ + i·imₖ) so e(J2000) is exact by construction; 18 modes (ω, re, im) from the ±10-Myr NAFF table | D · A (beyond ~5 Myr the table is spectrum-class: the attractor, not a pointwise ephemeris) | — | **the entire lunar chain** (this chain) | `packages/physics/src/moon/deep-ecc-channel.cjs` 60–120 |
-| **H/3 line (deleted, plan 09 step 6)** | e(t) = base′·(1 + cos θ(t)/2), θ = θ₀ + 2π·cycles(2000→t, divisor 3), base′ = e₀/(1 + cos θ₀/2), θ₀ = ϖ_ICRF(J2000) − 21.77° | e₀ = 0.01671022 (IAU, astro-reference), ϖ_ICRF(J2000) = 102.94719°, anchor 21.77° | K · L (the epoch-local tangent, 5 % era ≈ −2,600…+2,850) | RETIRED from the physics package (plan 06 layer B): the eclipse Sun's equation of centre, the Besselian Sun distance and the cardinal braid now ride the banked series plus the derived mean-element offset (next row); DELETED at plan 09 step 6: the browser's `_moonEcc`, the Node twin's `_fwEarthEcc`, the two ecc-channel modules and the 21.77° anchor are gone; the scene keeps the line's J2000 phase as a recorded pose (`kDeviceInclinationPhaseJ2000Deg`) | — (doc 66 §1 is the derivation record) |
 | **mean-element offset** | Δϖ = <!--v:sunMeanOffsetPomArcsec-->+70.08<!--/v-->″, Δe = <!--v:sunMeanOffsetE-->+5.81e-6<!--/v--> added to the series for the SUN only — the 1890–2110 mean of (osculating − secular) EMB e and ϖ from the Horizons J2000 seed integrated as a nine-body system (the lab RK4, daily samples), the chain as the secular reference | the seed vectors, the chain, the lab derivative | P (fully derived; the JPL Sun sample is a validation only: all-phase sd 3.23″ → 1.59″, the former K law 1.58″) | eclipse Sun equation of centre, Besselian Sun distance, cardinal braid — the mean elements of the era (Simon 1994's 102.937°, 0.0167086 reproduced to 0.2″); the published Earth surface stays the secular series | `tools/verify/earth-osculating-offset.js` → `data/earth-osculating-mean-offset.json`; `model/earth-scalars.js` `sunPerihelionDegAt` / `sunEccentricityAt` |
 | **banked series** | e = \ | z(t)\ | sampled from the same N-body run (`data/nbody-secular-series.json`, 2-kyr grid inside ±10 Myr; the mode table beyond) | D · A | — | the scene's readouts, the Eccentricity Path exhibit, the FV charts | `src/script.js` `_sceneEccTargetAt`, `tools/lib/deep-orbital-history.js` |
 
-The deep-mode channel and the retired H/3 line agreed within ~8×10⁻⁵ across the
-historical era and diverged beyond it (0.0034 vs 0.0079 at the 28,832 AD
-minimum — the measured reason the line could not be the physics); the series and the mode table agree in-era and sit ~1×10⁻³ apart
+The series and the mode table agree in-era and sit ~1×10⁻³ apart
 by 27 kyr (the table pins the unresolved short-period content only at
 J2000). The two J2000 anchors differ by 7.8×10⁻⁶ (JPL vector seed vs IAU
 mean element) — the reason the first row below shows two e's at 2000.
@@ -65,7 +61,7 @@ mean element) — the reason the first row below shows two e's at 2000.
 | 5 | Meeus E-factor, bounded | E(t) = e(t)/e₀ (≡ 1 at J2000); replaces 1 − 0.002516T − 0.0000074T²; every series term carrying M is multiplied by E, terms with 2M by E² | step 1 | `model/lunar-theory.js` `fwEFactor`; `series.cjs` 180–181 |
 | 6 | the L′ planetary carrier (Δe²) | K_PL · ∫₀ᵀ (e(t′)² − e₀²) dt′ with K_PL derived from the ELP W1 T² budget (table 1.3) | e₀ (the channel's anchor constant, not eccAt(0)) | `arguments.cjs` 199–225 |
 | 7 | deep-time lunar periods | perigee period(t) = P₀ · (T_yr(t)/T_yr₀)² · (M_sid₀/M_sid(t)) / (g/g₀)^s_ϖ; node likewise with s_Ω; M_sid(t) from Kepler on the receded distance; T_yr(t) from the mass-loss tier | step 2 + the tidal chain | `month-chain.cjs` 186–206 |
-| 7′ | the precession of date in this chain (the former H entry point, re-expressed at plan 09 step 5c) | the tropical month removes one equinox turn per T_p(t): `tropicalMonthSecondsAtAge` = M_sid·(1 − M_sid/(T_p·T_yr)) (was 13 turns per the counter H(t), 0.086 % slow — the chain's J2000 tropical month sat 5.85 ms above the IAU input); the apsidal/nodal "cycles per H" and their H² scaling are deleted — the of-date perigee and node are the count compositions N_trop − N_anom and N_drac − N_trop | `lunisolarPrecessionPeriodYearsAtAge` | `month-chain.cjs` — no H entry point |
+| 7′ | the precession of date in this chain | the tropical month removes one equinox turn per T_p(t): `tropicalMonthSecondsAtAge` = M_sid·(1 − M_sid/(T_p·T_yr)); the of-date perigee and node are the count compositions N_trop − N_anom and N_drac − N_trop | `lunisolarPrecessionPeriodYearsAtAge` | `month-chain.cjs` |
 
 ### 1.3 Live values — the spreadsheet check
 
@@ -120,7 +116,7 @@ The audit's findings for this chain (the carrier's one home, the proxy the retir
 ## Chain 2 — the lunisolar precession: the Earth clock
 
 This is the chain plan 06 turns on. The luni-solar precession of Earth's
-spin axis is what the legacy constant H was a proxy for. The model computes
+spin axis is what the retired unit was a proxy for. The model computes
 it in **three places** that must be read together: the *mean* tidal-tier
 clock (2.1, where T_p(t) is composed from the day length and the Moon's
 distance), the *of-date*
@@ -137,27 +133,12 @@ Earth's spin × the solar + lunar torques on the recession history).
 | 3 | day length LOD(t) | 2π·I(t) / (L_EM(t) − L_M(t)), I = α·M_E·R_E², L_M = m_M·√(GM_EM·a_M)·√(1 − e_M²) — angular-momentum conservation in the Earth–Moon system; L_EM constant (the solar channels that once made it time-dependent beyond the era were deleted at plan 12 option A) | steps 1–2; L_EM from Layer 0 (chain 1's √(1 − e_M²) factor) | `deltat/deep-time.cjs` 80–86; L_EM `layer0/derive-params.js` 63–64 |
 | 4 | spin rate ω(t) | 2π / LOD(t) | step 3 | (implicit) |
 | 5 | the spin factor ω₀/ω(t) = LOD(t)/LOD₀ | **LOD(t)/LOD_J2000** | LOD_J2000 = ω₀ = 86,400 s (the SI day — plan 09; the device's kinematic day read 86,399.99968) | `earth/precession-composed` (the ω₀/ω factor of 2.3) |
-| 6 | **T_p(t), the composed lunisolar precession period** | **1,296,000″ / ψ̇(t)**, ψ̇(t) = p₀·[ω₀/ω]·[f_S + (1 − f_S)(a₀/a_M)³], p₀ = 1,296,000/T_p(J2000) | step 5; a_M(t) (step 1); f_S = 0.3165 from the shared constants (`derive-params`); T_p(J2000) = 25,771.575 yr = 1,296,000/p_A, the IAU 2006 general precession input (plan 09; S5 had anchored it on the certified year combs' beat, 25,771.4) | `deltat/deep-time.cjs` `lunisolarPrecessionPeriodYearsAtAge` (one formula home: `earth/precession-composed`) |
-| 7 | tropical year of age | 1/T_trop = 1/T_sid(t) + ψ̇(t)/(1,296,000″ · 365.25 d) — the sidereal year less one equinox turn per the composed precession period T_p(t) (plan 09 step 5d; it was the unit's calendar convention T_sid·(1 − 13/H(t)), 0.086 % slow on the equinox term — 1.0 s of year at J2000, 1.1 h of the deep JD↔year calendar at ±4 kyr — which plan 06 D2 had kept as a named device). At J2000 it is the derived mean tropical year of 2.1 step 4c to 5 ns. The deep JD↔year calendar integrates this over the day of date | step 6's ψ̇(t) (ω₀/ω, f_S, a₀/a_M); T_sid(t) = T₀(1 − Δm)² (Driver 2) | `deltat/deep-time.cjs` `tropicalYearSecondsFromLod`; layer-0 twin `tropicalYearSecondsCore` (bit-identical, the layer0 gate); the frozen clock's device twin on H_era, `eraClockTropicalYearSecondsAtAge`, was deleted with the era clock at plan 09 step 7a |
+| 6 | **T_p(t), the composed lunisolar precession period** | **1,296,000″ / ψ̇(t)**, ψ̇(t) = p₀·[ω₀/ω]·[f_S + (1 − f_S)(a₀/a_M)³], p₀ = 1,296,000/T_p(J2000) | step 5; a_M(t) (step 1); f_S = 0.3165 from the shared constants (`derive-params`); T_p(J2000) = 25,771.575 yr = 1,296,000/p_A, the IAU 2006 general precession input (plan 09) | `deltat/deep-time.cjs` `lunisolarPrecessionPeriodYearsAtAge` (one formula home: `earth/precession-composed`) |
+| 7 | tropical year of age | 1/T_trop = 1/T_sid(t) + ψ̇(t)/(1,296,000″ · 365.25 d) — the sidereal year less one equinox turn per the composed precession period T_p(t). At J2000 it is the derived mean tropical year of 2.1 step 4c to 5 ns. The deep JD↔year calendar integrates this over the day of date | step 6's ψ̇(t) (ω₀/ω, f_S, a₀/a_M); T_sid(t) = T₀(1 − Δm)² (Driver 2) | `deltat/deep-time.cjs` `tropicalYearSecondsFromLod`; layer-0 twin `tropicalYearSecondsCore` (bit-identical, the layer0 gate) |
 
-Plan 06 Phase 3 made the unit follow the composed physics of 2.3, and the
-former step 5 was the frozen devices' own counter under its own name; plan
-09 steps 7a/7b deleted both counters — step 6 is the period itself.
-Numerically the two had agreed wherever (a₀/a_M)³ ≈ 1 (0.999995 at 26 kyr)
-and split at depth (0.68 at 2.46 Ga). **S5 (one J2000 precession
-reading)** then anchored the composed rate on the model's own derived
-J2000 period — 25,771.4 yr, the certified year laws' beat, IAU to 8×10⁻⁶
-— instead of on H₀/13 = 25,793.6 (plan 09 then made the anchor the IAU
-2006 p_A itself, 25,771.575 yr, an input: the derived beat's 8 ppm was a
-sidereal-year-input residual, finding 2.5-1), and retired "H = 13·T_p" as a claim:
-H₀ was fitted on the 1246 AD perihelion–solstice alignment (the
-perihelion-of-date beat, finding 1), so H₀/13 is the fit anchor's reading,
-0.086 % slow, and is not a period of anything the model computes (nor a
-window mean: the published period averages 25,598 yr over ±26 kyr). The
-unit and the clock had scaled together, their ratio 13.011 a fit constant;
-the unit left the physics at plan 09 step 7b. At S5 the composed
-rate rose 0.086 % everywhere (paleo rows: +0.94 % / −3.68 % against
-Xiamaling / Lantink, both inside tolerance).
+The composed rate is anchored on the IAU 2006 p_A (plan 09), an input; the
+retired counters that once stood beside step 6 are recorded in
+[doc 109 §23](109-model-nbody-engine.md).
 
 ### 2.2 The of-date precession period — the one-family beat
 
@@ -182,8 +163,7 @@ exactly (P03's 5,028.796195″/cy, the input `generalPrecessionJ2000_arcsecPerYr
 plan 09; the S5-era derived beat 25,771.40 sat 8 ppm above it). This is the
 model's ONE J2000 precession reading: the composed clock's anchor p₀, the
 hybrid's self-anchor target and every published face (`lunisolar`, the
-registry, the panels) read it. The retired unit's H₀/13 read 25,793.6 yr =
-50.2450 ″/yr — the fit anchor's reading, never a period (finding 1). Away from J2000 the
+registry, the panels) read it. Away from J2000 the
 published route follows the hybrid (finding 5).
 
 ### 2.3 The torque composition — the physical rate
@@ -199,7 +179,7 @@ registry (`tools/docs/model-values.mjs`) and the instrument
 `tools/explore/w3-precession-crosscoupling.mjs` read it.
 
 **The precession of date.** The composition above is the SECULAR law: the
-deep-time clock T_p(t) rides it (so did the unit H(t), until plan 09 step 7b
+deep-time clock T_p(t) rides it (so did the retired unit, until plan 09 step 7b
 deleted it). The spin integration (route B,
 the published movement) multiplies it by two factors of date, both exactly
 1 at J2000 — ONE home, `earth/deep-orbital-history.cjs`:
@@ -232,7 +212,7 @@ J₂(t)/J₂₀ stays within ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!
 | solar torque factor | 3.965677e-14 km³/s²/km³ | GM☉/AU³ · (1 − e_E²)^(−3/2), e_E = 0.01671022 (IAU J2000) |
 | lunar torque factor | 8.565827e-14 | GM_M/a_M³ · (1 − e_M²)^(−3/2) · (1 − 1.5 sin² i_M), a_M = 384399.07 km, e_M = 0.054900489, i_M = 5.1573° |
 | **f_S, the solar share** | **31.65 %** | sol/(sol + lun) — literature ≈ 31.6 % |
-| p₀, the composition's J2000 anchor | 50.2880 ″/yr | the IAU 2006 general precession in longitude p_A (astro-reference `generalPrecessionJ2000_arcsecPerYr`, T_p(J2000) = 25,771.575 yr) — the model's ONE J2000 reading since plan 09 (S5 had anchored it on the retired year combs' beat at 2000, 25,771.395 yr, 8 ppm faster). The former 1,296,000/(H/13) = 50.2450 was the fit anchor's reading, 0.086 % slow |
+| p₀, the composition's J2000 anchor | 50.2880 ″/yr | the IAU 2006 general precession in longitude p_A (astro-reference `generalPrecessionJ2000_arcsecPerYr`, T_p(J2000) = 25,771.575 yr) — the model's ONE J2000 reading since plan 09 |
 | α = p₀ / cos ε₀ | 54.811 ″/yr | the hybrid's precession constant (ε₀ = 23.439279444444445°); literature ≈ 54.9 |
 <!-- /generated:calcmap-torque-split -->
 
@@ -254,7 +234,7 @@ The mean tidal clock and the composition, by age:
 | 1400 | 339940 | 18.537 | 1.29470 | 0.330695 | 1.4459 | 1.01861 | **14976.9** | 86.53 |
 | 2460 | 321186 | 16.845 | 1.42477 | 0.330695 | 1.7143 | 1.02452 | **11863.3** | 109.24 |
 
-T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = 50.2880 ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — `@essrt/physics/earth/precession-composed` built inside `deltat/deep-time.cjs`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. (The internal UNIT H(t) = H₀·(ω₀/ω)/[f_S + (1 − f_S)(a₀/a)³] — `hAtAge`, 13.011 composed periods at every epoch, a fit constant’s multiple and not a period of anything the model computes; H₀ was fitted on the 1246 AD perihelion–solstice alignment — left the physics at plan 09 step 7b, after its spin-scaling twin H_era = H₀·LOD/LOD₀, the FROZEN era clock’s counter, left with the last comb at step 7a.) External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).
+T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = 50.2880 ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09) — `@essrt/physics/earth/precession-composed` built inside `deltat/deep-time.cjs`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows `xiamaling-prec-1400` / `lantink-prec-2460`).
 <!-- /generated:calcmap-tidal-clock -->
 
 The of-date precession, by year (the hybrid's ε alongside, from the
@@ -295,7 +275,7 @@ record is kept below where a retired reading explains a present one.
 | sidereal year (days, IAU) | 365.256363004 | `yearLengthRef.siderealYear` (astro-reference) |
 | **LOD_mean** (the kinematic day ω₀, s) | 86400 | `yearLengthRef.solarDay` — the SI day (plan 09: was the retired device's kinematic identity, 86,399.99968 s) |
 | anomalistic year (days) | 365.259634985 | the one-family law of date at 2000 — the series' own apsidal rate 11.609 ″/yr on the sidereal year (plan 09 step 4d; the Simon 1994 mean element 365.259636 is a citation, 87 ms longer; before step 3 the device's anomalistic identity, 0.3 s low) |
-| **p₀, the J2000 precession anchor** | 50.28796195 ″/yr (T_p = 25771.575 yr) | `earthOrbital.generalPrecessionJ2000_arcsecPerYr` — IAU 2006 p_A (plan 09: was the retired year combs' beat at 2000, 25,771.395 yr) |
+| **p₀, the J2000 precession anchor** | 50.28796195 ″/yr (T_p = 25771.575 yr) | `earthOrbital.generalPrecessionJ2000_arcsecPerYr` — IAU 2006 p_A (plan 09) |
 <!-- /generated:calcmap-j2000-identities -->
 
 The snap that used to sit in the second row — the input tropical year
@@ -313,15 +293,6 @@ fitter's lunar counts ride the real-valued product).
 | **(B) the one-family route** (`model.yearLengths`) — THE SCENE'S FAMILY: the rendered Sun integrates its tropical year and turns with its frame and apsidal line, and the scene-sampled gate (`tools/verify/scene-year-lengths.js`) pins the measured sidereal, tropical and anomalistic years to it within 30 ms | D6 λ̇ channel | 1/T_trop = 1/T_sid + p/(360°·365.25 d), p the hybrid's general-precession rate (broken angle, per Julian year) | 1/T_anom = 1/T_trop − ϖ̇_eq/(360°·365.25 d), ϖ̇_eq the movement's own year-over-year apsidal advance against the equinox (the scene's perihelion; until 2026-09 the planet chain's secular tangent — seconds from the scene within a few millennia, 395 s at +25 kyr) | `earth/year-lengths.cjs` |
 | the same years in DAYS of the epoch (`model.lengths.siderealYearDays` / `tropicalYearDays` / `anomalisticYearDays`; the browser's `*YearDaysOfDate`) | (B) ÷ the kinematic day of date | (B) ÷ the kinematic day of date | (B) ÷ the kinematic day of date (null beyond the one-family window) | `model/year-day-lengths.js` `dayLengthSeconds` |
 
-The comb family (A) — three fitted combs, 12 + 6 + 8 lines on divisors of H
-on tidal-chain bases carrying 13/H(t) and (H/16)/(H/16 − 1), with the
-cardinal form (A′) — and its coefficients
-(TROPICAL/SIDEREAL/ANOMALISTIC_YEAR_HARMONICS, Ledger 3 of the parameter
-accounting) are deleted at plan 09. They were fitted to the scene's own
-solstice/equinox geometry (tools/fit README, Step 6c); "on the lattice" was
-a property of the basis chosen, not a finding, and the comb carried no
-secular drift (the tropical comb sat +1.09 s flat where the physical year
-drifts −0.53 s/cy).
 
 <!-- generated:calcmap-year-lengths-of-date -->
 | year | sid, days of the epoch (`lengths.siderealYearDays`) | **sid one-family (SI d) — published** | trop, days of the epoch (`lengths.tropicalYearDays`) | **trop one-family (SI d) — published** | anom, days of the epoch (`lengths.anomalisticYearDays`) | **anom one-family (SI d) — published** |
@@ -341,9 +312,8 @@ drifts −0.53 s/cy).
 | quantity | formula | code |
 | --- | --- | --- |
 | LOD kinematic of date | the tidal mean 2πI(t)/(L_EM − L_M) (chain 2.1 step 3) — exactly ω₀ = 86,400 s at J2000 (plan 09; the retired form was the tidal-tier year in seconds over the comb-family year in days, the comb's λ̇ ripple written as a day ripple) | `model/year-day-lengths.js` `dayLengthSeconds`; `deltat/deep-time.cjs` 80–86 |
-| (measured solar day — DELETED, plan 09 step 5b) | was LOD kinematic + RA-day-offset(y)/1000 with the fitted comb −14.194 − 5.64·cos(phase₁₆) − 1.684·cos(phase₈) ms on the H/16 and H/8 counters — the equation of time's WINDOW term of the Framework-Verification instrument (365 noons from the June solstice end 0.2422 d short of the year; the two lines are the e·cos(90° − ϖ) and tan²(ε/2) terms of dEoT/dt at the solstice), a property of the window, not of the sky — docs/11 § "The retired RA day offset" | (deleted) |
 | sidereal day | solar-year-seconds / (tropical-year-days + 1) | `model/one-source-movement.js` `siderealDaySeconds` |
-| stellar day | sidereal day + the RA-projection term (solar-year/(days+1)/T_p(t)/(days+1))·cos ε — one extra rotation per precession turn, T_p(t) the composed lunisolar period (S5: its certified J2000 anchor past the chain's domain), not the counter H(t)/13 (7 µs slow) | `model/one-source-movement.js` `stellarDaySeconds` |
+| stellar day | sidereal day + the RA-projection term (solar-year/(days+1)/T_p(t)/(days+1))·cos ε — one extra rotation per precession turn, T_p(t) the composed lunisolar period (S5: its certified J2000 anchor past the chain's domain) | `model/one-source-movement.js` `stellarDaySeconds` |
 | LOD with cycle corrections | tidal mean + the ΔT-stack cycle sum (Bond, Hallstatt, Jose5, Jose4 — fitted periods stated in years, amplitudes fitted; plan 06 T5 retired their former integer-divisor labels) | `deltat/deep-time.cjs` 187–193; `deltat/cycles.cjs` |
 
 <!-- generated:calcmap-day-lengths -->
@@ -411,8 +381,7 @@ frame. The Sun's declination at the June solstice is the scene's ε.
 Inputs: ε₀ and T_p(J2000) only. Since S5 there is ONE α reading,
 54.811 ″/yr = the J2000 rate p₀ / cos ε₀ (p₀ = p_A since plan 09; the registry's
 `lunisolarTorqueConstantJ2000ArcsecPerYr`, the verdict artifact and the
-hybrid's own K_LUNI target agree); the former 54.764 rode H/13 (50.245)
-and is retired with it.
+hybrid's own K_LUNI target agree).
 
 ### 4.4 The obliquity beat — falsification leg 1
 
@@ -426,15 +395,11 @@ with T_p(t) the composed lunisolar period on the J2000 anchor
 evaluator the hybrid's injection scales on, the tidal-clock table of 2.1
 tabulates and the paleo-anchors gate rows `xiamaling-prec-1400` /
 `lantink-prec-2460` read. The deep chain's tidal-mean year pair beats at
-T_p(t) counted in sidereal years, + 1 (plan 09 step 5d; it had beaten at the
-retired unit's H(t)/13, 0.086 % apart — the 4.5 block asserts the identity
-per row). The pre-Phase-3 reading on the frozen era clock's counter H_era/13
-(pure spin scaling, missing the lunar 1/a³ growth) is retired with the
-clock. The alternative
+T_p(t) counted in sidereal years, + 1 (plan 09 step 5d; the 4.5 block asserts the identity
+per row). The alternative
 `obliqPrecScaled*Kyr` is the "obliquity period ∝ T_p" reading —
 the J2000 beat held proportional to T_p(t), identical to the beat today —
-carried for the discrimination (D8 iii); S5 retired its former T_p·13/8
-(= H/8) form.
+carried for the discrimination (D8 iii).
 
 ### 4.5 Live values — the spreadsheet check
 
@@ -467,7 +432,7 @@ Banked window rms vs La2004 (″), hybrid on the series / the same hybrid on the
 The beat at the deep anchors, both ψ̇ readings:
 
 <!-- generated:calcmap-obliquity-beat -->
-| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d; it was the unit’s H(t)/13, 0.086 % apart) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \|s₃\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |
+| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \|s₃\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqPrecScaled*Kyr` |
 |---|---|---|---|---|---|
 | 0 | **25771.575** | 25772.126 | 50.288 | 41.22 | 41.22 |
 | 380 | **21235.375** | 21237.506 | 61.030 | 30.73 | 33.97 |
@@ -475,7 +440,7 @@ The beat at the deep anchors, both ψ̇ readings:
 | 1400 | **14976.924** | 14981.563 | 86.533 | 19.15 | 23.96 |
 | 2460 | **11863.274** | 11869.497 | 109.245 | 14.34 | 18.98 |
 
-s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.6 yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The third column is the deep chain’s tidal-mean year pair: since plan 09 step 5d its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row); before it the pair beat at the retired unit’s H(t)/13, the calendar convention plan-06 D2 had kept as a named device, 0.086 % above the composed period. Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the fifth column; `obliqH8Scaled*Kyr` (name kept) is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is retired with the frozen era clock (plan 09 step 7a).
+s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.6 yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The third column is the deep chain’s tidal-mean year pair: since plan 09 step 5d its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row). Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the fifth column; `obliqPrecScaled*Kyr` is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii).
 <!-- /generated:calcmap-obliquity-beat -->
 
 ### 4.6 Findings from this chain — resolved
@@ -531,7 +496,7 @@ of [doc 109 §23.2–23.3](109-model-nbody-engine.md).
 
 Validated against the banked CSV: bias ~1 s / rms ~101 s on the year
 lengths (the residual is the ecliptic-plane planetary-precession term the
-closed form does not carry). **No H enters this device anywhere.**
+closed form does not carry). **The retired unit never entered this device.**
 
 ### 5.4 The scene's panel — one source
 

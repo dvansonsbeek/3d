@@ -156,7 +156,7 @@ ecliptic_period = (ICRF × reference) / (ICRF + reference)
 ```
 
 Where:
-- reference = the general precession period T_p (1,296,000/p_A at J2000, the IAU 2006 input; the retired unit's reading was 0.086 % long)
+- reference = the general precession period T_p (1,296,000/p_A at J2000, the IAU 2006 input)
 
 **Implementation (`src/script.js`):**
 
@@ -330,7 +330,7 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| General precession | <!--v:axialPrecExact-->25,771.58<!--/v--> yr | 1,296,000/p_A, p_A the IAU 2006 general precession input (`generalPrecessionJ2000_arcsecPerYr`); the deep-time clock is the composed T_p(t) (see [Constants Reference](20-constants-reference.md)). The former H/13 on the fitted anchor `holisticyearLength` is deleted (plan 09) |
+| General precession | <!--v:axialPrecExact-->25,771.58<!--/v--> yr | 1,296,000/p_A, p_A the IAU 2006 general precession input (`generalPrecessionJ2000_arcsecPerYr`); the deep-time clock is the composed T_p(t) (see [Constants Reference](20-constants-reference.md)) |
 
 ---
 

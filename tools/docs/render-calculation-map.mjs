@@ -126,7 +126,7 @@ function blockTorqueSplit() {
     `| solar torque factor | ${e(s.sol, 6)} km³/s²/km³ | GM☉/AU³ · (1 − e_E²)^(−3/2), e_E = ${s.eE} (IAU J2000) |`,
     `| lunar torque factor | ${e(s.lun, 6)} | GM_M/a_M³ · (1 − e_M²)^(−3/2) · (1 − 1.5 sin² i_M), a_M = ${C.moonDistance} km, e_M = ${C.moonOrbitalEccentricity}, i_M = ${C.moonEclipticInclinationJ2000}° |`,
     `| **f_S, the solar share** | **${(100 * s.fS).toFixed(2)} %** | sol/(sol + lun) — literature ≈ 31.6 % |`,
-    `| p₀, the composition's J2000 anchor | ${s.p0.toFixed(4)} ″/yr | the IAU 2006 general precession in longitude p_A (astro-reference \`generalPrecessionJ2000_arcsecPerYr\`, T_p(J2000) = 25,771.575 yr) — the model's ONE J2000 reading since plan 09 (S5 had anchored it on the retired year combs' beat at 2000, 25,771.395 yr, 8 ppm faster). The former 1,296,000/(H/13) = 50.2450 was the fit anchor's reading, 0.086 % slow |`,
+    `| p₀, the composition's J2000 anchor | ${s.p0.toFixed(4)} ″/yr | the IAU 2006 general precession in longitude p_A (astro-reference \`generalPrecessionJ2000_arcsecPerYr\`, T_p(J2000) = 25,771.575 yr) — the model's ONE J2000 reading since plan 09 |`,
     `| α = p₀ / cos ε₀ | ${s.alpha.toFixed(3)} ″/yr | the hybrid's precession constant (ε₀ = ${s.eps0}°); literature ≈ 54.9 |`,
   ].join('\n');
 }
@@ -149,7 +149,7 @@ function blockTidalClock() {
     rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(lf, 4)} | ${f(fe, 5)} | **${f(Tp, 1)}** | ${f(pc, 2)} |`);
   }
   rows.push('');
-  rows.push(`T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = ${f(s.p0, 4)} ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09; S5 had the retired year combs’ beat at 2000, 8 ppm faster) — \`@essrt/physics/earth/precession-composed\` built inside \`deltat/deep-time.cjs\`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. (The internal UNIT H(t) = H₀·(ω₀/ω)/[f_S + (1 − f_S)(a₀/a)³] — \`hAtAge\`, 13.011 composed periods at every epoch, a fit constant’s multiple and not a period of anything the model computes; H₀ was fitted on the 1246 AD perihelion–solstice alignment — left the physics at plan 09 step 7b, after its spin-scaling twin H_era = H₀·LOD/LOD₀, the FROZEN era clock’s counter, left with the last comb at step 7a.) External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows \`xiamaling-prec-1400\` / \`lantink-prec-2460\`).`);
+  rows.push(`T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = ${f(s.p0, 4)} ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09) — \`@essrt/physics/earth/precession-composed\` built inside \`deltat/deep-time.cjs\`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows \`xiamaling-prec-1400\` / \`lantink-prec-2460\`).`);
   return rows.join('\n');
 }
 
@@ -186,7 +186,7 @@ function blockJ2000Identities() {
     `| sidereal year (days, IAU) | ${sidD} | \`yearLengthRef.siderealYear\` (astro-reference) |`,
     `| **LOD_mean** (the kinematic day ω₀, s) | ${lod} | \`yearLengthRef.solarDay\` — the SI day (plan 09: was the retired device's kinematic identity, 86,399.99968 s) |`,
     `| anomalistic year (days) | ${anom.toFixed(9)} | the one-family law of date at 2000 — the series' own apsidal rate 11.609 ″/yr on the sidereal year (plan 09 step 4d; the Simon 1994 mean element 365.259636 is a citation, 87 ms longer; before step 3 the device's anomalistic identity, 0.3 s low) |`,
-    `| **p₀, the J2000 precession anchor** | ${pA} ″/yr (T_p = ${(1296000 / pA).toFixed(3)} yr) | \`earthOrbital.generalPrecessionJ2000_arcsecPerYr\` — IAU 2006 p_A (plan 09: was the retired year combs' beat at 2000, 25,771.395 yr) |`,
+    `| **p₀, the J2000 precession anchor** | ${pA} ″/yr (T_p = ${(1296000 / pA).toFixed(3)} yr) | \`earthOrbital.generalPrecessionJ2000_arcsecPerYr\` — IAU 2006 p_A (plan 09) |`,
   ].join('\n');
 }
 
@@ -260,7 +260,7 @@ function blockObliquityBeat() {
     .filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9).sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
   const s3 = Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;
   const rows = [
-    '| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d; it was the unit’s H(t)/13, 0.086 % apart) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqH8Scaled*Kyr` |',
+    '| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqPrecScaled*Kyr` |',
     '|---|---|---|---|---|---|',
   ];
   const Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0), pc0 = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(0), beat0 = 1296000 / (pc0 - s3);
@@ -274,7 +274,7 @@ function blockObliquityBeat() {
     rows.push(`| ${t} | **${f(Tp, 3)}** | ${f(TpPair, 3)} | ${f(pc, 3)} | ${f(1296000 / (pc - s3) / 1000, 2)} | ${f(beat0 * Tp / Tp0 / 1000, 2)} |`);
   }
   rows.push('');
-  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = ${f(Tp0, 1)} yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The third column is the deep chain’s tidal-mean year pair: since plan 09 step 5d its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row); before it the pair beat at the retired unit’s H(t)/13, the calendar convention plan-06 D2 had kept as a named device, 0.086 % above the composed period. Registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the fifth column; \`obliqH8Scaled*Kyr\` (name kept) is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii; S5 retired its former T_p·13/8 = H/8 form). The pre-Phase-3 "structural" beat on H_era/13 is retired with the frozen era clock (plan 09 step 7a).`);
+  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = ${f(Tp0, 1)} yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The third column is the deep chain’s tidal-mean year pair: since plan 09 step 5d its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row). Registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the fifth column; \`obliqPrecScaled*Kyr\` is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii).`);
   return rows.join('\n');
 }
 

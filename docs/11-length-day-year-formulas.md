@@ -52,7 +52,7 @@ siderealYearJ2000 = 365.256363004 d (IAU)      p_A = 50.28796195 ″/yr (IAU 200
 
 ### Key Principle
 
-The **sidereal year in SI seconds is an input** (the IAU value, `astro-reference.json`), and the tropical year is derived from it and the precession — at J2000 from p_A, at every other epoch from the composed precession rate of date. The retired era device derived the three means from one input mean solar year and its unit H (the tropical mean rounded onto 1/(H/8), the sidereal × H/(H − 13), the anomalistic × H/(H − 16)) and carried the tropical year of date as "one turn per H/13", 0.086 % slow on the equinox term; the combs that modulated them are deleted (plan 09 steps 3, 4c, 4d, 5d).
+The **sidereal year in SI seconds is an input** (the IAU value, `astro-reference.json`), and the tropical year is derived from it and the precession — at J2000 from p_A, at every other epoch from the composed precession rate of date.
 
 
 ## Mean Year Lengths (Inputs)
@@ -217,7 +217,7 @@ The correction represents Earth's need to rotate slightly MORE per solar day to 
 δ_LOD = LOD_mean × δ_rev = LOD_mean / (T_s₃ × mSY)       ≈ <!--v:h5LodCorrectionMs-->3.441<!--/v--> ms per solar day
 ```
 
-**Why the nodal period (not the apsidal one):** the correction's reference frame must be the Sun's apparent motion, which follows the ecliptic; the ecliptic's turn on the invariable plane is the nodal mode s₃ — an ORBITAL quantity, constant at every epoch (μ-tier). The apsidal precession is a fixed-frame (ICRF) construction, not the ecliptic-of-date reference used for the solar-day counting. Until the plan 06 T2 restatement the divisor was the retired anchor's fifth (67,063 yr at J2000, 2.5 % short of the nodal period) and it scaled with Earth's SPIN at deep time — the wrong tier for an orbital reference. Measured on the change (plan 06 record): the term moved 3.527 → 3.441 ms, the joint ΔT-stack re-closed at USNO 86400.0021 (measured-day basis; the display-basis LOD_real moved from 86400.001580 to 86400.001693 s, toward the observed 86400.0017), the eclipse record stayed flat (lunar mean residual 1213 → 1211 s, events beating NASA 119 → 121; solar 665 → 669 s), while the closeness to the Espenak/Stephenson polynomials — theory references, not observations — loosened (Espenak-window RMS 11.9 → 13.4 s, full window 21.0 → 27.0 s).
+**Why the nodal period (not the apsidal one):** the correction's reference frame must be the Sun's apparent motion, which follows the ecliptic; the ecliptic's turn on the invariable plane is the nodal mode s₃ — an ORBITAL quantity, constant at every epoch (μ-tier). The apsidal precession is a fixed-frame (ICRF) construction, not the ecliptic-of-date reference used for the solar-day counting.
 
 **Where each is used:**
 

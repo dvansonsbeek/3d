@@ -384,7 +384,7 @@ Newtonian plus the derived relativistic supplement:
 
 ## Moon Derived Cycles
 
-All Moon cycles derive from the IAU inputs — the sidereal month and the two equinox-of-date precession periods (apsidal, nodal) — and the certified J2000 precession period T_p (plan 09). The retired era device had rounded the months onto whole counts over its anchor interval; those counts are gone, and the counts a fitter still needs (the Step-0 Sun harmonics' lunar divisors) are real-valued.
+All Moon cycles derive from the IAU inputs — the sidereal month and the two equinox-of-date precession periods (apsidal, nodal) — and the certified J2000 precession period T_p (plan 09); the counts the Step-0 Sun-harmonics fitter needs (its lunar divisors) are real-valued.
 
 | Cycle | Variable | Formula | Value (days) |
 |-------|----------|---------|-------------|

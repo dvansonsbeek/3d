@@ -306,9 +306,7 @@ The inertial chain and its composition with the precession of date:
   18.5994 yr from the of-date 8.848 /
   <!--v:nodalPrecICRFexact-->18.61335<!--/v--> yr);
 - **the tropical month** — the sidereal month less one equinox turn per
-  T_p(t). The retired counter made the equinox term run 0.086 % slow and the chain's
-  J2000 tropical month sat 5.85 ms above the IAU input; on T_p(t) it is within
-  0.1 ms of it.
+  T_p(t); the chain's J2000 tropical month is within 0.1 ms of the IAU input.
 
 **The factored deep-time law.** The inertial chain's Brown-m² mean governs
 the MEAN rate; the solar-perturbation strength modulates around it with
@@ -864,7 +862,7 @@ Quantitative reconciliation at 650 Ma using the physical formula:
 | Lunar (n_M² ∝ a_moon⁻³, scales with ω × a_moon⁻³) | <!--v:earthPrecLunarJ2000ArcsecPerYr-->34.3740<!--/v--> ″/yr | × ω(t)/ω₀ × (a₀/a_M(t))³ |
 | Total | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2880<!--/v--> ″/yr | **<!--v:earthPrecComposed650MaArcsecPerYr-->70.3<!--/v--> ″/yr** at 650 Ma (the shipped composed clock, `earth/precession-composed`) |
 
-This lands within a few per cent of Wu et al.'s **67.64 ″/yr** (the table: the composed value above theirs by about 4 %, where the spin-only scaling sits a tenth below) — the lunar 1/a_moon³ coupling closes most of the gap. (The earlier hand split 16.8/33.4 on a 50.2 total was the H/13-anchored reading; the values above are the registry's, one home.)
+This lands within a few per cent of Wu et al.'s **67.64 ″/yr** (the table: the composed value above theirs by about 4 %, where the spin-only scaling sits a tenth below) — the lunar 1/a_moon³ coupling closes most of the gap; the values are the registry's, one home.
 
 **Both views are correct, depending on the question:**
 
@@ -1471,7 +1469,7 @@ a × M_Sun = const,  T ∝ M_Sun⁻²                         [adiabatic mass lo
 days/yr = tropical_year_s(t) / LOD(t)                   [where the two meet in one observable]
 ```
 
-Drivers 1 and 2 are independent in physics: tidal coupling drives Moon recession; solar mass loss drives the planetary year-second drift. They meet only in the per-epoch day count. (The former "structural identity" — the frozen era clock's `H_era × days/yr ≈ TOTAL_DAYS_IN_H` with `H_era ∝ LOD`, presented as deriving the Moon's drift — is deleted with the era counter at plan 09 step 7a; it added nothing angular-momentum conservation does not state.)
+Drivers 1 and 2 are independent in physics: tidal coupling drives Moon recession; solar mass loss drives the planetary year-second drift. They meet only in the per-epoch day count.
 
 ### But for the historical-eclipse window, PGR DOES matter — the α(t) correction
 
