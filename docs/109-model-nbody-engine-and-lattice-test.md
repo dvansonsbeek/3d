@@ -718,7 +718,11 @@ sample as the RUNNING MEAN of the osculating vectors over its interval
 Jupiter/Venus short-period content into the secular band (Earth's secular
 e read 0.5·10⁻⁵ rms below DE441 through the series' 1-kyr boxcar, the
 Sun's 5″ annual line at −3500), which the 19-sample boxcar could not
-remove; the means bring it to 0.1·10⁻⁵ and 8″, and the La2004 figures
+remove — measured by `tools/explore/evector-vs-de441.cjs` on the DE441 EMB
+vectors `fetch-emb-vectors-de441.mjs` fetches; `evector-ingredient-isolation.mjs`
+and the fresh point-mass run `evector-fresh-run.mjs` cleared the lunar
+proxy and the asteroids as causes and named the sampling; the means bring
+it to 0.1·10⁻⁵ and 8″, and the La2004 figures
 above from 3.0/3.4/7.1·10⁻⁵ to the values quoted. The published series (the 500-yr
 resampling of the shipped run) reads <!--v:earthEccSeriesVsLa2010aRms-->2.5e-5<!--/v--> against La2010a over the
 last 500 kyr (registry key `earthEccSeriesVsLa2010aRms`; the inclination to the invariable plane <!--v:earthInclSeriesVsLa2010aRmsDeg-->0.0006<!--/v-->° rms on the same rows) — the figure `tools/explore/deep-ecc-history.mjs` draws. A

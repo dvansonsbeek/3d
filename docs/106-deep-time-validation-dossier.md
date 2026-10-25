@@ -170,6 +170,33 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 | Uniform secular solar drift | bounded at r = −0.13 ± 0.09 ms/cy; a uniform −0.5 is disfavoured ~4σ | fit-anchor documentation |
 | The former Config-#7 falsification criterion | RETIRED with the integer-law restatement (its instrument is deleted; doc 109 is the evidence record). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine-and-lattice-test.md) |
 
+## E. The μ partition of the anchors — which rows may calibrate, which may only test
+
+Every deep-time cyclostratigraphic quantity in the literature is calibrated
+against an assumed astronomical model: TimeOpt-class inversions tune to the
+g-beat frequencies, the 405-kyr metronome above all, which are exactly the
+μ-sensitive quantities (period ∝ 1/μ). Such anchors are CONDITIONAL on
+μ = 1 and cannot simultaneously calibrate the Earth–Moon history and test
+the solar-mass history — the circularity guard behind falsification leg 3.
+Tidal rhythmites, coral and bivalve growth bands and bundle counts count
+physical days and tides and are μ-INDEPENDENT. The partition of the 45
+anchors, by method family (`tools/explore/anchor-partition.mjs`, the
+pre-registered obligation of plan 04 §4):
+
+| class | n | anchors | hold |
+|---|---|---|---|
+| μ-independent | 15 | Wells corals 65–600 Ma (10) and the flagship 380 Ma; Winter 2020 (70); Pannella (90); Williams Elatina (620); Weeli Wolli rhythmite (2450); Moodies bundles (3200) | 15/15 (5 as documented-deviation bands) |
+| μ-conditional | 28 | Wu 2024 TimeOptB LOD and distance (12); Zhou 2024 (9: the three k-derived precession rows and the six LOD/distance rows derived from the same k); Lantink Joffre LOD and precession (2); Xiamaling LOD and precession (2); Nanfen; Mitchell-Kirscher 650; the Triassic compilation | 28/28 (11 as bands) |
+| modern | 2 | Wu 0 Ma LOD and distance | 2/2 |
+
+The reading: the recession history holds on the μ-independent class ALONE,
+so the Earth–Moon history may be calibrated on that class, and the 28
+conditional anchors are free to serve as tests of the solar-mass history
+through the two-expansions forward model. The `paleo-anchors` gate itself
+is unchanged — all 45 stay in the falsification suite, because as a pure
+μ = 1 consistency test the mixture is legitimate; the partition binds only
+an inversion that fits the solar-mass history.
+
 ## Re-running everything
 
 ```

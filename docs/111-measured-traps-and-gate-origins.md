@@ -175,11 +175,15 @@ per event) — remove the planetary completion per event and read the
 cumulative angle, four-cardinal mean, against TT. Gate:
 `tools/verify/scene-year-lengths.js`. The inertial referee for the sidereal
 law is DE441 in the fixed J2000 frame
-(`tools/explore/sun-inertial-vs-de441.cjs`): the λ̇ channel's 2-kyr boxcar
+(`tools/explore/sun-inertial-vs-de441.cjs`, on the DE441 vectors
+`fetch-sun-inertial-de441.mjs` fetches): the λ̇ channel's 2-kyr boxcar
 of per-step rates telescoped to the osculating longitude's endpoint
 difference and left 0.1–0.3 s of node noise, which the Sun's longitude
 integrated to +18…28″ at 4000–6500 — now a least-squares quadratic slope
-over 10 kyr (rms 5.4″ over ±9000 yr, was 18.9″).
+over 10 kyr (rms 5.4″ over ±9000 yr, was 18.9″). The same referee read at
+the channel's nine 2-kyr nodes (`lamdot-nodes-vs-de441.cjs`): banked minus
+DE441-implied λ̇ within 13 ms rms, the implied values carrying the ~30 ms
+long-period inequality residual.
 
 ### 1.15 A term's amplitude is a function of the elements, not a constant
 

@@ -17,16 +17,19 @@
 // still validate on the μ-independent anchors ALONE?" gets a measured
 // answer. Classification only — no anchor moves, no gate changes.
 //
-// RESULT (the pre-registered partition, discharged): 16 μ-INDEPENDENT
-// (10 Wells corals + flagship-380 + coral-600, Winter, Pannella, Williams
-// Elatina, Roche endpoint, Weeli Wolli rhythmite, Moodies bundles) ·
-// 23 μ-CONDITIONAL (Wu TimeOptB ×12, Zhou ×6 incl. the paired distances,
-// Joffre, Xiamaling, Nanfen, Mitchell-Kirscher, the Triassic compilation) ·
-// 2 modern. THE HEADLINE: the recession history holds on the μ-independent
-// subset ALONE, 16/16 — Weeli Wolli 2450 Ma −5.2 % (±15 %), Moodies
-// 3200 Ma −0.03 %, Williams-620 inside its documented band — so H(t) can be
-// calibrated on the independent class and the 23 conditional anchors are
-// FREE to serve as M(t) tests through the W3 forward model.
+// RESULT (the pre-registered partition, discharged; re-run on the plan-12
+// anchor set — the Roche endpoint left, the five Precambrian precession rows
+// and Zhou's derived rows joined): 15 μ-INDEPENDENT (10 Wells corals +
+// flagship-380 + coral-600, Winter, Pannella, Williams Elatina, Weeli Wolli
+// rhythmite, Moodies bundles) · 28 μ-CONDITIONAL (Wu TimeOptB ×12, Zhou ×9 —
+// three k-derived precession rows, six LOD/distance rows derived from the
+// same k — Joffre LOD + precession, Xiamaling LOD + precession, Nanfen,
+// Mitchell-Kirscher, the Triassic compilation) · 2 modern; all 45 hold
+// (16 of them as documented-deviation bands). THE HEADLINE: the recession
+// history holds on the μ-independent subset ALONE, 15/15 — so H(t) can be
+// calibrated on the independent class and the 28 conditional anchors are
+// FREE to serve as M(t) tests through the W3 forward model. The partition
+// is banked in doc 106 §E.
 //
 //   node tools/explore/anchor-partition.mjs
 
@@ -44,6 +47,8 @@ const PREDICT = {
   lodHr: (ageMa) => dt.meanLodSecondsAtAge(ageMa) / 3600,
   moonDistanceRE: (ageMa) => dt.meanMoonDistanceCorrectedAtAge(ageMa) / RE_KM,
   moonDistanceRawRE: (ageMa) => dt.meanMoonDistanceAtAge(ageMa) / RE_KM,
+  // the five Precambrian precession rows (plan 12 option A) — the gate's own predictor
+  precArcsecPerYr: (ageMa) => dt.meanLunisolarPrecessionRateArcsecPerYrAtAge(ageMa),
 };
 
 // One rule per method family. Direct physical counts → independent;
@@ -54,7 +59,9 @@ function classify(a) {
   if (/rhythmite|growth band|laminae|increment|bundle|roche|coral/.test(m)) return 'independent';
   // Zhou's paired Earth–Moon distances come out of the SAME cyclostratigraphic
   // records as its LOD values — conditional with them.
-  if (/timeopt|cyclostrat|inversion|multi-proxy|compilation|paired earth-moon/.test(m)) return 'conditional';
+  // Zhou 2024's LOD and distance rows are DERIVED from the cyclostratigraphic k
+  // through Farhat's tool — conditional with the k they come from.
+  if (/timeopt|cyclostrat|inversion|multi-proxy|compilation|paired earth-moon|derived from k/.test(m)) return 'conditional';
   return 'UNCLASSIFIED';
 }
 

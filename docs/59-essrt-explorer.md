@@ -135,6 +135,8 @@ One **Export** button in the header prints the view on screen — the current qu
 
 It uses `essrtRenderPaperChart()`, which mirrors the modal renderer's plot geometry and dresses it in the shared export page — title, legend row, the plot with its axes, the credit "ESSRT · holisticuniverse.com" (doc 57, "The export standard"); the quantity's subtitle paragraph reads on screen only. Triggered by `essrtExport(rangeKey)`; the SVG is rasterized in the browser and shown in the chart-export modal (`openChartExportModal`) with Download PNG / Download SVG / Share / Copy buttons.
 
+The same export runs headless: `node tools/docs/export-genesis-pictures.mjs` opens the built bundle in Chromium, selects each quantity and range, clicks Export and saves the modal's PNG — the website's seven `08_*_genesis.png` figures are produced this way (with `ESSRT_SITE_DIR` set they land under the site's names).
+
 ## Validation summary
 
 The modal's curves pass through anchored data points from multiple independent sources:
