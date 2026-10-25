@@ -9096,6 +9096,23 @@ let lastFrameTime = 0;
 let smoothedFps   = 60;
 let lastCameraX   = 0, lastCameraY = 0, lastCameraZ = 0;
 let lowPerformanceMode = false;
+// The pixel-ratio switch's dwell (the owner's 2026-10 stutter report): the
+// smoothed rate must sit out of band for PR_DWELL_MS before a switch, and
+// switches are at least PR_MIN_GAP_MS apart — every switch reallocates the
+// drawing buffer (a stall and a resolution pop), so a rate hovering around the
+// thresholds must not toggle it.
+const PR_DWELL_MS = 2000, PR_MIN_GAP_MS = 10000;
+let _prOutOfBandSince = 0, _prLastSwitchMs = -Infinity;
+// The SMOOTHED frame time the simulation advances by (an exponential moving
+// average of the real frame gaps, α = 0.1 ≈ a 0.3-s memory at 60 Hz). Measured
+// on the owner's machine (3840×1822 buffer, 60 fps median): one frame in every
+// few hundred milliseconds took two vsyncs (p95 33 ms, 146 long frames in a
+// minute) while the loop's JS stayed at 3–4 ms — the GPU missing a frame. With
+// the raw gap as the step every such frame moved the Sun a double step: the
+// visible stutter. The average of the smoothed steps equals the average gap,
+// so the simulation clock still tracks wall time; a single missed frame no
+// longer jumps the scene.
+let smoothedDeltaMs = 1000 / 60;
 
 // At the top of your file, create reusable vectors
 const centerPosVec = new THREE.Vector3();
@@ -22969,7 +22986,7 @@ function _perfRecord(gapMs, jsMs) {
     `${(1000 / gapMed).toFixed(0)} fps · frame ${gapMed.toFixed(1)} ms (p95 ${q(_perf.gaps, 0.95).toFixed(1)}) · ` +
     `JS ${q(_perf.js, 0.5).toFixed(1)} ms (p95 ${q(_perf.js, 0.95).toFixed(1)}) · long frames ${_perf.longFrames} · ` +
     `pixel ratio ${renderer.getPixelRatio().toFixed(2)} (device ${(window.devicePixelRatio || 1).toFixed(2)}${lowPerformanceMode ? ', LOW mode' : ''}, switches ${_perf.switches}) · ` +
-    `${c.width}×${c.height} px · ${info.calls} draw calls · ${(info.triangles / 1000).toFixed(0)}k tri · ${o.Run ? 'playing' : 'paused'}`;
+    `${c.width}×${c.height} px · ${info.calls} draw calls · ${(info.triangles / 1000).toFixed(0)}k tri · step ${smoothedDeltaMs.toFixed(1)} ms · ${o.Run ? 'playing' : 'paused'}`;
   _perf.el.textContent = _perf.line;
 }
 
@@ -23069,14 +23086,20 @@ function render(now) {
   // 4) FPS smoothing + adaptive pixel ratio
   const fps = 1000 / deltaMs;
   smoothedFps = smoothedFps * 0.9 + fps * 0.1;
-  if (smoothedFps < 30 && !lowPerformanceMode) {
-    renderer.setPixelRatio(1);
-    lowPerformanceMode = true;
-    if (PERF_HUD) { _perf.switches++; console.info(`[perf] pixel ratio → 1 (smoothed ${smoothedFps.toFixed(1)} fps) at t=${(now / 1000).toFixed(1)} s`); }
-  } else if (smoothedFps > 40 && lowPerformanceMode) {
-    renderer.setPixelRatio(window.devicePixelRatio);
-    lowPerformanceMode = false;
-    if (PERF_HUD) { _perf.switches++; console.info(`[perf] pixel ratio → ${window.devicePixelRatio} (smoothed ${smoothedFps.toFixed(1)} fps) at t=${(now / 1000).toFixed(1)} s`); }
+  // Out of band = below 30 fps at full ratio, or above 40 fps in LOW mode. A
+  // switch needs the condition to hold for PR_DWELL_MS and PR_MIN_GAP_MS since
+  // the last one; the restore goes to the CAPPED start-up ratio
+  // (getOptimizedPixelRatio, ≤ 2), not the raw device ratio — on a ratio-3
+  // display the raw restore left the scene heavier than it started.
+  const outOfBand = lowPerformanceMode ? smoothedFps > 40 : smoothedFps < 30;
+  if (!outOfBand) _prOutOfBandSince = 0;
+  else if (!_prOutOfBandSince) _prOutOfBandSince = now;
+  else if (now - _prOutOfBandSince >= PR_DWELL_MS && now - _prLastSwitchMs >= PR_MIN_GAP_MS) {
+    const ratio = lowPerformanceMode ? getOptimizedPixelRatio() : 1;
+    renderer.setPixelRatio(ratio);
+    lowPerformanceMode = !lowPerformanceMode;
+    _prLastSwitchMs = now; _prOutOfBandSince = 0;
+    if (PERF_HUD) { _perf.switches++; console.info(`[perf] pixel ratio → ${ratio} (smoothed ${smoothedFps.toFixed(1)} fps) at t=${(now / 1000).toFixed(1)} s`); }
   }
 
   // 5) OrbitControls: point at your selected pivot
@@ -23122,9 +23145,13 @@ function render(now) {
     }
   }
 
-  // 6) Advance the simulation time (once per frame)
+  // 6) Advance the simulation time (once per frame) — by the SMOOTHED frame
+  //    time, clamped to [4, 100] ms, so a GPU-missed frame does not jump the
+  //    scene (see smoothedDeltaMs); the sub-system throttles below keep the
+  //    real delta — they are rate limits, not motion.
+  smoothedDeltaMs = smoothedDeltaMs * 0.9 + Math.min(Math.max(deltaMs, 4), 100) * 0.1;
   if (o.Run) {
-    o.pos += Number(o.speedFact) * o.speed * delta;
+    o.pos += Number(o.speedFact) * o.speed * (smoothedDeltaMs * 0.001);
     // Throttle CSS2D label updates to 30 Hz during playback
     labelElapsed += delta;
     if (labelElapsed >= 0.033) {

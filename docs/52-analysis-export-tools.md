@@ -466,9 +466,14 @@ scene — the render loop measuring itself on the machine it runs on. Over a
 2-second window it shows the frame rate and frame gap (median and p95), the
 loop's own JavaScript time per frame (median and p95), the count of long
 frames (over 33 ms), the active pixel ratio beside the device's with every
-adaptive switch counted (the loop drops to pixel ratio 1 under 30 fps and
-restores above 40; each switch is also logged to the console), the drawing
-buffer size, draw calls and triangles, and whether the scene is playing.
+adaptive switch counted (the loop drops to pixel ratio 1 after two seconds
+under 30 fps and restores the capped start-up ratio after two seconds above
+40, at most once per ten seconds; each switch is also logged to the
+console), the drawing buffer size, draw calls and triangles, the smoothed
+frame time the simulation actually advances by (`step` — an exponential
+average of the frame gaps, so one GPU-missed frame does not jump the scene;
+its average equals the average gap, so the clock still tracks wall time), and
+whether the scene is playing.
 Clicking the line copies it, with the browser's user-agent string appended,
 to the clipboard and to the console, ready to paste into a report. It is off
 without the flag and runs nothing then. Reading it: JavaScript time
