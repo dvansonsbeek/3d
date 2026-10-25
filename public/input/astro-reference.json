@@ -146,7 +146,7 @@
     "_ascendingNodeInvPlaneClosedFormNote": "ascendingNodeInvPlaneClosedForm (plan 11 step 2, moved verbatim from model-parameters planets.<p>.ascendingNodeInvPlane): the planet's J2000 ascending node on the invariable plane in the Souami & Souchay longitude origin, SOLVED from the spherical-triangle identity cos i_ecl = cos i_P cos i_E + sin i_P sin i_E cos(Ω_P − Ω_E) with JPL's J2000 ecliptic inclination, the S&S invariable-plane inclination and Earth's S&S (i_E, Ω_E) — the closed-form node calibration (tools/explore/analytical-ascending-nodes.js, moved from tools/verify at plan 13 A5) run forward, 2 dp. A reference derivation beside the S&S 2012 nodes (ascendingNodesSouamiSouchay): the registry's <p>OmegaVerified / <p>EclInclVerifiedClosureArcsec rows and the published planet records read it; the rendered planets' node of date is the N-body chain's.",
     "_description": "JPL/SPICE J2000 orbital elements per planet",
     "mercury": {
-      "solarYearInput": 87.9683,
+      "orbitalPeriodInputDays": 87.9683,
       "orbitalEccentricityJ2000": 0.20563593,
       "axialTiltJ2000": 0.03,
       "eclipticInclinationJ2000": 7.00497902,
@@ -158,7 +158,7 @@
       "ascendingNodeInvPlaneClosedForm": 32.83
     },
     "venus": {
-      "solarYearInput": 224.695,
+      "orbitalPeriodInputDays": 224.695,
       "orbitalEccentricityJ2000": 0.00677672,
       "axialTiltJ2000": 2.6392,
       "eclipticInclinationJ2000": 3.39467605,
@@ -171,7 +171,7 @@
       "ascendingNodeInvPlaneClosedForm": 54.7
     },
     "mars": {
-      "solarYearInput": 686.93,
+      "orbitalPeriodInputDays": 686.93,
       "orbitalEccentricityJ2000": 0.0933941,
       "axialTiltJ2000": 25.19,
       "eclipticInclinationJ2000": 1.84969142,
@@ -184,7 +184,7 @@
       "ascendingNodeInvPlaneClosedForm": 354.87
     },
     "jupiter": {
-      "solarYearInput": 4330.53,
+      "orbitalPeriodInputDays": 4330.53,
       "orbitalEccentricityJ2000": 0.04838624,
       "axialTiltJ2000": 3.13,
       "eclipticInclinationJ2000": 1.30439695,
@@ -197,7 +197,7 @@
       "ascendingNodeInvPlaneClosedForm": 312.89
     },
     "saturn": {
-      "solarYearInput": 10747,
+      "orbitalPeriodInputDays": 10747,
       "orbitalEccentricityJ2000": 0.05386179,
       "axialTiltJ2000": 26.73,
       "eclipticInclinationJ2000": 2.48599187,
@@ -210,7 +210,7 @@
       "ascendingNodeInvPlaneClosedForm": 118.81
     },
     "uranus": {
-      "solarYearInput": 30586,
+      "orbitalPeriodInputDays": 30586,
       "orbitalEccentricityJ2000": 0.04725744,
       "axialTiltJ2000": 82.23,
       "eclipticInclinationJ2000": 0.77263783,
@@ -223,7 +223,7 @@
       "ascendingNodeInvPlaneClosedForm": 307.8
     },
     "neptune": {
-      "solarYearInput": 59800,
+      "orbitalPeriodInputDays": 59800,
       "orbitalEccentricityJ2000": 0.00859048,
       "axialTiltJ2000": 28.32,
       "eclipticInclinationJ2000": 1.77004347,
@@ -239,7 +239,7 @@
   "additionalBodiesReference": {
     "_description": "J2000 orbital elements for the four additional bodies, mirroring planetOrbitalElements. Previously only 2-3 fields per body lived here and the rest were literals in src/script.js with no source of truth.",
     "pluto": {
-      "solarYearInput": 90465,
+      "orbitalPeriodInputDays": 90465,
       "orbitalEccentricityJ2000": 0.2488273,
       "eclipticInclinationJ2000": 17.14001,
       "invPlaneInclinationJ2000": 15.5639473,
@@ -253,7 +253,7 @@
       "_ascendingNodeInvPlaneClosedFormNote": "plan 11 step 2, moved verbatim from model-parameters additionalBodies.pluto.ascendingNodeInvPlane — the model's VERIFIED closed-form node (see planetOrbitalElements), deliberately ≠ the raw S&S 107.06 (docs/32); the registry's plutoOmegaJ2000 reads it"
     },
     "halleys": {
-      "solarYearInput": 27503,
+      "orbitalPeriodInputDays": 27503,
       "orbitalEccentricityJ2000": 0.96714291,
       "eclipticInclinationJ2000": 162.26269,
       "invPlaneInclinationJ2000": 150,
@@ -265,7 +265,7 @@
       "rotationPeriodDays": 2.2
     },
     "eros": {
-      "solarYearInput": 642.93,
+      "orbitalPeriodInputDays": 642.93,
       "orbitalEccentricityJ2000": 0.2229512,
       "eclipticInclinationJ2000": 10.8276,
       "invPlaneInclinationJ2000": 9.25,
@@ -277,7 +277,7 @@
       "rotationPeriodDays": 0.21958333344885
     },
     "ceres": {
-      "solarYearInput": 1680.5,
+      "orbitalPeriodInputDays": 1680.5,
       "orbitalEccentricityJ2000": 0.0755347,
       "eclipticInclinationJ2000": 10.59407,
       "invPlaneInclinationJ2000": 0.4331698,

@@ -2218,12 +2218,12 @@ export const VALUES = {
     }
     for (const [p, el] of Object.entries(astro.planetOrbitalElements)) {
       if (p.startsWith('_') || typeof el !== 'object') continue;
-      out[`${p}OrbitalPeriodInputDays`] = { get: () => el.solarYearInput, render: (v) => String(v), unit: 'days', note: 'JPL orbital period input' };
+      out[`${p}OrbitalPeriodInputDays`] = { get: () => el.orbitalPeriodInputDays, render: (v) => String(v), unit: 'days', note: 'JPL orbital period input' };
       out[`${p}AxialTiltJ2000`] = { get: () => el.axialTiltJ2000, render: (v) => String(v), unit: 'deg', note: 'IAU' };
     }
     for (const [b, el] of Object.entries(astro.additionalBodiesReference)) {
       if (b.startsWith('_') || typeof el !== 'object') continue;
-      out[`${b}OrbitalPeriodInputDays`] = { get: () => el.solarYearInput, render: group, unit: 'days', note: 'JPL orbital period input' };
+      out[`${b}OrbitalPeriodInputDays`] = { get: () => el.orbitalPeriodInputDays, render: group, unit: 'days', note: 'JPL orbital period input' };
       out[`${b}EccJ2000Full`] = { get: () => el.orbitalEccentricityJ2000, render: (v) => String(v), note: 'JPL J2000 catalog input' };
       out[`${b}EclInclJ2000Full`] = { get: () => el.eclipticInclinationJ2000, render: (v) => String(v), unit: 'deg', note: 'JPL catalog input' };
       out[`${b}PeriLongJ2000Full`] = { get: () => el.longitudePerihelion, render: (v) => String(v), unit: 'deg', note: 'JPL catalog input' };
@@ -2280,16 +2280,16 @@ export const VALUES = {
   })(),
 
   // ── Semi-major axes (11-2aa) — Kepler over the quantized year inputs ────
-  // a = (T_planet / mSY)^(2/3), T from the tracked per-planet solarYearInput
+  // a = (T_planet / mSY)^(2/3), T from the tracked per-planet orbitalPeriodInputDays
   // (the model's quantized orbital period in days); Earth 1.0 by definition.
   ...(() => {
     const out = {};   // (plan 07 sweep: `earthSemiMajor` = 1 by definition is gone; nothing quoted it)
     for (const planet of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       out[`${planet}SemiMajor`] = {
-        get: () => Math.pow(C.planets[planet].solarYearInput / C.meanSolarYearDays, 2 / 3),
+        get: () => Math.pow(C.planets[planet].orbitalPeriodInputDays / C.meanSolarYearDays, 2 / 3),
         render: (v) => Number(v).toFixed(4),
         unit: 'AU',
-        note: 'Kepler: (solarYearInput / mSY)^(2/3)',
+        note: 'Kepler: (orbitalPeriodInputDays / mSY)^(2/3)',
       };
     }
     return out;
@@ -2548,10 +2548,10 @@ export const VALUES = {
     const eclRate = (p) => chainWindowNewton(p);
     const grAdvance = (p) => {   // ″/cy, 6π GM_sun / (c² a (1 − e²)) per orbit × orbits per century
       const P = C.planets[p];
-      const aAU = Math.pow(P.solarYearInput / C.meanSiderealYearDays, 2 / 3);
+      const aAU = Math.pow(P.orbitalPeriodInputDays / C.meanSiderealYearDays, 2 / 3);
       const aKm = aAU * C.currentAUDistance;
       const perOrbit = 6 * Math.PI * C.GM_SUN / (C.speedOfLight ** 2 * aKm * (1 - P.orbitalEccentricityJ2000 ** 2));
-      return perOrbit * (36525 / P.solarYearInput) * 206264.806;
+      return perOrbit * (36525 / P.orbitalPeriodInputDays) * 206264.806;
     };
     for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const lamA = () => chainArt().j2000AnchorElements[p].lonPeriEclipticDeg;   // the chain's J2000 ϖ (plan 07; was the IAU input)

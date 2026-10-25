@@ -46,7 +46,7 @@ export function assemblePlanetRecords(ctx) {
     const sArc = chainModes.s[k] && chainModes.s[k].arcsecPerYr;
     PUBLISHED_PLANET_RECORDS[k] = Object.freeze({
       name: PLANET_DISPLAY_NAMES[k],   // presentation — planets/display-names, the deleted JSON's last leaf (plan 11 step 6)
-      solarYearInput: ar.solarYearInput,
+      orbitalPeriodInputDays: ar.orbitalPeriodInputDays,
       longitudePerihelion: ar.longitudePerihelion,
       ascendingNodeInvPlane: ar.ascendingNodeInvPlaneClosedForm,   // the closed-form verified J2000 node — astro-reference since plan 11 step 2
       invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,

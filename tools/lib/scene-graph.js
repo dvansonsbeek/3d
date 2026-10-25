@@ -41,7 +41,7 @@ const MOON_ARGS_FRAMEWORK_NATIVE = !process.env.MOON_ARGS_PURE_MEEUS;
 // mirrors src/script.js FW_A2_RATE/FW_A3_RATE; derivation record docs/109 §22)
 const _FW_A2_RATE = 2 * (360 * 36525 / C.moonTropicalMonth)
                   - (360 * 36525 / C.moonAnomalisticMonth)
-                  - 2 * (360 * 36525 / C.planets.jupiter.solarYearInput);
+                  - 2 * (360 * 36525 / C.planets.jupiter.orbitalPeriodInputDays);
 const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
 
 // Planet orbital chains (8.3-1 S-P2 — mirrors src/script.js
@@ -53,7 +53,7 @@ const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
 const _mcPlanet = {};
 const { driver2PeriodSecondsAtAge } = _req('@essrt/physics/planets/orbit-chain');
 for (const _pk of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-  const T0 = C.planets[_pk].solarYearInput * 86400;
+  const T0 = C.planets[_pk].orbitalPeriodInputDays * 86400;
   // 8.3 L6: Driver 2 shared; one period fn per planet (stable identity for
   // the chain-cycles tables).
   const periodFn = (t_Ma) => driver2PeriodSecondsAtAge(t_Ma, T0, DT.SOLAR_MASS_LOSS_FRAC_PER_YR);

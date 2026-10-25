@@ -318,11 +318,11 @@
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
       "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:f85dd33c548b107e2983c9bd550897895229ee451ed83c9ff83033bc1bccfd8a",
       "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
-      "public/input/astro-reference.json": "sha256:dfa6049d8a2464eacfc60c90a915f7e57443051868848ef589ac81679fba50fb",
-      "public/input/climate-formula-coefficients.json": "sha256:7ebe9b38c26dc006cbe915ba8a04c01d488f216ac2091dcb685c28371b9185cc",
+      "public/input/astro-reference.json": "sha256:b568736717355903c8298422cf48128a3897743ea0b1c57d64f0823ce8b1813f",
+      "public/input/climate-formula-coefficients.json": "sha256:466e9004cbfe7631a4ade2e8397b9faeaeb4d615cd93863f86e9dd00987f8b37",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
-      "tools/lib/constants.js": "sha256:8ffa6ecc16702b4673111dbdbffbfcb7a7fd0761f83ad7cf78812e426cff8353",
+      "tools/lib/constants.js": "sha256:0e25cfcf902a8a4369bf98b3a3da303704328064ea7d49e52b8be3767b907d6b",
       "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd"
     }
   }

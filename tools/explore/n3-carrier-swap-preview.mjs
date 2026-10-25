@@ -40,7 +40,7 @@ const EMB_WOBBLE_AS = (C.moonReference.moonDistance / (1 + C.physicalConstants.M
 const _n3mSY = computeMeanTropicalYearJ2000Days(C.yearLengthRef.siderealYear, C.earthOrbital.generalPrecessionJ2000_arcsecPerYr);   // the derived mean tropical year (plan 09 step 7e)
 const _n3dpc = (/** @type {number} */ f) => 360 * 36525 * f;
 const SHIPPED_RATES = {
-  planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planetOrbitalElements[k].solarYearInput) : _n3dpc(1 / _n3mSY))),
+  planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planetOrbitalElements[k].orbitalPeriodInputDays) : _n3dpc(1 / _n3mSY))),
   moonElongation: _n3dpc(1 / C.moonReference.moonSiderealMonthInput - 1 / C.yearLengthRef.siderealYear),
 };
 const shipped = createSunPlanetaryCompletion({ embWobbleArcsec: EMB_WOBBLE_AS, carrierRatesDegPerCy: SHIPPED_RATES });
@@ -58,7 +58,7 @@ const CY = 36525;
 const degPerCy = (f) => 360 * CY * f;
 const RATES_FW = { lE: degPerCy(1 / TL.meanSolarYearDays) };
 for (const [key, name] of Object.entries({ lMe: 'mercury', lV: 'venus', lM: 'mars', lJ: 'jupiter', lS: 'saturn' })) {
-  RATES_FW[key] = degPerCy(1 / model.planets.record(name).solarYearInput);
+  RATES_FW[key] = degPerCy(1 / model.planets.record(name).orbitalPeriodInputDays);
 }
 const ZEROS = { lMe: 252.250906, lV: 181.979801, lE: 100.466457, lM: 355.433000, lJ: 34.351519, lS: 50.077444 };
 const PERI = { Me: 77.456, V: 131.564, E: 102.937, M: 336.060, J: 14.331, S: 93.057 };

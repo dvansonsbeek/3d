@@ -118,7 +118,7 @@
     "n_lines": 28,
     "ridge_lambda": 0.01,
     "cv": "split-half, both directions, canonical baseline (without the line) fitted on the full regime",
-    "runtime_sec": 2.2865705490112305
+    "runtime_sec": 3.695431709289551
   },
   "regime_results": {
     "post-mpt": {
@@ -1329,7 +1329,7 @@
   "inputs": {
     "generator": "python3 scripts/milankovitch_l1_line_audit.py",
     "files": {
-      "data/l1-physical-lines.json": "sha256:2051da12de84cd06e47538e9df4c1288004a33faa369c7f50a1d3ad66a29d5e0",
+      "data/l1-physical-lines.json": "sha256:1766b75a43b05c487e54d61758ab8844177550a5f936d1c8dbfa7457bca67e35",
       "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
       "scripts/milankovitch_climate_formula.py": "sha256:c16a99025d13fbbbd5448a067d39be62e27dff78d0d68432ca600c337817a41f",
       "scripts/milankovitch_insolation_stability.py": "sha256:ea9571b1496ce9cb772d316a90a895049d4fddbf1187cfcacdc446ff84b73b4b",

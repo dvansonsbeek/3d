@@ -45,7 +45,7 @@ const CY = 36525;
 const degPerCy = (cyclesPerDay) => 360 * CY * cyclesPerDay;
 const RATES_FW = { lE: degPerCy(1 / TL.meanSolarYearDays) };
 for (const [key, name] of Object.entries({ lMe: 'mercury', lV: 'venus', lM: 'mars', lJ: 'jupiter', lS: 'saturn' })) {
-  RATES_FW[key] = degPerCy(1 / model.planets.record(name).solarYearInput);
+  RATES_FW[key] = degPerCy(1 / model.planets.record(name).orbitalPeriodInputDays);
 }
 
 const ZEROS = { lMe: 252.250906, lV: 181.979801, lE: 100.466457, lM: 355.433000, lJ: 34.351519, lS: 50.077444 };

@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.5
+modelVersion: v26.6
 coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
@@ -1369,21 +1369,21 @@ For current values, see [Constants Reference](20-constants-reference.md).
 
 | Planet | Eccentricity | Inclination (inv) | Semi-major (AU) | Period (days) |
 |--------|--------------|-------------------|-----------------|---------------|
-| Mercury | chain, of date | chain, of date | derived | `solarYearInput` |
-| Venus | chain, of date | chain, of date | derived | `solarYearInput` |
+| Mercury | chain, of date | chain, of date | derived | `orbitalPeriodInputDays` |
+| Venus | chain, of date | chain, of date | derived | `orbitalPeriodInputDays` |
 | Earth | one-source series | one-source engine normal | 1.000 | `meanSolarYearDays` |
-| Mars | chain, of date | chain, of date | derived | `solarYearInput` |
-| Jupiter | chain, of date | chain, of date | derived | `solarYearInput` |
-| Saturn | chain, of date | chain, of date | derived | `solarYearInput` |
-| Uranus | chain, of date | chain, of date | derived | `solarYearInput` |
-| Neptune | chain, of date | chain, of date | derived | `solarYearInput` |
-| Pluto | `orbitalEccentricityBase` (JSON input) | `invPlaneInclinationMean` (JSON input) | derived | `solarYearInput` |
+| Mars | chain, of date | chain, of date | derived | `orbitalPeriodInputDays` |
+| Jupiter | chain, of date | chain, of date | derived | `orbitalPeriodInputDays` |
+| Saturn | chain, of date | chain, of date | derived | `orbitalPeriodInputDays` |
+| Uranus | chain, of date | chain, of date | derived | `orbitalPeriodInputDays` |
+| Neptune | chain, of date | chain, of date | derived | `orbitalPeriodInputDays` |
+| Pluto | `orbitalEccentricityBase` (JSON input) | `invPlaneInclinationMean` (JSON input) | derived | `orbitalPeriodInputDays` |
 
 **How values are sourced:**
 - **Eccentricity**: the chain's element of date (`_chainElementsOfDate(k, jd).e`)
 - **Inclination (inv)**: the chain's element of date (`.inclInvPlaneDeg`)
 - **Semi-major axis**: the chain's element of date for the seven planets; for the no-chain bodies derived from the observed period input via Kepler's third law (`_planetGeom.<k>`, `@essrt/physics` `planets/geometry`)
-- **Period**: Input constant per planet (`planets.{name}.solarYearInput`)
+- **Period**: Input constant per planet (`planets.{name}.orbitalPeriodInputDays`)
 
 > **Display note.** These constants are the scene-scaffold and no-chain-body
 > parameters. The planetStats "Orbital Period & Motion" rows for the seven

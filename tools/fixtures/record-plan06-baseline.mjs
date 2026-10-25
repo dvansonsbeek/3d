@@ -41,6 +41,22 @@ const {
 } = await import('@essrt/physics');
 const DT = require(join(ROOT, 'tools/lib/deep-time.js'));
 const DOH = require(join(ROOT, 'tools/lib/deep-orbital-history.js'));
+const { createCoRotatingAnchoredModeSum } = require('@essrt/physics/earth/deep-orbital-history');
+
+// The deep eccentricity nodes, read WITHOUT the spin walk: e(t) = |z(t)| with
+// z the one-source history's own co-rotating anchored mode sum on the same
+// embed and the same J2000 anchor the model builds it from — bit-identical to
+// createModel().earth.eccentricity at the 5,000-yr grid nodes the deep anchors
+// sit on (measured at all four), while the published surface's read would run
+// the RK4 spin-axis integration from J2000 to the anchor (ε and ϖ need it; e
+// does not). The DEEP ϖ row is kept at 380 Ma only: the walk is incremental,
+// so that one pin keeps the integration itself under the 1-ULP gate (~15 s)
+// while the three deeper ϖ rows (~90 s of walk) are recorded null like the
+// other series-backed rows (the owner's decision in the third maintenance round).
+const _AEarth = /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements.earth;
+const _zAt = createCoRotatingAnchoredModeSum(DEEP_MODES_ARTIFACT.earthZ,
+  [_AEarth.e * Math.cos(_AEarth.lonPeriEclipticDeg * Math.PI / 180), _AEarth.e * Math.sin(_AEarth.lonPeriEclipticDeg * Math.PI / 180)]);
+const DEEP_PERIHELION_PIN_MA = 380;
 
 // The wander window (2-kyr steps) + the epoch the metronome exhibit labels
 // (the +26.8-kyr near-circular pass) + the deep-time anchors (years).
@@ -92,12 +108,13 @@ function measure() {
     // (plan 09 step 7b: the `.nPeriPerH` probe — 13 + H/T_aps, the unit's count — left with hAtYear)
     // eccentricity — all three evaluators, named (series inside the window)
     v[`${tag}.eDeepModes`] = num(deep.eccAt(year - 2000));
-    v[`${tag}.eLawH3`] = num(m.earth.eccentricity(year));
+    v[`${tag}.eLawH3`] = inWindow ? num(m.earth.eccentricity(year)) : num(Math.hypot(..._zAt(year - 2000)));
     v[`${tag}.eOneSource`] = oneSource && inWindow ? num(oneSource.e(year)) : null;
     // obliquity — the one-source hybrid (plan 09: the K comb row `epsLawDeg`
     // left with the frozen era device; the published ε is the hybrid)
     v[`${tag}.epsOneSourceDeg`] = oneSource && inWindow ? num(oneSource.epsDeg(year)) : null;
-    v[`${tag}.perihelionLongitudeDeg`] = num(m.earth.perihelionLongitudeDeg(year));
+    v[`${tag}.perihelionLongitudeDeg`] = inWindow || Math.abs(year - 2000) <= DEEP_PERIHELION_PIN_MA * 1e6
+      ? num(m.earth.perihelionLongitudeDeg(year)) : null;   // the one deep pin on the spin walk (see _zAt)
     // plan 06 Phase 7 — the planets' spin channel (own torques on the own ζ
     // plane history; null beyond ±10 Myr, so the deep anchors record null)
     for (const p of m.planets.keys) {

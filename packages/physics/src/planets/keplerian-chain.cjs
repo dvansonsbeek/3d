@@ -352,7 +352,7 @@ function buildPlanetChainsFromArtifactData(art, opts = {}) {
  * @param {Object<string,KcPlanetChain>=} allChains the full chain map
  * @returns {number} deg/yr, prograde positive
  */
-function computeApsidalSecularDegPerYr(year, planetChain, allChains) {
+function computeApsidalTangentDegPerYr(year, planetChain, allChains) {
   const D = 150;
   const w1 = computePlanetElementsAtYear(year - D, planetChain, allChains).lonPeriEclipticDeg;
   const w2 = computePlanetElementsAtYear(year + D, planetChain, allChains).lonPeriEclipticDeg;
@@ -370,6 +370,6 @@ module.exports = {
   computeHeliocentricEclipticFromElements,
   computePoissonArgRad,
   computePlanetElementsAtYear,
-  computeApsidalSecularDegPerYr,
+  computeApsidalTangentDegPerYr,
   buildPlanetChainsFromArtifactData,
 };

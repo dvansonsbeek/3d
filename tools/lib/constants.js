@@ -128,7 +128,7 @@ for (const key of Object.keys(PLANET_DISPLAY_NAMES)) {
     // reference derivation (astro-reference; the key name stays for the Python
     // bridge's OMEGA_J2000 and the registry)
     ascendingNodeInvPlane: ar.ascendingNodeInvPlaneClosedForm,
-    solarYearInput: ar.solarYearInput,
+    orbitalPeriodInputDays: ar.orbitalPeriodInputDays,
     orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
     axialTiltJ2000: ar.axialTiltJ2000,
     eclipticInclinationJ2000: ar.eclipticInclinationJ2000,
@@ -155,7 +155,7 @@ const additionalBodies = {};
 for (const [key, ar] of Object.entries(astroRef.additionalBodiesReference)) {
   if (key.startsWith('_') || !ar || typeof ar !== 'object') continue;
   additionalBodies[key] = {
-    solarYearInput: ar.solarYearInput,
+    orbitalPeriodInputDays: ar.orbitalPeriodInputDays,
     orbitalEccentricityBase: ar.orbitalEccentricityJ2000,
   };
 }
@@ -391,7 +391,7 @@ function computePlanetDerived(key) {
   const p = planets[key];
   const g = derivePlanetGeometry({
     key,   // the ellipse family is the law's own taxonomy (plan 11 step 3)
-    ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, p.solarYearInput),
+    ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, p.orbitalPeriodInputDays),
     // The scene's ellipse geometry reads the OBSERVED J2000 eccentricity, the
     // value the chain is anchored on.
     orbitalEccentricityBase: p.orbitalEccentricityJ2000,
@@ -426,7 +426,7 @@ function computeAdditionalDerived(key) {
   // the ellipse family for pluto/halleys/eros is NEW capability here).
   const g = derivePlanetGeometry({
     key,   // the minor bodies' ellipse family is the law's own (body-name branches; Eros' type default lives there since plan 11 step 2)
-    ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, b.solarYearInput),
+    ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, b.orbitalPeriodInputDays),
     orbitalEccentricityBase: b.orbitalEccentricityBase,
     longitudePerihelion: b.longitudePerihelion,
     ascendingNode: b.ascendingNode,

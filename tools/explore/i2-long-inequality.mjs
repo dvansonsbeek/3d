@@ -39,7 +39,7 @@
 //   • the same fit on the integration's OWN planet mean longitudes (the
 //     carriers' phase drift measured), and a symmetric-window control.
 //
-// CARRIERS — SIDEREAL (plan 06 I2, measured): the planet records' solarYearInput
+// CARRIERS — SIDEREAL (plan 06 I2, measured): the planet records' orbitalPeriodInputDays
 // are OF-DATE periods (their rates sit +1.39..1.62°/cy above the VSOP sidereal
 // mean motions — the framework precession 1.397°/cy plus input rounding), and
 // the N3 carriers rode them as they are. A perturbation argument is inertial
@@ -75,8 +75,8 @@ const ARG_L0 = [252.250906, 181.979801, 100.466457, 355.433000, 34.351519, 50.07
 const KEYS = ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'];
 const degPerCy = (f) => 360 * CY * f;
 const P0_DEG_PER_CY = degPerCy(1 / C.meanSolarYearDays) - degPerCy(1 / C.meanSiderealYearDays);
-const RATES_OFDATE = KEYS.map((k) => (k ? degPerCy(1 / C.planets[k].solarYearInput) : degPerCy(1 / C.meanSolarYearDays)));
-const RATES = KEYS.map((k) => (k ? degPerCy(1 / C.planets[k].solarYearInput) - P0_DEG_PER_CY : degPerCy(1 / C.meanSiderealYearDays)));
+const RATES_OFDATE = KEYS.map((k) => (k ? degPerCy(1 / C.planets[k].orbitalPeriodInputDays) : degPerCy(1 / C.meanSolarYearDays)));
+const RATES = KEYS.map((k) => (k ? degPerCy(1 / C.planets[k].orbitalPeriodInputDays) - P0_DEG_PER_CY : degPerCy(1 / C.meanSiderealYearDays)));
 console.log('p0 (deg/cy)', P0_DEG_PER_CY.toFixed(5), '\nsidereal carriers:', RATES.map((r) => r.toFixed(4)).join(' '), '\nof-date (N3):     ', RATES_OFDATE.map((r) => r.toFixed(4)).join(' '));
 
 // ── the model's own N-body on the ONE seed ──────────────────────────────────

@@ -78,7 +78,7 @@ in order (CLAUDE.md: generate the constants LAST, run the cascade ONCE).
 | what moved | what runs |
 |---|---|
 | a Bond / Hallstatt / Jose5 / Jose4 period (`period_yr`), the Stephenson 2016 polynomial (`public/input/stephenson-2016-deltaT-polynomial.json`), the tidal LOD physics, the GIA τ, the climate coefficients, the cited Earth–Moon history | the ΔT joint fit (`check:artifacts` names it: its inputs block hashes all of them), then the cascade |
-| a planet record's period (`solarYearInput`, `moonSiderealMonthInput`, `yearLengthRef.siderealYear`) | the Sun-completion carriers ride these: the N3 extraction chain + the re-embed (fingerprint-gated) |
+| a planet record's period (`orbitalPeriodInputDays`, `moonSiderealMonthInput`, `yearLengthRef.siderealYear`) | the Sun-completion carriers ride these: the N3 extraction chain + the re-embed (fingerprint-gated) |
 | the engine's frame of date (anything that moves the certified Sun's cardinal instants) | `npm run fit:6a2` + `npm run check:csv-smoke` |
 | the L1 line set (`data/l1-physical-lines.json` — it moves with the pole rate's LR04-window mean, so with ANY change to the tidal history) | the climate chain: `l1_physical_lines.py --write` → `milankovitch_climate_formula.py` → `milankovitch_l1_line_audit.py` → `export_climate_formula_browser.py` — all cascade nodes since plan 13 |
 | the Holocene taper (`_TAPER_*_HALFWIDTH_YR`) | nothing — applied at runtime, not in the fitted coefficients |

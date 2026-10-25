@@ -308,7 +308,7 @@ const planets = {};
 // The planets' spin rides the spin channel, @essrt/physics/planets/spin-channel.
 planets.mercury = {
   // Astro references (astro-reference.json -> planetOrbitalElements.mercury)
-  solarYearInput: K.planetOrbitalElements.mercury.solarYearInput,
+  orbitalPeriodInputDays: K.planetOrbitalElements.mercury.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.planetOrbitalElements.mercury.eclipticInclinationJ2000,
   orbitalEccentricityJ2000: K.planetOrbitalElements.mercury.orbitalEccentricityJ2000,
   invPlaneInclinationJ2000: K.planetOrbitalElements.mercury.invPlaneInclinationJ2000,
@@ -324,7 +324,7 @@ planets.mercury = {
 // Venus
 planets.venus = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.planetOrbitalElements.venus.solarYearInput,
+  orbitalPeriodInputDays: K.planetOrbitalElements.venus.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.planetOrbitalElements.venus.eclipticInclinationJ2000,
   orbitalEccentricityJ2000: K.planetOrbitalElements.venus.orbitalEccentricityJ2000,
   invPlaneInclinationJ2000: K.planetOrbitalElements.venus.invPlaneInclinationJ2000,
@@ -340,7 +340,7 @@ planets.venus = {
 // Mars
 planets.mars = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.planetOrbitalElements.mars.solarYearInput,
+  orbitalPeriodInputDays: K.planetOrbitalElements.mars.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.planetOrbitalElements.mars.eclipticInclinationJ2000,
   orbitalEccentricityJ2000: K.planetOrbitalElements.mars.orbitalEccentricityJ2000,
   invPlaneInclinationJ2000: K.planetOrbitalElements.mars.invPlaneInclinationJ2000,
@@ -356,7 +356,7 @@ planets.mars = {
 // Jupiter
 planets.jupiter = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.planetOrbitalElements.jupiter.solarYearInput,
+  orbitalPeriodInputDays: K.planetOrbitalElements.jupiter.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.planetOrbitalElements.jupiter.eclipticInclinationJ2000,
   orbitalEccentricityJ2000: K.planetOrbitalElements.jupiter.orbitalEccentricityJ2000,
   invPlaneInclinationJ2000: K.planetOrbitalElements.jupiter.invPlaneInclinationJ2000,
@@ -372,7 +372,7 @@ planets.jupiter = {
 // Saturn
 planets.saturn = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.planetOrbitalElements.saturn.solarYearInput,
+  orbitalPeriodInputDays: K.planetOrbitalElements.saturn.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.planetOrbitalElements.saturn.eclipticInclinationJ2000,
   orbitalEccentricityJ2000: K.planetOrbitalElements.saturn.orbitalEccentricityJ2000,
   invPlaneInclinationJ2000: K.planetOrbitalElements.saturn.invPlaneInclinationJ2000,
@@ -388,7 +388,7 @@ planets.saturn = {
 // Uranus
 planets.uranus = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.planetOrbitalElements.uranus.solarYearInput,
+  orbitalPeriodInputDays: K.planetOrbitalElements.uranus.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.planetOrbitalElements.uranus.eclipticInclinationJ2000,
   orbitalEccentricityJ2000: K.planetOrbitalElements.uranus.orbitalEccentricityJ2000,
   invPlaneInclinationJ2000: K.planetOrbitalElements.uranus.invPlaneInclinationJ2000,
@@ -404,7 +404,7 @@ planets.uranus = {
 // Neptune
 planets.neptune = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.planetOrbitalElements.neptune.solarYearInput,
+  orbitalPeriodInputDays: K.planetOrbitalElements.neptune.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.planetOrbitalElements.neptune.eclipticInclinationJ2000,
   orbitalEccentricityJ2000: K.planetOrbitalElements.neptune.orbitalEccentricityJ2000,
   invPlaneInclinationJ2000: K.planetOrbitalElements.neptune.invPlaneInclinationJ2000,
@@ -422,7 +422,7 @@ planets.neptune = {
 // Pluto
 planets.pluto = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.additionalBodiesReference.pluto.solarYearInput,
+  orbitalPeriodInputDays: K.additionalBodiesReference.pluto.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.additionalBodiesReference.pluto.eclipticInclinationJ2000,
   invPlaneInclinationJ2000: K.additionalBodiesReference.pluto.invPlaneInclinationJ2000,
   axialTiltJ2000: K.additionalBodiesReference.pluto.axialTiltJ2000,
@@ -438,7 +438,7 @@ planets.pluto = {
 // Halley's
 planets.halleys = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.additionalBodiesReference.halleys.solarYearInput,
+  orbitalPeriodInputDays: K.additionalBodiesReference.halleys.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.additionalBodiesReference.halleys.eclipticInclinationJ2000,
   invPlaneInclinationJ2000: K.additionalBodiesReference.halleys.invPlaneInclinationJ2000,
   axialTiltJ2000: K.additionalBodiesReference.halleys.axialTiltJ2000,
@@ -452,7 +452,7 @@ planets.halleys = {
 // Eros
 planets.eros = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.additionalBodiesReference.eros.solarYearInput,
+  orbitalPeriodInputDays: K.additionalBodiesReference.eros.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.additionalBodiesReference.eros.eclipticInclinationJ2000,
   invPlaneInclinationJ2000: K.additionalBodiesReference.eros.invPlaneInclinationJ2000,
   axialTiltJ2000: K.additionalBodiesReference.eros.axialTiltJ2000,
@@ -466,7 +466,7 @@ planets.eros = {
 // Ceres
 planets.ceres = {
   // Astro references (from astro-reference.json)
-  solarYearInput: K.additionalBodiesReference.ceres.solarYearInput,
+  orbitalPeriodInputDays: K.additionalBodiesReference.ceres.orbitalPeriodInputDays,
   eclipticInclinationJ2000: K.additionalBodiesReference.ceres.eclipticInclinationJ2000,
   invPlaneInclinationJ2000: K.additionalBodiesReference.ceres.invPlaneInclinationJ2000,
   axialTiltJ2000: K.additionalBodiesReference.ceres.axialTiltJ2000,
@@ -1783,7 +1783,7 @@ for (const _k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'ne
     // (a from the anchor set, the period from the fitted era-window mean
     // motion); the no-chain bodies keep their observed period input. ONE home:
     // @essrt/physics planets/geometry.
-    ...scaffoldOrbitInputs(_k, CHAIN_ARTIFACT, planets[_k].solarYearInput),
+    ...scaffoldOrbitInputs(_k, CHAIN_ARTIFACT, planets[_k].orbitalPeriodInputDays),
     // The seven planets' scene ellipse geometry reads the OBSERVED J2000
     // eccentricity (the mirror of tools/lib/constants.js); the additional
     // bodies keep their stored base.
@@ -2094,13 +2094,13 @@ const NEPTUNE_ORBIT_DISTANCE_J2000 = neptuneOrbitDistance;   // ≈ 30.103
 
 // Per-planet J2000 orbital period in seconds — used as input to
 // meanPlanetOrbitalPeriodAtAge() and to recomputePlanetCountsForEpoch().
-const MERCURY_PERIOD_J2000_S = planets.mercury.solarYearInput * SECONDS_PER_DAY;
-const VENUS_PERIOD_J2000_S   = planets.venus.solarYearInput   * SECONDS_PER_DAY;
-const MARS_PERIOD_J2000_S    = planets.mars.solarYearInput    * SECONDS_PER_DAY;
-const JUPITER_PERIOD_J2000_S = planets.jupiter.solarYearInput * SECONDS_PER_DAY;
-const SATURN_PERIOD_J2000_S  = planets.saturn.solarYearInput  * SECONDS_PER_DAY;
-const URANUS_PERIOD_J2000_S  = planets.uranus.solarYearInput  * SECONDS_PER_DAY;
-const NEPTUNE_PERIOD_J2000_S = planets.neptune.solarYearInput * SECONDS_PER_DAY;
+const MERCURY_PERIOD_J2000_S = planets.mercury.orbitalPeriodInputDays * SECONDS_PER_DAY;
+const VENUS_PERIOD_J2000_S   = planets.venus.orbitalPeriodInputDays   * SECONDS_PER_DAY;
+const MARS_PERIOD_J2000_S    = planets.mars.orbitalPeriodInputDays    * SECONDS_PER_DAY;
+const JUPITER_PERIOD_J2000_S = planets.jupiter.orbitalPeriodInputDays * SECONDS_PER_DAY;
+const SATURN_PERIOD_J2000_S  = planets.saturn.orbitalPeriodInputDays  * SECONDS_PER_DAY;
+const URANUS_PERIOD_J2000_S  = planets.uranus.orbitalPeriodInputDays  * SECONDS_PER_DAY;
+const NEPTUNE_PERIOD_J2000_S = planets.neptune.orbitalPeriodInputDays * SECONDS_PER_DAY;
 
 // (the planets' spin rides the spin channel; their perihelion period is the
 // chain's 1,296,000/g, a quantity of the governed artifact that scales with the
@@ -2944,7 +2944,7 @@ const _moonArgsM = (() => {
 // tools/explore/derive-planetary-lunar-terms.js.
 const FW_A2_RATE = 2 * (360 * julianCenturyDays / moonTropicalMonth)
                  - (360 * julianCenturyDays / moonAnomalisticMonth)
-                 - 2 * (360 * julianCenturyDays / planets.jupiter.solarYearInput);
+                 - 2 * (360 * julianCenturyDays / planets.jupiter.orbitalPeriodInputDays);
 const FW_A3_RATE = 360 * julianCenturyDays / moonSiderealMonth;
 
 /** Deep-time secular phases for the five arguments — ALWAYS-CHAINS (Stage B):
@@ -21382,7 +21382,7 @@ function setupGUI() {
       const p = planets[key];
       const v = {
         massRatio: '1 / ' + _massRatios[key].toLocaleString('en-US'),
-        period: fmtD(p.solarYearInput),
+        period: fmtD(p.orbitalPeriodInputDays),
         eccJ2000: String(p.orbitalEccentricityJ2000),
         tilt: fmtDeg(p.axialTiltJ2000),
         incEcl: fmtDeg(p.eclipticInclinationJ2000),
@@ -41628,9 +41628,9 @@ function eclipticLongitudeToRaDeg(lamDeg, year) {
 // 6π GM☉ / (c² a (1 − e²)) per orbit, a from the period (Kepler III), × orbits per century.
 function relativisticPerihelionAdvanceArcsecCy(planetKey) {
   const p = planets[planetKey];
-  const aKm = Math.pow(p.solarYearInput / (meansiderealyearlengthinSeconds / SECONDS_PER_DAY), 2 / 3) * AU_J2000_KM;
+  const aKm = Math.pow(p.orbitalPeriodInputDays / (meansiderealyearlengthinSeconds / SECONDS_PER_DAY), 2 / 3) * AU_J2000_KM;
   const perOrbit = 6 * Math.PI * GM_SUN / (speedOfLight * speedOfLight * aKm * (1 - p.orbitalEccentricityJ2000 ** 2));
-  return perOrbit * (36525 / p.solarYearInput) * 206264.806;
+  return perOrbit * (36525 / p.orbitalPeriodInputDays) * 206264.806;
 }
 
 // 0 — per-frame stats

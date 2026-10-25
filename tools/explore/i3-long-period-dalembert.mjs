@@ -76,7 +76,7 @@ const ARG_L0 = [252.250906, 181.979801, 100.466457, 355.433000, 34.351519, 50.07
 const KEYS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn'];
 const degPerCy = (f) => 360 * CY * f;
 const P0_DEG_PER_CY = degPerCy(1 / C.meanSolarYearDays) - degPerCy(1 / C.meanSiderealYearDays);
-const RATES_RECORD = KEYS.map((k) => (k !== 'earth' ? degPerCy(1 / C.planets[k].solarYearInput) - P0_DEG_PER_CY : degPerCy(1 / C.meanSiderealYearDays)));
+const RATES_RECORD = KEYS.map((k) => (k !== 'earth' ? degPerCy(1 / C.planets[k].orbitalPeriodInputDays) - P0_DEG_PER_CY : degPerCy(1 / C.meanSiderealYearDays)));
 const bank = Object.fromEntries(SERIES.verdict.planetLamDot.rows.map((r) => [r.body, r.lamDotJ2000DegPerYr * 100]));
 const RATES_BANKED = KEYS.map((k) => (k !== 'earth' ? bank[k] : degPerCy(1 / C.meanSiderealYearDays)));
 console.log('carriers (deg/cy): record ' + RATES_RECORD.map((r) => r.toFixed(4)).join(' ') + '\n                   banked ' + RATES_BANKED.map((r) => r.toFixed(4)).join(' ') + '\n                   banked − record (″/yr): ' + RATES_BANKED.map((r, i) => ((r - RATES_RECORD[i]) * 36).toFixed(3)).join(' '));

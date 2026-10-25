@@ -54,7 +54,7 @@ const env = {
 /** @param {*} b @returns {import('../src/planets/model.cjs').PlanetModelBody} */
 const pickInputs = (b) => ({
   // (plan 11 step 3: the ellipse family is geometry.cjs's own taxonomy, not an input)
-  solarYearInput: b.solarYearInput,
+  orbitalPeriodInputDays: b.orbitalPeriodInputDays,
   invPlaneInclinationJ2000: b.invPlaneInclinationJ2000,
   longitudePerihelion: b.longitudePerihelion,
   // (plan 07 R8: fibonacciD, inclinationCycleAnchor, antiPhase and the lattice

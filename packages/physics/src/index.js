@@ -138,9 +138,9 @@ export * as planetOrbitChain from './planets/orbit-chain.cjs';
 export { computeSecularShape } from './planets/secular-shape.cjs';
 // `computeApsidalTangentDegPerYr` is the chain's ±150-yr central tangent of the perihelion
 // longitude (the panels' "Prec." cell — osculating, NOT the ±1-kyr secular stencil of the
-// "Secular" cell); `computeApsidalSecularDegPerYr` is its former name, kept as a deprecated
-// alias on the API axis.
-export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalSecularDegPerYr, computeApsidalSecularDegPerYr as computeApsidalTangentDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
+// "Secular" cell). Its former name `computeApsidalSecularDegPerYr` left the API at 24.0.0
+// (no reader in the simulator, the website or the paper).
+export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalTangentDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from './planets/keplerian-chain.cjs';
 export { computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg } from './planets/inv-plane-frame.cjs';
 export { createSecularSeriesOverride } from './planets/secular-series.cjs';
 // The planets' spin channel (the precession constant from each planet's own

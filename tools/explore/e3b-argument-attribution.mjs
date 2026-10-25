@@ -6,7 +6,7 @@
 //   Δrate (″/cy) · Δphase over the modern window (T ±1) · Δphase at −135
 //   (T −21.35) · the INDUCED TABLE ERROR Σ|amp·Δarg| per carrier.
 // Framework sources (all model-native, zero external literals):
-//   planet sidereal periods  planets.record(k).solarYearInput (solar yr)
+//   planet sidereal periods  planets.record(k).orbitalPeriodInputDays (solar yr)
 //   equinox precession       epoch.axialPrecessionYearsAtYear(2000)
 //   tropical/sidereal years  the framework year chain
 //   lunar months             moonSiderealMonthInput + the framework
@@ -76,10 +76,10 @@ const eqRateDegPerCy = 360 * 100 / EQ_YR;                  // deg per Julian cen
 const P = { lMe: 'mercury', lV: 'venus', lMa: 'mars', lJ: 'jupiter', lS: 'saturn' };
 for (const [key, name] of Object.entries(P)) {
   const rec = model.planets.record(name);
-  // solarYearInput = the planet's TROPICAL (equinox-referenced) period in
+  // orbitalPeriodInputDays = the planet's TROPICAL (equinox-referenced) period in
   // DAYS (doc 20 "official JPL solar year periods") — already the same
   // referencing as the tropical mean-longitude literals; no equinox term.
-  fw[key] = degPerCy(1 / rec.solarYearInput);
+  fw[key] = degPerCy(1 / rec.orbitalPeriodInputDays);
 }
 // lunar months from framework identities (equinox-free combos)
 const T_SIDM_D = C.moonReference.moonSiderealMonthInput;   // sidereal month (d)

@@ -36,20 +36,20 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "320c51865d620009";
+export const CONSTANTS_HASH = "da713fc2d846767d";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v26.5";
+export const MODEL_VERSION = "v26.6";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "320c51865d620009",
+  hash: "da713fc2d846767d",
   additionalBodiesReference: {
     "pluto": {
-      "solarYearInput": 90465,
+      "orbitalPeriodInputDays": 90465,
       "orbitalEccentricityJ2000": 0.2488273,
       "eclipticInclinationJ2000": 17.14001,
       "invPlaneInclinationJ2000": 15.5639473,
@@ -62,7 +62,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlaneClosedForm": 101.06
     },
     "halleys": {
-      "solarYearInput": 27503,
+      "orbitalPeriodInputDays": 27503,
       "orbitalEccentricityJ2000": 0.96714291,
       "eclipticInclinationJ2000": 162.26269,
       "invPlaneInclinationJ2000": 150,
@@ -74,7 +74,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "rotationPeriodDays": 2.2
     },
     "eros": {
-      "solarYearInput": 642.93,
+      "orbitalPeriodInputDays": 642.93,
       "orbitalEccentricityJ2000": 0.2229512,
       "eclipticInclinationJ2000": 10.8276,
       "invPlaneInclinationJ2000": 9.25,
@@ -86,7 +86,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "rotationPeriodDays": 0.21958333344885
     },
     "ceres": {
-      "solarYearInput": 1680.5,
+      "orbitalPeriodInputDays": 1680.5,
       "orbitalEccentricityJ2000": 0.0755347,
       "eclipticInclinationJ2000": 10.59407,
       "invPlaneInclinationJ2000": 0.4331698,
@@ -237,7 +237,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   },
   planetOrbitalElements: {
     "mercury": {
-      "solarYearInput": 87.9683,
+      "orbitalPeriodInputDays": 87.9683,
       "orbitalEccentricityJ2000": 0.20563593,
       "axialTiltJ2000": 0.03,
       "eclipticInclinationJ2000": 7.00497902,
@@ -249,7 +249,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlaneClosedForm": 32.83
     },
     "venus": {
-      "solarYearInput": 224.695,
+      "orbitalPeriodInputDays": 224.695,
       "orbitalEccentricityJ2000": 0.00677672,
       "axialTiltJ2000": 2.6392,
       "eclipticInclinationJ2000": 3.39467605,
@@ -262,7 +262,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlaneClosedForm": 54.7
     },
     "mars": {
-      "solarYearInput": 686.93,
+      "orbitalPeriodInputDays": 686.93,
       "orbitalEccentricityJ2000": 0.0933941,
       "axialTiltJ2000": 25.19,
       "eclipticInclinationJ2000": 1.84969142,
@@ -275,7 +275,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlaneClosedForm": 354.87
     },
     "jupiter": {
-      "solarYearInput": 4330.53,
+      "orbitalPeriodInputDays": 4330.53,
       "orbitalEccentricityJ2000": 0.04838624,
       "axialTiltJ2000": 3.13,
       "eclipticInclinationJ2000": 1.30439695,
@@ -288,7 +288,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlaneClosedForm": 312.89
     },
     "saturn": {
-      "solarYearInput": 10747,
+      "orbitalPeriodInputDays": 10747,
       "orbitalEccentricityJ2000": 0.05386179,
       "axialTiltJ2000": 26.73,
       "eclipticInclinationJ2000": 2.48599187,
@@ -301,7 +301,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlaneClosedForm": 118.81
     },
     "uranus": {
-      "solarYearInput": 30586,
+      "orbitalPeriodInputDays": 30586,
       "orbitalEccentricityJ2000": 0.04725744,
       "axialTiltJ2000": 82.23,
       "eclipticInclinationJ2000": 0.77263783,
@@ -314,7 +314,7 @@ export const DEFAULT_CONSTANTS = Object.freeze({
       "ascendingNodeInvPlaneClosedForm": 307.8
     },
     "neptune": {
-      "solarYearInput": 59800,
+      "orbitalPeriodInputDays": 59800,
       "orbitalEccentricityJ2000": 0.00859048,
       "axialTiltJ2000": 28.32,
       "eclipticInclinationJ2000": 1.77004347,

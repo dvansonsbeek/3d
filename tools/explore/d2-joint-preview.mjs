@@ -29,7 +29,7 @@ const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
   embWobbleArcsec: (C.moonReference.moonDistance / (1 + C.physicalConstants.MASS_RATIO_EARTH_MOON)
     / C.physicalConstants.currentAUDistance) * (648000 / Math.PI),
   carrierRatesDegPerCy: {
-    planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planetOrbitalElements[k].solarYearInput) : _n3dpc(1 / _n3mSY))),
+    planets: ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'].map((k) => (k ? _n3dpc(1 / C.planetOrbitalElements[k].orbitalPeriodInputDays) : _n3dpc(1 / _n3mSY))),
     moonElongation: _n3dpc(1 / C.moonReference.moonSiderealMonthInput - 1 / C.yearLengthRef.siderealYear),
   },
 });

@@ -155,7 +155,7 @@ export function computePlanetElementsAtYear(year: number, planetChain: KcPlanetC
  * @param {Object<string,KcPlanetChain>=} allChains the full chain map
  * @returns {number} deg/yr, prograde positive
  */
-export function computeApsidalSecularDegPerYr(year: number, planetChain: KcPlanetChain, allChains?: {
+export function computeApsidalTangentDegPerYr(year: number, planetChain: KcPlanetChain, allChains?: {
     [x: string]: KcPlanetChain;
 } | undefined): number;
 /** The chain's canonical constructor from a PARSED governed artifact (K2.1 →

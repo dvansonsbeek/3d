@@ -61,7 +61,7 @@ export function assembleLunarTheory(ctx) {
   const anomalisticMonthPeriodFn = (tMa) => moonChain.anomalisticMonthSecondsAtAge(tMa);
   /** @param {number} tMa @returns {number|null} */
   const siderealMonthPeriodFn = (tMa) => moonChain.siderealMonthSecondsAtAge(tMa);
-  const jupiterT0Seconds = C.planetOrbitalElements.jupiter.solarYearInput * 86400;
+  const jupiterT0Seconds = C.planetOrbitalElements.jupiter.orbitalPeriodInputDays * 86400;
   /** @param {number} tMa @returns {number} */
   const jupiterPeriodFn = (tMa) => driver2PeriodSecondsAtAge(tMa, jupiterT0Seconds, EPOCH_PARAMS.solarMassLossFracPerYear);
   /** @param {number} a @param {number} b @returns {number|null} */
@@ -164,7 +164,7 @@ export function assembleLunarTheory(ctx) {
   // docs/109 §22 for the derivation)
   const fwA2RateDegPerCy = 2 * ((360 * 36525) / moonTropicalMonthDays)
     - (360 * 36525) / moonAnomalisticMonthDays
-    - 2 * ((360 * 36525) / C.planetOrbitalElements.jupiter.solarYearInput);
+    - 2 * ((360 * 36525) / C.planetOrbitalElements.jupiter.orbitalPeriodInputDays);
   const fwA3RateDegPerCy = (360 * 36525) / moonSiderealMonth;
 
   // Meeus Ch. 47 truncated series (framework-native arguments + E-factor)

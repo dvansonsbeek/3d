@@ -40,8 +40,8 @@ const jdAtS = (i) => SIG.jd0 + i * SIG.stride;
 const KEYS = ['mercury', 'venus', null, 'mars', 'jupiter', 'saturn'];
 const degPerCy = (f) => 360 * CY * f;
 const P0 = degPerCy(1 / C.meanSolarYearDays) - degPerCy(1 / C.meanSiderealYearDays);
-const RATES_OFDATE = KEYS.map((k) => (k ? degPerCy(1 / C.planets[k].solarYearInput) : degPerCy(1 / C.meanSolarYearDays)));
-const RATES_SID = KEYS.map((k) => (k ? degPerCy(1 / C.planets[k].solarYearInput) - P0 : degPerCy(1 / C.meanSiderealYearDays)));
+const RATES_OFDATE = KEYS.map((k) => (k ? degPerCy(1 / C.planets[k].orbitalPeriodInputDays) : degPerCy(1 / C.meanSolarYearDays)));
+const RATES_SID = KEYS.map((k) => (k ? degPerCy(1 / C.planets[k].orbitalPeriodInputDays) - P0 : degPerCy(1 / C.meanSiderealYearDays)));
 const ZEROS = [252.250906, 181.979801, 100.466457, 355.433000, 34.351519, 50.077444];
 const PERI = [77.456, 131.564, 102.937, 336.060, 14.331, 93.057];
 const makeArgOf = (RATES) => (jd) => {

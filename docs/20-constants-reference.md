@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v26.5
+modelVersion: v26.6
 coefficients: sha256:b2d4e64c4e6a947e
 status: current
 ---
@@ -41,7 +41,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 | `meanSiderealYearSeconds` (`siderealYearJ2000 × 86400`) | `meanSiderealYearSecondsAtAge(t_Ma)` |
 | Tropical year (from `meanSolarYearDays`) | `meanTropicalYearSecondsAtAge(t_Ma)` |
 | Moon distance (`moonDistance` = <!--v:moonOrbitalRadius-->384,399.07<!--/v--> km) | `meanMoonDistanceMetresAtAge(t_Ma)` |
-| Planet orbital periods (Part 4 `solarYearInput`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
+| Planet orbital periods (Part 4 `orbitalPeriodInputDays`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
 | α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
 
 The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr. (The unit H(t) that scaled with it — 13.011 periods, a fit constant's multiple — left the model at plan 09 step 7b.) The K-device wheel periods are a J2000 pose and do not scale; no observable rides them.
@@ -686,7 +686,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 
 | Parameter | Variable | Value | Source |
 |-----------|----------|-------|--------|
-| Orbital Period | `solarYearInput` | <!--v:plutoOrbitalPeriodInputDays-->90,465<!--/v--> days | JPL Horizons |
+| Orbital Period | `orbitalPeriodInputDays` | <!--v:plutoOrbitalPeriodInputDays-->90,465<!--/v--> days | JPL Horizons |
 | Eccentricity | `orbitalEccentricityBase` | <!--v:plutoEccJ2000Full-->0.2488273<!--/v--> | JPL Horizons |
 | Long. Perihelion | `longitudePerihelion` | <!--v:plutoPeriLongJ2000Full-->224.06891<!--/v--> deg | JPL Horizons |
 | Sun/Pluto Mass Ratio | `MASS_RATIO_SUN_PLUTO` | <!--v:plutoMassRatioDE440-->136,045,556<!--/v--> | DE440 |
@@ -698,7 +698,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 |-----------|----------|-------|--------|
 | Ecliptic Inclination | `eclipticInclinationJ2000` | <!--v:halleysEclInclJ2000Full-->162.26269<!--/v--> deg | JPL (retrograde orbit) |
 | Ascending Node (Ecliptic) | `ascendingNode` | <!--v:halleysAscNodeEclJ2000-->58.42008<!--/v--> deg | JPL Horizons |
-| Orbital Period | `solarYearInput` | <!--v:halleysOrbitalPeriodInputDays-->27,503<!--/v--> days | JPL |
+| Orbital Period | `orbitalPeriodInputDays` | <!--v:halleysOrbitalPeriodInputDays-->27,503<!--/v--> days | JPL |
 | Eccentricity | `orbitalEccentricityBase` | <!--v:halleysEccJ2000Full-->0.96714291<!--/v--> | JPL |
 | Long. Perihelion | `longitudePerihelion` | <!--v:halleysPeriLongJ2000Full-->111.33249<!--/v--> deg | JPL Horizons |
 | Mass | `M_HALLEYS` | ~2.2 × 10¹⁴ kg | Estimated (~11×8×8 km, ~0.6 g/cm³) |
@@ -709,7 +709,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 |-----------|----------|-------|--------|
 | Ecliptic Inclination | `eclipticInclinationJ2000` | 10.82760 deg | JPL Horizons |
 | Ascending Node (Ecliptic) | `ascendingNode` | <!--v:erosAscNodeEclJ2000-->304.30993<!--/v--> deg | JPL Horizons |
-| Orbital Period | `solarYearInput` | <!--v:erosOrbitalPeriodInputDays-->642.93<!--/v--> days | JPL |
+| Orbital Period | `orbitalPeriodInputDays` | <!--v:erosOrbitalPeriodInputDays-->642.93<!--/v--> days | JPL |
 | Eccentricity | `orbitalEccentricityBase` | <!--v:erosEccJ2000Full-->0.2229512<!--/v--> | JPL |
 | Long. Perihelion | `longitudePerihelion` | <!--v:erosPeriLongJ2000Full-->178.81322<!--/v--> deg | JPL Horizons |
 | Mass | `M_EROS` | 6.687 × 10¹⁵ kg | NEAR Shoemaker (2000–2001) |
@@ -721,7 +721,7 @@ f₅ = 0 (invariable plane, no evolution) is excluded — 7 active Laplace-Lagra
 | Ecliptic Inclination | `eclipticInclinationJ2000` | <!--v:ceresEclInclJ2000Full-->10.59407<!--/v--> deg | JPL Horizons |
 | Inv. Plane Inclination | `invPlaneInclinationJ2000` | <!--v:ceresInvPlaneInclJ2000-->0.4331698<!--/v--> deg | S&S 2012 |
 | Ascending Node (Ecliptic) | `ascendingNode` | <!--v:ceresAscNodeEclJ2000-->80.30533<!--/v--> deg | JPL Horizons |
-| Orbital Period | `solarYearInput` | <!--v:ceresOrbitalPeriodInputDays-->1,680.5<!--/v--> days | JPL |
+| Orbital Period | `orbitalPeriodInputDays` | <!--v:ceresOrbitalPeriodInputDays-->1,680.5<!--/v--> days | JPL |
 | Eccentricity | `orbitalEccentricityBase` | <!--v:ceresEccJ2000Full-->0.0755347<!--/v--> | JPL |
 | Long. Perihelion | `longitudePerihelion` | <!--v:ceresPeriLongJ2000Full-->73.59769<!--/v--> deg | JPL Horizons |
 | Orbit Distance | `orbitDistanceOverride` | 2.76596 AU | JPL Horizons |
@@ -737,13 +737,13 @@ These values result from the retired optimization campaign; the campaign write-u
 
 | Planet | Variable | Value (days) |
 |--------|----------|-------------|
-| Mercury | `solarYearInput` | <!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v--> |
-| Venus | `solarYearInput` | <!--v:venusOrbitalPeriodInputDays-->224.695<!--/v--> |
-| Mars | `solarYearInput` | <!--v:marsOrbitalPeriodInputDays-->686.93<!--/v--> |
-| Jupiter | `solarYearInput` | <!--v:jupiterOrbitalPeriodInputDays-->4330.53<!--/v--> |
-| Saturn | `solarYearInput` | <!--v:saturnOrbitalPeriodInputDays-->10747<!--/v--> |
-| Uranus | `solarYearInput` | <!--v:uranusOrbitalPeriodInputDays-->30586<!--/v--> |
-| Neptune | `solarYearInput` | <!--v:neptuneOrbitalPeriodInputDays-->59800<!--/v--> |
+| Mercury | `orbitalPeriodInputDays` | <!--v:mercuryOrbitalPeriodInputDays-->87.9683<!--/v--> |
+| Venus | `orbitalPeriodInputDays` | <!--v:venusOrbitalPeriodInputDays-->224.695<!--/v--> |
+| Mars | `orbitalPeriodInputDays` | <!--v:marsOrbitalPeriodInputDays-->686.93<!--/v--> |
+| Jupiter | `orbitalPeriodInputDays` | <!--v:jupiterOrbitalPeriodInputDays-->4330.53<!--/v--> |
+| Saturn | `orbitalPeriodInputDays` | <!--v:saturnOrbitalPeriodInputDays-->10747<!--/v--> |
+| Uranus | `orbitalPeriodInputDays` | <!--v:uranusOrbitalPeriodInputDays-->30586<!--/v--> |
+| Neptune | `orbitalPeriodInputDays` | <!--v:neptuneOrbitalPeriodInputDays-->59800<!--/v--> |
 
 Stored in `astro-reference.json`. These start from the JPL solar-year periods and carry small pipeline refinements (the calibration record, doc 68, is archived).
 

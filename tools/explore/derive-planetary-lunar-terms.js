@@ -64,7 +64,7 @@ const PLANETS = PLANET_KEYS.map(k => {
   return {
     key: k,
     gm: GM_S / MASS_RATIO_SUN[k],
-    T_days: p.solarYearInput,
+    T_days: p.orbitalPeriodInputDays,
     e: p.orbitalEccentricityJ2000,
     inc: (p.eclipticInclinationJ2000 || 0) * d2r,
     Om: (p.ascendingNode || 0) * d2r,

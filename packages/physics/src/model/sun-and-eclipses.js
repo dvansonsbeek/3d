@@ -132,7 +132,7 @@ export function assembleSunAndEclipses(ctx) {
   // FQ-5 N3 — the completion's carriers are FRAMEWORK-derived from the
   // model's own planet period records (the Moon-elongation rate from the
   // sidereal month/year identity). Plan 06 I2 — the carriers are SIDEREAL
-  // (measured): the records' solarYearInput are OF-DATE periods (their
+  // (measured): the records' orbitalPeriodInputDays are OF-DATE periods (their
   // rates sit +1.39..1.62°/cy above the VSOP sidereal mean motions — the
   // framework precession plus input rounding), and a perturbation argument
   // is inertial (D'Alembert: only Σk = 0 arguments are frame-free), so on

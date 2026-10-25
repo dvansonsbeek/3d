@@ -98,3 +98,26 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
         ellipticity: number;
     };
 };
+/**
+ * The CO-ROTATING anchored mode sum — the z-side evaluator of the history
+ * (the ϖ̇ fix, measured): the plain DC anchor residual is a spurious
+ * zero-frequency mode that preserves the J2000 VALUE but dilutes the local
+ * argument rate by |sum(0)|/|anchor| (z: 11.47 → 7.93″/yr, a 92 s-class
+ * anomalistic-year bias in the mode tier). Here the residual ROTATES at the
+ * raw sum's own local arg-rate g* = Im(ż·z̄)/|z|² (analytic), so at t = 0
+ * both the value AND the rate are exact, and at depth the residual is one
+ * |R|-amplitude term at a physical frequency instead of a DC offset (deep
+ * envelope measured unchanged: [0.0001, 0.0672] → [0.0003, 0.0678] over
+ * 10–50 Myr). Exported: e(t) = hypot(sum(t)) needs no spin integration,
+ * so a fixture can read a deep eccentricity node here (bit-identical at the
+ * grid nodes; the published surface is the grid's linear interpolation and
+ * stays on the history).
+ * @param {ReadonlyArray<{omegaRadPerYr: number, re: number, im: number}>} modes
+ * @param {[number, number]} anchor the J2000 value (q, p) the sum is pinned to
+ * @returns {(t: number) => [number, number]} t in years from J2000
+ */
+export function createCoRotatingAnchoredModeSum(modes: ReadonlyArray<{
+    omegaRadPerYr: number;
+    re: number;
+    im: number;
+}>, anchor: [number, number]): (t: number) => [number, number];

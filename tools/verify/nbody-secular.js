@@ -78,7 +78,7 @@ const LASKAR2004 = {
 
 /** Derived instantaneous 1PN apsidal supplement (″/cy) — shared constants only. */
 function relativisticSupplementArcsecCy(planet) {
-  const yearDays = planet === 'earth' ? TL.meanSolarYearDays : TL.planets[planet].solarYearInput;
+  const yearDays = planet === 'earth' ? TL.meanSolarYearDays : TL.planets[planet].orbitalPeriodInputDays;
   const e = planet === 'earth'
     ? astro.earthOrbital.earthEccentricityJ2000
     : TL.planets[planet].orbitalEccentricityJ2000;

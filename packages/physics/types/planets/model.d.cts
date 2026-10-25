@@ -1,8 +1,8 @@
 export type PlanetModelBody = {
     /**
-     * - the observed sidereal period input, SI days (the scaffold period of the no-chain bodies; the chain planets ride the artifact's elements)
+     * - the body's orbital-period input, SI days — for the planets the period OF DATE (measured in sun-and-eclipses.js: their rates sit 1.4–1.6°/cy above the VSOP sidereal mean motions, the precession plus input rounding), not the sidereal period the field was once documented as; the scaffold period of the no-chain bodies — the chain planets ride the artifact's elements
      */
-    solarYearInput: number;
+    orbitalPeriodInputDays: number;
     invPlaneInclinationJ2000?: number | undefined;
     longitudePerihelion?: number | undefined;
     /**
@@ -43,7 +43,7 @@ export type PlanetModelRecord = {
 };
 /**
  * @typedef {Object} PlanetModelBody
- * @property {number} solarYearInput - the observed sidereal period input, SI days (the scaffold period of the no-chain bodies; the chain planets ride the artifact's elements)
+ * @property {number} orbitalPeriodInputDays - the body's orbital-period input, SI days — for the planets the period OF DATE (measured in sun-and-eclipses.js: their rates sit 1.4–1.6°/cy above the VSOP sidereal mean motions, the precession plus input rounding), not the sidereal period the field was once documented as; the scaffold period of the no-chain bodies — the chain planets ride the artifact's elements
  * @property {number} [invPlaneInclinationJ2000]
  * @property {number} [longitudePerihelion]
  * @property {number} [wobblePeriodYears] - carriers: the chain's g-mode beat (input since Phase 7 commit 2)

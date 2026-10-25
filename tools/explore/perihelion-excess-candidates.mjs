@@ -55,8 +55,8 @@ const EPS_J2000 = 23.43928;   // IAU 2006, deg — used ONLY by the projection c
 // (Clemence 1947 for Mercury; Standish J2000-frame rates minus GR for the rest).
 const planet = (key, newtonianAscy) => {
   const P = C.planets[key];
-  const aAU = Math.pow(P.solarYearInput / C.meanSiderealYearDays, 2 / 3);
-  return { name: key, aAU, e: P.orbitalEccentricityJ2000, periodDays: P.solarYearInput, periLonDeg: P.longitudePerihelion,
+  const aAU = Math.pow(P.orbitalPeriodInputDays / C.meanSiderealYearDays, 2 / 3);
+  return { name: key, aAU, e: P.orbitalEccentricityJ2000, periodDays: P.orbitalPeriodInputDays, periLonDeg: P.longitudePerihelion,
            latticeAscy: 1296000 / P.perihelionEclipticYears * 100, newtonianAscy };
 };
 const BODIES = [

@@ -2,17 +2,17 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "320c51865d620009";
+export declare const CONSTANTS_HASH: "da713fc2d846767d";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "320c51865d620009";
+  readonly hash: "da713fc2d846767d";
   readonly additionalBodiesReference: {
     "pluto": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "eclipticInclinationJ2000": number;
       "invPlaneInclinationJ2000": number;
@@ -25,7 +25,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeInvPlaneClosedForm": number;
     };
     "halleys": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "eclipticInclinationJ2000": number;
       "invPlaneInclinationJ2000": number;
@@ -37,7 +37,7 @@ export declare const DEFAULT_CONSTANTS: {
       "rotationPeriodDays": number;
     };
     "eros": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "eclipticInclinationJ2000": number;
       "invPlaneInclinationJ2000": number;
@@ -49,7 +49,7 @@ export declare const DEFAULT_CONSTANTS: {
       "rotationPeriodDays": number;
     };
     "ceres": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "eclipticInclinationJ2000": number;
       "invPlaneInclinationJ2000": number;
@@ -200,7 +200,7 @@ export declare const DEFAULT_CONSTANTS: {
   };
   readonly planetOrbitalElements: {
     "mercury": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "axialTiltJ2000": number;
       "eclipticInclinationJ2000": number;
@@ -212,7 +212,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeInvPlaneClosedForm": number;
     };
     "venus": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "axialTiltJ2000": number;
       "eclipticInclinationJ2000": number;
@@ -225,7 +225,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeInvPlaneClosedForm": number;
     };
     "mars": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "axialTiltJ2000": number;
       "eclipticInclinationJ2000": number;
@@ -238,7 +238,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeInvPlaneClosedForm": number;
     };
     "jupiter": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "axialTiltJ2000": number;
       "eclipticInclinationJ2000": number;
@@ -251,7 +251,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeInvPlaneClosedForm": number;
     };
     "saturn": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "axialTiltJ2000": number;
       "eclipticInclinationJ2000": number;
@@ -264,7 +264,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeInvPlaneClosedForm": number;
     };
     "uranus": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "axialTiltJ2000": number;
       "eclipticInclinationJ2000": number;
@@ -277,7 +277,7 @@ export declare const DEFAULT_CONSTANTS: {
       "ascendingNodeInvPlaneClosedForm": number;
     };
     "neptune": {
-      "solarYearInput": number;
+      "orbitalPeriodInputDays": number;
       "orbitalEccentricityJ2000": number;
       "axialTiltJ2000": number;
       "eclipticInclinationJ2000": number;
