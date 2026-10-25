@@ -580,7 +580,7 @@ re-reduction measures against this column as pinned.
 The differential contact-time re-reduction (the gate's `phaseC`
 section; per observation `ΔT_re = ΔT_obs + (TT_greatest_ours −
 TT_greatest_canon)` — the raw tablet time and the shadow-enlargement
-convention cancel identically) identifies **69 of 75** Babylonian
+convention cancel identically) identifies **<!--v:lunarPhaseCIdentified-->69<!--/v--> of <!--v:lunarPhaseCTotal-->75<!--/v-->** Babylonian
 timed observations (S01/S02/S04, −800..−301; 4 via the ±1-yr calendar
 straddle; one 16-min three-way ambiguity and one no-night-candidate
 drop). Century statistic: the MEDIAN with MAD-derived standard error —
@@ -597,7 +597,7 @@ years), so weights must not concentrate a century into one tablet.
 | -500…-401 | −20.0 ± 13.9 | −9.4 | −0.8 |
 | -400…-301 | −10.5 ± 2.7 | −12.4 | +0.7 |
 
-**χ² = 6.7 over 5 centuries** (median-primary; instrument:
+**χ² = 6.7 over 5 centuries** (the governed artifact's own per-century column, `tools/verify/lunar-alignment.js` `phaseC`, reads χ² = <!--v:lunarPhaseCChi2-->9.2<!--/v--> over <!--v:lunarPhaseCCenturies-->5<!--/v--> — the two reductions weight the centuries differently, both inside the 95 % band; median-primary; instrument:
 `tools/explore/phase-c-rereduction-hardened.mjs` — Stephenson-weighted
 century means, ±1-yr candidate straddle, per-table split, verdict
 against the RECORDED pre-registered column). The re-reduced

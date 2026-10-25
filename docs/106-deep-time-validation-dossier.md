@@ -139,8 +139,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.22<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
-  differential re-reduction (69/75 Babylonian observations identified)
-  is statistically consistent with the pinned column, χ² = 6.7 over 5
+  differential re-reduction (<!--v:lunarPhaseCIdentified-->69<!--/v-->/<!--v:lunarPhaseCTotal-->75<!--/v--> Babylonian observations identified)
+  is statistically consistent with the pinned column, χ² = <!--v:lunarPhaseCChi2-->9.2<!--/v--> over <!--v:lunarPhaseCCenturies-->5<!--/v-->
   centuries under the E5 basis — the dLOD/dt stack survives its
   falsification test — [doc 102 §Phase C verdict](102-gia-alpha-lunar-validation.md).
 - **The certified Sun** — the eclipse chain's Sun is assembled from the

@@ -24,7 +24,7 @@ The **invariable plane** is the plane passing through the solar system's barycen
 
 1. **It is truly fixed** — unlike the ecliptic, it doesn't change over time (< 0.1 mas variation over 100 years; the model treats it as fixed)
 2. **Defined by physics** — perpendicular to the total angular momentum
-3. **Dominated by the giant planets** — Jupiter contributes 61.6%, Saturn 24.9%, Neptune 8.0%, Uranus 5.4% (orbital angular momentum ∝ m·√a); it lies within 0.32° of Jupiter's orbital plane
+3. **Dominated by the giant planets** — Jupiter contributes <!--v:invPlaneMomentumShareJupiterPct-->61.5<!--/v-->%, Saturn <!--v:invPlaneMomentumShareSaturnPct-->24.9<!--/v-->%, Neptune <!--v:invPlaneMomentumShareNeptunePct-->8.0<!--/v-->%, Uranus <!--v:invPlaneMomentumShareUranusPct-->5.4<!--/v-->% (orbital angular momentum ∝ m·√a, the registry's shares on the DE440 masses and the input periods); it lies within 0.32° of Jupiter's orbital plane
 
 The **ecliptic** (Earth's orbital plane), by contrast, precesses around the invariable plane, so ecliptic inclinations measured at different epochs aren't directly comparable. Measured against the invariable plane, all planetary motions sit on equal footing.
 
@@ -133,14 +133,14 @@ The simulation verifies the plane's orientation two independent ways.
 
 | Planet | L (% of total) |
 |--------|----------------|
-| Mercury | 0.003% |
-| Venus | 0.06% |
-| Earth | 0.08% |
-| Mars | 0.01% |
-| **Jupiter** | **61.6%** |
-| **Saturn** | **24.9%** |
-| Uranus | 5.4% |
-| Neptune | 8.0% |
+| Mercury | <!--v:invPlaneMomentumShareMercuryPct-->0.003<!--/v-->% |
+| Venus | <!--v:invPlaneMomentumShareVenusPct-->0.06<!--/v-->% |
+| Earth | <!--v:invPlaneMomentumShareEarthPct-->0.08<!--/v-->% |
+| Mars | <!--v:invPlaneMomentumShareMarsPct-->0.01<!--/v-->% |
+| **Jupiter** | **<!--v:invPlaneMomentumShareJupiterPct-->61.5<!--/v-->%** |
+| **Saturn** | **<!--v:invPlaneMomentumShareSaturnPct-->24.9<!--/v-->%** |
+| Uranus | <!--v:invPlaneMomentumShareUranusPct-->5.4<!--/v-->% |
+| Neptune | <!--v:invPlaneMomentumShareNeptunePct-->8.0<!--/v-->% |
 
 **Option B — the published reference** (Souami & Souchay 2012 values above).
 

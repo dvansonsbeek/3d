@@ -1462,6 +1462,12 @@ export const VALUES = {
     keys.lunarDtBandsN = { get: () => la.dtBands.overall.n, render: (v) => String(v) };
     keys.lunarS13FrameworkInside = { get: () => la.dtBounds.S13.frameworkInside, render: (v) => String(v) };
     keys.lunarS13N = { get: () => la.dtBounds.S13.n, render: (v) => String(v) };
+    // Phase C — the differential re-reduction of the Babylonian corpus against the pre-registered
+    // per-century column (lunar-alignment.js phaseC; docs 102 § Phase C verdict, 106 §C).
+    keys.lunarPhaseCIdentified = { get: () => la.phaseC.identified, render: (v) => String(v), note: 'Phase C: Babylonian observations identified by the differential re-reduction (S01/S02/S04, −800…−301)' };
+    keys.lunarPhaseCTotal = { get: () => la.phaseC.identified + la.phaseC.viaYearStraddle + la.phaseC.ambiguous + la.phaseC.dropped, render: (v) => String(v), note: 'Phase C: the corpus size the re-reduction worked through (identified + via year straddle + ambiguous + dropped)' };
+    keys.lunarPhaseCChi2 = { get: () => la.phaseC.chi2, render: (v) => Number(v).toFixed(1), note: 'Phase C: χ² of the per-century medians against the pre-registered column' };
+    keys.lunarPhaseCCenturies = { get: () => la.phaseC.chi2Centuries, render: (v) => String(v), note: 'Phase C: the number of centuries the χ² runs over' };
     // theoryDrift: the framework-vs-ELP-class secular drift and the
     // pre-registered re-reduction prediction (doc 102 §lunar-theory drift).
     const signedMin = (/** @type {number} */ v) => (v < 0 ? '−' : v > 0 ? '+' : '') + Math.abs(v).toFixed(1);
@@ -2290,6 +2296,21 @@ export const VALUES = {
         render: (v) => Number(v).toFixed(4),
         unit: 'AU',
         note: 'Kepler: (orbitalPeriodInputDays / mSY)^(2/3)',
+      };
+    }
+    // Orbital angular-momentum shares of the eight planets, m·√a normalised — the
+    // invariable plane's weights (doc 05): L_i ∝ m_i·√(GM_Sun·a_i) at circular-orbit
+    // order, on the DE440 mass fractions and the Kepler semi-major axes of the input
+    // periods (Earth a = 1 by definition).
+    const aOf = (p) => (p === 'earth' ? 1 : Math.pow(C.planets[p].orbitalPeriodInputDays / C.meanSolarYearDays, 2 / 3));
+    const PLANETS8 = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
+    const lTotal = () => PLANETS8.reduce((s, p) => s + C.massFraction[p] * Math.sqrt(aOf(p)), 0);
+    for (const p of PLANETS8) {
+      out[`invPlaneMomentumShare${p[0].toUpperCase()}${p.slice(1)}Pct`] = {
+        get: () => (100 * C.massFraction[p] * Math.sqrt(aOf(p))) / lTotal(),
+        render: (v) => (v >= 1 ? Number(v).toFixed(1) : v >= 0.01 ? Number(v).toFixed(2) : Number(v).toFixed(3)),
+        unit: '%',
+        note: 'share of the planets’ orbital angular momentum, m·√a normalised — the invariable plane’s weight (doc 05)',
       };
     }
     return out;
