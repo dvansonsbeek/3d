@@ -28,7 +28,7 @@ The simulation provides five export / validation systems (the fifth, the **Solar
 | **Planet Positions, Perihelion & Inclination** | All planets over a date range | Excel (.xlsx) or TSV | Reports menu |
 | **Solstices & Equinoxes** | Annual solstice/equinox data | Excel (.xlsx) | Reports menu |
 | **Days, Years & Precession** (year-length analysis) | Tropical, anomalistic, sidereal year lengths | Excel (.xlsx) | Reports menu |
-| **Planet Position Reports** | Detailed validation for individual planets | Excel (.xlsx) or Clipboard | Hierarchy Inspector |
+| **Planet Position Reports** | Detailed validation for individual planets | Excel (.xlsx) or Clipboard | Planet Orbit Analysis |
 
 The validation checks run in `npm run check`; Part 5 maps the former console tests to their gates.
 
@@ -54,8 +54,7 @@ Tools
 │   ├── Earth–Moon Genesis Analysis
 │   ├── Earth Climate Analysis
 │   └── Earth dLOD/dt Analysis
-├── Standard Model overlay (VSOP87 · MPP02)   [ghost-body overlay sub-folder]
-└── Console Tests (F12)
+└── Standard Model overlay (VSOP87 · MPP02)   [ghost-body overlay sub-folder]
 ```
 
 ---
@@ -506,7 +505,7 @@ recorded generator in `npm run check`, which fails when the number moves:
 | the Stephenson 2016 primary observations (L-5b, L-7) and the documented visibility (L-5) | `eclipse-audit` lunar / solar, `lunar-alignment` visibility |
 | the Framework-Moon arguments against Meeus | `test:model` (bit-exact), the cross-engine mirror, `lunar-alignment` theoryDrift |
 | the cycle stack against climate transitions | `lod-climate-correlation` |
-| the planet integrators and the scene-graph composition audit | `test:planet-model`, `chain-vs-jpl`, the snapshot chain |
+| the planet integrators and the scene-graph composition audit | `test:planet-model`, the chain-vs-JPL record (`data/chain-vs-jpl-rms.json`), the snapshot chain |
 
 The research one-offs among the buttons (predictions beyond the canon, the
 37-event Ω/γ signal test, the residual-investigation hypotheses, the

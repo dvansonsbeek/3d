@@ -523,7 +523,7 @@ const M_EARTH_ALONE = GM_EARTH_ALONE / G_CONSTANT;
 **Why Solar Perturbation Correction?**
 - Raw Kepler-derived GM from Moon's orbit is ~397,500 km³/s² (underestimates by ~0.27%)
 - The Sun perturbs Moon's orbit, making observed a and P slightly different from pure two-body values
-- The correction factor 1/(1 - moonApogee/AU) ≈ 1.00271 reconciles this difference
+- The Δa correction (the Hill–Brown solar perturbation, `Δa = a_M·μ·m` — [doc 24](24-moon-kepler-derivation.md); one home `@essrt/physics` `earth/mass-chain`) reconciles this difference
 - After correction: ~398,600 km³/s² matching JPL's measured value
 
 **Display:** Added to Earth's planetStats
@@ -541,10 +541,9 @@ The Moon's gravitational parameter uses the same Earth-Moon system GM and solar 
 
 ```javascript
 // Moon's gravitational parameter (km³/s²)
-// GM_Moon = GM_system / (ratio + 1) with same solar perturbation correction
-// The entire GM_EARTH_MOON_SYSTEM is affected by solar perturbation
-const GM_MOON_ALONE = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1)
-              / (1 - moonAtApogee / meanAUDistance);
+// GM_Moon = GM_system / (ratio + 1); GM_system carries the Δa correction (doc 24)
+// ONE home: @essrt/physics earth/mass-chain (mass.gmMoonAloneKm3S2)
+const GM_MOON_ALONE = GM_EARTH_MOON_SYSTEM / (MASS_RATIO_EARTH_MOON + 1);
 // Result: ~4,902.8 km³/s² (matches GRAIL value)
 
 // Moon's mass derived from gravitational parameter (kg)
@@ -1279,16 +1278,16 @@ The periods are the N-body chain's J2000 readings: the inertial (ICRF) period is
 
 | Planet | Ecliptic Period (yr) | ICRF Period (yr) |
 |--------|---------------------:|-----------------:|
-| **Mercury** | <!--v:mercuryPeriPeriod-->23,199<!--/v--> | −<!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> |
-| **Venus** | −<!--v:venusPeriPeriod-->22,463<!--/v--> | −<!--v:venusPeriPeriodICRF-->174,997<!--/v--> |
-| **Earth** | <!--v:periPrecYears-->~20,938<!--/v--> | +<!--v:earthPeriPeriodICRF-->111,635<!--/v--> |
-| **Mars** | <!--v:marsPeriPeriod-->19,002<!--/v--> | −<!--v:marsPeriPeriodICRF-->72,335<!--/v--> |
-| **Jupiter** | <!--v:jupiterPeriPeriod-->23,760<!--/v--> | −<!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> |
-| **Saturn** | −<!--v:saturnPeriPeriod-->16,503<!--/v--> | −<!--v:saturnPeriPeriodICRF-->45,883<!--/v--> |
-| **Uranus** | <!--v:uranusPeriPeriod-->23,907<!--/v--> | −<!--v:uranusPeriPeriodICRF-->330,515<!--/v--> |
-| **Neptune** | <!--v:neptunePeriPeriod-->25,464<!--/v--> | −<!--v:neptunePeriPeriodICRF-->2,136,797<!--/v--> |
+| **Mercury** | <!--v:mercuryPeriPeriod-->23,199<!--/v--> | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> |
+| **Venus** | <!--v:venusPeriPeriod-->22,463<!--/v--> | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> |
+| **Earth** | <!--v:periPrecYears-->~20,938<!--/v--> | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> |
+| **Mars** | <!--v:marsPeriPeriod-->19,002<!--/v--> | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> |
+| **Jupiter** | <!--v:jupiterPeriPeriod-->23,760<!--/v--> | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> |
+| **Saturn** | <!--v:saturnPeriPeriod-->16,503<!--/v--> | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> |
+| **Uranus** | <!--v:uranusPeriPeriod-->23,907<!--/v--> | <!--v:uranusPeriPeriodICRF-->330,515<!--/v--> |
+| **Neptune** | <!--v:neptunePeriPeriod-->25,464<!--/v--> | <!--v:neptunePeriPeriodICRF-->2,136,797<!--/v--> |
 
-**Note:** Venus and Saturn precess retrograde in the ecliptic frame; Saturn's window retrograde is the Great-Inequality phase of its own chain ([doc 109](109-model-nbody-engine-and-lattice-test.md)). The registry's live values and their window are in [doc 20](20-constants-reference.md#perihelion-precession-periods-ecliptic).
+**Note:** the periods are the registry's, unsigned — every secular g is positive, so every secular period is prograde ([doc 20](20-constants-reference.md)); the signs this table once carried by hand were the retired device's. Saturn's ±150-yr WINDOW rate reads retrograde in the current centuries — the Great-Inequality phase of its own chain ([doc 109](109-model-nbody-engine-and-lattice-test.md)), not the secular period. The registry's live values and their window are in [doc 20](20-constants-reference.md#perihelion-precession-periods-ecliptic).
 
 ### 10.7 Formula Quick Reference
 

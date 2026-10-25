@@ -746,7 +746,7 @@ while the Sun/clock machinery (eclipse Sun equation of centre,
 besselian Sun distance, cardinal braid) stayed on the H/3 line — a
 certification split, not a physics one (the two agree within 4.2e-5
 across the historical era). Since plan 09 the split is closed: the H/3
-law is deleted and Earth's e of date is the N-body series on every path. Acceptance, measured and rebaselined: all 41 paleo
+law is deleted and Earth's e of date is the N-body series on every path. Acceptance, measured and rebaselined: all 45 paleo
 anchors in bands; the ancient-eclipse dense-target χ² IMPROVED
 (full stack 44.7 → 32.9, Phase-C 5.4 → 4.7, ablation ordering
 preserved) — explained, not tuned: this e is La2004-corroborated
@@ -1000,9 +1000,9 @@ The registry carries the derived origin (`invPlaneNodeOriginSFrameDeg`)
 and the converted J2000 nodes (`<planet>ChainAscNodeInvSSJ2000Deg`)
 alongside the s-frame keys; the per-planet `<planet>OmegaDelta` keys now
 read chain-converted minus S&S. **Read the live values from the keys,
-never from this paragraph.** The gate is
-`tools/explore/k5c-invplane-probe.mjs` — both its node gates are
-fail-proven (a silent frame swap trips the pole-class gate; a
+never from this paragraph.** The instrument is
+`tools/explore/k5c-invplane-probe.mjs` (a frozen research script, not a
+gate of the check chain) — both its node checks are fail-proven (a silent frame swap trips the pole-class gate; a
 pole-sign bug trips the origin-RA gate).
 
 ## 21. The planets' mean motions of date — and the model measuring its own resonances (C1/C2)
@@ -1092,7 +1092,7 @@ The frozen era unit left the model at plan 09 steps 7a–7c. The research script
 | `tools/lib/python/planet_beats.py`, `tools/fit/python/planet_eccentricity_jpl.py` | The six comb periods per planet and their pairwise beats; the base eccentricities of the retired balance construction | Both inputs retired with the planet channel (plan 07) and the comb (plan 09) | tools READMEs |
 | `tools/explore/`: `audit-moon-months.js`, `moon-cycles.js`, `derive-a1a2a3.js`, `regime-aware-recession-study.js`, `fq7s-h3-law-candidate.mjs`, `fq7s-laplace-lagrange-e.mjs`, `fq7s-jpl-preview.mjs`, `fq7s-annual-channel.mjs`, `diagonal-ll-rates.mjs`, `j2000-lattice-snapshot-null.mjs`, `sun-annual-correction.js` | Lunar counts per unit, the lunar-argument derivation on the comb, the recession study on the unit's history, the H/3 eccentricity-law candidates (retired at step 6), the J2000 snapshot null of §11, the Sun's annual correction on comb terms | §11 above keeps the snapshot-null facts; the annual-correction instrument read a raw residual ~198″ RMS and ~7″ with its 3-term fit (doc 65) | docs 65, 109 |
 
-Scripts that stayed were stripped of the unit instead: `dense-targets-residual-structure.mjs` (its comb periodogram section), `perihelion-excess-candidates.mjs` (its comb-slot candidate), `d2-joint-preview.mjs` / `n3-carrier-swap-preview.mjs` / `fq7s-sun-registry-metric.mjs` (the rounded mean-year input → the derived mean tropical year), `v4-frame-audit.js` (the device precession → the published J2000 precession period), `fit-regime-recession.js` (its unit rows), `lattice-long-window-test.mjs` and `naff-frequencies.mjs` (their nearest-divisor columns — a hashed-recipe edit, so the N-body pair was re-stamped), and the Python `milankovitch_climate_formula.py` (the legacy comb list and labels), `climate_formula_mwp_check.py`, `milankovitch_insolation_laskar_check.py`, `constants_scripts.py`.
+Scripts that stayed were stripped of the unit instead: `dense-targets-residual-structure.mjs` (its comb periodogram section), `perihelion-excess-candidates.mjs` (its comb-slot candidate), `d2-joint-preview.mjs` / `n3-carrier-swap-preview.mjs` / `fq7s-sun-registry-metric.mjs` (the rounded mean-year input → the derived mean tropical year), `v4-frame-audit.js` (the device precession → the published J2000 precession period), `fit-regime-recession.js` (its unit rows; the script itself was deleted at plan 12 option A), `lattice-long-window-test.mjs` and `naff-frequencies.mjs` (their nearest-divisor columns — a hashed-recipe edit, so the N-body pair was re-stamped), and the Python `milankovitch_climate_formula.py` (the legacy comb list and labels), `climate_formula_mwp_check.py`, `milankovitch_insolation_laskar_check.py`, `constants_scripts.py`.
 
 ## 23. The planet-channel and era-device retirements — the record (moved from CLAUDE.md at plan 13 B5)
 
@@ -1112,7 +1112,7 @@ engine's long-term mean eccentricities (99.8636 % was the tuned-inputs figure
 read 99.8717 % at retirement, because upstream inputs moved after the last
 search run and nothing re-recorded the preset, since no gate and no published
 surface read it). `data/balance-presets.json` stays as the frozen search
-record that docs 10/109 cite; it is no longer regenerable.
+record this section cites; it is no longer regenerable.
 
 **Plan 07 R5/R9 (model v18.0, physics MAJOR 14): the ψ inclination law and the
 geometric-elements device are DELETED** — the ψ/K law module,
@@ -1214,8 +1214,7 @@ fitted correction stack (parallax / gravitation / elongation — keys,
 evaluators, fitters ex-Steps 2/5a-5b) is deleted; git history carries its
 record. The Law-4/Law-5 constants (`K = 3.4143e-6`; base eccentricities from
 the balance construction) survive only in the legacy scene scaffolding
-(device anchors, the no-chain bodies Pluto/Halley/Eros, and the o.fib*
-diagnostics). Earth, the Moon and the Sun stay on the engine-K hierarchy —
+(the no-chain bodies Pluto/Halley/Eros, which are not rendered). Earth, the Moon and the Sun stay on the engine-K hierarchy —
 the two-engine interface; the historical gate suite is calibrated on it.
 
 The former Config-#7 falsification criterion (checks 46–50 of the deleted

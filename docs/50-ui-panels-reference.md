@@ -26,7 +26,7 @@ The simulation includes several interactive panels for inspecting planetary data
 | **Earth Climate Analysis** | L1+L2+L3 climate formula visualized across LR04 / CENOGRID / EPICA / CenCO2PIP, multiple time windows — see [doc 58](58-climate-formula-explorer.md) |
 | **Earth–Moon Genesis Analysis** | Deep-time evolution of H, LOD, year length, Moon distance under Expanding Solar System Resonance Theory — see [doc 59](59-essrt-explorer.md) |
 | **Earth dLOD/dt Analysis** | dLOD/dt driver layers (Tidal (L1) / + GIA (L2) / + Cycles (L3) / + Core-mantle (L4)) vs named climate periods + GISP2/LR04 temperature; Σ_stack ↔ Bond 2001 IRD comparison — physics in [doc 102](102-gia-alpha-lunar-validation.md) + [doc 104](104-millennial-rotation-swing.md) |
-| **Framework Verification** | Model vs published celestial-mechanics formulas (±12,000 yr, 11 quantities) — see [doc 57](57-formula-verification.md) |
+| **Framework Verification** | Model vs published celestial-mechanics formulas — 26 categories in six groups on four standard windows (1000–2500 AD to ±1 Myr) — see [doc 57](57-formula-verification.md) |
 | **Framework Images** | The website's twelve explanatory figures drawn from the model — every printed number a model surface, every date a computed crossing; exported one at a time through the standard export modal |
 
 > **Scope note (ESSRT).** Each panel is intrinsically a present-epoch UI that reads from the live simulation state — what users see at any time reflects whatever date is currently active. When users scrub the simulation date by millions of years, the panels reflect ESSRT-evolved values automatically (per `DEEP_TIME_MODE_ENABLED` in `src/script.js`). The Earth–Moon Genesis Analysis is the dedicated visualization for how the lattice divisors' literal year-counts evolve at deep time. See [doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the formalism.
@@ -142,7 +142,7 @@ Rows are distributed across tabs to reduce scrolling. The tab bar appears betwee
 
 | Planet Type | Tabs | Notes |
 |-------------|------|-------|
-| **Standard planets** (Mercury–Neptune, Pluto, Halley's, Eros) | GENERAL, ORBIT, POSITION, CYCLES | 4 tabs |
+| **Standard planets** (Mercury–Neptune) | GENERAL, ORBIT, POSITION, CYCLES | 4 tabs |
 | **Earth** | GENERAL, ORBIT, POSITION, CYCLES | Same 4 tabs; extra Date Specific + Precession Cycles sections go into CYCLES |
 | **Moon** | GENERAL, ORBIT, CYCLES | 3 tabs; eclipse cycles in CYCLES |
 | **Sun** | GENERAL, POSITION, CYCLES | The Sun's header map (TAB_CONFIG.sunHeaderMap) — POSITION carries the **Solar Mass Loss (Driver 2)** block: the radiative (L☉/c²) and solar-wind mass-loss rates, their total as Ṁ/M per year against the Pitjeva & Pitjev (2012) ephemeris bound, the implied AU growth against Pitjeva & Standish (2009), and the implied sidereal-year drift (T ∝ M⁻²) that the Framework Verification Sidereal Year panel carries and the μ-consistency falsification leg rides — the model's second driver on a surface, registry-driven, no typed numbers |
@@ -228,8 +228,7 @@ Within each tab, rows are organized under section headers (e.g., "Perihelion Pre
 
 One chart type is embedded as inline SVG within planetStats rows. (A
 second — the obliquity-cycle chart on the retired device period — was retired from display with
-the Earth-CYCLES dynamical pass; `buildObliquityChart` survives as
-machinery only, attached to no row.)
+the Earth-CYCLES dynamical pass, and its builder is deleted.)
 
 #### Orbital Plane Precession Cycle Chart
 
@@ -471,7 +470,7 @@ Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](9
 1. Open the Tweakpane Tools folder
 2. Click "Earth Climate Analysis"
 3. Use the time-window tabs across the top to switch records
-4. Use the three layer checkboxes (Total / L1 / L2 — L3 is folded into every curve) to add or remove formula layers
+4. Use the three toggles (Proxy data / Total / L1 alone) to show or hide the record and the formula's layers
 5. On CENOGRID, use the δ¹⁸O / δ¹³C sub-toggle
 
 ### Key Features
@@ -479,7 +478,7 @@ Modal that visualizes the canonical **L1+L2+L3 climate formula** (see [doc 92](9
 | Feature | Description |
 |---------|-------------|
 | **Eight time-window tabs** | CenCO2PIP 66M, CENOGRID 67M, LR04 5.3M, LR04 1.2M, EPICA 800k, LR04 700k, LR04 200k, forward projection |
-| **Layer toggles (3 checkboxes)** | Total (baseline + L1 + L2 + L3), L1 only (the orbital lines — the 28 physical lines of doc 92 §2), L2 (carbon-cycle thermostat 405/202/135 kyr family); the L3 Heaviside steps (PETM/EOT/Mi-1/MMCT/iNHG/MPT) are folded into every curve |
+| **Toggles (3)** | Proxy data (the record), Total (baseline + L1 + L2 + L3), L1 alone (the orbital lines — the 28 physical lines of doc 92 §2); the L2 carbon-cycle family and the L3 Heaviside steps (PETM/EOT/Mi-1/MMCT/iNHG/MPT) are folded into the Total curve |
 | **Proxy chart** | Observed proxy data + the formula evaluated at the same timestamps |
 | **CENOGRID proxy sub-toggle** | δ¹⁸O vs δ¹³C |
 | **Forward projection tab** | Predicts climate forcing forward — Holocene correctly identified as interglacial; next natural glaciation predicted ~58 kyr ahead |
@@ -516,7 +515,7 @@ Modal that visualizes the **Expanding Solar System Resonance Theory (ESSRT)** �
 
 ### Full Reference
 
-See [doc 59 — Earth–Moon Genesis Analysis](59-essrt-explorer.md) for the complete panel reference (7 quantity tabs, 2 range tabs, era markers, Wu 2024 anchor overlay, hover tooltip, the Export, code locations). The underlying theory — Driver 1 (Farhat polynomial + angular-momentum conservation), Driver 2 (Kepler scaling under solar mass loss), the T_p(t) / LOD(t) / year(t) parameterizations, validation against the published cyclostratigraphy record (sub-percent agreement Hadean → present), and the per-frame integrator architecture (`_dtMoonIntegrator`, `_dtPlanetIntegrator`) — lives in [doc 99 — Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md).
+See [doc 59 — Earth–Moon Genesis Analysis](59-essrt-explorer.md) for the complete panel reference (6 quantity tabs, 2 range tabs, era markers, Wu 2024 anchor overlay, hover tooltip, the Export, code locations). The underlying theory — Driver 1 (Farhat polynomial + angular-momentum conservation), Driver 2 (Kepler scaling under solar mass loss), the T_p(t) / LOD(t) / year(t) parameterizations, validation against the published cyclostratigraphy record (sub-percent agreement Hadean → present), and the per-frame integrator architecture (`_dtMoonIntegrator`, `_dtPlanetIntegrator`) — lives in [doc 99 — Expanding Solar System Resonance Theory](99-expanding-solar-system-resonance-theory.md).
 
 ---
 
@@ -542,7 +541,7 @@ It is the interactive home of the **Σ_stack ↔ Bond 2001 IRD comparison** — 
 | **Layer toggles (9)** | **Tidal (L1)** (flat rust dashed, +2.12 ms/cy — pure Moon-recession reference) · **+ GIA (L2)** (teal secular baseline, +1.77 ms/cy at J2000, matches IERS +1.75) · **+ Cycles (L3)** (gold dashed, flags only, −0.13 ms/cy at J2000; gates the ▲/▼ transition markers) · **+ Core-mantle (L4)** (orange bold, −0.08 ms/cy — the shipped observable incl. the Resonator episode) · **Periods** (climate-band shading) · **Bond** (the 1,466-yr Bond harmonic isolated, lavender dashed, default OFF) · **Core** (the Core-mantle swing isolated on the L2 baseline, green, default OFF) · **GISP2** (opt-in proxy overlay, secondary °C axis) · **LR04** (opt-in inverted-δ¹⁸O overlay, green, covers the 200-kyr tab) |
 | **Epoch tabs (7)** | 200,000 BC–2050 AD (glacial; fine 3,000-sample grid, crossing triangles suppressed above 120 crossings) · 27,500 BC–2050 AD · 13,000 BC–2050 AD · 4,000 BC–2050 AD · 750–2050 AD (default) · 1,200–2,500 AD (near future) · 13,000 BC–15,000 AD (full). Y-range auto-computed per tab from the currently-visible curves |
 | **Climate-period bands** | 19 named periods from mainstream literature (MIS 7 interglacial, Penultimate Glaciation MIS 6, Eemian MIS 5e, Last Glacial Period, LGM, Older/Younger Dryas, Holocene Optimum, 8.2 ka, Bond 4, 4.2 ka, Late Bronze Age Collapse, Iron Age cold, Roman Warm, Late Antique LIA, MWP, LIA incl. Maunder + Dalton, Modern warm) — cold = blue band, warm = red band; wide bands get inline labels, narrow bands get 45° leader labels in the top margin |
-| **Transition markers ▲/▼** | Zero-crossings of the stack rate on the + Cycles (L3) curve: ▲ PEAK (stack at max, rate turns negative → Earth spins up vs baseline → warm episode starts), ▼ TROUGH (stack at min → cooling starts). The matching console test *All cycles (4-flag stack) ↔ climate transitions* scans −5000 to +5000 CE and matches each crossing to the nearest named transition of the correct sign |
+| **Transition markers ▲/▼** | Zero-crossings of the stack rate on the + Cycles (L3) curve: ▲ PEAK (stack at max, rate turns negative → Earth spins up vs baseline → warm episode starts), ▼ TROUGH (stack at min → cooling starts). The former console test *All cycles (4-flag stack) ↔ climate transitions* (retired with its folder in plan 18; [doc 52](52-analysis-export-tools.md) Part 5 names its gate) scanned −5000 to +5000 CE and matches each crossing to the nearest named transition of the correct sign |
 | **Temperature overlay** | GISP2 (Alley 2000) Greenland ice-core reconstruction on a secondary right-hand °C-anomaly axis, 27,950 BC–1850 AD at 100-yr resolution — independent reconstruction, not part of any model fit. A 5-kyr rolling-mean detrend (`lcrDetrendSeries`) removes the Milankovitch-scale trend so Bond-scale oscillations are visible |
 | **Evidence panels (3, collapsible)** | *Model ↔ Bond 2001 IRD correlation (detrended)* — Pearson r for Σ_stack and for the isolated Bond harmonic, plus best-lag cross-correlation (±500 yr scan) · *Sign convention check* — Σ_stack sign vs warm/cold at 10 named events (dynamic match count; joint world 4/5 within the validated window) · *Bond event ↔ nearest model ▼ TROUGH crossing* — offsets from Bond 0–8 (1450 CE back to 9150 BC) |
 | **Export button** | One "Export" — the standard export page (title, one legend entry per toggled layer, the chart, the credit; the Bond-correlation sentence and the fit provenance stay on screen) of the current tab, shown in the chart-export modal with Download PNG / Download SVG / Share / Copy |
@@ -577,13 +576,13 @@ The physics and validation methodology live in [doc 102 — GIA α(t) lunar vali
 
 ### Purpose
 
-Compares the model's predictions against published closed-form formulas from celestial-mechanics literature (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray) across eleven Earth quantities over a ±12,000-year window, plus two all-planet chart panels ("Inclination of all planets", "Eccentricity of all planets") witnessed by JPL Horizons and La2010. This is the **analytical twin** of the Perihelion of Planets Verification — where WebGeoCalc compares the model against *observed JPL data*, Framework Verification compares it against *published analytical formulas*. Together they validate the model from two independent directions.
+Compares the model's predictions against published closed-form formulas from celestial-mechanics literature (Meeus, Chapront, Capitaine, Vondrák, Laskar, Berger, Bills & Ray) across 26 categories in six groups on four standard windows (1000–2500 AD up to ±1 Myr), plus two all-planet chart panels ("Inclination of all planets", "Eccentricity of all planets") witnessed by JPL Horizons and La2010. This is the **analytical twin** of the Perihelion of Planets Verification — where WebGeoCalc compares the model against *observed JPL data*, Framework Verification compares it against *published analytical formulas*. Together they validate the model from two independent directions.
 
 ### Accessing the Panel
 
 1. Open the Tweakpane Tools folder
 2. Click "Framework Verification"
-3. Navigate between the 11 categories with the `‹` / `›` arrows or click the category name to open a dropdown
+3. Navigate between the categories with the `‹` / `›` arrows or click the category name to open the grouped dropdown
 
 ### Key Features
 

@@ -159,7 +159,7 @@ npm run check             # the full gate chain (~4.4 min): lint, typecheck, bou
 npm run check:docs        # scoped tier (~30 s) for docs/registry/marker edits;
                           # tools/lib and packages/physics edits take the full chain
 npm run test:browser      # golden masters in headless Chromium (~2.5 min, builds first)
-npm run test:verify:list  # how the 18 tools/verify scripts classify (6 gates, 12 generators)
+npm run test:verify:list  # how the tools/verify scripts classify (6 gates, 13 generators)
 npm run values:package    # packaged @essrt/model-values vs the live registry
 npm run check:artifacts   # campaign artifacts vs their recorded input hashes
 ```
@@ -178,11 +178,11 @@ Two things worth knowing before you read a red result as breakage:
   and required in CI** — a year's computed values do not depend on which epoch
   the scene happens to be set to, bit-exact on the round trip. Red there is a
   regression of a closed acceptance criterion, not a tracked state.
-- Of the 24 scripts in `tools/verify/`, only the five gates can actually fail —
-  the rest print analysis without asserting anything. `test:verify` runs the real
-  gates and deliberately skips the twelve generators, which regenerate tracked
-  data files rather than checking them. The suite fails on any unclassified
-  script, so the inventory cannot silently drift.
+- Every script in `tools/verify/` either FAILS or WRITES: six gates and thirteen
+  generators. `test:verify` runs the gates and deliberately skips the generators,
+  which regenerate tracked data files rather than checking them (`npm run
+  regen:cascade` lists the stale ones in order). The suite fails on any
+  unclassified script, so the inventory cannot silently drift.
 
 ---
 
@@ -200,7 +200,7 @@ Two things worth knowing before you read a red result as breakage:
 
 ---
 
-## Deep-Time Implementation — Hadean to +200 Myr
+## Deep-Time Implementation — from the Moon's genesis to the tidal-lock asymptote
 
 The model's parameters apply at **all epochs from the end of the cited Earth–Moon history (4.43 Gyr ago — the lunar age of Farhat et al. 2022's solution, the model's distance input) through J2000 and into the future tidal-lock asymptote at ~<!--v:tidalLockRE-->87.1<!--/v--> R_⊕**. [Doc 99](docs/99-expanding-solar-system-resonance-theory.md) documents the canonical chain from the epoch through the length of day, the mean lunisolar precession period, the AU, solar mass loss, the Kepler year, the Moon's distance and synodic month, the anomalistic year, the stellar and sidereal days and the planets' orbital and synodic periods. The chain is anchored to modern Lunar Laser Ranging and the [Farhat 2022](https://www.aanda.org/articles/aa/full_html/2022/09/aa44329-22/aa44329-22.html) lunar-distance evolution; the deep-time outputs are then validated against external anchors the model was **not** fit against:
 
@@ -224,16 +224,17 @@ These are calibration findings, not structural claims, and not improvements on N
 
 ## Documentation
 
-Detailed documentation is in the [`/docs`](docs/00-readme.md) folder, organized by category:
+Detailed documentation is in the [`/docs`](docs/00-readme.md) folder. The document numbers are stable identifiers, not a reading order (the archival of retired docs left gaps); [docs/00](docs/00-readme.md) gives the reading order — five documents if you read nothing else: the index → [the theory (99)](docs/99-expanding-solar-system-resonance-theory.md) → [the calculation map (110)](docs/110-calculation-map.md) → [the constants (20)](docs/20-constants-reference.md) → [the measured traps behind every rule (111)](docs/111-measured-traps-and-gate-origins.md) — and themed tables:
 
-| Range | Category | Start here |
-|-------|----------|------------|
-| 00–09 | Getting Started & Overview | [Introduction](docs/01-introduction.md), [User Guide](docs/02-user-guide.md), [Glossary](docs/03-glossary.md) |
-| 10–19 | Theory & Model | [Day & Year Length Formulas](docs/11-length-day-year-formulas.md), [Perihelion Precession](docs/13-mercury-precession-breakdown.md) |
-| 20–29 | Technical Reference | [Constants Reference](docs/20-constants-reference.md), [Formulas](docs/21-orbital-formulas-reference.md) |
-| 40–49 | Architecture & Code | [Architecture](docs/40-architecture.md), [Scene Graph](docs/41-scene-graph-hierarchy.md) |
-| 90–99 | Climate Analysis | [Climate Formula (Doc 92)](docs/92-climate-formula.md), [Insolation Null Test (Doc 94)](docs/94-insolation-null-test.md), [ESSRT (Doc 99)](docs/99-expanding-solar-system-resonance-theory.md) |
-| 100–109 | ΔT, Historical Eclipse & Deep-Time Validation | [GIA α(t) lunar validation (Doc 102)](docs/102-gia-alpha-lunar-validation.md), [-135 Babylonian case study (Doc 103)](docs/103-135-babylonian-case-study.md), [Millennial rotation swing (Doc 104)](docs/104-millennial-rotation-swing.md), [ΔT stack flag audit (Doc 105)](docs/105-dt-stack-flag-audit.md), [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md) |
+| Theme | Start here |
+|-------|------------|
+| Getting started | [Introduction](docs/01-introduction.md), [User Guide](docs/02-user-guide.md), [Glossary](docs/03-glossary.md) |
+| The model | [ESSRT (99)](docs/99-expanding-solar-system-resonance-theory.md), [the N-body record (109)](docs/109-model-nbody-engine-and-lattice-test.md), [the calculation map (110)](docs/110-calculation-map.md), [measured traps and gate origins (111)](docs/111-measured-traps-and-gate-origins.md) |
+| Earth, the planets, the Moon | [Day & Year Length Formulas](docs/11-length-day-year-formulas.md), [Perihelion Precession](docs/13-mercury-precession-breakdown.md), [Orbital Elements](docs/04-dynamic-elements-overview.md), [The Invariable Plane](docs/05-invariable-plane-overview.md), [The Derived Moon](docs/66-moon-meeus-corrections.md), [The Δa Mass Derivation](docs/24-moon-kepler-derivation.md) |
+| Validation | [Deep-Time Validation Dossier (106)](docs/106-deep-time-validation-dossier.md), [GIA α(t) lunar validation (102)](docs/102-gia-alpha-lunar-validation.md), [Millennial rotation swing (104)](docs/104-millennial-rotation-swing.md), [ΔT stack flag audit (105)](docs/105-dt-stack-flag-audit.md), [−135 Babylonian case study (103)](docs/103-135-babylonian-case-study.md), [Ancient-record review (107)](docs/107-ancient-record-review.md) |
+| Climate | [Climate Formula (92)](docs/92-climate-formula.md), [Insolation test (94)](docs/94-insolation-null-test.md) |
+| Reference | [Constants](docs/20-constants-reference.md), [Formulas](docs/21-orbital-formulas-reference.md), [Coordinate Frames](docs/22-coordinate-frames.md), [Verification Data](docs/23-verification-data-reference.md) |
+| Architecture & UI | [Architecture](docs/40-architecture.md), [Scene Graph](docs/41-scene-graph-hierarchy.md), [UI Panels](docs/50-ui-panels-reference.md), [Analysis & Export Tools](docs/52-analysis-export-tools.md) |
 
 **Investigation & Verification:**
 - [Python Scripts](scripts/) — the climate formula and its spectral tests, the LOD/ΔT stack, the paleo anchors and the null tests
@@ -246,20 +247,17 @@ Detailed documentation is in the [`/docs`](docs/00-readme.md) folder, organized 
 
 ## Fitting Pipeline
 
-The model's inputs are JSON under `public/input/` — `astro-reference.json` (the IAU/JPL/Meeus anchors and the scene epoch; the one input file), `meeus-lunar-tables.json` and `climate-formula-coefficients.json` — and the fitted artifacts under `data/`, each written by its own fitter (`model-parameters.json` was retired leaf by leaf and deleted at plan 11; `fitted-coefficients.json` at plan 11 step 1). When an input changes, the fitting pipeline recalibrates the derived coefficients so the simulation matches JPL Horizons.
+The model's inputs are JSON under `public/input/` — `astro-reference.json` (the IAU/JPL/Meeus anchors and the scene epoch), `meeus-lunar-tables.json` and `climate-formula-coefficients.json` — and the governed fitted artifacts under `data/`, each written by its own fitter and stamped with the hashes of what it was fitted on. The planetary side carries zero fitted constants; the fitters that remain close the ΔT stack, the core–mantle swing and the climate formula's coefficients, and the solar-measurements window export is the engine's own check.
 
 ```bash
-node tools/fit/run-pipeline.js --phase1        # Step 1, the Sun optimizer (~15 s)
-node tools/fit/run-pipeline.js --phase2        # Steps 4a–10 (~1 h, requires the Step 3 browser export)
-node tools/fit/run-pipeline.js --all           # Step 1, then 4a–10
-node tools/fit/run-pipeline.js --from 5c       # resume from a step onwards
+node tools/fit/run-pipeline.js --list          # the live steps (6a2, 7c, 7f, 7h, 7i, 8, 9) and what each writes
+node tools/fit/run-pipeline.js --from 7c       # resume from a step onwards
+npm run regen:cascade -- --run                 # after ANY input, fitter or generator change: every stale artifact in order, the constants module last
 ```
 
-The pipeline runs in phases: Sun geometry → perihelion harmonics → Moon → solar measurements and harmonic fits → campaign artifacts → verify → regenerate the constants module `src/script.js` imports. Step 3 (the browser data export) is always manual. Step 6a2 exports the cardinal points, perihelion/aphelion and world angles of a −4000…+4000 window in one scene-graph pass; steps 6b–6d fit harmonics from that data. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
+A re-close of a governed fit is a decision, never an automatic regeneration: `check:artifacts` fails naming the exact command when the physics an artifact was fitted on moves, and `regen:cascade` lists the stale fit as a by-hand step. See [tools/fit/README.md](tools/fit/README.md) for the full reference.
 
-The cardinal points (solstices and equinoxes) are **derived, not independently fitted**: their dates come from the tropical year-length model plus one shared braiding term ([the braid law, Doc 99](docs/99-expanding-solar-system-resonance-theory.md)), reaching 0.28–0.37 min RMS per event over ±270,000 years, with the seasonal spread emerging from the geometry rather than from per-point fitting.
-
-**Safety**: Step 8 (`verify-pipeline.js`) validates all results against IAU reference values before Step 9 regenerates the constants module. If a parameter change produces unrealistic values — year lengths off IAU by more than a second, obliquity off J2000 by more than 0.01″, planet baselines that regress — the pipeline stops and reports which checks failed.
+The cardinal points (solstices and equinoxes) are **derived, not fitted**: their instants come from the one-source movement — the composed precession clock and the N-body series' elements of date — and the fail-proven cardinal-point gates read them against JPL Horizons (−3000 to +2000: <!--v:cardinalVsHorizonsMeanMin-->−1.02<!--/v--> min mean).
 
 ---
 

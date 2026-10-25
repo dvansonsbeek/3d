@@ -20,7 +20,7 @@ Sun).
 **Related documents:**
 - [20 — Constants Reference](20-constants-reference.md) — canonical mass / GM values
 - [21 — Orbital Formulas Reference §A.6.1](21-orbital-formulas-reference.md) — central GM/Mass table
-- Code: [src/script.js §E2a](../src/script.js) and [tools/lib/constants.js §9](../tools/lib/constants.js) (search `moonOrbitalShift`); [src/script.js §E2 / OrbitalFormulas.keplerPeriod](../src/script.js)
+- Code: ONE home — [`packages/physics/src/earth/mass-chain.cjs`](../packages/physics/src/earth/mass-chain.cjs) (the Moon Kepler → GM_EM → the Earth/Moon split → the Sun; plan 13 B3); `src/script.js` and `tools/lib/constants.js` read it
 
 > *Scope: the derivations use J2000-anchored inputs (Moon distance, sidereal
 > month, sidereal year, LOD) to reproduce the modern-era JPL DE440 reference
@@ -457,9 +457,8 @@ Both `T` forms produce the same value for every planet: Mercury 87.97 d, Venus 2
 
 ## See Also
 
-- [src/script.js §E2a](../src/script.js) — implementation (`moonOrbitalShift`, `moonDistanceCorrected`, `GM_EARTH_MOON_SYSTEM`); `computeSunSSBOffset` / `buildSunSSBChart` — the Sun-SSB chart
-- [tools/lib/constants.js §9](../tools/lib/constants.js) — same Δa chain in the tooling module
-- [20 — Constants Reference](20-constants-reference.md) §1.3 — DE440 mass-ratio table
+- [`packages/physics/src/earth/mass-chain.cjs`](../packages/physics/src/earth/mass-chain.cjs) — the ONE implementation of the Δa chain (`src/script.js` and `tools/lib/constants.js` read it); `computeSunSSBOffset` / `buildSunSSBChart` in `src/script.js` — the Sun-SSB chart
+- [20 — Constants Reference](20-constants-reference.md) — the DE440 mass-ratio inputs
 - [21 — Orbital Formulas Reference §A.6.1](21-orbital-formulas-reference.md) — central GM/Mass reference table
-- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time Moon distance evolution (Farhat 2022 polynomial → `meanMoonDistanceMetresAtAge`); the Δa machinery extends to any epoch given epoch-consistent inputs
+- [99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — deep-time Moon distance evolution (the cited Farhat 2022 AstroGeo22 history → `meanMoonDistanceMetresAtAge`); the Δa machinery extends to any epoch given epoch-consistent inputs
 - JPL DE440 SPICE kernel: [gm_de440.tpc](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/gm_de440.tpc) — authoritative system GMs

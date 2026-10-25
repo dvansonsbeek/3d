@@ -33,7 +33,7 @@ Two of Earth's precession motions rotate in **opposite directions**, so their fr
 
 The ratios are J2000 readings, not laws: the apsidal ratio wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr, as the simulator's Lunisolar Clock panel shows live. The perihelion-of-date beat is the carrier of the climatic-precession band; the obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqCycleYears-->~41,099<!--/v--> years today.
 
-**No fitted timing unit.** The time-domain machinery — the cardinal points, the day lengths and the eclipses — rides the same two movements: the composed precession clock and the N-body series' elements of date. The frozen era device that once carried small periodic corrections on a fitted anchor (calibrated on the perihelion–solstice alignment of the IAU mean elements in early 1246 AD, JD <!--v:periAlignJD-->2,176,153<!--/v-->; the model's own orbital series crosses at <!--v:periAlignYearSeries-->1247.2<!--/v--> AD) is retired (plan 09). The parameter accounting is three ledgers: zero fitted constants on the planetary side, the derived clock, and the scene scaffold's recorded J2000 pose ([Constants Reference](20-constants-reference.md)). Nothing is tuned per phenomenon.
+**No fitted timing unit.** The time-domain machinery — the cardinal points, the day lengths and the eclipses — rides the same two movements: the composed precession clock and the N-body series' elements of date (the fitted era device that preceded them is retired — the record is [doc 109 §23](109-model-nbody-engine-and-lattice-test.md)). The parameter accounting is three ledgers: zero fitted constants on the planetary side, the derived clock, and the scene scaffold's recorded J2000 pose ([Constants Reference](20-constants-reference.md)). Nothing is tuned per phenomenon.
 
 ---
 
@@ -41,8 +41,8 @@ The ratios are J2000 readings, not laws: the apsidal ratio wanders between <!--v
 
 The simulator is a geo-heliocentric orrery: the Sun is the centre of the solar system, and the scene is viewed from Earth's perspective so that the two counter-rotating motions are visible. Two markers carry them:
 
-- **EARTH-WOBBLE-CENTER** — Earth circles it clockwise in one axial precession period; this is the precession of the equinoxes, the equinox moving westward through the zodiac under the solar and lunar torques on Earth's equatorial bulge.
-- **PERIHELION-OF-EARTH** — the point that sets Earth's varying distance to the Sun through the year; it moves counter-clockwise around the wobble centre in one apsidal period, carrying Earth's perihelion against the fixed stars.
+- **EARTH-WOBBLE-CENTER** — a display marker that circles Earth clockwise once per axial precession period, marking the direction Earth's axis leans; this is the precession of the equinoxes, the equinox moving westward through the zodiac under the solar and lunar torques on Earth's equatorial bulge. Earth itself sits at the origin; every instrument measures from Earth.
+- **PERIHELION-OF-EARTH** — the point that sets Earth's varying distance to the Sun through the year; it moves counter-clockwise around the Sun in one apsidal period, carrying Earth's perihelion against the fixed stars.
 
 The two meet every perihelion-of-date cycle, and the solstice–perihelion alignment moves around the zodiac on that cycle. They are reference points placed from the engine, not forces: Earth's frame is placed from the engine's own elements of date ([doc 41](41-scene-graph-hierarchy.md)), the seven planets follow their own N-body element chains, and the Sun and the Moon stack over that frame. The view is geocentric; the predictions are those of a heliocentric model.
 

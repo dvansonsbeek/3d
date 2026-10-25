@@ -44,10 +44,10 @@ A named evaluation level — which inputs and which approximation a surface read
 Derivations in which each quantity is computed from the one before it, each with one home: the **N-body chain** (above); the **Keplerian chain** (`planets/keplerian-chain` — a planet's elements of date from the J2000 anchor and the secular modes); the **Moon chains** (the tropical, apsidal and nodal periods of date, the inertial month chain composed with the precession of date); the **deep-time chain** (`deltat/deep-time-chain` — the length of day, ΔT, the Moon's recession and the solar-mass scalars at an age); the **mass chain** (`earth/mass-chain` — G, the mass ratios and the GM values from the cited inputs).
 
 ### EARTH-WOBBLE-CENTER
-The scene's reference point for axial precession: Earth circles it clockwise in one axial precession period (<!--v:axialPrecRound-->~25,772<!--/v--> years), which is the precession of the equinoxes. A reference point placed from the engine, not a force.
+The scene's display marker for axial precession: it circles Earth clockwise once per axial precession period (<!--v:axialPrecRound-->~25,772<!--/v--> years), marking the direction Earth's axis leans — the precession of the equinoxes. A reference point placed from the engine, not a force; every instrument measures from Earth itself.
 
 ### PERIHELION-OF-EARTH
-The scene's reference point for Earth's perihelion. It orbits counter-clockwise around the EARTH-WOBBLE-CENTER in one apsidal period (<!--v:inclPrecYears-->~111,635<!--/v--> years at J2000) and sets Earth's varying distance to the Sun through the year.
+The scene's reference point for Earth's perihelion. It moves counter-clockwise around the Sun in one apsidal period (<!--v:inclPrecYears-->~111,635<!--/v--> years at J2000) and sets Earth's varying distance to the Sun through the year.
 
 ### Geo-heliocentric
 A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Earth's perspective. Produces identical predictions to standard heliocentric models.
@@ -60,7 +60,7 @@ A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Ea
 The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: the clock, <!--v:axialPrecExact-->25,771.58<!--/v--> years at J2000 in the model.
 
 ### Apsidal Precession
-The perihelion's revolution against the fixed stars — for Earth the one-source movement's own apsidal rate, for a planet the N-body chain's secular rate g (period 1,296,000″/g). Earth's period at J2000: <!--v:inclPrecYears-->~111,635<!--/v--> years, <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods, a reading of the orbit's own motion that wanders. The scene draws it as PERIHELION-OF-EARTH circling the EARTH-WOBBLE-CENTER — a construction of the picture, not a force. Scene nodes and code identifiers keep the historical name "inclination precession".
+The perihelion's revolution against the fixed stars — for Earth the one-source movement's own apsidal rate, for a planet the N-body chain's secular rate g (period 1,296,000″/g). Earth's period at J2000: <!--v:inclPrecYears-->~111,635<!--/v--> years, <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods, a reading of the orbit's own motion that wanders. The scene draws it as PERIHELION-OF-EARTH moving around the Sun — a construction of the picture, not a force. Scene nodes and code identifiers keep the historical name "inclination precession".
 
 ### Perihelion Precession
 Two usages, both in the simulator. **For Earth** (the climate sense): the advance of the perihelion point through the seasons — the perihelion-of-date cycle, the beat of the two motions above: 1/T_peri = 1/T_p + 1/T_aps, <!--v:periPrecYears-->~20,938<!--/v--> years at J2000, the carrier of the climatic-precession band. **For a planet** (the standard planetary sense, as in "Mercury's perihelion precession"): the apsidal advance itself, quoted as a rate in arcseconds per century — the Perihelion of Planets Verification panel compares the chain's rate with the JPL WebGeoCalc observations in this sense ([doc 13](13-mercury-precession-breakdown.md)).
@@ -171,9 +171,6 @@ The angle between Earth's rotational axis and the perpendicular to its orbital p
 
 ### Expanding Solar System Resonance Theory (ESSRT)
 The deep-time model: two physically independent drivers stretch the model's periods across geological time. **Driver 1** — Earth–Moon tidal evolution (the day lengthens, the Moon recedes; the mean lunisolar precession period follows the composed torque rate). **Driver 2** — solar mass loss (every orbit slowly expands via Kepler's third law). The axial precession period was <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr at the Devonian (380 Ma), is <!--v:axialPrecRound-->~25,772<!--/v--> yr today and reaches <!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr at +200 Myr; the climate formula's precession-band lines ride it, its eccentricity-band lines are planetary beats that do not. Validated against Wells 1963 (Devonian coral growth bands), Wu et al. 2024 (650-Myr cyclostratigraphy) and the Earth–Moon genesis epoch. Full theory: [Doc 99](99-expanding-solar-system-resonance-theory.md).
-
-### The two device-tier invariants (retired)
-The **day-count near-invariant** and the **lunar precession invariant** were relations held on the frozen era counter, device conventions rather than physical claims. Both are retired with the counter at plan 09: the lunar one at step 5c (the of-date periods are the inertial chain composed with the precession of date), the day-count one with the counter at step 7a. Record: [doc 109 §22](109-model-nbody-engine-and-lattice-test.md) and `public/input/model-version.json` `_v24Note`.
 
 ### Souami & Souchay (2012)
 A scientific paper providing high-precision values for planetary orbital inclinations and ascending nodes relative to the invariable plane. The published reference the model's invariable-plane quantities are stated beside.

@@ -37,8 +37,10 @@ siderealYearJ2000 = 365.256363004 d (IAU)      p_A = 50.28796195 ″/yr (IAU 200
              what the deep JD↔year calendar integrates):
                sidereal:  T₀·(1 − Δm)²                         (Driver 2, solar mass loss)
                tropical:  1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″·365.25 d),
-                          ψ̇(t) = [ω₀/ω(t)]⁻¹… = (LOD₀/LOD(t))·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³]
-                          — one equinox turn per the composed precession period T_p(t)
+                          ψ̇(t) the composed lunisolar rate — spin, the lunar torque on the
+                          cited distance history AND the cos ε̄(t)/cos ε̄(0) factor; ONE home,
+                          @essrt/physics earth/precession-composed, stated in doc 99 —
+                          one equinox turn per the composed precession period T_p(t)
                (no deep anomalistic year: the apsidal line is not resolved beyond the window)
         │
         ▼  Days of the epoch
@@ -79,7 +81,7 @@ The window CSV (Step 6a2) is the measurement export the laws are checked against
 
 ### Tropical Year
 
-The tropical year is measured at the actual solstices and equinoxes (declination extrema and zero-crossings), NOT at RA crossings. The mean tropical year is the average of 4 cardinal point intervals: SS-to-SS, WS-to-WS, VE-to-VE, AE-to-AE — `computeSolarYearDaysFromCardinals(year)`, the intervals between successive APPARENT crossings of the one certified Sun (`createModel().cardinal.yearLengthDays`, whose mean longitude integrates the one-source tropical year; plan 06 R1 — the fitted cardinal-point harmonic formula, CARDINAL_POINT_* with 23 harmonics per type plus the ECC/JOINT/DERIVED families, left the runtime; doc 14 is its record). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
+The tropical year is measured at the actual solstices and equinoxes (declination extrema and zero-crossings), NOT at RA crossings. The mean tropical year is the average of 4 cardinal point intervals: SS-to-SS, WS-to-WS, VE-to-VE, AE-to-AE — `computeSolarYearDaysFromCardinals(year)`, the intervals between successive APPARENT crossings of the one certified Sun (`createModel().cardinal.yearLengthDays`, whose mean longitude integrates the one-source tropical year; plan 06 R1 — the fitted cardinal-point harmonic formula, CARDINAL_POINT_* with 23 harmonics per type plus the ECC/JOINT/DERIVED families, left the runtime at plan 06 R1; the record is [doc 109 §23](109-model-nbody-engine-and-lattice-test.md)). Kept for chart consistency in `charts/report` code paths that already display cardinal-point data.
 
 ### Sidereal Year
 
@@ -324,7 +326,7 @@ stellarDay = siderealDay × (1 + cos(ε) / (T_p(t) × rotationsPerYear))
 
 T_p is the physical period in both identities.
 
-**This was confirmed by measurement, not asserted.** The "Analyze Stellar Day" tool's Method D tracks Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the precession cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
+**This was confirmed by measurement, not asserted.** Method D of the former stellar-day analysis (a console check, retired with its folder in plan 18 — [doc 52](52-analysis-export-tools.md) Part 5) tracked Earth's rotation about its own spin axis against ICRF — using no precession period at all, since the spin axis precesses on the precession cone and the projection plane tilts with it — and reproduces the IAU stellar day to ~0.02 ms. Methods A and B, which reference the ecliptic normal instead of the spin axis, overshoot by ~0.79 and ~0.47 ms respectively; that ~23.44° of axis difference *is* the cos ε.
 
 The obliquity used follows the family of the sidereal day it is applied to: the IAU J2000 obliquity input for the mean values, the hybrid obliquity of date (`_sceneEpsTargetDeg(year)`) for epoch-specific ones. At J2000 the choice is worth 0.0008 ms, but across the deep-time obliquity range (~22.0°–24.5°) the offset runs 8.46 → 8.30 ms.
 

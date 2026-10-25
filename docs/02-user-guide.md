@@ -39,7 +39,7 @@ When you first load the simulation, you'll see:
 
 ### Reset View
 
-Click the **RESET** button or the **3D** button in the top right to return to the default view orientation.
+Click any planet to focus the camera on it; **Tools › Camera** sets the viewpoint by RA, Dec and distance; reloading the page restores the default bird's-eye view of Earth.
 
 ### Touch Controls (Mobile/Tablet)
 
@@ -63,18 +63,18 @@ On phones and tablets, the interface adapts automatically:
 
 ### Time Speed
 
-The **"1 second equals"** dropdown controls how fast time passes in the simulation:
+Two controls in **Simulation Controls** set how fast time passes: the **Time step** dropdown is the simulated time per real second, and the **Speed ×** slider (−5 … +5 in steps of 0.5) multiplies it — a negative value runs time backwards.
 
-| Setting | Use Case |
+| Time step | Use Case |
 |---------|----------|
-| Real-time | Observe current positions |
-| 1 day | Watch daily motion |
+| 1 second | Observe current positions in real time |
+| 1 minute · 1 hour | Earth's rotation, the Moon against the stars |
+| 1 day · 1 week | Daily motion, the lunar phases |
 | 1 month | Track lunar cycles |
 | 1 year | Observe annual patterns |
 | 10 years | See planetary alignments |
 | 100 years | Watch precession begin |
-| 1,000 years | Observe significant precession |
-| 10,000 years | See axial precession cycle |
+| 1000 years | Observe significant precession — one axial precession cycle in under half a minute |
 
 ### Date/Time Input
 
@@ -88,18 +88,20 @@ The display shows:
 - Julian Day number (continuous day count since 4713 BC)
 - Simulation speed
 
-**Date range**: The simulation supports dates from ancient history to far future, enabling observation of long-term precession cycles.
+**Date range**: the model is valid across ±500 Myr of J2000, and the scene can be set to any date in that span. A jump of hundreds of millions of years integrates Earth's spin axis from J2000 first, which takes the browser a minute or more before the scene shows the new date (the Earth–Moon Genesis Analysis panel under Tools plots the deep-time evolution over the Moon's whole cited history instead, without moving the scene).
 
-**Deep-time scrubbing (ESSRT).** When you scrub the date by millions of years, the simulation automatically applies **Expanding Solar System Resonance Theory** scaling — length-of-day, the precession period, planet orbital periods, and the Moon's distance all evolve smoothly according to the two physical drivers (Earth-Moon tidal evolution + solar mass loss). This mode is on by default; the scene-graph stays consistent at any epoch from Hadean (~−4 Gyr) to +200 Myr in the future. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full model.
+**Deep-time scrubbing (ESSRT).** When you scrub the date by millions of years, the simulation automatically applies **Expanding Solar System Resonance Theory** scaling — length-of-day, the precession period, planet orbital periods, and the Moon's distance all evolve smoothly according to the two physical drivers (Earth-Moon tidal evolution + solar mass loss). This mode is on by default. See [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) for the full model.
 
 ### Playback Controls
 
 | Button | Function |
 |--------|----------|
-| **Play/Pause** | Start/stop time progression |
-| **Step Forward** | Advance by one time unit |
-| **Step Backward** | Go back by one time unit |
-| **Reverse** | Run time backwards |
+| **Play / Pause** | Start/stop time progression |
+| **Back** · **Fwd** | Step one time step backward / forward |
+| **Reset** | Return to the start date (J2000) |
+| **Now** | Jump to the current time (UTC) |
+
+To run time backwards, set **Speed ×** below zero.
 
 ---
 
@@ -115,7 +117,7 @@ This small grey marker rides Earth's precession frame: it circles Earth once per
 
 This white dot marks the point closest to the Sun in Earth's orbit. It moves at the model's measured apsidal rate — in the current era one revolution per <!--v:inclPrecYears-->~111,635<!--/v--> years; the displayed direction follows the model's own N-body dynamics.
 
-**To observe**: Speed up time to 10,000+ years and watch it drift through the zodiac.
+**To observe**: set the Time step to 1000 years and watch it drift through the zodiac.
 
 ### The Invariable Plane
 
@@ -128,9 +130,9 @@ The invariable plane is the solar system's fundamental reference plane, perpendi
 
 ## Information Panels
 
-### Celestial Positions Panel
+### Positions (Ecliptic)
 
-Displays real-time astronomical coordinates for all bodies:
+The **Positions (Ecliptic)** folder displays real-time astronomical coordinates for all bodies (its sub-folders carry the elongations, the perihelion longitudes and the eclipse rows):
 
 | Column | Meaning |
 |--------|---------|
@@ -159,9 +161,9 @@ Click on any planet to show a collapsible sidebar handle on the left edge. Click
 - Time since/to perihelion
 - Height above invariable plane
 
-### Invariable Plane Positions Panel
+### Positions (Invariable Plane)
 
-Shows which planets are currently above or below the invariable plane:
+The **Positions (Invariable Plane)** folder shows which planets are currently above or below the invariable plane (and holds the Balance Trend Analysis and the Plane Verification rows):
 - **Above**: Positive height value
 - **Below**: Negative height value
 - **Crossing**: Near zero, transitioning
@@ -172,14 +174,14 @@ Shows which planets are currently above or below the invariable plane:
 
 ### Show / Hide
 
-The **Show / Hide** folder contains a chip-grid of toggle buttons grouped by planet (Sun, Mercury, Venus, Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune). Click any chip to toggle visibility of that object. For the seven chain planets a group holds the planet, **Perihelion at Sun** (the perihelion point of the orbit of date, Sun + a(1−e) in the chain's perihelion direction, with a Sun → P line — the same construction as the Planet Orbit Analysis' P) and **Perihelion at Earth** (the geocentric direction marker at the legacy display radius); the device wheels behind the planets (the ecliptic-duration and fixed/real-perihelion wheels) and the retired eccentricity-cycle wobble centres have no chips. Pluto, Halley's and Eros have no group (they render as before). The Moon's group is the Moon, **Apsidal Precession** — the perigee of date, Earth + a(1−e) in the orbit plane at the argument F − M′ with an Earth → perigee line, advancing once per ~8.85 yr — and **Nodal Precession** — the line of nodes, the ascending ↑ and descending ↓ nodes on the mean-distance circle at the longitude L′ − F with a dashed line through Earth, regressing once per ~18.6 yr; both are drawn from the framework-native lunar arguments on the ecliptic of date (focus on Earth and zoom in to the Moon's orbit to see them). The Moon's device wheels have no chips, and neither do Earth's five precession wheels (the Earth frame is placed from the engine; Earth's group is the Earth, its Wobble Center and its Perihelion). The Sun's group is the Sun, **Sun barycenter** — the Solar System Barycenter as the mass-weighted sum of the chain's heliocentric positions of date (the same sum as the Sun panel's Sun-SSB rows), with a Sun → SSB line and the barycenter's path around the Sun over ±25 years (focus on the Sun and zoom in: the loops span about two solar radii) — and **Sun barycenter at Earth**, the same vector and path drawn from Earth's centre: a transposed display, not a position, so the Sun's wobble reads where the camera usually sits (the loops reach past the Moon's orbit).
+The **Show / Hide** folder contains a chip-grid of toggle buttons grouped by planet (Sun, Mercury, Venus, Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune). Click any chip to toggle visibility of that object. For the seven chain planets a group holds the planet, **Perihelion at Sun** (the perihelion point of the orbit of date, Sun + a(1−e) in the chain's perihelion direction, with a Sun → P line — the same construction as the Planet Orbit Analysis' P) and **Perihelion at Earth** (the geocentric direction marker at the legacy display radius); the device wheels behind the planets (the ecliptic-duration and fixed/real-perihelion wheels) and the retired eccentricity-cycle wobble centres have no chips. Pluto, Halley's and Eros have no group (they are not rendered). The Moon's group is the Moon, **Apsidal Precession** — the perigee of date, Earth + a(1−e) in the orbit plane at the argument F − M′ with an Earth → perigee line, advancing once per ~8.85 yr — and **Nodal Precession** — the line of nodes, the ascending ↑ and descending ↓ nodes on the mean-distance circle at the longitude L′ − F with a dashed line through Earth, regressing once per ~18.6 yr; both are drawn from the framework-native lunar arguments on the ecliptic of date (focus on Earth and zoom in to the Moon's orbit to see them). The Moon's device wheels have no chips, and neither do Earth's five precession wheels (the Earth frame is placed from the engine; Earth's group is the Earth, its Wobble Center and its Perihelion). The Sun's group is the Sun, **Sun barycenter** — the Solar System Barycenter as the mass-weighted sum of the chain's heliocentric positions of date (the same sum as the Sun panel's Sun-SSB rows), with a Sun → SSB line and the barycenter's path around the Sun over ±25 years (focus on the Sun and zoom in: the loops span about two solar radii) — and **Sun barycenter at Earth**, the same vector and path drawn from Earth's centre: a transposed display, not a position, so the Sun's wobble reads where the camera usually sits (the loops reach past the Moon's orbit).
 
-### Celestial Tools
+### Sky and reference lines (the **Visualization** folder)
 
 | Tool | Description |
 |------|-------------|
-| **Polar Line** | Shows Earth's axis orientation pointing toward Polaris |
-| **Star Names** | Labels for prominent stars |
+| **Earth Polar Line** | Shows Earth's axis orientation pointing toward Polaris |
+| **Stars › Names** | Labels for prominent stars |
 | **Constellations** | Constellation outlines |
 | **Zodiac constellations (IAU)** | The band of the thirteen IAU constellations the ecliptic crosses, centred on Earth and fixed to the stars (J2000 boundaries carried with the precession) — the equinox of date and the perihelion marker precess through it |
 | **Zodiac signs** | The twelve equal 30° signs of the tropical zodiac, Aries 0° at the vernal equinox of date — fixed to the seasons; the inner ring turns with the equinox against the constellation band, the precession of the equinoxes as the drift between the two |
@@ -202,7 +204,7 @@ In the **Visualization** folder:
 
 ### Elongations Display
 
-The **Settings > Elongations show/hide** folder shows the angular separation between the Sun and each planet as seen from Earth:
+The **Positions (Ecliptic) › Elongations** folder shows the angular separation between the Sun and each planet as seen from Earth:
 
 | Value | Meaning |
 |-------|---------|
@@ -214,13 +216,13 @@ Elongation is useful for determining planet visibility and predicting conjunctio
 
 ### Camera Position Display
 
-The **Settings > Camera show/hide** folder shows your current viewpoint:
+The **Tools › Camera** folder shows and sets your viewpoint:
 
 | Field | Description |
 |-------|-------------|
 | **RA** | Right Ascension of camera position |
 | **Dec** | Declination of camera position |
-| **AU distance** | Distance from origin in AU |
+| **Distance** | Distance from the look-at target |
 
 ---
 
@@ -242,31 +244,31 @@ When the Planet Orbit Analysis panel is open:
 
 ### Watch Axial Precession (≈ <!--v:axialPrecRound-->~25,772<!--/v--> years)
 
-1. Set time speed to **10,000 years per second**
-2. Enable the **Polar Line**
+1. Set the Time step to **1000 years**
+2. Enable the **Earth Polar Line** (Visualization)
 3. Watch Earth's axis trace a circle against the stars
 4. Note how the North Celestial Pole moves away from Polaris
 
 ### Observe Moon's Nodal Precession (~18.6 years)
 
-1. Set time speed to **1 year per second**
-2. Enable **Moon Nodes**
+1. Set the Time step to **1 year**
+2. Enable **Nodal Precession** in the Moon's group of Show / Hide, focus on Earth and zoom in to the Moon's orbit
 3. Watch the lunar nodes regress westward
 4. One complete cycle takes about 18.6 years
 
 ### See Venus's 5-Petal Pattern
 
-1. Set time speed to **1 month per second**
-2. Enable trace for Venus
+1. Set the Time step to **1 month**
+2. Enable the Venus trace (Tracing)
 3. Watch for 8 years (simulation time)
 4. Venus traces a 5-pointed star pattern relative to Earth
 
 ### Track Perihelion-Solstice Alignment
 
-1. Go to date **December 26, 1245** (perihelion alignment epoch)
+1. Enter Julian Day **<!--v:periAlignJD-->2,176,153<!--/v-->** (early 1246 AD — the perihelion–solstice alignment of the IAU mean elements; the model's own orbital series crosses at <!--v:periAlignYearSeries-->1247.2<!--/v--> AD)
 2. Note perihelion is near the December solstice direction
 3. Advance to year **2000**
-4. Perihelion now occurs around January 3 (~12.95° shift)
+4. Perihelion now occurs around January 3
 
 ### Compare with Stellarium
 
@@ -305,7 +307,7 @@ Declination is displayed in degrees:
 
 ## Tips for Exploration
 
-1. **Start slow**: Use real-time or 1-day speed to understand basic movements
+1. **Start slow**: use a 1-second or 1-day time step to understand basic movements
 2. **Use traces**: Enable path tracing to visualize complex patterns
 3. **Compare dates**: Jump between historical dates to see changes
 4. **Verify externally**: Cross-check positions with Stellarium or NASA Horizons
@@ -317,9 +319,9 @@ Declination is displayed in degrees:
 
 | Issue | Solution |
 |-------|----------|
-| Slow performance | Reduce time speed, hide some objects |
-| Can't find an object | Use the Objects panel to ensure it's visible |
-| View is disoriented | Click RESET to return to default view |
+| Slow performance | Reduce the time step, hide some objects; `index.html?perf=1` shows the frame-time readout ([doc 52](52-analysis-export-tools.md) Part 4b) |
+| Can't find an object | Use Show / Hide to ensure it's visible |
+| View is disoriented | Click a planet to focus the camera on it, or reload the page for the default view |
 | Time seems wrong | Check if simulation is paused; verify timezone |
 
 ---

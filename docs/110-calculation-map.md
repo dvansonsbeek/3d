@@ -154,8 +154,8 @@ Earth's spin × the solar + lunar torques on the recession history).
 | step | quantity | formula | inputs | H-role | code |
 |---|---|---|---|---|---|
 | 1 | Moon distance a_M(t) | a₀ · r(t), r the CITED history's ratio a(t)/a(0) (Farhat et al. 2022, AstroGeo22, 0–4,429 Ma at 1 Myr) on a monotone cubic Hermite with the J2000 end-slope = the LLR α₁; forward of J2000 the LLR rate held; null beyond 4,429 Ma (plan 12 option A — no fitted term) | the AstroGeo22 table; α₁; a₀ = 384,399.07 km | — | `deltat/moon-distance-history.cjs` |
-| 2 | Earth's moment-of-inertia factor α(t) | α_J2000 − alphaClimateScale·(L1(t) − L1(2000)) — the climate (GIA) modulation of I/MR²; α_J2000 = 0.330695 | the L1 climate formula | — (the L1 lines are the engine's own orbital lines + the 405-kyr family, `data/l1-physical-lines.json`, plan 06 T1; formerly **C**, integer-divisor lines) | `deltat/deep-time-chain.js` `alphaGia` (the model reads it through `model/deep-time-chain.js`; twin `tools/lib/deep-time.js`) |
-| 3 | day length LOD(t) | 2π·I(t) / (L_EM(t) − L_M(t)), I = α·M_E·R_E², L_M = m_M·√(GM_EM·a_M)·√(1 − e_M²) — angular-momentum conservation in the Earth–Moon system; L_EM constant inside the gated era, time-dependent beyond (the ocean-leak/thermal-pump solar channels) | steps 1–2; L_EM from Layer 0 (chain 1's √(1 − e_M²) factor) | — | `deltat/deep-time.cjs` 80–86; L_EM `layer0/derive-params.js` 63–64 |
+| 2 | Earth's moment-of-inertia factor α(t) | α_J2000 − k·[L1(t) − ⟨L1⟩_τ(t)] — the GIA channel: the polar moment's LAGGED response to the ice history the L1 lines proxy (τ the mantle relaxation time; k derived at construction from the observed dJ₂/dt, no stored scale; `climate/l1-orbital` `createAlphaGiaChannel`); α_J2000 = 0.330695 | the L1 climate formula | — (the L1 lines are the engine's own orbital lines + the 405-kyr family, `data/l1-physical-lines.json`, plan 06 T1; formerly **C**, integer-divisor lines) | `deltat/deep-time-chain.js` `alphaGia` (the model reads it through `model/deep-time-chain.js`; twin `tools/lib/deep-time.js`) |
+| 3 | day length LOD(t) | 2π·I(t) / (L_EM(t) − L_M(t)), I = α·M_E·R_E², L_M = m_M·√(GM_EM·a_M)·√(1 − e_M²) — angular-momentum conservation in the Earth–Moon system; L_EM constant (the solar channels that once made it time-dependent beyond the era were deleted at plan 12 option A) | steps 1–2; L_EM from Layer 0 (chain 1's √(1 − e_M²) factor) | — | `deltat/deep-time.cjs` 80–86; L_EM `layer0/derive-params.js` 63–64 |
 | 4 | spin rate ω(t) | 2π / LOD(t) | step 3 | — | (implicit) |
 | 5 | the spin factor ω₀/ω(t) = LOD(t)/LOD₀ | **LOD(t)/LOD_J2000** | LOD_J2000 = ω₀ = 86,400 s (the SI day — plan 09; the device's kinematic day read 86,399.99968) | — (plan 09 steps 7a/7b: the two counters that rode this factor — the frozen era clock's H_era = H₀·LOD/LOD₀, `eraClockHAtAge`, and the unit H(t) = H_era/[torque term], `hAtAge`, 13.011 composed periods at every epoch — are deleted; H₀ = 335,317 was the fitted primitive) | `earth/precession-composed` (the ω₀/ω factor of 2.3) |
 | 6 | **T_p(t), the composed lunisolar precession period** | **1,296,000″ / ψ̇(t)**, ψ̇(t) = p₀·[ω₀/ω]·[f_S + (1 − f_S)(a₀/a_M)³], p₀ = 1,296,000/T_p(J2000) | step 5; a_M(t) (step 1); f_S = 0.3165 from the shared constants (`derive-params`); T_p(J2000) = 25,771.575 yr = 1,296,000/p_A, the IAU 2006 general precession input (plan 09; S5 had anchored it on the certified year combs' beat, 25,771.4) | **P** — the published deep-time clock (`epoch.axialPrecessionYearsAtYear`, `lunisolar.meanPeriodYearsAtYear`) | `deltat/deep-time.cjs` `lunisolarPrecessionPeriodYearsAtAge` (one formula home: `earth/precession-composed`) |
@@ -214,10 +214,10 @@ published route follows the hybrid (finding 5).
 — the spin-and-tides side supplies ω(t) and a_M(t) (the recession
 history), the orbital side the solar term; f_S is the solar share of the
 J2000 torque. The
-composition lives in the **registry** (`tools/docs/model-values.mjs`, "the
-two-engine composed precession") and in its instrument twin
-`tools/explore/w3-precession-crosscoupling.mjs` — **not in the physics
-package** (finding 2 below).
+composition's ONE home is the physics package
+(`earth/precession-composed`, plan 06 D6 — finding 2 below, RESOLVED); the
+registry (`tools/docs/model-values.mjs`) and the instrument
+`tools/explore/w3-precession-crosscoupling.mjs` read it.
 
 **The precession of date.** The composition above is the SECULAR law: the
 deep-time clock T_p(t) rides it (so did the unit H(t), until plan 09 step 7b
@@ -472,8 +472,8 @@ drifts −0.53 s/cy).
 
 One evaluator computes ε(t): the **hybrid** integrates one torque law on
 the dynamical orbit plane of the N-body chain (zero fitted constants). The
-scene itself carries a geometric construction — two tilted wheels — that
-pose the Earth frame; the engine places the frame from the hybrid (R4).
+engine places the Earth frame from the hybrid every frame (R4); the two
+tilted wheels that once posed it were deleted at plan 11 step 4.
 
 ### 4.1 The obliquity's readers — one surface
 
@@ -495,8 +495,8 @@ was fitted to, are the record of [doc 109 §23.1](109-model-nbody-engine-and-lat
 
 The scene's world frame is the J2000 ecliptic (`@essrt/physics`
 `computeSceneWorldFrameJ2000`) and the engine PLACES the Earth frame every
-update (`_applyEngineEarthFrame`, relative to the J2000 pose
-`_chainDeriveFrameR`): the axis is the hybrid's ŝ(t) on the ecliptic of
+update (`_applyEngineEarthFrame`, relative to the J2000 world frame
+`computeSceneWorldFrameJ2000`): the axis is the hybrid's ŝ(t) on the ecliptic of
 date; the perihelion pair hangs on Earth's pivot and is world-placed every
 frame. The Sun's declination at the June solstice is the scene's ε.
 H-role: —.
@@ -630,10 +630,9 @@ s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.85
    direct integrations do not — a note for anyone re-deriving the rate from
    the artifact rather than the series.
 5. **The scene's obliquity pose is a geometric composition of two wheels**
-   (4.2) — once the last place where "obliquity cycle = H/8" was
-   structural. The wheels keep turning as the scene's scaffolding at the
-   recorded pose periods (plan 09 step 7c), the axis follows the hybrid,
-   and the presentation states the beat.
+   (4.2) — once the last place where the obliquity cycle was a structural
+   divisor. The wheels were deleted at plan 11 step 4; the axis follows the
+   hybrid, and the presentation states the beat.
 
 ---
 

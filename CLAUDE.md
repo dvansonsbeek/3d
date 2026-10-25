@@ -5,8 +5,8 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~39,000 lines (the console-test folder, 13,000 lines, retired in plan 18 — its checks are gates) · `tools/` ~205 tracked scripts
-across 15 directories (plus the untracked local archives) · ~40 Python files · 36 docs (the retired docs are archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs) · one web UI (the simulator; the Data Explorer dashboard is retired).
+**Scale:** `src/script.js` ~39,000 lines (the console-test folder, 13,000 lines, retired in plan 18 — its checks are gates) · `tools/` ~185 tracked scripts
+across 12 directories (plus the untracked local archives) · ~40 Python files · 36 docs (the retired docs are archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs) · one web UI (the simulator; the Data Explorer dashboard is retired).
 **`npm run check` is the enforced gate chain — the ONE list in package.json;
 CI runs it plus a headless-browser job and auto-deploys the simulator to
 GitHub Pages on green main.** Golden masters live in `packages/fixtures/`.
@@ -151,6 +151,10 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   cascade. (§1.24)
 - **"Placed by the engine every frame" does not cover what was aligned ONCE at
   init** — grep the top-level `matrixWorld` readers before deleting a pose. (§1.25)
+- **A precession CONSTANT is not a precession RATE** — the composed law scales
+  the constant α(t); the rate is α(t)·cos ε̄(t) on the cited mean obliquity of
+  date; and at a series seam the pole continues through n̂, never through its
+  mean plane. (§1.26)
 
 ---
 

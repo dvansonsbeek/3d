@@ -26,7 +26,7 @@ because a miss that silently becomes a hit means the formula changed.
 ## A. Rotational and tidal chronology — gate-backed
 
 The model's T_p(t)/LOD(t)/Moon-distance curve against the published
-paleontological record: **43 anchors** (41 chronology anchors plus the two
+paleontological record: **45 anchors** (40 chronology anchors plus the five
 precession rows at 1.4 and 2.46 Ga) across Wells 1963 (coral growth
 bands, ×9), de Winter 2020 (rudist bivalve), Pannella 1972 (bivalves), a
 Triassic compilation, Williams 2000 (Elatina tidal rhythmites),
@@ -63,7 +63,7 @@ never to the fossil data it is tested against.
   the Devonian-window precession constants of Wu et al. 2024, 59.5–61.5 ″/yr,
   which the composed clock reads to 2–3 %). (The frozen era clock's
   day-count invariant this bullet once cited is deleted with its counter,
-  plan 09 step 7a — [doc 99 record](99-expanding-solar-system-resonance-theory.md#the-frozen-era-clocks-day-count-invariant-device-tier).)
+  plan 09 step 7a — [doc 109 §23](109-model-nbody-engine-and-lattice-test.md).)
 - Full tables and the per-anchor discussion: [doc 99 §Validation](99-expanding-solar-system-resonance-theory.md#validation-against-published-paleontological-measurements)
 - The Hadean endpoint is the input's: the cited history ends at 4,429 Ma
   (Farhat et al. 2022's lunar-age input, 4.425 Ga) with the Moon at
@@ -161,11 +161,11 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 
 | Item | Status | Where |
 |:---|:---|:---|
-| Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+7.26<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate. Regime analysis shows Williams conflicts with Wu's 650 Ma anchor and stays the outlier under every history tried | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
+| Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+7.26<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate. Williams conflicts with Wu's 650 Ma anchor on the cited history (the regime fitter that once tried alternatives was deleted at plan 12 option A) | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
 | The mid-Precambrian window (Driver 1½ retired) | the model carries NO thermal-tide pump and no fitted recession regime since plan 12 option A: the distance history is Farhat 2022's ocean-model solution, whose authors' own review concludes the day-length lock "is not supported" once the questionable stromatolite points are dropped. On it the derived precession reads Joffre −1.8 %, Xiamaling −1.0 %, and Zhou 2024's older two sites −6.5 % / −7.2 % (2.5–3.6σ) — the OPEN discrepancy, asserted as bands: either the solution lacks the Mesoproterozoic dissipation peak Zhou suspect or the inferred constants are biased; the model states the gap and does not fit it | [doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-cited-history-and-the-record) |
-| Wu 2024 Pangea interval (200–500 Ma Moon rows) | the smooth Farhat polynomial cannot capture the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
+| Wu 2024 Pangea interval (200–500 Ma Moon rows) | the cited Farhat 2022 history (a globally averaged ocean-tide solution) does not carry the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
 | Saturn Laplace–Lagrange bound | the retired law model's documented physical-constraint failure — recorded at the integer-law retirement; its instrument is deleted | [doc 109](109-model-nbody-engine-and-lattice-test.md), CLAUDE.md §falsification |
-| LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 94](94-insolation-null-test.md) |
+| LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 102](102-gia-alpha-lunar-validation.md) item 7 |
 | Fixed vs clock-rescaled lattice discrimination (retired framing; record) | 2.4σ — the 66-Ma record cannot decide | doc 98 (archived) |
 | Uniform secular solar drift | bounded at r = −0.13 ± 0.09 ms/cy; a uniform −0.5 is disfavoured ~4σ | fit-anchor documentation |
 | The former Config-#7 falsification criterion | RETIRED with the integer-law restatement (its instrument is deleted; doc 109 is the evidence record). The current criterion stands on three legs: the deep-time scaling split, historical-era exactness, and two-expansions μ-consistency | CLAUDE.md §falsification, [doc 109](109-model-nbody-engine-and-lattice-test.md) |

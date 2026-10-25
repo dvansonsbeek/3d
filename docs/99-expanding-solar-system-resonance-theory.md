@@ -8,7 +8,7 @@ status: current
 # Doc 99 — The Expanding Solar System Resonance Theory (ESSRT)
 
 ## Status
-Active theory draft — Expanding Solar System Resonance Theory (ESSRT). Full scope: the two expansions — Earth's spin tier on the tidal history (the composed lunisolar precession clock), every orbit on the solar-mass history across all 8 planets. Builds on docs 91-92 (the climate formula), 98 (mechanism — action-angle closure, written in the retired integer-label framing), 102 (historical lunar eclipse timing test + α(t) GIA derivation), and 103 (-135 Babylonian case study).
+Active theory draft — Expanding Solar System Resonance Theory (ESSRT). Full scope: the two expansions — Earth's spin tier on the tidal history (the composed lunisolar precession clock), every orbit on the solar-mass history across all 8 planets. Builds on doc 92 (the climate formula; its predecessors 91 and 98 are archived out of the tree), 102 (historical lunar eclipse timing test + α(t) GIA derivation), and 103 (-135 Babylonian case study).
 
 ---
 
@@ -160,9 +160,11 @@ The Phanerozoic window, both clocks against the published inferences (written by
 The composed clock sits within 3 % of every published Phanerozoic precession constant and reads 2–3 % LOW across 300–500 Ma (the Pangea window, where Wu's Moon-distance anchors are closer than the shipped recession polynomial — the documented Pangea offset); the retired spin-only clock reads 9–13 % low there. Beats via 1,296,000/(ψ̇ − |s₃|), |s₃| = 18.85 ″/yr. Wu's constants carry the astronomical model of their inversion; Berger 1992 is theory — neither is a measurement, and the table is labelled accordingly.
 <!-- /generated:doc99-phanerozoic-comparison -->
 
-The rock-derived inferences side with the COMPOSITION: 0.2 % at 650 Ma —
-a number the orbital engine cannot produce (it knows nothing of Earth's day length)
-— and inside the published 1σ of both Precambrian precession constants.
+The rock-derived inferences side with the COMPOSITION: a few per cent at
+650 Ma (the table above: the composed clock against Wu et al.'s inferred
+rate, where the spin-only scaling misses by a tenth) — a number the orbital
+engine cannot produce (it knows nothing of Earth's day length) — and inside
+the published 1σ of both Precambrian precession constants.
 **The composed rate is the model's deep-time ψ̇(t), anchored at J2000 on
 the IAU 2006 general precession p_A (an input since plan 09; T_p(t) is the
 published deep-time clock)** (plan 06 D6, plan 09):
@@ -234,7 +236,7 @@ The climate formula's precession-band lines p + g_i and p + s_i scale with ψ̇(
 The eccentricity-band lines |g_i − g_j| do NOT scale — MEASURED: the 405-kyr
 (g₂−g₅) family is stable while the precession band moves (Lantink 2022 at
 2.46 Ga, Meyers & Malinverno 2018 at 1.4 Ga; our own engine derives the
-405 from gravity, doc 109 §12). Only the ψ̇-carrying lines scale (MEASURED — the all-lines variant
+405 from gravity, doc 109 §17). Only the ψ̇-carrying lines scale (MEASURED — the all-lines variant
 failed the record); the lines are the engine's own Berger/Laskar-style beats
 (data/l1-physical-lines.json).
 ```
@@ -322,7 +324,7 @@ Meeus's empirical node T² to 1.8% with no fitting; the shipped 1.018 makes
 the node channel Meeus-exact) and s_ϖ = 2.407 (anchored, the
 Clairaut-amplified apsidal sensitivity; constant across the T²/T³ orders —
 an independent check; the lab-derived physical exponents are 0.867/2.479,
-the 2.407/1.018 pair being their frame-effective Meeus-convention form). e_E(t) is the model's own N-body eccentricity of date (the deep-mode channel, decision (ii) of plan 02 §8). The former H/3 fluctuation line that stood here — e(t) = base·(1 + cos θ(t)/2) on the inclination wheel's phase, whose J2000 eccentricity (−0.9 %) and rate (+1.7 %) were predictions — is deleted at plan 09 step 6; doc 66 §1 keeps its derivation record, and the scene keeps its J2000 phase as a recorded pose. The modulation is bounded at every epoch
+the 2.407/1.018 pair being their frame-effective Meeus-convention form). e_E(t) is the model's own N-body eccentricity of date (the deep-mode channel, decision (ii) of plan 02 §8). The former H/3 fluctuation line that stood here — e(t) = base·(1 + cos θ(t)/2) on the inclination wheel's phase, whose J2000 eccentricity (−0.9 %) and rate (+1.7 %) were predictions — is deleted at plan 09 step 6; doc 109 §22 keeps the record, and the scene keeps its J2000 phase as a recorded pose. The modulation is bounded at every epoch
 (e ∈ [0.0077, 0.0231]: perigee within ±0.1%, node within ±0.04%), so the
 mean is the law and the modulation a bounded oscillation about it — while
 Meeus's empirical T² polynomial, correct locally, diverges without bound at
@@ -790,7 +792,7 @@ are statements of the secular law and do not move.
 
 **Modern → Devonian fractional change**: −8.7 % in LOD, −15.8 % in the precession period (the lunar torque adds to the spin scaling), +9.5 % in days/yr.
 
-**Note on Williams 2000 (Ediacaran, 620 Ma):** Williams's tidal-rhythmite count gives 400.3 days/yr at this epoch. Our proper-physics formula gives <!--v:anchorWilliams620Pred-->429.37<!--/v--> days/yr — a <!--v:anchorWilliams620DeltaPct-->+7.26<!--/v-->% discrepancy. This is honest: Farhat 2022 (which we fit) has the smooth Earth-Moon evolution curve dipping shallower than Williams's direct measurement suggests, possibly because the Ediacaran-Cryogenian Snowball Earth interval (~650–580 Ma) had unusual ocean-tidal Q that Farhat's model averages over. The smooth formula passes between Williams's measurement and the modern Phanerozoic rate. See Mitchell-Kirscher 2023 for analysis of this Precambrian transition.
+**Note on Williams 2000 (Ediacaran, 620 Ma):** Williams's tidal-rhythmite count gives 400.3 days/yr at this epoch. Our proper-physics formula gives <!--v:anchorWilliams620Pred-->429.37<!--/v--> days/yr — a <!--v:anchorWilliams620DeltaPct-->+7.26<!--/v-->% discrepancy. This is honest: Farhat 2022 (the cited history the model reads, not a fit) has the smooth Earth-Moon evolution curve dipping shallower than Williams's direct measurement suggests, possibly because the Ediacaran-Cryogenian Snowball Earth interval (~650–580 Ma) had unusual ocean-tidal Q that Farhat's model averages over. The smooth formula passes between Williams's measurement and the modern Phanerozoic rate. See Mitchell-Kirscher 2023 for analysis of this Precambrian transition.
 
 ---
 
@@ -833,7 +835,7 @@ The full table published in Wells 1963 (data extracted via Arbab 2001 review):
 
 The proper-physics formula misses Williams's Elatina rhythmite at 620 Ma by **<!--v:anchorWilliams620DeltaPct-->+7.26<!--/v--> %** (predicted <!--v:anchorWilliams620Pred-->429.37<!--/v--> days/yr vs measured 400.3). This is a regression relative to the earlier pure-linear LOD formula, which hit Williams almost exactly (−0.01 %).
 
-Why? The pure-linear formula's `LOD = 24 − 0.00526·t_Ma` happens to pass through 21.90 hr at 620 Ma — coincidentally matching Williams. The proper-physics formula is calibrated to Farhat 2022's smooth numerical curve, which dips to LOD ≈ 21.02 hr at 620 Ma — a 4 % mismatch with Williams.
+Why? The pure-linear formula's `LOD = 24 − 0.00526·t_Ma` happens to pass through 21.90 hr at 620 Ma — coincidentally matching Williams. The derived chain reads Farhat 2022's cited distance history (plan 12 option A — an input, not a calibration), on which the conserved angular momentum puts LOD ≈ 21.02 hr at 620 Ma — a 4 % mismatch with Williams.
 
 Three plausible interpretations, in honest order:
 
@@ -888,7 +890,7 @@ The 300–200 Ma peak gives ~4 R⊕ extra Moon-Earth approach during the Pangea-
 
 This is **a real physical effect** (driven by continental shelf configuration and bathymetry during supercontinental assembly). Wu et al. note that even Farhat 2022's full ocean-tidal numerical model shows a similar acceleration, but shifted **~50 Myr earlier** than the cyclostratigraphy data places it.
 
-For the model: this is an honest limitation of using a single smooth polynomial. The Phanerozoic-averaged behaviour is captured; the regime-dependent supercontinent-era acceleration is not.
+For the model: this is an honest limitation of reading one globally averaged ocean-tide history. The Phanerozoic-averaged behaviour is captured; the regime-dependent supercontinent-era acceleration is not.
 
 ### Physical axial precession at deep time — why a spin-only scaling misses
 
@@ -912,7 +914,7 @@ Quantitative reconciliation at 650 Ma using the physical formula:
 | Lunar (n_M² ∝ a_moon⁻³, scales with ω × a_moon⁻³) | <!--v:earthPrecLunarJ2000ArcsecPerYr-->34.3740<!--/v--> ″/yr | × ω(t)/ω₀ × (a₀/a_M(t))³ |
 | Total | <!--v:earthPrecRateJ2000ArcsecPerYr-->50.2880<!--/v--> ″/yr | **<!--v:earthPrecComposed650MaArcsecPerYr-->70.3<!--/v--> ″/yr** at 650 Ma (the shipped composed clock, `earth/precession-composed`) |
 
-This lands on Wu et al.'s **67.64 ″/yr** to a few tenths of a percent — the lunar 1/a_moon³ coupling closes the gap quantitatively. (The earlier hand split 16.8/33.4 on a 50.2 total was the H/13-anchored reading; the values above are the registry's, one home.)
+This lands within a few per cent of Wu et al.'s **67.64 ″/yr** (the table: the composed value above theirs by about 4 %, where the spin-only scaling sits a tenth below) — the lunar 1/a_moon³ coupling closes most of the gap. (The earlier hand split 16.8/33.4 on a 50.2 total was the H/13-anchored reading; the values above are the registry's, one home.)
 
 **Both views are correct, depending on the question:**
 
@@ -1198,7 +1200,7 @@ So in 1 Gyr (1,000 Myr), the day would lengthen by about **22 %** under the line
 
 **Important caveat: the rate isn't constant.** It was much higher at Moon formation (Earth-Moon system far from equilibrium, strong tidal coupling) and slows asymptotically as the system approaches tidal-lock equilibrium. The current rates in the generated table are *modern* rates, not time-averages. The cited history carries this curvature as its authors' ocean-dissipation physics; the chain adds no term for it.
 
-The values above are anchored at the canonical Wells lunar-only rate (<!--v:wellsTidalRate-->0.00526<!--/v--> hr/Ma) — the long-term-stable rate driving the model's structural evolution. Modern observed LOD rate (2.3 ms/century) includes both tidal and post-glacial-rebound contributions and would give a different long-term stretch; the Wells lunar-only rate is the correct choice for structural evolution timescales.
+The former pure-linear formula was anchored at the canonical Wells lunar-only rate (<!--v:wellsTidalRate-->0.00526<!--/v--> hr/Ma); the shipped chain reads the cited distance history instead, and Wells is one of the anchors that TEST it. Modern observed LOD rate (2.3 ms/century) includes both tidal and post-glacial-rebound contributions and would give a different long-term stretch; the Wells lunar-only rate is the correct choice for structural evolution timescales.
 
 ### 🌌 The Expanding-Universe parallel
 
@@ -1472,8 +1474,8 @@ The model **explicitly tracks AU, sidereal year, and tropical year drift** rathe
 ```javascript
 // Δm(t) = SOLAR_MASS_LOSS_FRAC_PER_YR × t_Ma × 1e6   (≈ 9.30 × 10⁻¹⁴ × t_Ma × 1e6)
 
-// auAtAge(t_Ma): AU drift from adiabatic conservation a × M = const
-auAtAge(t_Ma) = currentAUDistance × (1 − Δm)
+// meanAuAtAge(t_Ma): AU drift from adiabatic conservation a × M = const
+meanAuAtAge(t_Ma) = currentAUDistance × (1 − Δm)
 
 // siderealYearSecondsAtAge(t_Ma): Kepler orbital period, fixed-star anchor —
 // exact Kepler under a × M = const, T ∝ M⁻² (the same Driver-2 law the planet chains use)
@@ -1496,7 +1498,7 @@ This formulation keeps Driver 1 (LOD and ψ̇ via tidal evolution) and Driver 2 
 |:---|:---|
 | AU drifts outward | ✓ Yes (~1.42 cm/yr from solar mass loss) |
 | AU drift is dominated by solar tides | ✗ No — mass loss dominates by 5000× |
-| Model treats AU and year_s as constants | ✗ No — explicit via `auAtAge()`, `siderealYearSecondsAtAge()`, `tropicalYearSecondsAtAge()` |
+| Model treats AU and year_s as constants | ✗ No — explicit via `meanAuAtAge()`, `siderealYearSecondsAtAge()`, `tropicalYearSecondsAtAge()` |
 | Mass-loss effect on the year in seconds at Phanerozoic | Small (−71 ppm at Devonian) but tracked |
 | Mass-loss effect on the year in seconds at Hadean (4.5 Gyr) | Significant (−845 ppm); critical for that scope |
 
@@ -1735,7 +1737,7 @@ the amplitude is bounded and the average tends to zero.
 | Property | Status |
 |---|:---:|
 | α(J2000) = EARTH_MOI_FACTOR exact | ✓ |
-| dα/dt(J2000) = Cox & Chao × factor 2.0 | ✓ (via ALPHA_CLIMATE_SCALE calibration) |
+| dα/dt(J2000) = Cox & Chao × factor 2.0 | ✓ (k derived at construction from the observed dJ₂/dt — no stored scale) |
 | Bounded at deep time (periodic L1 sum) | ✓ (~1500 ppb peak-to-peak) |
 | C∞ smooth at J2000 (no piecewise past/future split) | ✓ |
 | Reproduces Milankovitch α oscillation | ✓ |
@@ -1743,9 +1745,11 @@ the amplitude is bounded and the average tends to zero.
 
 **Amplitude sanity check.** Peak-to-peak Δ(δ¹⁸O) over a glacial cycle is
 ~1.7‰ (LR04). The literature-independent estimate for peak-to-peak Δα over a
-glacial cycle is 100–300 ppb (Peltier ICE-6G / Cheng 2011). Our calibrated
-prediction is `~3.93×10⁻⁷ × 1.7‰ ≈ 670 ppb` — same order of magnitude,
-within the model-uncertainty band for the underlying J₂ measurements.
+glacial cycle is 100–300 ppb (Peltier ICE-6G / Cheng 2011). The lagged
+channel's peak-to-peak Δα over a glacial cycle is of the same order (the
+value is the channel's own, `alphaGia` — [doc 110](110-calculation-map.md)
+chain 3), within the model-uncertainty band for the underlying J₂
+measurements.
 
 **Visualization.** The Framework Verification modal in the simulator has an
 **Export Cycles** button on the Solar Day Length category that renders the
@@ -1764,7 +1768,9 @@ C∞ and preserves Cox & Chao but implies α asymptotes to different values
 in past vs future, which lacks a physical mechanism. The L1-orbital
 coupling uniquely satisfies all four constraints (smooth at J2000, Cox &
 Chao preserved, bounded deep time, physically-motivated glacial-cycle
-mechanism) with a single scalar free parameter.
+mechanism) with no stored scale — k is derived at construction from the
+observed dJ₂/dt, and the one measured constant is the relaxation time τ
+(plan 06 D7, against the historical ΔT record).
 
 ---
 
@@ -2060,7 +2066,7 @@ If ESSRT is correct, the following predictions should hold. All values from the 
 
 ### 1. Deep-time obliquity periods lengthen with the clock
 Devonian (380 Ma) obliquity beat 2π/(ψ̇ − |s₃|) at **31.7 kyr** (vs modern 41.2 kyr; generated tables above).
-**Status**: Consistent. Berger, Loutre & Laskar 1992's deep-time solution (29 kyr and 61 ″/yr at 500 Ma; theory) and Wu et al. 2024's inferred precession constants (59.5–64.5 ″/yr across 300–500 Ma; cyclostratigraphic inference) both sit within 2–8 % of the composed clock, which reads 2–3 % low in the Pangea window — the residual attributed to the recession history there (Wu's Moon-distance anchors are closer than the smooth polynomial; doc 99 § "Pangea interval"), not to the composition law. A Devonian obliquity gate row waits for a period with a stated 1σ verified from the primary paper (the Zeeden et al. 2023 class). The former "confirmed against 36–38 kyr (Meyers 2008, Boulila 2018)" was a mis-citation of Cretaceous and Eocene records, and the retired spin-only clock (37.7 kyr) matched them by that error — withdrawn (plan 06 D6/Phase 4b).
+**Status**: Consistent. Berger, Loutre & Laskar 1992's deep-time solution (29 kyr and 61 ″/yr at 500 Ma; theory) and Wu et al. 2024's inferred precession constants (59.5–64.5 ″/yr across 300–500 Ma; cyclostratigraphic inference) both sit within 2–8 % of the composed clock, which reads 2–3 % low in the Pangea window — the residual attributed to the recession history there (Wu's Moon-distance anchors are closer than the smooth polynomial; the "Pangea interval" section above), not to the composition law. A Devonian obliquity gate row waits for a period with a stated 1σ verified from the primary paper (the Zeeden et al. 2023 class). The former "confirmed against 36–38 kyr (Meyers 2008, Boulila 2018)" was a mis-citation of Cretaceous and Eocene records, and the retired spin-only clock (37.7 kyr) matched them by that error — withdrawn (plan 06 D6/Phase 4b).
 
 ### 2. Deep-time short-eccentricity periods expand with the clock (view 2) — RESOLVED AGAINST
 Devonian short-eccentricity peaks would have been at **87.5, 98.0, 111.3 kyr** under view 2 (vs modern 95.8, 107.3, 121.9 kyr).
@@ -2107,11 +2113,11 @@ This is distinct from the tidal-channel coupling (which is faster, direct, and w
 
 | Question | Status |
 |:---|:---|
-| Exact deep-past rate of the clock's evolution (variable tidal-Q regimes) | Open — proper-physics formula averages over Earth's complex tidal history via polynomial fit to Farhat 2022. Specific regimes (Bartlett-Stevenson Proterozoic stall, Snowball-boundary spike) are smoothed over. |
-| Williams 2000 (Ediacaran 620 Ma) +5.70 % regression | Open — formula matches Wells/Pannella/Winter to ≤1.4 % but misses Williams's rhythmite count by +5.70 %. Whether this is Farhat's curve over-smoothing the Cryogenian or Williams's count being locally biased is unresolved. |
+| Exact deep-past rate of the clock's evolution (variable tidal-Q regimes) | Open — the chain reads Farhat 2022's globally averaged ocean-tide history. Specific regimes (Bartlett-Stevenson Proterozoic stall, Snowball-boundary spike) are smoothed over. |
+| Williams 2000 (Ediacaran 620 Ma) <!--v:anchorWilliams620DeltaPct-->+7.26<!--/v--> % miss | Open — the chain matches Wells/Pannella/Winter to ≤1.4 % but misses Williams's rhythmite count. Whether this is Farhat's history over-smoothing the Cryogenian or Williams's count being locally biased is unresolved. |
 | Whether all L1 integers truly scale together (view 2) or only k-involving ones (view 1) | **DECIDED: view 1, by measurement** — the precession band moves with the clock while the eccentricity bands stay fixed (1.4/2.46-Ga sections; doc 109's engine derivation of the e-beats from the fixed g-modes). |
 | The mechanism by which planetary g_i, s_j frequencies would scale with the clock (per view 2) | **Moot** — no such coupling exists; the campaign measured the planetary shapes as standard secular dynamics (doc 109, E1–E25), and the g-modes' only drift is ∝ M_Sun (the mass-loss tier). |
-| The role of L2 (carbon-cycle 405-kyr line) — confirmed NOT scaling | Established; L2 is carbon-cycle resonance, not orbital. See doc 92 §6 (Doc 99's 405-kyr investigation). |
+| The role of L2 (carbon-cycle 405-kyr line) — confirmed NOT scaling | Established; L2 is carbon-cycle resonance, not orbital. See doc 92 §3.1 (the 405-kyr thermostat). |
 | Whether L3 transitions (PETM, EOT, etc.) are coupled to the clock's evolution | Likely no; these are climate-system threshold transitions, not orbital periods. |
 | Future projections beyond +<!--v:essrtFormulaHorizonGyr-->4.48<!--/v--> Gyr (the formula horizon) | Formula returns null; would require explicit tidal-Q decay model to project to Sun's red-giant phase. |
 
@@ -2158,4 +2164,4 @@ All values written by the engine (`npm run docs:doc99:write`). Epochs chosen to 
 
 ## Net theory statement
 
-> The solar system expands on two measured tiers. On the **tidal tier**, the Earth–Moon system carries one clock — the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> yr at J2000, the period of the composed precession rate ψ̇ = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0) (the constant's scaling on the spin and the lunar torque, times the cited mean obliquity's cosine — plan 12 §8) — and the spin/tide family that rides it (the obliquity beat 2π/(ψ̇ − |s₃|), the climate formula's precession and obliquity lines, the LOD stack) — where the model's validated results live (eclipses, LOD, cardinal points, 41 paleo anchors) — plus Earth's exact **epoch-local** orbital laws (the apsidal and perihelion-of-date tangents, whose rates add) of the present era. The period lengthens monotonically as the Moon recedes (**Driver 1**): shorter in the past (~<!--v:axialPrecAtDevonian-->21,235<!--/v--> yr in the Devonian), longer in the future (~<!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr in 200 Myr), from Earth-Moon genesis at the rigid Roche limit ~<!--v:moonGenesisAgeGa-->4.429<!--/v--> Gyr ago toward the tidal-lock asymptote at <!--v:tidalLockKm-->555,623<!--/v--> km, through a spin–orbit crossover ~1.7 Gyr ahead where the beat diverges. On the **mass-loss tier** (**Driver 2**), solar mass loss expands every planetary orbit via adiabatic conservation of `a × M_Sun`; the ancient Sun's mass is now rock-measured (μ(2.48 Ga) = 1.00 ± 0.07). Planetary orbital shapes — perihelia, nodes, eccentricity vectors, and their beats including the 405-kyr metronome — follow standard secular dynamics, which the model's own N-body engine reproduces (doc 109); the former planetary integer labels were era-typed descriptors of those motions and are retired. The two tiers' scaling split (the precession band moves with the clock, the 405 does not) is confirmed at 1.4 and 2.46 Ga and is the theory's standing falsifier.
+> The solar system expands on two measured tiers. On the **tidal tier**, the Earth–Moon system carries one clock — the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> yr at J2000, the period of the composed precession rate ψ̇ = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0) (the constant's scaling on the spin and the lunar torque, times the cited mean obliquity's cosine — plan 12 §8) — and the spin/tide family that rides it (the obliquity beat 2π/(ψ̇ − |s₃|), the climate formula's precession and obliquity lines, the LOD stack) — where the model's validated results live (eclipses, LOD, cardinal points, 45 paleo anchors) — plus Earth's exact **epoch-local** orbital laws (the apsidal and perihelion-of-date tangents, whose rates add) of the present era. The period lengthens monotonically as the Moon recedes (**Driver 1**): shorter in the past (~<!--v:axialPrecAtDevonian-->21,235<!--/v--> yr in the Devonian), longer in the future (~<!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr in 200 Myr), from Earth-Moon genesis at the rigid Roche limit ~<!--v:moonGenesisAgeGa-->4.429<!--/v--> Gyr ago toward the tidal-lock asymptote at <!--v:tidalLockKm-->555,623<!--/v--> km, through a spin–orbit crossover ~1.7 Gyr ahead where the beat diverges. On the **mass-loss tier** (**Driver 2**), solar mass loss expands every planetary orbit via adiabatic conservation of `a × M_Sun`; the ancient Sun's mass is now rock-measured (μ(2.48 Ga) = 1.00 ± 0.07). Planetary orbital shapes — perihelia, nodes, eccentricity vectors, and their beats including the 405-kyr metronome — follow standard secular dynamics, which the model's own N-body engine reproduces (doc 109); the former planetary integer labels were era-typed descriptors of those motions and are retired. The two tiers' scaling split (the precession band moves with the clock, the 405 does not) is confirmed at 1.4 and 2.46 Ga and is the theory's standing falsifier.

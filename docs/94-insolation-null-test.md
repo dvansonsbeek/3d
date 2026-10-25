@@ -14,12 +14,11 @@ status: current
 > e·sin(ϖ) and e·cos(ϖ) — to the canonical climate formula (L1+L2+L3) improves
 > R². **Result: no fourth layer.** The pre-registered rule (§2.3) adopts the
 > layer only on a cross-window-stable gain above 0.02, and no window reaches it.
-> Every regime window is negative out of sample; the full 5.3-Myr record is the
-> one window with an out-of-sample gain —
+> Every window is negative out of sample, the full 5.3-Myr record included —
 > <!--v:insolStabModelCvLr04Full-->−0.0356<!--/v--> with the model's own features,
-> <!--v:insolStabLaskarCvLr04Full-->−0.0389<!--/v--> with La2004's — inside the
-> tentative band (0.005–0.02), below the bar; its in-sample reading of
-> <!--v:insolExtDeltaR2Lr04Full-->+0.0193<!--/v--> does not hold out of sample (§9).
+> <!--v:insolStabLaskarCvLr04Full-->−0.0389<!--/v--> with La2004's; its in-sample
+> reading of <!--v:insolExtDeltaR2Lr04Full-->+0.0193<!--/v--> sits in the tentative
+> band (0.005–0.02), below the 0.02 bar, and does not hold out of sample (§9).
 > On 0–500 kyr the independent La2010a elements add
 > <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v--> on LR04 and
 > <!--v:insolLaskarV2DeltaR2Epica-->+0.00794<!--/v--> on EPICA CO₂ in sample (§8), the
@@ -144,7 +143,7 @@ The same procedure was repeated for four LR04 regimes plus EPICA CO₂.
 | lr04-full | 0–5320  | <!--v:insolExtR2L1Lr04Full-->0.325<!--/v--> | **<!--v:insolExtR2CanonLr04Full-->0.3329<!--/v-->** | **<!--v:insolExtR2FullLr04Full-->0.3522<!--/v-->** | **<!--v:insolExtDeltaR2Lr04Full-->+0.0193<!--/v-->** |
 | EPICA CO₂ | 0–800   | —     | **<!--v:insolExtR2CanonEpicaCo2-->0.7238<!--/v-->** | **<!--v:insolExtR2FullEpicaCo2-->0.7244<!--/v-->** | **<!--v:insolExtDeltaR2EpicaCo2-->+0.0006<!--/v-->** |
 
-**Max ΔR² = <!--v:insolExtMaxDeltaR2-->+0.0193<!--/v-->** (the full record) — inside the pre-registered POSITIVE band (§2.3) in sample, which is why the cross-window stability check of §9 decides the verdict (§4).
+**Max ΔR² = <!--v:insolExtMaxDeltaR2-->+0.0193<!--/v-->** (the full record) — inside the pre-registered TENTATIVE band (0.005–0.02, §2.3) in sample, below the 0.02 bar, which is why the cross-window stability check of §9 decides the verdict (§4).
 
 ### 3.2 L_insol coefficients (post-MPT)
 
@@ -191,18 +190,18 @@ column).
 ## 4. Verdict — no fourth layer
 
 ```
-Max ΔR² (model features, in-sample)               = <!--v:insolExtMaxDeltaR2-->+0.0193<!--/v-->   full record → POSITIVE band in sample; §9 decides
-Cross-validated, full record, model features      = <!--v:insolStabModelCvLr04Full-->−0.0356<!--/v-->   (TENTATIVE band, below the 0.02 bar)
+Max ΔR² (model features, in-sample)               = <!--v:insolExtMaxDeltaR2-->+0.0193<!--/v-->   full record → TENTATIVE band in sample; §9 decides
+Cross-validated, full record, model features      = <!--v:insolStabModelCvLr04Full-->−0.0356<!--/v-->   (negative — no out-of-sample gain)
 Cross-validated, full record, La2004 features     = <!--v:insolStabLaskarCvLr04Full-->−0.0389<!--/v-->   (same reading)
 Cross-validated, every regime window, either set  < 0
 ```
 
 Read with §8 and §9, the statistic makes two statements:
 
-1. **No cross-window-stable gain — no fourth layer.** The one out-of-sample
+1. **No cross-window-stable gain — no fourth layer.** The largest in-sample
    gain is on the full 5.3-Myr record, where the canonical fit is weakest
-   (R² = <!--v:insolExtR2CanonLr04Full-->0.3329<!--/v-->) and the in-sample
-   reading is largest; it stays inside the tentative band. Every regime window
+   (R² = <!--v:insolExtR2CanonLr04Full-->0.3329<!--/v-->); it stays inside the
+   tentative band in sample and turns negative out of sample. Every regime window
    is negative out of sample. On 0–500 kyr (§8) the independent La2010a
    elements add <!--v:insolLaskarV2DeltaR2Lr04-->+0.00758<!--/v--> (LR04) and
    <!--v:insolLaskarV2DeltaR2Epica-->+0.00794<!--/v--> (EPICA CO₂) in sample —
@@ -409,7 +408,7 @@ Three questions the main result leaves open are answered:
    consistent. La2004/La2010 e(t) and ϖ(t) are Fourier decompositions of the
    same g/s secular rhythm the lines enumerate, and the residual gain of a
    4-feature projection on top of 28 fitted lines is small and not stable.
-3. **§5.3 forward reference to doc 95** — the thesis "climate is determined by
+3. **§5.3 forward reference to doc 95 (archived — git history carries it)** — the thesis "climate is determined by
    the solar system's rhythm, not by solar insolation directly" rests on the
    lines' explanatory power (§3.3) and reads the same with the model's orbit
    or with Laskar's.
@@ -453,11 +452,10 @@ of the shipped formula out of sample?*
 
 Reading:
 
-- **Neither feature set passes the stability bar.** The only positive
-  out-of-sample readings are on the full record —
+- **Neither feature set passes the stability bar.** No out-of-sample
+  reading is positive, the full record included —
   <!--v:insolStabModelCvLr04Full-->−0.0356<!--/v--> (model) and
-  <!--v:insolStabLaskarCvLr04Full-->−0.0389<!--/v--> (La2004) — inside the
-  tentative band, below 0.02; the in-sample
+  <!--v:insolStabLaskarCvLr04Full-->−0.0389<!--/v--> (La2004); the in-sample
   <!--v:insolExtDeltaR2Lr04Full-->+0.0193<!--/v--> /
   <!--v:insolStabLaskarDeltaR2Lr04Full-->+0.0184<!--/v--> there does not hold.
   Every regime window is negative for both sets. Maximum cross-validated gain

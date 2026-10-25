@@ -109,7 +109,7 @@ Each orbital plane has **two distinct angles** evolving at different rates — a
 - **Inclination** `i(t)` — the "nodding" of the orbital plane. Changes **how far** above/below the plane the planet gets; it does not change the fact of two crossings per orbit.
 - **Ascending node** `Ω(t)` — the "spinning" of the line of nodes. Shifts **where/when** the crossings happen.
 
-For the planets both angles are **dynamical outputs of the chain** (elements of date; the long-term curves are the orbital dynamics engine's own secular modes). For Earth both angles are the **one-source engine reading** (plan 07 R5/R9): the engine's own Earth-orbit normal of date against the banked invariable plane gives the inclination, and that normal's node on the plane — expressed in the Souami & Souchay origin through the same derived conversion the planets use — gives Ω. The former kinematic identities (Ω regressing at the K device's ecliptic-wheel rate, the inclination oscillating on its inclination wheel, read as the <!--v:earthPeriPeriodICRF-->111,635<!--/v-->-yr ICRF perihelion cycle) were the K device's forms: they agreed with the engine at J2000 by construction and parted with distance (0.67° of inclination and 18° of node at −100 kyr).
+For the planets both angles are **dynamical outputs of the chain** (elements of date; the long-term curves are the orbital dynamics engine's own secular modes). For Earth both angles are the **one-source engine reading** (plan 07 R5/R9): the engine's own Earth-orbit normal of date against the banked invariable plane gives the inclination, and that normal's node on the plane — expressed in the Souami & Souchay origin through the same derived conversion the planets use — gives Ω. The retired device's kinematic identities agreed with the engine at J2000 by construction and parted with distance (0.67° of inclination and 18° of node at −100 kyr); the record is [doc 109 §23](109-model-nbody-engine-and-lattice-test.md).
 
 Earth's charted model inclination `i_inv(t)` is the **one-source** reading: the engine's own Earth-orbit normal (secular series inside ±10 Myr, mode tail beyond) against the artifact's invariable plane — it matches La2010 at rms 0.003° over −500 kyr.
 
@@ -144,7 +144,7 @@ The simulation verifies the plane's orientation two independent ways.
 
 **Option B — the published reference** (Souami & Souchay 2012 values above).
 
-Expected agreement: tilt 1.5787° ± 0.01°, node ~107° ± 0.5°, A-vs-B difference < 0.1°. The check is a live self-consistency gate: if the two diverge, the orbital-element data is inconsistent.
+Expected agreement: tilt 1.5787° ± 0.01°, node ~107° ± 0.5°, A-vs-B difference < 0.1°. The check is a live panel row (Positions (Invariable Plane) › Plane Verification), not a gate in the check chain: if the two diverge, the orbital-element data is inconsistent.
 
 ---
 
@@ -159,7 +159,7 @@ Because the plane is defined by total angular momentum, the mass-weighted averag
 
 ## Visualization in the Simulation
 
-Enable via **Celestial Tools > Earth Inclination to Invariable plane**: a translucent disc centered on the Sun, Earth's current height line, crossing markers (ascending green, descending red), and high/low markers (yellow/blue). Each planet's inspector shows its ascending node on the invariable plane (ecliptic convention: `o.<planet>AscendingNodeInvPlaneEcliptic`), its current signed height, and above/below status.
+Enable via **Reference Planes › Invariable plane**: a translucent disc centered on the Sun, Earth's current height line, crossing markers (ascending green, descending red), and high/low markers (yellow/blue). Each planet's inspector shows its ascending node on the invariable plane (ecliptic convention: `o.<planet>AscendingNodeInvPlaneEcliptic`), its current signed height, and above/below status.
 
 ---
 

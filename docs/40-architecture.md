@@ -37,8 +37,8 @@ status: current
 The Interactive 3D Solar System Simulation is a sophisticated WebGL-based astronomical visualization tool that implements the Expanding Solar System Resonance Theory (ESSRT). It provides accurate planetary positions, precession cycles, and orbital mechanics calculations spanning hundreds of thousands of years.
 
 **Key Statistics:**
-- Single monolithic script.js (~59,800 lines)
-- 13 celestial bodies with full orbital mechanics
+- Single monolithic script.js (~39,000 lines since plan 18 retired the console-test folder)
+- 10 rendered bodies (Sun, Earth, Moon and the seven chain planets)
 - 50+ astronomical calculation functions
 - Real-time 3D visualization at 60 FPS
 - Support for date ranges from millennia (snapshot mode) to millions of years (deep-time mode, the shipped default)
@@ -145,16 +145,12 @@ WebGL Render (60 FPS target)
 3d/
 ├── src/
 │   ├── index.html              # Entry point (minimal HTML wrapper)
-│   ├── script.js               # Main application (~59,800 lines)
+│   ├── script.js               # Main application (~39,000 lines)
 │   └── style.css               # GUI and label styling
 │
 ├── public/
-│   ├── textures/               # Planetary textures (~25MB total)
-│   │   ├── earth/              # Earth day, night, clouds, specular, bump maps
-│   │   ├── planets/            # Mercury through Neptune textures
-│   │   ├── sun/                # Solar surface texture
-│   │   ├── moon/               # Lunar surface texture
-│   │   └── skybox/             # Background starfield
+│   ├── *.jpg, *.png            # Planetary textures, flat in public/ (Earth day/night/clouds/specular/bump,
+│   │                           #   Mercury–Neptune, the Sun, the Moon, the starfield)
 │   │
 │   └── input/
 │       ├── astro-reference.json       # IAU/JPL reference values (J2000 elements, periods) + the scene epoch — the ONE input file (model-parameters.json deleted, plan 11)
@@ -176,19 +172,22 @@ WebGL Render (60 FPS target)
 │   │       + src/model/        #   slices (derived-constants → deep-time-chain → … →
 │   │                           #   lunar-theory → sun-and-eclipses → surface)
 │   ├── model-values/           # @essrt/model-values — the rendered value registry
+│   ├── api/                    # the published API + MCP server (test:api, test:mcp)
+│   ├── reference/              # @essrt/reference — VSOP87 / MPP02 ghosts, published curves (comparison only)
+│   ├── data/, analysis/, render/, simulator/   # the datasets, the analysis helpers, the headless renderers, the simulator package
 │   ├── fitting/                # Fitter implementations (tools/fit are CLI shims)
 │   └── fixtures/               # Golden masters for the regression gates
 │
 ├── tools/
 │   ├── fit/                    # Pipeline CLI shims (implementations in packages/fitting)
 │   ├── verify/                 # the gates and the artifact generators — every script fails or writes (`npm run test:verify:list`)
-│   ├── explore/                # Exploratory analysis scripts (~150 tracked one-offs; closed-campaign instruments live in the untracked archive/, git history is the record)
+│   ├── explore/                # Exploratory analysis scripts (~110 tracked one-offs — a script stays while something names it; closed-campaign instruments live in the untracked archive/, git history is the record)
 │   ├── constants/              # generate.mjs — the generated-constants pipeline
 │   ├── docs/                   # Doc machinery (marker renderer, frontmatter stamper)
 │   ├── lib/                    # Shared libraries (constants, scene-graph, orbital-engine, deep-time)
 │   └── results/                # Baseline records (chain-era comparisons live in data/chain-vs-jpl-rms.json)
 │
-├── docs/                       # Documentation (47 docs, numbered 00–109 with gaps)
+├── docs/                       # Documentation (36 docs; the numbers are stable identifiers, with gaps — docs/00 is the index)
 │
 ├── package.json                # Dependencies and scripts
 ├── .gitignore
@@ -223,7 +222,7 @@ WebGL Render (60 FPS target)
 
 ### script.js Organization
 
-The monolithic script.js (~59,800 lines) is organized into logical sections. Constants are grouped by source (A = the scene epoch, the research toggles and the two display literals — the former model-parameters.json, retired leaf by leaf and deleted at plan 11 step 6, B = the shipped fit artifacts under data/ — the former fitted-coefficients.json, deleted at plan 11 step 1, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
+The monolithic script.js (~39,000 lines) is organized into logical sections. Constants are grouped by source (A = the scene epoch, the research toggles and the two display literals — the former model-parameters.json, retired leaf by leaf and deleted at plan 11 step 6, B = the shipped fit artifacts under data/ — the former fitted-coefficients.json, deleted at plan 11 step 1, C = astro-reference.json, D = meeus-lunar-tables.json, E = derived, F = display-only).
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -768,7 +767,7 @@ eccentricAnomaly: (M_deg, e) => {
 },
 ```
 
-### True Anomaly (`updatePlanetAnomalies`, line ~26774)
+### True Anomaly (`updatePlanetAnomalies`)
 
 True anomaly is computed geometrically from world-space positions using `atan2`, not from the eccentric anomaly. The function reads each planet's 3D position relative to the Sun and computes the angular position directly. (Planet *mean* anomaly, by contrast, is the textbook `M = M₀ + n·Δt` with a Kepler-equation solve — the position-based alternative was rejected. The Moon keeps the geometric method.)
 

@@ -1338,7 +1338,7 @@ convention — `data/deltaT-4flag-fit.json`) come from fitting
 `Stephenson_residual = polynomial_detrend + cos_A · cos(ωy) +
 sin_A · sin(ωy)` at n=1830. The shipped coefficients now come from
 `tools/fit/dt-corrections-fit.js` (Node, cascaded LSQ with the three
-companion cycles — see Phase 8 in `tools/fit/README.md`) and are
+companion cycles — the ΔT re-close in `tools/fit/README.md`) and are
 persisted to `data/deltaT-4flag-fit.json`, the sole source of truth
 for the runtime constants. Enabling this in the live
 model **VIOLATES the paper's original "no coefficients fitted to
@@ -1366,7 +1366,7 @@ away for baseline measurement without the stack.
 
 Current shipped fit (sole runtime source of truth):
 
-- `tools/fit/dt-corrections-fit.js` — Node cascaded-LSQ fit tool (Phase 8 Step 11). Reads Stephenson polynomial, samples the pure-tidal model residual (with `DT_CORRECTIONS_DISABLED=1` bypassing the shipped corrections), fits Bond→Hallstatt→Jose5→Jose4 in cascade, writes the artifact below.
+- `tools/fit/dt-corrections-fit.js` — Node cascaded-LSQ fit tool (the joint ΔT fitter; `--joint --write` is the governed re-close). Reads Stephenson polynomial, samples the pure-tidal model residual (with `DT_CORRECTIONS_DISABLED=1` bypassing the shipped corrections), fits Bond→Hallstatt→Jose5→Jose4 in cascade, writes the artifact below.
 - The website consumes the ΔT-stack and resonator constants through the published `@essrt/physics` package (`FITTED_COEFFICIENTS.DT_STACK` / `DT_RESONATOR`). `src/script.js` imports the same values from the generated constants module; `tools/lib/deep-time.js` reads the JSON directly.
 - `data/deltaT-4flag-fit.json` — combined 4-cycle fit output; sole authoritative source for the shipped coefficients.
 

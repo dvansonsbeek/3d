@@ -55,7 +55,7 @@ average returns to the ecliptic value. Two implementations exist:
   inclination and obliquity cycles — a
   property of the projection, not of the orbits.
 - **The projection** (`perihelionFrameBreakdown`, plan 06 R8): the
-  Earth-frame RA rate is §1.8's identity applied to the lattice motion
+  Earth-frame RA rate is §1.8's identity applied to the chain's ecliptic motion
   (rate × dα/dλ + ∂α/∂ε·ε̇), evaluated at any year for all seven planets —
   one formula, zero fitted constants. Mercury:
   <!--v:mercuryEarthFrameRa1900-->576.17<!--/v--> ″/cy at 1900,
@@ -84,9 +84,9 @@ so the long-term Earth-frame average equals the ecliptic value.
   the model's precession rates, any scientific calculation.
 - **Earth-frame**: understanding what an equatorial measurement does to
   the rate, and studying the interaction of Earth's precession cycles.
-- GUI: each planet's perihelion folder shows both — `(Geocentric)` the
-  Earth-frame value (fluctuates), `(Heliocentric)` the ecliptic value
-  (stable).
+- GUI: the **Perihelion Longitudes (Ecliptic)** folder shows the ecliptic
+  value (stable); the equatorial reading is in the Planet Info panel's
+  Orbital Orientation and Cycles rows.
 
 ---
 
@@ -287,8 +287,8 @@ with ε̇ = <!--v:obliquityRateJ2000ArcsecCy-->-46.8<!--/v--> ″/cy from the sh
 obliquity law. The Earth-frame rate IS this projection, so the identity
 holds by construction.
 
-**Mercury.** The ecliptic advance is the lattice divisor,
-<!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> ″/cy (the device's ecliptic-period value). At the
+**Mercury.** The ecliptic advance is the chain's secular rate,
+<!--v:mercuryPeriRateEclipticArcsecCy-->529.03<!--/v--> ″/cy. At the
 IAU J2000 perihelion longitude (77.457°) and the IAU 2006 obliquity the slope
 is <!--v:mercuryPeriRaSlopeJ2000-->1.08036<!--/v-->, the projected rate
 <!--v:mercuryPeriRateRaProjectedJ2000-->571.54<!--/v--> ″/cy, and the excess
@@ -328,7 +328,7 @@ classical system (Newcomb p_A 5,025.645) observed 5,599.74 vs model
 5,557.08 → 42.66 ″/cy in longitude, 46.09 in RA (= 42.66 × slope); modern
 system, compared directly in ICRF (no equinox-referred determination
 exists there, and none may be manufactured by adding p_A to a ranging
-value): Park 575.31 vs model lattice 531.44 → 43.87 in longitude (0.89 of
+value): Park 575.31 vs the model's 531.44 → 43.87 in longitude (0.89 of
 it the baseline 532.33 − 531.44); p_A, common to both sides of an of-date
 statement, cancels in any within-system subtraction. The scene's
 Earth-frame rate is the RA rate in an equator that co-moves with its stars (no
@@ -369,9 +369,8 @@ date (the N-body series' ϖ of date, <!--v:earthPeriRateEclipticOfDateArcsecCy--
 projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.64<!--/v--> ″/cy
 against a GR advance of 3.84. This table is the pre-registered test of the
 statement "the Mercury anomaly is the equatorial projection of the ecliptic
-advance" applied to all planets; the statement's scope, frame wording and
-public form are decided in the plan `IP-mercury-anomaly-projection.md`
-(private repo), not here.
+advance" applied to all planets; its frame wording is §1.8's — the
+projection account, gate-pinned for all seven planets.
 
 **Frames, measured.** In the scene the equatorial frame (`earth.rotationAxis`)
 and the star field (`zodiac`, a child of `earth.pivotObj`) share the `earth`

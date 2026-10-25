@@ -20,7 +20,7 @@ This document describes the astronomical verification data embedded in the simul
 
 ## Overview
 
-The simulation includes over 8,000 verification data points from authoritative astronomical sources. These allow users to compare the model's calculated positions against historically observed events such as planetary transits, oppositions, conjunctions, mutual occultations, and historical observations (notably Tycho Brahe's Mars observations).
+The simulation includes about 1,250 verification data points from authoritative astronomical sources. These allow users to compare the model's calculated positions against historically observed events such as planetary transits, oppositions, conjunctions, mutual occultations, and historical observations (notably Tycho Brahe's Mars observations).
 
 **Location:** `src/script.js` (`PLANET_TEST_DATES`)
 
@@ -101,7 +101,7 @@ Each verification entry has the following structure:
 |------|-------|-------------|
 | 1A | 42 | Highest quality — model start positions |
 | 1B | 76 | High quality — precise transit observations |
-| 1C | 7,384 | Historical observations (Tycho Brahe Mars data) |
+| 1C | 580 | Historical observations (Tycho Brahe Mars data) |
 | 1D | 88 | High quality — precise declinations |
 | 2A | 46 | Medium quality — opposition data |
 | 2B | 180 | Medium quality — conjunction/opposition data |
@@ -283,8 +283,7 @@ The data spans thousands of years (some entries date to ~2000 BC) to verify:
 
 Larger errors at ancient dates are acceptable because:
 - Source data has inherent uncertainty
-- Model uses simplified precession (constant rates)
-- No perturbation modeling for planet-planet interactions
+- The planets ride the N-body chain's elements of date (secular modes to 0.1–1 %, [doc 109](109-model-nbody-engine-and-lattice-test.md)); the short-period perturbations are not in the chain
 
 ---
 
@@ -407,7 +406,7 @@ To add new verification entries:
 | Uranus | 1 | ~3 | ~14 | - | ~18 |
 | Neptune | 1 | ~33 | ~15 | - | ~49 |
 | Others | 3 | - | - | - | 3 |
-| **Total** | **~378** | **~186** | **~114** | **~7,384** | **~8,062** |
+| **Total** | **~378** | **~186** | **~114** | **580** | **~1,258** |
 
 ---
 

@@ -435,9 +435,8 @@ one-source tropical year of date (route B, SI seconds) + equation of centre
 on the banked series' e(t) and ϖ(t) plus the derived mean-element offset
 (`data/earth-osculating-mean-offset.json`). It carries **zero fitted solar
 constants**; accuracy <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL (modern window 1970–2049; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″).
-The scene wheel displays the same longitude via the δ overlay
-(δ = λ_certified − λ_realized, the wheel's own longitude read from the scene
-geometry; clock-convention window). See
+The scene's Sun is placed at the same longitude by the engine every frame
+(`_applyEngineEarthFrame`, R4 — the former δ overlay is retired, [doc 41](41-scene-graph-hierarchy.md)). See
 [doc 99 § The framework-native Sun](99-expanding-solar-system-resonance-theory.md#the-framework-native-sun-e4e5--the-certified-apparent-solar-longitude).
 
 ## Earth's perihelion of date
