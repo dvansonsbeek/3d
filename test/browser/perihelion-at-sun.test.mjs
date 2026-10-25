@@ -180,6 +180,48 @@ try {
     return { active: s.active, frames: s.frames, pressed };
   });
   check('a Show/Hide chip click wakes the paused loop (the frame that draws the marker)', !!wake && wake.active >= 1 && wake.pressed, wake ? `${wake.active} of ${wake.frames} frames active after the click · chip pressed ${wake.pressed}` : 'chip not found');
+  // Plan 20 T2 — the deep-epoch and jumped-state rows (born from the script.js
+  // review's frame/epoch findings, each measured before the fix):
+  //  • at a deep epoch the Moon stack's GEOMETRY follows a(t) — the apsidal
+  //    arm is a(t)·e and the drawn ring's radius a(t) (createPlanet froze both
+  //    at build; measured at −400 Ma: 0.014107 vs 0.013520 and 0.25695 vs
+  //    0.24627 while the placed Moon sat at 0.24854);
+  //  • at a deep epoch the TRACE path's perihelion-marker radius is the
+  //    rendered marker's a·e of date (it read the container's build offset —
+  //    Jupiter 24.02 vs 30.02 units at −400 Ma, 24.02 vs 25.37 even at J2000);
+  //  • the Moon's distance row reads the PLACED mesh on the first frame after a
+  //    jump (it read the pre-override position — 440 km off, measured);
+  //  • a synchronous jump with the Tracing button on leaves the scene posed at
+  //    the JUMP, not at the trace's last sample (the Sun's RA read 8.6° off).
+  // The PLANT (1 %) shifts the expected geometry so the first two rows cannot hold.
+  // The epoch: −100 Ma (the Moon's a ~1 % smaller; the −400 Ma reading above
+  // cost 131 s of spin walk per run — the same defects, a fifth of the time).
+  const DEEP_YEAR = -100e6;
+  const t0 = Date.now();
+  const deep = await sim.page.evaluate(async ({ deepJD, midJD }) => {
+    const T = window.__test__; const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+    T.jumpJD(2451545.0); await wait(400); T.jumpJD(2451545.0);
+    const ringJ2000 = T.moonRingProbe();
+    const sunSettled = T.sunSceneNow();
+    T.setTracing(true); T.traceEnable('Sun', true); T.jumpJD(midJD); T.jumpJD(2451545.0); const sunTraced = T.sunSceneNow(); const sunFill = T.traceProbe('Sun').filled;
+    T.setTracing(false);
+    T.jumpJD(midJD); const moonFirst = T.moonDistanceProbe();
+    T.jumpJD(deepJD); await wait(1500); T.jumpJD(deepJD);   // the loop syncs the epoch anchors, the second jump poses on them
+    const ring = T.moonRingProbe(); const peri = T.periMarkerTraceRadiusProbe('PERIHELION JUPITER');
+    T.jumpJD(2451545.0); await wait(1000); T.jumpJD(2451545.0);
+    return { ringJ2000, ring, peri, moonFirst, sunSettled, sunTraced, sunFill };
+  }, { deepJD: 2451545.0 + (DEEP_YEAR - 2000) * 365.25, midJD: 2451545.0 + (1000 - 2000) * 365.25 });
+  console.log(`      (deep-epoch rows took ${((Date.now() - t0) / 1000).toFixed(1)} s)`);
+  const mr2 = deep.ring, pj = deep.peri;
+  check('−100 Ma: the epoch moved the Moon\'s a (sanity)', !!mr2 && Math.abs(mr2.ringExpectedScene - deep.ringJ2000.ringExpectedScene) > 1e-3, mr2 ? `${deep.ringJ2000.ringExpectedScene.toFixed(5)} → ${mr2.ringExpectedScene.toFixed(5)} units` : 'probe returned null');
+  check('−100 Ma: the Moon ring\'s apsidal arm is a(t)·e', !!mr2 && Math.abs(mr2.offsetScene - mr2.offsetExpectedScene * PLANT) < 1e-9, mr2 ? `${mr2.offsetScene.toFixed(9)} vs ${(mr2.offsetExpectedScene * PLANT).toFixed(9)}` : '');
+  check('−100 Ma: the drawn Moon ring\'s radius is a(t)', !!mr2 && Math.abs(mr2.ringRadiusScene - mr2.ringExpectedScene * PLANT) < 1e-9, mr2 ? `${mr2.ringRadiusScene.toFixed(9)} vs ${(mr2.ringExpectedScene * PLANT).toFixed(9)} (placed Moon at ${mr2.moonMeshDistScene.toFixed(5)})` : '');
+  check('−100 Ma: the traced perihelion marker rides the rendered marker\'s a·e of date (Jupiter)', !!pj && Math.abs(pj.traceRadiusUnits - pj.markerRadiusUnits * PLANT) < 1e-9 && Math.abs(pj.markerRadiusUnits - pj.j2000Units) > 0.1, pj ? `trace ${pj.traceRadiusUnits.toFixed(6)} vs marker ${(pj.markerRadiusUnits * PLANT).toFixed(6)} units (J2000 container offset ${pj.j2000Units.toFixed(3)})` : 'probe returned null');
+  const md = deep.moonFirst;
+  check('first update after a jump: the Moon\'s distance row reads the placed mesh', !!md && Math.abs(md.distAU - md.worldDistAU) < 1e-12, md ? `${md.distAU.toFixed(12)} vs ${md.worldDistAU.toFixed(12)} AU` : '');
+  const sunLimit = PLANT === 1 ? 1e-9 : -1;
+  check('a synchronous jump with the Tracing button on poses the scene at the jump (not the trace\'s last sample)', deep.sunFill > 0 && Math.abs(deep.sunTraced.raDeg - deep.sunSettled.raDeg) < sunLimit && Math.abs(deep.sunTraced.decDeg - deep.sunSettled.decDeg) < sunLimit, `Sun RA ${deep.sunTraced.raDeg.toFixed(6)} vs settled ${deep.sunSettled.raDeg.toFixed(6)}° (${deep.sunFill} trace samples filled)`);
+
   check('page came up without errors', sim.errors.length === 0, sim.errors.slice(0, 3).join(' | '));
 } catch (e) {
   check('suite ran to completion', false, String((e && e.stack) || e));

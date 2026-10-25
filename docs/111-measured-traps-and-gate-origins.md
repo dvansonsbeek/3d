@@ -463,7 +463,23 @@ The `test:snapshot` chain also carries:
   panel's Sun-SSB sum) are placed as stated, and every group's chip list is
   exact — no device-wheel chips (born from the "Real Perihelion" wheel ~90°
   off the chain and three chips that showed nothing; fail-proven via
-  `ESSRT_PERI_SUN_PLANT=1`).
+  `ESSRT_PERI_SUN_PLANT=1`). Since plan 20 the gate also carries the
+  deep-epoch and jumped-state rows, each measured before its fix: at
+  −100 Ma the Moon stack's geometry follows a(t) — the apsidal arm a(t)·e
+  and the drawn ring's radius a(t) (createPlanet froze both at build and
+  moveModel read the frozen value, so the epoch updater's write reached
+  nothing: at −400 Ma the arm read 0.014107 against 0.013520 and the ring
+  0.25695 against 0.24627 while the placed Moon sat at 0.24854); the trace
+  path's perihelion-marker radius is the rendered marker's a·e of date (it
+  read the container's build offset — Jupiter 24.02 against 30.02 units at
+  −400 Ma, 24.02 against 25.37 even at J2000, Mercury 6.60 against 7.96);
+  the Moon's distance row reads the placed mesh on the first frame after a
+  jump (the pre-override position was 440 km off); and a synchronous jump
+  with the Tracing button on leaves the scene posed at the jump — the old
+  `forceSceneUpdate` traced AFTER `moveModel`, so every synchronous reader
+  saw the trace's last sample (the Sun's RA 8.6° off, the ring's perigee
+  190° off after a year-1000 → J2000 jump). The same plant breaks the two
+  geometry rows; the jump row's limit becomes unreachable under it.
 - **The star and constellation containers** (J2000 RA/Dec catalogs, aligned
   ONCE at module init) sit on the J2000 equatorial frame through R (born
   from the owner's "the Sun is at 160° against the constellations where it
