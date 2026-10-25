@@ -4572,6 +4572,11 @@ if (typeof window !== 'undefined') {
     }),
     openVerificationPanel: () => openVerificationPanel(),
     updateVerificationPanel: (id) => updateVerificationPanel(id),
+    vfpCategoryIds: () => VFP_CATEGORIES.map((c) => c.id),   // the tools-panels gate renders EVERY category (a deleted reference curve threw on one, unseen)
+    // The Reports exporters, for the headless reports gate (XLSX stubbed by the test):
+    // two of them had crashed on a deleted name for weeks with no row to see it.
+    runYearAnalysisExport, runRATest, runSolsticeExport,
+    setReportInputs: (patch) => Object.assign(o, patch),   // the Reports folders' range/list fields, for the gate
     // C-VIS smoke surface: exercise both Visualization toggles headlessly
     visInvPlaneProbe: () => {
       invariablePlaneGroup.visible = true;
@@ -6328,8 +6333,6 @@ let o = {
   Day: "",
   julianDay: "",
   pos : 0,
-  sun : {pivotObj: new THREE.Object3D()},
-  earth : {pivotObj: new THREE.Object3D()},
   displayFormat : 'sexagesimal',
   distanceUnit : 'AU',
   RA_Display : '',
@@ -9081,6 +9084,7 @@ const DESIRED_HFOV   = 60;        // horizontal slice you like
 const MIN_SIZE       = 2;         // protect against 0-px viewports
 const starMaterial   = new THREE.PointsMaterial({ size: 2, sizeAttenuation: false });
 
+let lowPerformanceMode = false;   // read by onWindowResize's initial call below — declared before it (TDZ)
 let resizeTimeout;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);               // debounce
@@ -9105,7 +9109,6 @@ let currPos;
 let lastFrameTime = 0;
 let smoothedFps   = 60;
 let lastCameraX   = 0, lastCameraY = 0, lastCameraZ = 0;
-let lowPerformanceMode = false;
 // The pixel-ratio switch's dwell (the owner's 2026-10 stutter report): the
 // smoothed rate must sit out of band for PR_DWELL_MS before a switch, and
 // switches are at least PR_MIN_GAP_MS apart — every switch reallocates the
@@ -11822,7 +11825,7 @@ function wgcRenderPlanet(planetKey) {
         })()}
       </div>
       <div class="wgc-planet-method">
-        Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury, Mars, and Saturn have reliably resolvable trends from observation.</span>' : ''}
+        Baseline: ${Math.round(baselineYr)} yr, ${nCycles.toFixed(1)}\u00D7 dominant osc period (${oscPeriod} yr) \u2014 ${reliable ? 'raw OLS is reliable' : '\u26a0 too few cycles for raw OLS \u2014 use sin+lin'}${undeterminedTrend ? '<br><span style="color:#cb4b16;">\u26a0 Long-term trend <b>cannot be determined</b> from 1900\u20132026 observations \u2014 short-baseline trend flips sign across sub-windows (1800\u20131900, 1900\u20132026, 2026\u20132100). Only Mercury and Mars have reliably resolvable trends from observation.</span>' : ''}
       </div>
       ${wgcRenderChart('Longitude of perihelion vs. Time (\u03D6 = \u03A9 + \u03C9)', d.yrArr, d.piArr, '#268bd2', `Baseline: ${d.yrArr[0]}\u2013${Math.round(d.yrArr[d.yrArr.length-1])} \u2014 <span style="color:#ff5252">red line = model (own N-body)</span>`, model ? model.values : null, undeterminedTrend)}
       <div class="wgc-frame-note">
@@ -12006,7 +12009,7 @@ function wgcRenderPaperSVG(planetKey, opts) {
   const legend = [{ name: numCharts > 1 ? 'Observed ϖ = Ω + ω (WebGeoCalc, ecliptic)' : 'Observed (WebGeoCalc, ecliptic)', color: COL_OBS, bold: true }];
   if (showNode) legend.push({ name: 'Observed Ω', color: COL_NODE });
   if (showArg) legend.push({ name: 'Observed ω', color: COL_ARG });
-  if (model) legend.push({ name: 'Model (ecliptic-frame rate + equatorial projection)', color: COL_MODEL });
+  if (model) legend.push({ name: 'Model (the N-body chain’s ϖ, ECLIPJ2000)', color: COL_MODEL });
   legend.push({ name: 'Linear trend (OLS)', color: '#888', dash: '4,3' });
   const head = chartExportHeader(`Perihelion of Planets Verification — ${planetName}, JPL WebGeoCalc 1900–2026`, legend, W);
   const HEADER_H = head.bottom + 8;
@@ -12130,7 +12133,7 @@ function _gcEvent(path, title) {
   const gc = window.goatcounter;
   if (gc && typeof gc.count === 'function') gc.count({ path, title, event: true });
 }
-const _GC_PANEL_TITLES = { wgc: 'Perihelion of Planets Verification', essrt: 'Framework Verification', cfm: 'Earth Climate Analysis', lcr: 'Earth dLOD/dt Analysis' };
+const _GC_PANEL_TITLES = { wgc: 'Perihelion of Planets Verification', essrt: 'Earth–Moon Genesis Analysis', cfm: 'Earth Climate Analysis', lcr: 'Earth dLOD/dt Analysis' };
 function _openPanelOnce(key, build) {
   if (_panelOpening.has(key)) return _panelOpening.get(key);
   _gcEvent('tools/' + key, _GC_PANEL_TITLES[key] || key);
@@ -13889,8 +13892,8 @@ function essrtRenderChart(qtyKey, rangeKey) {
 
   const frame = `<rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#0a0d11" stroke="#5a5f68" stroke-width="0.8"/>`;
 
-  // Extrapolation zone — anything FUTURE of J2000 (t_cal > 0). The entire
-  // future is a projection of the polynomial past-fit; values remain physically
+  // Extrapolation zone — anything FUTURE of J2000 (t_cal > 0). Forward of J2000
+  // the distance history holds the LLR rate; values remain physically
   // reasonable but become increasingly uncertain at multi-100-Myr scales.
   // Subtle grey wash so it reads as "this region is projected" without competing
   // with the data curve. Hidden on ranges that end at J2000 (Phanerozoic).
@@ -13971,12 +13974,12 @@ function essrtRenderChart(qtyKey, rangeKey) {
   // Driver note at bottom — only what applies to THIS panel, like WebGeoCalc's
   // "Frame note:" block. Concise per-quantity description.
   const driverText = {
-    lod:        '<strong>Driver 1</strong> — Earth-Moon tidal recession (Layer-2 angular-momentum conservation, Farhat 2022 polynomial fit).',
+    lod:        '<strong>Driver 1</strong> — Earth-Moon tidal recession (angular-momentum conservation on the cited Farhat 2022 distance history).',
     year:       '<strong>Drivers 1+2</strong> — days/year = (sidereal year_s) / LOD. Driver 2 sets year-in-seconds (Kepler dT/T = −2 dM/M); Driver 1 sets day-in-seconds (conservation on the cited Farhat 2022 distance history). Wu et al. days/year are derived from their LOD: at 400 Ma → ~403 days/yr (Wells 1963 coral bands ~400).',
     axial:      '<strong>Driver 1</strong> — the composed lunisolar precession period: Earth’s spin (Layer-2 angular momentum, Farhat 2022 recession) carrying the solar and lunar torques, the lunar torque growing on the Moon’s distance; anchored on the IAU 2006 general precession at J2000 (25,771.6 yr).',
     obliqCycle: '<strong>Driver 1</strong> — the obliquity beat 2π/(ψ̇ᵢₙ − |s₃|): the spin axis’s inertial precession rate (the composed rate × the hybrid’s self-anchor factor) against the orbit’s dominant nodal mode (s₃ at its dynamical value under the solar-mass history).',
     au:         '<strong>Driver 2</strong> — solar mass loss: a × M = const (Kepler dT/T = −2 dM/M, ~9.3×10⁻¹⁴ /yr).',
-    moon:       '<strong>Driver 1</strong> — tidal recession via the Farhat 2022 LSQ polynomial fit a(t)/a_now = 1 + α₁t + α₃t³ + α₄t⁴.',
+    moon:       '<strong>Driver 1</strong> — tidal recession on the cited Farhat 2022 (AstroGeo22) distance history, an input, not a fit; forward of J2000 the LLR rate is held.',
   }[qtyKey] || 'Drivers 1+2';
   const wuLine = (spec.hasWu && rangeKey === 'phanero')
     ? ' <strong style="color:#ff9a3c">Orange markers</strong>: <a href="https://www.science.org/doi/10.1126/sciadv.ado2412" target="_blank" rel="noopener" style="color:#ff9a3c">Wu et al. 2024</a> cyclostratigraphy anchors ±2σ.'
@@ -15726,6 +15729,7 @@ function yearToJDApprox(year) { return j2000JD + (year - 2000) * DAYS_PER_JULIAN
 function eccMeeus(year) { return _pubCurves().eccMeeus(year); }
 function obliquityChapront2002(year) { return _pubCurves().obliquityChapront2002(year); }
 function perihelionMeeusEarth(year) { return _pubCurves().perihelionMeeusEarth(year); }
+function perihelionRateMeeusJ2000FrameDegPerCy(year) { return _pubCurves().perihelionRateMeeusJ2000FrameDegPerCy(year); }
 /** The anomalistic year of date (SI days), derived as the Tropical panel
  *  derives Vondrák: Chapront's sidereal year with the Table 31.B sidereal
  *  perihelion rate — T_anom = 360 / (360/T_sid − ϖ̇), ϖ̇ per day. */
@@ -16702,7 +16706,7 @@ const VFP_CATEGORIES = [
         fn: year => { const v = _stephensonDtPoly ? stephensonDeltaT(year, _stephensonDtPoly) : null; return v === null ? NaN : v; },
         sourceUrl: 'https://doi.org/10.1098/rspa.2016.0404' },
     ],
-    reading: 'The model’s calibrated long-term trend: the J2000 anchor (~54.6 s, the joint fit) plus the integrated day-length history with the ecliptic-precession term and the harmonic cycle stack, fitted against the Espenak history 1650–2017 (rms ≈ 13.4 s). The anchor sits ~9 s below the IERS instantaneous 63.6 s by design — the industrial-era rotation acceleration no cyclic model captures. Espenak & Meeus is the NASA canon’s eclipse-timing polynomial; Stephenson, Morrison & Hohenkerk (2016) is the observational spline from −720 to 2016 the stack was fit against; the ~15 s gap at the 1900 dip is the ~50-year structure the stack’s ≥ 700-yr cycles cannot resolve. On the two deep windows the trend is read in years: the parabola of the secular spin-down, with no observational reference beyond the canon.',
+    reading: 'The model’s calibrated long-term trend: the J2000 anchor (the joint fit’s deltaTStart) plus the integrated day-length history with the ecliptic-precession term and the harmonic cycle stack, fitted against the Espenak history 1650–2017. The anchor sits several seconds below the IERS instantaneous 63.6 s by design — the industrial-era rotation acceleration no cyclic model captures. Espenak & Meeus is the NASA canon’s eclipse-timing polynomial; Stephenson, Morrison & Hohenkerk (2016) is the observational spline from −720 to 2016 the stack was fit against; the ~15 s gap at the 1900 dip is the ~50-year structure the stack’s ≥ 700-yr cycles cannot resolve. On the two deep windows the trend is read in years: the parabola of the secular spin-down, with no observational reference beyond the canon.',
   },
   {
     // ── Inclination of all planets (owner spec 2026-09-15) — the LAST
@@ -21036,7 +21040,7 @@ function setupGUI() {
     versionEl.textContent = 'ESSRT ' + MODEL_VERSION;
     versionEl.title =
       MODEL_VERSION + ' highlights:\n' +
-      '• The restatement (two engines + two expansions): the Earth-family core (spin, tides, H(t), eclipses, LOD, deep-time climate) stands validated; planetary orbits follow standard secular dynamics, re-measured with the model’s own N-body engine.\n' +
+      '• The restatement (two engines + two expansions): the Earth-family core (spin, tides, the precession clock, eclipses, LOD, deep-time climate) stands validated; planetary orbits follow standard secular dynamics, re-measured with the model’s own N-body engine.\n' +
       '• The integer-ratio structural claims for planetary orbits retire to typed observations; the six relations remain documented with per-relation statuses (one exact epoch-local law, one identity, two open predictions, two typed observations).\n' +
       '• The solar-mass-loss expansion tier joins the tidal tier: all secular frequencies scale with solar mass, giving the first rock-based weighing of the ancient Sun (μ(2.48 Ga) = 1.00 ± 0.07).\n' +
       '• The physics numbers are unchanged — every Earth-family gate bit-identical to v12.0.';
@@ -21685,9 +21689,7 @@ function setupGUI() {
     ['moonElongation', 'Moon'], ['mercuryElongation', 'Mercury'],
     ['venusElongation', 'Venus'], ['marsElongation', 'Mars'],
     ['jupiterElongation', 'Jupiter'], ['saturnElongation', 'Saturn'],
-    ['uranusElongation', 'Uranus'], ['neptuneElongation', 'Neptune'],
-    ['plutoElongation', 'Pluto'], ['halleysElongation', "Halley's"],
-    ['erosElongation', 'Eros']
+    ['uranusElongation', 'Uranus'], ['neptuneElongation', 'Neptune']
   ];
   // (elongGaugeEls hoisted — see declaration before GUI block)
   elongKeys.forEach(([key, label]) => {
@@ -22261,7 +22263,7 @@ function setupGUI() {
   }), 'Physical (observable) length of one solar day = framework\'s full prediction (Tidal + GIA + all cycles). At J2000 \u2248 86400.0018 s. Broken down in the Solar Day decomposition sub-folder below.');
   addTooltip(daysFolder.addBinding(predictions, 'siderealDayReal', {
     label: 'Sidereal Day (s)', readonly: true, format: fmt6
-  }), 'One rotation relative to the MOVING vernal equinox — shorter than the solar day by ~235.9 s: Solar Day × Y/(Y + 1), Y the tropical year of date in days, on the REAL solar day shown above (the same day the Formula Verification panel plots). The IAU constant 86164.090531 s rests on the nominal 86,400-s day, so this row sits above it by the real day\'s excess over 86,400 s (~1.7 ms today).');
+  }), 'One rotation relative to the MOVING vernal equinox — shorter than the solar day by ~235.9 s: Solar Day × Y/(Y + 1), Y the tropical year of date in days, on the REAL solar day shown above (the same day the Framework Verification panel plots). The IAU constant 86164.090531 s rests on the nominal 86,400-s day, so this row sits above it by the real day\'s excess over 86,400 s (~1.7 ms today).');
   addTooltip(daysFolder.addBinding(predictions, 'stellarDayReal', {
     label: 'Stellar Day (s)', readonly: true, format: fmt6
   }), 'One rotation relative to the fixed stars. Longer than a sidereal day by ~8.37 ms — the equinox\'s daily regression projected onto the equator, sidereal · cos ε / (T_p · (Y + 1)), T_p the composed precession period of date. On the real solar day like the row above; the IAU 86164.098904 s rests on the 86,400-s day.');
@@ -22270,7 +22272,7 @@ function setupGUI() {
   const dtFolder = daysFolder.addFolder({ title: '\u0394T (TT \u2212 UT1)' });
   addTooltip(dtFolder.addBinding(predictions, 'deltaTCorrectionSeconds', {
     label: '\u0394T trend (s)', readonly: true, format: v => v.toFixed(2)
-  }), 'Model-calibrated long-term TREND of \u0394T (TT \u2212 UT1) in seconds. Reads \u2248 54.6 s at J2000 \u2014 the smooth trend value passing through 2000, distinct from the IERS instantaneous observation of ~63.6 s (the ~9-s gap is industrial-era Earth-rotation acceleration our cyclic model does not attempt to capture). Formula: deltaTStart + Simpson integral of Layer 2 + the ecliptic-precession LOD term + 4-flag stack + Core-mantle swing (jointly fit under the hard USNO closure; Espenak history 1650-2017 RMS \u2248 13.4 s). Used by Meeus geometry, eclipse timing, and the live accumulator. The pure-physics-only (no cycles) variant is available on the Framework Verification chart at Reports \u2192 Days & Years \u2192 \u0394T.');
+  }), 'Model-calibrated long-term TREND of \u0394T (TT \u2212 UT1) in seconds. Reads the joint fit\u2019s deltaTStart at J2000 \u2014 the smooth trend value passing through 2000, distinct from the IERS instantaneous observation of ~63.6 s (the gap of several seconds is industrial-era Earth-rotation acceleration our cyclic model does not attempt to capture). Formula: deltaTStart + Simpson integral of Layer 2 + the ecliptic-precession LOD term + 4-flag stack + Core-mantle swing (jointly fit under the hard USNO closure; Espenak history 1650-2017 RMS \u2248 13.4 s). Used by Meeus geometry, eclipse timing, and the live accumulator. The pure-physics-only (no cycles) variant is available on the Framework Verification chart at Reports \u2192 Days & Years \u2192 \u0394T.');
   addTooltip(dtFolder.addBinding(predictions, 'predictedDeltatPerYear', {
     label: 'Rate (s/yr)', readonly: true, format: v => v.toFixed(4)
   }), 'Current d(\u0394T)/dt = (LOD_real \u2212 86400) \u00d7 solarYearDays. LOD_real is Layer 4 = o.lodKinematic + h5Correction + dtCycleLodCorrectionSum(year), i.e. the same value shown as Solar Day = REAL. Positive = clocks running slower than TT (Earth day > 86400 SI s).');
@@ -22291,7 +22293,7 @@ function setupGUI() {
   }), 'Kinematic base + the ecliptic term + the 4-flag harmonic stack ONLY (Bond/Hallstatt/Jose5/Jose4 cyclic \u03b4LOD corrections) \u2014 the Core-mantle swing is EXCLUDED here and added in the next row, so each layer is honest. Baseline is o.lodKinematic (IAU-anchored), not the physics Layer 2.');
   addTooltip(astroSolarDayFolder.addBinding(predictions, 'lodReal', {
     label: '+ Core-mantle swing (REAL)', readonly: true, format: fmt6
-  }), 'Layer 4 \u2014 the framework\'s full shipped solar day: Layer 3 + the Core-mantle swing episode (Resonator driver, fitted jointly with the flags). Physical length of one solar day. At J2000 = 86400.0018 s (closes the USNO Earth-orientation anchor by construction \u2014 the joint closure constrains this TOTAL; the fit\u2019s measured-day-basis target is 86400.0021, the 0.32 ms spread is the two-J2000-day-bases difference). Same value as the top-level "Solar Day (s)" row. Equals Layer 3 only when the resonator is toggled off (research state).');
+  }), 'Layer 4 \u2014 the framework\'s full shipped solar day: Layer 3 + the Core-mantle swing episode (Resonator driver, fitted jointly with the flags). Physical length of one solar day. At J2000 it closes on the USNO Earth-orientation anchor by construction (the joint fit constrains this TOTAL; the shipped value is the registry\u2019s lodRealPhysical). Same value as the top-level "Solar Day (s)" row. Equals Layer 3 only with the resonator term switched off in the code (no UI toggle).');
 
   // dLOD/dt driver decomposition sub-folder \u2014 tidal + GIA + all-cycles stack producing observed LOD growth.
   // Collapsed by default \u2014 the numbers are diagnostic rather than everyday.
@@ -22311,42 +22313,42 @@ function setupGUI() {
   }), 'Secular baseline = Tidal + GIA. At J2000: +1.77 ms/century, matching IERS observation of +1.75 ms/century within 1%. No parameters fitted to the observed rate \u2014 both channels come from independent literature anchors (LLR + Cox & Chao). The ~17% cancellation between Tidal and GIA at J2000 is what makes the observed Earth-rotation slowdown smaller than the pure-tidal rate.');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtResonator_msCy', {
     label: 'Core-mantle swing', readonly: true, format: fmt3msCy
-  }), 'Resonator driver (4th physical channel): the Core-mantle swing episode — a 2-kick damped oscillation of the core\'s eigenmode (T₀ ≈ 3,916 yr, Q = 1.8, axiMC range) driven through quadratic coupling by the stack cycles\' beat structure (locked bond−hallstatt difference tone). JOINT world: fitted with the 4 flags in one equality-constrained solve; the USNO closure is exact on the total (flags + resonator). kick2 ≈ 0 — the medieval shutdown is carried by flag interference. Default ON; the Eclipse-buttons toggle switches it off for research (breaks the anchors). See docs/104.');
+  }), 'Resonator driver (4th physical channel): the Core-mantle swing episode — a 2-kick damped oscillation of the core\'s eigenmode (T₀ ≈ 3,916 yr, Q = 1.8, axiMC range) driven through quadratic coupling by the stack cycles\' beat structure (locked bond−hallstatt difference tone). JOINT world: fitted with the 4 flags in one equality-constrained solve; the USNO closure is exact on the total (flags + resonator). kick2 ≈ 0 — the medieval shutdown is carried by flag interference. Default ON; switching it off in the code (RESONATOR_DT_CORRECTION_ENABLED, no UI toggle) breaks the anchors. See docs/104.');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtNetL3_msCy', {
     label: 'Tidal + GIA + all cycles', readonly: true, format: fmt3msCy
   }), 'Framework\'s full prediction = Tidal + GIA + All cycles. The full observable dLOD/dt including millennial modulation. Diverges from the Tidal + GIA baseline by the All cycles rate on ~1-2 kyr timescales. Above the baseline at some epochs (contributing to cooling excursions like the Little Ice Age); below at others (contributing to warm anomalies like the Medieval Warm Period).');
   addTooltip(dLodDtFolder.addBinding(predictions, 'dLodDtNetL4_msCy', {
     label: '+ Core-mantle swing', readonly: true, format: fmt3msCy
-  }), 'Layer 4 net = Tidal + GIA + All cycles + Core-mantle swing (Resonator) — the complete 4-driver decomposition and the shipped default since the joint-world flip. Equals Layer 3 only when the resonator is toggled off (research state).');
+  }), 'Layer 4 net = Tidal + GIA + All cycles + Core-mantle swing (Resonator) — the complete 4-driver decomposition and the shipped default since the joint-world flip. Equals Layer 3 only with the resonator term switched off in the code (no UI toggle).');
 
   const yearsFolder = astroFolder.addFolder({ title: 'Solar Year' });
   const fmt8 = v => v.toFixed(8);
   const fmt2sec = v => v.toFixed(2);
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Mean tropical (solar) year OF DATE in SI seconds — the one-source movement’s analytic mean (equinox rate + λ̇ correction; the Tropical Year chart’s line). ONE FAMILY with the sidereal/anomalistic rows, so the precession beats recompute exactly. The scene-MEASURED cardinal mean lives in the Days & Years report (agrees to sub-0.5 s). Before the series has loaded: frozen-clock days × o.lodKinematic (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
+  }), 'Mean tropical (solar) year OF DATE in SI seconds — the one-source movement’s analytic mean (equinox rate + λ̇ correction; the Tropical Year chart’s line). ONE FAMILY with the sidereal/anomalistic rows, so the precession beats recompute exactly. The scene-MEASURED cardinal mean lives in the Days & Years report (agrees to sub-0.5 s). Before the series has loaded the row reads the mode-table fallback.');
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearDays', {
     label: 'Model (days)', readonly: true, format: fmt8
-  }), 'Mean tropical (solar) year OF DATE in SI days (seconds / 86400). Before the series has loaded: the frozen Step 6d Fourier law (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
+  }), 'Mean tropical (solar) year OF DATE in SI days (seconds / 86400). Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
 
   const siderealYrFolder = astroFolder.addFolder({ title: 'Sidereal Year' });
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Sidereal year OF DATE in SI seconds — the one-source λ̇ channel over the mass-loss law (the same evaluator the Sidereal Year chart and the API serve; = the IAU 31,558,149.7635 s at J2000 by anchor). Before the series has loaded: frozen-clock days × o.lodKinematic (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
+  }), 'Sidereal year OF DATE in SI seconds — the one-source λ̇ channel over the mass-loss law (the same evaluator the Sidereal Year chart and the API serve; = the IAU 31,558,149.7635 s at J2000 by anchor). Before the series has loaded the row reads the mode-table fallback.');
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearDays', {
     label: 'Model (days)', readonly: true, format: fmt8
-  }), 'Sidereal year OF DATE in SI days (seconds / 86400). Before the series has loaded: the frozen Step 6d Fourier law (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
+  }), 'Sidereal year OF DATE in SI days (seconds / 86400). Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
 
   const anomalisticFolder = astroFolder.addFolder({ title: 'Anomalistic Year' });
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Anomalistic year OF DATE in SI seconds (perihelion to perihelion) — the one-source cardinal structure the API serves: the engine’s own apsidal rate ϖ̇ + the λ̇ correction. Before the series has loaded: the frozen Fourier fit × o.lodKinematic (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
+  }), 'Anomalistic year OF DATE in SI seconds (perihelion to perihelion) — the one-source cardinal structure the API serves: the engine’s own apsidal rate ϖ̇ + the λ̇ correction. Before the series has loaded this row is NaN.');
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearDays', {
     label: 'Model (days)', readonly: true, format: v => v.toFixed(9)
-  }), 'Anomalistic year OF DATE in SI days (seconds / 86400). Before the series has loaded: the frozen Step 6d Fourier law (the fallback; the ?hybridSpin=0 opt-out is gone — plan 06 D5).');
+  }), 'Anomalistic year OF DATE in SI days (seconds / 86400). Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
 
   const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points', expanded: false });
-  addFolderTooltip(cpFolder, 'Predicted dates of solstices and equinoxes from the cardinal-point harmonic combs (23 terms per point, bounded Fourier bases on the frozen era clock). Fitted and gated over ±270 kyr (0.26–0.29 min). See doc 14.');
+  addFolderTooltip(cpFolder, 'Predicted instants of the solstices and equinoxes from the one-source movement — the certified Sun’s apparent crossings on the composed precession clock and the N-body series’ elements of date; the cardinal-point gates read them against JPL Horizons (−3000 … +2000). See doc 11.');
   for (const [cp, label] of [['VE', 'Vernal Equinox'], ['SS', 'Summer Solstice'], ['AE', 'Autumnal Equinox'], ['WS', 'Winter Solstice']]) {
     const sub = cpFolder.addFolder({ title: label });
     addTooltip(sub.addBinding(predictions, 'cp' + cp + 'Date', {
@@ -22364,7 +22366,7 @@ function setupGUI() {
   }
   addTooltip(cpFolder.addBinding(predictions, 'cpSolsticeObliquity', {
     label: 'Observed Obliquity (\u00B0)', readonly: true, format: v => v.toFixed(6)
-  }), 'Obliquity as measured at the summer solstice (max declination). 12-harmonic formula, RMSE 0.20\". More accurate than the geometric obliquity by 935\u00d7 because it includes equation-of-center corrections.');
+  }), 'Obliquity as measured at the summer solstice (max declination) \u2014 the published obliquity of date, the hybrid integration on the banked N-body series, the same value the frame renders.');
 
   const precessionFolder = astroFolder.addFolder({ title: 'Precession Periods' });
   const fmt2 = v => v.toFixed(2);
@@ -22863,7 +22865,7 @@ function setupGUI() {
   // ── Tools ──
   const toolsFolder = gui.addFolder({ title: 'Tools', expanded: false });
   toolsFolder.element.dataset.category = 'tools';
-  addFolderTooltip(toolsFolder, 'Two groups: Verification — the model against references (published formulas, JPL observations, the standard theory’s ghost bodies) — and Analysis — the model’s own predictions (one planet’s orbit of date, the deep-time evolution, Earth’s climate, the day-length rate); plus the console diagnostics.');
+  addFolderTooltip(toolsFolder, 'Two groups: Verification — the model against references (published formulas, JPL observations, the standard theory’s ghost bodies) — and Analysis — the model’s own predictions (one planet’s orbit of date, the deep-time evolution, Earth’s climate, the day-length rate).');
 
   // The Invariable Plane Inspector, Eccentricity Balance Scale and Solar
   // System Resonance Cycle panels were removed with the Fibonacci-law
@@ -23113,7 +23115,8 @@ function render(now) {
   // the last one; the restore goes to the CAPPED start-up ratio
   // (getOptimizedPixelRatio, ≤ 2), not the raw device ratio — on a ratio-3
   // display the raw restore left the scene heavier than it started.
-  const outOfBand = lowPerformanceMode ? smoothedFps > 40 : smoothedFps < 30;
+  // ?dpr= pins the ratio for an A/B reading: no adaptive switch while it is set.
+  const outOfBand = !URL_FLAGS.has('dpr') && (lowPerformanceMode ? smoothedFps > 40 : smoothedFps < 30);
   if (!outOfBand) _prOutOfBandSince = 0;
   else if (!_prOutOfBandSince) _prOutOfBandSince = now;
   else if (now - _prOutOfBandSince >= PR_DWELL_MS && now - _prLastSwitchMs >= PR_MIN_GAP_MS) {
@@ -24636,7 +24639,7 @@ async function runYearAnalysisExport(years) {
     // its EPOCH-specific year days (o.solarYearDays), not for these means. Mixing
     // the two pushes the sidereal row 0.12 s off IAU.
     ['0. MEAN YEAR LENGTHS — the model at J2000', 'Value'],
-    [`The model's mean year lengths at J2000, for H = ${_j2kH.toFixed(0)}. These are FIXED:`],
+    [`The model's mean year lengths at J2000. These are FIXED:`],
     ['they do not move with the analysis period, so a run over any epoch reports the'],
     ['same J2000 means here. The MEASURED values for the period requested are in'],
     ['sections 1-3 and will differ slightly — the two are not the same quantity.'],
@@ -26169,7 +26172,7 @@ async function runSolarDayReport(year, onProgress) {
       summaryRows.push(['A ratio of 1.000000000 confirms the scene rotates at exactly one solar']);
       summaryRows.push(['day per JD over a full year. It does NOT confirm the length of that day.']);
       summaryRows.push(['The scene carries no ΔT (see updateEarthForEpoch); the LOD value comes']);
-      summaryRows.push(['from the ΔT/H-5 chain and is asserted here, not measured.']);
+      summaryRows.push(['from the deep-time chain (the LOD stack) and is asserted here, not measured.']);
     }
     summaryRows.push([]);
     summaryRows.push(['WHAT IS MEASURED HERE — AND WHAT IS NOT']);
@@ -27161,7 +27164,10 @@ async function runRATest() {
     const neptuneDec    = 90-(neptune.dec * 180 / Math.PI);
     const neptuneDistE  = neptune.distAU;
     const neptuneDistS  = neptune.sunDistAU;
-        const modelYear = Math.floor(jdToModelYear(jd));
+        // The decimal year, not its floor: the perihelion-rate stencil below reads this
+        // column as its time axis, and floored years made neighbouring rows share a
+        // year at sub-year steps (division by zero → Infinity in every rate cell).
+        const modelYear = jdToModelYear(jd);
         earthRows.push([jd, date, time, modelYear, earthWobbRA.toFixed(6), earthWobbDec.toFixed(6), earthWobbDistE.toFixed(8), earthWobbDistS.toFixed(8), earthPerRA.toFixed(6), earthPerDec.toFixed(6), earthPerDistE.toFixed(8), earthPerDistS.toFixed(8)]);
     
 //    periRows.push([jd, date, time, mercuryPer.toFixed(6), venusPer.toFixed(6), earthPerRA.toFixed(6), marsPer.toFixed(6), jupiterPer.toFixed(6), saturnPer.toFixed(6), uranusPer.toFixed(6), neptunePer.toFixed(6), plutoPer.toFixed(6), halleysPer.toFixed(6), erosPer.toFixed(6)]);
@@ -27193,7 +27199,7 @@ async function runRATest() {
    * rebuild each row with the rate column appended to its planet's block.
    * Collection layout: [0-3]=common, [4-10]=Mercury, [11-17]=Venus,
    *   [18-21]=Earth, [22-28]=Mars, [29-35]=Jupiter, [36-42]=Saturn,
-   *   [43-49]=Uranus, [50-56]=Neptune, [57]=EARTH Eccentricity,
+   *   [43-49]=Uranus, [50-56]=Neptune, [57]=Earth perihelion-marker distance (≈ a·e, scene units),
    *   [58]=EARTH OBLIQUITY */
   {
     // colIdx = the '* Perihelion (Ecliptic)' column in the collection layout
@@ -27262,7 +27268,7 @@ async function runRATest() {
       'JD', 'Date', 'Time', 'Model Year',
       'Mercury Perihelion RA', 'Mercury Asc Node', 'Mercury Arg Peri', 'Mercury Ecliptic Inclination', 'Mercury InvPlane Inclination', 'Mercury Asc Node InvPlane (S&S origin)', '* Mercury Perihelion (Ecliptic)', 'Mercury Perihelion rate (arcsec / century)',
       'Venus Perihelion RA', 'Venus Asc Node', 'Venus Arg Peri', 'Venus Ecliptic Inclination', 'Venus InvPlane Inclination', 'Venus Asc Node InvPlane (S&S origin)', '* Venus Perihelion (Ecliptic)', 'Venus Perihelion rate (arcsec / century)',
-      'EARTH Eccentricity', 'EARTH OBLIQUITY (deg)', 'Earth Perihelion (Ecliptic)', 'Earth Perihelion RA', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (S&S origin)', 'Earth Perihelion rate (arcsec / century)',
+      'Earth Perihelion-marker distance (scene, ≈ a·e)', 'EARTH OBLIQUITY (deg)', 'Earth Perihelion (Ecliptic)', 'Earth Perihelion RA', 'Earth InvPlane Inclination', 'Earth Asc Node InvPlane (S&S origin)', 'Earth Perihelion rate (arcsec / century)',
       'Mars Perihelion RA', 'Mars Asc Node', 'Mars Arg Peri', 'Mars Ecliptic Inclination', 'Mars InvPlane Inclination', 'Mars Asc Node InvPlane (S&S origin)', '* Mars Perihelion (Ecliptic)', 'Mars Perihelion rate (arcsec / century)',
       'Jupiter Perihelion RA', 'Jupiter Asc Node', 'Jupiter Arg Peri', 'Jupiter Ecliptic Inclination', 'Jupiter InvPlane Inclination', 'Jupiter Asc Node InvPlane (S&S origin)', '* Jupiter Perihelion (Ecliptic)', 'Jupiter Perihelion rate (arcsec / century)',
       'Saturn Perihelion RA', 'Saturn Asc Node', 'Saturn Arg Peri', 'Saturn Ecliptic Inclination', 'Saturn InvPlane Inclination', 'Saturn Asc Node InvPlane (S&S origin)', '* Saturn Perihelion (Ecliptic)', 'Saturn Perihelion rate (arcsec / century)',
@@ -28867,11 +28873,11 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). It rides the model's own N-body series inside ±10 Myr, the mode-tail beyond (ONE SOURCE — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18); before the series has loaded, the framework's device law is the fallback (the ?hybridSpin=0 opt-out is gone — plan 06 D5). The obliquity oscillates with the DERIVED beat 2π/(|ψ̇| − |s₃|) ≈ 40.6 kyr — the "Obliquity cycle (derived beat)" row in the CYCLES tab.`],
+       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). It rides the model's own N-body series inside ±10 Myr, the mode-tail beyond (ONE SOURCE — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18); before the series has loaded, the deep mode table is the fallback. The obliquity oscillates with the DERIVED beat 2π/(|ψ̇| − |s₃|) ≈ 40.6 kyr — the "Obliquity cycle (derived beat)" row in the CYCLES tab.`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _chainElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
-       hover : [`The model's own N-body eccentricity of date — the published Earth element, the SECULAR convention (J2000: 0.016702, ≡ JPL's osculating seed state and La2004). The IAU/Standish mean-elements value is 0.016710 (the Calibration Inputs row) and the eclipse Sun's derived mean element 0.016708 — conventions, not discrepancies. This row IS the scene's rendered e (the banked engine series inside ±10 Myr, the mode-tail beyond — ONE SOURCE: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). Under ?hybridSpin=0: the era chain of date (the framework's eccentricity law e(t) = base′·(1 + cos θ/2) that once rode the scene's orbit machinery is deleted — plan 09 step 6 the law, plan 11 step 2 its base′; the scene offset is the series on every path).`],
+       hover : [`The model's own N-body eccentricity of date — the published Earth element, the SECULAR convention (J2000: 0.016702, ≡ JPL's osculating seed state and La2004). The IAU/Standish mean-elements value is 0.016710 (the Calibration Inputs row) and the eclipse Sun's derived mean element 0.016708 — conventions, not discrepancies. This row IS the scene's rendered e (the banked engine series inside ±10 Myr, the mode-tail beyond — ONE SOURCE: the geometric offset, the equation of center and this readout share one value; series-vs-chain 1e-5 in 1600–2400). The scene offset is the series on every path.`],
        tpLink: true, observed: true},
       {label : () => `Ecliptic Inclination (i)`,
        value : [ { v: () => 0, dec:6, sep:',' },{ small: 'degrees (°)' }],
@@ -29160,7 +29166,7 @@ const planetStats = {
      null,
       {label : () => `Solar year (SI seconds)`,
        value : [ { small: () => meanlengthofday*meansolaryearlengthinDays },{ v: () => predictions.solarYearSeconds, dec:6, sep:',' }],
-       hover : [`Left = mean solar year at current epoch (in SI seconds). Right = the ONE published family (plan 06 Phase 3 S2): the one-source tropical year of date, SI seconds — the same value as the Predictions panel, the report's Physics column and the API; under ?hybridSpin=0 the scene-measured kinematic year.`]},
+       hover : [`Left = mean solar year at current epoch (in SI seconds). Right = the ONE published family (plan 06 Phase 3 S2): the one-source tropical year of date, SI seconds — the same value as the Predictions panel, the report's Physics column and the API — the one family on every surface.`]},
       {label : () => `Solar year (days)`,
        value : [ { small: () => meansolaryearlengthinDays },{ v: () => predictions.solarYearDays ?? o.solarYearDays, dec:11, sep:',' }],
        hover : [`Left = mean tropical year at current epoch ≈ ~365.2422 days. Right = live current. Basis for the calendar year and leap year cycle. Days in the declared scene basis (doc 11 §Day bases).`]},
@@ -29756,7 +29762,7 @@ const planetStats = {
        hover : [`Whether the SSB currently lies inside the Sun's body (R☉ = ${fmtNum(diameters.sunDiameter/2, 0, ',')} km). Famously sometimes outside — e.g., when Jupiter and Saturn align around 1990, 2000-2002, 2017-2018.`]},
       {label : () => `Dominant planet`,
        value : [ { v: () => computeSunSSBOffset(o.currentYear).dominantPlanet }],
-       hover : [`Planet contributing the largest fraction of the SSB displacement at this moment. Jupiter dominates ~99% of the time; Saturn can occasionally rival it during specific Jupiter-Saturn configurations.`]},
+       hover : [`Planet contributing the largest fraction of the SSB displacement at this moment. Jupiter at every epoch — the shares are the magnitudes |a·M/M☉|, which barely move.`]},
       {label : () => `Dominant share`,
        value : [ { v: () => computeSunSSBOffset(o.currentYear).dominantShare, dec:1, sep:',' },{ small: '%' }],
        hover : [`Percentage of total SSB-contribution magnitude coming from the dominant planet alone.`]},
@@ -30043,10 +30049,10 @@ const planetStats = {
       ..._planetSpinRows('mercury', 'Mercury', { cassini: true }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _chainSecularShape('mercury'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`|e| wobble period = the beat of the two largest secular modes of Mercury's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
+       hover : [`|e| wobble period = the beat of the two largest secular modes of Mercury's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §5). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
       {label : () => `Obliquity Cycle (observed)`,
        value : [ { v: () => 895000, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`Published observed obliquity-oscillation period for Mercury (~895,000 yr, Bills 2005). Shown as an observation — the retired integer-decomposition prediction is archived (doc 109 §9).`],
+       hover : [`Published observed obliquity-oscillation period for Mercury (~895,000 yr, Bills 2005). Shown as an observation — the retired integer-decomposition prediction is archived (doc 109 §23).`],
        observed: true},    null,
     null,
       { viz: 'perihelion-chart', planet: 'mercury' },
@@ -30347,7 +30353,7 @@ const planetStats = {
       ..._planetSpinRows('venus', 'Venus', { retrograde: true, note: 'Closure at J2000: the derived pole rate against the measured 44.58 ± 3.3 ″/yr (Margot et al. 2021, whose C/MR² was inferred from that rate).' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _chainSecularShape('venus'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`|e| wobble period = the beat of the two largest secular modes of Venus's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
+       hover : [`|e| wobble period = the beat of the two largest secular modes of Venus's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §5). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'venus' },
     null,
@@ -30657,10 +30663,10 @@ const planetStats = {
       ..._planetSpinRows('mars', 'Mars', { note: 'Closure at J2000: the derived pole rate against the measured −7.606 ″/yr (Konopliv 2016, whose C/MR² was inferred from that rate) — within 0.1 %.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _chainSecularShape('mars'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`|e| wobble period = the beat of the two largest secular modes of Mars's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
+       hover : [`|e| wobble period = the beat of the two largest secular modes of Mars's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §5). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},
       {label : () => `Obliquity Cycle (observed)`,
        value : [ { v: () => 124800, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`Published observed obliquity-oscillation period for Mars (~124,800 yr class). Shown as an observation — the retired integer-decomposition prediction is archived (doc 109 §9).`],
+       hover : [`Published observed obliquity-oscillation period for Mars (~124,800 yr class). Shown as an observation — the retired integer-decomposition prediction is archived (doc 109 §23).`],
        observed: true},    null,
     null,
       { viz: 'perihelion-chart', planet: 'mars' },
@@ -30970,7 +30976,7 @@ const planetStats = {
       ..._planetSpinRows('jupiter', 'Jupiter', { note: 'Prediction (gravity-constrained C/MR² 0.2639): α lands at the low end of Saillenfest et al. 2020\'s 2.64–3.17 ″/yr range; the spin is adjacent to the engine\'s own s7 line.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _chainSecularShape('jupiter'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`|e| wobble period = the beat of the two largest secular modes of Jupiter's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
+       hover : [`|e| wobble period = the beat of the two largest secular modes of Jupiter's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §5). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'jupiter' },
     null,
@@ -31280,7 +31286,7 @@ const planetStats = {
       ..._planetSpinRows('saturn', 'Saturn', { note: 'Prediction (gravity-constrained C/MR² 0.2181): the derived pole rate lands ~11 % above the engine\'s own s8 line (the Ward–Hamilton capture); inside the WH04 libration band 0.2257–0.2438 it lands within 7 %.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _chainSecularShape('saturn'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`|e| wobble period = the beat of the two largest secular modes of Saturn's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
+       hover : [`|e| wobble period = the beat of the two largest secular modes of Saturn's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §5). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'saturn' },
     null,
@@ -31590,7 +31596,7 @@ const planetStats = {
       ..._planetSpinRows('uranus', 'Uranus', { retrograde: true, note: 'C/MR² is the interior-model class (no measurement); the satellites\' quadrupole dominates J₂ and the period is of order 10⁸ yr.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _chainSecularShape('uranus'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`|e| wobble period = the beat of the two largest secular modes of Uranus's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
+       hover : [`|e| wobble period = the beat of the two largest secular modes of Uranus's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §5). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'uranus' },
     null,
@@ -31900,7 +31906,7 @@ const planetStats = {
       ..._planetSpinRows('neptune', 'Neptune', { note: 'Starts from the MEAN pole (the 688-yr Triton-forced nutation is not in the channel): the J2000 obliquity reads 27.85°, 0.5° below the instantaneous IAU 28.32°. C/MR² is the interior-model class; Triton\'s retrograde orbit enters the angular-momentum term with its sign.' }),
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => { const _s = _chainSecularShape('neptune'); return 1296000/Math.abs(_s.dom.arcsecPerYr - _s.sub.arcsecPerYr); }, dec:0, sep:',', infinity: 1e9 },{ small: 'years' }],
-       hover : [`|e| wobble period = the beat of the two largest secular modes of Neptune's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §11). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
+       hover : [`|e| wobble period = the beat of the two largest secular modes of Neptune's eccentricity vector (base mode × largest companion — the two rows below; the model's own N-body mode table, doc 109 §5). Replaces the retired law-loop beat of the device axial and ICRF periods.`]},    null,
     null,
       { viz: 'perihelion-chart', planet: 'neptune' },
     null,
@@ -32079,9 +32085,8 @@ function autoOpenGroups(stats, selName, threshold = 25) {
  *
  *  The Sun's offset from the Solar System Barycenter (SSB) is the vector sum
  *  of each planet's contribution: Δr_b = a_b · M_b / M_S (toward the planet).
- *  Each planet contributes 3·Δa (where Δa is the Sun-side correction from
- *  doc 24). Jupiter and Saturn dominate; outer planets matter a little; inner
- *  planets are negligible (<100 km vs Jupiter's ~743,000 km).
+ *  Jupiter and Saturn dominate; the ice giants matter a little; the inner
+ *  planets are a few hundred km against Jupiter's ~743,000 km.
  *
  *  This is NOT a gravity simulation — it's a mass-weighted vector sum over
  *  the chain's heliocentric positions of date. See doc 24 and the README's
@@ -32413,14 +32418,14 @@ function buildPerihelionChart(planetKey, currentYear) {
   const gridClr = 'rgba(255,255,255,0.08)', textClr = 'rgba(255,255,255,0.45)';
   const meanClr = 'rgba(255,255,255,0.20)';
   const inclClr = '#EFC04A', eclClr = 'rgba(86,180,233,0.7)', dotClr = '#fff';
-  const fmtYr = (y) => y < 0 ? fmtNum(-y, 0, ',') + ' BC' : fmtNum(y, 0, ',') + ' AD';
+  const fmtYr = (y) => y < 0 ? fmtNum(1 - y, 0, ',') + ' BC' : fmtNum(y, 0, ',') + ' AD';   // astronomical year −500 = 501 BC
   const midVal = incl.reduce((t, v) => t + v, 0) / N;
   const modeLbl = sMode.nearestLaskar ? sMode.nearestLaskar.mode : 's-mode';
 
   const curYear = Math.round(currentYear || startmodelYear);
   const simInWindow = curYear >= y0 && curYear <= y0 + T;
   const elNow = _chainChartElementsOfDate(planetKey, yrToJd(curYear));
-  const refYear = Math.round(startmodelYear);
+  const refYear = Math.floor(startmodelYear);   // the J2000 reference year (the epoch label is 2000.5)
   const elFix = _chainChartElementsOfDate(planetKey, yrToJd(refYear));
   const fixedInWindow = refYear >= y0 && refYear <= y0 + T;
   const cx = toX(curYear).toFixed(1), cy = toY(inclOf(elNow, curYear)).toFixed(1);
@@ -32471,7 +32476,7 @@ function buildPerihelionChart(planetKey, currentYear) {
   return `<div class="pl-prec-viz" style="grid-column:1/-1; padding:4px 2px 2px;">
     <svg viewBox="0 0 ${W} ${Ht}" width="100%" style="display:block;overflow:visible;">
       <!-- title -->
-      <g style="cursor:help"><title>The model's own N-body chain: inclination of date (invariable-plane and ecliptic), series-governed at deep time${planetKey === 'earth' ? ' — Earth on the one-source engine route (engine orbit normal vs the invariable plane), the same evaluator as the rows above and the inclination path' : ''}.\nWindow = one period of the planet's dominant nodal secular mode (${modeLbl}-class, governed artifact — the Laskar name is a label, never an input).\nThe retired device drew a single cosine at the ICRF-perihelion period — that construction survives only on the no-chain bodies (doc 31).</title>
+      <g style="cursor:help"><title>The model's own N-body chain: inclination of date (invariable-plane and ecliptic), series-governed at deep time${planetKey === 'earth' ? ' — Earth on the one-source engine route (engine orbit normal vs the invariable plane), the same evaluator as the rows above and the inclination path' : ''}.\nWindow = one period of the planet's dominant nodal secular mode (${modeLbl}-class, governed artifact — the Laskar name is a label, never an input).</title>
         <text x="${W/2}" y="8" fill="#8FBC8F" font-size="7.5" font-weight="600" text-anchor="middle">Orbital Plane Precession Cycle</text>
       </g>
       <!-- legend -->
@@ -33131,11 +33136,14 @@ function updateFocusRing() {
   /* ── 2  Show the ring only when we are looking at the Sun ─────── */
   const isSun = o.lookAtObj.name === 'Sun';
 
-  if (isSun && o.sun?.pivotObj) {
-    o.sun.pivotObj.updateMatrixWorld();
+  // The ring follows the rendered Sun (the scene object), not a stand-in:
+  // `o.sun` was a bare Object3D that was never added to the scene, so the
+  // ring sat at the world origin — beside Earth — whenever the Sun was focused.
+  if (isSun && sun?.pivotObj) {
+    sun.pivotObj.updateMatrixWorld();
 
     focusRing.position.copy(
-      o.sun.pivotObj.getWorldPosition(tmpVec)
+      sun.pivotObj.getWorldPosition(tmpVec)
     );
     focusRing.scale.set(5, 5, 0);   // whatever size you need
     focusRing.visible = true;
@@ -35415,7 +35423,10 @@ function onWindowResize() {
 
   /* ---------- renderer sizes --------- */
   renderer.setSize(width, height);
-  renderer.setPixelRatio(getOptimizedPixelRatio());
+  // Keep the LOW-mode ratio across a resize — restoring the capped ratio here while
+  // lowPerformanceMode stayed true left a slow GPU at full ratio with a loop that
+  // would never drop it again (its test was "above 40 fps → restore").
+  renderer.setPixelRatio(lowPerformanceMode ? 1 : getOptimizedPixelRatio());
   labelRenderer.setSize(width, height);
 
   /* ---------- star sprite size ------- */
@@ -37106,7 +37117,7 @@ function updatePredictions() {
     // it onto the Espenak/IERS observational scale so the displayed value reads
     // ~56.0 s at J2000 and follows the Espenak history trend.
     // The raw-physics variant `deltaTStart + pureH5DeltaTAtAge(t_Ma_now)` is still
-    // available on the Framework Verification chart at Reports → Days & Years → ΔT.
+    // available on the Framework Verification panel (Tools → Verification), the ΔT category.
     predictions.deltaTCorrectionSeconds = o.deltaTCorrectionSeconds = deltaTStart + meanDeltaTSecondsAtAge(t_Ma_now);
     predictions.alphaMoiFactor = o.alphaMoiFactor = earthMoiFactorAtAge(t_Ma_now);
   }

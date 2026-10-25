@@ -203,7 +203,9 @@ itself on every push:
 Chromium — the only tier that guards Phase 8 — plus the epoch-consistency
 gate, `test:perf` (ratio thresholds, travel-speed, paused-idle and
 monitor-polling rows) and the `test:snapshot` chain (`chart-export`,
-`tools-panels`, `perihelion-at-sun`, the star-field init alignment, the
+`tools-panels` — every Tools panel and every Framework Verification
+category —, `reports-export` — the three Reports exporters headless on a
+stubbed SheetJS —, `perihelion-at-sun`, the star-field init alignment, the
 orbit-plane grid at the Sun, the Planet Info eye, the chip-click wake, the
 wobble-centre trace). What each row guards and the owner report it was born
 from: doc 111 §2. `npm run test:transparency` is the Phase 6 acceptance gate

@@ -63,6 +63,28 @@ try {
     check(`${name}: three quick clicks leave ONE panel, visible`, r.found && r.rapid && r.rapid.count === 1 && r.rapid.visible === 1, r.found ? JSON.stringify(r.rapid) : '');
     check(`${name}: closes again`, r.found && r.closed && r.closed.count === 1 && r.closed.visible === 0, r.found ? JSON.stringify(r.closed) : '');
   }
+  // ── Every Framework-Verification category renders without throwing ────────
+  // Measured (plan 20): the Anomalistic Year category's only reference curve
+  // called a function deleted at plan 18 — a ReferenceError on open that the
+  // default-open category hid. Render each category once; a throw inside the
+  // render is caught here, a deferred one lands in sim.errors.
+  const vfpErrorsBefore = sim.errors.length;
+  const vfp = await sim.page.evaluate(async () => {
+    const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+    window.__test__.openVerificationPanel(); await wait(1500);
+    const out = [];
+    for (const id of window.__test__.vfpCategoryIds()) {
+      try { window.__test__.updateVerificationPanel(id); await wait(60); out.push({ id, ok: true }); }
+      catch (e) { out.push({ id, ok: false, err: String((e && e.message) || e) }); }
+    }
+    const c = document.querySelector('.vfp-close'); if (c) c.click();
+    return out;
+  });
+  const vfpBad = vfp.filter((r) => !r.ok);
+  const vfpErrs = sim.errors.slice(vfpErrorsBefore);
+  check(`every Framework Verification category renders (${vfp.length} categories, none throws)`,
+    vfp.length >= 20 && vfpBad.length === 0 && vfpErrs.length === 0,
+    (vfpBad.map((r) => `${r.id}: ${r.err}`).concat(vfpErrs.slice(0, 2)).join(' | ')) || `${vfp.length} rendered`);
   // ── The Framework-Verification panel ORDER invariant ──────────────────────
   // VFP_CATEGORIES is SORTED by VFP_ORDER, so a category id missing from the
   // order array scores indexOf = −1 and silently sorts FIRST — and the first

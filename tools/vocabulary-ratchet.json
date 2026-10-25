@@ -246,11 +246,11 @@
       "plan-step label": 11
     },
     "code:tools/docs/render-calculation-map.mjs": {
-      "H-divisor label": 15,
-      "era device / K device": 6,
-      "comb / lattice": 14,
-      "deletion narrative": 11,
-      "plan-step label": 19
+      "H-divisor label": 5,
+      "era device / K device": 4,
+      "comb / lattice": 10,
+      "deletion narrative": 10,
+      "plan-step label": 17
     },
     "code:tools/docs/render-doc92-tables.mjs": {
       "comb / lattice": 1,
@@ -401,10 +401,10 @@
     },
     "code:src/script.js": {
       "H-divisor label": 9,
-      "era device / K device": 7,
-      "comb / lattice": 7,
-      "deletion narrative": 9,
-      "plan-step label": 63
+      "era device / K device": 6,
+      "comb / lattice": 6,
+      "deletion narrative": 1,
+      "plan-step label": 54
     }
   }
 }

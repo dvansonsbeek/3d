@@ -385,9 +385,19 @@ function createPublishedCurves(deps) {
     return 129600000 / rateArcsecPerCy;
   }
 
+  /** Meeus (1991) Table 31.B after Simon et al. (1994): the RATE of Earth's longitude of perihelion in the
+   *  J2000 (fixed) frame — the derivative of the sidereal polynomial, degrees per Julian century
+   *  (0.3226°/cy ≈ 11.6″/yr at J2000; T in Julian centuries from J2000). Table 31.A above is the OF-DATE form.
+   *  The Framework Verification's derived anomalistic year reads it: T_anom = 360/(360/T_sid − ϖ̇).
+   *  @param {number} year @returns {number} degrees per Julian century */
+  function perihelionRateMeeusJ2000FrameDegPerCy(year) {
+    const T = centuriesAt(year);
+    return 0.3225654 + 2 * 0.00014799 * T - 3 * 0.000000039 * T * T;
+  }
+
   return {
     tropicalYearLaskar, solarDayPeters, siderealYearChapront, axialPrecessionCapitaine2009,
-    eccMeeus, obliquityChapront2002, perihelionMeeusEarth,
+    eccMeeus, obliquityChapront2002, perihelionMeeusEarth, perihelionRateMeeusJ2000FrameDegPerCy,
   };
 }
 

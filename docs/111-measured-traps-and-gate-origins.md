@@ -442,7 +442,20 @@ The `test:snapshot` chain also carries:
 - **`tools-panels`** — every Tools button opens its panel with no page
   error, three clicks within a frame leave ONE panel, and it closes again
   (born from a ReferenceError on open and the double-build race;
-  fail-proven via `ESSRT_TOOLS_PLANT=1`).
+  fail-proven via `ESSRT_TOOLS_PLANT=1`). Since plan 20 the gate also
+  renders EVERY Framework Verification category once (born from the
+  Anomalistic Year category's only reference curve calling a function
+  deleted at plan 18 — a ReferenceError on open that the default-open
+  category hid for weeks; the row fails on that build).
+- **`reports-export`** — the three Reports exporters ("Days, Years &
+  Precession", the RA test, "Solstices & Equinoxes") run headlessly against
+  a stubbed SheetJS: each completes without a page error and yields its
+  sheets, and the RA test's cells are all finite at a sub-year step (born
+  from two crashes no gate could see: the year-analysis export read a name
+  deleted at plan 09 after the whole cardinal scan had run, and the RA
+  test's perihelion-rate stencil ran on FLOORED years, so neighbours in one
+  calendar year divided by zero and every rate cell read Infinity;
+  fail-proven via `ESSRT_REPORTS_PLANT=1`).
 - **`perihelion-at-sun`** — the Show/Hide grid: the chain planets'
   "Perihelion at Sun" marker sits at a(1−e) in the orbit plane at the
   chain's ϖ, the Moon's "Apsidal/Nodal Precession" markers (the perigee at
@@ -534,6 +547,7 @@ points to; each gate's header states its own plant in full):
 | `ESSRT_PERI_SUN_PLANT=1` | `test/browser/perihelion-at-sun.test.mjs` | the expected marker distance shifted by 1 % |
 | `ESSRT_PLAN06_PLANT=1` | `tools/fixtures/record-plan06-baseline.mjs` | one fixture value by 1 ULP |
 | `ESSRT_PY_SMOKE_PLANT=1` | `tools/check-python-smoke.mjs` | one fake stage-C failure |
+| `ESSRT_REPORTS_PLANT=1` | `test/browser/reports-export.test.mjs` | one Infinity cell recorded in every exported sheet |
 | `ESSRT_SCENE_YEARS_PLANT=1` | `tools/verify/scene-year-lengths.js` | the compared sidereal law shifted by 0.1 s (the tolerance is 30 ms) |
 | `ESSRT_TOOLS_PLANT=1` | `test/browser/tools-panels.test.mjs` | one expected panel id renamed |
 | `ESSRT_VALUES_PLANT=1` | `tools/docs/export-model-values-package.mjs` | the 16.0.0 offset (167.048°) re-injected on the first plausibility row |
