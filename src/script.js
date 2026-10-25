@@ -7008,7 +7008,12 @@ wobbleLabelDiv.innerHTML =
   helperPointer;
 const wobbleLabelObj = new CSS2DObject(wobbleLabelDiv);
 wobbleLabelObj.position.set(0, 0.04, 0);
-earthWobbleCenter.rotationAxis.add(wobbleLabelObj);
+// Parent the label to the MESH, not rotationAxis (the perihelion label's
+// rule): updatePositions places the marker mesh along the spin axis of date
+// from Earth every frame, while rotationAxis stays on the legacy wheel — at a
+// deep epoch the two part, and the label sat on the wheel while the marker had
+// moved (the owner's −200-Myr report).
+earthWobbleCenter.planetObj.add(wobbleLabelObj);
 earthWobbleCenter.labelObj = wobbleLabelObj;
 earthWobbleCenter._labelDiv = wobbleLabelDiv;
 
@@ -15934,7 +15939,7 @@ let _zetaSeriesEndYr = 0;
         // history and drop its samplers so every ε read is the series hybrid.
         _deepHistSeriesM = null;
         _epsSeriesSamplers.clear();
-        _epsSeriesDeepRangeYr = 0;
+        _epsSeriesDeepRangeYr = { [-1]: 0, [1]: 0 };
         // (R4: the J2000 frame bridge _chainR is the J2000 ecliptic constant —
         // nothing to re-derive when the artifact lands)
         // Perf (measured, the Play-start wait): the rebuilt tier model's
@@ -16081,7 +16086,7 @@ function _deepHistSeries() {
 // and the rendered ε/e picked up coarse-grid interpolation error too.
 // Values are now pure in `year`.
 const _epsSeriesSamplers = new Map();   // tier span → sampler; the >2-Myr tier grows in span
-let _epsSeriesDeepRangeYr = 0;
+let _epsSeriesDeepRangeYr = { [-1]: 0, [1]: 0 };   // the deep tier's walked span per DIRECTION
 /** The ONE evaluator's sample at a decimal year (per-tier grid cache):
  *  {epsDeg, e, periOfDateDeg, …} — series inside ±10 Myr, the α(H(t))
  *  mode-tail beyond. Both ε and e targets read THIS. */
@@ -16090,8 +16095,19 @@ function _hybridSeriesSampleAt(year) {
   const need = Math.max(20000, Math.abs(t) * 1.25);
   const span = _hybridTierSpan(need);
   const key = span > 2000000 ? 'deep' : span;
-  if (!_epsSeriesSamplers.has(key) || (key === 'deep' && span > _epsSeriesDeepRangeYr)) {
-    if (key === 'deep') _epsSeriesDeepRangeYr = span;
+  if (key === 'deep') {
+    // The deep tier (5000-yr grid) is walked in the queried DIRECTION only
+    // (as the package's one-source movement does): the factory extends its
+    // one shared walk, so the nodes are bit-identical, and a jump to −200 Myr
+    // no longer walks +200 Myr as well — a third of the RK4 steps of the
+    // owner's 80-s deep jump were that forward walk (measured headless:
+    // 86 → 65 s).
+    const dir = t < 0 ? -1 : 1;
+    if (span > _epsSeriesDeepRangeYr[dir]) {
+      _epsSeriesDeepRangeYr[dir] = span;
+      _epsSeriesSamplers.set(key, _deepHistSeries().build(dir * span, 0, 5000));
+    }
+  } else if (!_epsSeriesSamplers.has(key)) {
     _epsSeriesSamplers.set(key, _deepHistSeries().build(span, -span, _hybridGridStep(span)));
   }
   return _epsSeriesSamplers.get(key).at(t);
