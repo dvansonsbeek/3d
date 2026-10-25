@@ -382,7 +382,7 @@
     "code:test/browser/snapshot.test.mjs": {
       "H-divisor label": 1,
       "era device / K device": 2,
-      "comb / lattice": 5,
+      "comb / lattice": 3,
       "deletion narrative": 3,
       "plan-step label": 7
     },
@@ -402,9 +402,9 @@
     "code:src/script.js": {
       "H-divisor label": 9,
       "era device / K device": 6,
-      "comb / lattice": 6,
+      "comb / lattice": 1,
       "deletion narrative": 1,
-      "plan-step label": 52
+      "plan-step label": 51
     }
   }
 }

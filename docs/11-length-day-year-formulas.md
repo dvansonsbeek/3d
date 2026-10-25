@@ -224,7 +224,7 @@ The correction represents Earth's need to rotate slightly MORE per solar day to 
 | LOD used | Purpose | Code path |
 |----------|---------|-----------|
 | **LOD_mean** | sidereal↔tropical conversions (day-count identity), calibrated ΔT correction integrand (Bond/Hallstatt/Jose4/5 stack expects this baseline), Meeus JD_UT → JD_TT, eclipse code, live accumulator | `meanDeltaTSecondsAtAge`, `updateDeltaT` |
-| **LOD_real** (Layer 4) | User-facing "physical" LOD display, pure-physics ΔT V-curve | `pureH5DeltaTAtAge`, Predictions panel LOD binding |
+| **LOD_real** (Layer 4) | User-facing "physical" LOD display, pure-physics ΔT V-curve | `pureDeltaTAtAge`, Predictions panel LOD binding |
 
 **Why no other explicit corrections appear:** the axial precession is ALREADY implicit in the tropical year itself — the tropical year is the sidereal year less the equinox's return, 1/T_p of a turn, so over one T_p the sidereal frame counts one year fewer. Adding an explicit precession correction to the day count would double-count. The obliquity cycle is oscillatory (mean zero). The perihelion's motion contributes to the anomalistic year, not to the tropical-day counting relative to the Sun. Only the ecliptic's own turn (the nodal mode s₃) gives the correct reference for the Sun's apparent motion.
 

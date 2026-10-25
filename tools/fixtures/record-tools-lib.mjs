@@ -180,7 +180,7 @@ function measure() {
   // Pins CURRENT Node behaviour, KNOWN divergences from the browser included
   // (flag gates and taper wiring on the cycle corrections; frameworkDeltaT's
   // model-year convention vs the browser _eclDeltaT calendar-year convention;
-  // pureH5DeltaTAtAge / meanLodSecondsAtAgeMeanAlpha / Espenak-Meeus are
+  // pureDeltaTAtAge / meanLodSecondsAtAgeMeanAlpha / Espenak-Meeus are
   // browser-only — the 8.4 survey). These move only with deliberate, measured
   // alignment commits. The year-0 dtstack.* keys above predate this section
   // and stay (different key namespace, both load-bearing).

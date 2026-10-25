@@ -261,8 +261,8 @@ const moonSiderealMonthInput = K.moonReference.moonSiderealMonthInput;  // IAU s
 // KEEP IN SYNC with public/input/astro-reference.json moonReference block.
 // Browser can't load JSON at runtime (Vite doesn't auto-inject), so these are
 // manually mirrored. tools/lib/constants.js reads the JSON directly.
-const moonApsidalPrecessionDaysInputICRF = K.moonReference.moonApsidalPrecessionDaysInputICRF;  // Meeus apsidal period; N_apsidalI derived at line ~3498
-const moonNodalPrecessionDaysInputICRF   = K.moonReference.moonNodalPrecessionDaysInputICRF;    // Meeus nodal period;   N_nodalI   derived at line ~3500
+const moonApsidalPrecessionDaysInputICRF = K.moonReference.moonApsidalPrecessionDaysInputICRF;  // Meeus apsidal period
+const moonNodalPrecessionDaysInputICRF   = K.moonReference.moonNodalPrecessionDaysInputICRF;    // Meeus nodal period
 // SEEDED, not imported — recomputeMoonAndAuForEpoch reassigns this (§5e).
 let   moonDistance = K.moonReference.moonDistance;        // Mean Earth-Moon distance (km; Phase 2: mutable for deep-time mode)
 const moonEclipticInclinationJ2000 = K.moonReference.moonEclipticInclinationJ2000;  // Moon DYNAMICAL mean osculating inclination at J2000 (v4 E3c; the Brown/ELP theory constant 5.1453964 = sinF normalization is the documented partner in astro-reference.json)
@@ -751,7 +751,7 @@ const eocEccentricity = K.earthOrbital.earthEccentricityJ2000 / 2;
 
 // Deep-time mode helpers. When DEEP_TIME_MODE_ENABLED is OFF (production parity),
 // cardinal-scan approxJDs and the sidereal-day-LOD factor revert to pre-Phase-9
-// epoch-local values. DEEP_TIME_MODE_ENABLED itself is declared later (line ~5530);
+// epoch-local values. DEEP_TIME_MODE_ENABLED itself is declared later;
 // these helper bodies resolve the flag at call time, so the forward reference is fine.
 function _phase9YearToJDDays() {
   return DEEP_TIME_MODE_ENABLED ? SI_TROPICAL_YEAR_DAYS : meansolaryearlengthinDays;
@@ -969,7 +969,7 @@ const M_CERES = GM_CERES / G_CONSTANT;               // ~9.38 × 10²⁰ kg
 
 // ─── E2d. Wobble periods, obliquity cycles, and K-derived eccentricity ──
 // Moved here (before scene geometry) so orbitalEccentricityBase is available
-// for perihelion distance calculations at line ~2088.
+// for perihelion distance calculations.
 
 // The eccentricity cycle period is the chain's OWN g-mode beat — the dominant
 // mode × largest companion of the planet's eccentricity vector
@@ -1061,12 +1061,6 @@ const OrbitalFormulas = {
   // c = a × e
   focalDistance: (a, e) => a * e,
 
-  // Heliocentric distance from true anomaly (AU)
-  // r = a × (1 - e²) / (1 + e × cos(ν))
-  heliocentricDist: (a, e, nu_deg) => {
-    const nu = nu_deg * Math.PI / 180;
-    return a * (1 - e * e) / (1 + e * Math.cos(nu));
-  },
 
   // Flight path angle (degrees)
   // tan(γ) = e × sin(ν) / (1 + e × cos(ν))
@@ -1184,12 +1178,6 @@ const OrbitalFormulas = {
   // dA/dt = h/2 (constant throughout orbit)
   areaSweepRate: (a_km, e, GM = GM_SUN) => OrbitalFormulas.specificAngularMomentum(a_km, e, GM) / 2,
 
-  // Synodic period between any two planets (days)
-  // P_syn = |P₁ × P₂ / (P₁ - P₂)|
-  synodicPeriod: (P1_days, P2_days) => {
-    if (P1_days === P2_days) return Infinity;
-    return Math.abs(P1_days * P2_days / (P1_days - P2_days));
-  },
 
   // Phase angle between two planets (degrees, 0-180)
   // Angular separation as seen from Sun
@@ -1214,9 +1202,6 @@ const OrbitalFormulas = {
   // v_p/v_a = (1 + e) / (1 - e)
   velocityRatioPeriApo: (e) => (1 + e) / (1 - e),
 
-  // Distance ratio aphelion vs perihelion
-  // Q/q = (1 + e) / (1 - e)
-  distanceRatioApoPerip: (e) => (1 + e) / (1 - e),
 
   // Kepler's 3rd Law: Orbital period from semi-major axis
   // P = 2π√(a³/GM) - returns days
@@ -1335,128 +1320,20 @@ const OrbitalFormulas = {
     return M_kg / V;
   },
 
-  // Orbital Energy Ratio (dimensionless)
-  // ratio = r/a - shows position relative to semi-major axis
-  // < 1: closer than semi-major axis (moving toward aphelion)
-  // = 1: at semi-major axis distance
-  // > 1: farther than semi-major axis (moving toward perihelion)
-  orbitalEnergyRatio: (r_km, a_km) => r_km / a_km,
 
-  // Tidal Acceleration (m/s²)
-  // a_tidal = 2 × GM × Δr / r³
-  // Differential gravitational acceleration across an extended body
-  tidalAcceleration: (GM, r_km, delta_r_km) => {
-    return 2 * GM * delta_r_km / Math.pow(r_km, 3) * 1000;  // Convert to m/s²
-  },
 
-  // Semi-major Axis from Period (km)
-  // a = (GM × P² / 4π²)^(1/3)
-  // Inverse of Kepler's 3rd Law
-  semiMajorAxisFromPeriod: (P_seconds, GM) => {
-    return Math.pow(GM * P_seconds * P_seconds / (4 * Math.PI * Math.PI), 1/3);
-  },
 
-  // Mean Motion from GM (rad/s)
-  // n = √(GM / a³)
-  // Angular velocity in radians per second
-  meanMotionFromGM: (GM, a_km) => Math.sqrt(GM / Math.pow(a_km, 3)),
 
-  // --- 11b. Precession & Newtonian dynamics ---
 
-  // Precession rate from precession period (arcsec/century)
-  // Rate = 360° × 3600"/° × 100 years / Period_years = 129,600,000 / Period_years
-  precessionRateFromPeriod: (period_years) => {
-    if (!isFinite(period_years) || period_years === 0) return 0;
-    return 129600000 / period_years;
-  },
 
-  // Precession period from rate (years for full 360° cycle)
-  // Period = 129,600,000 / Rate_arcsec_per_century
-  precessionPeriodFromRate: (arcsec_per_century) => {
-    if (!isFinite(arcsec_per_century) || arcsec_per_century === 0) return Infinity;
-    return 129600000 / arcsec_per_century;
-  },
 
-  // Convert precession against Ecliptic to precession against ICRF
-  // From ω_ICRF = ω_ecl - ω_ref → T_ICRF = (T_ecl × T_ref) / (T_ref - T_ecl)
-  // Reference is typically the axial precession period T_p (general precession)
-  precessionEclipticToICRF: (ecliptic_years, reference_years) => {
-    const diff = reference_years - ecliptic_years;
-    if (diff === 0) return Infinity;
-    return (ecliptic_years * reference_years) / diff;
-  },
 
-  // Convert precession against ICRF to precession against Ecliptic
-  // Inverse transformation: ecliptic = (ICRF × reference) / (ICRF + reference)
-  precessionICRFToEcliptic: (ICRF_years, reference_years) => {
-    const sum = ICRF_years + reference_years;
-    if (sum === 0) return Infinity;
-    return (ICRF_years * reference_years) / sum;
-  },
 
-  // Ratio of Earth Fundamental Cycle to precession period
-  // Shows resonance structure in Newtonian precession (e.g., Mars = 4, Earth = 3)
-  holisticPrecessionRatio: (precession_period, holistic_year) => {
-    if (precession_period === 0) return Infinity;
-    return holistic_year / precession_period;
-  },
 
-  // Precession period from Earth Fundamental Cycle ratio
-  // period in years
-  precessionFromHolisticRatio: (holistic_year, ratio) => {
-    if (ratio === 0) return Infinity;
-    return holistic_year / ratio;
-  },
 
-  // Precession angular velocity (rad/year) from arcsec/century
-  // Converts observational units to angular velocity
-  precessionAngularVelocity: (arcsec_per_century) => {
-    // 1 arcsec = π/(180×3600) rad, 1 century = 100 years
-    return (arcsec_per_century / 100) * (Math.PI / 648000);
-  },
 
-  // Newtonian perturbation strength estimate (dimensionless)
-  // Shows relative influence of perturbing planet on another
-  // strength = (m_perturber/M_sun) × (a_inner/a_outer)²
-  perturbationStrength: (a_planet_km, a_perturber_km, m_perturber, M_sun) => {
-    const ratio = a_planet_km < a_perturber_km
-      ? Math.pow(a_planet_km / a_perturber_km, 2)
-      : Math.pow(a_perturber_km / a_planet_km, 2);
-    return (m_perturber / M_sun) * ratio;
-  },
 
-  // Precession ratio between two planets
-  // Useful for identifying resonance patterns
-  precessionRatio: (rate1_arcsec, rate2_arcsec) => {
-    if (rate2_arcsec === 0) return Infinity;
-    return rate1_arcsec / rate2_arcsec;
-  },
 
-  // Decompose total precession into ecliptic and perturbation components
-  // Returns object with total, ecliptic contribution, and planetary perturbations
-  precessionDecomposition: (total_arcsec, ecliptic_contribution_arcsec) => {
-    return {
-      total: total_arcsec,
-      ecliptic: ecliptic_contribution_arcsec,
-      perturbations: total_arcsec - ecliptic_contribution_arcsec
-    };
-  },
-
-  // Format a period's ratio to the frozen clock's anchor interval as a readable
-  // fraction (e.g., "anchor interval / 4" for ratio=4). Plan 06 Phase 4d: the
-  // interval is the correction bases' unit, named as such — not a cycle.
-  holisticRatioDescription: (ratio) => {
-    if (!isFinite(ratio) || ratio === 0) return 'N/A';
-    const absRatio = Math.abs(ratio);
-    const sign = ratio < 0 ? ' (retrograde)' : '';
-    // Check if it's close to an integer
-    if (Math.abs(absRatio - Math.round(absRatio)) < 0.01) {
-      const n = Math.round(absRatio);
-      if (n === 1) return `= anchor interval${sign}`;
-      return `= anchor interval / ${n}${sign}`;
-    }
-    return `≈ anchor interval / ${absRatio.toFixed(2)}${sign}`;
-  },
 
   // --- 11c. Precession breakdown (Lagrange-Laplace secular theory) ---
 
@@ -1481,125 +1358,11 @@ const OrbitalFormulas = {
     return sum * dPsi / Math.PI;
   },
 
-  // Laplace coefficient b_{3/2}^{(2)}(α) - for inner perturber on outer planet
-  // Computed using numerical integration with j=2:
-  //   b_s^j(α) = (1/π) × ∫₀^(2π) cos(jψ) / (1 - 2α cos(ψ) + α²)^s dψ
-  // Used when calculating perturbation from an INNER planet
-  laplaceCoefficient_3_2_2: (alpha) => {
-    const steps = 1000;
-    const dPsi = (2 * Math.PI) / steps;
-    let sum = 0;
 
-    for (let i = 0; i < steps; i++) {
-      const psi = i * dPsi;
-      const cosPsi = Math.cos(psi);
-      const cos2Psi = Math.cos(2 * psi);
-      const denom = Math.pow(1 - 2 * alpha * cosPsi + alpha * alpha, 1.5);
-      sum += cos2Psi / denom;
-    }
 
-    return sum * dPsi / Math.PI;
-  },
 
-  // Eccentricity correction factor for precession (first-order)
-  // For first-order secular theory, this is negligible (~2% for Mercury)
-  // Full formula from disturbing function: f(e) ≈ 1 + (1/2)e² + O(e⁴)
-  // Reference: PERIHELION_PRECESSION_CORRECTED.md
-  eccentricityCorrectionFactor: (e_planet, e_perturber) => {
-    // Simplified first-order correction - negligible for most planets
-    // Setting to 1.0 matches the corrected document which doesn't use this
-    return 1.0;
-  },
 
-  // Mutual inclination between two orbital planes (degrees)
-  // cos(I_mutual) = cos(i₁)cos(i₂) + sin(i₁)sin(i₂)cos(ΔΩ)
-  mutualInclination: (i1_deg, i2_deg, deltaOmega_deg) => {
-    const i1 = i1_deg * Math.PI / 180;
-    const i2 = i2_deg * Math.PI / 180;
-    const dO = deltaOmega_deg * Math.PI / 180;
-    const cosI = Math.cos(i1) * Math.cos(i2) + Math.sin(i1) * Math.sin(i2) * Math.cos(dO);
-    return Math.acos(Math.max(-1, Math.min(1, cosI))) * 180 / Math.PI;
-  },
 
-  // Inclination correction factor for precession
-  // g(I) = cos(I_mutual) - reduces in-plane perturbation
-  inclinationCorrectionFactor: (i_mutual_deg) => {
-    return Math.cos(i_mutual_deg * Math.PI / 180);
-  },
-
-  // Mean motion in rad/year from orbital period in days
-  meanMotionRadPerYear: (period_days) => {
-    const period_years = period_days / DAYS_PER_JULIAN_YEAR;
-    return (2 * Math.PI) / period_years;
-  },
-
-  // Secular precession contribution from ONE perturber (arcsec/century)
-  // Implements Lagrange-Laplace first-order secular perturbation theory.
-  //     A_ii = Σ(j≠i) (n_i/4) × ε_ij × α_ij × ᾱ_ij × b₃/₂⁽¹⁾(α_ij)
-  // Where:
-  //   ε_ij = m_j / M_sun
-  //   α_ij = min(a_i, a_j) / max(a_i, a_j) (always ≤ 1)
-  //   ᾱ_ij = α_ij if j is outer of i (α × ᾱ = α²)
-  //          1    if j is inner of i (α × ᾱ = α)
-  //   b₃/₂⁽¹⁾(α) = Laplace coefficient — ALWAYS this one for the diagonal
-  //                self-precession rate.  b₃/₂⁽²⁾ appears only in the
-  //                off-diagonal A_ij terms (eigenvector mixing), which we
-  //                don't use for the per-planet precession display.
-  // All contributions are POSITIVE: the diagonal self-precession rate is
-  // prograde for every perturber.  (An earlier version negated inner
-  // perturbers; that was a confusion with the off-diagonal A_ij formula.)
-  // Reference: Murray & Dermott (1999) §7.4, eq 7.138.
-  secularPrecessionContribution: (
-    n_rad_per_year,       // Mean motion of perturbed planet (rad/year)
-    m_perturber,          // Mass of perturbing planet (kg)
-    M_sun,                // Mass of Sun (kg)
-    a_planet_km,          // Semi-major axis of perturbed planet (km)
-    a_perturber_km,       // Semi-major axis of perturbing planet (km)
-    e_planet,             // Eccentricity of perturbed planet
-    e_perturber,          // Eccentricity of perturbing planet
-    i_planet_deg,         // Ecliptic inclination of perturbed planet (degrees)
-    i_perturber_deg,      // Ecliptic inclination of perturbing planet (degrees)
-    deltaOmega_deg        // Difference in ascending node longitudes (degrees)
-  ) => {
-    const isOuter = a_perturber_km > a_planet_km;
-
-    // α = a_inner / a_outer (always < 1)
-    const alpha = isOuter
-      ? a_planet_km / a_perturber_km
-      : a_perturber_km / a_planet_km;
-
-    // ᾱ = a_planet / a_perturber for outer, or 1 for inner perturber
-    const alpha_bar = isOuter
-      ? a_planet_km / a_perturber_km  // Same as α for outer perturber
-      : 1;                             // 1 for inner perturber
-
-    // Diagonal A_ii secular contributions always use b₃/₂⁽¹⁾(α) —
-    // for both inner and outer perturbers.  The shape difference comes
-    // from the α · ᾱ prefactor above, not from switching Laplace orders.
-    const laplace = OrbitalFormulas.laplaceCoefficient_3_2_1(alpha);
-
-    // Mass ratio ε = m_perturber / M_sun
-    const massRatio = m_perturber / M_sun;
-
-    // Base secular precession rate (rad/year).  Laplace-Lagrange first-order
-    // secular theory, diagonal A_ii contribution:
-    //
-    //   For EXTERIOR perturber:  dω/dt = (n/4) × ε × α² × b₃/₂⁽¹⁾(α)
-    //   For INTERIOR perturber:  dω/dt = (n/4) × ε × α  × b₃/₂⁽¹⁾(α)
-    //
-    // Both use the SAME Laplace coefficient b₃/₂⁽¹⁾; the α-vs-α² difference
-    // is the α·ᾱ prefactor computed above.  Both contribute prograde (+),
-    // no sign flip.
-    //
-    // Eccentricity and inclination corrections are negligible at first order
-    // (~2–5 % for Mercury, within the method's ~4 % expected accuracy).
-    const rate_rad_per_year = 0.25 * n_rad_per_year * massRatio * alpha * alpha_bar * laplace;
-
-    // Convert rad/year to arcsec/century (1 rad = 206264.806 arcsec).
-    const arcsec_per_century = rate_rad_per_year * 206264.806 * 100;
-
-    return arcsec_per_century;
-  }
 };
 
 // ─── END OF CONSTANTS & FORMULAS SECTION ───────────────────────────────────────────
@@ -1609,7 +1372,7 @@ const OrbitalFormulas = {
 // Phase 8.3 L1: the geometry derivation lives ONCE in
 // @essrt/physics/planets/geometry — one type-branched law over body records
 // (this replaces the hand-unrolled per-planet block; the aliases keep their
-// exact names and epoch MUTABILITY — recomputePlanetCountsForEpoch and the
+// exact names and epoch MUTABILITY — recomputePlanetCyclesForEpoch and the
 // update*ForEpoch family still reassign the `let`s, untouched).
 const _rotationInputDays = {
   venus: K.planetOrbitalElements.venus.rotationPeriodDays,
@@ -1862,19 +1625,19 @@ const SOLAR_MASS_LOSS_FRAC_PER_YR =
       dM_dt_total_kg_s * meansiderealyearlengthinSeconds / M_SUN;     // ≈ 9.30 × 10⁻¹⁴ /yr
 
 // ───── LOD anchor: the J2000 day — the IAU sidereal year in seconds over the
-// IAU sidereal year in days = the SI day (the identifier is historical) ─────
-const LOD_NOW_H13_S = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays_kinematic;
+// IAU sidereal year in days = the SI day ─────
+const LOD_J2000_S = meansiderealyearlengthinSeconds / meansiderealyearlengthinDays_kinematic;
 
 const MEAN_TROPICAL_YEAR_J2000_S = meansolaryearlengthinDays * meanlengthofday;
 // Frozen J2000 mSY, captured before the deep-time mutation.
 // SI tropical year in 86400-s Julian days: the sDay time-unit anchor, so scene
 // orbital periods in JD are Kepler-invariant across epochs (they do not scale
 // with the epoch-local day count).
-const SI_TROPICAL_YEAR_DAYS      = MEAN_TROPICAL_YEAR_J2000_S / SECONDS_PER_DAY;   // ≈ 365.24189
+const SI_TROPICAL_YEAR_DAYS      = MEAN_TROPICAL_YEAR_J2000_S / SECONDS_PER_DAY;   // ≈ 365.2422 d (the derived mean tropical year at J2000 — the registry's tropicalYearMeanJ2000Days)
 
 
 // Per-planet J2000 orbital period in seconds — used as input to
-// meanPlanetOrbitalPeriodAtAge() and to recomputePlanetCountsForEpoch().
+// meanPlanetOrbitalPeriodAtAge() (recomputePlanetCyclesForEpoch is the kept no-op).
 const MERCURY_PERIOD_J2000_S = planets.mercury.orbitalPeriodInputDays * SECONDS_PER_DAY;
 const VENUS_PERIOD_J2000_S   = planets.venus.orbitalPeriodInputDays   * SECONDS_PER_DAY;
 const MARS_PERIOD_J2000_S    = planets.mars.orbitalPeriodInputDays    * SECONDS_PER_DAY;
@@ -1887,7 +1650,7 @@ const NEPTUNE_PERIOD_J2000_S = planets.neptune.orbitalPeriodInputDays * SECONDS_
 // chain's 1,296,000/g, a quantity of the governed artifact that scales with the
 // solar mass — Driver 2 — so the epoch recompute has nothing to rescale)
 const PLANET_KEYS = ['mercury','venus','mars','jupiter','saturn','uranus','neptune'];
-const MOON_NODAL_MONTH_J2000_S  = moonNodalMonth * LOD_NOW_H13_S;                 // 27.2122209 d — draconitic clock for the moon layer
+const MOON_NODAL_MONTH_J2000_S  = moonNodalMonth * LOD_J2000_S;                 // 27.2122209 d — draconitic clock for the moon layer
                                                                              // ≈ 2,360,591 s
 
 // ───── Layer-1 / Layer-2 constants (Architecture α proper physics) ─────
@@ -2193,14 +1956,10 @@ function resonatorSwingLodRate(year) {
 //   d/dy ΔT(y)  =  (LOD(y) − 86400) / 86400 · yearS
 //   ⇒ δLOD_i(y) = 86400 · d/dy[correction_i(y)] / yearS
 //
-// Current shipped fit: Bond dominates (in decreasing-LOD phase); joint-optimum
-// sweep against Espenak lands the flags+resonator net at −1.34 ms at J2000
-// (Layer-4 86400.001780 − raw kinematic+ecliptic 86400.003117 = −0.001337 s,
-// joint world; the USNO target 86400.0021 is in the fit's measured-day basis). See
-// `data/deltaT-4flag-fit.json` → `usno_anchor.shipped_sum_lod_at_j2000_s` and
-// per-cycle amplitudes/phases under `shipped_coefficients`. Individual per-cycle
-// contributions are best inspected via the "ΔT Breakdown" console test rather
-// than frozen here — they rescale each refit.
+// The shipped fit's J2000 closure is the artifact's own: `data/deltaT-4flag-fit.json`
+// → `usno_anchor.shipped_sum_lod_at_j2000_s` (the flags + swing net) against
+// `usno_anchor.usno_target_lod_s`, with the per-cycle amplitudes and phases under
+// `shipped_coefficients` — they rescale each refit, so none is frozen here.
 
 // Under the current 300000/400000 half-widths, the taper derivative is 0
 // within ±300 kyr of J2000 → the "raw − raw@J2000" term drops out and only
@@ -2225,13 +1984,11 @@ function jose4CycleLodCorrection(year) {
   return _dtCycles().cycleLodSecondsAt('jose4', year);
 }
 
-/** Sum of DT cyclic LOD contributions at year. At J2000 the shipped sum
- *  ≈ −1.34 ms — the target for the joint-optimum fit that closes Layer 4 LOD_real
- *  onto the USNO 86400.0021 s target (measured-day basis; raw kinematic+ecliptic
- *  86400.003117 − 1.34 ms = 86400.001780 Layer 4, the 0.32 ms spread being the two-day-bases difference;
+/** Sum of DT cyclic LOD contributions at year. At J2000 the shipped sum is
+ *  the artifact's `usno_anchor.shipped_sum_lod_at_j2000_s` — the amount that
+ *  closes Layer 4 LOD_real onto the fit's USNO target (`usno_target_lod_s`;
  *  joint world: the sum includes the Core-mantle swing episode).
- *  See data/deltaT-4flag-fit.json → usno_anchor.shipped_sum_lod_at_j2000_s.
- *  Used by the Solar Day display (Layer 4) and by future modal chart. */
+ *  Used by the Solar Day display (Layer 4). */
 function dtCycleLodCorrectionSum(year) {
   return bondCycleLodCorrection(year)
        + hallstattCycleLodCorrection(year)
@@ -2263,17 +2020,17 @@ function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
  *
  *  Integrand uses raw LOD = MEAN_LOD × (1 + 1/(T_nodal·mSY_days)), T_nodal the
  *  nodal period 1,296,000/|s₃| — the ecliptic-precession "missing motion" adds
- *  ~3.4 ms at J2000, so raw ≈ 86400.003 s. This overshoots the USNO Earth Orientation
- *  Center J2000 anchor (86400.0021 s, measured-day basis) by ~1.3 ms; the Bond/Hallstatt/Jose5/
- *  Jose4 post-integration stack closes the composite (Layer 4 LOD_real) onto
- *  the USNO anchor exactly by construction of the joint-optimum fit. This
+ *  ~3.4 ms at J2000, so raw ≈ 86400.003 s — above the fit's USNO Earth Orientation
+ *  Center anchor (`usno_target_lod_s`); the Bond/Hallstatt/Jose5/Jose4
+ *  post-integration stack closes the composite (Layer 4 LOD_real) onto
+ *  that anchor exactly by construction of the joint-optimum fit. This
  *  integrand correctly reproduces the positive dΔT/dt slope near J2000.
  *
  *  Used by the Meeus ephemeris wrappers (`_eclSunLon`, `_eclMoonLon`,
  *  `_eclMoonBeta`, `_meeusMoon*`) to convert JD_UT → JD_TT before evaluating
  *  the Sun and Moon polynomials, so the inertial positions are at their
  *  correct TT-time evaluation. For ABSOLUTE ΔT (Espenak convention with
- *  ΔT(J2000) ≈ 54.55 s trend anchor, joint world), add `deltaTStart` to the return value — see the
+ *  ΔT(J2000) = deltaTStart, the joint fit's trend anchor), add `deltaTStart` to the return value — see the
  *  'delta-t' chart configuration for the display-layer convention.
  *
  *  If BOND_DT_CORRECTION_ENABLED is ON, an additional Bond-cycle correction
@@ -2283,7 +2040,7 @@ function meanLodSecondsWithCorrectionsAtAge(t_Ma) {
  *  J2000 LOD anchor is preserved. */
 function meanDeltaTSecondsAtAge(t_Ma) {
   // ΔT(J2000) = 0 by convention for this function (integration reference).
-  // The DISPLAY value adds deltaTStart (54.55 s trend anchor, joint world) — done at the chart layer.
+  // The DISPLAY value adds deltaTStart (the joint fit's trend anchor) — done at the chart layer.
   // B2: the chain's — the Simpson integral plus the SEQUENTIAL post-integration
   // adds in the twins' order (pre-summing would change the FP association),
   // behind a cache keyed on the five research flags (flagsAt).
@@ -2299,9 +2056,8 @@ function meanDeltaTSecondsAtAge(t_Ma) {
  *  rises again. The baseline curve, separate from the calibrated Layer 3
  *  composite (meanDeltaTSecondsAtAge), which adds the cyclic Bond/Hallstatt/
  *  Jose5/Jose4 stack to match the Espenak/Stephenson history and hit the USNO
- *  86400.0021 s J2000 anchor exactly (joint world: incl. resonator). The
- *  function keeps its historical name for its readers. */
-function pureH5DeltaTAtAge(t_Ma) {
+ *  USNO J2000 anchor exactly (joint world: incl. resonator). */
+function pureDeltaTAtAge(t_Ma) {
   // 8.4-3: identical to the shared module's raw integral (Simpson + the
   // ecliptic term, no cycle corrections).
   return _deepLod().deltaTRawSecondsAtAge(t_Ma);
@@ -2333,11 +2089,10 @@ function _eclDeltaT(jd) {
  *  NOTE (2026-07): returns MEAN GEOMETRIC longitude, NOT apparent. An earlier
  *  attempt to add aberration (-0.00569°) and nutation (-0.00478 sin Ω) made
  *  modern events worse (2024 Dallas 12→24 km, 2026 Burgos 124→131 km).
- *  Framework's SUN_HARMONICS was fitted against observed eclipses that already
- *  include aberration/nutation effects → adding raw aberration on top double-
- *  counted the correction at present epoch. To upgrade Sun to apparent
- *  longitude cleanly, SUN_HARMONICS would need to be refit with the correction
- *  active. Kept as MEAN for consistency with existing SUN_HARMONICS calibration. */
+ *  The certified Sun's longitude was fitted against observed eclipses that
+ *  already include aberration/nutation → adding raw aberration on top double-
+ *  counted the correction at the present epoch. Kept as MEAN for consistency
+ *  with that calibration. */
 function _eclSunLon(jd) {
   // 8.5-1: the Meeus Ch.25 evaluator (and the MEAN-not-apparent
   // calibration rationale) lives in @essrt/physics/eclipse/finders.
@@ -2744,7 +2499,7 @@ function meanTropicalMonthAtAge(t_Ma) { return _moonChain().tropicalMonthSeconds
 // ≈ 2,360,584.7 s (≈ 27.32158 d × 86400 s/d)
 
 /** Derived period helpers in seconds, mirroring the in-days formulas at
- *  line ~5516 and ~5518 (recomputeMoonAndAuForEpoch). Required as integrand
+ *  recomputeMoonAndAuForEpoch. Required as integrand
  *  inputs for the apsidal-meets-nodal and lunar-leveling scene-graph nodes. */
 function meanApsidalMeetsNodalAtAge(t_Ma) { return _moonChain().apsidalMeetsNodalSecondsAtAge(t_Ma); }
 function meanLunarLevelingCycleAtAge(t_Ma) { return _moonChain().lunarLevelingSecondsAtAge(t_Ma); }
@@ -2867,10 +2622,10 @@ function meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s) {
 // period-function-agnostic).
 //
 // Cache identity invariant: each period function MUST be captured ONCE as a stable
-// const so the caches AND `_MOON_CYCLE_TABLES` (all keyed by function identity) work. Inline
+// const so the caches and the chain-cycle tables (all keyed by function identity) work. Inline
 // `t_Ma => meanPlanetOrbitalPeriodAtAge(t_Ma, K)` inside the wrappers would create
 // a new function object per call, defeating the cache. The render loop reaches
-// the wrappers through the `obj._dtIntegrator` tags.
+// the wrappers through the `obj._dtPlanetIntegrator` tags.
 const meanMercuryOrbitalPeriodSeconds = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, MERCURY_PERIOD_J2000_S);
 const meanVenusOrbitalPeriodSeconds   = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, VENUS_PERIOD_J2000_S);
 const meanMarsOrbitalPeriodSeconds    = (t_Ma) => meanPlanetOrbitalPeriodAtAge(t_Ma, MARS_PERIOD_J2000_S);
@@ -2919,10 +2674,8 @@ function recomputeEpochAnchors(t_Ma) {
 }
 
 // ───── Module-load derived anchors that affect per-frame math ─────
-// Re-derives the Earth-cycle anchors that downstream code reads as identifiers:
-// Tier 1 (math-critical): balancedYear (2000 by construction).
-// Tier 2 (display): meanearthRotationsinDays, meanSiderealday, meanStellarday,
-//   axialCoinRotationMs(+Yearly).
+// Re-derives the display anchors that downstream code reads as identifiers:
+// meanSiderealday, meanStellarday, axialCoinRotationMs(+Yearly).
 // All assignments are pure derivations from already-mutable anchors
 // (meansolaryearlengthinDays, meanlengthofday) plus stable J2000 constants.
 // Must run AFTER recomputeEpochAnchors (chained from setEpochByAge), so the
@@ -3153,15 +2906,15 @@ function posFromDateTime(dateStr, timeStr) {
 // 79640-s days. The product (absolute seconds) is preserved within Driver
 // 2's 70 ppm tolerance, so simulation time continuity is maintained.
 //
-// IMPORTANT: speed-button comparisons (Step forward/back at line 7975+)
+// IMPORTANT: speed-button comparisons (Step forward/back)
 // still use `SYEAR_J2000` snapshots, because the tweakpane dropdown values
-// at line 29906+ are captured at script-load time. This preserves "1 year
+// are captured at script-load time. This preserves "1 year
 // per click" semantics: the click advances 1 absolute year regardless of
 // epoch.
 function recomputeTimeUnitsForEpoch(t_Ma) {
   // sDay is anchored on the SI tropical year (Kepler-invariant in JD across
   // epochs), not on the epoch-local day count: at deep time the year in JD
-  // stays ~365.24189 (the mass-loss drift only).
+  // stays ~365.2422 d (the mass-loss drift only).
   // Note: meansolaryearlengthinDays itself remains epoch-local for other
   // consumers (delta-T accumulation, report internal LOD derivation, etc.).
   const tropDays = meanTropicalYearDaysAtAge(t_Ma);
@@ -3184,7 +2937,7 @@ function recomputeTimeUnitsForEpoch(t_Ma) {
   return true;
 }
 
-// ───── PHASE 6.7 — Trace-line scaling for 14 scene-graph objects ─────
+// ───── PHASE 6.7 — Trace-line scaling for 19 scene-graph objects ─────
 // Each object below has traceLength + traceStep properties captured at
 // construction from the J2000 sX values. Recompute them in-place from the
 // now-epoch-aware sX values so trace lines represent the same calendar
@@ -3294,7 +3047,7 @@ function recomputeMoonAndAuForEpoch(t_Ma) {
   moonSynodicMonth     = T_syn_s  / LOD_s;
   moonTropicalMonth    = T_trop_s / LOD_s;
 
-  // Precession periods — re-derive from updated months (script.js lines 3362, 3364)
+  // Precession periods — re-derive from updated months
   moonNodalPrecessionindaysEarth   = (moonSiderealMonth / (moonSiderealMonth - moonNodalMonth)) * moonNodalMonth;
   moonApsidalPrecessionindaysEarth = (1 / ((moonAnomalisticMonth / moonSiderealMonth) - 1)) * moonAnomalisticMonth;
   return true;
@@ -3335,7 +3088,7 @@ function _setCircularOrbitRadius(pd, r) {
   }
 }
 
-/** Mutate epoch-dependent fields on the `earth` object literal (line ~5212). */
+/** Mutate epoch-dependent fields on the `earth` object literal. */
 function updateEarthForEpoch() {
   // Earth rotation rate is locked to the J2000 sidereal day (the node's axis is
   // engine-placed every frame and its orbit node rests at zero).
@@ -3375,11 +3128,11 @@ function updateEarthForEpoch() {
   earth.size          = (diameters.earthDiameter / 2 / currentAUDistance) * 100;
 }
 
-/** Mutate epoch-dependent fields on the `moon` object literal (line ~5538). */
+/** Mutate epoch-dependent fields on the `moon` object literal. */
 function updateMoonForEpoch() {
   // moon.speed is locked to the J2000 anchor. In deep-time mode the
   // scene-graph applies the Farhat-integrated Moon tropical motion via
-  // `_dtMoonIntegrator` (see line ~6886 + moveModel branch), so mutating
+  // `_dtMoonIntegrator` (see the moveModel branch), so mutating
   // moon.speed here would either be retroactively applied to the full
   // elapsed scene interval since startmodel (snapshot path) or shadowed by
   // the integrator (deep-time path). Locking it eliminates the first risk
@@ -3420,7 +3173,7 @@ function updateSafeObjectsForEpoch() {
 /** The full object-updater orchestrator: Earth, the Moon and the traces. */
 function updateAllObjectsForEpoch() {
   updateSafeObjectsForEpoch();
-  updateAllTracesForEpoch();    // Phase 6.7: 26 trace properties on 14 scene-graph objects
+  updateAllTracesForEpoch();    // Phase 6.7: 38 trace properties on 19 scene-graph objects
 }
 
 // ═════════════════════════════════════════════════════════════════
@@ -3436,20 +3189,15 @@ function updateAllObjectsForEpoch() {
 //                                   for tweakpane sliders / programmatic
 //                                   geological time control.
 //   resetEpochToJ2000()           — restore all deep-time globals to J2000.
-//   enableDeepTimeMode()          — turn on auto-sync from o.currentYear in
-//                                   the animation loop.
-//   disableDeepTimeMode()         — turn off auto-sync AND reset to J2000.
 //   isDeepTimeMode()              — query the mode flag.
 //   currentEpochTMa()             — read the currently-applied t_Ma.
 //
 // Gating: DEEP_TIME_MODE_ENABLED is the single master switch that controls:
 //   1. Animation-loop auto-sync from o.currentYear to setEpoch
-//   2. The SI-anchored sDay + cardinal-scan approxJDs + siderealDayRow LOD
-//      factor (helpers `_phase9YearToJDDays` / `_phase9SiderealDayLODFactor`)
-// When OFF the model matches pre-deep-time production behavior across all
-// three areas. When ON, deep-time scaling, integrated phase math, and SI
-// anchoring are all active. Toggle via enableDeepTimeMode() /
-// disableDeepTimeMode() or flip this flag directly.
+//   2. The SI-anchored sDay + cardinal-scan approxJDs (helper `_phase9YearToJDDays`)
+// When OFF the model matches pre-deep-time production behavior. When ON,
+// deep-time scaling, integrated phase math, and SI anchoring are all active
+// (the `setDeepTimeMode` test hook flips the flag).
 
 const J2000_CALENDAR_YEAR = startmodelYear;   // 2000.5
 
@@ -3514,7 +3262,7 @@ function _engineYearOfSceneYear(sceneYear) {
 // reproduce Meeus polynomial linear coefficients to floating-point precision
 // over short spans).
 // At year=-584 (Thales): values may differ by 0.5-2° per argument — this is
-// the Meeus polynomial extrapolation error documented in doc 100.
+// the Meeus polynomial's extrapolation error.
 //
 // Call from console:
 //   meeusVsIntegratorDiagnostic(2451545)   // J2000
@@ -3635,7 +3383,7 @@ function setEpochByAge(t_Ma) {
     console.warn(`setEpochByAge(${t_Ma}): outside deep-time formula domain — anchors unchanged`);
     return false;
   }
-  recomputeDerivedAnchorsForEpoch(t_Ma);  // Phase 6: 13 Earth-cycle derived anchors
+  recomputeDerivedAnchorsForEpoch(t_Ma);  // Phase 6: the four derived display anchors
   recomputeMoonAndAuForEpoch(t_Ma);
   recomputeMoonDerivedForEpoch(t_Ma);     // Phase 6.5: 9 Moon ICRF/harmonic helpers
   recomputePlanetCyclesForEpoch(t_Ma);   // Phase 5: per-planet cycle anchors
@@ -3917,7 +3665,7 @@ if (typeof window !== 'undefined') {
     // ── ΔT/LOD probe surface ─────────────────────────────────────────────────
     // Pins the ΔT/LOD behaviour — including the browser flag gates and taper
     // wiring, and the _eclDeltaT year convention (KNOWN divergence from Node
-    // frameworkDeltaT: calendar-year vs model-year). pureH5DeltaTAtAge,
+    // frameworkDeltaT: calendar-year vs model-year). pureDeltaTAtAge,
     // meanLodSecondsAtAgeMeanAlpha and the Espenak-Meeus pair are browser-only.
     // Test surface, not an API.
     dtCycleAt: (year) => ({
@@ -3936,7 +3684,7 @@ if (typeof window !== 'undefined') {
     }),
     dtAtAge: (t_Ma) => ({
       meanDeltaTSeconds: meanDeltaTSecondsAtAge(t_Ma),
-      pureH5DeltaT: pureH5DeltaTAtAge(t_Ma),
+      pureDeltaT: pureDeltaTAtAge(t_Ma),
       meanLodSeconds: meanLodSecondsAtAge(t_Ma),
       meanLodSecondsMeanAlpha: meanLodSecondsAtAgeMeanAlpha(t_Ma),
       meanLodSecondsWithCorrections: meanLodSecondsWithCorrectionsAtAge(t_Ma),
@@ -4447,9 +4195,9 @@ if (typeof window !== 'undefined') {
  *      NOT covered by this function. Refactor to function-returning hovers
  *      would close that gap (Option B in the analysis).
  *
- * Defensive `typeof` guards: this function is defined in the deep-time block
- * (line ~4400) which loads before `staticValueCache` (line ~10377) and `o`
- * (line ~7816). At call time (animation-loop hook line ~30847) both exist,
+ * Defensive `typeof` guards: this function is defined in the deep-time block,
+ * which loads before `staticValueCache` and `o`. At call time (the
+ * animation-loop hook) both exist,
  * but the guards keep the function safe under any call-order scenario.
  */
 function _invalidateUiCachesForEpoch() {
@@ -4465,7 +4213,7 @@ function _invalidateUiCachesForEpoch() {
     const prevGuard = o._renderLoopRefreshing;
     o._renderLoopRefreshing = true;
     try { o._guiPane.refresh(); }
-    catch (e) { /* swallow — UI update is non-critical */ }
+    catch { /* swallow — UI update is non-critical */ }
     finally { o._renderLoopRefreshing = prevGuard; }
   }
 }
@@ -4668,7 +4416,7 @@ const earthWobbleCenter = {
   // pointed at earth.planetObj (measuring from the wobble frame ran the
   // perihelion 8 % fast). startPos/speed MUST stay 0: the offset direction
   // comes from Earth's own orbit phase. The radius is a display radius (the
-  // Law-4 amplitude constant eccentricityAmplitudeK).
+  // Law-4 amplitude constant).
   startPos: 0,
   speed: 0,
   tilt: 0,
@@ -4691,11 +4439,6 @@ const earthWobbleCenter = {
   traceOn: false,
   isNotPhysicalObject: true,
 };
-
-// EARTH-MID-ECCENTRICITY-ORBIT: REMOVED (P5/K5b, owner-ruled) — the law's
-// mean-offset visual reference lost its purpose once the chain owns the
-// planet story; the one law's base' itself lives on in the engine-K Earth
-// machinery (eccentricityBaseDerived), untouched.
 
 const earth = {
   name: "Earth",
@@ -4785,18 +4528,15 @@ const earthPerihelionPrecession2 = {
 
 // ───── Deep-time integral-form rotation tags ─────
 // The default scene-graph render is the SNAPSHOT formula θ = obj.speed × pos
-// (speed at the current epoch × time from startmodel). A scene object tagged
-// `_dtCycleN` (orbital) or `_dtRotN` (self-rotation) is rendered instead on the
-// anchored uniform form θ = ±2π × N × (yearSI − anchor) (+ the recorded J2000
-// phase), the anchor per object via `_dtCycleAnchor`, sign +1 prograde / −1
-// retrograde. The override fires only when DEEP_TIME_MODE_ENABLED is true.
-//
+// (speed at the current epoch × time from startmodel). Two integrator tags
+// replace it under DEEP_TIME_MODE_ENABLED: the Moon's `_dtMoonIntegrator`
+// (applied after the moon literal below) and the seven planets'
+// `_dtPlanetIntegrator` (after their literals) — each the integral of the
+// body's evolving mean motion from the startmodel anchor, so θ matches the
+// snapshot exactly at J2000. Earth's frame is engine-placed (R4); no object
+// carries a wheel tag.
 // `earth` has startPos = 0 (pos = 0 at startmodel gives the J2000 reference
-// scene with the Sun between Gemini and Taurus); its `_dtCycleAnchor =
-// STARTMODEL_YEAR_SI` anchors its cycle at startmodel so θ = 0 there (matches
-// snapshot). Earth's overall rotation does not affect the eccentricity scalar.
-// The Moon mean-longitude integrator tag is applied after the moon object
-// literal below, in the same anchor-startmodel pattern.
+// scene with the Sun between Gemini and Taurus).
 
 const barycenterEarthAndSun = {
   name: "Barycenter Earth and Sun",
@@ -5028,11 +4768,11 @@ const moon = {
 };
 
 // Moon mean-longitude integrator tag. In deep-time mode the
-// scene-graph branches at line ~42906 use `_dtMoonIntegrator` to compute the
+// scene-graph branch in moveModel uses `_dtMoonIntegrator` to compute the
 // integral of Moon tropical mean motion over [startmodel, currentYear]
 // instead of the snapshot `moon.speed × pos`, restoring physically correct
-// Moon position under Farhat-evolving sidereal-month period. Anchor matches
-// Earth's `_dtCycleAnchor = STARTMODEL_YEAR_SI` so the integrator returns
+// Moon position under the cited sidereal-month history. Anchored at
+// STARTMODEL_YEAR_SI so the integrator returns
 // 0 at startmodel (preserves modern J2000 Moon position).
 // ONE L′ clock for the ring's Moon: the layer's
 // in-plane angle is the argument of latitude F = L′ − Ω of the SAME lunar
@@ -5470,25 +5210,21 @@ const neptune = {
 // ═════════════════════════════════════════════════════════════════════════════
 // PLANET SCENE-GRAPH DEEP-TIME TAG ARCHITECTURE
 //
-// Two integrator-tag families, each for a physical evolution law (the
-// composition is pinned by test:planet-model and the browser snapshot chain).
+// The planets' integrator-tag family (the composition is pinned by
+// test:planet-model and the browser snapshot chain):
 //
 // ┌────────────────────────────┬─────────────────────────┬─────────────────────────┐
 // │ Tag family                 │ Physical law            │ Time base               │
-// ├────────────────────────────┼─────────────────────────┼─────────────────────────┤
-// │ _dtCycleN / _dtCycleSign   │ a uniform wheel pose:   │ UT (_currentYearSI)     │
-// │ + _dtCycleAnchor (opt)     │ N turns at the recorded │                         │
-// │   → Earth's scene wheels   │ J2000 rate (R4 places   │                         │
-// │                            │ the engine frame over)  │                         │
 // ├────────────────────────────┼─────────────────────────┼─────────────────────────┤
 // │ _dtPlanetIntegrator        │ Kepler + solar mass     │ TT (_currentYearSI_TT)  │
 // │ + _dtPlanetAnchor          │ loss (Driver 2)         │                         │
 // │ + _dtPlanetSign            │                         │                         │
 // │   → planet orbital nodes   │                         │                         │
 // └────────────────────────────┴─────────────────────────┴─────────────────────────┘
+// (Earth's wheels are engine-placed — R4; the Moon rides _dtMoonIntegrator.)
 //
 // Planet orbital objects take _dtPlanetIntegrator (Kepler/Driver 2 through
-// _moonChainCycles with meanPlanetOrbitalPeriodAtAge), never _dtCycleN.
+// _moonChainCycles with meanPlanetOrbitalPeriodAtAge).
 //
 // SIGN CONVENTION for _dtPlanetSign: derived from Math.sign(planet.speed) so
 // the integrator's rotation direction automatically matches the existing
@@ -5500,7 +5236,7 @@ const neptune = {
 // Mercury orbits the Sun under Kepler's third law + solar mass loss
 // (Driver 2). The orbital period T_mercury(t) is TT-uniform, so the
 // integrator anchor must be TT-aligned. The new `_dtPlanetIntegrator`
-// dispatch branch at script.js ~line 45548 consumes _currentYearSI_TT
+// dispatch branch in moveModel consumes _currentYearSI_TT
 // (introduced in Phase P-A.1) for this purpose.
 //
 // At J2000 anchor: meanDeltaTSecondsAtAge(0) === 0 → _currentYearSI_TT
@@ -6454,10 +6190,9 @@ periLabelDiv.innerHTML =
   '<div style="margin-top:3px;color:rgba(254,170,13,.35);font-size:8px;line-height:1;">&#9660;</div>';
 const periLabelObj = new CSS2DObject(periLabelDiv);
 periLabelObj.position.set(0, 0.08, 0);
-// P5/K5b: parent the label to the MESH, not rotationAxis — under the
-// Keplerian flag the marker mesh carries the chain-true perihelion position
-// (updatePositions override); rotationAxis stays on the legacy hierarchy.
-// Flag-off the two coincide (zero-radius marker), so this is convention-safe.
+// P5/K5b: parent the label to the MESH, not rotationAxis — the marker mesh
+// carries the chain's perihelion position (updatePositions override);
+// rotationAxis stays on the scene hierarchy.
 earthPerihelionFromEarth.planetObj.add(periLabelObj);
 earthPerihelionFromEarth.labelObj = periLabelObj;
 earthPerihelionFromEarth._labelDiv = periLabelDiv;
@@ -7058,7 +6793,7 @@ function _rebuildInclinationPathGeometry() {
   placeExtreme(cyc.nextMin, ud.nextMinMarker, ud.nextMinLabelDiv, ud.nextMinLabelObj, 'NEXT MIN', '#88ffff');
   return cyc;
 }
-function createInclinationPath(radius = 250, numPoints = 120, yScale = 50) {
+function createInclinationPath(radius = 250, yScale = 50) {
   const group = new THREE.Group();
   group.name = 'InclinationPath';
 
@@ -8253,7 +7988,7 @@ function setCSS2DVisibility(group, visible) {
 // Create inclination path (wobble curve showing the inclination wheel's cycle)
 // Add to earth.pivotObj (same as zodiac) so it can be toggled independently
 // The rotation is applied in moveModel() to match zodiac alignment
-const inclinationPathGroup = createInclinationPath(250, 360, 50);
+const inclinationPathGroup = createInclinationPath(250, 50);
 earth.pivotObj.add(inclinationPathGroup);
 inclinationPathGroup.visible = false; // Off by default
 
@@ -10221,7 +9956,7 @@ function _hiCardinalDates(year) {
   try {
     const seed = dateToJulianDay(year, 7, 2) + 0.5, cpM = _tierModelB().cardinal;
     for (const [cp] of _HI_CARDINALS) out[cp] = _hiDateTimeFromJD(cpM.jdNearUT(seed, cp));
-  } catch (e) { for (const [cp] of _HI_CARDINALS) out[cp] = '—'; }
+  } catch { for (const [cp] of _HI_CARDINALS) out[cp] = '—'; }
   return out;
 }
 
@@ -10235,7 +9970,7 @@ function _hiCalendarFromJD(jd) {
 function _hiMonthSunLongitudes(year) {
   return _HI_MONTHS.map((_, i) => {
     try { return _hiWrap360(_tierModelB().eclipse.sunLonDegAtJD(dateToJulianDay(year, i + 1, 1))); }
-    catch (e) { return _hiWrap360(360 * (i - 2) / 12); }
+    catch { return _hiWrap360(360 * (i - 2) / 12); }
   });
 }
 
@@ -10722,7 +10457,7 @@ const _HI_ROWS_LIVE = [
 ];
 
 function _hiGridHtml(rows) {
-  return '<div class="hi-props">' + rows.map(([id, label, unit, tip]) =>
+  return '<div class="hi-props">' + rows.map(([id, label, , tip]) =>
     `<span class="hi-key"${tip ? ` title="${tip.replace(/"/g, '&quot;')}"` : ''}>${label}</span>` +
     `<span class="hi-val" data-id="${id}"></span>`).join('') + '</div>';
 }
@@ -11247,7 +10982,7 @@ function wgcModelCurves(planetKey, d) {
   const modelPlanet = planets[modelPlanetKey];
   if (!modelPlanet || !modelPlanet.perihelionEclipticYears || typeof perihelionFrameBreakdown !== 'function') return null;
   const fb = perihelionFrameBreakdown(modelPlanetKey, 2000);
-  const latticeCy = 1296000 / modelPlanet.perihelionEclipticYears * 100;   // ″/cy, the chain's inertial advance in ecliptic longitude
+  const newtonCy = 1296000 / modelPlanet.perihelionEclipticYears * 100;   // ″/cy, the chain's inertial advance in ecliptic longitude
   const projectedCy = fb.projectedRa;                                     // ″/cy, the advance + equatorial projection
   const values = new Array(d.yrArr.length);
   for (let i = 0; i < d.yrArr.length; i++) {
@@ -11269,7 +11004,7 @@ function wgcModelCurves(planetKey, d) {
     if (shift !== 0) for (let i = 0; i < values.length; i++) values[i] += shift;
   }
   const grCy = (typeof relativisticPerihelionAdvanceArcsecCy === 'function') ? relativisticPerihelionAdvanceArcsecCy(modelPlanetKey) : null;
-  return { values, latticeCy, projectedCy, excessCy: fb.projection, grCy };
+  return { values, newtonCy, projectedCy, excessCy: fb.projection, grCy };
 }
 
 // Paper-styled single chart panel for the export SVG.
@@ -11656,8 +11391,7 @@ function closeWGCPanel() {
 // an L2 array (empty since the 405-kyr family moved into L1); the evaluator
 // reads it under 'all', no UI offers it. See docs/92-climate-formula.md.
 //
-// Coefficients are embedded as CLIMATE_FORMULA_COEFFS below (same pattern
-// as PREDICT_COEFFS / BALANCE_PRESETS). Proxy data arrays stay as runtime
+// Coefficients are embedded as CLIMATE_FORMULA_COEFFS below. Proxy data arrays stay as runtime
 // fetches because of size:
 //   public/input/lr04-data.json                LR04 (Lisiecki & Raymo 2005)
 //   public/input/cenogrid-data.json            CENOGRID (Westerhold 2020, 25-kyr binned)
@@ -12833,7 +12567,7 @@ function closeClimateFormulaPanel() {
 
 // ═══════════════════════════════════════════════════════════════════
 // ESSRT EXPLORER (.essrt-) — Expanding Solar System Resonance Theory
-// Deep-time visualisation of 8 quantities over solar-system history.
+// Deep-time visualisation of six quantities over solar-system history.
 // Reuses .cfm-* CSS classes (generic modal patterns).
 // ═══════════════════════════════════════════════════════════════════
 
@@ -13193,7 +12927,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
   }
   // Step 2: render in left-to-right order so the SVG paint sequence is natural
   const sortedByX = [...visibleEras].sort((a, b) => a.x - b.x);
-  const eraMarkers = sortedByX.map(({ m, x, labelWidth }) => {
+  const eraMarkers = sortedByX.map(({ m, x }) => {
     const isJ2000 = m.t_cal === 0;
     const isGen   = isGenesis(m);
     const dash = isJ2000 ? '' : ' stroke-dasharray="3,4"';
@@ -13220,8 +12954,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
       const sigmaKey = spec.wuKey === 'lod_hr' ? 'lod_sigma' :
                        spec.wuKey === 'moon_er' ? 'moon_sigma' : 'axial_sigma';
       const sig = a[sigmaKey] || 0;
-      const sigConverted = spec.wuConvert === ((x)=>x) ? sig
-        : Math.abs(spec.wuConvert(a[spec.wuKey] + sig) - v);
+      const sigConverted = Math.abs(spec.wuConvert(a[spec.wuKey] + sig) - v);   // = sig for an identity converter
       const yErrTop    = yPosClipped(v + sigConverted);
       const yErrBottom = yPosClipped(v - sigConverted);
       return `<line x1="${xt}" y1="${yErrTop}" x2="${xt}" y2="${yErrBottom}" stroke="#ff9a3c" stroke-width="1.2"/>
@@ -13519,8 +13252,7 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
       const sigmaKey = spec.wuKey === 'lod_hr' ? 'lod_sigma' :
                        spec.wuKey === 'moon_er' ? 'moon_sigma' : 'axial_sigma';
       const sig = a[sigmaKey] || 0;
-      const sigConverted = spec.wuConvert === ((x) => x) ? sig
-        : Math.abs(spec.wuConvert(a[spec.wuKey] + sig) - v);
+      const sigConverted = Math.abs(spec.wuConvert(a[spec.wuKey] + sig) - v);   // = sig for an identity converter
       const yErrTop = yPosClipped(v + sigConverted);
       const yErrBottom = yPosClipped(v - sigConverted);
       return `<line x1="${xt}" y1="${yErrTop}" x2="${xt}" y2="${yErrBottom}" stroke="#e07b00" stroke-width="1.4"/>
@@ -14457,7 +14189,7 @@ function lcrRenderChart(rangeKey) {
     const LEADER_LENGTHS  = [12, 24, 36];
     const leaderRowLastX  = [-Infinity, -Infinity, -Infinity];
 
-    visible.forEach(({ p, x1, x2, w, midX }) => {
+    visible.forEach(({ p, x1, w, midX }) => {
       const color = p.type === 'warm' ? '#e07070' : '#6db4ff';
       rects.push(`<rect x="${x1}" y="${margin.top}" width="${w}" height="${plotH}" fill="${color}" opacity="0.10" data-lcr-band="${p.name}" data-lcr-band-src="${p.src}"><title>${p.name} (${p.start}–${p.end}) — ${p.src}</title></rect>`);
 
@@ -14596,7 +14328,7 @@ function lcrRenderChart(rangeKey) {
         const combined = src.dataChartExtension
           ? [...src.data, ...src.dataChartExtension]
           : src.data;
-        const filtered = combined.filter(([y, _]) => y >= S.xLo && y <= S.xHi);
+        const filtered = combined.filter(([y]) => y >= S.xLo && y <= S.xHi);
         return { src, filtered };
       })
       .filter(({ filtered }) => filtered.length >= 2);
@@ -15116,8 +14848,8 @@ function solarDayPeters(year) { return _pubCurves().solarDayPeters(year); }
 /** Espenak & Meeus (NASA Five Millennium Canon) piecewise ΔT polynomial.
  *  Standard form covers ~[-1999, 3000]; returns the raw TT − UT1 offset in
  *  seconds. Anchored at the RAW convention: ΔT(2000) ≈ 62.92 s. To compare
- *  with our model's ΔT-relative-to-J2000 convention (ΔT(2000) = 0), use
- *  deltaTEspenakMeeusRelJ2000 instead. */
+ *  with the model's ΔT-relative-to-J2000 convention (ΔT(2000) = 0), subtract
+ *  the J2000 value. */
 function deltaTEspenakMeeusRaw(year) {
   // EXACTLY the published NASA canon, from
   // @essrt/physics/deltat/historical. The previously shipped simplification
@@ -15319,7 +15051,7 @@ let _zetaSeriesEndYr = 0;
         positionChanged = true;
         console.log(`secular series loaded from ${url} (earth + ${Object.keys(a.bodies).length - 1} planets) — planet deep-time elements + Earth ε/e one-source ${HYBRID_SPIN_REQUESTED ? 'ON (D4; the K device is only the pre-load fallback — plan 06 D5)' : 'planets on; Earth on the K device (fallback)'}`);
         return;
-      } catch (e) { /* try the next candidate */ }
+      } catch { /* try the next candidate */ }
     }
     console.error('secular-series artifact not reachable — planet deep-time elements stay on the era chain (invalid beyond its boundary!)' + (HYBRID_SPIN_REQUESTED ? '; Earth ε/e falls back to the K device' : ''));
   })();
@@ -16041,7 +15773,7 @@ const VFP_CATEGORIES = [
     fmtValue: v => Number.isFinite(v) ? v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : 'N/A',
     // Model curve shows the calibrated long-term ΔT trend (the raw LOD physics +
     // 4-flag stack + Core-mantle swing, jointly fit against Espenak & Meeus
-    // under the hard USNO closure). Reads ~56.0 s at J2000 — the trend value,
+    // under the hard USNO closure). Reads deltaTStart at J2000 — the trend value,
     // not the industrial-era-inflated instantaneous IERS observation of
     // 63.6 s. Reference curve is
     // NASA's Five Millennium Canon piecewise polynomial fit to observed eclipse
@@ -20194,10 +19926,7 @@ const periDetailEls = {};
 const invPlaneGaugeEls = {};
 const invPlaneMaxes = {};
 const invPlaneTooltipEls = {};
-const fibGaugeEls = {};
-
-// fibGaugeEls above KEEPS its historical name: it serves only the Invariable
-// Plane mass-height gauge.
+const invGaugeEls = {};   // the Invariable Plane mass-height gauge
 
 const aboveColor = 'hsla(35, 70%, 50%, 0.30)';
 const belowColor = 'hsla(210, 60%, 45%, 0.30)';
@@ -20287,12 +20016,11 @@ const _eclipseState = { idx: 0 };
 //   - era:              'Modern' / 'Medieval' / 'Classical' / 'Ancient' (display tag)
 //   - source:           Documentary reference
 // NOTE: This seed catalog contains ONLY directly NASA-Lunar-Canon-verified events from
-// the 2020-2025 window — the same events the "Verify Lunar Eclipse Finder" console test
-// cross-checks our predictive finder against.
+// the 2020-2025 window (the lunar-alignment gate cross-checks the finder against them).
 //
 // To safely expand the catalog:
-//   1. Run console test "Discover lunar eclipses in a year range" to list model-predicted
-//      oppositions in a given era (default 1000-1010 CE).
+//   1. List the model-predicted oppositions of the era with the finder
+//      (`__test__.eclFindLunar(jdStart, jdEnd)`).
 //   2. Cross-reference the model-predicted JDs against an authoritative source (NASA Lunar
 //      Canon, Stephenson 1997, Said & Stephenson 1996) to confirm the event was documented.
 //   3. Add the verified entry below.
@@ -20968,7 +20696,7 @@ function setupGUI() {
     const massValEl = massB.element.querySelector('.tp-lblv_v');
     massValEl.classList.add('inv-gauge');
     setInvGaugeProps(massValEl, o.massWeightedBalance, 0.01);
-    fibGaugeEls.massHeight = massValEl;
+    invGaugeEls.massHeight = massValEl;
   }
 
   // ── Positions (Ecliptic) — top-level, observed category ──
@@ -21040,7 +20768,7 @@ function setupGUI() {
         golden.setHelpersVisible(value);
         if (value) golden.update();  // build geometry immediately (render loop skips when idle)
         for (const key in triadBlades) {
-          triadBlades[key].classList.toggle('fib-triad-highlight', value);
+          triadBlades[key].classList.toggle('triad-highlight', value);
         }
       }),
     'Twice the Sun\u2013Jupiter perihelion distance equals the Sun\u2013Saturn perihelion distance. The Earth\u2013Jupiter\u2013Saturn alignment recurs every axial precession cycle. Toggle to visualize this with the spiral overlay.'
@@ -21107,10 +20835,9 @@ function setupGUI() {
       bladeEl: b.element,
       ascEl: ascKey ? detail.querySelector('[data-key="' + ascKey + '"]') : null,
       argEl: detail.querySelector('[data-key="' + argKey + '"]'),
-      // P5/K5b: both cells go DYNAMIC under the Keplerian flag — Prec. is the
-      // SCENE's of-date period (the osculating perihelion the marker follows),
-      // Secular the series tier's; the static chain period above is the
-      // initial text and the flag-off display.
+      // P5/K5b: both cells are DYNAMIC — Prec. is the SCENE's of-date period
+      // (the osculating perihelion the marker follows), Secular the series
+      // tier's; the static chain period above is the initial text.
       precEl: detail.querySelector('[data-prec]'),
       precSecEl: detail.querySelector('[data-prec-sec]'),
       planetKey: planetKey,
@@ -21137,7 +20864,7 @@ function setupGUI() {
   // jumps the simulation to the eclipse JD and switches the camera to Earth
   // view (so the user sees the eclipse from the right vantage point — the
   // previous planetStats-Moon UI showed the Moon perspective which is wrong).
-  // Data: ECLIPSE_PRESETS at ~line 39006; nav: jumpToEclipsePreset(idx).
+  // Data: ECLIPSE_PRESETS; nav: jumpToEclipsePreset(idx).
   const eclipsesFolder = gui.addFolder({ title: 'Solar & Lunar Eclipses', expanded: false });
   eclipsesFolder.element.dataset.category = 'observed';
   addFolderTooltip(eclipsesFolder, 'Well-known historical solar and lunar eclipses. Prev/Next jumps the simulation to that eclipse moment and auto-switches the camera to Earth view (the eclipse-observer perspective).');
@@ -21235,8 +20962,7 @@ function setupGUI() {
     _solarEclRefresh();
   };
 
-  // Side-by-side button row (same pattern as the Balanced Year JD nav buttons,
-  // see _dt_makeBalancedJdButtonRow at line ~26120). Tweakpane's addButton()
+  // Side-by-side button row. Tweakpane's addButton()
   // stacks vertically; this custom row uses Element.after() to inject a 2-button
   // toolbar immediately after the last binding's blade.
   const _eclLastBladeEl = solarEclBindings[solarEclBindings.length - 1].element;
@@ -21587,7 +21313,7 @@ function setupGUI() {
   // breaks it into its physical layers.
   addTooltip(daysFolder.addBinding(predictions, 'lodReal', {
     label: 'Solar Day (s)', readonly: true, format: fmt6
-  }), 'Physical (observable) length of one solar day = framework\'s full prediction (Tidal + GIA + all cycles). At J2000 \u2248 86400.0018 s. Broken down in the Solar Day decomposition sub-folder below.');
+  }), 'Physical (observable) length of one solar day = framework\'s full prediction (Tidal + GIA + all cycles). At J2000 it closes on the USNO Earth Orientation Center day by construction of the joint fit. Broken down in the Solar Day decomposition sub-folder below.');
   addTooltip(daysFolder.addBinding(predictions, 'siderealDayReal', {
     label: 'Sidereal Day (s)', readonly: true, format: fmt6
   }), 'One rotation relative to the MOVING vernal equinox — shorter than the solar day by ~235.9 s: Solar Day × Y/(Y + 1), Y the tropical year of date in days, on the REAL solar day shown above (the same day the Framework Verification panel plots). The IAU constant 86164.090531 s rests on the nominal 86,400-s day, so this row sits above it by the real day\'s excess over 86,400 s (~1.7 ms today).');
@@ -22193,18 +21919,13 @@ function setupGUI() {
   toolsFolder.element.dataset.category = 'tools';
   addFolderTooltip(toolsFolder, 'Two groups: Verification — the model against references (published formulas, JPL observations, the standard theory’s ghost bodies) — and Analysis — the model’s own predictions (one planet’s orbit of date, the deep-time evolution, Earth’s climate, the day-length rate).');
 
-  // The Invariable Plane Inspector, Eccentricity Balance Scale and Solar
-  // System Resonance Cycle panels were removed with the Fibonacci-law
-  // retirement (the model restatement; doc 10 Status + doc 109 carry the
-  // record); their fbe*/gho* subsystems were excised with the legacy
-  // chains (K5).
   // The panels on two topic TABS (owner: the nested folders read crowded and
   // mixed buttons with a sub-folder): VERIFICATION — the model against
   // references — in the panel's "observed" colour, ANALYSIS — the model's
   // own predictions — in the "calculated" colour, so the legend at the foot
   // of the panel explains the Tools folder too. A tab page holds buttons
-  // only; the two instrument FOLDERS (the standard-model overlay, the
-  // console tests) sit under the tabs. Each panel has ONE "Export" that
+  // only; the instrument FOLDER (the standard-model overlay) sits under the
+  // tabs. Each panel has ONE "Export" that
   // prints the current view.
   const toolTabs = toolsFolder.addTab({ pages: [{ title: 'Verification' }, { title: 'Analysis' }] });
   const verifyFolder = toolTabs.pages[0], analysisFolder = toolTabs.pages[1];
@@ -22229,9 +21950,9 @@ function setupGUI() {
     'The website\u2019s twelve explanatory figures, drawn from the model: every number and date on them is the model\u2019s own, so a changed model changes the figure. Export downloads the figure on screen (PNG or SVG).');
 
   // ── K8: the Standard-Model overlay — a comparison INSTRUMENT (toggles and
-  // readouts, not a panel), so it is a folder under the tabs, beside the
-  // console tests (owner: too prominent as a top-level menu item; not a
-  // button, so not on the Verification tab).
+  // readouts, not a panel), so it is a folder under the tabs (owner: too
+  // prominent as a top-level menu item; not a button, so not on the
+  // Verification tab).
   {
     const stdFolder = toolsFolder.addFolder({ title: 'Standard Model overlay (VSOP87 · MPP02)', expanded: false });
     addFolderTooltip(stdFolder, 'The Sun, Moon and the seven planets AS THE CURRENT SCIENTIFIC MODEL predicts them (planets/Sun: VSOP87A, truncated series measured at 0.3–3.6″ RMS vs JPL Horizons over 1600–2400; Moon: ELP/MPP02, measured 0.22″ RMS over the observed-ΔT era, on the standard Stephenson-2016 ΔT), shown as pale-blue ghost bodies — the planets with the standard theory’s own orbit rings — next to the model’s own, with the live angular separation per body. Both sides use the same astrometric convention. The comparison is published either way it falls — nothing in the model is tuned to it. Beyond ±4,000 years the ghosts are a stated extrapolation of the standard theory: the divergence you see at deep time is part of the model’s claim.');
@@ -22557,7 +22278,7 @@ function render(now) {
     updatePlanetInvariablePlaneHeights();
     updateDynamicInclinations();
     updateInvariablePlaneBalance();
-    if (fibGaugeEls.massHeight) setInvGaugeProps(fibGaugeEls.massHeight, o.massWeightedBalance, 0.01);
+    if (invGaugeEls.massHeight) setInvGaugeProps(invGaugeEls.massHeight, o.massWeightedBalance, 0.01);
     updateBalanceTrendAnalysis();
     updateBalanceMinMax();
     calculateInvariablePlaneFromAngularMomentum();
@@ -23611,7 +23332,6 @@ async function runSolsticeExport(years) {
 /* ══════════════════════════════════════════════════════════════════════════
    YEAR ANALYSIS REPORT EXPORT
    Creates an Excel file with comprehensive alignment analysis data
-   (same data as "Analyze All Alignments" console test but in Excel format)
 
    TRUE SINGLE-PASS IMPLEMENTATION: All data is collected in one loop through
    the year range for optimal performance and clear progress indication.
@@ -25364,7 +25084,7 @@ function jumpToJulianDay (jd) {
    Supports three modes for performance optimization:
    - 'minimal': moveModel + matrix updates only (for getWorldPosition/worldToLocal measurements)
    - 'light':   + updatePositions (for sun.ra/dec/distAU measurements)
-   - default:   full update (all 13 functions — traces, predictions, perihelion, etc.) */
+   - default:   full update (the trace first, then every subsystem — predictions, positions, perihelion, …) */
 function forceSceneUpdate (mode) {
   // The render loop's order — the trace FIRST, then moveModel restores the
   // pose of date: tracePlanet poses the scene at each sample (moveModel at the
@@ -27095,7 +26815,7 @@ function initStars() {
       const R            = o.starDistance    || 10000;
       const baseSize     = o.starsizeBase    ||   50;
 
-      data.forEach((star, i) => {
+      data.forEach((star) => {
         // 2) Parse & validate fields
         const ra   = raToRadians(star.RA);
         const dec  = decToRadians(star.Dec);
@@ -27228,8 +26948,8 @@ function loadTexture( url, onLoad ) {
   return tex;
 }
 
-// ECLIPSE_PRESETS + _eclipseState moved earlier in the file (~line 24830)
-// so they're available when setupGUI() runs at line ~24839 and constructs
+// ECLIPSE_PRESETS + _eclipseState are declared earlier in the file
+// so they're available when setupGUI() runs and constructs
 // the Solar & Lunar Eclipses tweakpane folder. Keeping them here would put
 // them in temporal-dead-zone at GUI construction time.
 
@@ -27265,18 +26985,17 @@ function perihelionFrameBreakdown(planetKey, year) {
   // predictiveMachinery (identical ops — the base must match there, or the
   // two surfaces quote different windows of one rate); the relativistic
   // supplement stays an explicit addition, never folded into the projection.
-  // The property name `lattice` is kept for the callers.
-  const lattice = CHAIN_ARTIFACT.windowRatesArcsecCy.newton[planetKey];                         // (a) ″/cy, sidereal, Newtonian
+  const newton = CHAIN_ARTIFACT.windowRatesArcsecCy.newton[planetKey];                          // (a) ″/cy, sidereal, Newtonian
   const eps = _sceneEpsTargetDeg(year) * D2R;   // Phase 3 S3b: the published ε (the hybrid)
   const epsRate = (_sceneEpsTargetDeg(year + 50) - _sceneEpsTargetDeg(year - 50)) * 3600;  // ″/cy
   // projection excess and obliquity-rate term for the chain motion at ecliptic longitude lamDeg
   const lam = _chainPerihelionEclLonDeg(planetKey, yearToJDApprox(year)) * D2R;
   const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
-  const projection = lattice * (Math.cos(eps) / den - 1);
+  const projection = newton * (Math.cos(eps) / den - 1);
   const obliquityTerm = (-Math.sin(lam) * Math.cos(lam) * Math.sin(eps) / den) * epsRate;
-  const projectedRa = lattice + projection;                                                       // the advance × dα/dλ
+  const projectedRa = newton + projection;                                                        // the advance × dα/dλ
   const earthFrame = projectedRa + obliquityTerm;                                                  // (b) ″/cy
-  return { lattice, projection, obliquityTerm, projectedRa, earthFrame };
+  return { newton, projection, obliquityTerm, projectedRa, earthFrame };
 }
 // Right ascension of an ecliptic-of-date direction (β = 0) in the equatorial frame of the same date.
 function eclipticLongitudeToRaDeg(lamDeg, year) {
@@ -30473,8 +30192,8 @@ function computeTabRanges(stats, selName) {
   for (let i = 0; i < stats.length; i++) {
     const row = stats[i];
     if (row?.header) {
-      const clean = row.header.replace(/^[\u2014\u2013\u2012\u2015\u2015\u2010\u2500—–\-]+\s*/, '')
-                               .replace(/\s*[\u2014\u2013\u2012\u2015\u2015\u2010\u2500—–\-]+$/, '')
+      const clean = row.header.replace(/^[\u2014\u2013\u2012\u2015\u2015\u2010\u2500—–-]+\s*/, '')
+                               .replace(/\s*[\u2014\u2013\u2012\u2015\u2015\u2010\u2500—–-]+$/, '')
                                .trim();
       if (clean in map) {
         currentTab = map[clean];
@@ -30499,7 +30218,7 @@ const _openGroups = { '0-0': true, '1-0': true, '2-0': true, '3-0': true };
  * @param {string} selName   - planet name (lowercase)
  * @param {number} threshold - max data rows per tab before collapsing (default 25)
  */
-function autoOpenGroups(stats, selName, threshold = 25) {
+function autoOpenGroups(stats, selName) {
   // Clear previous state
   for (const k in _openGroups) delete _openGroups[k];
 
@@ -31405,8 +31124,8 @@ function updateDomLabel () {
       const headerTitleAttr = headerHover ? ` title="${escapeAttr(headerHover)}"` : '';
 
       let headerText = row.header
-        .replace(/^[\u2014\u2013\u2012\u2015\u2010\u2500—–\-]+\s*/, '')
-        .replace(/\s*[\u2014\u2013\u2012\u2015\u2010\u2500—–\-]+$/, '')
+        .replace(/^[\u2014\u2013\u2012\u2015\u2010\u2500—–-]+\s*/, '')
+        .replace(/\s*[\u2014\u2013\u2012\u2015\u2010\u2500—–-]+$/, '')
         .trim();
       if (row.date) {
         const rawDate = (typeof row.date === 'function') ? row.date() : row.date;
@@ -33212,13 +32931,6 @@ function updatePositions() {
         SPHERICAL.radius = obj._meeusDistKm * 100 / currentAUDistance;
       }
       _moonVisualCorrection.setFromSpherical(SPHERICAL);
-      // (Stage C note: a rigid ring-frame placement variant was implemented
-      // and MEASURED to be an exact identity — the rotAxis frame is rigid to
-      // the base chain, so the frame-drift hypothesis is falsified; reverted.
-      // The deep-time Moon-vs-ring misalignment was resolved by the ring
-      // lock (_applyMoonRingLock): the ring's ellipse/node phases follow the
-      // argument clock, compensating the still-open browser earth-chain
-      // frame divergence — see TODO Stage C.)
       _moonVisualCorrection.applyMatrix4(earth.rotationAxis.matrixWorld);          // local → world
       _moonVisualMatrix.copy(obj.pivotObj.parent.matrixWorld).invert();
       _moonVisualCorrection.applyMatrix4(_moonVisualMatrix);                      // world → orbitObj local
@@ -33533,9 +33245,6 @@ function moveModel(pos) {
   planetObjects.forEach(obj => {
 
     // current angular position (mean anomaly for uniform motion)
-    // For objects tagged with `_dtCycleN`, replace the snapshot `speed × pos`
-    // with the anchored uniform form at o.currentYear (`_dtCycleAnchor` per
-    // object).
     let θ;
     // Convert o.julianDay → SI tropical year for the integrators: `o.currentYear`
     // is calendar-based (365/366-day years) and the integrators take SI tropical
@@ -33543,13 +33252,13 @@ function moveModel(pos) {
     // 95° at −584). _jdToSIyear for both the anchor (STARTMODEL_YEAR_SI) and
     // the current year.
     const _currentYearSI = DEEP_TIME_MODE_ENABLED ? _jdToSIyear(o.julianDay) : o.currentYear;
-    // TT-shifted SI year for the planet _dtIntegrator branch AND the Moon-chain
+    // TT-shifted SI year for the planet _dtPlanetIntegrator branch AND the Moon-chain
     // _dtMoonIntegrator branch — ONE clock (TT, physical dynamics) for the ring
     // layers and the override arguments: two clocks diverge as precession-rate
     // × ΔT (at +200 kyr ΔT ≈ 4 yr → the ring's perigee lagged the Moon's by
     // ~163°, the visible Moon-off-ring detachment); in-window the shift is
-    // arcsecond-scale. Only the _dtCycleN layers remain on UT — they drive
-    // frames the UT-based cardinal-point machinery is calibrated against. The
+    // arcsecond-scale. Only the untagged snapshot objects remain on UT — they
+    // drive frames the UT-based cardinal-point machinery is calibrated against. The
     // convention meanDeltaTSecondsAtAge(0) = 0 means the anchor identity holds
     // at J2000 with no separate TT anchor — _currentYearSI_TT ===
     // STARTMODEL_YEAR_SI at startmodelJD, so the integrators return 0 there →
@@ -33584,8 +33293,7 @@ function moveModel(pos) {
       // (The Moon-chain branch above is ALSO on TT since the earth-chain
       // frame divergence root-cause fix — see the Phase P-A.1 comment.)
       //
-      // No object has _dtPlanetIntegrator tagged yet — this branch is
-      // dead code until Phase P-B1 starts wiring per-planet tags.
+      // Mercury … Neptune carry the tag (set after their literals).
       const _pAnchor = Number.isFinite(obj._dtPlanetAnchor) ? obj._dtPlanetAnchor : STARTMODEL_YEAR_SI;
       const _pCycles = obj._dtPlanetIntegrator(_pAnchor, _currentYearSI_TT);
       θ = (_pCycles !== null ? _pCycles : 0) * 2 * Math.PI * obj._dtPlanetSign
@@ -33652,7 +33360,7 @@ function moveModel(pos) {
           // and the registry instruments add the same bridge). The curve alone
           // is the eclipse FINDERS' certified axis (_eclDeltaT), which had leaked
           // into the scene: at true UT the scene Moon sat 30″ west (0.549″/s ×
-          // 54.55 s), the Sun 2.2″. Mirror: tools/lib/scene-graph.js
+          // deltaTStart), the Sun 2.2″. Mirror: tools/lib/scene-graph.js
           // _jdTTToolsFromUT.
           d += (deltaTStart + deltaT_sec_d) / SECONDS_PER_DAY;   // JD_UT → JD_TT (absolute)
         }
@@ -33775,7 +33483,7 @@ function onWindowResize() {
   const dpr = renderer.getPixelRatio();      // 1, 2, 3, …
   starMaterial.size = 2 / dpr;               // stays ~2 CSS-px on any screen
 
-  try { positionChanged = true; } catch(e) {} // trigger a render after resize (safe during init)
+  try { positionChanged = true; } catch { /* a render before init */ }
 }
 
 
@@ -33828,8 +33536,7 @@ function updatePerihelion() {
   // ═══════════════════════════════════════════════════════════════════════════
   // EARTH-FRAME (Equatorial RA) — Earth's own perihelion marker as the scene
   // reads it (RA of date). The seven planets' RA rows are set below from the
-  // chain (the former apparentRaFromPdA values here were overwritten there
-  // every call — plan 20 §2, the thrown-away work).
+  // chain.
   // ═══════════════════════════════════════════════════════════════════════════
   o["earthPerihelion"] = (earthPerihelionFromEarth.ra * 180 / Math.PI + 360) % 360;
 
@@ -33841,9 +33548,7 @@ function updatePerihelion() {
   // The SEVEN PLANETS' perihelion panels read the engine-D chain's
   // elements-of-date: ϖ(t) from the multi-mode secular skeleton + derived
   // terms (the true apsidal wander; a linear advance would be 8.6° out for
-  // Neptune and 2.5° for Saturn at J2000 — measured). The no-chain bodies
-  // below keep their geometric reading, which is all they have.
-  // The RA channel is RA OF DATE: the J2000-frame ϖ carried to the engine
+  // Neptune and 2.5° for Saturn at J2000 — measured).  // The RA channel is RA OF DATE: the J2000-frame ϖ carried to the engine
   // frame's equinox of date, then the doc-37 "RA of a Keplerian apsis"
   // projection with ε at the engine year (eclipticJ2000LongitudeToRaOfDateDeg)
   // — the frame o.earthPerihelion reads from the scene.
@@ -34751,7 +34456,7 @@ function updateElongations() {
 function updatePredictions() {
   // 1. Auto-copy fields with same names
   for (let key in predictions) {
-    if (o.hasOwnProperty(key)) {
+    if (Object.hasOwn(o, key)) {
       predictions[key] = o[key];
     }
   }
@@ -34768,14 +34473,6 @@ function updatePredictions() {
   // Compute obliquity and eccentricity first - needed for year calculations.
   predictions.obliquityEarth = o.obliquityEarth = _sceneEpsTargetDeg(engineYear);
   predictions.eccentricityEarth = o.eccentricityEarth = _sceneEccTargetAt(engineYear);
-
-  // The seven per-planet o.eccentricity<P>/predictions.eccentricity<P>
-  // writes + the computeDynamicFibonacciBalance() call — REMOVED (the
-  // no-decision cleanup batch): WRITE-ONLY since the ORBIT-tab device rows
-  // moved to the chain and the export columns left (audited 2026-09-08).
-  // The wobble LAW itself stays live where it is load-bearing:
-  // _eccentricityInline (the Sun EoC + the no-chain trio + the probe)
-  // computes it directly from the year — it never read these fields.
 
   // Year lengths of date (the one-source family over the kinematic day of
   // date) at the engine year — one axis with the rendered frame. Under the
@@ -34809,11 +34506,10 @@ function updatePredictions() {
     ? _siderealYearOneSourceSeconds(engineYear)
     : o.siderealYearSeconds;
   // Tweakpane display: LOD_real = o.lodKinematic + the ecliptic-precession missing-motion term (nodal period) + DT cyclic sum incl. swing (Layer 4).
-  // At J2000: raw kinematic + ecliptic term + (−1.34 ms from the calibrated 4-flag stack +
-  // Core-mantle swing) = 86400.001780 s → closes on the USNO closure target
-  // (86400.0021) in the fit's MEASURED-day basis; the 0.32 ms spread is
-  // the measured-vs-Fourier sidereal-days difference at 2000 (doc 99 § "The two J2000
-  // day bases"; engine twin computeLodRealSecondsAtEpoch in tools/lib/deep-time.js).
+  // At J2000: raw kinematic + ecliptic term + the shipped cycle sum (the fit's
+  // usno_anchor.shipped_sum_lod_at_j2000_s, swing included) closes on the fit's
+  // USNO target (usno_target_lod_s; doc 99 § "The two J2000 day bases"; engine
+  // twin computeLodRealSecondsAtEpoch in tools/lib/deep-time.js).
   // Layer 3 is the same sum with the
   // swing left out — see `solarDayLayer3` below, which subtracts it back off.
   //
@@ -34921,7 +34617,7 @@ function updatePredictions() {
   // Sidereal/stellar day of date on the REAL solar day of date (lodReal — the
   // Solar Day row of this folder and the Formula Verification panel's day;
   // owner: the three Days rows ride ONE day). The IAU constants are DEFINED on
-  // the nominal 86,400-s day while the Solar Day row reads 86400.0018 — one
+  // the nominal 86,400-s day while the Solar Day row reads the fit's USNO day — one
   // day per folder ("name its window").
   // The IAU values stay the comparison in the panel's J2000 table; the
   // published registry values (siderealDayJ2000Physical / stellarDayJ2000Physical
@@ -34988,8 +34684,7 @@ function updatePredictions() {
   predictions.earthInvPlaneInclinationDynamic = o.earthInvPlaneInclinationDynamic = inclInvPlaneModel(o.currentYear);
   // ONE ϖ (plan 09 step 4): the chain's ecliptic ϖ OF DATE — the same
   // expression as the Earth panel's ϖ/ω rows and the perihelion gauge — on
-  // o.longitudePerihelion too, so the true-solar-longitude routine
-  // (solarLongitudeDegLong) and the debug snapshot read the displayed value.
+  // o.longitudePerihelion too, so the debug snapshot reads the displayed value.
   o.longitudePerihelion = earthPerihelionEclipticOfDateDeg(o.julianDay, o.currentYear);
   predictions.longitudePerihelion = o.longitudePerihelion;
   
@@ -35003,21 +34698,21 @@ function updatePredictions() {
 
   // ΔT (TT − UT1) and Earth polar-moment α at the current epoch. ΔT integrates
   // the (86400 − LOD_real(τ)) contribution from J2000 to the current year, then
-  // adds deltaTStart (54.55 s trend anchor, joint world) so the displayed value is ABSOLUTE ΔT — matching
+  // adds deltaTStart (the joint fit's trend anchor) so the displayed value is ABSOLUTE ΔT — matching
   // Espenak/Meeus at J2000. α is the climate-driven refinement (doc 99
   // §prediction-7), anchored at IERS 2010 at J2000.
   {
     // t_Ma on the engine year — one axis with the frame and the year rows above.
     const t_Ma_now = (J2000_CALENDAR_YEAR - engineYear) / 1e6;
     // ΔT (TT − UT1), the single model-calibrated value shown to the user.
-    //   = deltaTStart (54.55 s J2000 trend anchor — joint-world optimum vs Espenak)
+    //   = deltaTStart (the joint fit's J2000 trend anchor — FIT.DT_ANCHOR)
     //     + meanDeltaTSecondsAtAge(t_Ma_now)
     // meanDeltaTSecondsAtAge = Simpson integral of the raw LOD (kinematic + ecliptic term)
     // + 4-flag stack + Core-mantle swing, fitted jointly against the Stephenson-2016
     // residual under the hard USNO closure. 0 at J2000; the deltaTStart anchor lifts
     // it onto the Espenak/IERS observational scale so the displayed value reads
-    // ~56.0 s at J2000 and follows the Espenak history trend.
-    // The raw-physics variant `deltaTStart + pureH5DeltaTAtAge(t_Ma_now)` is still
+    // deltaTStart at J2000 and follows the Espenak history trend.
+    // The raw-physics variant `deltaTStart + pureDeltaTAtAge(t_Ma_now)` is still
     // available on the Framework Verification panel (Tools → Verification), the ΔT category.
     predictions.deltaTCorrectionSeconds = o.deltaTCorrectionSeconds = deltaTStart + meanDeltaTSecondsAtAge(t_Ma_now);
     predictions.alphaMoiFactor = o.alphaMoiFactor = earthMoiFactorAtAge(t_Ma_now);
@@ -35125,12 +34820,6 @@ function computeSolarYearDaysFromCardinals(currentYear) {
 //                                        = meanLodSecondsAtAgeMeanAlpha(t_Ma)
 //     + L2_GIA(year)                    // Layer 2: GIA via L1 orbital (non-negotiable)
 //                                        = meanLodSecondsAtAge − meanLodSecondsAtAgeMeanAlpha
-//     + L3_deltaT(year)                 // Layer 3: ΔT correction (FITTED to anchor)
-//                                        = bond_deriv(year) + hallstat_deriv(year)
-//                                          + _LOD_DELTA_T_CALIBRATION_OFFSET_SEC
-//
-//   where the calibration offset is auto-computed so:
-//       epochSpecificMeanLodSec(LOD_ANCHOR_YEAR) = LOD_ANCHOR_VALUE_SEC
 //
 // Ships:
 //   absoluteMeanLodSec(year)     — Layer 1a (mass-loss trend, α at climate mean)
@@ -35168,7 +34857,7 @@ function absoluteMeanLodSec(year) {
  *  contributions. Diagnostic revealed adding their derivatives introduced a spurious −1.5 ms
  *  secular trend over 185 yr, dragging the LOD slope below the observed value.
  *
- *  At J2000: = LOD_NOW_H13_S ≈ 86400.002745 (framework structural anchor).
+ *  At J2000: ω₀ = 86,400 s (the IAU-anchored kinematic day).
  *  Slope from 1815 to 2000: +2.6 ms over 185 yr (Wells tidal rate + small GIA fluctuation),
  *  matches observed ~1.5 ms/century within 20%.
  */

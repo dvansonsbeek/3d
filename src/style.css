@@ -736,8 +736,8 @@ a:link {
   position: fixed;
 } 
 
-/* Fibonacci Spiral (3-5-8) triad highlight — pale gold left border */
-#gui .fib-triad-highlight {
+/* E-J-S resonance triad highlight — pale gold left border */
+#gui .triad-highlight {
   border-left: 3px solid hsla(48, 90%, 75%, 0.7);
 }
 

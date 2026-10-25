@@ -545,7 +545,7 @@ The raw ecliptic correction `δ_LOD = LOD_mean/(T_s₃·mSY)` **scales with LOD_
 | **Raw ecliptic LOD kinematic correction** | **`δ_LOD = LOD_mean/(T_s₃·mSY)`** | **Driver 1 + ecliptic precession** | **Structural (parameter-free geometry); fractional correction ≈ 3.98 × 10⁻⁸, absolute <!--v:h5LodCorrectionMs-->3.441<!--/v--> ms at J2000** |
 | **LOD_real (Layer 4 composite)** | **`LOD_real = lod_kinematic + raw ecliptic term + Σ calibrated ΔT δ_LOD + δ_LOD,swing`** | **raw ecliptic term + calibrated Bond/Hallstatt/Jose5/Jose4 stack + Core-mantle swing** | **Displays <!--v:lodRealPhysical-->86,400.001200<!--/v--> s; closes on the USNO target <!--v:usnoLodJ2000-->86,400.0012<!--/v--> s on the one J2000 day basis, by construction of the joint fit** |
 
-Cross-references: `pureH5DeltaTAtAge` in `src/script.js` (browser, raw kinematic baseline; identifier kept) and `meanDeltaTSecondsAtAge` in `tools/lib/deep-time.js` (Node lib mirror, calibrated stack); tweakpane bindings under Orbital → "ΔT (TT − UT1)" (raw kinematic curve), "ΔT correction (rel. J2000)" (calibrated stack) and the Solar Day decomposition sub-folder (Layer 1–4); chart config for `id: 'delta-t'`; component-breakdown diagnostic in Tools > Console Tests "ΔT Breakdown (tidal-LOD physics vs Bond stack)".
+Cross-references: `pureDeltaTAtAge` in `src/script.js` (browser, raw kinematic baseline) and `meanDeltaTSecondsAtAge` in `tools/lib/deep-time.js` (Node lib mirror, calibrated stack); tweakpane bindings under Orbital → "ΔT (TT − UT1)" (raw kinematic curve), "ΔT correction (rel. J2000)" (calibrated stack) and the Solar Day decomposition sub-folder (Layer 1–4); chart config for `id: 'delta-t'`.
 
 ### Layer 1 / Layer 2 / Layer 3 / Layer 4 — solar-day taxonomy
 

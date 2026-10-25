@@ -5,12 +5,14 @@
  * document is advice; a boundary in CI is a boundary. This file is the §4 table
  * of IP-unified-architecture.md, executable.
  *
- * SCOPE. `packages/` and `test/` are linted. `src/script.js` (~59,300 lines),
- * `tools/` and `scripts/` are pre-migration code — linting them
- * now would produce thousands of findings that say nothing about the
- * architecture and would train everyone to ignore the output. Phase 8's
- * physics extraction is complete; these trees join when `tools/lib`
- * collapses to adapters.
+ * SCOPE. `packages/` and `test/` are linted with the architecture rules;
+ * `src/script.js` (~36,500 lines) with the recommended CORRECTNESS set only
+ * (plan 20: ESLint's no-undef found two ReferenceErrors on live UI paths
+ * that no gate saw, and no-unused-vars 274 dead symbols — the rules that
+ * caught them now run in the chain). `tools/` and `scripts/` are
+ * pre-migration code — linting them now would produce thousands of findings
+ * that say nothing about the architecture and would train everyone to ignore
+ * the output; they join when `tools/lib` collapses to adapters.
  *
  * `.cjs` IS IN SCOPE — the physics domain modules are CommonJS. The rules
  * blocks matched only *.js/*.mjs until the post-Phase-14 review found the
@@ -37,7 +39,8 @@ export default [
       // bundled JS here continuously; unignored it swept 4.5k phantom
       // lint errors into the chain the moment npm start was restarted.
       'dist-dev/**', '.parcel-cache-build/**',
-      'src/**', 'tools/**', 'scripts/**', 'public/**',
+      // (src/script.js is IN scope — see SCOPE; a directory pattern cannot be negated, so the other source file is named)
+      'src/framework-images.js', 'tools/**', 'scripts/**', 'public/**',
       'data/**', 'docs/**', 'web-bundles/**',
       'packages/analysis/**',
       // Harness workspace — a KEPT git worktree under .claude/worktrees/ is a
@@ -48,6 +51,33 @@ export default [
   },
 
   js.configs.recommended,
+
+  {
+    // The browser monolith: the recommended correctness rules over a browser
+    // module. XLSX is the SheetJS CDN global the Reports exporters load on
+    // demand; the thin spaces in its template strings are content.
+    files: ['src/script.js'],
+    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: 'module',
+      globals: {
+        window: 'readonly', document: 'readonly', navigator: 'readonly', location: 'readonly',
+        console: 'readonly', performance: 'readonly', requestAnimationFrame: 'readonly', cancelAnimationFrame: 'readonly',
+        setTimeout: 'readonly', clearTimeout: 'readonly', setInterval: 'readonly', clearInterval: 'readonly', queueMicrotask: 'readonly',
+        fetch: 'readonly', URL: 'readonly', URLSearchParams: 'readonly', Blob: 'readonly', FileReader: 'readonly', Image: 'readonly',
+        HTMLElement: 'readonly', HTMLCanvasElement: 'readonly', Element: 'readonly', Node: 'readonly', Event: 'readonly', CustomEvent: 'readonly',
+        MutationObserver: 'readonly', ResizeObserver: 'readonly', IntersectionObserver: 'readonly', getComputedStyle: 'readonly',
+        localStorage: 'readonly', sessionStorage: 'readonly', alert: 'readonly', confirm: 'readonly', prompt: 'readonly',
+        XMLSerializer: 'readonly', DOMParser: 'readonly', TextEncoder: 'readonly', TextDecoder: 'readonly', AbortController: 'readonly',
+        structuredClone: 'readonly', CSS: 'readonly', devicePixelRatio: 'readonly', innerWidth: 'readonly', innerHeight: 'readonly',
+        createImageBitmap: 'readonly', File: 'readonly', ClipboardItem: 'readonly',
+        XLSX: 'readonly',
+      },
+    },
+    rules: {
+      'no-irregular-whitespace': ['error', { skipStrings: true, skipTemplates: true }],
+    },
+  },
 
   {
     files: ['packages/**/*.js', 'packages/**/*.mjs', 'packages/**/*.cjs'],

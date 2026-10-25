@@ -106,7 +106,7 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   // this pins the browser's own evaluation of them.
   for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
     const b = T.perihelionFrameBreakdown(p, 2000);
-    v[`periFrames.${p}.lattice@2000`] = b.lattice;
+    v[`periFrames.${p}.newton@2000`] = b.newton;
     v[`periFrames.${p}.projection@2000`] = b.projection;
     v[`periFrames.${p}.obliquityTerm@2000`] = b.obliquityTerm;
     v[`periFrames.${p}.projectedRa@2000`] = b.projectedRa;

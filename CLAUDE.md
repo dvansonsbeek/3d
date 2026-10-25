@@ -183,8 +183,11 @@ registry, plus PLAUSIBILITY rows), `test:verify` (the model gates),
 `test:py-smoke`, `test:pipeline`. Every gate has been shown to **fail on a
 planted violation**, not merely to pass on clean code — the fixture gates on a
 1-ULP change (~1.6e-16 relative); the plant variables are listed per gate in
-doc 111 §2. Lint and typecheck cover `packages/` and `test/`; `src/script.js`
-and `tools/` are pre-migration and join as Phase 8 extracts.
+doc 111 §2. Lint covers `packages/`, `test/` and — since plan 20, with the
+recommended correctness set (`no-undef` found two ReferenceErrors on live UI
+paths no gate saw, `no-unused-vars` 274 dead symbols) — `src/script.js`;
+typecheck covers `packages/` and `test/`; `tools/` is pre-migration and joins
+when `tools/lib` collapses to adapters.
 
 **Scoped tiers** (measured step by step, plan 18 step 0: the full chain
 4.4 min, of which `test:fixtures` 2.0 min — 1.8 of it the plan-06 baseline's
