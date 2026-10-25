@@ -7,14 +7,16 @@
  *   - the deep mode tables read from the governed DATA artifact (richer
  *     than the embed: it also carries earthZetaEra, the era ζ tier);
  *   - the anchors from the chain artifact's one home;
- *   - the equinox-precession anchor from the engine's own year lengths
- *     (sid/(sid−sol) at 2000 = 25,771.4 yr — the same surface the Stage-C
- *     lab uses; the kinematic H/13 25,793.6 is a recorded 0.09% relation
- *     tension, stated never tuned) and ε₀ from the astro reference.
+ *   - the J2000 precession anchor — the IAU 2006 p_A (plan 09; ONE home,
+ *     deep-time.js certifiedAxialPrecessionJ2000Years) — and ε₀ from the
+ *     astro reference.
  *
  * Consumers: scripts/extract_insolation_features_deep.js (the deep-source
  * insolation feature set — the DEEP ζ tier over its whole Myr-scale grid,
- * per the no-mid-curve-handoff doctrine).
+ * per the no-mid-curve-handoff doctrine) through createDeepOrbitalHistory;
+ * the scene graph and the cross-engine probes through createOneSourceMovement;
+ * the T7 histories generator (tools/explore/t7-export-orbital-histories.mjs)
+ * through createOneSourceTier — the SAME construction on its own 1-kyr grid.
  */
 
 'use strict';
@@ -65,7 +67,15 @@ function createDeepOrbitalHistory() {
  * only Node scene). Consumers: the scene graph and the cross-engine parity
  * probes.
  */
-function createOneSourceMovement() {
+/**
+ * The one-source movement's FACTORY INSTANCE — the series-backed history every
+ * Node consumer of the movement builds its grids from (createOneSourceMovement's
+ * tiered sampler; the T7 generator's own 1-kyr grid over 0 … −5.4 Myr). ONE
+ * construction, so a consumer can never drift from the scene by assembling
+ * the factory's inputs itself. Returns null when the series artifact is absent.
+ * @returns {ReturnType<import('../../packages/physics/src/earth/deep-orbital-history.cjs').createDeepOrbitalHistory> | null}
+ */
+function createOneSourceTier() {
   let seriesArt;
   try {
     seriesArt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
@@ -80,7 +90,7 @@ function createOneSourceMovement() {
   const axial0 = DT.certifiedAxialPrecessionJ2000Years();   // plan 09: the IAU p_A anchor
   const eb = seriesArt.bodies.earth;
 
-  const tier = factory({
+  return factory({
     zModes: ART.modes.earth.z,
     zetaModes: ART.modes.earth.zeta,
     zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP },
@@ -105,6 +115,12 @@ function createOneSourceMovement() {
     solarTorqueShareJ2000: DT.PRECESSION_SOLAR_SHARE_J2000,
     dynamicalEllipticityRatioAtYearFn: DT.j2RatioAtYear,
   });
+}
+
+function createOneSourceMovement() {
+  const tier = createOneSourceTier();
+  if (!tier) return null;
+  const DT = require('./deep-time.js');
 
   // grown-grid sampler (the browser's tiers: 250-aligned beyond ±50 kyr).
   // TIER-FILLING growth: build each grid tier to its FULL span the first time
@@ -177,4 +193,4 @@ function createOneSourceMovement() {
   };
 }
 
-module.exports = { createDeepOrbitalHistory, createOneSourceMovement };
+module.exports = { createDeepOrbitalHistory, createOneSourceTier, createOneSourceMovement };

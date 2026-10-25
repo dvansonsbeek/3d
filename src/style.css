@@ -1,8 +1,12 @@
-@import url("https://fonts.googleapis.com/css2\
-?family=Inter:wght@400;500;600\
-&family=IBM+Plex+Mono:wght@400;500\
-&family=Exo+2:wght@200;300;400\
-&display=swap");
+/* The two web fonts, bundled from the pinned @fontsource packages (OFL) — the
+   simulator loads nothing from Google (the self-contained simulator). The same
+   weights the former Google import carried: Inter 400/500/600, IBM Plex Mono
+   400/500; Exo 2 was imported but used nowhere. Latin subset. */
+@import "npm:@fontsource/inter/latin-400.css";
+@import "npm:@fontsource/inter/latin-500.css";
+@import "npm:@fontsource/inter/latin-600.css";
+@import "npm:@fontsource/ibm-plex-mono/latin-400.css";
+@import "npm:@fontsource/ibm-plex-mono/latin-500.css";
 
 /* ───────────────────────────────────────────────
    0.  GLOBAL FONT TOKENS

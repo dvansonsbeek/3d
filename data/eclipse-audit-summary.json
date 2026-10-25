@@ -420,9 +420,9 @@
   "inputs": {
     "generator": "node tools/verify/eclipse-audit.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:965a84de906d8f86b0a1bff9f106c9861c9d1a0f16412b1521b422cc0ee8b6d1",
+      "data/core-mantle-resonator-stage1.json": "sha256:6071686e7bcf60bf1f86a1e9503e7749c4b66851992a0837e46fab7dbf0fdadd",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "data/deltaT-4flag-fit.json": "sha256:65c134ed8e0081cc96657cf3945107e0f147121001062443c2ce21a2d64ce2e3",
+      "data/deltaT-4flag-fit.json": "sha256:3545d40fed76d55ca0610aea31b614e7216706830b9b0e72737297daf74e2d02",
       "data/nbody-secular-series.json": "sha256:67291b28b0c8b0854ab19881dbbd0b0062599fc6106a05bc94396eb6ec24431c",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:f3ffe49e38cd745b04163465ef632a0b69bfa82fd9b47fef0adda0d95fdf3e9a",

@@ -226,14 +226,8 @@ const cardinalPointYearFractions = {
   AE: 0.73 - _epochOffset,   // September equinox (≈+0.23, later-same-year)
 };
 
-// The IAU obliquity and the observed cardinal anchors at J2000 (the names keep
-// their "AtGrid" suffix for their readers)
+// The IAU obliquity at J2000 (the name keeps its "AtGrid" suffix for its readers)
 const iauObliquityAtGrid = ASTRO_REFERENCE.obliquityJ2000_deg;
-const cardinalPointAnchorsAtGrid = {};
-for (const [type, jd2000] of Object.entries(ASTRO_REFERENCE.cardinalPointAnchors)) {
-  if (typeof jd2000 !== 'number') continue;   // the key carries its provenance `_comment` (R4d)
-  cardinalPointAnchorsAtGrid[type] = jd2000;
-}
 
 // J2000.0 epoch (standard astronomical convention: Jan 1.5, 2000 TT = JD 2451545.0)
 // Julian century = exactly 36525 days by IAU definition (used in Meeus, IAU precession, parallax)
@@ -415,10 +409,6 @@ for (const key of Object.keys(planets)) {
   derived[key] = computePlanetDerived(key);
 }
 
-function rebuildDerived(key) {
-  derived[key] = computePlanetDerived(key);
-}
-
 function computeAdditionalDerived(key) {
   const b = additionalBodies[key];
   // 8.3 L1: full geometry via the shared law (this engine previously returned
@@ -481,10 +471,7 @@ module.exports = {
   // twin reads the SAME embed the browser and the package read, so there is one
   // assembly, and `test:constants` pins the embed to its sources)
   EARTH_MOI_FACTOR: astroRef.physicalConstants.earthMoiFactorJ2000,
-  EARTH_FLATTENING_INVERSE_WGS84: astroRef.physicalConstants.earthFlatteningInverseWGS84,
   EARTH_DIAMETER_KM: astroRef.bodyDiametersKm.earth,
-  NUTATION_LEADING_TERMS_ARCSEC: astroRef.physicalConstants.nutationLeadingTermsArcsec,
-  ABERRATION_CONSTANT_ARCSEC: astroRef.physicalConstants.aberrationConstantArcsec,
   SOLAR_LUMINOSITY_W: astroRef.physicalConstants.solarLuminosityW,
   SOLAR_WIND_KG_PER_S: astroRef.physicalConstants.solarWindMassLossKgPerS,
   ALPHA_1: GENERATED_DEEP_TIME.alpha1PerMa,
@@ -520,7 +507,6 @@ module.exports = {
   balancedJD,
   cardinalPointYearFractions,
   iauObliquityAtGrid,
-  cardinalPointAnchorsAtGrid,
   yearsFromBalancedToJ2000,
   meanSiderealYearDays,
   meanLengthOfDay,
@@ -581,7 +567,6 @@ module.exports = {
   derived,
   additionalDerived,
   computePlanetDerived,
-  rebuildDerived,
 
   // External reference values
   yearLengthRef,

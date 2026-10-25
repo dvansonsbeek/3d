@@ -363,7 +363,7 @@
    "packages/reference/src/published-curves.cjs": "sha256:5e67ddb88a8a6ee4aa31bf5bd67ce80dbeabb860ee3074edce749dffffcd5d9a",
    "public/input/astro-reference.json": "sha256:b568736717355903c8298422cf48128a3897743ea0b1c57d64f0823ce8b1813f",
    "public/input/climate-formula-coefficients.json": "sha256:466e9004cbfe7631a4ade2e8397b9faeaeb4d615cd93863f86e9dd00987f8b37",
-   "tools/lib/deep-orbital-history.js": "sha256:965e2f2e8c1c27a3d36e70c3a66a80102cf655208b1b0729dcb9f7a857710385",
+   "tools/lib/deep-orbital-history.js": "sha256:6323a34c149194bdf206da274208c1b5f4e2a11443f9bf34c32506cce30b79ea",
    "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
    "tools/verify/equinox-vs-vondrak.js": "sha256:cada313d44f72daa6f0d3fd4b83f813a59e7197b5ba5b84f9422b6fc200caba5"
   }

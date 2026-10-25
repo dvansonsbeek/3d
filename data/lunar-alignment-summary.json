@@ -517,9 +517,9 @@
   "inputs": {
     "generator": "node tools/verify/lunar-alignment.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:965a84de906d8f86b0a1bff9f106c9861c9d1a0f16412b1521b422cc0ee8b6d1",
+      "data/core-mantle-resonator-stage1.json": "sha256:6071686e7bcf60bf1f86a1e9503e7749c4b66851992a0837e46fab7dbf0fdadd",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "data/deltaT-4flag-fit.json": "sha256:65c134ed8e0081cc96657cf3945107e0f147121001062443c2ce21a2d64ce2e3",
+      "data/deltaT-4flag-fit.json": "sha256:3545d40fed76d55ca0610aea31b614e7216706830b9b0e72737297daf74e2d02",
       "data/nbody-secular-series.json": "sha256:67291b28b0c8b0854ab19881dbbd0b0062599fc6106a05bc94396eb6ec24431c",
       "data/rspa20160404supp2/Table-S10.txt": "sha256:67a949e3a80574880b3e79338c3527fe9b7be639dd2c06080a098b75610abe7f",
       "data/rspa20160404supp2/Table-S11.txt": "sha256:19538f6ff8889df919da4ed1587296d540c9827d1155b605d9f3da0428916d2c",
