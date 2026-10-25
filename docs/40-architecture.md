@@ -686,8 +686,7 @@ Tweakpane Root ("Expanding Solar System Resonance Theory")
    │   ├─ Earth–Moon Genesis Analysis       [button]
    │   ├─ Earth Climate Analysis            [button]
    │   └─ Earth dLOD/dt Analysis            [button]
-   ├─▼ Standard Model overlay (VSOP87 · MPP02)  (ghost-body overlay)
-   └─▼ Console Tests (F12)       (buttons, not toggles)
+   └─▼ Standard Model overlay (VSOP87 · MPP02)  (ghost-body overlay)
 ```
 
 ---

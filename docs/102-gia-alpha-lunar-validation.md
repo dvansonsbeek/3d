@@ -291,8 +291,13 @@ response function, not fitted.
 ## The L-track validation pipeline
 
 Eight core phases (L-1, L-2 lunar, L-2 solar, L-3, L-4, L-5, L-5b, L-7),
-plus residual-investigation diagnostics — 20 console-test buttons total
-(Console Tests F12 → Lunar Eclipses & Validation):
+plus residual-investigation diagnostics. They were run as 20 console-test
+buttons in the simulator's Tools menu; the folder is retired, and the
+phases that are tests now run as recorded generators in `npm run check`:
+L-1 and the canon geometry in `lunar-alignment`, L-4 in `lunar-canon-recall`,
+L-5 in `lunar-alignment` visibility, L-5b Section 1 and L-7 in `eclipse-audit`
+(doc 52 Part 5 maps every former button). The phases are described here as
+they were run, with their findings:
 
 ### L-1 — Predictive lunar-eclipse finder (sanity check)
 

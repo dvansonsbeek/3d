@@ -68,6 +68,8 @@ const MANIFEST = [
     writes: 'data/equinox-vs-vondrak.json (tracked; --write only — the precession of date against its two theory referees: the equinox vs Vondrák 2011 over ±3000 yr beside the secular law alone, the obliquity vs La2004 over the last Myr; --write REFUSES if a precession-of-date term is missing; plain run = reproduction check)' },
   { n: 'earth-osculating-offset.js', class: 'generator', ms: 30000,
     writes: 'data/earth-osculating-mean-offset.json (tracked; --write only — the nine-body real-state run from the Horizons seed, ±110 yr; plain run = reproduction check). The eclipse Sun’s mean-element offset over the secular series (plan 06 layer B)' },
+  { n: 'lunar-canon-recall.js', class: 'generator', ms: 300000, slow: true,
+    writes: 'data/lunar-canon-recall.json (tracked; same convention as lunar-alignment: plain run = reproduction check, --write refuses on divergence, --rebaseline adopts). The lunar finder\'s COMPLETENESS over the whole NASA Five Millennium Canon −1999…+3000 on the UT axis (±3 h, same type; tight ≤15-min rate; signed median ΔT divergence per 500-yr era) — the former console button L-4, ~4.6 min' },
   { n: 'lunar-alignment.js', class: 'generator', ms: 82000, slow: true,
     writes: 'data/lunar-alignment-summary.json (tracked; same convention as eclipse-audit: plain run = reproduction check, --write refuses on divergence, --rebaseline adopts). Sections: canon TT-axis geometry 1600-2200 · documented visibility via the api observer tier · the -746 Babylonian lunar anchor · Stephenson-2016 raw-timing deltaT bands vs framework + spline' },
 

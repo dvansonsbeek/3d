@@ -30,7 +30,7 @@ The simulation provides five export / validation systems (the fifth, the **Solar
 | **Days, Years & Precession** (year-length analysis) | Tropical, anomalistic, sidereal year lengths | Excel (.xlsx) | Reports menu |
 | **Planet Position Reports** | Detailed validation for individual planets | Excel (.xlsx) or Clipboard | Hierarchy Inspector |
 
-Console validation tests are under **Tools > Console Tests (F12)**.
+The validation checks run in `npm run check`; Part 5 maps the former console tests to their gates.
 
 All Excel exports use the [SheetJS library](https://sheetjs.com/) loaded on-demand from CDN.
 
@@ -459,69 +459,33 @@ _currentReportData = {
 
 ---
 
-## Part 5: Console Tests (F12)
+## Part 5: The former Console Tests (F12) — where each check lives now
 
-### Purpose
+The Tools menu's Console Tests folder (49 buttons printing to the browser's
+developer console) was retired in the third maintenance round. It existed to
+check the browser against the Node tools before the model could be read
+directly; every check it carried that is worth keeping is a gate or a
+recorded generator in `npm run check`, which fails when the number moves:
 
-Runs detailed astronomical validation tests with output to the browser's Developer Console (F12).
+| former console check | the gate or generator that owns it |
+|---|---|
+| the six year-length and three day-length analyses, the scene-vs-engine diff | `scene-year-lengths` (the scene twin against the one-family laws to 30 ms), `deltat-slope-basis`, the window CSV, the browser tier's cross-engine mirror |
+| the obliquity rate against IAU 2006 | `test:pipeline` step 4, `equinox-vs-vondrak` |
+| the ΔT diagnostics (historical epochs, the cycle stack breakdown, the LOD/ΔT basis) | `lunar-alignment` (dtBands / dtBounds / dtBandsByCentury), `deltat-slope-basis` |
+| the Sun position against Meeus | `sun-vs-horizons` (against JPL Horizons, ±3000 yr) |
+| the −135 Babylonian case study, the 26-preset audit, the centerlines | `eclipse-audit` (babylon135 / audit26 / centerlines) |
+| the lunar finder against the canon (L-1, the 1600–2200 geometry) | `lunar-alignment` canonGeometry |
+| the full-canon recall −1999…+3000 (L-4) | `lunar-canon-recall` |
+| the Stephenson 2016 primary observations (L-5b, L-7) and the documented visibility (L-5) | `eclipse-audit` lunar / solar, `lunar-alignment` visibility |
+| the Framework-Moon arguments against Meeus | `test:model` (bit-exact), the cross-engine mirror, `lunar-alignment` theoryDrift |
+| the cycle stack against climate transitions | `lod-climate-correlation` |
+| the planet integrators and the scene-graph composition audit | `test:planet-model`, `chain-vs-jpl`, the snapshot chain |
 
-### Location
-
-`Tools > Console Tests (F12)`
-
-### Configuration
-
-| Control | Description |
-|---------|-------------|
-| **Start year** | First year in analysis range |
-| **End year** | Last year in analysis range |
-
-### Available Tests
-
-#### Year Length Analysis
-
-| Test | Description |
-|------|-------------|
-| **Analyze Year at June Solstice** | Measures tropical year length at summer solstice |
-| **Analyze Year at December Solstice** | Measures tropical year length at winter solstice |
-| **Analyze Year Length by Cardinal** | Comprehensive analysis of all 4 cardinal points |
-| **Analyze Anomalistic Year** | Measures perihelion-to-perihelion interval |
-| **Analyze Sidereal Year** | Measures Sun's return to same stellar position |
-| **Analyze All Alignments** | Combined analysis of all year types |
-
-#### Day Length Analysis
-
-| Test | Description |
-|------|-------------|
-| **Analyze Sidereal Day** | Measures Earth's rotation relative to stars |
-| **Analyze Solar Day** | Measures Earth's rotation relative to Sun |
-| **Analyze Stellar Day** | Measures Earth's rotation relative to distant stars |
-
-### Output Format
-
-Results are printed to the browser console with:
-- Measured values
-- IAU/reference values for comparison
-- Difference in seconds
-- Pass/fail status based on tolerance
-
-### Example Console Output
-
-```
-TROPICAL YEAR ANALYSIS (VERNAL EQUINOX)
-Year range: 2000 to 2025
-
-Year    VE Julian Day    Interval (days)    IAU Ref (days)    Diff (seconds)
-2001    2451991.234567   365.242374         365.242374        +0.12
-2002    2452356.477891   365.243324         365.242374        +82.15
-...
-
-SUMMARY:
-  Mean tropical year: 365.242374 days
-  IAU J2000 reference: 365.242374 days
-  Difference: +0.05 seconds
-  Status: PASS (within +/-1 second tolerance)
-```
+The research one-offs among the buttons (predictions beyond the canon, the
+37-event Ω/γ signal test, the residual-investigation hypotheses, the
+chronology searches) left with the folder; their findings are the records in
+[doc 102](102-gia-alpha-lunar-validation.md), [doc 103](103-135-babylonian-case-study.md)
+and [doc 107](107-ancient-record-review.md).
 
 ---
 
@@ -693,11 +657,9 @@ Reports compare against these reference sources:
 
 1. **List Mode**: Use comma-separated years for non-consecutive analysis (e.g., "2000, 2025, 2050, 2100").
 
-2. **Console Tests**: Open Developer Tools (F12) before running to see detailed output.
+2. **Validation**: the model's checks against IAU, JPL and the eclipse canons run in `npm run check` (Part 5 names the owner of each former console check).
 
-3. **Validation**: Compare model output against IAU references to verify accuracy.
-
-4. **Export Formats**: All exports use Excel format (.xlsx) via the SheetJS library. Large bulk exports fall back to TSV.
+3. **Export Formats**: All exports use Excel format (.xlsx) via the SheetJS library. Large bulk exports fall back to TSV.
 
 ---
 

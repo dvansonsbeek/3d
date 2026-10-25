@@ -5,7 +5,7 @@ System Resonance Theory (ESSRT). The model is analytic and parametric, valid
 across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
-**Scale:** `src/script.js` ~54,000 lines · `tools/` ~205 tracked scripts
+**Scale:** `src/script.js` ~39,000 lines (the console-test folder, 13,000 lines, retired in plan 18 — its checks are gates) · `tools/` ~205 tracked scripts
 across 15 directories (plus the untracked local archives) · ~40 Python files · 36 docs (the retired docs are archived out of the tree to `docs/archive/retired/`, gitignored — git history carries their diffs) · one web UI (the simulator; the Data Explorer dashboard is retired).
 **`npm run check` is the enforced gate chain — the ONE list in package.json;
 CI runs it plus a headless-browser job and auto-deploys the simulator to
@@ -211,13 +211,13 @@ trio (`nbody-secular.js`, `deep-secular-modes.js`, `secular-series.js`),
 `obliquity-hybrid.js` (REFUSES if the realized obliquity period parts from the
 window-mean prediction), `measure-rms-by-epoch.js` and `equinox-vs-vondrak.js`
 (write under `--write`; the latter REFUSES if a precession-of-date factor is
-missing), the four campaign generators (cassini-results /
-lod-climate-correlation / eclipse-audit / lunar-alignment — the latter two
-REFUSE on divergence; `--write --rebaseline` is the conscious re-measurement
-path) and the two reference comparisons (`sun-vs-horizons.js`,
-`earth-osculating-offset.js`). `npm run regen:cascade` lists the stale
-generators in regeneration order; `npm run test:verify:list` the full
-classification (12 generators, 6 gates).
+missing), the five campaign generators (cassini-results /
+lod-climate-correlation / eclipse-audit / lunar-alignment /
+lunar-canon-recall — the latter three REFUSE on divergence; `--write
+--rebaseline` is the conscious re-measurement path) and the two reference
+comparisons (`sun-vs-horizons.js`, `earth-osculating-offset.js`). `npm run
+regen:cascade` lists the stale generators in regeneration order; `npm run
+test:verify:list` the full classification (13 generators, 6 gates).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

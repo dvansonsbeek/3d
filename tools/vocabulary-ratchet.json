@@ -218,7 +218,6 @@
       "plan-step label": 3
     },
     "code:tools/lib/deep-orbital-history.js": {
-      "H-divisor label": 1,
       "plan-step label": 3
     },
     "code:tools/lib/deep-time.js": {
@@ -401,11 +400,11 @@
       "plan-step label": 1
     },
     "code:src/script.js": {
-      "H-divisor label": 23,
+      "H-divisor label": 9,
       "era device / K device": 7,
-      "comb / lattice": 10,
-      "deletion narrative": 12,
-      "plan-step label": 78
+      "comb / lattice": 7,
+      "deletion narrative": 9,
+      "plan-step label": 63
     }
   }
 }

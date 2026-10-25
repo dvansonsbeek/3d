@@ -195,7 +195,7 @@ Two things worth knowing before you read a red result as breakage:
 - Time controls: play, pause, speed adjustment and date navigation; click any planet to focus the camera and see its orbital data
 - Planet info sidebar with per-planet data, charts and precession analysis
 - **Earth Climate Analysis** — a Tools-menu modal plotting the canonical climate formula over four proxy records across eight time-window tabs (CenCO2PIP 66 Myr → forward projection of the next natural glaciation)
-- Console tests for year length, day length and calibration; export of solstice dates and object positions
+- Export of solstice dates and object positions; the year-length, day-length and eclipse checks run as gates in `npm run check`
 - Built with [Three.js](https://threejs.org/) and [Tweakpane v4](https://tweakpane.github.io/docs/)
 
 ---
