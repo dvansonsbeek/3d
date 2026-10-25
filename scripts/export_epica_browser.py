@@ -45,9 +45,14 @@ def main():
     keep = np.concatenate([[True], np.diff(a) > 0])
     a = a[keep]; v = v[keep]
 
-    # Bin to DT_KYR resolution via linear interpolation
+    # Bin to DT_KYR resolution via linear interpolation. The grid starts at
+    # DT_KYR, not 0: the composite runs to 2001 AD, so a 0-kyr (1950 BP) bin
+    # reads the industrial rise (313.66 ppm against 278 at 2 kyr) — an
+    # anthropogenic sample in a natural record (found by plan 17; the browser's
+    # EPICA tab plotted it as part of the record). The last two kyr of an
+    # 800-kyr record are not missed.
     hi = min(a.max(), 800.0)
-    grid = np.arange(0, hi + DT_KYR, DT_KYR)
+    grid = np.arange(DT_KYR, hi + DT_KYR, DT_KYR)
     v_binned = np.interp(grid, a, v)
 
     out = {

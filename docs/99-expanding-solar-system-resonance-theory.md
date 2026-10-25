@@ -605,6 +605,22 @@ GIA:    dLOD/dt(GIA) = LOD × (dα/dt) / α  (L_E fixed for GIA-only decompositi
                      = −3.53×10⁻⁶ s/yr = −0.35 ms/century
 ```
 
+**The J₂ → α conversion factor is an effective pair, and is kept as one.** The
+GIA channel turns the observed secular dJ₂/dt (Cox & Chao 2002, the
+`giaCoxChaoPeltier` anchors in astro-reference) into dα/dt by dividing by
+`giaJ2ToAlphaFactor` = <!--v:giaJ2ToAlphaFactor-->2.0<!--/v-->. The degree-2
+identity for a pure polar-moment change gives 1.5; the difference is the solar
+tide's share of the angular-momentum transfer, which the channel does not carry
+as its own term. The LOD-budget scan (2026-09) measured the alternatives against
+the eclipse-validated ΔT record: 1.5 alone is rejected outright, and the
+physical pair — 1.5 with a net solar tide of a few per cent of the lunar
+transfer — fits the record as well as the shipped factor, because the record
+fixes the SUM of the secular drivers, <!--v:dLodDtNetSecularJ2000-->+1.77<!--/v--> ms/cy
+at J2000, and not its split. Moving to the physical pair is therefore a
+Layer-2 recalibration campaign (the recession budget is closed, so several
+paleo anchors would move), not a numeric correction; the shipped factor stands
+in for the solar tide by design, and this paragraph is where that is said.
+
 The IERS observed rate is the physical Earth-rotation slowdown, integrating tidal + GIA + minor terms (mantle-core coupling ~ ±0.2 ms/century, hydrology ~ ±0.05 ms/century). The model matches to within 1% using **only two literature-anchored parameters** (LLR α₁ and Cox & Chao dJ₂/dt with the Peltier ICE-6G factor-2.0 J₂→α conversion) — no fitting to the observed rate.
 
 **Physical picture**: the ~1.77 ms/century LOD growth we experience today is what remains of the tidal channel after GIA cancels ~17% of the tidal effect. Without GIA, Earth would be slowing 20% faster than observed; without the tidal channel, Earth would be spinning UP at −0.35 ms/century instead of slowing down.

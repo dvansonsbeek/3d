@@ -49,6 +49,15 @@ does not "assume prograde"; the first-order *approximation* does, and nobody
 predicts with it. The lattice's 8H/N divisors are A-type claims and can only
 be tested against A-type quantities.
 
+Neptune is the extreme C-type case: on a near-circular orbit the osculating
+perihelion direction swings through the full circle on a decades-long cycle,
+and the chain follows WebGeoCalc's osculating ϖ through that swing to a
+fraction of a degree (the Perihelion of Planets Verification panel shows both
+series). The Planet Info panel and the website's planet figure print that
+osculating value by design; JPL's J2000 *mean* element for Neptune is the
+orbit-averaged quantity and sits several degrees away from it — a different
+quantity, not a disagreement.
+
 Even C is not one number: the same DE series
 (`public/input/wgc-perihelion-data.json`, its `windowRates` fields) fits
 −1,599 over the full 300-yr window (15 cycles of the 19.9-yr Jupiter–Saturn

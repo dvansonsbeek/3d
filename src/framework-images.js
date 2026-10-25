@@ -1620,8 +1620,9 @@ function renderIceCores(ctx) {
     body += fiText(lx, ly + 16, `~${fiNum(fiRoundTo(lgm[0], 1), 0)} kyr ago · ${lgm[1].toFixed(1)} °C`, { size: 11.5, color: C.accent, anchor: 'end', halo: true });
     body += fiLine(lx + 4, ly + 6, x - 3, y - 10, { color: C.accent, width: 1.3 }) + fiArrowHead([x - 9, y - 18], [x - 2, y - 7], { color: C.accent, head: 9 });
   }
-  // (b) CO₂ — the composite's youngest (0-kyr) bin averages in the industrial-era samples (the record runs to 2001 AD):
-  // dropped, and said so — the strip shows the natural cycle
+  // (b) CO₂ — the exporter (scripts/export_epica_browser.py) starts the 2-kyr grid at 2 kyr BP: a 0-kyr
+  // bin averaged the industrial-era samples in (the composite runs to 2001 AD). The > 0 filter stays as a
+  // guard; the strip shows the natural cycle and says what it leaves out
   const epc = ep ? within(ep.age_kyr_BP, ep.co2_ppm).filter((p) => p[0] > 0) : [];
   const vosC = ic ? within(ic.vostokCO2.ageKyrBP, ic.vostokCO2.co2Ppm) : [];
   body += fiText(L, t2 - 12, 'Atmospheric CO₂ (ppm)', { size: 14, weight: '600' });
