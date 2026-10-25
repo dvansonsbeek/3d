@@ -459,6 +459,23 @@ _currentReportData = {
 
 ---
 
+## Part 4b: Frame-time readout (`index.html?perf=1`)
+
+Opening the simulator with `?perf=1` adds a one-line readout at the top of the
+scene — the render loop measuring itself on the machine it runs on. Over a
+2-second window it shows the frame rate and frame gap (median and p95), the
+loop's own JavaScript time per frame (median and p95), the count of long
+frames (over 33 ms), the active pixel ratio beside the device's with every
+adaptive switch counted (the loop drops to pixel ratio 1 under 30 fps and
+restores above 40; each switch is also logged to the console), the drawing
+buffer size, draw calls and triangles, and whether the scene is playing.
+Clicking the line copies it, with the browser's user-agent string appended,
+to the clipboard and to the console, ready to paste into a report. It is off
+without the flag and runs nothing then. Reading it: JavaScript time
+near the frame gap means the model is the cost; JavaScript at a few
+milliseconds with a long frame gap means the draw is; a rising switch count
+means the pixel-ratio hysteresis is oscillating.
+
 ## Part 5: The former Console Tests (F12) — where each check lives now
 
 The Tools menu's Console Tests folder (49 buttons printing to the browser's

@@ -22926,6 +22926,53 @@ dateHUD.id = 'dateHUD';
 dateHUD.textContent = o.Date || '';
 document.body.appendChild(dateHUD);
 
+// ── Frame-time readout, opt-in: index.html?perf=1 ─────────────────────────
+// The scene's own instrument for "the motion stutters": what the render loop
+// measures about itself on THIS machine — frame gap and the loop's JS time per
+// frame (median / p95 over a 2-s window), long frames (> 33 ms), the active
+// pixel ratio with every adaptive switch counted, draw calls and triangles.
+// Off by default: nothing below runs unless the flag is present, so the gates
+// and the normal page are untouched. Headless profiling put the loop's JS at
+// ~5 ms a frame with 96 % of the frame outside JavaScript (the draw), which a
+// software GPU cannot speak for — this readout is how the owner's GPU speaks.
+const PERF_HUD = new URLSearchParams(window.location.search).has('perf');
+const _perf = { gaps: [], js: [], longFrames: 0, switches: 0, lastHud: 0, el: null, line: '' };
+if (PERF_HUD) {
+  _perf.el = document.createElement('div');
+  _perf.el.id = 'perfHUD';
+  _perf.el.title = 'click to copy this line';
+  // click → the line goes to the clipboard (and to the console, for a browser
+  // without clipboard access), so a reading can be pasted into a report as is
+  _perf.el.addEventListener('click', () => {
+    const line = _perf.line + ` · ${navigator.userAgent}`;
+    console.info('[perf] ' + line);
+    const flash = (msg) => { _perf.el.textContent = msg; _perf.lastHud = performance.now() + 700; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(line).then(() => flash('copied — paste it into the report'), () => flash('copy failed — the line is in the console'));
+    else flash('the line is in the console (no clipboard access)');
+  });
+  document.body.appendChild(_perf.el);
+}
+/** Record one ACTIVE frame (the idle-skipped frames never reach the loop body). @param {number} gapMs @param {number} jsMs */
+function _perfRecord(gapMs, jsMs) {
+  _perf.gaps.push(gapMs); _perf.js.push(jsMs);
+  if (gapMs > 33) _perf.longFrames++;
+  const nowMs = performance.now();
+  if (nowMs - _perf.lastHud < 500) return;
+  _perf.lastHud = nowMs;
+  // the 2-s window: the last ~120 frames at 60 Hz
+  if (_perf.gaps.length > 120) { _perf.gaps.splice(0, _perf.gaps.length - 120); _perf.js.splice(0, _perf.js.length - 120); }
+  const q = (arr, p) => { const s = arr.slice().sort((a, b) => a - b); return s.length ? s[Math.floor((s.length - 1) * p)] : 0; };
+  const gapMed = q(_perf.gaps, 0.5);
+  const info = renderer.info.render;
+  const c = renderer.domElement;
+  _perf.line =
+    `${(1000 / gapMed).toFixed(0)} fps · frame ${gapMed.toFixed(1)} ms (p95 ${q(_perf.gaps, 0.95).toFixed(1)}) · ` +
+    `JS ${q(_perf.js, 0.5).toFixed(1)} ms (p95 ${q(_perf.js, 0.95).toFixed(1)}) · long frames ${_perf.longFrames} · ` +
+    `pixel ratio ${renderer.getPixelRatio().toFixed(2)} (device ${(window.devicePixelRatio || 1).toFixed(2)}${lowPerformanceMode ? ', LOW mode' : ''}, switches ${_perf.switches}) · ` +
+    `${c.width}×${c.height} px · ${info.calls} draw calls · ${(info.triangles / 1000).toFixed(0)}k tri · ${o.Run ? 'playing' : 'paused'}`;
+  _perf.el.textContent = _perf.line;
+}
+
 /* Keyboard hint — fades out after 5 seconds */
 const keyHint = document.createElement('div');
 keyHint.id = 'keyHint';
@@ -22979,6 +23026,7 @@ function _refreshVisibleMonitors() {
 
 function render(now) {
   requestAnimationFrame(render);
+  const _perfT0 = PERF_HUD ? performance.now() : 0;
 
   // 0) Cap at ~60 FPS — skip redundant frames on high-refresh displays
   if (now - lastFrameTime < 16.0) return;
@@ -23024,9 +23072,11 @@ function render(now) {
   if (smoothedFps < 30 && !lowPerformanceMode) {
     renderer.setPixelRatio(1);
     lowPerformanceMode = true;
+    if (PERF_HUD) { _perf.switches++; console.info(`[perf] pixel ratio → 1 (smoothed ${smoothedFps.toFixed(1)} fps) at t=${(now / 1000).toFixed(1)} s`); }
   } else if (smoothedFps > 40 && lowPerformanceMode) {
     renderer.setPixelRatio(window.devicePixelRatio);
     lowPerformanceMode = false;
+    if (PERF_HUD) { _perf.switches++; console.info(`[perf] pixel ratio → ${window.devicePixelRatio} (smoothed ${smoothedFps.toFixed(1)} fps) at t=${(now / 1000).toFixed(1)} s`); }
   }
 
   // 5) OrbitControls: point at your selected pivot
@@ -23267,7 +23317,7 @@ function render(now) {
     forceSceneUpdate();
     updatePositionDisplayStrings();
   }
-  //stats.end();
+  if (PERF_HUD) _perfRecord(deltaMs, performance.now() - _perfT0);
 }
 // ── Startup heal: fresh-load state ≡ epoch-chain state at J2000 ─────────────
 // The object literals and the epoch updaters are two hand-maintained copies
