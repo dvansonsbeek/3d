@@ -4066,6 +4066,17 @@ if (typeof window !== 'undefined') {
     // The Tracing button itself (traceEnable switches it ON and never off; the
     // default-on traces then fill on every update) — the gate restores it.
     setTracing: (on) => { o.traceBtn = !!on; resetAllTraces(); },
+    // The scene time coordinate — the perf gate's Play-start row watches it advance.
+    scenePos: () => o.pos,
+    // The perihelion-date rows' solve against the certified Sun it rides
+    // (plan 20 §1b.11): the instant's JD, the Sun's longitude there and the target.
+    perihelionDateProbe: () => {
+      const yr = Math.floor(o.currentYear), target = wrap360(o.longitudePerihelion + 180);
+      const jd = _jdOfSunLongitudeInYear(target, yr);
+      const lonCompleted = _tierModelB().eclipse.sunLonCompletedDegAtJD(jd + deltaTStart / SECONDS_PER_DAY);
+      // (the solve's floor at a deep epoch is the JD's ulp in solar motion — ~1e-5° at −100 Ma; the gate scales its tolerance by |jd|)
+      return { year: yr, jd, lonAtJdDeg: wrap360(lonCompleted), lonCompletedDeg: lonCompleted, targetDeg: target, dateStr: o.longitudePerihelionDatePer };
+    },
     traceProbe: (name) => {
       const obj = tracePlanets.find((p) => p.name === name);
       if (!obj) return null;
@@ -8331,7 +8342,6 @@ let labelElapsed = 0;   // Throttle for CSS2D label updates during playback (30 
 // this point — a dev bundle keeps `let` in place and threw the TDZ error)
 let _needsInitialSceneUpdate = true; // Force forceSceneUpdate() on first render frame
 
-const DEG = Math.PI / 180;
 const KM_TO_MI = 0.62137119;   // 1 kilometre  → 0.621 371 miles
 
 
@@ -12640,11 +12650,11 @@ const ESSRT_QTY_SPECS = {
     // derivation from their LOD: days/year = year_seconds / LOD_seconds.
     // (Year-seconds is essentially constant across the Phanerozoic — Driver 2
     // shifts it by only ~0.05% over 650 Myr.)
-    // At 400 Ma: 31,556,925 / (21.75 × 3600) ≈ 403 days/year — matches Wells
+    // At 400 Ma: 31,558,150 / (21.75 × 3600) ≈ 403 days/year — matches Wells
     // 1963's Devonian coral growth-band count.
     hasWu:    true,
     wuKey:    'lod_hr',
-    wuConvert:(lod_hr) => MEAN_TROPICAL_YEAR_J2000_S / (lod_hr * 3600),
+    wuConvert:(lod_hr) => _EPOCH_SEEDS_J2000.meansiderealyearlengthinSeconds / (lod_hr * 3600),   // the curve's year (sidereal), not the tropical
     footnote: 'Note: the Wu et al. 2024 points here are derived from their LOD anchors, so the same documented Pangea-interval offset applies as on the Length-of-Day tab (docs/99 §Pangea interval).',
   },
   axial: {
@@ -22101,8 +22111,11 @@ function render(now) {
   requestAnimationFrame(render);
   const _perfT0 = PERF_HUD ? performance.now() : 0;
 
-  // 0) Cap at ~60 FPS — skip redundant frames on high-refresh displays
-  if (now - lastFrameTime < 16.0) return;
+  // (no frame cap: requestAnimationFrame paces at the display's rate and the
+  // simulation step is the clamped smoothed delta below, so motion is
+  // rate-independent. The former `< 16.0 ms → return` skipped every other
+  // vsync on 75–144 Hz displays and turned 60-Hz timestamp jitter into 33-ms
+  // gaps — the stutter class ?perf=1 was built to see; plan 20 §1b.16.)
 
   // 1) Delta
   const deltaMs = now - lastFrameTime;
@@ -25349,6 +25362,7 @@ function umbraNASAConventionAtJd(jd) {
 // (`createModel().cardinal.jdNearUT` seeded at the displayed calendar year's
 // midpoint — updatePredictions) and cache per calendar year here.
 const _cpPanelCache = { year: null, vals: null, lastMs: -Infinity, holdMs: 300 };
+const _periDateCache = { year: null, key: null, hybrid: null, per: '', ap: '' };   // the perihelion/aphelion date rows (updatePredictions)
 
 /*  Load SheetJS the first time we need it  */
 function ensureSheetJs () {
@@ -27943,7 +27957,7 @@ const planetStats = {
       {label : () => `In solar radii`,
        value : [ { v: () => computeSunSSBOffset(o.currentYear).magnitude / (diameters.sunDiameter / 2), dec:3, sep:',' },{ small: 'R☉' }],
        hover : [`Sun-SSB distance in units of solar radius (R☉ = ${fmtNum(diameters.sunDiameter/2, 0, ',')} km). Values < 1 mean SSB sits inside the Sun; > 1 means outside. The Sun's surface passes near or outside the SSB roughly every Jupiter-Saturn synodic period (~20 years).`]},
-      {label : () => `Direction (ecliptic λ)`,
+      {label : () => `Direction (inv.-plane λ)`,
        value : [ { v: () => computeSunSSBOffset(o.currentYear).direction, dec:2, sep:',' },{ small: '°' }],
        hover : [`In-plane longitude (measured in the engine's own invariable plane from the s-frame origin — within ~1.6° of ecliptic longitude) pointing from Sun toward SSB. This is roughly the angular position of the dominant pulling planet (usually Jupiter).`]},
       {label : () => `Inside Sun?`,
@@ -34688,11 +34702,20 @@ function updatePredictions() {
   o.longitudePerihelion = earthPerihelionEclipticOfDateDeg(o.julianDay, o.currentYear);
   predictions.longitudePerihelion = o.longitudePerihelion;
   
-  // The dates of Earth's perihelion and aphelion are the instants the Sun's
-  // longitude reaches ϖ_Earth + 180° and ϖ_Earth (the series' perihelion of
-  // date above).
-  predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = longitudeToDateTime(o.longitudePerihelion + 180, o.currentYear);
-  predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = longitudeToDateTime(o.longitudePerihelion, o.currentYear);
+  // The dates of Earth's perihelion and aphelion are the instants the certified
+  // Sun's longitude reaches ϖ_Earth + 180° and ϖ_Earth (the series' perihelion
+  // of date above) — two Newton solves on the model's Sun, cached like the
+  // cardinal rows: per calendar year and per 1e-4° of ϖ (2.4 s of date).
+  {
+    const periYear = Math.floor(o.currentYear), periKey = Math.round(o.longitudePerihelion * 1e4);
+    if (_periDateCache.year !== periYear || _periDateCache.key !== periKey || _periDateCache.hybrid !== _hybridSpinActive()) {
+      _periDateCache.year = periYear; _periDateCache.key = periKey; _periDateCache.hybrid = _hybridSpinActive();
+      _periDateCache.per = longitudeToDateTime(o.longitudePerihelion + 180, periYear);
+      _periDateCache.ap = longitudeToDateTime(o.longitudePerihelion, periYear);
+    }
+    predictions.longitudePerihelionDatePer = o.longitudePerihelionDatePer = _periDateCache.per;
+    predictions.longitudePerihelionDateAp = o.longitudePerihelionDateAp = _periDateCache.ap;
+  }
   
   predictions.lengthofAU = currentAUDistance;  // tweakpane display shadow; algebraic round-trip removed (broke under Driver 2)
 
@@ -35681,19 +35704,35 @@ function colorTemperature2rgb(kelvin) {
 
 /* -----------------------------------------------------------------
    Ecliptic longitude ➜ calendar date *with time*  (±1 s accuracy)
-   – uses the dateTimeToJulianDay() + dayToDateNew()
-   – ONLY valid for roughly 1000 AD … 2500 AD (But according to Theory from 4000 BC to 4000 AD)
+   – the certified Sun (the one home the rendered Sun, the cardinal rows and
+     the eclipse finders ride), so the instant holds at every epoch the model
+     states (plan 20 §1b.11: the Meeus Ch. 25 polynomial this solved before
+     was a 1000–2500 AD form fed a UT day — arbitrary at deep time)
+   – uses dateTimeToJulianDay() + dayToDateNew()
 ------------------------------------------------------------------ */
 
-/* Meeus – Sun’s true longitude  ---------------------------------- */
-function solarLongitudeDeg(JD){
-  const T  = (JD - j2000JD) / julianCenturyDays;
-  const L0 = 280.46646 + 36000.76983*T + 0.0003032*T*T;
-  const M  = 357.52911 + 35999.05029*T - 0.0001537*T*T;
-  const C  = (1.914602 - 0.004817*T - 0.000014*T*T)*Math.sin(M*DEG) +
-             (0.019993 - 0.000101*T)*Math.sin(2*M*DEG) +
-              0.000289*Math.sin(3*M*DEG);
-  return (L0 + C) % 360;
+/** The UT Julian day in the civil year `yr` at which the certified Sun's
+ *  longitude reaches lonDeg: a Newton solve on the model's
+ *  sunLonCompletedDegAtJD (true TT: the bridge is ours, the finder axis adds
+ *  the curve) from the mean-longitude day-of-year seed. */
+function _jdOfSunLongitudeInYear(lonDeg, yr) {
+  lonDeg = wrap360(lonDeg);
+  const anchorLon = [  0,  90, 180, 270, 360];
+  const anchorDOY = [ 79, 172, 266, 355, 444];   // mean dates in a non-leap year (the seed only)
+  let i = 0;
+  while (lonDeg >= anchorLon[i + 1]) i++;
+  const doy = anchorDOY[i] + (lonDeg - anchorLon[i]) / 90 * (anchorDOY[i + 1] - anchorDOY[i]);
+  let JD = dateTimeToJulianDay(`${yr}-01-01`, '00:00:00') + doy;
+  const sunLon = _tierModelB().eclipse.sunLonCompletedDegAtJD;
+  const dλdT = 360 / meansolaryearlengthinDays;                 // mean solar motion °/day (the Newton slope)
+  for (let k = 0; k < 12; k++) {
+    const λ = sunLon(JD + deltaTStart / SECONDS_PER_DAY);
+    if (!Number.isFinite(λ)) return NaN;
+    const diff = ((λ - lonDeg) % 360 + 540) % 360 - 180;       // signed −180…+180
+    if (Math.abs(diff) < 1e-8) break;                           // ~0.00001 °
+    JD -= diff / dλdT;
+  }
+  return JD;
 }
 
 /**
@@ -35724,28 +35763,11 @@ function longitudeToDateTime(lonDeg, currentYear) {
                 ? Math.floor(o.currentYear)
                 : new Date().getUTCFullYear());
 
-  /* 3 — crude day-of-year guess (linear anchors) ----------------------- */
-  const anchorLon = [  0,  90, 180, 270, 360];
-  const anchorDOY = [ 79, 172, 266, 355, 444];   // mean dates in non-leap year
-  let i = 0;
-  while (lonDeg >= anchorLon[i + 1]) i++;
-  const f   = (lonDeg - anchorLon[i]) / 90;
-  const doy = anchorDOY[i] + f * (anchorDOY[i + 1] - anchorDOY[i]);
+  /* 3 — the instant, on the certified Sun ------------------------------- */
+  const JD = _jdOfSunLongitudeInYear(lonDeg, yr);
+  if (!Number.isFinite(JD)) return "—";
 
-  /* 4 — JD at 00:00 UTC, 1 Jan of chosen year -------------------------- */
-  let JD = dateTimeToJulianDay(`${yr}-01-01`, '00:00:00') + doy;
-
-  /* 5 — Newton iterations to refine JD to the exact longitude ---------- */
-  const dλdT = 360/meansolaryearlengthinDays;                     // mean solar motion °/day
-  for (let k = 0; k < 8; k++) {
-    const λ = solarLongitudeDeg(JD);
-    if (λ === null) return "no formula";
-    const diff = ((λ - lonDeg + 540) % 360) - 180;   // signed −180…+180
-    if (Math.abs(diff) < 1e-8) break;                // ~0.00001 °
-    JD -= diff / dλdT;
-  }
-
-  /* 6 — JD → calendar date-time via your helper ------------------------ */
+  /* 4 — JD → calendar date-time via your helper ------------------------ */
   const { date, time } = dayToDateNew(
     JD,
     'julianday',

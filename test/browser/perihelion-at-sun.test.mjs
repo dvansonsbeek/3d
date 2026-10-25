@@ -206,10 +206,13 @@ try {
     T.setTracing(true); T.traceEnable('Sun', true); T.jumpJD(midJD); T.jumpJD(2451545.0); const sunTraced = T.sunSceneNow(); const sunFill = T.traceProbe('Sun').filled;
     T.setTracing(false);
     T.jumpJD(midJD); const moonFirst = T.moonDistanceProbe();
+    const periDateMid = T.perihelionDateProbe();   // year 1000 (jumped above)
     T.jumpJD(deepJD); await wait(1500); T.jumpJD(deepJD);   // the loop syncs the epoch anchors, the second jump poses on them
     const ring = T.moonRingProbe(); const peri = T.periMarkerTraceRadiusProbe('PERIHELION JUPITER');
+    const periDateDeep = T.perihelionDateProbe();
     T.jumpJD(2451545.0); await wait(1000); T.jumpJD(2451545.0);
-    return { ringJ2000, ring, peri, moonFirst, sunSettled, sunTraced, sunFill };
+    const periDateJ2000 = T.perihelionDateProbe();
+    return { ringJ2000, ring, peri, moonFirst, sunSettled, sunTraced, sunFill, periDateJ2000, periDateMid, periDateDeep };
   }, { deepJD: 2451545.0 + (DEEP_YEAR - 2000) * 365.25, midJD: 2451545.0 + (1000 - 2000) * 365.25 });
   console.log(`      (deep-epoch rows took ${((Date.now() - t0) / 1000).toFixed(1)} s)`);
   const mr2 = deep.ring, pj = deep.peri;
@@ -219,6 +222,16 @@ try {
   check('−100 Ma: the traced perihelion marker rides the rendered marker\'s a·e of date (Jupiter)', !!pj && Math.abs(pj.traceRadiusUnits - pj.markerRadiusUnits * PLANT) < 1e-9 && Math.abs(pj.markerRadiusUnits - pj.j2000Units) > 0.1, pj ? `trace ${pj.traceRadiusUnits.toFixed(6)} vs marker ${(pj.markerRadiusUnits * PLANT).toFixed(6)} units (J2000 container offset ${pj.j2000Units.toFixed(3)})` : 'probe returned null');
   const md = deep.moonFirst;
   check('first update after a jump: the Moon\'s distance row reads the placed mesh', !!md && Math.abs(md.distAU - md.worldDistAU) < 1e-12, md ? `${md.distAU.toFixed(12)} vs ${md.worldDistAU.toFixed(12)} AU` : '');
+  // the perihelion-date rows ride the certified Sun (plan 20 §1b.11): the Sun's
+  // longitude at the solved instant IS the target, at J2000, year 1000 and the
+  // deep epoch — to a microdegree, or to eight ulps of the JULIAN DAY in solar
+  // motion where that is coarser (−100 Ma: |JD| ~3.7e10 d, ulp ~8e-6 d ≈ 1e-5°
+  // of solar longitude — the solve's floating-point floor)
+  for (const [tag, pd] of [['J2000', deep.periDateJ2000], ['year 1000', deep.periDateMid], [`${DEEP_YEAR / 1e6} Ma`, deep.periDateDeep]]) {
+    const d = pd ? Math.abs(wrap(pd.lonAtJdDeg - pd.targetDeg * PLANT)) : NaN;
+    const tol = pd ? Math.max(1e-6, 8 * Math.abs(pd.jd) * Number.EPSILON * (360 / 365.25)) : 0;
+    check(`perihelion date (${tag}): the certified Sun's longitude at the solved instant is ϖ + 180°`, Number.isFinite(d) && d < tol && Number.isFinite(pd.jd), pd ? `Δ ${d.toExponential(2)}° (tol ${tol.toExponential(1)}) · ${pd.dateStr} (civil year ${pd.year})` : 'probe returned null');
+  }
   const sunLimit = PLANT === 1 ? 1e-9 : -1;
   check('a synchronous jump with the Tracing button on poses the scene at the jump (not the trace\'s last sample)', deep.sunFill > 0 && Math.abs(deep.sunTraced.raDeg - deep.sunSettled.raDeg) < sunLimit && Math.abs(deep.sunTraced.decDeg - deep.sunSettled.decDeg) < sunLimit, `Sun RA ${deep.sunTraced.raDeg.toFixed(6)} vs settled ${deep.sunSettled.raDeg.toFixed(6)}° (${deep.sunFill} trace samples filled)`);
 

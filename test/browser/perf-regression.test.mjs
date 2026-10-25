@@ -217,21 +217,26 @@ try {
     // the steady-state window below
     const monitorText = () => fresh.page.evaluate(() => { const row = [...document.querySelectorAll('#gui .tp-lblv')].find((r) => /Mass height/.test(r.querySelector('.tp-lblv_l')?.textContent || '')); return row ? (row.querySelector('.tp-lblv_v input')?.value ?? row.querySelector('.tp-lblv_v')?.textContent ?? '').trim() : null; });   // a monitor renders as a readonly <input>: read its value
     const monitorBefore = await monitorText();
-    const dateText = () => fresh.page.evaluate(() => { const el = [...document.querySelectorAll('input')].find((i) => /^\d{4}-\d\d-\d\d$/.test(i.value)); return el ? el.value : '?'; });
-    const before = await dateText();
+    // Play → the first frame that ADVANCES the scene (o.pos): the start latency
+    // the owner reported. The row first watched the day-granular date string,
+    // which at one week per second and a clamped 100-ms headless frame could
+    // only change after the second active frame — 3–5 frames by construction
+    // against the 5× limit (measured 4.3–5.3× at HEAD; plan 20 follow-up).
+    const posNow = () => fresh.page.evaluate(() => window.__test__.scenePos());
+    const before = await posNow();
     const t0 = Date.now();
     const clicked = await fresh.page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => /Play/.test(x.textContent || '')); if (!b) return false; b.click(); return true; });
     if (!clicked) { console.log('FAIL  play start — Play button not found'); fail++; }
     let firstMs = NaN;
-    while (Date.now() - t0 < 15000) { if ((await dateText()) !== before) { firstMs = Date.now() - t0; break; } await fresh.page.waitForTimeout(20); }
+    while (Date.now() - t0 < 15000) { if ((await posNow()) !== before) { firstMs = Date.now() - t0; break; } await fresh.page.waitForTimeout(10); }
     const steady = await fresh.page.evaluate(async (ms) => {
       const gaps = []; let last = performance.now(); const start = last;
       await new Promise((res) => { const step = (t) => { gaps.push(t - last); last = t; if (t - start < ms) requestAnimationFrame(step); else res(); }; requestAnimationFrame(step); });
       gaps.sort((a, b) => a - b);
       return gaps[Math.floor(gaps.length / 2)];
     }, 3000);
-    console.log(`      play start: Play → first date change ${firstMs.toFixed(0)} ms · steady frame gap ${steady.toFixed(0)} ms (default speed)`);
-    gate('play start: first-change delay / steady frame gap ratio', firstMs / steady, 5, 'x');
+    console.log(`      play start: Play → first scene advance ${firstMs.toFixed(0)} ms · steady frame gap ${steady.toFixed(0)} ms (default speed)`);
+    gate('play start: first scene advance / steady frame gap ratio', firstMs / steady, 5, 'x');
     const monitorAfter = await monitorText();
     const monitorOk = monitorBefore !== null && monitorAfter !== null && monitorBefore !== monitorAfter;
     console.log(`${monitorOk ? 'PASS' : 'FAIL'}  loop-driven monitors update while playing  — "Mass height" ${monitorBefore} → ${monitorAfter}`);

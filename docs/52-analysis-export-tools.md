@@ -160,11 +160,11 @@ Position data for Sun and all planets.
 
 ### Functions
 
-| Function | Line | Description |
-|----------|------|-------------|
-| `runRATest()` | ~19744 | Main export function |
-| `buildJdArray()` | ~19661 | Build Julian Day array from config |
-| `forceSceneUpdate()` | ~19706 | Force calculation update |
+| Function | Description |
+| ---------- | ------------- |
+| `runRATest()` | Main export function |
+| `buildJdArray()` | Build Julian Day array from config |
+| `forceSceneUpdate()` | Force calculation update |
 
 ---
 
@@ -423,15 +423,15 @@ Reports include various astronomical events:
 
 ### Functions
 
-| Function | Line | Description |
-|----------|------|-------------|
-| `generatePlanetReport(planetKey, showAll)` | ~20624 | Main report generator |
-| `exportPlanetReportToExcel(planetKey, excelData)` | ~20688 | Excel export |
-| `copyReportToClipboard(reportText)` | ~20768 | Clipboard copy |
-| `collectPlanetDataForDate(planetKey, testDate)` | ~20146 | Data collection helper |
-| `buildReportHeader(planetKey)` | ~20252 | Screen header builder |
-| `buildDateSection(planetKey, testDate, data)` | ~20458 | Screen section builder |
-| `generateAndDisplayReport(planetKey)` | ~20792 | UI integration |
+| Function | Description |
+| ---------- | ------------- |
+| `generatePlanetReport(planetKey, showAll)` | Main report generator |
+| `exportPlanetReportToExcel(planetKey, excelData)` | Excel export |
+| `copyReportToClipboard(reportText)` | Clipboard copy |
+| `collectPlanetDataForDate(planetKey, testDate)` | Data collection helper |
+| `buildReportHeader(planetKey)` | Screen header builder |
+| `buildDateSection(planetKey, testDate, data)` | Screen section builder |
+| `generateAndDisplayReport(planetKey)` | UI integration |
 
 ### Global State
 
@@ -567,19 +567,19 @@ Finds the aphelion (farthest point from Sun) for a given year.
 
 ### Library Loading
 
-| Function | Line | Description |
-|----------|------|-------------|
-| `ensureSheetJs()` | ~19727 | Load SheetJS from CDN on-demand |
-| `workbookToBlob(wb)` | ~19738 | Convert workbook to downloadable blob |
+| Function | Description |
+| ---------- | ------------- |
+| `ensureSheetJs()` | Load SheetJS from CDN on-demand |
+| `workbookToBlob(wb)` | Convert workbook to downloadable blob |
 
 ### Coordinate Conversion
 
-| Function | Line | Description |
-|----------|------|-------------|
-| `raToHMSFromRadians(rad)` | ~20052 | Radians to HMS format |
-| `raDecimalHoursToHMS(decimalHours)` | ~20065 | Decimal hours to HMS |
-| `decDecimalDegreesToDMS(decimalDegrees)` | ~20078 | Decimal degrees to DMS |
-| `longitudeToRAHMS(longitudeDeg, obliquityDeg)` | ~20388 | Ecliptic longitude to RA |
+| Function | Description |
+| ---------- | ------------- |
+| `raToHMSFromRadians(rad)` | Radians to HMS format |
+| `raDecimalHoursToHMS(decimalHours)` | Decimal hours to HMS |
+| `decDecimalDegreesToDMS(decimalDegrees)` | Decimal degrees to DMS |
+| `longitudeToRAHMS(longitudeDeg, obliquityDeg)` | Ecliptic longitude to RA |
 
 **Longitude to RA Formula:**
 ```
@@ -589,11 +589,11 @@ Where l = ecliptic longitude, e = obliquity
 
 ### Validation Functions
 
-| Function | Line | Description |
-|----------|------|-------------|
-| `compareRAToSun(planetRARad, sunRARad)` | ~20283 | NASA transit validation |
-| `compareRAToReference(planetRARad, refRA)` | ~20334 | Reference data comparison |
-| `compareDecValues(calculatedDecRad, refDecStr)` | ~20261 | Declination within 1 deg |
+| Function | Description |
+| ---------- | ------------- |
+| `compareRAToSun(planetRARad, sunRARad)` | NASA transit validation |
+| `compareRAToReference(planetRARad, refRA)` | Reference data comparison |
+| `compareDecValues(calculatedDecRad, refDecStr)` | Declination within 1 deg |
 
 ---
 

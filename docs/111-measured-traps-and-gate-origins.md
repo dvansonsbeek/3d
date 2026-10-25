@@ -412,7 +412,10 @@ chain at ±1/±5 Myr; the golden master cannot catch that class), plus
 in-table cost, runner-speed independent; born from four ungated ratio
 regressions, one owner-bisected at 28×; plus two travel-speed rows the
 steady-state rows cannot see — the orbit-ring resample against the per-JD
-route and the Play-start delay on a fresh page, both bisected from the
+route and the Play-start delay on a fresh page — Play → the first frame that
+advances the scene (it first watched the day-granular date string, which at
+one week per second and a 100-ms headless frame could only change after the
+second active frame: 3–5× by construction against the 5× limit) — both bisected from the
 owner's "waiting time before Play / stutter at 1000 yr/s"; plus the
 paused-idle row — a paused, untouched page must leave the render loop's
 idle check in place (Tweakpane's readonly rows re-emit `change` on every
@@ -479,7 +482,14 @@ The `test:snapshot` chain also carries:
   `forceSceneUpdate` traced AFTER `moveModel`, so every synchronous reader
   saw the trace's last sample (the Sun's RA 8.6° off, the ring's perigee
   190° off after a year-1000 → J2000 jump). The same plant breaks the two
-  geometry rows; the jump row's limit becomes unreachable under it.
+  geometry rows; the jump row's limit becomes unreachable under it. The
+  perihelion-date rows ride the certified Sun (the Meeus Ch. 25 polynomial
+  they solved before was a 1000–2500 AD form fed a UT day, arbitrary at deep
+  time): at J2000, year 1000 and the deep epoch the Sun's longitude at the
+  solved instant is ϖ + 180° to a microdegree — or to eight ulps of the
+  Julian day in solar motion where that is coarser (−100 Ma: |JD| ~3.7e10 d,
+  ulp ~8e-6 d ≈ 1e-5° of longitude, the solve's floating-point floor) — and
+  the plant shifts the target.
 - **The star and constellation containers** (J2000 RA/Dec catalogs, aligned
   ONCE at module init) sit on the J2000 equatorial frame through R (born
   from the owner's "the Sun is at 160° against the constellations where it
