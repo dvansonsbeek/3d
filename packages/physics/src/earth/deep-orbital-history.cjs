@@ -237,6 +237,14 @@ function createDeepOrbitalHistory({
     // shift of a rotating vector bends its angular rate (+0.001 ″/yr
     // measured). e(0) and ϖ(0) still equal the anchor. ζ keeps the plain
     // form: it passes through zero near J2000.
+    // PLAN 21: the anchor IS the series' own J2000 node (the 1-kyr-boxcar MEAN
+    // element, `bodies.earth.zAnchorJ2000`, carried by the deep-modes embed),
+    // so the join below is the identity to rounding and the series is the mean
+    // element of date on every surface — the API, the panel, the eclipse Sun.
+    // The join stays as the seam machinery: with the osculating snapshot as
+    // anchor (the former wiring) it rotated the whole series by the J2000
+    // phase of the 11.9-yr Jupiter term (+70″ in ϖ, −5.8e-6 in e), and the
+    // eclipse Sun needed that constant undone (doc 109 §23.4).
     const eS = new Float64Array(nS), thS = new Float64Array(nS);
     let prev = 0, acc = 0;
     for (let k = 0; k < nS; k++) {

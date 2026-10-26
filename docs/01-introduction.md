@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -28,8 +28,8 @@ Two of Earth's precession motions rotate in **opposite directions**, so their fr
 | Motion | Direction | Period at J2000 | In precession periods |
 |--------|-----------|-----------------|-----------------------|
 | Axial precession (the clock) | Clockwise | <!--v:axialPrecRound-->~25,772<!--/v--> yr | 1 |
-| Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,635<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> |
-| Perihelion-of-date (their beat, 1/T_peri = 1/T_p + 1/T_aps) | — | <!--v:periPrecYears-->~20,938<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
+| Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,581<!--/v--> yr | <!--v:lunisolarApsidalPerPrecessionJ2000-->4.330<!--/v--> |
+| Perihelion-of-date (their beat, 1/T_peri = 1/T_p + 1/T_aps) | — | <!--v:periPrecYears-->~20,936<!--/v--> yr | <!--v:lunisolarPeriOfDatePerPrecessionJ2000-->0.8124<!--/v--> |
 
 The ratios are J2000 readings, not laws: the apsidal ratio wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr, as the simulator's Lunisolar Clock panel shows live. The perihelion-of-date beat is the carrier of the climatic-precession band; the obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqCycleYears-->~41,099<!--/v--> years today.
 

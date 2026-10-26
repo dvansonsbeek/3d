@@ -485,9 +485,9 @@ planets.ceres = {
 // ─── B1. (the year lengths of date are the one-family laws over the kinematic
 // day of date: tropicalYearDaysOfDate & co.) ───────────────────────────────────
 
-// ─── B2. (no perihelion device — Earth's perihelion of date is the chain's
-// ecliptic ϖ OF DATE, earthPerihelionEclipticOfDateDeg, on every surface; the
-// Earth-frame rate is its equatorial projection, perihelionFrameBreakdown) ───
+// ─── B2. (no perihelion device — Earth's perihelion of date is the one-source
+// series' ecliptic ϖ OF DATE, earthPerihelionEclipticOfDateDeg, on every surface;
+// the Earth-frame rate is its equatorial projection, perihelionFrameBreakdown) ───
 
 // ─── B3. (The fitted planet-path corrections — parallax, gravitation,
 // elongation — were EXCISED with the legacy planet chains, K5.) ──────────
@@ -20296,7 +20296,7 @@ function setupGUI() {
       'World Y is the J2000 ecliptic pole; the J2000 equinox lies in the horizontal plane at this azimuth \u2014 the browser\u2019s own measured pose (90.0066\u00b0 before plan 11), the one view literal the retired scaffold leaves. Every frame of date \u2014 Earth\u2019s axis, the sun plane, the Moon stack, the planets\u2019 poles and paths \u2014 is placed from the engine through this frame; no observable rides it.');
     head('Ledger 3 \u00B7 The fitted correction stack (gated, hashed)');
     row('\u0394T/LOD 4-flag stack \u00B7 core-mantle resonator \u00B7 climate formula',
-      'Fitter-owned coefficient arrays under the coefficients hash (Model Identity above); the recession knots, \u03B1\u2083/\u03B1\u2084 and the GIA \u03C4 are the banked deep-time record under the constants hash; beside them the osculating-mean offset of the published perihelion is measured, not fitted. Every gate is fail-proven. The published year lengths and precession periods ride the one-family route, not a fit. None of these touch the planetary dynamics.');
+      'Fitter-owned coefficient arrays under the coefficients hash (Model Identity above); the recession knots, \u03B1\u2083/\u03B1\u2084 and the GIA \u03C4 are the banked deep-time record under the constants hash. Every gate is fail-proven. The published year lengths and precession periods ride the one-family route, not a fit. None of these touch the planetary dynamics.');
   }
 
   // --- Calibration Inputs (from astro-reference.json — external observations) ---
@@ -31806,21 +31806,17 @@ function _chainPerihelionEclLonDeg(nameLower, jd) {
 }
 /** Earth's ecliptic ϖ OF DATE (equinox-referenced), degrees — ONE home for the
  *  Earth panel's ϖ/ω rows, the perihelion gauge and the mean/true-longitude
- *  rows: the one-source series' periOfDateDeg (the chain's J2000-frame ϖ
- *  carried on the composed equinox motion, wobble included — the SAME field
- *  the engine frame's apsidal arm renders; ≡ the chain at J2000 to 0.00″,
- *  measured) while the movement is live, sampled at the ENGINE YEAR
- *  (_engineYearTT — the frame's own argument, R4b; the SI/UT year had put
- *  the row and the rendered arm on different instants at deep time);
- *  otherwise the chain's J2000-frame ϖ advanced at the certified J2000
- *  general-precession rate (the linear gauges part from the series by 37″ at
- *  3000 AD — the wobble).
- *  Owner: the panel shows the PUBLISHED value — while the
- *  movement is live the rows read the Sun tier's ϖ of date — the package
- *  model's `sun.perihelionLongitudeDegAt` = the same series plus the
- *  osculating-mean offset (70.08″, `EARTH_OSCULATING_MEAN_OFFSET`; Meeus to
- *  0.001°), ONE ϖ with the API and the eclipse Sun. When the Sun-tier
- *  campaign replaces the offset by its movement, the panel follows. */
+ *  rows: the one-source series' periOfDateDeg (the MEAN element — the series'
+ *  own J2000 node is its anchor since plan 21 — carried on the composed
+ *  equinox motion, wobble included — the SAME field the engine frame's
+ *  apsidal arm renders) while the movement is live, sampled at the ENGINE
+ *  YEAR (_engineYearTT — the frame's own argument, R4b; the SI/UT year had
+ *  put the row and the rendered arm on different instants at deep time);
+ *  otherwise the chain's J2000-frame ϖ (the osculating anchor, 70″ below the
+ *  mean) advanced at the certified J2000 general-precession rate.
+ *  The panel reads the package model's `sun.perihelionLongitudeDegAt`, which
+ *  IS `earth.perihelionLongitudeDeg` — ONE ϖ with the API and the eclipse
+ *  Sun (Simon 1994's mean element to 1.3″ at J2000; doc 109 §23.4). */
 function earthPerihelionEclipticOfDateDeg(jd, year) {
   if (_hybridSpinActive()) return wrap360(_tierModelB().sun.perihelionLongitudeDegAt(_engineYearTT(jd)));
   const w = _chainPerihelionEclLonDeg('earth', jd) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000);

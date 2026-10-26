@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -115,9 +115,8 @@ The fitted artifacts under the coefficients hash (shown in the simulator's
 About → Model Identity) are the shipped `data/` fits that
 `tools/constants/generate.mjs` embeds: the ΔT stack (`DT_STACK`), the
 core-mantle resonator (`DT_RESONATOR`) and the climate formula
-(`CLIMATE_FORMULA_COEFFS`); beside them sit the measured osculating-mean
-offset (`EARTH_OSCULATING_MEAN_OFFSET`, derived, not fitted), the literature
-Meeus lunar term tables and the frozen balance-search record. The GIA τ is
+(`CLIMATE_FORMULA_COEFFS`); beside them sit the literature Meeus lunar term
+tables and the frozen balance-search record. The GIA τ is
 the banked fitted record `data/deep-time-fitted.json` (the distance history
 is the cited input above; the deep-time block of the constants is ASSEMBLED
 from it, from astro-reference's LLR α₁ and Cox & Chao block, and from the ΔT
@@ -142,19 +141,19 @@ they anchor per-planet geometry but carry no model freedom.
 | Parameter | Variable | Value |
 |-----------|----------|-------|
 | Perihelion-solstice alignment | `perihelionalignmentYear` | <!--v:periAlignYear-->1246.03125<!--/v--> AD |
-| Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v-->° — the IAU/Standish MEAN element; the series' secular element at J2000 is <!--v:earthSeriesPeriLongJ2000-->102.918<!--/v-->°, <!--v:earthConventionGapPeriArcsec-->105<!--/v-->″ lower (two conventions, labelled not reconciled) |
+| Long. perihelion (J2000) | `perihelionLongitudeJ2000_deg` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v-->° — the IAU/Standish MEAN element; the series' secular element at J2000 is <!--v:earthSeriesPeriLongJ2000-->102.937<!--/v-->°, <!--v:earthConventionGapPeriArcsec-->37<!--/v-->″ lower (two conventions, labelled not reconciled) |
 | Obliquity (J2000) | `obliquityJ2000_arcsec` | <!--v:obliquityJ2000Arcsec-->84381.406<!--/v-->" (<!--v:obliquityJ2000Deg-->23.439279<!--/v-->°) |
 | Obliquity rate (J2000) | `obliquityRate_arcsecPerCentury` | <!--v:obliquityRateArcsecPerCy-->-46.836769<!--/v-->"/cy |
 | Obliquity range | — | <!--v:mainstreamObliqRange-->~22.1° to ~24.5°<!--/v--> |
 | Earth incl. (J2000) | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v-->° |
-| Eccentricity (J2000) | `eccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> — the IAU/Standish MEAN element; the series' secular element at J2000 is <!--v:earthSeriesEccJ2000-->0.01670244<!--/v-->, <!--v:earthConventionGapEcc-->7.8e-6<!--/v--> lower (two conventions) |
+| Eccentricity (J2000) | `eccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> — the IAU/Standish MEAN element; the series' secular element at J2000 is <!--v:earthSeriesEccJ2000-->0.01670835<!--/v-->, <!--v:earthConventionGapEcc-->1.9e-6<!--/v--> lower (two conventions) |
 | Sidereal year (J2000) | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days |
 | Tropical year mean (J2000) | `tropicalYearMeanJ2000` — DERIVED | <!--v:tropicalYearMeanJ2000Days-->365.242190469<!--/v--> days — the beat of the sidereal year and p_A, 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d), one home (`computeMeanTropicalYearJ2000Days`; plan 09 — the Meeus & Savoie 1992 input 365.2421897, 66 ms shorter, left the registry) |
 | Tropical year VE (J2000) | `tropicalYearVEJ2000` | <!--v:tropicalYearVEJ2000Days-->365.242374<!--/v--> days |
 | Tropical year SS (J2000) | `tropicalYearSSJ2000` | <!--v:tropicalYearSSJ2000Days-->365.241626<!--/v--> days |
 | Tropical year AE (J2000) | `tropicalYearAEJ2000` | <!--v:tropicalYearAEJ2000Days-->365.242018<!--/v--> days |
 | Tropical year WS (J2000) | `tropicalYearWSJ2000` | 365.242740 days |
-| Anomalistic year (J2000) | derived — the law of date at 2000 | <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v--> days (the series' own apsidal rate on the sidereal year; Simon 1994's mean element <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> is a citation, <!--v:anomalisticYearSimon1994DeltaSeconds-->-0.088<!--/v--> s) |
+| Anomalistic year (J2000) | derived — the law of date at 2000 | <!--v:anomalisticYearJ2000Days-->365.2596365<!--/v--> days (the series' own apsidal rate on the sidereal year; Simon 1994's mean element <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> is a citation, <!--v:anomalisticYearSimon1994DeltaSeconds-->+0.047<!--/v--> s) |
 | Tropical year rate | `tropicalYearRateSecPerCentury` | −0.53 s/cy |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> |
 | Cardinal instants 2000 (VE / SS / AE / WS, UTC) | `cardinalPointAnchors` | <!--v:cardinalAnchorVE2000JD-->2451623.816<!--/v--> / <!--v:cardinalAnchorSS2000JD-->2451716.575<!--/v--> / <!--v:cardinalAnchorAE2000JD-->2451810.2271<!--/v--> / <!--v:cardinalAnchorWS2000JD-->2451900.0674<!--/v--> |
@@ -240,11 +239,11 @@ These are computed from foundational constants. The formula is the definition; t
 
 | Cycle | Formula | Period (years) | Direction |
 |-------|---------|----------------|-----------|
-| Apsidal Precession | the beat of the one-family anomalistic and sidereal years, T_anom·T_sid/(T_anom − T_sid) — the movement's own apsidal rate | <!--v:inclPrecYears-->~111,635<!--/v--> | Counter-clockwise |
+| Apsidal Precession | the beat of the one-family anomalistic and sidereal years, T_anom·T_sid/(T_anom − T_sid) — the movement's own apsidal rate | <!--v:inclPrecYears-->~111,581<!--/v--> | Counter-clockwise |
 | Ecliptic Precession | 1,296,000/\|s₃\|, the N-body chain's dominant nodal mode | <!--v:eclPrecYears-->~68,751<!--/v--> | Counter-clockwise |
 | Obliquity Cycle | the beat 1,296,000/(ψ̇ᵢₙ − \|s₃\|) of the spin axis's inertial rate against s₃ (the instantaneous limit) | <!--v:obliqCycleYears-->~41,099<!--/v--> | Clockwise (negative) |
 | Axial Precession | 1,296,000 / p_A — the IAU 2006 general precession input | <!--v:axialPrecRound-->~25,772<!--/v--> | Clockwise (negative) |
-| Perihelion Precession | the perihelion-of-date beat, 1/T_peri = 1/T_p + 1/T_aps | <!--v:periPrecYears-->~20,938<!--/v--> | Both directions |
+| Perihelion Precession | the perihelion-of-date beat, 1/T_peri = 1/T_p + 1/T_aps | <!--v:periPrecYears-->~20,936<!--/v--> | Both directions |
 
 ## Time Constants
 
@@ -252,7 +251,7 @@ These are computed from foundational constants. The formula is the definition; t
 |----------|----------|---------|-------|
 | Mean Solar Year | `meanSolarYearDays` | derived from the IAU sidereal year and p_A, `computeMeanTropicalYearJ2000Days` | <!--v:meanSolarYearDaysFull-->365.242190469006<!--/v--> days |
 | Mean Sidereal Year | `meanSiderealYearDays` | the IAU sidereal year, `yearLengthRef.siderealYear` | <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> days |
-| Mean Anomalistic Year | (the law of date at 2000) | derived: the one-family anomalistic year at 2000 — the sidereal year and the series' own apsidal rate | <!--v:anomalisticYearDaysFull-->365.259634985<!--/v--> days |
+| Mean Anomalistic Year | (the law of date at 2000) | derived: the one-family anomalistic year at 2000 — the sidereal year and the series' own apsidal rate | <!--v:anomalisticYearDaysFull-->365.259636543<!--/v--> days |
 | Mean Length of Day | `meanLengthOfDay` | the SI day ω₀, `yearLengthRef.solarDay` | ~86,400.0 s |
 | Mean Sidereal Day | `meanSiderealDay` | (meanSolarYearDays/(meanSolarYearDays+1)) × meanLengthOfDay | <!--v:meanSiderealDaySeconds-->86,164.0905329<!--/v--> s |
 | Mean Stellar Day | `meanStellarDay` | (meanSiderealDay/T_p) / (meanSolarYearDays+1) · cos ε + meanSiderealDay — T_p the J2000 precession period 1,296,000/p_A | <!--v:meanStellarDaySeconds-->86,164.0989084<!--/v--> s |
@@ -330,7 +329,7 @@ beside them.
 |--------|----------|---------------|-------------|
 | Mercury | <!--v:mercuryInclMean-->6.690391<!--/v--> | <!--v:mercuryInclMin-->0.14<!--/v-->–<!--v:mercuryInclMax-->10.97<!--/v--> | <!--v:mercuryPeriPeriodICRF-->232,437<!--/v--> yr |
 | Venus | <!--v:venusInclMean-->1.538475<!--/v--> | <!--v:venusInclMin-->0.00<!--/v-->–<!--v:venusInclMax-->3.46<!--/v--> | <!--v:venusPeriPeriodICRF-->174,997<!--/v--> yr |
-| Earth | <!--v:earthInclMean-->1.28741<!--/v--> | <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v--> | <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Earth | <!--v:earthInclMean-->1.28741<!--/v--> | <!--v:earthInclMin-->0.034<!--/v-->–<!--v:earthInclMax-->2.942<!--/v--> | <!--v:earthPeriPeriodICRF-->111,581<!--/v--> yr |
 | Mars | <!--v:marsInclMean-->4.205698<!--/v--> | <!--v:marsInclMin-->0.07<!--/v-->–<!--v:marsInclMax-->6.80<!--/v--> | <!--v:marsPeriPeriodICRF-->72,335<!--/v--> yr |
 | Jupiter | <!--v:jupiterInclMean-->0.362449<!--/v--> | <!--v:jupiterInclMin-->0.20<!--/v-->–<!--v:jupiterInclMax-->0.49<!--/v--> | <!--v:jupiterPeriPeriodICRF-->304,456<!--/v--> yr |
 | Saturn | <!--v:saturnInclMean-->0.891489<!--/v--> | <!--v:saturnInclMin-->0.77<!--/v-->–<!--v:saturnInclMax-->1.02<!--/v--> | <!--v:saturnPeriPeriodICRF-->45,883<!--/v--> yr |
@@ -359,7 +358,7 @@ multi-mode quantity has no single amplitude); the period is the chain's
 |--------|---------|----------------|
 | Mercury | 1,296,000/(g + p_A) | ~<!--v:mercuryPeriPeriod-->23,199<!--/v--> |
 | Venus | 1,296,000/(g + p_A) | ~<!--v:venusPeriPeriod-->22,463<!--/v--> |
-| Earth | the perihelion-of-date beat of the one-family year laws, 1/T_peri = 1/T_p + 1/T_aps | <!--v:periPrecYears-->~20,938<!--/v--> |
+| Earth | the perihelion-of-date beat of the one-family year laws, 1/T_peri = 1/T_p + 1/T_aps | <!--v:periPrecYears-->~20,936<!--/v--> |
 | Mars | 1,296,000/(g + p_A) | ~<!--v:marsPeriPeriod-->19,002<!--/v--> |
 | Jupiter | 1,296,000/(g + p_A) | ~<!--v:jupiterPeriPeriod-->23,760<!--/v--> |
 | Saturn | 1,296,000/(g + p_A) | ~<!--v:saturnPeriPeriod-->16,503<!--/v--> |
@@ -428,8 +427,8 @@ The certified apparent solar longitude is **assembled, not fitted** (E4/E5
 framework-native Sun, `packages/physics/src/model/sun-and-eclipses.js`, exported as
 `eclipse.frameworkSunDeps`): the mean longitude as the INTEGRAL of the
 one-source tropical year of date (route B, SI seconds) + equation of centre
-on the banked series' e(t) and ϖ(t) plus the derived mean-element offset
-(`data/earth-osculating-mean-offset.json`). It carries **zero fitted solar
+on the banked series' e(t) and ϖ(t) — the mean element of date, the same
+function the published Earth surface serves. It carries **zero fitted solar
 constants**; accuracy <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS vs JPL (modern window 1970–2049; the Meeus Ch. 25 basis on the same completion: <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″).
 The scene's Sun is placed at the same longitude by the engine every frame
 (`_applyEngineEarthFrame`, R4 — the former δ overlay is retired, [doc 41](41-scene-graph-hierarchy.md)). See
@@ -437,7 +436,7 @@ The scene's Sun is placed at the same longitude by the engine every frame
 
 ## Earth's perihelion of date
 
-Earth's perihelion of date is the series' ϖ in every runtime (doc 110 chain 1.1). Two readings of the one series, named: the PUBLISHED perihelion of date (the registry rows, the eclipses, the cardinal points) is the Sun channel's `createModel().sun.perihelionLongitudeDegAt` — the series' secular mean plus the measured osculating-mean offset `EARTH_OSCULATING_MEAN_OFFSET.dPomArcsec`, the osculating-mean apsidal direction that Meeus's and Standish's mean elements tabulate (within 0.001° of Meeus at 1000–3000 AD); the bare series mean `createModel().earth.perihelionLongitudeDeg` sits a constant 0.0195° below it.
+Earth's perihelion of date is the series' ϖ in every runtime (doc 110 chain 1.1) — ONE reading: `createModel().earth.perihelionLongitudeDeg` and the eclipse Sun's `sun.perihelionLongitudeDegAt` are the same function, the one-source series' mean element of date (the series' own de-rotated 1-kyr boxcar, anchored at J2000 on its own node: <!--v:earthMeanPerihelionJ2000Deg-->102.9369<!--/v-->°, the apsidal direction Meeus's and Standish's mean elements tabulate — Simon 1994: 102.9373°). The chain's Earth anchor (the osculating J2000 snapshot, 102.9179°) is the planets' path and not a published Earth value.
 
 ## Delta-T
 
@@ -460,8 +459,8 @@ These come from external astronomical sources and do not change with the model.
 | Obliquity range | - | <!--v:mainstreamObliqRange-->~22.1° to ~24.5°<!--/v--> | Laskar 1993 |
 | Earth inclination | `earthInclinationJ2000_deg` | <!--v:earthInclJ2000-->1.57869<!--/v--> deg | Astronomical Almanac |
 | Earth inclination rate | `earthInclinationRate_arcsecPerCentury` | -18"/cy | Astronomical Almanac |
-| Eccentricity | `earthEccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | JPL Keplerian-elements table (Standish & Williams) — the IAU MEAN element; the N-body series' secular element is <!--v:earthSeriesEccJ2000-->0.01670244<!--/v--> (≡ JPL's osculating seed state, La2004) |
-| Long. of perihelion | `earthPerihelionLongitudeJ2000` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v--> deg | JPL Keplerian-elements table (Standish & Williams) — the IAU MEAN element, a 1800–2050 fit; the series' secular element is <!--v:earthSeriesPeriLongJ2000-->102.918<!--/v--> deg; the eclipse Sun's derived mean element 102.937 deg (Sun-side table above) |
+| Eccentricity | `earthEccentricityJ2000` | <!--v:j2000Eccentricity-->0.01671022<!--/v--> | JPL Keplerian-elements table (Standish & Williams) — the IAU MEAN element; the N-body series' secular element is <!--v:earthSeriesEccJ2000-->0.01670835<!--/v--> (≡ JPL's osculating seed state, La2004) |
+| Long. of perihelion | `earthPerihelionLongitudeJ2000` | <!--v:earthPerihelionLongitudeJ2000-->102.947<!--/v--> deg | JPL Keplerian-elements table (Standish & Williams) — the IAU MEAN element, a 1800–2050 fit; the series' secular element is <!--v:earthSeriesPeriLongJ2000-->102.937<!--/v--> deg; the eclipse Sun's derived mean element 102.937 deg (Sun-side table above) |
 | Perihelion passage J2000 | `perihelionRefJD` | <!--v:perihelionPassageJD-->2451547.042<!--/v--> | USNO (2000 Jan 3 13:00 UTC) |
 | June Solstice 2000 JD | `juneSolstice2000_JD` | <!--v:juneSolstice2000JD-->2451716.575<!--/v--> | USNO (June 21, 2000 01:48 UTC) |
 | Cardinal instants 2000 (VE / SS / AE / WS) | `cardinalPointAnchors` | <!--v:cardinalAnchorVE2000JD-->2451623.816<!--/v--> / <!--v:cardinalAnchorSS2000JD-->2451716.575<!--/v--> / <!--v:cardinalAnchorAE2000JD-->2451810.2271<!--/v--> / <!--v:cardinalAnchorWS2000JD-->2451900.0674<!--/v--> | USNO "Earth's Seasons" 2000 (Mar 20 07:35 · Jun 21 01:48 · Sep 22 17:27 · Dec 21 13:37 UTC, minute precision); reference data, no runtime reader — the cardinal instants are `createModel().cardinal` (plan 06 R4d: the VE/AE entries had been retired-device anchors 112 min off) |
@@ -476,7 +475,7 @@ These come from external astronomical sources and do not change with the model.
 | Tropical year (AE) | `tropicalYearAEJ2000` | <!--v:tropicalYearAEJ2000Days-->365.242018<!--/v--> days | Meeus & Savoie 1992 |
 | Tropical year (WS) | `tropicalYearWSJ2000` | 365.242740 days | Meeus & Savoie 1992 |
 | Tropical year rate | `tropicalYearRateSecPerCentury` | -0.53 s/cy | Meeus & Savoie 1992 |
-| Anomalistic year (mean element) | `simon1994AnomalisticYearDays` | <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> days | Simon et al. 1994 — a citation since plan 09 step 4d; the model's J2000 value is the law of date (<!--v:anomalisticYearJ2000Days-->365.2596350<!--/v--> d) |
+| Anomalistic year (mean element) | `simon1994AnomalisticYearDays` | <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> days | Simon et al. 1994 — a citation since plan 09 step 4d; the model's J2000 value is the law of date (<!--v:anomalisticYearJ2000Days-->365.2596365<!--/v--> d) |
 | Sidereal year | `siderealYearJ2000` | <!--v:siderealYearInputDays-->365.256363004<!--/v--> days | JPL Horizons (adjusted for LOD=86400) |
 | Solar day | `solarDayJ2000` | 86400.0 s | SI definition |
 | Scene day basis at J2000 | `measuredMeanSolarDayJ2000Seconds` | <!--v:measuredMeanSolarDayJ2000Seconds-->86,400.000000<!--/v--> s | The SI day ω₀ — ONE J2000 day basis since plan 09 (the comb-era "measured mean solar day", IAU sidereal seconds over the retired Step-6c sidereal anchor, 86,400.00032 s, is retired with the comb) measured year lengths are counted in. ONE J2000 basis: LOD_mean, the scene basis and `o.lodKinematic` at J2000 (<!--v:lodKinematicFourierJ2000Seconds-->86,400.000000<!--/v--> s) are all ω₀; LOD_real is the Layer-4 observable; see [doc 11 §Day bases](11-length-day-year-formulas.md#day-types) |

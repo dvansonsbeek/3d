@@ -155,6 +155,12 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   the constant α(t); the rate is α(t)·cos ε̄(t) on the cited mean obliquity of
   date; and at a series seam the pole continues through n̂, never through its
   mean plane. (§1.26)
+- **A mean series is anchored on its OWN mean, never on an osculating snapshot**
+  — the snapshot's wobble phase comes back out as a "measured constant"; and a
+  moving average of a rotating, curving vector is taken in the co-rotating
+  frame as a local quadratic — a Cartesian boxcar is biased at every node
+  (2.2e-6 + 1.1e-6 in e, −24″ in ϖ at 1 kyr). The swap gate is the external
+  referee's sd on the whole span. (§1.27)
 
 ---
 
@@ -223,10 +229,10 @@ window-mean prediction), `measure-rms-by-epoch.js` and `equinox-vs-vondrak.js`
 missing), the five campaign generators (cassini-results /
 lod-climate-correlation / eclipse-audit / lunar-alignment /
 lunar-canon-recall — the latter three REFUSE on divergence; `--write
---rebaseline` is the conscious re-measurement path) and the two reference
-comparisons (`sun-vs-horizons.js`, `earth-osculating-offset.js`). `npm run
+--rebaseline` is the conscious re-measurement path) and the Horizons
+comparison (`sun-vs-horizons.js` — the Sun tier's swap gate). `npm run
 regen:cascade` lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (13 generators, 6 gates).
+test:verify:list` the full classification (12 generators, 6 gates).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

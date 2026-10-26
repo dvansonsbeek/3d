@@ -219,7 +219,7 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
         frameworkSunDeps: Readonly<{
             sunMeanLongitudeJ2000Deg: any;
             tropicalRateDegPerCy: number;
-            eccentricityAt: (year: number) => any;
+            eccentricityAt: (year: number) => number;
             perihelionLongitudeDegAt: (year: number) => number;
             meanLongitudeDegAt: (year: number) => number;
         }>;

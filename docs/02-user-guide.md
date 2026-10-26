@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -115,7 +115,7 @@ This small grey marker rides Earth's precession frame: it circles Earth once per
 
 ### PERIHELION-OF-EARTH (White Dot)
 
-This white dot marks the point closest to the Sun in Earth's orbit. It moves at the model's measured apsidal rate — in the current era one revolution per <!--v:inclPrecYears-->~111,635<!--/v--> years; the displayed direction follows the model's own N-body dynamics.
+This white dot marks the point closest to the Sun in Earth's orbit. It moves at the model's measured apsidal rate — in the current era one revolution per <!--v:inclPrecYears-->~111,581<!--/v--> years; the displayed direction follows the model's own N-body dynamics.
 
 **To observe**: set the Time step to 1000 years and watch it drift through the zodiac.
 
@@ -265,7 +265,7 @@ When the Planet Orbit Analysis panel is open:
 
 ### Track Perihelion-Solstice Alignment
 
-1. Enter Julian Day **<!--v:periAlignJD-->2,176,153<!--/v-->** (early 1246 AD — the perihelion–solstice alignment of the IAU mean elements; the model's own orbital series crosses at <!--v:periAlignYearSeries-->1247.2<!--/v--> AD)
+1. Enter Julian Day **<!--v:periAlignJD-->2,176,153<!--/v-->** (early 1246 AD — the perihelion–solstice alignment of the IAU mean elements; the model's own orbital series crosses at <!--v:periAlignYearSeries-->1246.1<!--/v--> AD)
 2. Note perihelion is near the December solstice direction
 3. Advance to year **2000**
 4. Perihelion now occurs around January 3

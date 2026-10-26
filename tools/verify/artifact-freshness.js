@@ -59,8 +59,6 @@ const REQUIRED = [
   'data/eclipse-audit-summary.json',
   // stamped at Batch D of the restatement (engine-D secular frequencies):
   'data/nbody-secular-frequencies.json',
-  // plan 06 layer B — the eclipse Sun's derived mean-element offset:
-  'data/earth-osculating-mean-offset.json',
   // plan 06 I1 — the Sun and the cardinal instants against the ±3000-yr Horizons TT cache:
   'data/sun-vs-horizons-summary.json',
   // plan 06 §9 item 10 — the precession of date against Vondrák 2011 and La2004:

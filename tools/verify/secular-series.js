@@ -146,7 +146,78 @@ const smooth = (/** @type {Float64Array} */ arr, widthYr = SMOOTH_YR) => {
   }
   return out;
 };
-const qS = smooth(qR), pS = smooth(pR), zqS = smooth(zqR), zpS = smooth(zpR);
+const qS = smooth(qR), pS = smooth(pR);
+// THE z FILTER IS A DE-ROTATED LOCAL QUADRATIC (plan 21, measured 2026-10-26).
+// A Cartesian boxcar of a vector that ROTATES at ϖ̇ = 1161 ″/cy while its length
+// shrinks at ė = −4.2e-5/cy is biased at every node: |z| low by e·(ϖ̇W)²/24 =
+// 2.2e-6 and the direction by ė·ϖ̇·W²/(12e) = −24″ for W = 1 kyr — and the bias
+// GROWS with the window (the J2000 mean of this dump read e +0.6e-6/ϖ −14″ over
+// 220 yr, −2.4e-6/−33″ over 1 kyr, −12.3e-6/−92″ over 2 kyr against its t = 0
+// sample; the Sun-vs-Horizons sd doubled on the 1-kyr Cartesian node as the
+// Sun's anchor). A plain MEAN in the co-rotating frame removes that first-order
+// bias but keeps the second-order one of every moving average, ë·W²/24: Earth's
+// ė changes by 2.6e-7/cy², so the 1-kyr mean sat 1.1e-6 below e at the window's
+// centre (measured: the anchor read 0.0167076 against Simon 1994's 0.0167086,
+// and the Sun's sd widened 0.043″ by that 0.44″ annual term). The eclipse Sun
+// carried both biases back out as a measured constant until plan 21 (its window
+// was 220 yr, filter-free). The node is therefore the CENTRE VALUE of a local
+// least-squares QUADRATIC (Savitzky–Golay, order 2, the 1-kyr window) fitted in
+// the frame CO-ROTATING at the window's own secular rate ω (the Cartesian-
+// smoothed angle's slope over the window): exact for e and ϖ quadratic in t —
+// the secular motion inside any 1-kyr window — so the node IS the mean element
+// of date. (Anti-aliasing is unchanged in substance: the raw samples are 54.76-yr
+// running means, which already hold the 11.9-yr Jupiter term to 16″ aliased
+// onto 143 yr, and the 19-point quadratic leaves 1e-3 of a 143-yr line.)
+// Where the window turns FAST the linear-rotation model does not hold —
+// e passing near zero in deep time, ϖ swinging tens of degrees per kyr: there
+// the vector moves LINEARLY past the origin and the plain Cartesian mean is the
+// unbiased one (a polar mean there read z fidelity 6.2e-5, a hard switch to the
+// de-rotated mean 5.2e-5, against the 2e-5 resample gate — the 500-yr nodes
+// cannot carry a field that turns 0.25 rad per step). The two means are
+// BLENDED by the window's turn θ = |ω|·W: weight exp(−(θ/DEROTATE_BLEND_RAD)⁴)
+// on the co-rotating mean — 0.994 at the J2000 class (θ = 0.056 rad: the bias
+// left is 0.01e-6 in e, 0.1″ in ϖ), 0.37 at θ = 0.2, 0.006 at 0.3 — so no step
+// is introduced and the two models differ, where the blend is mixed, by
+// ≤ e·θ²/24 ≈ 0.2 % of e. ζ keeps the Cartesian form on purpose: it passes
+// THROUGH zero near J2000 (the J2000 ecliptic is its reference plane), exactly
+// the regime where the Cartesian mean is right; its deep rotation (Ω̇
+// −0.51°/cy) biases sin(i/2) by 3.3e-4 relative = 0.0005° of inclination,
+// below every gate on the hybrid, and n̂'s direction is unbiased by symmetry.
+const DEROTATE_BLEND_RAD = 0.2;
+const smoothDerotated = (/** @type {Float64Array} */ qArr, /** @type {Float64Array} */ pArr, widthYr = SMOOTH_YR) => {
+  const NA = qArr.length, half = Math.max(1, Math.round(widthYr / 2 / rDt));
+  const qC = smooth(qArr, widthYr), pC = smooth(pArr, widthYr);
+  const th = new Float64Array(NA);
+  { let prev = 0, acc = 0;
+    for (let i = 0; i < NA; i++) {
+      const a = Math.atan2(pC[i], qC[i]);
+      if (i) { let d = a - prev; if (d > Math.PI) d -= 2 * Math.PI; else if (d < -Math.PI) d += 2 * Math.PI; acc += d; } else acc = a;
+      prev = a; th[i] = acc;
+    } }
+  // Savitzky–Golay order-2 centre weights for the symmetric 2m+1 window (exact for quadratics)
+  const m = half, sgDen = (2 * m + 1) * (4 * m * m + 4 * m - 3);
+  const sgW = (/** @type {number} */ j) => (3 * (3 * m * m + 3 * m - 1) - 15 * j * j) / sgDen;
+  const outQ = new Float64Array(NA), outP = new Float64Array(NA);
+  let wSum = 0;
+  for (let i = 0; i < NA; i++) {
+    const lo = Math.max(0, i - half), hi = Math.min(NA - 1, i + half), n = hi - lo + 1;
+    const om = (th[hi] - th[lo]) / ((hi - lo) * rDt);          // the window's secular rotation, rad/yr
+    const turn = Math.abs(om) * widthYr, w = Math.exp(-((turn / DEROTATE_BLEND_RAD) ** 4));
+    wSum += w;
+    if (w < 1e-6) { outQ[i] = qC[i]; outP[i] = pC[i]; continue; }
+    const symmetric = (hi - i) === half && (i - lo) === half;   // the edge zones (no node sits there) take the plain mean
+    let sq = 0, sp = 0;
+    for (let j = lo; j <= hi; j++) {
+      const ph = -om * (j - i) * rDt, c = Math.cos(ph), s = Math.sin(ph), wj = symmetric ? sgW(j - i) : 1 / n;
+      sq += wj * (qArr[j] * c - pArr[j] * s); sp += wj * (qArr[j] * s + pArr[j] * c);
+    }
+    outQ[i] = w * sq + (1 - w) * qC[i]; outP[i] = w * sp + (1 - w) * pC[i];
+  }
+  return { q: outQ, p: outP, meanDerotationWeight: wSum / NA };
+};
+const zSm = smoothDerotated(zqR, zpR);
+const zqS = zSm.q, zpS = zSm.p;
+console.log(`earth z: de-rotated local quadratic (SG-2, ${SMOOTH_YR} yr), mean co-rotating weight ${zSm.meanDerotationWeight.toFixed(4)} (blend scale ${DEROTATE_BLEND_RAD} rad of window turn)`);
 const liRaw = (arr, tt) => {
   const x = (tt - rT0) / rDt, i = Math.max(0, Math.min(NR - 2, Math.floor(x))), f = x - i;
   return arr[i] * (1 - f) + arr[i + 1] * f;
@@ -180,6 +251,25 @@ const q = Array.from({ length: n }, (_, i) => Number(liRaw(qS, t0Yr + i * STEP_Y
 const p = Array.from({ length: n }, (_, i) => Number(liRaw(pS, t0Yr + i * STEP_YR).toFixed(9)));
 const zq = Array.from({ length: n }, (_, i) => Number(liRaw(zqS, t0Yr + i * STEP_YR).toFixed(9)));
 const zp = Array.from({ length: n }, (_, i) => Number(liRaw(zpS, t0Yr + i * STEP_YR).toFixed(9)));
+// THE J2000 ANCHOR OF THE EARTH e-VECTOR IS THE SERIES' OWN MEAN (plan 21): the
+// 1-kyr-boxcar node at J2000, read from the rounded node arrays the artifact
+// ships so the consumer's join (deep-orbital-history.cjs) is the identity. The
+// former anchor was the dump's t = 0 OSCULATING sample (the chain's Earth
+// anchor) — a point inside the 263″ 11.9-yr Jupiter term of ϖ — and the eclipse
+// Sun carried that phase back out as a measured constant (+70.08″, +5.81e-6);
+// measured over ±3 kyr on the 1PN run the channel (osculating − series) is a
+// constant 6.4e-6 in e and the mean element of the literature in ϖ̇ (1160.9 vs
+// Simon 1994's 1161.2 ″/cy), so the mean IS the physics and the anchor says so.
+const iJ2000 = Math.round((0 - t0Yr) / STEP_YR);
+if (!(iJ2000 > 0 && iJ2000 < n && t0Yr + iJ2000 * STEP_YR === 0)) {
+  console.error(`REFUSING: no J2000 node on the ${STEP_YR}-yr grid (t0Yr ${t0Yr}) — the anchor must be a node`);
+  process.exit(1);
+}
+const zAnchorJ2000 = {
+  e: Math.hypot(zq[iJ2000], zp[iJ2000]),
+  lonPeriEclipticDeg: ((Math.atan2(zp[iJ2000], zq[iJ2000]) * 180 / Math.PI) + 360) % 360,
+  note: 'the 1-kyr-boxcar series at the J2000 node (ecliptic J2000) — the MEAN element; the deep-modes embed carries it as anchorE/anchorPeriEclipticDeg and every consumer of the movement anchors on it (plan 21)',
+};
 // the content the filter removed (banked as meta — the short-period budget)
 let maxRemoved = 0, maxRemovedZ = 0;
 for (let i = 0; i < NR; i++) {
@@ -435,7 +525,7 @@ const mkTier = (withAxialFn) => createDeepOrbitalHistory({
   zetaModes: MT.modes.earth.zeta,             // the TAIL beyond the span
   zetaSeries: { t0Yr, stepYr: STEP_YR, q, p },
   zSeries: { t0Yr, stepYr: STEP_YR, q: zq, p: zp },
-  anchorE: AE.e, anchorPeriEclipticDeg: AE.lonPeriEclipticDeg,
+  anchorE: zAnchorJ2000.e, anchorPeriEclipticDeg: zAnchorJ2000.lonPeriEclipticDeg,   // plan 21: the series' own mean at J2000
   anchorInclEclipticDeg: AE.inclEclipticDeg, anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
   axialPrecessionYearsJ2000,
   obliquityJ2000Deg,
@@ -701,6 +791,8 @@ const artifact = {
     // the node grid: origin on a multiple of gridAnchorYr inside the raw span (see the resample block)
     gridAnchorYr: GRID_ANCHOR_YR, rawSpanYr: [Number(rT0.toFixed(3)), Number(tR[NR - 1].toFixed(3))], lastNodeYr: tEdgeNodeYr,
     antiAliasBoxcarYr: SMOOTH_YR,
+    // plan 21: the z filter is the centre value of a local quadratic (Savitzky–Golay order 2 over the 1-kyr window) fitted in the window's co-rotating frame — exact for e and ϖ quadratic in t, the secular motion inside a window — blended into the Cartesian boxcar mean as the window's turn grows past derotateBlendRad; ζ is the plain Cartesian boxcar
+    zSmoothing: { kind: 'de-rotated local quadratic (Savitzky–Golay order 2)', derotateBlendRad: DEROTATE_BLEND_RAD, meanDerotationWeight: Number(zSm.meanDerotationWeight.toFixed(4)) },
     resampleMaxDeparture: Number(maxResample.toExponential(2)),
     resampleMaxDepartureZ: Number(maxResampleZ.toExponential(2)),
     removedShortPeriodMax: Number(maxRemoved.toExponential(2)),
@@ -709,7 +801,7 @@ const artifact = {
   },
   t0Yr,
   bodies: {
-    earth: { stepYr: STEP_YR, zetaQ: q, zetaP: p, zQ: zq, zP: zp, lamDotRel, lamDotStepYr: LAMDOT_STEP_YR, lamDotWindowYr: LAMDOT_WINDOW_YR, lamDotEstimator: 'least-squares quadratic slope of the unwrapped L' },
+    earth: { stepYr: STEP_YR, zetaQ: q, zetaP: p, zQ: zq, zP: zp, zAnchorJ2000, lamDotRel, lamDotStepYr: LAMDOT_STEP_YR, lamDotWindowYr: LAMDOT_WINDOW_YR, lamDotEstimator: 'least-squares quadratic slope of the unwrapped L' },
     ...planetBodies,
   },
   verdict: {

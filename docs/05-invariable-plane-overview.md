@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -14,7 +14,7 @@ and the invariable-plane argument of periapsis are computed, and the two
 live self-checks (angular-momentum validation and the mass-weighted
 balance gauge).
 
-> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Earth's node and inclination quoted here are the one-source engine readings against the banked invariable plane (plan 07 R5/R9): the node regresses on the chain's nodal mode (<!--v:eclPrecYears-->~68,751<!--/v--> yr), the inclination follows the orbit normal, and the apsidal line circulates on the chain's secular tangent (<!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr at J2000). Under [ESSRT](99-expanding-solar-system-resonance-theory.md) the orbital tier scales with the solar-mass history only (Driver 2) at deep time.
+> **Scope note (ESSRT).** The invariable plane itself (perpendicular to total angular momentum) is fixed in space; the angular-momentum conservation argument that defines it is scale-invariant. Earth's node and inclination quoted here are the one-source engine readings against the banked invariable plane (plan 07 R5/R9): the node regresses on the chain's nodal mode (<!--v:eclPrecYears-->~68,751<!--/v--> yr), the inclination follows the orbit normal, and the apsidal line circulates on the chain's secular tangent (<!--v:earthPeriPeriodICRF-->111,581<!--/v--> yr at J2000). Under [ESSRT](99-expanding-solar-system-resonance-theory.md) the orbital tier scales with the solar-mass history only (Driver 2) at deep time.
 
 ---
 

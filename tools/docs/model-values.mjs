@@ -104,16 +104,14 @@ function balanceMachinery() {
 let _predictHelpersM = null;
 function predictiveMachinery() {
   if (_predictHelpersM) return _predictHelpersM;
-  // The PUBLISHED perihelion of date is the Sun channel's — the series' ϖ plus
-  // the MEASURED osculating-mean offset EARTH_OSCULATING_MEAN_OFFSET.dPomArcsec
-  // (createModel().sun.perihelionLongitudeDegAt, ecliptic of date): the
-  // osculating-mean apsidal direction that Meeus's and Standish's mean
-  // elements tabulate and that the eclipses and the cardinal points ride.
-  // Measured: it matches Meeus at 1000/1246/2000/2500/3000 AD within 0.001°;
-  // the bare series mean (createModel().earth.perihelionLongitudeDeg, the
-  // N-body secular mean) sits a constant 0.0195° below it. The rate is the
-  // ±50-yr central difference in ″/cy (a constant offset does not enter it).
-  const earthPeriOfDateDeg = (year) => physModel().sun.perihelionLongitudeDegAt(year);
+  // The PUBLISHED perihelion of date is the one-source series' ϖ of date — the
+  // MEAN element (the series' own J2000 node is its anchor, plan 21), ecliptic
+  // of date: the apsidal direction that Meeus's and Standish's mean elements
+  // tabulate and that the eclipses and the cardinal points ride; ONE function
+  // with the eclipse Sun (createModel().sun.perihelionLongitudeDegAt ≡
+  // earth.perihelionLongitudeDeg). The rate is the ±50-yr central difference
+  // in ″/cy.
+  const earthPeriOfDateDeg = (year) => physModel().earth.perihelionLongitudeDeg(year);
   const earthPeriOfDateRateArcsecCy = (year) => {
     const d = earthPeriOfDateDeg(year + 50) - earthPeriOfDateDeg(year - 50);
     return (((d + 540) % 360) - 180) * 3600;   // ° per century → ″/cy
@@ -504,6 +502,22 @@ export const VALUES = {
     get: () => astro.earthOrbital.earthEccentricityJ2000,
     render: (v) => Number(v).toFixed(8),
     note: 'the IAU/Standish MEAN element (JPL Keplerian-elements table) — a calibration input, not a fit product; the series\' secular element is earthSeriesEccJ2000',
+  },
+  // Plan 21 — the published Earth e-vector at J2000 IS the one-source series' own
+  // mean element (its de-rotated 1-kyr boxcar at the J2000 node — the anchor the
+  // deep-modes embed carries; Simon 1994 reads 102.9373° / 0.0167086): ONE ϖ and
+  // ONE e with the eclipse Sun. The osculating J2000 snapshot (the chain's Earth
+  // anchor, 102.9179° / 0.0167024) is the planets' path, not a published Earth value.
+  earthMeanPerihelionJ2000Deg: {
+    get: () => physModel().earth.perihelionLongitudeDeg(2000),
+    render: (v) => Number(v).toFixed(4),
+    unit: '°',
+    note: 'Earth\'s perihelion longitude at J2000 (ecliptic and equinox J2000) — the series\' mean element, the one value the API, the Earth panel and the eclipse Sun share',
+  },
+  earthMeanEccentricityJ2000: {
+    get: () => physModel().earth.eccentricity(2000),
+    render: (v) => Number(v).toFixed(7),
+    note: 'Earth\'s eccentricity at J2000 — the series\' mean element (the eclipse Sun\'s e; Simon 1994: 0.0167086)',
   },
   // ── The two J2000 conventions, labelled ────────────────────────────────
   // The published Earth surface reads the SECULAR element of the one-source
@@ -1274,11 +1288,6 @@ export const VALUES = {
     const ecl = rd('data/eclipse-audit-summary.json');
     const clim = rd('data/lod-climate-correlation-summary.json');
     const L = ecl.lunar, S = ecl.solar;
-    // The eclipse Sun's mean-element offset: the window mean of (osculating −
-    // secular) EMB ϖ and e from the Horizons J2000 seed integrated as a
-    // nine-body system — the generator is tools/verify/earth-osculating-offset.js
-    // (derived; no JPL fit).
-    const osc = rd('data/earth-osculating-mean-offset.json');
     return {
       // The model's apparent Sun and its cardinal instants against JPL Horizons
       // over ±3000 yr (TT cache; tools/verify/sun-vs-horizons.js).
@@ -1336,8 +1345,6 @@ export const VALUES = {
         }
         return out;
       })(),
-      sunMeanOffsetPomArcsec:    { get: () => osc.dPomArcsec, render: (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(2), unit: '″', note: 'mean-element ϖ offset of the eclipse Sun over the derivation window (osculating − secular)' },
-      sunMeanOffsetE:            { get: () => osc.dE, render: (v) => (v >= 0 ? '+' : '') + Number(v).toExponential(2), note: 'mean-element e offset of the eclipse Sun over the derivation window (osculating − secular)' },
       // Mean |residual|, never an RMS — the former key name (lunarResidualRmsSeconds)
       // described the wrong statistic for a value that has always been the mean
       // absolute residual, and the website published it in a table column headed

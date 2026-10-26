@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -57,6 +57,19 @@ series). The Planet Info panel and the website's planet figure print that
 osculating value by design; JPL's J2000 *mean* element for Neptune is the
 orbit-averaged quantity and sits several degrees away from it — a different
 quantity, not a disagreement.
+
+Earth is the case where the chain and the series part by physics, not by
+type (plan 21, measured on the model's own 1PN runs). The chain's Earth row
+is a point-mass window rate — 1154.4 ″/cy in the J2000 ecliptic — and the
+one-source series' ϖ̇ is 1160.9 ″/cy: the series' ±10-Myr run carries the
+calibrated lunar quadrupole on the Sun–EMB interaction, which advances the
+Earth–Moon barycentre's perihelion by the missing 6.5 ″/cy (≈ ¾·n·q̃·(a_M/a)²),
+and the literature's mean element reads 1161.2 (Simon 1994 / Meeus 31.B, with
+the same curvature +10.7 ″/cy per kyr and ė −4.204e-5/cy against the series'
++10.6 and −4.203e-5). WebGeoCalc's 1800–2100 fit to the osculating element,
+1156.95, is a C-type window value and sits between the two. The chain's Earth
+row is the planets' path and feeds no Sun or Earth surface; every published
+Earth ϖ and e, and the eclipse Sun, read the series (doc 110 chain 1.1).
 
 Even C is not one number: the same DE series
 (`public/input/wgc-perihelion-data.json`, its `windowRates` fields) fits
@@ -384,7 +397,7 @@ and the fresh point-mass run `evector-fresh-run.mjs` cleared the lunar
 proxy and the asteroids as causes and named the sampling; the means bring
 it to 0.1·10⁻⁵ and 8″, and the La2004 figures
 above from 3.0/3.4/7.1·10⁻⁵ to the values quoted. The published series (the 500-yr
-resampling of the shipped run) reads <!--v:earthEccSeriesVsLa2010aRms-->2.5e-5<!--/v--> against La2010a over the
+resampling of the shipped run) reads <!--v:earthEccSeriesVsLa2010aRms-->2.4e-5<!--/v--> against La2010a over the
 last 500 kyr (registry key `earthEccSeriesVsLa2010aRms`; the inclination to the invariable plane <!--v:earthInclSeriesVsLa2010aRmsDeg-->0.0006<!--/v-->° rms on the same rows) — the figure `tools/explore/deep-ecc-history.mjs` draws. A
 `createModel()` built WITHOUT the series artifact is a different
 evaluator (the 18-term mode table everywhere) and reads 3.6·10⁻³ on the
@@ -970,6 +983,41 @@ interior RMSE 0.23–0.37 min after the 8 %/side edge trim, tropical-year class
 cross-family fit (interior RMS 8.8–16 min, equinox anchors ±2 h off IAU) and
 rejected. FROZEN-CLOCK COUPLING: the coefficients were a certified artifact of
 the parameter set they shipped with.
+
+### 23.4 The eclipse Sun's osculating-mean offset — the record (RETIRED at plan 21)
+
+From plan 06 layer B to plan 21 the eclipse Sun's elements were the one-source
+series plus a measured constant pair, `EARTH_OSCULATING_MEAN_OFFSET`
+(Δϖ +70.076″, Δe +5.81e-6: the 1890–2110 mean of osculating − chain for the
+EMB on a nine-body Newtonian RK4 run from the Horizons seed, written by
+`tools/verify/earth-osculating-offset.js` to `data/earth-osculating-mean-offset.json`,
+validated on the JPL Sun sample as all-phase sd 3.23″ → 1.59″). The published
+Earth surface served the bare series, 0.0195° below the eclipse Sun — "two
+readings of one series". Measured at plan 21, the constant was two things the
+series carried wrongly, neither a planetary movement: (1) the series' J2000
+JOIN rotated the whole 1-kyr-boxcar history onto the dump's t = 0 OSCULATING
+sample (the chain's Earth anchor), a point inside the 263″ 11.9-yr Jupiter
+term of ϖ; (2) the Cartesian boxcar of a vector rotating at 1161 ″/cy while
+shrinking at ė = −4.2e-5/cy is biased at every node — |z| low by e·(ϖ̇W)²/24
+(2.2e-6) and by ë·W²/24 (1.1e-6), the direction by ė·ϖ̇·W²/(12e) (−24″) — so
+the shipped series was Simon 1994's mean element in rate, curvature and ė and
+not in its constant term. The in-between band of the e-vector (12 yr … 2 kyr:
+the great inequality at 6″-equivalent and lines at 2.6, 1.8 and 0.24 kyr, 12″
+rms in all) is worth 0.4″ on the Sun's longitude — recorded, not modelled; it
+is what the window constant had carried at its J2000 value, and the modern
+window's sd against Horizons gives it up (0.777 → 0.794″) while the ±3-kyr
+all-phase sd and the cardinal instants improve (2.2575 → 2.2554″, 1.0076 →
+1.0057 min). Since plan 21 the series' z filter is the centre value of a local
+quadratic fitted in the window's co-rotating frame, the anchor is the series'
+own J2000 node (`bodies.earth.zAnchorJ2000`, carried by the deep-modes embed),
+and the published Earth ϖ and e, the eclipse Sun, the cardinal braid and the
+lunar arguments' Sun perigee are one function (`model/earth-scalars.js`). The
+generator, its artifact, the constant, its type and the registry keys
+`sunMeanOffsetPomArcsec` / `sunMeanOffsetE` are deleted. The ζ series keeps the
+Cartesian boxcar and its J2000 offset onto the chain's inclination/node (it
+passes through zero near J2000, the regime where the Cartesian mean is right;
+the deep rotation bias is 0.0005° of inclination, below the hybrid's gates) — a
+measured follow-up, not this record.
 
 ## Related documents
 

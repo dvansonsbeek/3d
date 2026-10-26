@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -400,6 +400,39 @@ Joining the tail to the series at each seam (n̂ continuous) leaves
 +0.09°/+0.13°. Test the hypothesis against the quantity that is wrong, not
 against the quantity the hypothesis names.
 
+### 1.27 A mean series anchored on an osculating snapshot carries the wobble's phase as a constant — and a Cartesian boxcar of a rotating vector is biased at every node
+
+(plan 21, measured) The eclipse Sun needed a measured constant pair over the
+one-source series (+70.08″ in ϖ, +5.81e-6 in e, derived as a 220-yr window
+mean of osculating − chain and validated on the JPL Sun, 3.23″ → 1.59″) and
+the TODO carried it as "a constant standing in for the planetary long-period
+movement — derive the movement". Measured on the model's own 1PN runs over
+±3 kyr, the movement in the 12 yr … 2 kyr band is 12″-equivalent rms in the
+e-vector — 0.4″ on the Sun, below the floor — and the constant was two biases
+of the series itself: its J2000 join rotated the whole 1-kyr-boxcar history
+onto the dump's t = 0 OSCULATING sample (a point inside the 263″ 11.9-yr
+Jupiter term), and the Cartesian boxcar of a vector rotating at 1161 ″/cy
+with ė = −4.2e-5/cy sits low by e·(ϖ̇W)²/24 = 2.2e-6 and ë·W²/24 = 1.1e-6
+with its direction off by ė·ϖ̇·W²/(12e) = −24″ at every node (the J2000 mean
+of the same dump read e +0.6e-6/ϖ −14″ over 220 yr, −2.4e-6/−33″ over 1 kyr,
+−12.3e-6/−92″ over 2 kyr against its t = 0 sample: a "mean" that moves with
+the window is a filter bias, not a mean). The series was Simon 1994's mean
+element in rate (1160.9 vs 1161.2 ″/cy), curvature and ė, and not in its
+constant term. Rules: a mean series is anchored on its OWN mean, never on a
+snapshot; a moving average of a rotating, curving vector is taken in the
+co-rotating frame as a local quadratic (exact for the secular motion inside
+the window), blended back to the Cartesian mean where the window turns fast
+(e passing near zero); and the swap gate is the external referee's sd on the
+whole span — the 1-kyr Cartesian node as the Sun's anchor doubled the modern
+window's sd (0.78 → 1.60″), the co-rotating mean left it 0.048″ wide (the
+curvature term), the local quadratic improved the ±3-kyr all-phase sd
+(2.2575 → 2.2554″) and the cardinal instants (1.0076 → 1.0057 min) while the
+modern window gave up 0.018″ — the in-between band at its J2000 phase, which
+the window constant had carried by construction. Found on the way: a
+comment-only edit of a file the GOVERNED ΔT fit hashes
+(`precession-composed.cjs`) flags that fit for a by-hand re-close — price a
+header edit by the cascade's dry run before making it.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -608,9 +641,13 @@ model's ONE J2000 precession reading — since plan 09 the IAU 2006 general
 precession p_A = 50.28796195 ″/yr, an INPUT (astro-reference
 `generalPrecessionJ2000_arcsecPerYr`, T_p = 25,771.575 yr); before plan 09
 it was the retired year combs' beat at 2000, 25,771.395 yr (plan 06 S5),
-8 ppm faster, and that 8 ppm was absorbing a sidereal-year-input mismatch
-against DE441 (Sun vs Horizons gained +1″ per millennium on p_A) — a
-sidereal-year finding, parked. **T_p(t) is the published deep-time clock**
+7 ppm faster — a precession-anchor reading, closed by the p_A input; the
+sidereal year itself is right: the model's geometric Sun against DE441 in the
+fixed J2000 frame (no precession theory on the reference side,
+`tools/explore/sun-inertial-vs-de441.cjs`) shows no sidereal slope over
+±9 kyr, ±50 ms per 500-yr bin with no sign, rms 3.46″ (plan 21 §0.3; the two
+referees that disagree on the equinox, Vondrák and Horizons of date, both carry
+a precession theory). **T_p(t) is the published deep-time clock**
 (the retired unit H(t) scaled with it but was not 13 of them — H₀/T_p =
 13.011, H₀ fitted on the perihelion-of-date beat, so H/13 = 25,793.6 was the
 fit anchor's reading, 0.086 % slow, never a period; the unit function

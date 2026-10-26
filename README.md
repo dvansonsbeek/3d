@@ -30,9 +30,9 @@ Two of Earth's precession motions rotate in **opposite directions**, so their fr
 | Motion | Direction | Period at J2000 |
 |--------|-----------|-----------------|
 | Axial precession (the clock) | Clockwise | <!--v:axialPrecRound-->~25,772<!--/v--> years |
-| Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,635<!--/v--> years |
+| Apsidal precession (the orbit's own motion, a J2000 reading) | Counter-clockwise | <!--v:inclPrecYears-->~111,581<!--/v--> years |
 
-Their beat is the perihelion-of-date cycle, <!--v:periPrecYears-->~20,938<!--/v--> years (1/T_peri = 1/T_p + 1/T_aps), the carrier of the climatic-precession band. The apsidal period is <!--v:lunisolarApsidalPerPrecessionJ2000-->4.332<!--/v--> precession periods today and wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr: the ratio is a reading of two different clocks, not a gearing between them. The obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr today. The simulator's Lunisolar Clock panel shows the live ratios.
+Their beat is the perihelion-of-date cycle, <!--v:periPrecYears-->~20,936<!--/v--> years (1/T_peri = 1/T_p + 1/T_aps), the carrier of the climatic-precession band. The apsidal period is <!--v:lunisolarApsidalPerPrecessionJ2000-->4.330<!--/v--> precession periods today and wanders between <!--v:lunisolarApsidalPerPrecessionWanderMin-->1.08<!--/v--> and <!--v:lunisolarApsidalPerPrecessionWanderMax-->9.81<!--/v--> across ±26 kyr: the ratio is a reading of two different clocks, not a gearing between them. The obliquity band is the beat of the clock against the orbit's own nodal mode, <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr today. The simulator's Lunisolar Clock panel shows the live ratios.
 
 The time-domain machinery — the cardinal points, the day lengths and the eclipses — rides the same two movements with no fitted timing unit: the composed precession clock and the N-body series' elements of date (the frozen era device that once carried small periodic corrections on a fitted anchor is retired, plan 09). The full parameter accounting is three ledgers — zero fitted constants on the planetary side, the derived clock, and the scene scaffold's recorded J2000 pose — in the [Constants Reference](docs/20-constants-reference.md). **Nothing is tuned per phenomenon.**
 
@@ -45,7 +45,7 @@ The same machinery, checked against independent records across six orders of mag
 | Surface | Reference | Agreement |
 |---|---|---|
 | Position of the Sun | JPL Horizons | <!--v:frameworkSunVsJplRms-->1.03<!--/v-->″ RMS — the Meeus Ch. 25 reference reads <!--v:meeusCh25SunVsJplRms-->1.02<!--/v-->″ |
-| Positions of the seven planets | JPL Horizons, 2000–2099 | <!--v:jupiterChainVsJplRms2000sArcsec-->10.2<!--/v-->″ (Jupiter) to <!--v:marsChainVsJplRms2000sArcsec-->35.7<!--/v-->″ (Mars); every target inside 0.012° across 1800–2100 |
+| Positions of the seven planets | JPL Horizons, 2000–2099 | <!--v:jupiterChainVsJplRms2000sArcsec-->10.3<!--/v-->″ (Jupiter) to <!--v:marsChainVsJplRms2000sArcsec-->35.9<!--/v-->″ (Mars); every target inside 0.012° across 1800–2100 |
 | Cardinal points (equinoxes and solstices) | JPL Horizons, −3000 to +2000 | <!--v:cardinalVsHorizonsMeanMin-->−1.02<!--/v--> min mean |
 | Solar eclipses | <!--v:solarAudit26Total-->26<!--/v-->-event documented audit, −762 to 2026 CE | <!--v:solarAudit26ScanReach-->21<!--/v-->/<!--v:solarAudit26Total-->26<!--/v--> with the umbra reaching the observation site |
 | Lunar eclipse timings | Stephenson 2016, <!--v:lunarEventsTotal-->267<!--/v-->-event set | <!--v:lunarResidualMinutes-->20.2<!--/v--> min mean \|residual\|, with zero parameters fitted to eclipse data |
@@ -80,8 +80,8 @@ The climate formula rides the engine's own orbital lines — the beats of the N-
 The Sun is still the centre of the solar system. The scene uses a geo-heliocentric frame — viewing from Earth's perspective — to make the two counter-rotating precession motions visible:
 
 - **Earth's wobble centre** circles Earth clockwise in <!--v:axialPrecRound-->~25,772<!--/v--> years — axial precession.
-- **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,635<!--/v--> years — apsidal precession.
-- The two motions **meet every <!--v:periPrecYears-->~20,938<!--/v--> years** — perihelion precession.
+- **Earth's perihelion point** wobbles counter-clockwise around the Sun in <!--v:inclPrecYears-->~111,581<!--/v--> years — apsidal precession.
+- The two motions **meet every <!--v:periPrecYears-->~20,936<!--/v--> years** — perihelion precession.
 - Earth orbits its perihelion point in one solar year; the seven planets follow their own N-body element chains, Kepler ellipses of date.
 
 Obliquity, inclination and the precession movements all follow from these two motions read against one clock. They are reference points, not forces. For the full account see [holisticuniverse.com](https://holisticuniverse.com).
@@ -265,8 +265,8 @@ The cardinal points (solstices and equinoxes) are **derived, not fitted**: their
 
 - **The clock**: the mean lunisolar precession period, <!--v:lunisolarPeriodJ2000Yr-->25,771.6<!--/v--> years at J2000, lengthening under tidal evolution
 - **Axial precession**: <!--v:axialPrecRound-->~25,772<!--/v--> years
-- **Apsidal precession**: <!--v:inclPrecYears-->~111,635<!--/v--> years, a J2000 reading of the orbit's own motion
-- **Perihelion precession**: <!--v:periPrecYears-->~20,938<!--/v--> years — the beat of the two, 1/T_peri = 1/T_p + 1/T_aps
+- **Apsidal precession**: <!--v:inclPrecYears-->~111,581<!--/v--> years, a J2000 reading of the orbit's own motion
+- **Perihelion precession**: <!--v:periPrecYears-->~20,936<!--/v--> years — the beat of the two, 1/T_peri = 1/T_p + 1/T_aps
 - **Obliquity band**: <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr — the beat of the clock against the orbit's nodal mode
 - **Model parameters**: two engines, three ledgers — zero fitted constants on the planetary side, the derived clock, and the scene scaffold's recorded J2000 pose (no observable rides it); everything else is derived or anchored to observation ([Constants Reference](docs/20-constants-reference.md))
 

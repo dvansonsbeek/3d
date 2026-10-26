@@ -175,7 +175,7 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         frameworkSunDeps: Readonly<{
             sunMeanLongitudeJ2000Deg: any;
             tropicalRateDegPerCy: number;
-            eccentricityAt: (year: number) => any;
+            eccentricityAt: (year: number) => number;
             perihelionLongitudeDegAt: (year: number) => number;
             meanLongitudeDegAt: (year: number) => number;
         }>;

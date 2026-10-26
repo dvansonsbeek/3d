@@ -86,12 +86,13 @@ if (!movement) { console.error('REFUSING: data/nbody-secular-series.json is abse
 const seriesArt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
 const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-deep-secular-modes.json'), 'utf8'));
 const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth, eb = seriesArt.bodies.earth;
+const { DEEP_MODES_ARTIFACT } = require(path.join(ROOT, 'packages', 'physics', 'src', 'moon', 'deep-modes-artifact.cjs'));   // plan 21: the e/ϖ anchor is the series' own J2000 mean
 const axial0 = DT.certifiedAxialPrecessionJ2000Years();   // plan 09: the IAU p_A anchor (was the retired year combs' beat at 2000)
 const factory = (deps) => createDeepOrbitalHistory({
   zModes: ART.modes.earth.z, zetaModes: ART.modes.earth.zeta,
   zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP },
   zSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zQ, p: eb.zP },
-  anchorE: AE.e, anchorPeriEclipticDeg: AE.lonPeriEclipticDeg,
+  anchorE: DEEP_MODES_ARTIFACT.anchorE, anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
   anchorInclEclipticDeg: AE.inclEclipticDeg, anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
   axialPrecessionYearsJ2000: axial0, obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
   axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarTorquePeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,   // plan 12 §8: the TORQUE period (the integration's own ŝ·n̂ carries the cosine); plan 09 step 5c: the composed period directly

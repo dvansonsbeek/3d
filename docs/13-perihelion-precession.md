@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -355,8 +355,8 @@ are Mercury −0.004 ± 0.005, Venus +0.024 ± 0.033, Earth +0.006 ± 0.007,
 Mars −0.007 ± 0.007 ″/cy — the inertial excesses equal 42.98 / 8.62 / 3.84 /
 1.35 ″/cy to those precisions, and the projection values are excluded as
 their cause by three orders of magnitude for Venus and Mars. Earth's own perihelion of
-date (the N-body series' ϖ of date, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,189.73<!--/v--> ″/cy)
-projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.64<!--/v--> ″/cy
+date (the N-body series' ϖ of date, <!--v:earthPeriRateEclipticOfDateArcsecCy-->6,190.28<!--/v--> ″/cy)
+projects with an excess of <!--v:earthPeriProjectionExcessJ2000-->493.68<!--/v--> ″/cy
 against a GR advance of 3.84. This table is the pre-registered test of the
 statement "the Mercury anomaly is the equatorial projection of the ecliptic
 advance" applied to all planets; its frame wording is §1.8's — the

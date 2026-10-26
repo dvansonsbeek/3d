@@ -283,10 +283,6 @@
     "code:tools/verify/deltat-slope-basis.js": {
       "plan-step label": 1
     },
-    "code:tools/verify/earth-osculating-offset.js": {
-      "era device / K device": 1,
-      "plan-step label": 1
-    },
     "code:tools/verify/eclipse-audit.js": {
       "H-divisor label": 2,
       "comb / lattice": 1,

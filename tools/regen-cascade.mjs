@@ -65,13 +65,13 @@ for (const dir of ['data', 'public/input']) for (const f of readdirSync(join(ROO
   nodes.set(rel, { id: rel, cmd: String(j.inputs.generator), produces: [rel], inputs: Object.keys(files), stale, manual: /<[^>]+>/.test(String(j.inputs.generator)) });
 }
 
-// The generated constants module, as TWO nodes of one command (it is a two-stage
-// dependency, measured: the embedded N-body artifacts — chain-artifact.js,
-// deep-modes-artifact.cjs, the sidereal and Sun-completion artifacts — are inputs of
-// earth-osculating-offset.js, whose output the constants module embeds in turn, so
-// after an N-body regeneration the generator runs once before the offset and once
-// after). Inputs are parsed from the generator's own source so the list has one
-// home; outputs from its OUT_* paths. Both nodes are stale when the check mode fails.
+// The generated constants module, as TWO nodes of one command: the embedded
+// N-body artifacts — chain-artifact.js, deep-modes-artifact.cjs, the sidereal and
+// Sun-completion artifacts — are read by generators downstream of them, and the
+// constants embed proper comes last (two stages of one generator; the former
+// offset generator that sat between them left at plan 21). Inputs are parsed from
+// the generator's own source so the list has one home; outputs from its OUT_*
+// paths. Both nodes are stale when the check mode fails.
 {
   const genRel = 'tools/constants/generate.mjs';
   const src = readFileSync(join(ROOT, genRel), 'utf8');

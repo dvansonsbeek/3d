@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -735,10 +735,10 @@ cost of the physical year (plan 06 R1).
 (the apsidal period, the eccentricity-band beats); the perihelion-of-date
 period — the apsidal rotation seen from the moving equinox — belongs to
 ϖ_of-date, not to e. Accordingly the Sun's eccentricity is the banked N-body
-series plus the derived mean-element offset on every clock-side path — the
-eclipse Sun's equation of centre, the besselian Sun distance and the
-cardinal braid (`eccentricityAt` / `sunEccentricityAt`; plan 06 layer B, and
-plan 09 step 6 for the remaining readers). *Record:* the eclipse Sun rode the
+series — the mean element of date, the same function the published Earth
+eccentricity serves — on every clock-side path — the eclipse Sun's equation
+of centre, the besselian Sun distance and the cardinal braid
+(`eccentricityAt` ≡ `sunEccentricityAt`; plan 21). *Record:* the eclipse Sun rode the
 J2000-anchored single-line law (the Moon's own law) until plan 06 layer B,
 and the cardinal-point path and the besselian distance rode the retired
 perihelion law until plan 09; while they shipped, over 250 kyr none of the

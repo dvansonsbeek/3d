@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -63,7 +63,7 @@ The three J2000 mean year lengths are the IAU inputs of `astro-reference.json`:
 |-----------|-------|-------------|
 | Tropical | derived: the beat of the IAU sidereal year and p_A (`computeMeanTropicalYearJ2000Days`) | <!--v:meanSolarYearDaysFull-->365.242190469006<!--/v--> |
 | Sidereal | `yearLengthRef.siderealYear` | <!--v:meanSiderealYearDaysFull-->365.256363004<!--/v--> |
-| Anomalistic | derived: the law of date at 2000 (the sidereal year and the series' own apsidal rate; Simon 1994's mean element is a citation) | <!--v:anomalisticYearDaysFull-->365.259634985<!--/v--> |
+| Anomalistic | derived: the law of date at 2000 (the sidereal year and the series' own apsidal rate; Simon 1994's mean element is a citation) | <!--v:anomalisticYearDaysFull-->365.259636543<!--/v--> |
 
 The coin rotation paradox relates the three through the precession periods:
 - In one axial precession cycle (T_p), there is exactly **1 fewer sidereal year than tropical years** — the precessing equinox "absorbs" one full orbit
@@ -236,8 +236,8 @@ All precession periods emerge from ratios of year lengths:
 | Precession | Formula | Mean period |
 |------------|---------|-------------|
 | Axial | `Y_sid / (Y_sid − Y_trop)` | T_p = <!--v:earthAxialPeriod-->25,772<!--/v--> yr |
-| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | T_peri ≈ <!--v:earthPeriPeriod-->20,938<!--/v--> yr |
-| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | T_aps ≈ <!--v:earthPeriPeriodICRF-->111,635<!--/v--> yr |
+| Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | T_peri ≈ <!--v:earthPeriPeriod-->20,936<!--/v--> yr |
+| Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | T_aps ≈ <!--v:earthPeriPeriodICRF-->111,581<!--/v--> yr |
 | Obliquity | the beat of the spin axis's inertial precession against the nodal mode: 1/(1/T_ψ̇ᵢₙ − 1/T_s₃) with T_ψ̇ᵢₙ = <!--v:spinAxisInertialPeriodYearsJ2000-->25,722<!--/v--> yr (the pole's period, 0.097 ″/yr above the equinox clock T_p — IAU's planetary precession). A record sees the window mean of the pole rate, not the J2000 instant: <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr over the LR04 record | <!--v:obliqCycleYears-->~41,099<!--/v--> yr at J2000 |
 | Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
 
@@ -259,7 +259,7 @@ The coin rotation paradox manifests at every timescale:
 |----------|-------------|-----------|
 | Tropical year | 365.242190 days | 365.242190 days (IAU) |
 | Sidereal year | 365.256363 days | 365.256363 days (IAU) |
-| Anomalistic year | <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v--> days | <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> days (Simon 1994 mean element; the model's law of date at 2000: <!--v:anomalisticYearJ2000Days-->365.2596350<!--/v-->) |
+| Anomalistic year | <!--v:anomalisticYearJ2000Days-->365.2596365<!--/v--> days | <!--v:anomalisticYearSimon1994Days-->365.259636<!--/v--> days (Simon 1994 mean element; the model's law of date at 2000: <!--v:anomalisticYearJ2000Days-->365.2596365<!--/v-->) |
 | LOD_mean (kinematic, the SI day ω₀) | <!--v:meanSolarDaySeconds-->86,400.000000<!--/v--> s | — |
 | LOD_real (Layer 4: physical, + the ecliptic term + DT cycles + swing) | <!--v:lodRealPhysical-->86,400.001200<!--/v--> s | USNO joint-optimum target <!--v:usnoLodJ2000-->86,400.0012<!--/v--> s (fit's measured-day basis) |
 | Sidereal day — on LOD_real of J2000 (the simulator readout) | <!--v:siderealDayJ2000Physical-->86,164.091730<!--/v--> s | <!--v:siderealDayInputSeconds-->86,164.090531<!--/v--> s (IAU, on the 86,400-s day — the two differ by the day's excess, <!--v:lodRealJ2000ExcessMs-->1.20<!--/v--> ms) |

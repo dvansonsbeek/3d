@@ -6,7 +6,9 @@
  * injects the Node engine's certified surfaces:
  *   - the deep mode tables read from the governed DATA artifact (richer
  *     than the embed: it also carries earthZetaEra, the era ζ tier);
- *   - the anchors from the chain artifact's one home;
+ *   - the anchors from their one homes: e/ϖ the series' own J2000 node (the
+ *     mean element, plan 21 — the deep-modes embed carries it), the
+ *     inclination/node pair the chain artifact's;
  *   - the J2000 precession anchor — the IAU 2006 p_A (plan 09; ONE home,
  *     deep-time.js certifiedAxialPrecessionJ2000Years) — and ε₀ from the
  *     astro reference.
@@ -33,6 +35,7 @@ function createDeepOrbitalHistory() {
   const DT = require('./deep-time.js');
   const C = require('./constants.js');
 
+  const { DEEP_MODES_ARTIFACT } = require('../../packages/physics/src/moon/deep-modes-artifact.cjs');
   const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth;
   // Plan 09: the J2000 precession anchor is the IAU p_A (ONE home, deep-time.js)
   const axial0 = DT.certifiedAxialPrecessionJ2000Years();
@@ -40,8 +43,8 @@ function createDeepOrbitalHistory() {
   return factory({
     zModes: ART.modes.earth.z,
     zetaModes: ART.modes.earth.zeta,        // the DEEP ζ tier (Myr-scale grids)
-    anchorE: AE.e,
-    anchorPeriEclipticDeg: AE.lonPeriEclipticDeg,
+    anchorE: DEEP_MODES_ARTIFACT.anchorE,                            // plan 21: the series' own J2000 mean
+    anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
     anchorInclEclipticDeg: AE.inclEclipticDeg,
     anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
     axialPrecessionYearsJ2000: axial0,
@@ -86,6 +89,7 @@ function createOneSourceTier() {
   const DT = require('./deep-time.js');
   const C = require('./constants.js');
 
+  const { DEEP_MODES_ARTIFACT } = require('../../packages/physics/src/moon/deep-modes-artifact.cjs');
   const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth;
   const axial0 = DT.certifiedAxialPrecessionJ2000Years();   // plan 09: the IAU p_A anchor
   const eb = seriesArt.bodies.earth;
@@ -95,8 +99,8 @@ function createOneSourceTier() {
     zetaModes: ART.modes.earth.zeta,
     zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP },
     zSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zQ, p: eb.zP },
-    anchorE: AE.e,
-    anchorPeriEclipticDeg: AE.lonPeriEclipticDeg,
+    anchorE: DEEP_MODES_ARTIFACT.anchorE,                            // plan 21: the series' own J2000 mean
+    anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
     anchorInclEclipticDeg: AE.inclEclipticDeg,
     anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
     axialPrecessionYearsJ2000: axial0,

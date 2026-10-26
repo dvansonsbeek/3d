@@ -1,11 +1,11 @@
 {
  "_description": "T1 inputs — the engine’s own precession rates and Earth’s z / ζ secular modes (deep mode table). p = the general precession in longitude (the of-date precession beat at J2000, createModel().epoch.axialPrecessionYearsAtYear): the equinox along the ecliptic of date, the rate the climatic-precession lines p + g_i carry. pInertial = the spin axis’s inertial precession rate at J2000 (createModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000, the self-anchored rate the hybrid obliquity integrates on: p plus the planetary mean). pInertialMeanLr04 = the REALIZED pole rate over the LR04 record window (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr over lr04WindowKyr with ellipticity:false — the inertial rate of date × solar torque at e(t) × cos ε(t)/cos ε₀, averaged; the ice-driven J₂(t)/J₂₀ factor is left out because it rides the climate formula’s own fit, 3e-5 of the rate): the rate the obliquity lines pInertialMeanLr04 + s_i carry — a record sees the window mean, not the J2000 instant. Consumed by scripts/l1_physical_lines.py and scripts/t1_beat_model_vs_comb.py.",
- "pArcsecPerYr": 50.28795976667994,
- "precessionPeriodYr": 25771.57645712862,
+ "pArcsecPerYr": 50.28795976713892,
+ "precessionPeriodYr": 25771.576456893403,
  "pInertialArcsecPerYr": 50.38455189277776,
  "inertialPrecessionPeriodYr": 25722.169818201197,
- "pInertialMeanLr04ArcsecPerYr": 50.51908912477627,
- "inertialPrecessionPeriodMeanLr04Yr": 25653.669186295716,
+ "pInertialMeanLr04ArcsecPerYr": 50.51909387742775,
+ "inertialPrecessionPeriodMeanLr04Yr": 25653.666772892397,
  "lr04WindowKyr": [
   0,
   5320
@@ -185,7 +185,7 @@
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/nbody-deep-secular-modes.json": "sha256:87c325fac77d94a45e1381b62a2a4c5cd8253bc4765c8d497a1d9f5466649ccc",
    "data/nbody-secular-frequencies.json": "sha256:96c6665c91d8fa333418949bf221b030b90a28cc90ba4a73aa34526747cb474d",
-   "data/nbody-secular-series.json": "sha256:67291b28b0c8b0854ab19881dbbd0b0062599fc6106a05bc94396eb6ec24431c",
+   "data/nbody-secular-series.json": "sha256:7314ffc3fb0b23def7abb3185e501a58bbe746734be0f731fac2131b835173ec",
    "tools/explore/t1-export-engine-frequencies.mjs": "sha256:b4eb452e959566d390663fd02f4ce901466e3a2256cb0bc3f877a55762f632ac"
   }
  }

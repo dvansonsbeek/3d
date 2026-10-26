@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v26.7
-coefficients: sha256:b2d4e64c4e6a947e
+modelVersion: v27.0
+coefficients: sha256:5dbadf25f52e4749
 status: current
 ---
 
@@ -379,12 +379,13 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    Sun sits <!--v:sunVsHorizonsMeanArcsec-->2.50<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.26<!--/v-->″ over the whole
    span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->2.0<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->−0.9<!--/v-->″),
    <!--v:sunVsHorizonsMeanM2000Arcsec-->3.7<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
-   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.78<!--/v-->″ scatter in
+   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.79<!--/v-->″ scatter in
    1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.84<!--/v-->″, the L0 anchor and aberration conventions).
 
-**e(t) and ϖ(t)** are the banked N-body series' Earth elements plus the
-derived mean-element offset of the era (doc 110 chain 1.1; plan 06 layer B)
-— the eclipse Sun's mean elements; the Moon's E-factor reads the same
+**e(t) and ϖ(t)** are the banked N-body series' Earth elements — the mean
+element of date, anchored at J2000 on the series' own node (doc 110 chain
+1.1; plan 21): the eclipse Sun's elements and the published Earth values are
+one function; the Moon's E-factor reads the same
 N-body eccentricity of date, E = e(t)/e(J2000). Eccentricity is frame-invariant and
 carries no equinox-referenced period; the perihelion longitude does. The
 cardinal instants are the APPARENT crossings of this Sun (aberration and

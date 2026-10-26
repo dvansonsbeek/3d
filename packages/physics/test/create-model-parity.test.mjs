@@ -220,6 +220,20 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   }
 }
 
+// Plan 21 — ONE Earth e-vector of date: the published Earth ϖ/e and the eclipse
+// Sun's ϖ/e are the same function (the former osculating-mean offset is gone),
+// and the J2000 value is the series' own mean element (Simon 1994's class:
+// ϖ 102.937°, e 0.016709 — not the osculating snapshot 102.918° / 0.016702).
+{
+  for (const y of [2000, 1000, -2000, -100000]) {
+    if (model.earth.perihelionLongitudeDeg(y) !== model.sun.perihelionLongitudeDegAt(y)) failures.push(`one ϖ: earth ${model.earth.perihelionLongitudeDeg(y)} ≠ sun ${model.sun.perihelionLongitudeDegAt(y)} @ ${y}`);
+    if (model.earth.eccentricity(y) !== model.eclipse.frameworkSunDeps.eccentricityAt(y)) failures.push(`one e: earth ≠ eclipse Sun @ ${y}`);
+  }
+  const pom0 = model.earth.perihelionLongitudeDeg(2000), e0 = model.earth.eccentricity(2000);
+  if (!(Math.abs(pom0 - 102.937) < 0.0015)) failures.push(`ϖ(J2000) is not the mean element: ${pom0} (Simon 1994 102.9373°)`);
+  if (!(Math.abs(e0 - 0.016709) < 0.000001)) failures.push(`e(J2000) is not the mean element: ${e0} (Simon 1994 0.0167086)`);
+}
+
 if (failures.length) {
   console.error(`createModel parity — ${failures.length} FAILURE(S):`);
   for (const f of failures) console.error('  ' + f);

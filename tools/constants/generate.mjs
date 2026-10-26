@@ -115,13 +115,6 @@ const EXTRA_COEFFICIENT_SOURCES = [
   // N-body re-stamp. Readers: FIT.DT_ANCHOR.deltaTStartSeconds (never K.earthOrbital).
   { dir: 'data', file: 'deltaT-4flag-fit.json', as: 'DT_ANCHOR', pick: (j) => ({ deltaTStartSeconds: j.optimum.deltaTStart, usnoTargetLodSeconds: j.optimum.usno_target_lod_s }) },
 
-  // Plan 06 layer B — the eclipse Sun's DERIVED mean-element offset over the
-  // secular series (the 1890–2110 mean of osculating − secular e and ϖ of the
-  // EMB from the Horizons-seeded nine-body run; tools/verify/earth-osculating-
-  // offset.js). Consumed by model.js for the Sun laws only (finders, besselian,
-  // the cardinal braid); the published Earth surface stays the secular series.
-  { dir: 'data', file: 'earth-osculating-mean-offset.json', as: 'EARTH_OSCULATING_MEAN_OFFSET', pick: (j) => ({ dPomArcsec: j.dPomArcsec, dE: j.dE }) },
-
   // The fourth ΔT driver, fitted separately (core-mantle swing, 2-kick damped
   // oscillation). Its own file, its own fitter — hence its own entry.
   {
@@ -598,8 +591,10 @@ export const CHAIN_ARTIFACT = Object.freeze(${JSON.stringify(art)});
 // tools/verify/deep-secular-modes.js and guarded artifact↔engine by
 // check:artifacts. THIS embed guards embed↔artifact exactly like the chain
 // artifact above. The J2000 anchor pair (e, ϖ) is JOINED at emission time
-// from the chain artifact's j2000AnchorElements — the anchor's ONE home —
-// so the anchored evaluator form needs no retyped value. Emitted as CJS:
+// from the secular series' own J2000 node (bodies.earth.zAnchorJ2000 — the
+// MEAN element, plan 21; the inclination/node pair from the chain artifact's
+// j2000AnchorElements) — the anchors' ONE home — so the anchored evaluator
+// form needs no retyped value. Emitted as CJS:
 // the lunar-chain consumers (moon/*.cjs) are CommonJS modules.
 const DEEP_MODES_PATH = join(ROOT, 'data/nbody-deep-secular-modes.json');
 const OUT_DEEP_MODES = join(ROOT, 'packages/physics/src/moon/deep-modes-artifact.cjs');
@@ -748,6 +743,12 @@ function buildDeepModes(chainArt) {
   if (!(i0 > 0 && i0 + 1 < eb.zQ.length && series.t0Yr + i0 * eb.stepYr === 0)) {
     throw new Error('secular-series artifact: no J2000 node for the z-rate anchor — regenerate it first (node tools/verify/secular-series.js --write)');
   }
+  // Plan 21: the e/ϖ anchor is the series' OWN J2000 node — the 1-kyr-boxcar
+  // MEAN element the generator writes as zAnchorJ2000 — not the chain's
+  // osculating snapshot; the inclination/node pair stays the chain's.
+  if (!(eb.zAnchorJ2000 && Number.isFinite(eb.zAnchorJ2000.e) && Number.isFinite(eb.zAnchorJ2000.lonPeriEclipticDeg))) {
+    throw new Error('secular-series artifact: bodies.earth.zAnchorJ2000 absent — regenerate it first (node tools/verify/secular-series.js --write)');
+  }
   const anchorZDotPerYr = [
     (eb.zQ[i0 + 1] - eb.zQ[i0 - 1]) / (2 * eb.stepYr),
     (eb.zP[i0 + 1] - eb.zP[i0 - 1]) / (2 * eb.stepYr),
@@ -792,8 +793,8 @@ function buildDeepModes(chainArt) {
       planetZeta: Object.fromEntries(
         Object.keys(art.modes).filter((p) => p !== 'earth')
           .map((p) => [p, art.modes[p].zeta])),
-      anchorE: anchor.e,
-      anchorPeriEclipticDeg: anchor.lonPeriEclipticDeg,
+      anchorE: eb.zAnchorJ2000.e,
+      anchorPeriEclipticDeg: eb.zAnchorJ2000.lonPeriEclipticDeg,
       anchorInclEclipticDeg: anchor.inclEclipticDeg,
       anchorAscNodeEclipticDeg: anchor.ascNodeEclipticDeg,
       // the slope anchor pair (see above): [d(e·cos ϖ)/dt, d(e·sin ϖ)/dt] per year
@@ -810,9 +811,11 @@ function emitDeepModes({ hash, payload }) {
  *
  * Source: data/nbody-deep-secular-modes.json (the governed deep-time
  * Earth-z mode table, engine-switch Stage B), earth z-modes + verdict
- * emitted VERBATIM, plus the J2000 anchor pair (e, ϖ) joined from
+ * emitted VERBATIM, plus the J2000 anchors: the e/ϖ pair from
+ * data/nbody-secular-series.json bodies.earth.zAnchorJ2000 (the series' own
+ * J2000 node — the MEAN element, plan 21) and the inclination/node pair from
  * data/nbody-secular-frequencies.json j2000AnchorElements.earth — the
- * anchor's ONE home, plus the per-planet leading proper ζ modes (″/yr,
+ * anchors' ONE home, plus the per-planet leading proper ζ modes (″/yr,
  * the C-4 s-lines for the zoom labels — doc 109 §19), plus the J2000
  * z-rate pair from data/nbody-secular-series.json (the slope anchor of
  * the deep eccentricity channel) and its H/12 taper. Two gates guard

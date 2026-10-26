@@ -60,8 +60,10 @@ export function assembleOneSourceMovement(ctx) {
         zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: sb.stepYr, q: sb.zetaQ, p: sb.zetaP },
         zSeries: { t0Yr: seriesArt.t0Yr, stepYr: sb.stepYr, q: sb.zQ, p: sb.zP },
       } : {}),
-      anchorE: AEarth.e,
-      anchorPeriEclipticDeg: AEarth.lonPeriEclipticDeg,
+      // Plan 21: the e/ϖ anchor is the series' OWN J2000 node (the mean element,
+      // carried by the deep-modes embed); the inclination/node pair is the chain's.
+      anchorE: DEEP_MODES_ARTIFACT.anchorE,
+      anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
       anchorInclEclipticDeg: AEarth.inclEclipticDeg,
       anchorAscNodeEclipticDeg: AEarth.ascNodeEclipticDeg,
       axialPrecessionYearsJ2000: axial0,

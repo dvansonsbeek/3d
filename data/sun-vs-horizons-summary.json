@@ -12,13 +12,13 @@
     "unit": "arcsec (model − Horizons)",
     "all": {
       "n": 219152,
-      "mean": 2.504176,
-      "sd": 2.257522
+      "mean": 2.503368,
+      "sd": 2.255416
     },
     "window1970to2049": {
       "n": 2922,
-      "mean": 0.841076,
-      "sd": 0.77678,
+      "mean": 0.837583,
+      "sd": 0.794381,
       "note": "TT-clock definition; the registry key frameworkSunVsJplRmsArcsec is the UT-cache + bridge instrument (fq7s-sun-registry-metric.mjs) — two definitions, both recorded"
     },
     "perMillennium": [
@@ -26,405 +26,405 @@
         "from": -3000,
         "to": -2000,
         "n": 36525,
-        "mean": 1.955114,
-        "sd": 1.812835
+        "mean": 1.954443,
+        "sd": 1.804566
       },
       {
         "from": -2000,
         "to": -1000,
         "n": 36526,
-        "mean": 3.671266,
-        "sd": 1.459227
+        "mean": 3.667601,
+        "sd": 1.486072
       },
       {
         "from": -1000,
         "to": 0,
         "n": 36525,
-        "mean": 4.505413,
-        "sd": 1.201899
+        "mean": 4.505489,
+        "sd": 1.192473
       },
       {
         "from": 0,
         "to": 1000,
         "n": 36525,
-        "mean": 3.815309,
-        "sd": 1.07101
+        "mean": 3.814123,
+        "sd": 1.07902
       },
       {
         "from": 1000,
         "to": 2000,
         "n": 36526,
-        "mean": 2.025012,
-        "sd": 1.08985
+        "mean": 2.024846,
+        "sd": 1.079667
       },
       {
         "from": 2000,
         "to": 3000,
         "n": 36525,
-        "mean": -0.947079,
-        "sd": 1.36203
+        "mean": -0.946312,
+        "sd": 1.338705
       }
     ],
     "perCentury": [
       {
         "century": -3000,
         "n": 3653,
-        "mean": 0.762793,
-        "sd": 1.82806
+        "mean": 0.761472,
+        "sd": 1.828291
       },
       {
         "century": -2900,
         "n": 3652,
-        "mean": 0.962005,
-        "sd": 1.718228
+        "mean": 0.961818,
+        "sd": 1.729548
       },
       {
         "century": -2800,
         "n": 3653,
-        "mean": 1.766197,
-        "sd": 1.690244
+        "mean": 1.767021,
+        "sd": 1.71474
       },
       {
         "century": -2700,
         "n": 3652,
-        "mean": 1.452623,
-        "sd": 1.689173
+        "mean": 1.453697,
+        "sd": 1.693909
       },
       {
         "century": -2600,
         "n": 3653,
-        "mean": 1.742878,
-        "sd": 1.610741
+        "mean": 1.744022,
+        "sd": 1.588281
       },
       {
         "century": -2500,
         "n": 3652,
-        "mean": 2.147388,
-        "sd": 1.63237
+        "mean": 2.147772,
+        "sd": 1.603267
       },
       {
         "century": -2400,
         "n": 3653,
-        "mean": 2.144758,
-        "sd": 1.622731
+        "mean": 2.14442,
+        "sd": 1.581163
       },
       {
         "century": -2300,
         "n": 3652,
-        "mean": 2.468365,
-        "sd": 1.56142
+        "mean": 2.466738,
+        "sd": 1.535741
       },
       {
         "century": -2200,
         "n": 3653,
-        "mean": 2.815576,
-        "sd": 1.587489
+        "mean": 2.812872,
+        "sd": 1.57574
       },
       {
         "century": -2100,
         "n": 3652,
-        "mean": 3.288706,
-        "sd": 1.553236
+        "mean": 3.284749,
+        "sd": 1.550868
       },
       {
         "century": -2000,
         "n": 3653,
-        "mean": 2.963427,
-        "sd": 1.46157
+        "mean": 2.95859,
+        "sd": 1.485524
       },
       {
         "century": -1900,
         "n": 3652,
-        "mean": 3.810013,
-        "sd": 1.495808
+        "mean": 3.804367,
+        "sd": 1.530238
       },
       {
         "century": -1800,
         "n": 3653,
-        "mean": 3.453022,
-        "sd": 1.476577
+        "mean": 3.447177,
+        "sd": 1.535091
       },
       {
         "century": -1700,
         "n": 3652,
-        "mean": 3.14589,
-        "sd": 1.394515
+        "mean": 3.139976,
+        "sd": 1.452578
       },
       {
         "century": -1600,
         "n": 3653,
-        "mean": 3.848013,
-        "sd": 1.377724
+        "mean": 3.842789,
+        "sd": 1.419733
       },
       {
         "century": -1500,
         "n": 3653,
-        "mean": 3.236023,
-        "sd": 1.371195
+        "mean": 3.231687,
+        "sd": 1.401274
       },
       {
         "century": -1400,
         "n": 3652,
-        "mean": 3.709428,
-        "sd": 1.406505
+        "mean": 3.706124,
+        "sd": 1.414424
       },
       {
         "century": -1300,
         "n": 3653,
-        "mean": 4.016883,
-        "sd": 1.320635
+        "mean": 4.015085,
+        "sd": 1.336475
       },
       {
         "century": -1200,
         "n": 3652,
-        "mean": 4.086038,
-        "sd": 1.361564
+        "mean": 4.085497,
+        "sd": 1.355983
       },
       {
         "century": -1100,
         "n": 3653,
-        "mean": 4.443942,
-        "sd": 1.218925
+        "mean": 4.444733,
+        "sd": 1.222558
       },
       {
         "century": -1000,
         "n": 3652,
-        "mean": 4.433674,
-        "sd": 1.222485
+        "mean": 4.435345,
+        "sd": 1.222464
       },
       {
         "century": -900,
         "n": 3653,
-        "mean": 4.903917,
-        "sd": 1.189496
+        "mean": 4.90622,
+        "sd": 1.17979
       },
       {
         "century": -800,
         "n": 3652,
-        "mean": 4.104129,
-        "sd": 1.137252
+        "mean": 4.106461,
+        "sd": 1.131924
       },
       {
         "century": -700,
         "n": 3653,
-        "mean": 4.670498,
-        "sd": 1.214365
+        "mean": 4.672638,
+        "sd": 1.16544
       },
       {
         "century": -600,
         "n": 3652,
-        "mean": 4.450861,
-        "sd": 1.255762
+        "mean": 4.452171,
+        "sd": 1.209168
       },
       {
         "century": -500,
         "n": 3653,
-        "mean": 4.002112,
-        "sd": 1.185885
+        "mean": 4.002603,
+        "sd": 1.138114
       },
       {
         "century": -400,
         "n": 3652,
-        "mean": 4.88817,
-        "sd": 1.169724
+        "mean": 4.887384,
+        "sd": 1.153489
       },
       {
         "century": -300,
         "n": 3653,
-        "mean": 4.304737,
-        "sd": 1.119464
+        "mean": 4.302884,
+        "sd": 1.137246
       },
       {
         "century": -200,
         "n": 3652,
-        "mean": 4.633785,
-        "sd": 1.1115
+        "mean": 4.630757,
+        "sd": 1.13957
       },
       {
         "century": -100,
         "n": 3653,
-        "mean": 4.662238,
-        "sd": 1.044853
+        "mean": 4.658422,
+        "sd": 1.086212
       },
       {
         "century": 0,
         "n": 3653,
-        "mean": 4.531818,
-        "sd": 1.02158
+        "mean": 4.527473,
+        "sd": 1.052545
       },
       {
         "century": 100,
         "n": 3652,
-        "mean": 4.276264,
-        "sd": 0.989249
+        "mean": 4.271753,
+        "sd": 1.02347
       },
       {
         "century": 200,
         "n": 3653,
-        "mean": 3.962862,
-        "sd": 0.97589
+        "mean": 3.958768,
+        "sd": 0.993922
       },
       {
         "century": 300,
         "n": 3652,
-        "mean": 4.168981,
-        "sd": 1.017363
+        "mean": 4.165578,
+        "sd": 1.015139
       },
       {
         "century": 400,
         "n": 3653,
-        "mean": 3.24004,
-        "sd": 1.006956
+        "mean": 3.237837,
+        "sd": 1.001854
       },
       {
         "century": 500,
         "n": 3652,
-        "mean": 3.877426,
-        "sd": 1.063449
+        "mean": 3.876457,
+        "sd": 1.040071
       },
       {
         "century": 600,
         "n": 3653,
-        "mean": 3.730958,
-        "sd": 1.027666
+        "mean": 3.731417,
+        "sd": 1.035538
       },
       {
         "century": 700,
         "n": 3652,
-        "mean": 3.209094,
-        "sd": 0.947543
+        "mean": 3.210683,
+        "sd": 0.954927
       },
       {
         "century": 800,
         "n": 3653,
-        "mean": 3.941361,
-        "sd": 0.86472
+        "mean": 3.943919,
+        "sd": 0.882598
       },
       {
         "century": 900,
         "n": 3652,
-        "mean": 3.214195,
-        "sd": 0.809378
+        "mean": 3.217253,
+        "sd": 0.823194
       },
       {
         "century": 1000,
         "n": 3653,
-        "mean": 3.135002,
-        "sd": 0.73536
+        "mean": 3.138198,
+        "sd": 0.737975
       },
       {
         "century": 1100,
         "n": 3652,
-        "mean": 2.90394,
-        "sd": 0.749583
+        "mean": 2.90683,
+        "sd": 0.73808
       },
       {
         "century": 1200,
         "n": 3653,
-        "mean": 2.598884,
-        "sd": 0.813472
+        "mean": 2.601185,
+        "sd": 0.768034
       },
       {
         "century": 1300,
         "n": 3652,
-        "mean": 2.109855,
-        "sd": 0.815473
+        "mean": 2.111232,
+        "sd": 0.766838
       },
       {
         "century": 1400,
         "n": 3653,
-        "mean": 2.052618,
-        "sd": 0.875495
+        "mean": 2.053002,
+        "sd": 0.8014
       },
       {
         "century": 1500,
         "n": 3653,
-        "mean": 2.084629,
-        "sd": 0.917271
+        "mean": 2.083938,
+        "sd": 0.873787
       },
       {
         "century": 1600,
         "n": 3652,
-        "mean": 1.479901,
-        "sd": 0.884933
+        "mean": 1.478135,
+        "sd": 0.884198
       },
       {
         "century": 1700,
         "n": 3653,
-        "mean": 1.707561,
-        "sd": 0.881485
+        "mean": 1.704954,
+        "sd": 0.892084
       },
       {
         "century": 1800,
         "n": 3652,
-        "mean": 1.486481,
-        "sd": 0.91228
+        "mean": 1.483234,
+        "sd": 0.942902
       },
       {
         "century": 1900,
         "n": 3653,
-        "mean": 0.691213,
-        "sd": 0.797224
+        "mean": 0.687717,
+        "sd": 0.820442
       },
       {
         "century": 2000,
         "n": 3652,
-        "mean": 0.916324,
-        "sd": 0.773949
+        "mean": 0.912932,
+        "sd": 0.788136
       },
       {
         "century": 2100,
         "n": 3653,
-        "mean": 0.335951,
-        "sd": 0.816867
+        "mean": 0.333122,
+        "sd": 0.80562
       },
       {
         "century": 2200,
         "n": 3652,
-        "mean": -0.389836,
-        "sd": 0.840611
+        "mean": -0.391735,
+        "sd": 0.797767
       },
       {
         "century": 2300,
         "n": 3653,
-        "mean": -0.37102,
-        "sd": 0.850551
+        "mean": -0.371726,
+        "sd": 0.784423
       },
       {
         "century": 2400,
         "n": 3652,
-        "mean": -0.719675,
-        "sd": 0.935762
+        "mean": -0.719042,
+        "sd": 0.841233
       },
       {
         "century": 2500,
         "n": 3653,
-        "mean": -1.276953,
-        "sd": 0.936385
+        "mean": -1.275058,
+        "sd": 0.870613
       },
       {
         "century": 2600,
         "n": 3652,
-        "mean": -1.240836,
-        "sd": 0.841932
+        "mean": -1.237889,
+        "sd": 0.789459
       },
       {
         "century": 2700,
         "n": 3653,
-        "mean": -1.678983,
-        "sd": 0.844267
+        "mean": -1.675376,
+        "sd": 0.826687
       },
       {
         "century": 2800,
         "n": 3652,
-        "mean": -2.34305,
-        "sd": 0.784667
+        "mean": -2.339221,
+        "sd": 0.785444
       },
       {
         "century": 2900,
         "n": 3653,
-        "mean": -2.702453,
-        "sd": 0.701257
+        "mean": -2.698862,
+        "sd": 0.700595
       }
     ]
   },
@@ -432,413 +432,413 @@
     "unit": "minutes (model − Horizons, TT)",
     "all": {
       "n": 24001,
-      "mean": -1.017492,
-      "sd": 1.007604
+      "mean": -1.017166,
+      "sd": 1.005726
     },
     "perMillennium": [
       {
         "from": -3000,
         "to": -2000,
         "n": 4000,
-        "mean": -0.80351,
-        "sd": 0.853772
+        "mean": -0.80324,
+        "sd": 0.847113
       },
       {
         "from": -2000,
         "to": -1000,
         "n": 4000,
-        "mean": -1.491968,
-        "sd": 0.727955
+        "mean": -1.490479,
+        "sd": 0.73127
       },
       {
         "from": -1000,
         "to": 0,
         "n": 4000,
-        "mean": -1.821654,
-        "sd": 0.648586
+        "mean": -1.821686,
+        "sd": 0.641402
       },
       {
         "from": 0,
         "to": 1000,
         "n": 4001,
-        "mean": -1.542935,
-        "sd": 0.600856
+        "mean": -1.542465,
+        "sd": 0.603035
       },
       {
         "from": 1000,
         "to": 2000,
         "n": 4000,
-        "mean": -0.823558,
-        "sd": 0.611509
+        "mean": -0.823486,
+        "sd": 0.61116
       },
       {
         "from": 2000,
         "to": 3000,
         "n": 4000,
-        "mean": 0.378803,
-        "sd": 0.704472
+        "mean": 0.378491,
+        "sd": 0.699802
       }
     ],
     "perCentury": [
       {
         "century": -3000,
         "n": 400,
-        "mean": -0.31725,
-        "sd": 0.853956
+        "mean": -0.316678,
+        "sd": 0.853076
       },
       {
         "century": -2900,
         "n": 400,
-        "mean": -0.402762,
-        "sd": 0.806526
+        "mean": -0.40271,
+        "sd": 0.809688
       },
       {
         "century": -2800,
         "n": 400,
-        "mean": -0.73362,
-        "sd": 0.815033
+        "mean": -0.733912,
+        "sd": 0.818843
       },
       {
         "century": -2700,
         "n": 400,
-        "mean": -0.593582,
-        "sd": 0.823705
+        "mean": -0.594045,
+        "sd": 0.821657
       },
       {
         "century": -2600,
         "n": 400,
-        "mean": -0.720459,
-        "sd": 0.791743
+        "mean": -0.720883,
+        "sd": 0.778757
       },
       {
         "century": -2500,
         "n": 400,
-        "mean": -0.877789,
-        "sd": 0.785344
+        "mean": -0.877986,
+        "sd": 0.767932
       },
       {
         "century": -2400,
         "n": 400,
-        "mean": -0.881222,
-        "sd": 0.795755
+        "mean": -0.881066,
+        "sd": 0.776885
       },
       {
         "century": -2300,
         "n": 400,
-        "mean": -1.015188,
-        "sd": 0.771454
+        "mean": -1.014573,
+        "sd": 0.75697
       },
       {
         "century": -2200,
         "n": 400,
-        "mean": -1.146331,
-        "sd": 0.783448
+        "mean": -1.145225,
+        "sd": 0.775733
       },
       {
         "century": -2100,
         "n": 400,
-        "mean": -1.346903,
-        "sd": 0.747608
+        "mean": -1.345325,
+        "sd": 0.743583
       },
       {
         "century": -2000,
         "n": 400,
-        "mean": -1.20456,
-        "sd": 0.726115
+        "mean": -1.202566,
+        "sd": 0.730656
       },
       {
         "century": -1900,
         "n": 400,
-        "mean": -1.550987,
-        "sd": 0.760302
+        "mean": -1.548698,
+        "sd": 0.768164
       },
       {
         "century": -1800,
         "n": 400,
-        "mean": -1.409007,
-        "sd": 0.720911
+        "mean": -1.406578,
+        "sd": 0.73428
       },
       {
         "century": -1700,
         "n": 400,
-        "mean": -1.277947,
-        "sd": 0.699991
+        "mean": -1.275557,
+        "sd": 0.711949
       },
       {
         "century": -1600,
         "n": 400,
-        "mean": -1.571056,
-        "sd": 0.712053
+        "mean": -1.56889,
+        "sd": 0.716439
       },
       {
         "century": -1500,
         "n": 400,
-        "mean": -1.315222,
-        "sd": 0.694482
+        "mean": -1.313441,
+        "sd": 0.696151
       },
       {
         "century": -1400,
         "n": 400,
-        "mean": -1.503813,
-        "sd": 0.716907
+        "mean": -1.502535,
+        "sd": 0.711769
       },
       {
         "century": -1300,
         "n": 400,
-        "mean": -1.626854,
-        "sd": 0.678377
+        "mean": -1.626137,
+        "sd": 0.678132
       },
       {
         "century": -1200,
         "n": 400,
-        "mean": -1.660466,
-        "sd": 0.68916
+        "mean": -1.6603,
+        "sd": 0.683297
       },
       {
         "century": -1100,
         "n": 400,
-        "mean": -1.799766,
-        "sd": 0.654244
+        "mean": -1.800088,
+        "sd": 0.652732
       },
       {
         "century": -1000,
         "n": 400,
-        "mean": -1.79871,
-        "sd": 0.644647
+        "mean": -1.799394,
+        "sd": 0.642903
       },
       {
         "century": -900,
         "n": 400,
-        "mean": -1.98287,
-        "sd": 0.667313
+        "mean": -1.983759,
+        "sd": 0.660714
       },
       {
         "century": -800,
         "n": 400,
-        "mean": -1.656678,
-        "sd": 0.61816
+        "mean": -1.657611,
+        "sd": 0.613424
       },
       {
         "century": -700,
         "n": 400,
-        "mean": -1.892992,
-        "sd": 0.661171
+        "mean": -1.893803,
+        "sd": 0.641157
       },
       {
         "century": -600,
         "n": 400,
-        "mean": -1.798624,
-        "sd": 0.682319
+        "mean": -1.799172,
+        "sd": 0.661981
       },
       {
         "century": -500,
         "n": 400,
-        "mean": -1.619567,
-        "sd": 0.635703
+        "mean": -1.619749,
+        "sd": 0.61479
       },
       {
         "century": -400,
         "n": 400,
-        "mean": -1.976318,
-        "sd": 0.64637
+        "mean": -1.976054,
+        "sd": 0.635151
       },
       {
         "century": -300,
         "n": 400,
-        "mean": -1.735735,
-        "sd": 0.607078
+        "mean": -1.734998,
+        "sd": 0.60807
       },
       {
         "century": -200,
         "n": 400,
-        "mean": -1.874497,
-        "sd": 0.610677
+        "mean": -1.873316,
+        "sd": 0.615453
       },
       {
         "century": -100,
         "n": 400,
-        "mean": -1.880543,
-        "sd": 0.599824
+        "mean": -1.879,
+        "sd": 0.609204
       },
       {
         "century": 0,
         "n": 400,
-        "mean": -1.829434,
-        "sd": 0.573111
+        "mean": -1.827657,
+        "sd": 0.579978
       },
       {
         "century": 100,
         "n": 400,
-        "mean": -1.730944,
-        "sd": 0.581101
+        "mean": -1.72911,
+        "sd": 0.589924
       },
       {
         "century": 200,
         "n": 400,
-        "mean": -1.60102,
-        "sd": 0.580234
+        "mean": -1.599323,
+        "sd": 0.583555
       },
       {
         "century": 300,
         "n": 400,
-        "mean": -1.680815,
-        "sd": 0.587615
+        "mean": -1.679435,
+        "sd": 0.587411
       },
       {
         "century": 400,
         "n": 400,
-        "mean": -1.312455,
-        "sd": 0.583155
+        "mean": -1.311538,
+        "sd": 0.583175
       },
       {
         "century": 500,
         "n": 401,
-        "mean": -1.562967,
-        "sd": 0.59603
+        "mean": -1.562919,
+        "sd": 0.589677
       },
       {
         "century": 600,
         "n": 400,
-        "mean": -1.513098,
-        "sd": 0.592022
+        "mean": -1.513224,
+        "sd": 0.595202
       },
       {
         "century": 700,
         "n": 400,
-        "mean": -1.301224,
-        "sd": 0.564142
+        "mean": -1.301833,
+        "sd": 0.566363
       },
       {
         "century": 800,
         "n": 400,
-        "mean": -1.592185,
-        "sd": 0.539492
+        "mean": -1.593175,
+        "sd": 0.544006
       },
       {
         "century": 900,
         "n": 400,
-        "mean": -1.305157,
-        "sd": 0.543566
+        "mean": -1.306384,
+        "sd": 0.546642
       },
       {
         "century": 1000,
         "n": 400,
-        "mean": -1.262766,
-        "sd": 0.518008
+        "mean": -1.264061,
+        "sd": 0.518494
       },
       {
         "century": 1100,
         "n": 400,
-        "mean": -1.181397,
-        "sd": 0.535818
+        "mean": -1.182592,
+        "sd": 0.534447
       },
       {
         "century": 1200,
         "n": 400,
-        "mean": -1.056993,
-        "sd": 0.539457
+        "mean": -1.057939,
+        "sd": 0.530703
       },
       {
         "century": 1300,
         "n": 400,
-        "mean": -0.853006,
-        "sd": 0.533296
+        "mean": -0.853587,
+        "sd": 0.526256
       },
       {
         "century": 1400,
         "n": 400,
-        "mean": -0.83969,
-        "sd": 0.553931
+        "mean": -0.839838,
+        "sd": 0.539585
       },
       {
         "century": 1500,
         "n": 400,
-        "mean": -0.850759,
-        "sd": 0.554624
+        "mean": -0.850457,
+        "sd": 0.548777
       },
       {
         "century": 1600,
         "n": 400,
-        "mean": -0.599383,
-        "sd": 0.542122
+        "mean": -0.598655,
+        "sd": 0.546733
       },
       {
         "century": 1700,
         "n": 400,
-        "mean": -0.697188,
-        "sd": 0.557025
+        "mean": -0.696104,
+        "sd": 0.563102
       },
       {
         "century": 1800,
         "n": 400,
-        "mean": -0.613174,
-        "sd": 0.569688
+        "mean": -0.611844,
+        "sd": 0.579468
       },
       {
         "century": 1900,
         "n": 400,
-        "mean": -0.281225,
-        "sd": 0.532439
+        "mean": -0.27979,
+        "sd": 0.539365
       },
       {
         "century": 2000,
         "n": 400,
-        "mean": -0.380521,
-        "sd": 0.535262
+        "mean": -0.379138,
+        "sd": 0.539752
       },
       {
         "century": 2100,
         "n": 400,
-        "mean": -0.137914,
-        "sd": 0.545362
+        "mean": -0.136756,
+        "sd": 0.544537
       },
       {
         "century": 2200,
         "n": 400,
-        "mean": 0.153776,
-        "sd": 0.546678
+        "mean": 0.154555,
+        "sd": 0.539844
       },
       {
         "century": 2300,
         "n": 400,
-        "mean": 0.14108,
-        "sd": 0.557366
+        "mean": 0.141372,
+        "sd": 0.545852
       },
       {
         "century": 2400,
         "n": 400,
-        "mean": 0.287197,
-        "sd": 0.564443
+        "mean": 0.286948,
+        "sd": 0.544926
       },
       {
         "century": 2500,
         "n": 400,
-        "mean": 0.507243,
-        "sd": 0.584137
+        "mean": 0.506467,
+        "sd": 0.571998
       },
       {
         "century": 2600,
         "n": 400,
-        "mean": 0.501752,
-        "sd": 0.564099
+        "mean": 0.500549,
+        "sd": 0.555366
       },
       {
         "century": 2700,
         "n": 400,
-        "mean": 0.678753,
-        "sd": 0.561993
+        "mean": 0.677276,
+        "sd": 0.561588
       },
       {
         "century": 2800,
         "n": 400,
-        "mean": 0.943091,
-        "sd": 0.541928
+        "mean": 0.941527,
+        "sd": 0.544927
       },
       {
         "century": 2900,
         "n": 400,
-        "mean": 1.093569,
-        "sd": 0.521361
+        "mean": 1.092113,
+        "sd": 0.523506
       }
     ]
   },
@@ -846,13 +846,13 @@
     "generator": "node tools/verify/sun-vs-horizons.js --write",
     "files": {
       "data/jpl-sun-ecliptic-longitude-tt.json": "sha256:1b3ef502d849b1a3cbffca70e91fe7ed29b6331073688b81addf617a9e8d5ed5",
-      "data/nbody-secular-series.json": "sha256:67291b28b0c8b0854ab19881dbbd0b0062599fc6106a05bc94396eb6ec24431c",
+      "data/nbody-secular-series.json": "sha256:7314ffc3fb0b23def7abb3185e501a58bbe746734be0f731fac2131b835173ec",
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:2cc864c563ca816df4ccc01f651bd67fde8f29215b6670f8f8842b5d4f68445f",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/deltat/deep-time.cjs": "sha256:a152284d8ca8eb0a433fe6bab7e270c833ad4aae7e0184725a21646df9f9fbbc",
       "packages/physics/src/deltat/moon-distance-artifact.cjs": "sha256:ab04d079bb05ff14bc76e346afeb5c53ce28caed1b728542566967e81c638b90",
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
-      "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:f3ffe49e38cd745b04163465ef632a0b69bfa82fd9b47fef0adda0d95fdf3e9a",
+      "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:cfc9a64b09599709339dd750d69f259af5b280cbe9034bdab5d13ddcc6aa9f8b",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
       "packages/physics/src/earth/sidereal-year-channel.cjs": "sha256:3fbcfb4ef5e0a6faeaf8f14d3d77e48cbc1804315d9535a902e5b936e26e5732",
       "packages/physics/src/earth/year-lengths.cjs": "sha256:e61f895cded7dbf61754628196c4ddf8a1e0f15d056bdabca696f77864ff94d6",
@@ -864,11 +864,11 @@
       "packages/physics/src/model/deep-time-chain.js": "sha256:2e1517e70cd5af0cdd4ea049764278b935c411f5f31b571621940c010284d41f",
       "packages/physics/src/model/delta-t.js": "sha256:cac4dc717893e580bb8744e10ce4b0592f4a4bbbaa8ee58b613df866ab99d49c",
       "packages/physics/src/model/derived-constants.js": "sha256:c401d5dcd0879cea6b6ca010e2e9abc7ec9d9288d2ea88aabc29dc162f7fc99a",
-      "packages/physics/src/model/earth-scalars.js": "sha256:af3781101d6ae0b5e3773ff1da7b9cec92d5448d81536746b37e2d4a30fc3ec9",
+      "packages/physics/src/model/earth-scalars.js": "sha256:292024c388ae42ad31976fd7b0cbc98b9736de06b3bc81b7a63667a6f2a959c5",
       "packages/physics/src/model/inv-plane-elements.js": "sha256:97fc18474b126f589d4e29fc69f9e2d59611577afffed1b2a884360fe37f3117",
       "packages/physics/src/model/lunar-theory.js": "sha256:16f0904a6e090c8fe057233d1db6c30dfb93ef76c7a540ce574492188b9ecff5",
       "packages/physics/src/model/moon-epoch.js": "sha256:6ab1a890b71d8459333d4f8c99a386a030ae199855b308fbd3b926fb77c0daad",
-      "packages/physics/src/model/one-source-movement.js": "sha256:c661de8bed70815e16a718e83e844e97cacf947ec5076b4a160192bc49e10cf9",
+      "packages/physics/src/model/one-source-movement.js": "sha256:118a8de5cf8b27c3b19fae40d358791aba12b920d0638b263eec66fc59f7a63a",
       "packages/physics/src/model/planet-elements-of-date.js": "sha256:1069316fec3656c8dc8465314659d5ecf45238c4dce15992b5fdab4985a18731",
       "packages/physics/src/model/planet-records.js": "sha256:944a79363b7520e3e37035e6710994d12a7f7c70c866887d670f81513affa716",
       "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",
@@ -879,7 +879,7 @@
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
       "packages/physics/src/moon/arguments.cjs": "sha256:da666af19754f9bfa767aa61564ccc3e458773f6f1ce14d4dedd146ad1594bde",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
-      "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:7e694442be5bdb9b59087c3e8587bba8d7a271f8100d022f51418bbb351d996d",
+      "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:ed30bde369cf0d50ecee1a22125f5fff1edd4cf6f15c1f17b1e16b04173b0eb4",
       "tools/explore/fetch-jpl-sun-longitude-tt.mjs": "sha256:e067a851ecb54bc3cf70afa9b1c8d48ea27219a8b6de4a05aedcd02e2447488c",
       "tools/verify/sun-vs-horizons.js": "sha256:1f3d4da66ccfb1e48dbce7409ceb14daed5a9f3898dc6aa22e5ae5d11beaaa5b"
     }

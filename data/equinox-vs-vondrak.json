@@ -6,8 +6,8 @@
  },
  "equinox": {
   "unit": "arcsec (model − Vondrák 2011, + = east; the Sun's of-date longitude moves by the negative)",
-  "maxAbsArcsec": 7.873,
-  "maxAbsInnerArcsec": 0.62,
+  "maxAbsArcsec": 7.869,
+  "maxAbsInnerArcsec": 0.619,
   "innerWindow": [
    -500,
    2500
@@ -17,200 +17,200 @@
   "rows": [
    {
     "year": -3000,
-    "equinoxArcsec": -7.873,
+    "equinoxArcsec": -7.869,
     "secularOnlyArcsec": -28.15,
-    "solarTorqueOnlyArcsec": -24.296,
+    "solarTorqueOnlyArcsec": -24.293,
     "ellipticityOnlyArcsec": -11.727,
     "obliquityArcsec": 5.056,
     "eclipticPoleArcsec": 1.276,
-    "solarTorqueFactorMinusOne": 0.000029459,
+    "solarTorqueFactorMinusOne": 0.000029482,
     "ellipticityFactorMinusOne": 0.000128081
    },
    {
     "year": -2750,
-    "equinoxArcsec": -6.304,
+    "equinoxArcsec": -6.301,
     "secularOnlyArcsec": -24.662,
-    "solarTorqueOnlyArcsec": -21.167,
+    "solarTorqueOnlyArcsec": -21.164,
     "ellipticityOnlyArcsec": -9.8,
     "obliquityArcsec": 3.959,
     "eclipticPoleArcsec": 1.264,
-    "solarTorqueFactorMinusOne": 0.000028211,
+    "solarTorqueFactorMinusOne": 0.000028232,
     "ellipticityFactorMinusOne": 0.00012282
    },
    {
     "year": -2500,
-    "equinoxArcsec": -5.001,
+    "equinoxArcsec": -4.999,
     "secularOnlyArcsec": -21.523,
-    "solarTorqueOnlyArcsec": -18.37,
+    "solarTorqueOnlyArcsec": -18.367,
     "ellipticityOnlyArcsec": -8.154,
     "obliquityArcsec": 3.11,
     "eclipticPoleArcsec": 1.16,
-    "solarTorqueFactorMinusOne": 0.000026936,
+    "solarTorqueFactorMinusOne": 0.000026953,
     "ellipticityFactorMinusOne": 0.000117306
    },
    {
     "year": -2250,
-    "equinoxArcsec": -3.932,
+    "equinoxArcsec": -3.929,
     "secularOnlyArcsec": -18.702,
-    "solarTorqueOnlyArcsec": -15.876,
+    "solarTorqueOnlyArcsec": -15.874,
     "ellipticityOnlyArcsec": -6.758,
     "obliquityArcsec": 2.251,
     "eclipticPoleArcsec": 1.151,
-    "solarTorqueFactorMinusOne": 0.000025635,
+    "solarTorqueFactorMinusOne": 0.000025651,
     "ellipticityFactorMinusOne": 0.000111559
    },
    {
     "year": -2000,
-    "equinoxArcsec": -3.065,
+    "equinoxArcsec": -3.063,
     "secularOnlyArcsec": -16.173,
-    "solarTorqueOnlyArcsec": -13.658,
+    "solarTorqueOnlyArcsec": -13.656,
     "ellipticityOnlyArcsec": -5.58,
     "obliquityArcsec": 1.627,
     "eclipticPoleArcsec": 1.057,
-    "solarTorqueFactorMinusOne": 0.000024306,
+    "solarTorqueFactorMinusOne": 0.000024323,
     "ellipticityFactorMinusOne": 0.000105602
    },
    {
     "year": -1750,
-    "equinoxArcsec": -2.376,
+    "equinoxArcsec": -2.373,
     "secularOnlyArcsec": -13.911,
-    "solarTorqueOnlyArcsec": -11.691,
+    "solarTorqueOnlyArcsec": -11.689,
     "ellipticityOnlyArcsec": -4.596,
     "obliquityArcsec": 0.994,
     "eclipticPoleArcsec": 1.046,
-    "solarTorqueFactorMinusOne": 0.00002295,
+    "solarTorqueFactorMinusOne": 0.000022968,
     "ellipticityFactorMinusOne": 0.000099457
    },
    {
     "year": -1500,
-    "equinoxArcsec": -1.83,
+    "equinoxArcsec": -1.828,
     "secularOnlyArcsec": -11.888,
-    "solarTorqueOnlyArcsec": -9.945,
+    "solarTorqueOnlyArcsec": -9.943,
     "ellipticityOnlyArcsec": -3.773,
     "obliquityArcsec": 0.572,
     "eclipticPoleArcsec": 0.958,
-    "solarTorqueFactorMinusOne": 0.00002157,
+    "solarTorqueFactorMinusOne": 0.000021588,
     "ellipticityFactorMinusOne": 0.000093146
    },
    {
     "year": -1250,
-    "equinoxArcsec": -1.395,
+    "equinoxArcsec": -1.393,
     "secularOnlyArcsec": -10.072,
-    "solarTorqueOnlyArcsec": -8.389,
+    "solarTorqueOnlyArcsec": -8.387,
     "ellipticityOnlyArcsec": -3.078,
     "obliquityArcsec": 0.145,
     "eclipticPoleArcsec": 0.95,
-    "solarTorqueFactorMinusOne": 0.000020166,
+    "solarTorqueFactorMinusOne": 0.000020181,
     "ellipticityFactorMinusOne": 0.000086692
    },
    {
     "year": -1000,
-    "equinoxArcsec": -1.057,
+    "equinoxArcsec": -1.056,
     "secularOnlyArcsec": -8.452,
-    "solarTorqueOnlyArcsec": -7.011,
+    "solarTorqueOnlyArcsec": -7.01,
     "ellipticityOnlyArcsec": -2.498,
     "obliquityArcsec": -0.099,
     "eclipticPoleArcsec": 0.873,
-    "solarTorqueFactorMinusOne": 0.000018738,
+    "solarTorqueFactorMinusOne": 0.000018751,
     "ellipticityFactorMinusOne": 0.000080118
    },
    {
     "year": -750,
-    "equinoxArcsec": -0.808,
+    "equinoxArcsec": -0.806,
     "secularOnlyArcsec": -7.019,
-    "solarTorqueOnlyArcsec": -5.803,
+    "solarTorqueOnlyArcsec": -5.801,
     "ellipticityOnlyArcsec": -2.023,
     "obliquityArcsec": -0.353,
     "eclipticPoleArcsec": 0.859,
-    "solarTorqueFactorMinusOne": 0.000017286,
+    "solarTorqueFactorMinusOne": 0.000017301,
     "ellipticityFactorMinusOne": 0.000073448
    },
    {
     "year": -500,
-    "equinoxArcsec": -0.62,
+    "equinoxArcsec": -0.619,
     "secularOnlyArcsec": -5.749,
-    "solarTorqueOnlyArcsec": -4.74,
+    "solarTorqueOnlyArcsec": -4.739,
     "ellipticityOnlyArcsec": -1.629,
     "obliquityArcsec": -0.457,
     "eclipticPoleArcsec": 0.781,
-    "solarTorqueFactorMinusOne": 0.000015811,
+    "solarTorqueFactorMinusOne": 0.000015829,
     "ellipticityFactorMinusOne": 0.000066703
    },
    {
     "year": -250,
-    "equinoxArcsec": -0.475,
+    "equinoxArcsec": -0.474,
     "secularOnlyArcsec": -4.625,
-    "solarTorqueOnlyArcsec": -3.804,
+    "solarTorqueOnlyArcsec": -3.803,
     "ellipticityOnlyArcsec": -1.296,
     "obliquityArcsec": -0.579,
     "eclipticPoleArcsec": 0.767,
-    "solarTorqueFactorMinusOne": 0.000014317,
+    "solarTorqueFactorMinusOne": 0.000014329,
     "ellipticityFactorMinusOne": 0.000059908
    },
    {
     "year": 0,
-    "equinoxArcsec": -0.365,
+    "equinoxArcsec": -0.364,
     "secularOnlyArcsec": -3.638,
-    "solarTorqueOnlyArcsec": -2.987,
+    "solarTorqueOnlyArcsec": -2.986,
     "ellipticityOnlyArcsec": -1.016,
     "obliquityArcsec": -0.584,
     "eclipticPoleArcsec": 0.696,
-    "solarTorqueFactorMinusOne": 0.000012802,
+    "solarTorqueFactorMinusOne": 0.000012809,
     "ellipticityFactorMinusOne": 0.000053084
    },
    {
     "year": 250,
-    "equinoxArcsec": -0.28,
+    "equinoxArcsec": -0.279,
     "secularOnlyArcsec": -2.781,
-    "solarTorqueOnlyArcsec": -2.28,
+    "solarTorqueOnlyArcsec": -2.279,
     "ellipticityOnlyArcsec": -0.78,
     "obliquityArcsec": -0.603,
     "eclipticPoleArcsec": 0.68,
-    "solarTorqueFactorMinusOne": 0.000011264,
+    "solarTorqueFactorMinusOne": 0.000011276,
     "ellipticityFactorMinusOne": 0.000046253
    },
    {
     "year": 500,
-    "equinoxArcsec": -0.213,
+    "equinoxArcsec": -0.212,
     "secularOnlyArcsec": -2.046,
-    "solarTorqueOnlyArcsec": -1.677,
+    "solarTorqueOnlyArcsec": -1.676,
     "ellipticityOnlyArcsec": -0.582,
     "obliquityArcsec": -0.537,
     "eclipticPoleArcsec": 0.611,
-    "solarTorqueFactorMinusOne": 0.000009707,
+    "solarTorqueFactorMinusOne": 0.000009723,
     "ellipticityFactorMinusOne": 0.000039438
    },
    {
     "year": 750,
-    "equinoxArcsec": -0.163,
+    "equinoxArcsec": -0.162,
     "secularOnlyArcsec": -1.432,
     "solarTorqueOnlyArcsec": -1.174,
     "ellipticityOnlyArcsec": -0.42,
     "obliquityArcsec": -0.495,
     "eclipticPoleArcsec": 0.594,
-    "solarTorqueFactorMinusOne": 0.000008133,
+    "solarTorqueFactorMinusOne": 0.000008142,
     "ellipticityFactorMinusOne": 0.000032659
    },
    {
     "year": 1000,
-    "equinoxArcsec": -0.122,
+    "equinoxArcsec": -0.121,
     "secularOnlyArcsec": -0.931,
     "solarTorqueOnlyArcsec": -0.766,
     "ellipticityOnlyArcsec": -0.287,
     "obliquityArcsec": -0.397,
     "eclipticPoleArcsec": 0.529,
-    "solarTorqueFactorMinusOne": 0.000006541,
+    "solarTorqueFactorMinusOne": 0.000006543,
     "ellipticityFactorMinusOne": 0.000025937
    },
    {
     "year": 1250,
     "equinoxArcsec": -0.079,
     "secularOnlyArcsec": -0.533,
-    "solarTorqueOnlyArcsec": -0.44,
+    "solarTorqueOnlyArcsec": -0.439,
     "ellipticityOnlyArcsec": -0.173,
     "obliquityArcsec": -0.315,
     "eclipticPoleArcsec": 0.515,
-    "solarTorqueFactorMinusOne": 0.000004929,
+    "solarTorqueFactorMinusOne": 0.000004937,
     "ellipticityFactorMinusOne": 0.000019292
    },
    {
@@ -221,7 +221,7 @@
     "ellipticityOnlyArcsec": -0.085,
     "obliquityArcsec": -0.203,
     "eclipticPoleArcsec": 0.453,
-    "solarTorqueFactorMinusOne": 0.000003301,
+    "solarTorqueFactorMinusOne": 0.000003313,
     "ellipticityFactorMinusOne": 0.000012742
    },
    {
@@ -232,7 +232,7 @@
     "ellipticityOnlyArcsec": -0.032,
     "obliquityArcsec": -0.105,
     "eclipticPoleArcsec": 0.436,
-    "solarTorqueFactorMinusOne": 0.000001658,
+    "solarTorqueFactorMinusOne": 0.000001664,
     "ellipticityFactorMinusOne": 0.000006306
    },
    {
@@ -254,40 +254,40 @@
     "ellipticityOnlyArcsec": 0.032,
     "obliquityArcsec": 0.102,
     "eclipticPoleArcsec": 0.364,
-    "solarTorqueFactorMinusOne": -0.000001675,
+    "solarTorqueFactorMinusOne": -0.000001671,
     "ellipticityFactorMinusOne": -0.000006159
    },
    {
     "year": 2500,
-    "equinoxArcsec": 0.093,
+    "equinoxArcsec": 0.092,
     "secularOnlyArcsec": -0.104,
     "solarTorqueOnlyArcsec": -0.062,
     "ellipticityOnlyArcsec": 0.05,
     "obliquityArcsec": 0.191,
     "eclipticPoleArcsec": 0.307,
-    "solarTorqueFactorMinusOne": -0.000003364,
+    "solarTorqueFactorMinusOne": -0.000003355,
     "ellipticityFactorMinusOne": -0.000012156
    },
    {
     "year": 2750,
     "equinoxArcsec": 0.143,
     "secularOnlyArcsec": -0.298,
-    "solarTorqueOnlyArcsec": -0.202,
+    "solarTorqueOnlyArcsec": -0.203,
     "ellipticityOnlyArcsec": 0.047,
     "obliquityArcsec": 0.293,
     "eclipticPoleArcsec": 0.298,
-    "solarTorqueFactorMinusOne": -0.000005064,
+    "solarTorqueFactorMinusOne": -0.000005061,
     "ellipticityFactorMinusOne": -0.000017977
    },
    {
     "year": 3000,
-    "equinoxArcsec": 0.204,
+    "equinoxArcsec": 0.203,
     "secularOnlyArcsec": -0.575,
-    "solarTorqueOnlyArcsec": -0.404,
+    "solarTorqueOnlyArcsec": -0.405,
     "ellipticityOnlyArcsec": 0.033,
     "obliquityArcsec": 0.367,
     "eclipticPoleArcsec": 0.233,
-    "solarTorqueFactorMinusOne": -0.000006777,
+    "solarTorqueFactorMinusOne": -0.00000678,
     "ellipticityFactorMinusOne": -0.000023609
    }
   ]
@@ -312,37 +312,37 @@
    {
     "fromKyr": -500,
     "toKyr": -250,
-    "modelRmsArcsec": 9.07,
+    "modelRmsArcsec": 9.06,
     "secularOnlyRmsArcsec": 73.29,
-    "solarTorqueOnlyRmsArcsec": 7.79
+    "solarTorqueOnlyRmsArcsec": 7.78
    },
    {
     "fromKyr": -1000,
     "toKyr": -500,
-    "modelRmsArcsec": 19.79,
+    "modelRmsArcsec": 19.77,
     "secularOnlyRmsArcsec": 97.86,
-    "solarTorqueOnlyRmsArcsec": 17.28
+    "solarTorqueOnlyRmsArcsec": 17.27
    },
    {
     "fromKyr": -1000,
     "toKyr": 0,
-    "modelRmsArcsec": 14.82,
+    "modelRmsArcsec": 14.81,
     "secularOnlyRmsArcsec": 80.37,
-    "solarTorqueOnlyRmsArcsec": 12.91
+    "solarTorqueOnlyRmsArcsec": 12.9
    }
   ],
-  "equinoxShiftAtM1MyrDeg": 4.229
+  "equinoxShiftAtM1MyrDeg": 4.23
  },
  "factors": {
   "lastMyr": {
    "solarTorque": {
-    "meanMinusOne": 0.000321616,
-    "minMinusOne": -0.000124191,
-    "maxMinusOne": 0.001459731
+    "meanMinusOne": 0.000321699,
+    "minMinusOne": -0.000124273,
+    "maxMinusOne": 0.001460267
    },
    "ellipticity": {
     "meanMinusOne": -0.000026052,
-    "minMinusOne": -0.000152975,
+    "minMinusOne": -0.000152974,
     "maxMinusOne": 0.000167264
    }
   },
@@ -354,18 +354,18 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/nbody-deep-secular-modes.json": "sha256:87c325fac77d94a45e1381b62a2a4c5cd8253bc4765c8d497a1d9f5466649ccc",
-   "data/nbody-secular-series.json": "sha256:67291b28b0c8b0854ab19881dbbd0b0062599fc6106a05bc94396eb6ec24431c",
+   "data/nbody-secular-series.json": "sha256:7314ffc3fb0b23def7abb3185e501a58bbe746734be0f731fac2131b835173ec",
    "packages/physics/src/climate/l1-orbital.cjs": "sha256:2cc864c563ca816df4ccc01f651bd67fde8f29215b6670f8f8842b5d4f68445f",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:a152284d8ca8eb0a433fe6bab7e270c833ad4aae7e0184725a21646df9f9fbbc",
-   "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:f3ffe49e38cd745b04163465ef632a0b69bfa82fd9b47fef0adda0d95fdf3e9a",
+   "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:cfc9a64b09599709339dd750d69f259af5b280cbe9034bdab5d13ddcc6aa9f8b",
    "packages/physics/src/earth/frame-of-date.cjs": "sha256:a06a089d35b82e97d6fa3ea9255c36aff4df0f6ea32182f009cd8dd8a648cdce",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:a4a07a268d4f1a1beeae5a6ab7d05bc7c5ebeae5ff03140187f08799decba783",
    "packages/reference/src/published-curves.cjs": "sha256:66ecf7854f7bcb729dc07dac4bcae92c45cee6851f8afaf5372ac98b7dd94a7b",
    "public/input/astro-reference.json": "sha256:b568736717355903c8298422cf48128a3897743ea0b1c57d64f0823ce8b1813f",
-   "public/input/climate-formula-coefficients.json": "sha256:466e9004cbfe7631a4ade2e8397b9faeaeb4d615cd93863f86e9dd00987f8b37",
-   "tools/lib/deep-orbital-history.js": "sha256:6323a34c149194bdf206da274208c1b5f4e2a11443f9bf34c32506cce30b79ea",
+   "public/input/climate-formula-coefficients.json": "sha256:6c88fc36cefe5225a00daf9f8e009ad0f59bbb8f7a13a21b0394277c1782ff0f",
+   "tools/lib/deep-orbital-history.js": "sha256:43ec47d4059fad0594c93dcebe9f9e49f882cf6d8246da59d874f89ff2a90fb7",
    "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
-   "tools/verify/equinox-vs-vondrak.js": "sha256:cada313d44f72daa6f0d3fd4b83f813a59e7197b5ba5b84f9422b6fc200caba5"
+   "tools/verify/equinox-vs-vondrak.js": "sha256:6152105626859464486dd3414710d7ff1b6461e75220b9701b5ac36887825de3"
   }
  }
 }
