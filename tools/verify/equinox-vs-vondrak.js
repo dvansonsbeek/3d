@@ -66,7 +66,7 @@ const INPUT_FILES = [
 ];
 
 const req = createRequire(path.join(ROOT, 'package.json'));
-const { vondrakFrameOfDate2011 } = req('@essrt/reference/published-curves');
+const { vondrakFrameOfDate2011, iau2006FrameOfDate } = req('@essrt/reference/published-curves');
 const { createDeepOrbitalHistory } = require(path.join(ROOT, 'packages/physics/src/earth/deep-orbital-history.cjs'));
 const { computeEarthFrameOfDate } = require(path.join(ROOT, 'packages/physics/src/earth/frame-of-date.cjs'));
 const { CHAIN_ARTIFACT } = require(path.join(ROOT, 'packages/physics/src/planets/chain-artifact.js'));
@@ -103,26 +103,58 @@ const ELLIP = { dynamicalEllipticityRatioAtYearFn: DT.j2RatioAtYear };
 
 // ── 1. the equinox, ±3000 yr ─────────────────────────────────────────────────
 const fAll = factory({ ...SOLAR, ...ELLIP });   // the shipped wiring, for the factor read-outs
-const era = { secular: factory({}).build(50000, -50000, 100), solarOnly: factory(SOLAR).build(50000, -50000, 100), ellipOnly: factory(ELLIP).build(50000, -50000, 100) };
+// PLAN 21 STEP 2 — the decomposition of the residual into its PLANETARY and LUNISOLAR
+// parts. The planetary precession is not a factor: the integration generates it
+// geometrically from the moving ecliptic n̂(t) (the N-body ζ series). The variant
+// `planetaryFromReferee` runs the SAME integration (both factors on) with n̂(t)
+// taken from Vondrák's own P_A/Q_A — the referee's ecliptic — so its residual
+// against Vondrák is the lunisolar part alone and (shipped − variant) is what the
+// model's ecliptic contributes. Vondrák's ζ = sin(i/2)·e^{iΩ} relative to the
+// J2000 ecliptic: i = acos(n_z), Ω = atan2(n_x, −n_y) (the node of a plane with
+// normal n̂); its J2000 value is 0 by definition of the J2000 ecliptic, so the
+// variant's ζ anchors are 0 (the DOH join adds the anchor's ζ(0) to the series).
+const refZeta = (() => {
+  const t0Yr = -50000, stepYr = 100, n = (50000 - t0Yr) / stepYr + 1, q = new Array(n), p = new Array(n);
+  for (let k = 0; k < n; k++) {
+    const nv = vondrakFrameOfDate2011(2000 + t0Yr + k * stepYr).n;
+    const inc = Math.acos(Math.max(-1, Math.min(1, nv[2]))), Om = Math.atan2(nv[0], -nv[1]), s2 = Math.sin(inc / 2);
+    q[k] = s2 * Math.cos(Om); p[k] = s2 * Math.sin(Om);
+  }
+  return { t0Yr, stepYr, q, p };
+})();
+const era = {
+  secular: factory({}).build(50000, -50000, 100), solarOnly: factory(SOLAR).build(50000, -50000, 100), ellipOnly: factory(ELLIP).build(50000, -50000, 100),
+  planetaryFromReferee: factory({ ...SOLAR, ...ELLIP, zetaSeries: refZeta, anchorInclEclipticDeg: 0, anchorAscNodeEclipticDeg: 0 }).build(50000, -50000, 100),
+};
+const IAU2006_INNER_YR = 1000;   // the P03 polynomials' stated validity class about J2000
 const equinoxRows = [];
 for (let y = -3000; y <= 3000; y += 250) {
-  const v = vondrakFrameOfDate2011(y);
+  const v = vondrakFrameOfDate2011(y), iau = iau2006FrameOfDate(y);
   const smp = movement.sampleAt(y), F = computeEarthFrameOfDate(smp);
   const dg = (s) => signedArcsec(v.g, computeEarthFrameOfDate(s).g, v.n);
+  const onReferee = dg(era.planetaryFromReferee.at(y - 2000));
+  const inner = Math.abs(y - 2000) <= IAU2006_INNER_YR;
   equinoxRows.push({
     year: y,
     equinoxArcsec: round(signedArcsec(v.g, F.g, v.n), 3),
     secularOnlyArcsec: round(dg(era.secular.at(y - 2000)), 3),
     solarTorqueOnlyArcsec: round(dg(era.solarOnly.at(y - 2000)), 3),
     ellipticityOnlyArcsec: round(dg(era.ellipOnly.at(y - 2000)), 3),
+    // the decomposition: the shipped integration on the REFEREE's ecliptic (lunisolar part), and what the model's ecliptic adds
+    lunisolarPartArcsec: round(onReferee, 3),
+    planetaryPartArcsec: round(signedArcsec(v.g, F.g, v.n) - onReferee, 3),
+    // the second referee inside its validity: model − IAU 2006 (P03), and the referees against each other
+    iau2006Arcsec: inner ? round(signedArcsec(iau.g, F.g, iau.n), 3) : null,
+    vondrakMinusIau2006Arcsec: inner ? round(signedArcsec(iau.g, v.g, iau.n), 3) : null,
     obliquityArcsec: round((smp.epsDeg - v.epsDeg) * 3600, 3),
     eclipticPoleArcsec: round(Math.hypot(F.n[0] - v.n[0], F.n[1] - v.n[1]) * R2AS, 3),
     solarTorqueFactorMinusOne: round(fAll.precessionOfDateFactorsAt(y - 2000).solarTorque - 1, 9),
     ellipticityFactorMinusOne: round(fAll.precessionOfDateFactorsAt(y - 2000).ellipticity - 1, 9),
   });
 }
-const maxAbs = (rows, k) => rows.reduce((m, r) => Math.max(m, Math.abs(r[k])), 0);
+const maxAbs = (rows, k) => rows.reduce((m, r) => Math.max(m, Math.abs(r[k] ?? 0)), 0);
 const inner = equinoxRows.filter((r) => r.year >= -500 && r.year <= 2500);
+const rowAt = (y) => equinoxRows.find((r) => r.year === y);
 const equinox = {
   unit: 'arcsec (model − Vondrák 2011, + = east; the Sun\'s of-date longitude moves by the negative)',
   maxAbsArcsec: round(maxAbs(equinoxRows, 'equinoxArcsec'), 3),
@@ -130,6 +162,19 @@ const equinox = {
   innerWindow: [-500, 2500],
   secularOnlyMaxAbsArcsec: round(maxAbs(equinoxRows, 'secularOnlyArcsec'), 3),
   obliquityMaxAbsArcsec: round(maxAbs(equinoxRows, 'obliquityArcsec'), 3),
+  // plan 21 step 2 — the decomposition read at the span's past edge, and the second referee's window
+  decomposition: {
+    note: 'lunisolarPart = the shipped integration on the REFEREE\'s ecliptic (Vondrák P_A/Q_A) minus Vondrák; planetaryPart = shipped − that: what the model\'s N-body ecliptic contributes to the residual',
+    atMinus3000: { total: rowAt(-3000).equinoxArcsec, lunisolarPart: rowAt(-3000).lunisolarPartArcsec, planetaryPart: rowAt(-3000).planetaryPartArcsec },
+    atPlus3000: { total: rowAt(3000).equinoxArcsec, lunisolarPart: rowAt(3000).lunisolarPartArcsec, planetaryPart: rowAt(3000).planetaryPartArcsec },
+    planetaryPartMaxAbsArcsec: round(maxAbs(equinoxRows, 'planetaryPartArcsec'), 3),
+  },
+  iau2006: {
+    note: `model − IAU 2006 (P03, Capitaine et al. 2003; ERFA p06e) inside ±${IAU2006_INNER_YR} yr of J2000 — the polynomials' validity class — beside Vondrák − IAU 2006 (the referees against each other)`,
+    windowYr: IAU2006_INNER_YR,
+    modelMaxAbsArcsec: round(maxAbs(equinoxRows, 'iau2006Arcsec'), 3),
+    refereesMaxAbsArcsec: round(maxAbs(equinoxRows, 'vondrakMinusIau2006Arcsec'), 3),
+  },
   rows: equinoxRows,
 };
 
@@ -152,16 +197,18 @@ const factors = { lastMyr: { solarTorque: fStats('solarTorque'), ellipticity: fS
   j2RateJ2000PerYr: round((DT.j2RatioAtYear(2050) - DT.j2RatioAtYear(1950)) / 100 * C.earthJ2, 15), solarTorqueShareJ2000: round(DT.PRECESSION_SOLAR_SHARE_J2000, 6) };
 
 const art = {
-  _description: 'The precession of date against its two theory referees — GENERATED by tools/verify/equinox-vs-vondrak.js --write. equinox: the shipped movement\'s equinox of date minus Vondrák, Capitaine & Wallace (2011) over ±3000 yr (arcsec along the ecliptic of date, + = east), beside the same integration on the secular law alone and with each of-date factor alone. obliquity: the movement against La2004 over the last million years (rms by window), beside the secular law alone. factors: the two factors on the precession constant (solar torque at the eccentricity of date; J2(t)/J2_0 of the GIA channel) over the last Myr, and the channel\'s realized dJ2/dt at J2000 (the observed Cox & Chao rate by construction). THEORY AGAINST THEORY — Vondrák is IAU 2006 inside ±1 kyr and a fit to numerical integrations beyond; La2004 carries the eccentricity-dependent torque and no ice-age ellipticity.',
-  reference: { equinox: 'Vondrák, Capitaine & Wallace (2011), A&A 534, A22 — @essrt/reference vondrakFrameOfDate2011', obliquity: 'Laskar et al. (2004) — data/la2004-earth-51myr-back.asc' },
+  _description: 'The precession of date against its two theory referees — GENERATED by tools/verify/equinox-vs-vondrak.js --write. equinox: the shipped movement\'s equinox of date minus Vondrák, Capitaine & Wallace (2011) over ±3000 yr (arcsec along the ecliptic of date, + = east), beside the same integration on the secular law alone and with each of-date factor alone. obliquity: the movement against La2004 over the last million years (rms by window), beside the secular law alone. factors: the two factors on the precession constant (solar torque at the eccentricity of date; J2(t)/J2_0 of the GIA channel) over the last Myr, and the channel\'s realized dJ2/dt at J2000 (the observed Cox & Chao rate by construction). THEORY AGAINST THEORY — Vondrák is IAU 2006 inside ±1 kyr and a fit to numerical integrations beyond; La2004 carries the eccentricity-dependent torque and no ice-age ellipticity. equinox.decomposition (plan 21 step 2): the residual split into its lunisolar part (the shipped integration run on Vondrák\'s own ecliptic P_A/Q_A) and its planetary part (what the model\'s N-body ecliptic contributes); equinox.iau2006: the model and Vondrák against the IAU 2006 (P03) polynomials inside their validity window.',
+  reference: { equinox: 'Vondrák, Capitaine & Wallace (2011), A&A 534, A22 — @essrt/reference vondrakFrameOfDate2011; IAU 2006 (P03): Capitaine, Wallace & Chapront (2003), A&A 412, 567, coefficients as in ERFA p06e — @essrt/reference iau2006FrameOfDate', obliquity: 'Laskar et al. (2004) — data/la2004-earth-51myr-back.asc' },
   equinox, obliquity, factors,
   inputs: buildInputsBlock('node tools/verify/equinox-vs-vondrak.js --write', INPUT_FILES),
 };
 
 console.log('THE PRECESSION OF DATE — equinox vs Vondrák 2011 (″, + = east) · obliquity vs La2004 (″ rms)');
-console.log('   year    model   secular only   +solar torque   +ellipticity   Δε      |Δn̂|');
-for (const r of equinoxRows) console.log(`  ${String(r.year).padStart(5)} ${r.equinoxArcsec.toFixed(2).padStart(8)} ${r.secularOnlyArcsec.toFixed(2).padStart(12)} ${r.solarTorqueOnlyArcsec.toFixed(2).padStart(14)} ${r.ellipticityOnlyArcsec.toFixed(2).padStart(14)} ${r.obliquityArcsec.toFixed(2).padStart(8)} ${r.eclipticPoleArcsec.toFixed(2).padStart(7)}`);
+console.log('   year    model   secular only   +solar torque   +ellipticity   Δε      |Δn̂|   lunisolar  planetary   vs IAU2006  Vondrák−IAU');
+const f2 = (/** @type {number|null} */ v, w = 8) => (v === null || v === undefined ? '—'.padStart(w) : v.toFixed(2).padStart(w));
+for (const r of equinoxRows) console.log(`  ${String(r.year).padStart(5)} ${f2(r.equinoxArcsec)} ${f2(r.secularOnlyArcsec, 12)} ${f2(r.solarTorqueOnlyArcsec, 14)} ${f2(r.ellipticityOnlyArcsec, 14)} ${f2(r.obliquityArcsec)} ${f2(r.eclipticPoleArcsec, 7)} ${f2(r.lunisolarPartArcsec, 10)} ${f2(r.planetaryPartArcsec, 10)} ${f2(r.iau2006Arcsec, 11)} ${f2(r.vondrakMinusIau2006Arcsec, 12)}`);
 console.log(`  max |Δequinox| ${equinox.maxAbsArcsec}″ (secular law alone ${equinox.secularOnlyMaxAbsArcsec}″); inside −500…+2500: ${equinox.maxAbsInnerArcsec}″`);
+console.log(`  decomposition at −3000: total ${equinox.decomposition.atMinus3000.total}″ = lunisolar ${equinox.decomposition.atMinus3000.lunisolarPart}″ + planetary ${equinox.decomposition.atMinus3000.planetaryPart}″ (planetary max |·| ${equinox.decomposition.planetaryPartMaxAbsArcsec}″); vs IAU 2006 inside ±${IAU2006_INNER_YR} yr: model ${equinox.iau2006.modelMaxAbsArcsec}″, Vondrák − IAU 2006 ${equinox.iau2006.refereesMaxAbsArcsec}″`);
 for (const w of obliquity.windows) console.log(`  ε vs La2004 ${String(w.fromKyr).padStart(6)} … ${String(w.toKyr).padStart(5)} kyr: model ${w.modelRmsArcsec.toFixed(1).padStart(6)}″ · secular only ${w.secularOnlyRmsArcsec.toFixed(1).padStart(6)}″ · +solar torque ${w.solarTorqueOnlyRmsArcsec.toFixed(1).padStart(6)}″`);
 console.log(`  factors over the last Myr (mean − 1): solar torque ${factors.lastMyr.solarTorque.meanMinusOne.toExponential(3)}, ellipticity ${factors.lastMyr.ellipticity.meanMinusOne.toExponential(3)}; dJ2/dt(J2000) ${factors.j2RateJ2000PerYr.toExponential(3)} /yr`);
 

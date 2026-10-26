@@ -405,15 +405,22 @@ constant rows held inside ±3000 yr and drifted 3.7″ beyond); against
 Horizons over ±3000 yr the modern-window mean went +8.4 → +0.8″ and the
 per-millennium scatter roughly halved. What
 remains secular there is a precession-rate finding, labelled and not
-tuned: the model's general precession runs 0.4–0.7″/cy below the P03
-series over −3000..0 (+0.03 at 2000, +0.17 at 3000; +22″ of accumulated
-equinox at −3000) while the sidereal Sun against DE441's J2000-frame
-positions shows no trend at all. The model's ecliptic motion matches P03 to
-0.5″ in inclination, so the deficit sits in the torque coefficient the
-hybrid holds constant — the solar torque's (1 − e²)^−3/2 growth with
-Earth's eccentricity accounts for about a third of it at −3000; a
-theory-vs-theory tension at the 10⁻⁴ level, with no observation at the 20″
-level there.
+tuned: the model's equinox of date sits <!--v:equinoxVsVondrakM3000Arcsec-->−7.9<!--/v-->″
+west of Vondrák 2011 at −3000 (0.6″ inside −500…+2500; the secular law
+alone read 28″ before the two factors of date — the solar torque at the
+eccentricity of date and J₂(t)/J₂₀ — were adopted) while the sidereal Sun
+against DE441's J2000-frame positions shows no trend at all. Decomposed
+(plan 21 step 2, `equinox-vs-vondrak.js`): the same integration run on
+Vondrák's own ecliptic leaves <!--v:equinoxLunisolarPartM3000Arcsec-->−8.23<!--/v-->″,
+so the model's N-body ecliptic contributes
+<!--v:equinoxPlanetaryPartM3000Arcsec-->+0.36<!--/v-->″ (≤ 0.4″ at every
+epoch) — the residual is LUNISOLAR. Inside ±1 kyr the model is within
+<!--v:equinoxVsIau2006InnerMaxArcsec-->0.17<!--/v-->″ of the IAU 2006 (P03)
+polynomials and the two referees agree to 0.06″; beyond it Vondrák is a fit
+to La93 (no secular J₂ change) joined to P03 (a J₂ rate of −3e-11/yr, the
+model's cited rate −2.7e-11/yr accounts for ~1.6″ of the 7.9″ over 5 kyr),
+so part of the curvature is the referee's own seam. A theory-vs-theory
+tension at the 10⁻⁴ level, with no observation at the 20″ level there.
 
 **The scene-wheel overlay (SW)**: the visible wheel Sun adds one term on top
 of its untouched legacy stack, δ = λ_certified − λ_realized (the wheel's own

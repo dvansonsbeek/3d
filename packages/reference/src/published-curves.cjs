@@ -223,6 +223,38 @@ function vondrakFrameOfDate2011(epj) {
   };
 }
 
+/**
+ * IAU 2006 (P03) frame of date at a Julian epoch — the equinox-based precession
+ * angles of Capitaine, Wallace & Chapront (2003, A&A 412, 567), as adopted by
+ * IAU 2006 and coded in SOFA/ERFA `p06e` (the coefficients below are that
+ * source's, verbatim): the ecliptic pole n̂ from P_A/Q_A, the mean equator pole ŝ
+ * from ψ_A/ω_A, the equinox ĝ = ŝ × n̂ — unit vectors in the J2000 ECLIPTIC frame,
+ * the same construction as vondrakFrameOfDate2011. Polynomials in T (Julian
+ * centuries from J2000); their stated validity is a few centuries about J2000 —
+ * a REFEREE for the inner window only (plan 21 step 2), Vondrák for the long span.
+ * @param {number} epj - Julian epoch (TT)
+ * @returns {{n: number[], s: number[], g: number[], epsDeg: number}}
+ */
+function iau2006FrameOfDate(epj) {
+  const AS2R = Math.PI / 648000;
+  const t = (epj - 2000) / 100;
+  const poly = (/** @type {number[]} */ c) => { let v = 0; for (let i = c.length - 1; i >= 0; i--) v = v * t + c[i]; return v * t; };
+  const psiA = poly([5038.481507, -1.0790069, -0.00114045, 0.000132851, -0.0000000951]) * AS2R;
+  const omA = 84381.406 * AS2R + poly([-0.025754, 0.0512623, -0.00772503, -0.000000467, 0.0000003337]) * AS2R;
+  const pA = poly([4.199094, 0.1939873, -0.00022466, -0.000000912, 0.0000000120]) * AS2R;
+  const qA = poly([-46.811015, 0.0510283, 0.00052413, -0.000000646, -0.0000000172]) * AS2R;
+  const n = [pA, -qA, Math.sqrt(Math.max(0, 1 - pA * pA - qA * qA))];
+  // the mean equator pole: ω_A from the J2000 ecliptic pole, its node on the J2000 ecliptic carried
+  // westward by ψ_A from the J2000 equinox (at J2000 the pole lies toward +y: (0, sin ε₀, cos ε₀))
+  const s = [Math.sin(omA) * Math.sin(psiA), Math.sin(omA) * Math.cos(psiA), Math.cos(omA)];
+  const gx = s[1] * n[2] - s[2] * n[1], gy = s[2] * n[0] - s[0] * n[2], gz = s[0] * n[1] - s[1] * n[0];
+  const gn = Math.hypot(gx, gy, gz);
+  return {
+    n, s, g: [gx / gn, gy / gn, gz / gn],
+    epsDeg: Math.acos(Math.max(-1, Math.min(1, s[0] * n[0] + s[1] * n[1] + s[2] * n[2]))) * 180 / Math.PI,
+  };
+}
+
 // Laskar et al. (2004) La2004 N-body solution (IMCCE):
 // [year, eccentricity, obliquity_deg, perihelionLong_deg] at 1000-yr
 // intervals, −250,000..+100,000 from J2000.
@@ -403,7 +435,7 @@ function createPublishedCurves(deps) {
 
 module.exports = {
   createPublishedCurves,
-  eccBerger1978, obliquityBerger1978, axialPrecessionVondrak2011, vondrakFrameOfDate2011,
+  eccBerger1978, obliquityBerger1978, axialPrecessionVondrak2011, vondrakFrameOfDate2011, iau2006FrameOfDate,
   eccLa2004, obliquityLa2004, perihelionLa2004,
   stephensonDeltaT, stephensonDeltaTExtended, meeusMeanObliquityRad,
 };

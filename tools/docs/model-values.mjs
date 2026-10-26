@@ -1343,6 +1343,12 @@ export const VALUES = {
           out[`equinoxVsVondrak${tag}Arcsec`] = { get: () => row(y).equinoxArcsec, render: s1, unit: '″', note: `equinox of date, model − Vondrák 2011 at ${y} (+ = east)` };
           out[`equinoxSecularOnly${tag}Arcsec`] = { get: () => row(y).secularOnlyArcsec, render: s1, unit: '″', note: `the same on the secular precession law alone at ${y}` };
         }
+        // plan 21 step 2 — the residual decomposed, and the second referee inside its validity window
+        out.equinoxLunisolarPartM3000Arcsec = { get: () => evv.equinox.decomposition.atMinus3000.lunisolarPart, render: (v) => (v > 0 ? '+' : '') + Number(v).toFixed(2).replace('-', '−'), unit: '″', note: 'the shipped integration run on Vondrák\'s own ecliptic (P_A/Q_A), minus Vondrák, at −3000 — the LUNISOLAR part of the residual' };
+        out.equinoxPlanetaryPartM3000Arcsec = { get: () => evv.equinox.decomposition.atMinus3000.planetaryPart, render: (v) => (v > 0 ? '+' : '') + Number(v).toFixed(2).replace('-', '−'), unit: '″', note: 'what the model\'s N-body ecliptic contributes to the residual at −3000 (shipped − the integration on the referee\'s ecliptic)' };
+        out.equinoxPlanetaryPartMaxAbsArcsec = { get: () => evv.equinox.decomposition.planetaryPartMaxAbsArcsec, render: f2, unit: '″', note: 'largest |planetary part| of the equinox residual over ±3000 yr' };
+        out.equinoxVsIau2006InnerMaxArcsec = { get: () => evv.equinox.iau2006.modelMaxAbsArcsec, render: f2, unit: '″', note: `max |model − IAU 2006 (P03)| of the equinox of date inside ±${evv.equinox.iau2006.windowYr} yr of J2000 (the polynomials' validity class)` };
+        out.equinoxRefereesIau2006InnerMaxArcsec = { get: () => evv.equinox.iau2006.refereesMaxAbsArcsec, render: f2, unit: '″', note: `max |Vondrák 2011 − IAU 2006| inside ±${evv.equinox.iau2006.windowYr} yr — the two referees against each other` };
         return out;
       })(),
       // Mean |residual|, never an RMS — the former key name (lunarResidualRmsSeconds)
