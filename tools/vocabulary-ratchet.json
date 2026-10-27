@@ -52,14 +52,6 @@
       "era device / K device": 2,
       "plan-step label": 1
     },
-    "code:packages/physics/src/eclipse/besselian.cjs": {
-      "H-divisor label": 1,
-      "plan-step label": 2
-    },
-    "code:packages/physics/src/eclipse/sun-planetary-completion.cjs": {
-      "comb / lattice": 3,
-      "plan-step label": 5
-    },
     "code:packages/physics/src/index.js": {
       "H-divisor label": 1,
       "deletion narrative": 1,
@@ -84,53 +76,9 @@
     "code:packages/physics/src/math/angles.cjs": {
       "plan-step label": 1
     },
-    "code:packages/physics/src/model/cardinal-instants.js": {
-      "plan-step label": 3
-    },
-    "code:packages/physics/src/model/deep-time-chain.js": {
-      "comb / lattice": 1,
-      "plan-step label": 1
-    },
-    "code:packages/physics/src/model/lunar-theory.js": {
-      "plan-step label": 4
-    },
-    "code:packages/physics/src/model/one-source-movement.js": {
-      "comb / lattice": 1,
-      "plan-step label": 6
-    },
-    "code:packages/physics/src/model/planet-records.js": {
-      "plan-step label": 2
-    },
-    "code:packages/physics/src/model/published-periods.js": {
-      "plan-step label": 1
-    },
-    "code:packages/physics/src/model/sun-and-eclipses.js": {
-      "plan-step label": 3
-    },
-    "code:packages/physics/src/model/surface.js": {
-      "plan-step label": 6
-    },
     "code:packages/physics/src/moon/apparent.cjs": {
       "deletion narrative": 1,
       "plan-step label": 2
-    },
-    "code:packages/physics/src/moon/deep-ecc-channel.cjs": {
-      "H-divisor label": 5
-    },
-    "code:packages/physics/src/moon/month-chain.cjs": {
-      "H-divisor label": 1,
-      "era device / K device": 1,
-      "deletion narrative": 2,
-      "plan-step label": 4
-    },
-    "code:packages/physics/src/moon/series-extension.cjs": {
-      "comb / lattice": 1,
-      "plan-step label": 1
-    },
-    "code:packages/physics/src/moon/series.cjs": {
-      "H-divisor label": 1,
-      "comb / lattice": 2,
-      "plan-step label": 4
     },
     "code:packages/physics/src/phase/deep-calendar.cjs": {
       "comb / lattice": 3,
@@ -233,10 +181,6 @@
       "comb / lattice": 2,
       "deletion narrative": 2,
       "plan-step label": 6
-    },
-    "code:tools/lib/scene-graph.js": {
-      "deletion narrative": 5,
-      "plan-step label": 12
     },
     "code:tools/docs/model-values.mjs": {
       "H-divisor label": 2,
@@ -393,13 +337,6 @@
     },
     "code:tools/regen-cascade.mjs": {
       "plan-step label": 1
-    },
-    "code:src/script.js": {
-      "H-divisor label": 9,
-      "era device / K device": 6,
-      "comb / lattice": 1,
-      "deletion narrative": 1,
-      "plan-step label": 51
     }
   }
 }

@@ -44,7 +44,7 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
     lunisolar: Readonly<{
         /** The mean lunisolar precession period T_p(t), years — 1,296,000/the precession RATE of date (25,771.6 at J2000): THE published deep-time clock. @param {number} year @returns {number} */
         meanPeriodYearsAtYear: (year: number) => number;
-        /** THE PRECESSION RATE OF DATE ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0), ″/yr — the constant's scaling on the spin and the lunar torque times the cited mean obliquity's cosine (plan 12 §8 option (a); p₀ = 50.2880, the IAU 2006 input). @param {number} year @returns {number} */
+        /** THE PRECESSION RATE OF DATE ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0), ″/yr — the constant's scaling on the spin and the lunar torque times the cited mean obliquity's cosine (p₀ = 50.2880, the IAU 2006 input). @param {number} year @returns {number} */
         meanRateArcsecPerYrAtYear: (year: number) => number;
         /** THE PRECESSION CONSTANT OF DATE as a rate on the J2000 obliquity, ″/yr — the spin and torque scaling alone (the hybrid obliquity integration's integrand: its own ŝ·n̂ carries the cosine). @param {number} year @returns {number} */
         torqueRateArcsecPerYrAtYear: (year: number) => number;
@@ -123,9 +123,9 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
     earth: Readonly<{
         perihelionLongitudeDeg: (year: number) => number;
         obliquityDeg: (year: number) => number;
-        /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span, ±10 Myr about J2000 (plan 12 §8.5: the published surfaces serve `obliquityDeg` inside it only; null without a series, i.e. a bare createModel()). */
+        /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span, ±10 Myr about J2000 (the published surfaces serve `obliquityDeg` inside it only; null without a series, i.e. a bare createModel()). */
         obliquityHybridDomainYears: [number, number] | null;
-        /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column; plan 12 §8 option (a)), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
+        /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
         meanObliquityCitedDeg: (year: number) => number;
         eccentricity: (year: number) => number;
         inclinationDeg: (year: number) => number;
@@ -184,6 +184,19 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
         distanceKmAtYear: (year: number) => number;
         siderealMonthDaysAtYear: (year: number) => number;
         synodicMonthDays: number;
+        eccSensitivities: Readonly<{
+            perigeeEffective: number;
+            nodeEffective: number;
+            perigeePhysical: number;
+            nodePhysical: number;
+            kappaPerCy: number;
+            frameT2DegPerCy2: number;
+            generalPrecessionDegPerCy: number;
+            perigeeRateOfDateDegPerCy: number;
+            nodeRateOfDateDegPerCy: number;
+            perigeeRateIcrfDegPerCy: number;
+            nodeRateIcrfDegPerCy: number;
+        }>;
         lonDegAtJD: (jd: number) => number;
         betaDegAtJD: (jd: number) => number;
         distanceKmAtJD: (jd: number) => number;
@@ -191,7 +204,7 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
     eclipse: Readonly<{
         sunLonDegAtJD: (jd: number) => number;
         sunLonCompletedDegAtJD: (jd: number) => number;
-        /** The APPARENT Sun (completed geometric − the derived aberration constant + the leading nutation terms on the model's own arguments) — the quantity Horizons' observer ecliptic longitude is; the cardinal instants are its crossings (plan 06 R1/I1). @param {number} jdUT @returns {number} */
+        /** The APPARENT Sun (completed geometric − the derived aberration constant + the leading nutation terms on the model's own arguments) — the quantity Horizons' observer ecliptic longitude is; the cardinal instants are its crossings. @param {number} jdUT @returns {number} */
         sunApparentLonDegAtJD: (jdUT: number) => number;
         findLunarInRange: (jdStart: number, jdEnd: number) => {
             jd: number;

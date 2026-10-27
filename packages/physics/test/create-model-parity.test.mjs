@@ -234,6 +234,71 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   if (!(Math.abs(e0 - 0.016709) < 0.000001)) failures.push(`e(J2000) is not the mean element: ${e0} (Simon 1994 0.0167086)`);
 }
 
+// Plan 23 — ONE equinox for the lunar arguments. (i) The physical sensitivities
+// are DERIVED from the Meeus-effective pair by the T² identity, never typed: the
+// chain's pair must equal the closed form on the shipped constants. (ii) M′ = L′ − ϖ
+// and F = L′ − Ω are frame-free: under a counterfactual dynamical precession
+// (+1″/yr on the published rate of date) L′, ϖ and Ω move and M′/F do not — at
+// every epoch, deep time included (before plan 23 they inherited L′'s pFix
+// uncancelled: 2.5° at ±10 kyr, 39° at −1 Myr).
+{
+  const S = model.moon.eccSensitivities;
+  /** @type {any} */ const C = model.constants;
+  const e0 = C.earthOrbital.earthEccentricityJ2000, ed = C.earthOrbital.earthEccentricityDotJ2000;
+  const kappa = 3 * e0 * ed / (1 - e0 * e0);
+  const p0 = C.earthOrbital.generalPrecessionJ2000_arcsecPerYr * 100 / 3600;
+  const t2f = C.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976 / 3600;
+  const wOfDate = 481267.88123421 - 477198.8675055, nOfDate = 481267.88123421 - 483202.0175233;
+  const sW = (2.407 * wOfDate * kappa / 2 - t2f) / ((wOfDate - p0) * kappa / 2);
+  const sN = (1.018 * nOfDate * kappa / 2 - t2f) / ((nOfDate - p0) * kappa / 2);
+  check('moon ecc sensitivity perigee (physical, closed form)', 2000, S.perigeePhysical, sW, 1e-12);
+  check('moon ecc sensitivity node (physical, closed form)', 2000, S.nodePhysical, sN, 1e-12);
+  if (!(Math.abs(S.perigeePhysical - 2.479) < 0.002 && Math.abs(S.nodePhysical - 0.867) < 0.002)) failures.push(`physical pair ${S.perigeePhysical} / ${S.nodePhysical} parted from the recorded 2.479 / 0.867 (doc 66 §1)`);
+
+  // (ii) the frame-freedom counterfactual: the composer's slices to the lunar one, twice
+  const slices = await Promise.all(['derived-constants', 'deep-time-chain', 'earth-scalars', 'year-day-lengths', 'one-source-movement', 'moon-epoch', 'delta-t', 'planet-records', 'planet-spin-channel', 'planet-elements-of-date', 'inv-plane-elements', 'time-axis', 'lunar-theory', 'sun-and-eclipses', 'published-periods'].map((f) => import(`../src/model/${f}.js`)));
+  const { DEFAULT_CONSTANTS, FITTED_COEFFICIENTS } = await import('../src/index.js');
+  /** @param {number} dpArcsecPerYr the counterfactual offset on the dynamical precession rate */
+  const argsWith = (dpArcsecPerYr) => {
+    /** @type {any} */ const late = {};
+    /** @type {any} */ let c = { C: Object.freeze({ ...DEFAULT_CONSTANTS }), F: FITTED_COEFFICIENTS, laws: {}, secularSeriesArtifact, options: {}, late };
+    const [dc, dtc, es, ydl, osm, me, dtS, pr, psc, peod, ipe, ta, lt, sae, pp] = slices;
+    c = Object.assign(c, dc.assembleDerivedConstants(c));
+    c = Object.assign(c, dtc.assembleDeepTimeChain(c));
+    c = Object.assign(c, es.assembleEarthScalars(c));
+    c = Object.assign(c, ydl.assembleYearDayLengths(c));
+    late.certifiedAxialPrecessionJ2000Years = c.certifiedAxialPrecessionJ2000Years;
+    c = Object.assign(c, osm.assembleOneSourceMovement(c));
+    late.oneSourceM = c.oneSourceM; late.yearLengthsM = c.yearLengthsM;
+    c = Object.assign(c, me.assembleMoonEpoch(c));
+    c = Object.assign(c, dtS.assembleDeltaT(c));
+    c = Object.assign(c, pr.assemblePlanetRecords(c));
+    c = Object.assign(c, psc.assemblePlanetSpinChannel(c));
+    c = Object.assign(c, peod.assemblePlanetElementsOfDate(c));
+    c = Object.assign(c, ipe.assembleInvPlaneElements(c));
+    c = Object.assign(c, ta.assembleTimeAxis(c));
+    c = Object.assign(c, lt.assembleLunarTheory(c));
+    c = Object.assign(c, sae.assembleSunAndEclipses(c));
+    late.sunMeanLongitudeDegAt = c.sunMeanLongitudeDegAt;
+    c = Object.assign(c, pp.assemblePublishedPeriods(c));
+    const pub = c.publishedAxialPrecessionYearsAtYear;
+    late.publishedAxialPrecessionYearsAtYear = dpArcsecPerYr === 0 ? pub : (/** @param {number} y */ (y) => 360 / (360 / pub(y) + dpArcsecPerYr / 3600));
+    late.publishedSiderealYearSecondsAtYear = c.publishedSiderealYearSecondsAtYear;
+    return c.moonArgs;
+  };
+  const base = argsWith(0), cf = argsWith(1);
+  const w180 = (/** @type {number} */ d) => ((d + 540) % 360 + 360) % 360 - 180;
+  for (const y of [-3000, -10000, -100000, -1000000, 10000]) {
+    const jd = 2451545.0 + (y - 2000) * 365.25;
+    const a = base.argsAt(jd), b = cf.argsAt(jd);
+    const dLp = w180(b.Lp - a.Lp) * 3600, dMp = w180(b.Mp - a.Mp) * 3600, dF = w180(b.F - a.F) * 3600;
+    if (!(Math.abs(dLp) > 1)) failures.push(`frame-freedom probe inert @ ${y}: L′ moved only ${dLp.toFixed(3)}″ under +1″/yr of precession`);
+    // 1e-3″: the unwrapped compositions are ~1e6–1e8 degrees deep in time, so two ULPs of the
+    // difference are 1e-4″ — rounding, not a leak (the pre-plan-23 leak was degrees).
+    if (!(Math.abs(dMp) < 1e-3 && Math.abs(dF) < 1e-3)) failures.push(`M′/F are NOT frame-free @ ${y}: ΔM′ ${dMp.toExponential(2)}″ ΔF ${dF.toExponential(2)}″ under a counterfactual equinox (ΔL′ ${dLp.toFixed(1)}″)`);
+  }
+}
+
 if (failures.length) {
   console.error(`createModel parity — ${failures.length} FAILURE(S):`);
   for (const f of failures) console.error('  ' + f);

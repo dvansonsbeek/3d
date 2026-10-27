@@ -57,7 +57,7 @@ export function assembleCardinalInstants(ctx) {
   const CARDINAL_SI_YEAR_D = 365.2422;
   /** The crossing NEAREST a seed instant — the unique root within ±½ tropical
    *  year of the seed (the wrapped longitude difference is the Newton residual).
-   *  Plan 06 R4c: the seed is a JD because the caller's year may live on a
+   *  The seed is a JD because the caller's year may live on a
    *  different axis than the model year — the simulator's cardinal panel
    *  labels its year with the displayed CALENDAR date (the Julian calendar
    *  before 1582, 365.25-d years) while `year` below is the model year (the SI
@@ -79,13 +79,12 @@ export function assembleCardinalInstants(ctx) {
   /** The TRUE-UT JD at which the APPARENT Sun's longitude of date equals
    *  the cardinal target in the given year — Newton on the crossing (the
    *  Sun's rate 360°/tropical year; a handful of steps from the tropical-year
-   *  seed). Replaces the fitted cardinal model's instants (R1). Plan 06 R3
-   *  item 2: the Newton root lives on the FINDER axis (the curve-only ΔT the
+   *  seed). The Newton root lives on the FINDER axis (the curve-only ΔT the
    *  eclipse finders certify), and the returned instant is that root minus the
    *  deltaTStart bridge — true UT = TT − (deltaTStart + curve), the same
    *  bridge the besselian and the registry instruments apply. Before this the
    *  published instants were 54.55 s (0.9 min) late. Against Horizons over
-   *  ±3000 yr the remaining offset is the Sun's (plan 06 I2 measured).
+   *  ±3000 yr the remaining offset is the Sun's (measured).
    *  `year` is the MODEL year (the SI axis) — see cardinalCrossingNearJdUT.
    *  @param {number} year @param {string} type @returns {number} */
   const cardinalCrossingJdUT = (year, type) => {

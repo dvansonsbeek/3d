@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.0
+modelVersion: v27.1
 coefficients: sha256:1d7ef7b022b91f6c
 status: current
 ---
@@ -438,7 +438,7 @@ The model's independent validation is the 26-event solar-eclipse
 alignment audit (current certified-chain run): 16/26 with the umbra
 reaching the observation site (3 confirmed at greatest moment + 13
 off-peak alignments — including −135 Babylon at BestGap
-<!--v:babylon135BestGapKm-->152<!--/v--> km and −708 Lu at 9 km),
+<!--v:babylon135BestGapKm-->154<!--/v--> km and −708 Lu at 9 km),
 5/26 regional (model umbra in same continental band
 but off site), 0/26 with residual ΔT-signal — the model agrees
 with the documented UT on every event — and 5/26 geographic-class
@@ -631,7 +631,7 @@ per-cycle ablation χ² (<!--v:lunarDenseCenturies-->13<!--/v--> centuries with 
 framework-native Sun with the derived torque term, all from the governed
 artifact's `denseTargets.ablationChi2`: full stack <!--v:lunarDenseChi2FullStack-->55.7<!--/v-->
 (the Meeus-basis class, as it must be, since the torque term restores
-Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->121.0<!--/v--> — the
+Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->121.1<!--/v--> — the
 Core-mantle swing is confirmed outright by the eclipse record (removing
 it more than doubles the misfit)**; minus bond <!--v:lunarDenseChi2MinusBond-->61.7<!--/v--> — the
 Bond cycle is supported, not confirmed (removing it raises the misfit by

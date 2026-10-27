@@ -23,7 +23,7 @@ export function assembleLunarTheory(ctx) {
   // tools/verify/eclipse-audit.js (finders). Deep-time and framework-native
   // are hardwired ON here: they are the shipped defaults; the A/B env
   // toggles (SG_DEEP_TIME/MOON_ARGS_PURE_MEEUS) stay an engine concern.
-  const j2000JD = J2000_JD;                       // ONE home: constants/units (plan 14 step 2)
+  const j2000JD = J2000_JD;                       // ONE home: constants/units
   const julianCenturyDays = JULIAN_CENTURY_DAYS;
 
   // J2000 Moon precession anchors (the IAU inputs themselves). The
@@ -50,7 +50,7 @@ export function assembleLunarTheory(ctx) {
   // Float64Array tables key correctly and persist.
   const chainCycles = createChainCycleIntegrator({
     ageAnchorYear: startmodelYear,
-    tropicalYearJ2000Seconds: meanTropicalYearJ2000Seconds,   // the SI tick (plan 09 step 7c′)
+    tropicalYearJ2000Seconds: meanTropicalYearJ2000Seconds,   // the SI tick
     isDeepTime: () => true,
   });
   /** @param {number} tMa @returns {number|null} */
@@ -72,7 +72,7 @@ export function assembleLunarTheory(ctx) {
   const mcAnomalistic = (a, b) => chainCycles.cyclesBetween(anomalisticMonthPeriodFn, a, b);
   /** @param {number} a @param {number} b @returns {number|null} */
   const mcJupiter = (a, b) => chainCycles.cyclesBetween(jupiterPeriodFn, a, b);
-  /** The Moon's sidereal (star-referenced) orbits — the series' A3 argument (plan 09 step 5c). @param {number} a @param {number} b @returns {number|null} */
+  /** The Moon's sidereal (star-referenced) orbits — the series' A3 argument. @param {number} a @param {number} b @returns {number|null} */
   const mcSidereal = (a, b) => chainCycles.cyclesBetween(siderealMonthPeriodFn, a, b);
   /** @param {number} a @param {number} b @returns {number|null} */
   const mcApsidalOfDate = (a, b) => {
@@ -98,6 +98,8 @@ export function assembleLunarTheory(ctx) {
       elpGeneralPrecessionPA_T2ArcsecPerCy2: C.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
       // Decision (ii): the lunar chain reads ONE deep e end to end
       eccE0: deepEcc.e0,
+      // plan 23: the perigee/node sensitivities — the chain's derived pair (ONE home)
+      moonEccSensitivities: chain.moonEccSensitivities,
     },
     fns: {
       eccAt: /** @param {number} tYr */ (tYr) => deepEcc.eccAt(tYr),
@@ -191,8 +193,7 @@ export function assembleLunarTheory(ctx) {
       // against the MODEL-START anchor (startmodelYear, the browser's
       // J2000_CALENDAR_YEAR — NOT this model's 2000.0 yearToTMa convention:
       // the 0.5-yr difference is 4.95e-11 of distance and failed the
-      // bit-exact parity gate; plan 11 step 5 dropped the −0.83-d correction
-      // from the anchor, both twins alike). Falls back to the J2000 constant
+      // bit-exact parity gate). Falls back to the J2000 constant
       // without a jd (legacy call shape) or past the domain.
       getMoonDistanceKm: /** @param {number} [jdTT] */ (jdTT) => {
         if (jdTT === undefined) return moonDistanceKm;

@@ -2,6 +2,7 @@ export { createEpochPrimitives } from "./layer0/index.js";
 export { deriveEpochParams } from "./layer0/derive-params.js";
 export { createDerivedViews } from "./layer1/index.js";
 export { createDeepCalendar } from "./phase/deep-calendar.cjs";
+export { createDeepTimeChain } from "./deltat/deep-time-chain.js";
 export { createCardinalStructure } from "./cardinal/one-source-structure.cjs";
 export { createMoonMonthChain } from "./moon/month-chain.cjs";
 export { createChainCycleIntegrator } from "./chain-cycles/index.cjs";
@@ -61,7 +62,7 @@ export { GENERATED as DEFAULT_CONSTANTS, CONSTANTS_HASH, MODEL_VERSION, PREPRINT
 export { FITTED_COEFFICIENTS, COEFFICIENTS_HASH } from "./constants/index.js";
 export { GREGORIAN_START, GREGORIAN_START_JD, calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS, julianCalendarToJD, jdToJulianCalendar } from "./time/calendar.cjs";
 export { DEG2RAD, RAD2DEG, ARCSEC_PER_TURN, ARCSEC_PER_RAD, wrap360, wrap180, wrap180Closed, wrap2pi, wrapPi } from "./math/angles.cjs";
-export { createDeepTimeChain, MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE } from "./deltat/deep-time-chain.js";
+export { MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE, deriveMoonEccSensitivities, MEEUS_ARGUMENT_RATES_DEG_PER_CY } from "./moon/ecc-sensitivities.cjs";
 export { computeMassChainJ2000, computeMoonPeriodsJ2000 } from "./earth/mass-chain.cjs";
 export { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, SECONDS_PER_JULIAN_YEAR } from "./constants/units.cjs";
 export { computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG } from "./earth/frame-of-date.cjs";

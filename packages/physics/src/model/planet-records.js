@@ -45,10 +45,10 @@ export function assemblePlanetRecords(ctx) {
     const gArc = chainModes.g[k] && chainModes.g[k].arcsecPerYr;
     const sArc = chainModes.s[k] && chainModes.s[k].arcsecPerYr;
     PUBLISHED_PLANET_RECORDS[k] = Object.freeze({
-      name: PLANET_DISPLAY_NAMES[k],   // presentation — planets/display-names, the deleted JSON's last leaf (plan 11 step 6)
+      name: PLANET_DISPLAY_NAMES[k],   // presentation — planets/display-names
       orbitalPeriodInputDays: ar.orbitalPeriodInputDays,
       longitudePerihelion: ar.longitudePerihelion,
-      ascendingNodeInvPlane: ar.ascendingNodeInvPlaneClosedForm,   // the closed-form verified J2000 node — astro-reference since plan 11 step 2
+      ascendingNodeInvPlane: ar.ascendingNodeInvPlaneClosedForm,   // the closed-form verified J2000 node (astro-reference)
       invPlaneInclinationJ2000: ar.invPlaneInclinationJ2000,
       orbitalEccentricityJ2000: ar.orbitalEccentricityJ2000,
       axialTiltJ2000: ar.axialTiltJ2000,

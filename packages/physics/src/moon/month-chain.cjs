@@ -33,10 +33,7 @@
  *    pair is 2.479/0.867 after removing the IAU frame term — doc 66 §1).
  *  - The of-date perigee/node periods are COMPOSITIONS of the inertial chain
  *    with the precession of date (the engines' `…OfDateCyclesBetween` count
- *    identities N_trop − N_anom and N_drac − N_trop). The former 'OfDate'
- *    family here — N·(H(t)/H₀)² counts per anchor unit and period ∝ T_yr/H —
- *    was the era device's counter law (doc 99's "Lunar Precession
- *    Invariant"); it left at plan 09 step 5c with the per-H counts.
+ *    identities N_trop − N_anom and N_drac − N_trop).
  *  - apsidalMeetsNodal / lunarLeveling existed ONLY in the browser before
  *    this move (the Node scene aliased apsidal-of-date on a cancellation
  *    argument valid for the paired scene nodes only) — the Node engine gains
@@ -70,13 +67,10 @@
  *   eccentricity channel's modulation; constants are the engine's derived
  *   J2000 anchors (both engines derive them from the same JSON).
  *   fns.precessionPeriodYearsAtAge is the engine's lunisolar precession period
- *   of date T_p(t), Julian years (the composed rate's period; plan 09 step
- *   5c — the tropical month's equinox turn, formerly the counter's 13/H(t),
- *   0.086 % slow: the chain's J2000 tropical month sat 5.85 ms above the IAU
- *   input, the 1/T_p form is within 0.1 ms of it).
+ *   of date T_p(t), Julian years (the composed rate's period — the tropical
+ *   month's equinox turn; within 0.1 ms of the IAU input at J2000).
  *   fns.distanceMetresAtAge is the engine's CITED distance history
- *   (deltat/moon-distance-history; plan 12 option A — the internal quartic
- *   twin this chain carried until then is deleted; null beyond the span).
+ *   (deltat/moon-distance-history; null beyond the span).
  */
 function createMoonMonthChain({ constants, fns }) {
   const {
@@ -136,8 +130,7 @@ function createMoonMonthChain({ constants, fns }) {
 
   /** Tropical month in seconds (equinox-referenced): the sidereal month less
    *  the equinox's own motion over one month — one turn per the precession
-   *  period of date T_p(t). (Plan 09 step 5c: formerly 13 turns per the
-   *  counter H(t), 0.086 % slow.) @param {number} tMa @returns {number | null} */
+   *  period of date T_p(t). @param {number} tMa @returns {number | null} */
   function tropicalMonthSecondsAtAge(tMa) {
     const tSm = siderealMonthSecondsAtAge(tMa);
     if (tSm === null) return null;
@@ -146,10 +139,8 @@ function createMoonMonthChain({ constants, fns }) {
     return tSm * (1 - tSm / (/** @type {number} */ (tP) * tYr));
   }
 
-  // (Plan 09 step 5c: the H² of-date family — apsidal/nodal "cycles per H"
-  // N·(H(t)/H₀)² and the of-date periods ∝ T_yr/H — is deleted with the per-H
-  // counts. The of-date perigee and node of date are the engines' count
-  // compositions of this chain's inertial periods with the tropical month.)
+  // The of-date perigee and node are the engines' count compositions of this
+  // chain's inertial periods with the tropical month.
 
   /** Perigee precession period in seconds — Brouwer–Clemence m² scaling ×
    *  e_E-channel modulation (the factored law: period = invariant mean /

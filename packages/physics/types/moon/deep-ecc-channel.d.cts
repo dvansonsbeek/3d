@@ -17,7 +17,8 @@
  *
  * — ż_J2000 is the run's own z-rate at J2000 (script-written into the
  * artifact by generate.mjs from the banked series: "we are the source"),
- * T_q the H/12 taper the arguments' rate anchors ride. Inside the canon it
+ * T_q the arguments' secular-completion taper (SECULAR_COMPLETION_TAPER_YEARS,
+ * the one the rate anchors ride). Inside the canon it
  * restores the run's slope exactly; beyond ±T_q it is a constant vector
  * offset of ~3e-3, the size of the table's own spectrum-class scatter
  * there, never a growing polynomial. Absent the two fields (an older

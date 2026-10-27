@@ -68,6 +68,21 @@ const _mcJupiter = _mcPlanet.jupiter;   // the deep-time A2 argument feed (uncha
 // _fwEarthEcc(0)), and both argument branches). This engine injects its own
 // chain wrappers; env toggles ride along.
 const { createMoonArguments, jdToDecimalYear } = _req('@essrt/physics/moon/arguments');
+let _moonEccSensM = null;
+/** The perigee/node eccentricity sensitivities — moon/ecc-sensitivities.cjs's derivation on the
+ *  package constants (plan 23), memoised. */
+function _moonEccSensitivities() {
+  if (_moonEccSensM === null) {
+    const D = _req('@essrt/physics').DEFAULT_CONSTANTS;
+    _moonEccSensM = _req('@essrt/physics/moon/ecc-sensitivities').deriveMoonEccSensitivities({
+      eccentricityJ2000: D.earthOrbital.earthEccentricityJ2000,
+      eccentricityDotJ2000: D.earthOrbital.earthEccentricityDotJ2000,
+      frameT2ArcsecPerCy2: D.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
+      generalPrecessionArcsecPerYr: D.earthOrbital.generalPrecessionJ2000_arcsecPerYr,
+    });
+  }
+  return _moonEccSensM;
+}
 let _moonArgsMTools = null;
 function _moonArgsM() {
   if (_moonArgsMTools === null) {
@@ -83,6 +98,12 @@ function _moonArgsM() {
         elpGeneralPrecessionPA_T2ArcsecPerCy2: AR.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
         // Decision (ii): the lunar chain reads the ONE deep e end to end
         eccE0: DTmod._deepEcc().e0,
+        // plan 23: the perigee/node sensitivities — the ONE home's derivation on the
+        // package constants, the same call the deep-time chain makes for the month
+        // chain (tools/lib/deep-time.js does not re-export the chain's object: that
+        // file is a hashed input of the secular series). The fixtures gate pins the
+        // two wirings bit-identical through the Moon rows.
+        moonEccSensitivities: _moonEccSensitivities(),
       },
       fns: {
         eccAt: (tYr) => DTmod._deepEcc().eccAt(tYr),
@@ -137,7 +158,7 @@ function _fwChannelIntegralTools(T, s) {
 // divides by SI_TROPICAL_YEAR_DAYS = MEAN_TROPICAL_YEAR_J2000_S/86400
 // (≈ 365.24189 — NOT the 365.2422 input constant).
 const _SI_TROP_DAYS = DT.MEAN_TROPICAL_YEAR_J2000_S / 86400;
-const _jdToSIyearTools = (jd) => C.startmodelYear + (jd - C.startmodelJD) / _SI_TROP_DAYS;   // anchored on the scene epoch itself (plan 11 step 5: the correction is deleted)
+const _jdToSIyearTools = (jd) => C.startmodelYear + (jd - C.startmodelJD) / _SI_TROP_DAYS;   // anchored on the scene epoch itself
 // Chain-cycle integrator — Phase 8.2-4: lives ONCE in
 // @essrt/physics/chain-cycles. This mirror previously diverged from the
 // browser on THREE points, all closed by the shared module:
@@ -152,7 +173,7 @@ function _chainCyclesT() {
   if (_chainCyclesM === null) {
     _chainCyclesM = createChainCycleIntegrator({
       ageAnchorYear: C.startmodelYear,
-      tropicalYearJ2000Seconds: C.meanSolarYearDays * C.meanLengthOfDay,   // the SI tick (plan 09 step 7c′)
+      tropicalYearJ2000Seconds: C.meanSolarYearDays * C.meanLengthOfDay,   // the SI tick
       isDeepTime: () => DEEP_TIME_ENABLED,
     });
   }
@@ -173,7 +194,7 @@ const _mcArgF = (a, b) => {
 };
 const _mcTropical      = (a, b) => _moonChainCyclesTools(DT.meanTropicalMonthAtAge, a, b);
 const _mcAnomalistic   = (a, b) => _moonChainCyclesTools(DT.meanAnomalisticMonthAtAge, a, b);
-const _mcSidereal      = (a, b) => _moonChainCyclesTools(DT.meanMoonSiderealMonthAtAge, a, b);   // the series' star-referenced A3 (plan 09 step 5c)
+const _mcSidereal      = (a, b) => _moonChainCyclesTools(DT.meanMoonSiderealMonthAtAge, a, b);   // the series' star-referenced A3
 const _mcApsidalOfDate = (a, b) => {
   const t = _mcTropical(a, b), n = _mcAnomalistic(a, b);
   return (t === null || n === null) ? null : t - n;
@@ -209,7 +230,7 @@ function _jdTTToolsFromUT(jd) {
   // This mirror carried a linear 365.2425 approximation — ~5-6 s of ΔT and
   // ~1e-3° of Moon longitude adrift at the Babylonian epochs (measured
   // against the browser via the -135 decomposition probe; modern was fine).
-  // Plan 06 R3 item 2 — THE SCENE CLOCK IS TRUE TT: the model's absolute ΔT
+  // THE SCENE CLOCK IS TRUE TT: the model's absolute ΔT
   // is deltaTStart + curve (the published ΔT surface; the besselian and the
   // registry instruments add the same bridge). The curve alone is the
   // eclipse FINDERS' certified axis, which had leaked into the scene: at true
@@ -645,7 +666,7 @@ function _jdFromPosTools(pos) {
 let _e5TierM = null;
 function _e5Tier() {
   if (!_e5TierM) {
-    // Plan 06 R1 (measured): createModel() WITHOUT the shipped secular-series
+    // Measured: createModel() WITHOUT the shipped secular-series
     // artifact builds the hybrid on the ζ-mode tail — a DIFFERENT certified
     // Sun from the API's and the audit's (75″ at 0 AD, 168″ at −1000, 377″ at
     // −2500 in λ; the recorded 3c trap, third instance). The scene's target
@@ -759,7 +780,7 @@ function buildSceneGraph() {
   // eccentricity until the engine frame places them.
   const earthPeriPrec1 = makePrecessionNode('earthPerihelionPrecession1', {
     orbitRadius: 0, orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
-    orbitTilta: 0, orbitTiltb: 0,   // plan 11 step 4: the scaffold's earthRAAngle tilt is gone — the container is world-placed
+    orbitTilta: 0, orbitTiltb: 0,   // the container is world-placed
     tilt: 0,
     startPos: 0, speed: 0,
   });
@@ -855,7 +876,7 @@ function buildSceneGraph() {
     orbitTilta: Math.cos((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,  // 5.14° tilt lives here (below the nodal spin)
     orbitTiltb: Math.sin((-90 + 180) * d2r) * -C.moonEclipticInclinationJ2000,
     tilt: -(C.moonEclipticInclinationJ2000 + C.moonObliquityEclipticJ2000),  // Cassini composition in the scene's own convention (mirrors src/script.js moon.tilt)
-    startPos: 0,   // plan 11 step 2: the start angle is deleted — the certified override places the Moon's direction and distance every call; this node's own angle is the twin's geometric pivot only
+    startPos: 0,   // the certified override places the Moon's direction and distance every call; this node's own angle is the twin's geometric pivot only
     speed: (Math.PI * 2) / (1 / (C.meanSolarYearDays / C.moonNodalMonth)),  // draconitic (nodal-month) clock
     eccentricity: C.moonOrbitalEccentricity,
     lunarPerturbations: true,
@@ -891,9 +912,9 @@ function buildSceneGraph() {
       orbitCentera: 0, orbitCenterb: 0, orbitCenterc: 0,
       orbitTilta: pd.realPeriTiltA, orbitTiltb: pd.realPeriTiltB,
       tilt: 0,  // tilt only affects axial spin, not position
-      startPos: 0,   // plan 11 step 3: the scaffold's fitted start angle is deleted — the chain places the planet, _applyEngineEarthFrame its pole
+      startPos: 0,   // the chain places the planet, _applyEngineEarthFrame its pole
       speed: pd.planetSpeed,
-      eccentricity: pd.p.orbitalEccentricityJ2000,   // the OBSERVED J2000 eccentricity, inert (plan 07 R6)
+      eccentricity: pd.p.orbitalEccentricityJ2000,   // the OBSERVED J2000 eccentricity, inert
     };
     planetDef._dtPlanetIntegrator = _mcPlanet[key];
     planetDef._dtPlanetSign = Math.sign(planetDef.speed);
@@ -1119,7 +1140,7 @@ let _graph = null;
 function getGraph() {
   if (!_graph) {
     _graph = buildSceneGraph();
-    // (R4/plan 11 step 4: the frame bridge R is the J2000 ecliptic constant —
+    // (R4: the frame bridge R is the J2000 ecliptic constant —
     // nothing is derived from the fresh graph.)
   }
   return _graph;
@@ -1197,7 +1218,7 @@ function _chainFrameR() { return _chainR; }
 //     need no correction because they are the frame.
 // One clock: true TT for the year the engine is sampled at (the Moon block's
 // convention) and for the certified longitude (the finder-axis API plus the
-// bridge). Measured before this (plan 06 R3): the scene's sun plane and the RA
+// bridge). Measured before this: the scene's sun plane and the RA
 // frame's ecliptic parted by 20.5″ at J2000 and 10′ at −3000, the rendered
 // Sun −19″/+19″ in declination against Horizons at the 2000 equinoxes —
 // docs/41.
@@ -1463,8 +1484,7 @@ function computeSunPositionFast(jd) {
 
   // Animate a single node: orbit.ry = θ (with EoC if applicable)
   function animateFast(nodes, def) {
-    // (plan 11 step 4: the K-device wheel branch is deleted with the wheels —
-    // the snapshot form is the only form; the engine places the frame after)
+    // (the snapshot form is the only form; the engine places the frame after)
     let θ = def.speed * pos - def.startPos * d2r;
     if (C.useVariableSpeed && def.eccentricity && def.perihelionPhaseJ2000 !== undefined) {
       const e = def._eocDerived

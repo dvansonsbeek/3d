@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.0
+modelVersion: v27.1
 coefficients: sha256:1d7ef7b022b91f6c
 status: current
 ---
@@ -478,6 +478,45 @@ node moves the referees 0.01″; the planets' 4-kyr series on the quadratic
 passes the 0.9–4.3-kyr inequalities the window suppresses (Uranus 1.6°,
 Neptune 2.6° in ϖ) while the Cartesian filter's own bias is 1e-4 on
 Mercury's e and ≤ 1e-6 elsewhere.
+
+### 1.28 A frame term frozen inside a channel exponent rides the wrong carrier — and the frame-free arguments inherit whichever argument carries the frame alone
+
+**Measured** (plan 23, 2026-10-27). The lunar perigee and node of date ride
+the solar-eccentricity channel rate(t) = rate₀·[g(e_E)/g₀]^s with the
+Meeus-effective exponents s_ϖ 2.407 / s_Ω 1.018 — the values that
+reproduce Meeus's of-date T² exactly. Each of those T² contains the
+equinox's own acceleration (the general precession's T² term, 1.111″/cy²
+Lieske), so the effective exponents carry a frame share that has nothing to
+do with Earth's eccentricity: ~3 % of s. The mean longitude L′ carried the
+frame differently — the model's own precession of date, `pFix`, with the
+obliquity carrier normalized to Lieske's total. Two consequences, neither
+visible to a gate: (1) M′ = L′ − ϖ and F = L′ − Ω, frame-free by physics,
+inherited L′'s pFix uncancelled beyond the window — 0.27° at ±3 kyr
+(compensated in the window by the frame shares to 0.006″/cy²), 2.47° at
+10 kyr, 4.6–5.0° at ±20 kyr, 9.3° at −200 kyr, 38.8° at −1 Myr: 0.22° of
+lunar latitude at 10 kyr, 3° at 1 Myr, eclipse geometry wrong by half a
+lunar diameter at 10 kyr — recorded in doc 66 as "display-class", which the
+measurement contradicts; (2) ϖ and Ω carried 3 % of the eccentricity
+channel's own excursion (hundreds of degrees over the 100-kyr e-cycle) as a
+spurious frame wobble, tens of degrees at 25 kyr. The lunar campaign stack
+is validated inside ±3 kyr and sees neither. **The rule:** a frame
+bookkeeping term is attributed to the frame and carried by ONE function on
+every of-date longitude alike; a difference of two of-date longitudes is a
+physical quantity only when both carry the same frame term. **The
+construction:** the physical pair derived from the effective one by the T²
+identity (2.4798 / 0.8660 on the Lieske input; the lab's pure-gravity
+values are 2.486 / 0.880), pFix on all three longitudes, and the remainder
+(Lieske's share minus pFix's measured in-window T², 1.069″/cy²) on the
+obliquity carrier as L′ already does, so every argument's T² stays
+Meeus-exact. **The window change:** M′ −6″ / F −9″ around 0 AD, +76″ / +57″
+at −3000 (8″ of lunar longitude, 16 s of eclipse time), zero on L′, D and
+M; a first construction with the frame on the obliquity alone read −33″ at
+−3000 — the carrier's curvature, not the exponents — and was dropped. The
+gate: `create-model-parity`'s counterfactual (+1″/yr on the dynamical
+precession moves L′, ϖ, Ω and leaves M′/F within 1e-3″ to −1 Myr — the
+1e-3″ is two ULPs of a 1e8-degree composition) and the closed-form row on
+the derived pair. Doc 66's "0.658″/cy², 60 % of Lieske's" for pFix's T² was
+stale against the code (1.069, 96 %).
 
 ---
 

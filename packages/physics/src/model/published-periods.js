@@ -8,7 +8,7 @@ import { ONE_FAMILY_WINDOW_YEARS } from '../earth/year-lengths.cjs';
 /** @param {import('./sun-and-eclipses.js').Ctx} ctx @returns the bindings the later slices read */
 export function assemblePublishedPeriods(ctx) {
   const { certifiedAxialPrecessionJ2000Years, deepLod, yearLengthsM, yearToTMa } = ctx;
-  // Plan 06 Phase 3 S2 — THE published of-date precession period and mean
+  // THE published of-date precession period and mean
   // tropical year: the one-family route (B) inside the banked tiers
   // (|Δyear| ≤ ONE_FAMILY_WINDOW_YEARS), the composed lunisolar period
   // beyond (S5: on the derived J2000 anchor, so the two faces agree at

@@ -35,11 +35,10 @@
  *     the derived series-extension tail — deliberate for the certified
  *     finder statistics (knife-edge canon events), required here. The
  *     injected moonFullAtDaysTT is the series' sceneEvalAt — the same
- *     evaluation the browser scene ships (the extension inside it since
- *     plan 06 R3 item 1: one scene Moon).
+ *     evaluation the browser scene ships (the extension inside it: one scene
+ *     Moon).
  *
- * APPARENT PLACES (plan 06 R3 item 1 — measured, the cancellation the I2
- * Sun exposed): both bodies are evaluated mean-of-date (nutation is a common
+ * APPARENT PLACES (measured — the cancellation the I2 Sun exposed): both bodies are evaluated mean-of-date (nutation is a common
  * rotation of Sun and Moon and cancels in the elongation) but with their
  * PLANETARY ABERRATION: the Sun's derived κ = 2π a/(c T_sid √(1−e²))
  * (≈20.5″, the light-time of a source at rest in the barycentric frame) and
@@ -131,8 +130,8 @@ function createBesselian(deps) {
   }
 
   /** Elliptical Sun distance — FRAMEWORK-NATIVE: the model's own
-   *  eccentricity (Law-5-locked base + drift) and perihelion longitude
-   *  (H/16 precession) close the ellipse, with the true anomaly from the
+   *  eccentricity and perihelion longitude of date close the ellipse, with
+   *  the true anomaly from the
    *  already-computed sun longitude (v = λ − (ϖ + 180°), geocentric-perigee
    *  convention). Agrees with the Meeus Ch. 25 polynomial to ±0.001% over a
    *  year, with no fitted external coefficients, and stays honest at deep

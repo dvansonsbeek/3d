@@ -1575,6 +1575,21 @@ export const VALUES = {
     };
   })(),
 
+  // ── The lunar perigee/node eccentricity sensitivities (plan 23) ──────────
+  // The Meeus-effective pair the record fixes and the PHYSICAL pair the runtime
+  // derives from it (moon/ecc-sensitivities.cjs, the ONE home) — read from the
+  // model, never typed.
+  ...(() => {
+    const S = () => physModel().moon.eccSensitivities;
+    return {
+      moonEccSensitivityPerigeeEffective: { get: () => S().perigeeEffective, render: (v) => v.toFixed(3), note: 'Meeus-effective s_ϖ — reproduces Meeus Ch. 47\'s of-date perigee T² exactly, the frame\'s T² inside it (doc 66 §1)' },
+      moonEccSensitivityNodeEffective: { get: () => S().nodeEffective, render: (v) => v.toFixed(3), note: 'Meeus-effective s_Ω — the node T² exactly, the frame\'s T² inside it' },
+      moonEccSensitivityPerigeePhysical: { get: () => S().perigeePhysical, render: (v) => v.toFixed(3), note: 'the PHYSICAL s_ϖ the live channel runs: the frame\'s T² removed; the three-body laboratory\'s pure-gravity value is 2.486 (doc 66 §1)' },
+      moonEccSensitivityNodePhysical: { get: () => S().nodePhysical, render: (v) => v.toFixed(3), note: 'the PHYSICAL s_Ω the live channel runs; the laboratory\'s pure-gravity value is 0.880' },
+      moonEccSensitivityFrameT2ArcsecPerCy2: { get: () => S().frameT2DegPerCy2 * 3600, render: (v) => v.toFixed(5), unit: 'arcsec/cy²', note: 'the general precession\'s T² coefficient the of-date Meeus polynomials embed (Lieske 1976) — the frame share that left the exponents and rides the model\'s own precession of date instead' },
+    };
+  })(),
+
   // ── Moon inclination + Cassini obliquity labs (11-2v) ───────────────────
   // The dynamical inclination and Brown/ELP constant from astro moonReference
   // (the DYNAMICAL 5.1573 vs the theory constant 5.1454 — documented

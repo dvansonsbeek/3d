@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.0
+modelVersion: v27.1
 coefficients: sha256:1d7ef7b022b91f6c
 status: current
 ---
@@ -1023,6 +1023,37 @@ Cartesian boxcar and its J2000 offset onto the chain's inclination/node (it
 passes through zero near J2000, the regime where the Cartesian mean is right;
 the deep rotation bias is 0.0005° of inclination, below the hybrid's gates) — a
 measured follow-up, not this record.
+
+### 23.5 The lunar arguments' frame term — one equinox for L′, ϖ and Ω (plan 23)
+
+Until plan 23 the perigee and node of date carried the equinox's acceleration
+frozen inside the Meeus-effective channel exponents (s_ϖ 2.407 / s_Ω 1.018:
+the values that reproduce Meeus's of-date T² exactly, each T² embedding the
+general precession's 1.111″/cy² Lieske term), while the mean longitude carried
+the model's own precession of date (`pFix`) with the obliquity carrier
+normalized to Lieske's total — the "ϖ/Ω deliberately do NOT carry pFix" rule
+and its corollary "M′/F inherit L′'s pFix oscillation uncancelled at deep
+time (display-class)". Measured 2026-10-27: that inheritance is 2.47° at
+10 kyr, 4.6–5.0° at ±20 kyr, 38.8° at −1 Myr (0.22° of lunar latitude at
+10 kyr), and ϖ/Ω carried a 3 % share of the eccentricity channel's own
+excursion as a spurious frame wobble (tens of degrees at 25 kyr); doc 66's
+"pFix T² 0.658″/cy², 60 % of Lieske" was stale against the code (1.069,
+96 %). Since plan 23 the channel runs the PHYSICAL pair (2.4798 / 0.8660,
+derived in `moon/ecc-sensitivities.cjs` from the effective pair by the T²
+identity; the three-body laboratory's pure-gravity values 2.486 / 0.880 —
+doc 66 §1), the month chain and the arguments read it from the chain, and
+ONE frame term rides L′, ϖ and Ω alike: pFix plus the Lieske-minus-pFix
+remainder on the obliquity carrier (`frameRemainder`), so every argument's
+T² stays Meeus-exact and M′ and F are frame-free at every epoch (the
+`create-model-parity` counterfactual gates it). The snapshot branch carries
+the Meeus polynomial's frame p₀T + T2_frame·T² for ϖ and Ω. The window
+moved by M′ −6″ / F −9″ around 0 AD and +76″ / +57″ at −3000 (8″ of lunar
+longitude, 16 s of eclipse time), nothing on L′, D or M; the three
+refuse-on-divergence generators re-baselined with these deltas; the goldens
+re-recorded. Model v27.1 (MINOR: the published lunar arguments beyond the
+window move by degrees; no J2000 value moves). The literal twin of the pair
+in `moon/arguments.cjs` (a CJS module beside the ESM home) left with the
+one-home module; `MOON_ECC_SENSITIVITY_PERIGEE/NODE` are exported from it.
 
 ## Related documents
 

@@ -108,7 +108,10 @@ export { DEG2RAD, RAD2DEG, ARCSEC_PER_TURN, ARCSEC_PER_RAD, wrap360, wrap180, wr
 // cited Moon-distance history, the ΔT cycle stack, |s₃|, the LOD/ΔT core, the
 // lunar month chain and the mean*AtAge family, assembled ONCE from the
 // generated constants; the Node twin and the browser destructure it.
-export { createDeepTimeChain, MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE } from './deltat/deep-time-chain.js';
+export { createDeepTimeChain } from './deltat/deep-time-chain.js';
+// The lunar perigee/node eccentricity sensitivities — the Meeus-effective pair, the physical pair's
+// derivation and the Meeus Ch. 47 argument rates, ONE home (plan 23).
+export { MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE, deriveMoonEccSensitivities, MEEUS_ARGUMENT_RATES_DEG_PER_CY } from './moon/ecc-sensitivities.cjs';
 // The J2000 mass chain, the Moon's J2000 periods and the unit constants — ONE home.
 export { computeMassChainJ2000, computeMoonPeriodsJ2000 } from './earth/mass-chain.cjs';
 export { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, SECONDS_PER_JULIAN_YEAR } from './constants/units.cjs';

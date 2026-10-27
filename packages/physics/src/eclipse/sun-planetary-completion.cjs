@@ -68,8 +68,7 @@
  *       inconsistency for elongation. Removed: the nutation-free syzygy
  *       fleet improves 3.877 → 3.756″ and the fuller-bridged Sun
  *       comparison 2.344 → 2.123″ (measured by the fq7s preview and
- *       annual-channel instruments, deleted at plan 09 step 7e — docs/109
- *       §22). This file now carries ZERO fitted
+ *       annual-channel instruments — docs/109 §22). This file carries ZERO fitted
  *       constants. The Earth-around-EMB wobble is DERIVED: amplitude
  *       a_M·μ/AU with μ = 1/(1+M_E/M_M), injected by the model wiring
  *       from live package constants (6.4399″ at current constants), sign
@@ -143,8 +142,8 @@ const ARG_D0 = 297.8501921;
  * D2 window (the term's in-window ramp went to the projected-out secular
  * basis; the 240-yr term folded into it). WHY they were missing: the
  * certified Sun integrates a smooth tropical year for its mean longitude;
- * against Horizons its residual carried exactly this 6″ ripple (plan 06 I1
- * analysis) — with the same phase in the sidereal residual, a perturbation
+ * against Horizons its residual carried exactly this 6″ ripple — with the
+ * same phase in the sidereal residual, a perturbation
  * of Earth's mean motion, not a frame effect. Sub-0.2″ candidates left out
  * (2J−5S 0.17″, 5V−8E 0.17″: window-dependent phase). The CARRIERS moved
  * with I3 from the planet records' rounded of-date periods minus p₀ to the
@@ -225,7 +224,7 @@ const TERMS = [
   [[0, 0, 1, -1, 0, 0], [0, 0, 1, 0, 0, 0], 0.0188, 0.0523],
   [[0, 2, -2, 0, 0, 0], [0, 0, 1, 0, 0, 0], -0.0421, -0.0340],
   [[0, 0, 1, -1, 0, 0], [0, 0, -1, 0, 0, 0], -0.0353, -0.0379],
-  // plan 06 I3 — the Venus–Earth term 8λ_V − 13λ_E (≈239 yr on the banked
+  // The Venus–Earth term 8λ_V − 13λ_E (≈239 yr on the banked
   // carriers): a CONSTANT row, derived on the model's own run over ±3100 yr
   // (i3-long-period-dalembert.mjs `2 20000 3100 4`; the I2 row read 1.84/0.14″
   // on the record carriers over −5100..+1100). The term is formally FIFTH order
@@ -394,13 +393,9 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, e
   return { sunPlanetaryCompletionDeg };
 }
 
-/* (Plan 09 step 5a: PAIRED_SUN_HARMONICS_SHA256 — the sha256/16 of the Step-0
- *  SUN_LONGITUDE_HARMONICS this table was derived beside, last 53530a28a60b3c4a
- *  (the R10 rotation of a comb never refit since the eccentricity unification)
- *  — is retired with the comb. The comb left every Sun path at plan 06 R4, so
- *  the residual the table was derived from is the certified Sun's; the table
- *  stands (fidelity 0.616″, 70 terms) and the carrier-rate pair below remains
- *  its enforced matched pair.) */
+/* The table was derived from the certified Sun's residual and stands (fidelity
+ *  0.616″, 70 terms); the carrier-rate pair below is its enforced matched pair.
+ *  (The retired paired-harmonics fingerprint: doc 109 §23.) */
 
 /** sha256/16 of JSON.stringify([...planets, moonElongation]) — the seven
  *  full-precision carrier rates (deg/cy TT) the tables pair with: since plan

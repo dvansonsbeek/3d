@@ -43,14 +43,9 @@ import { createMoonMonthChain } from '../moon/month-chain.cjs';
 import { massLossScaledLinearAtAge, driver2PeriodSecondsAtAge, synodicPeriodSeconds } from '../planets/orbit-chain.cjs';
 import { computeMassChainJ2000, computeMoonPeriodsJ2000 } from '../earth/mass-chain.cjs';
 
-/**
- * Moon-channel eccentricity sensitivities (perigee/node), the [g/g₀]^s
- * exponents of the factored deep-time law — Meeus-effective (S_N moved
- * 1.0 → 1.018 with the v4 frame-attribution batch). ONE home since B2 (they
- * were literals in model.js, tools/lib/deep-time.js and script.js `_FW_MOON`).
- */
-export const MOON_ECC_SENSITIVITY_PERIGEE = 2.407;
-export const MOON_ECC_SENSITIVITY_NODE = 1.018;
+// The lunar perigee/node eccentricity sensitivities — ONE home moon/ecc-sensitivities.cjs
+// (plan 23): the Meeus-effective pair and the PHYSICAL pair derived from it there.
+import { deriveMoonEccSensitivities } from '../moon/ecc-sensitivities.cjs';
 
 /**
  * The ΔT stack's switches. `resonator` gates the swing's δLOD terms; the
@@ -126,6 +121,18 @@ export function createDeepTimeChain(deps) {
   const certifiedAxialPrecessionJ2000Years = () => axialPrecessionJ2000Years;
   /** p₀, ″/yr. @returns {number} */
   const precessionRateJ2000ArcsecPerYr = () => 1296000 / certifiedAxialPrecessionJ2000Years();
+
+  // The lunar perigee/node eccentricity sensitivities (plan 23): the Meeus-effective pair and the
+  // PHYSICAL pair derived from it by the T² identity (moon/ecc-sensitivities.cjs, the ONE home).
+  // The month chain and the arguments module run the physical pair; the frame share the effective
+  // pair carried rides the model's own precession of date instead (the arguments' pFix, on L′, ϖ
+  // and Ω alike), so the frame-free arguments M′ and F cancel it at every epoch.
+  const moonEccSensitivities = deriveMoonEccSensitivities({
+    eccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
+    eccentricityDotJ2000: C.earthOrbital.earthEccentricityDotJ2000,
+    frameT2ArcsecPerCy2: C.moonMeeus.elpW1T2Decomposition_arcsecPerCy2.generalPrecessionPA_T2_Lieske1976,
+    generalPrecessionArcsecPerYr: C.earthOrbital.generalPrecessionJ2000_arcsecPerYr,
+  });
 
   // ── α(t): the GIA channel (lagged L1 response), the memo and the lattice pin ──
   const CLIMATE_REGIME = F.CLIMATE_FORMULA_COEFFS.regimes['lr04-post-mpt'];
@@ -308,7 +315,8 @@ export function createDeepTimeChain(deps) {
       moonApsidalJ2000Seconds,
       moonNodalJ2000Seconds,
       moonSiderealMonthJ2000Seconds,
-      sPerigee: MOON_ECC_SENSITIVITY_PERIGEE, sNode: MOON_ECC_SENSITIVITY_NODE,
+      // plan 23: the PHYSICAL pair in the channel; the frame share rides the arguments' pFix
+      sPerigee: moonEccSensitivities.perigeePhysical, sNode: moonEccSensitivities.nodePhysical,
     },
     fns: {
       meanLodSecondsAtAge,
@@ -405,7 +413,7 @@ export function createDeepTimeChain(deps) {
     EPOCH_PARAMS, ageAnchorYear,
     // the pieces
     alphaGia, earthMoiFactorAtAge, withLatticeAlpha, j2RatioAtYear, iEarthAtAge,
-    recession, meanObliquity, dtCycles, s3ArcsecPerYr, deepLod, l0, deepEcc, eCompModulation, moonChain,
+    recession, meanObliquity, dtCycles, s3ArcsecPerYr, deepLod, l0, deepEcc, eCompModulation, moonChain, moonEccSensitivities,
     // the family
     meanMoonDistanceMetresAtAge: recession.distanceMetresAtAge,
     meanMoonDistanceAtAge: moonChain.distanceKmAtAge,

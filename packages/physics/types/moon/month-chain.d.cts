@@ -23,13 +23,10 @@
  *   eccentricity channel's modulation; constants are the engine's derived
  *   J2000 anchors (both engines derive them from the same JSON).
  *   fns.precessionPeriodYearsAtAge is the engine's lunisolar precession period
- *   of date T_p(t), Julian years (the composed rate's period; plan 09 step
- *   5c — the tropical month's equinox turn, formerly the counter's 13/H(t),
- *   0.086 % slow: the chain's J2000 tropical month sat 5.85 ms above the IAU
- *   input, the 1/T_p form is within 0.1 ms of it).
+ *   of date T_p(t), Julian years (the composed rate's period — the tropical
+ *   month's equinox turn; within 0.1 ms of the IAU input at J2000).
  *   fns.distanceMetresAtAge is the engine's CITED distance history
- *   (deltat/moon-distance-history; plan 12 option A — the internal quartic
- *   twin this chain carried until then is deleted; null beyond the span).
+ *   (deltat/moon-distance-history; null beyond the span).
  */
 export function createMoonMonthChain({ constants, fns }: {
     constants: {

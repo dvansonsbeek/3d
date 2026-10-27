@@ -153,6 +153,19 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
             apsidalMeetsNodalSecondsAtAge: (tMa: number) => number | null;
             lunarLevelingSecondsAtAge: (tMa: number) => number | null;
         };
+        moonEccSensitivities: Readonly<{
+            perigeeEffective: number;
+            nodeEffective: number;
+            perigeePhysical: number;
+            nodePhysical: number;
+            kappaPerCy: number;
+            frameT2DegPerCy2: number;
+            generalPrecessionDegPerCy: number;
+            perigeeRateOfDateDegPerCy: number;
+            nodeRateOfDateDegPerCy: number;
+            perigeeRateIcrfDegPerCy: number;
+            nodeRateIcrfDegPerCy: number;
+        }>;
         meanMoonDistanceMetresAtAge: (tMa: number) => number | null;
         meanMoonDistanceAtAge: (tMa: number) => number | null;
         meanLodSecondsAtAge: (tMa: number) => number | null;

@@ -161,6 +161,11 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   frame as a local quadratic — a Cartesian boxcar is biased at every node
   (2.2e-6 + 1.1e-6 in e, −24″ in ϖ at 1 kyr). The swap gate is the external
   referee's sd on the whole span. (§1.27)
+- **A frame term is attributed to the frame and carried by ONE function on
+  every of-date longitude alike** — frozen inside a channel exponent it rides
+  the wrong carrier, and a difference of two of-date longitudes is physical
+  only when both carry the same frame term (M′ and F inherited L′'s pFix:
+  2.5° at 10 kyr, 39° at −1 Myr, unseen by the ±3-kyr gates). (§1.28)
 
 ---
 

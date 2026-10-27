@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.0
+modelVersion: v27.1
 coefficients: sha256:1d7ef7b022b91f6c
 status: current
 ---
@@ -56,7 +56,7 @@ shows two e's at 2000.
 | step | quantity | formula | inputs | code |
 |---|---|---|---|---|
 | 1 | g(e), g₀ | g = (1 − e²)^(−3/2); g₀ = g(e₀) | e₀ from the deep channel | `deep-ecc-channel.cjs` 91–92 |
-| 2 | rate modulation | (g(e(t))/g₀)^s, s_ϖ = 2.407 (perigee), s_Ω = 1.018 (node) — the Meeus-EFFECTIVE sensitivities (physical pair 2.479/0.867 after removing the IAU ṗ_A frame term) | step 1 | `deep-ecc-channel.cjs` 96–100; the constants `arguments.cjs` 145 |
+| 2 | rate modulation | (g(e(t))/g₀)^s on the PHYSICAL sensitivities s_ϖ = <!--v:moonEccSensitivityPerigeePhysical-->2.480<!--/v--> (perigee), s_Ω = <!--v:moonEccSensitivityNodePhysical-->0.866<!--/v--> (node), derived from the Meeus-effective pair <!--v:moonEccSensitivityPerigeeEffective-->2.407<!--/v--> / <!--v:moonEccSensitivityNodeEffective-->1.018<!--/v--> by removing the frame's T² (<!--v:moonEccSensitivityFrameT2ArcsecPerCy2-->1.11113<!--/v-->″/cy², Lieske); the frame rides the arguments' pFix on L′, ϖ and Ω alike (plan 23) | step 1 | `deep-ecc-channel.cjs` `modulation`; the derivation `moon/ecc-sensitivities.cjs`, wired in `deltat/deep-time-chain.js` |
 | 3 | phase-aware channel integral | I(T, s) = ∫₀ᵀ [(g(e(t′))/g₀)^s − 1] dt′, T in Julian centuries; composite Simpson, step ≤ ~4 kyr | step 2 | `deep-ecc-channel.cjs` 106–118 |
 | 4 | perigee and node of date | ϖ(T) = (LP0 − MP0) + ϖ̇₀·(T + I(T, s_ϖ)); Ω(T) = (LP0 − F0) + Ω̇₀·(T + I(T, s_Ω)); ϖ̇₀ = LPR − MPR = 4069.0137 °/cy, Ω̇₀ = LPR − FR = −1934.1363 °/cy (Meeus Ch. 47 J2000 anchors; the rate SPEEDS UP and SLOWS DOWN with the e_E phase — replaces Meeus's frozen T²/T³) | step 3 | `arguments.cjs` 511–512 (era branch; the deep branch adds the rate completions) |
 | 5 | Meeus E-factor, bounded | E(t) = e(t)/e₀ (≡ 1 at J2000); replaces 1 − 0.002516T − 0.0000074T²; every series term carrying M is multiplied by E, terms with 2M by E² | step 1 | `model/lunar-theory.js` `fwEFactor`; `series.cjs` 180–181 |
@@ -100,13 +100,13 @@ The deep-time lunar periods (step 7), from the Node engine's month chain
 | age (Ma) | sidereal month (d) | perigee period (yr) | node period (yr) | T_p (yr) | (g/g₀)^s_ϖ | (g/g₀)^s_Ω |
 |---|---|---|---|---|---|---|
 | 0 | 27.321662 | 8.85038 | 18.59952 | 25771.6 | 1.0000000 | 1.0000000 |
-| 0.002584 | 27.321651 | 8.84923 | 18.59850 | 25771.5 | 1.0001306 | 1.0000552 |
-| 0.01 | 27.321621 | 8.84624 | 18.59585 | 25771.5 | 1.0004702 | 1.0001988 |
-| 0.1 | 27.321253 | 8.81485 | 18.56806 | 25770.4 | 1.0040457 | 1.0017091 |
-| 1 | 27.317557 | 8.81351 | 18.56831 | 25759.4 | 1.0043339 | 1.0018307 |
-| 10 | 27.280626 | 8.77902 | 18.55199 | 25650.3 | 1.0096412 | 1.0040663 |
-| 380 | 25.646057 | 9.43039 | 19.81467 | 21235.4 | 0.9996726 | 0.9998615 |
-| 650 | 24.440793 | 9.89327 | 20.78868 | 18435.1 | 0.9997902 | 0.9999113 |
+| 0.002584 | 27.321651 | 8.84920 | 18.59865 | 25771.5 | 1.0001306 | 1.0000552 |
+| 0.01 | 27.321621 | 8.84611 | 18.59640 | 25771.5 | 1.0004702 | 1.0001988 |
+| 0.1 | 27.321253 | 8.81378 | 18.57280 | 25770.4 | 1.0040457 | 1.0017091 |
+| 1 | 27.317557 | 8.81236 | 18.57338 | 25759.4 | 1.0043339 | 1.0018307 |
+| 10 | 27.280626 | 8.77648 | 18.56323 | 25650.3 | 1.0096412 | 1.0040663 |
+| 380 | 25.646057 | 9.43048 | 19.81426 | 21235.4 | 0.9996726 | 0.9998615 |
+| 650 | 24.440793 | 9.89334 | 20.78841 | 18435.1 | 0.9997902 | 0.9999113 |
 <!-- /generated:calcmap-lunar-periods -->
 
 ### 1.4 Findings from this chain — resolved
@@ -520,14 +520,14 @@ The four events and the year lengths (live, generated):
 <!-- generated:calcmap-cardinal-events -->
 | year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -10000 03-19 12:22 | -10000 06-16 06:27 | -10000 09-13 14:45 | -10000 12-16 11:59 | 365.244435 | 365.244435 | 365.243550 | 31556957.03 | 0.01964 |
+| -10000 | -10000 03-19 12:22 | -10000 06-16 06:27 | -10000 09-13 14:45 | -10000 12-16 11:59 | 365.244426 | 365.244426 | 365.243550 | 31556957.03 | 0.01964 |
 | -2584 | -2584 03-21 18:02 | -2584 06-23 22:08 | -2584 09-22 04:19 | -2584 12-19 16:15 | 365.243911 | 365.243911 | 365.242785 | 31556947.70 | 0.01835 |
 | -584 | -584 03-21 04:50 | -584 06-23 08:32 | -584 09-23 08:01 | -584 12-20 20:20 | 365.241643 | 365.241643 | 365.242534 | 31556938.72 | 0.01771 |
 | 0 | 0 03-20 15:53 | 0 06-22 15:02 | 0 09-23 01:49 | 0 12-20 18:26 | 365.243502 | 365.243502 | 365.242458 | 31556935.80 | 0.01750 |
 | 1246 | 1246 03-20 13:54 | 1246 06-21 20:44 | 1246 09-23 03:40 | 1246 12-21 11:33 | 365.240335 | 365.240335 | 365.242293 | 31556929.30 | 0.01702 |
 | 2000 | 2000 03-20 07:35 | 2000 06-21 01:48 | 2000 09-22 17:28 | 2000 12-21 13:37 | 365.242508 | 365.242508 | 365.242190 | 31556925.25 | 0.01671 |
 | 5000 | 5000 03-20 08:45 | 5000 06-18 19:07 | 5000 09-20 11:54 | 5000 12-21 15:35 | 365.247245 | 365.247245 | 365.241781 | 31556909.69 | 0.01534 |
-| 10000 | 10000 03-16 15:10 | 10000 06-13 23:44 | 10000 09-12 15:25 | 10000 12-14 22:22 | 365.239228 | 365.239228 | 365.241160 | 31556893.07 | 0.01262 |
+| 10000 | 10000 03-16 15:10 | 10000 06-13 23:44 | 10000 09-12 15:25 | 10000 12-14 22:22 | 365.239229 | 365.239229 | 365.241160 | 31556893.07 | 0.01262 |
 
 Dates on the proleptic Gregorian calendar from the TRUE-UT JD of the APPARENT crossing of the one Sun (since plan 06 R3 item 2 the finder-axis root minus the deltaTStart bridge — before it the published instants were 0.9 min late) (plan 06 R1 — formerly the retired device's JD); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27's successive instants to seconds); the mean tropical year is the one-family column.
 <!-- /generated:calcmap-cardinal-events -->
@@ -537,12 +537,12 @@ The e(t)-spread by both devices, the anomalistic year, the RA:
 <!-- generated:calcmap-cardinal-spread -->
 | year | crossing intervals: T_X − mean (s) VE · SS · AE · WS | one-source structure: T_X − mean (s) VE · SS · AE · WS | structure anomalistic year (s) | RA of VE (°) — the target by construction since R1 | e |
 |---|---|---|---|---|---|
-| -10000 | 396.8 · 76.5 · -348.2 · 25.9 | 7.8 · 55.1 · -6.2 · -56.7 | 31558391.04 | 0.0000 | 0.01964 |
-| -2584 | 356.2 · 97.3 · 404.9 · -63.9 | -48.1 · -25.2 · 47.2 · 26.1 | 31558418.93 | 0.0000 | 0.01835 |
+| -10000 | 395.8 · 75.7 · -348.9 · 25.3 | 7.8 · 55.1 · -6.2 · -56.7 | 31558391.04 | 0.0000 | 0.01964 |
+| -2584 | 356.2 · 97.3 · 404.9 · -63.8 | -48.1 · -25.2 · 47.2 · 26.1 | 31558418.93 | 0.0000 | 0.01835 |
 | 0 | 55.3 · 90.2 · 25.2 · 169.5 | -15.0 · -50.5 · 16.0 · 49.4 | 31558427.08 | 0.0000 | 0.01750 |
 | 2000 | 400.5 · 27.4 · -734.8 · -274.6 | 16.0 · -48.6 · -14.9 · 47.6 | 31558432.60 | 0.0000 | 0.01671 |
-| 5000 | 218.1 · 472.1 · -195.4 · -117.3 | 44.2 · -15.0 · -45.0 · 15.8 | 31558440.80 | 0.0000 | 0.01534 |
-| 10000 | 223.7 · -167.0 · -731.2 · -348.9 | 12.7 · 37.7 · -12.2 · -38.2 | 31558460.80 | 0.0000 | 0.01262 |
+| 5000 | 218.1 · 472.1 · -195.4 · -117.2 | 44.2 · -15.0 · -45.0 · 15.8 | 31558440.80 | 0.0000 | 0.01534 |
+| 10000 | 223.9 · -166.9 · -731.1 · -348.9 | 12.7 · 37.7 · -12.2 · -38.2 | 31558460.80 | 0.0000 | 0.01262 |
 
 Retired device's RA formula constants: the record left with the K-device scaffold (plan 11 step 4 — earthtiltMean, the inclination amplitude A and earthRAAngle = 2A − A²/ε̄ are deleted; git history carries them; the form was base − earthRAAngle/sin ε̄ + (A/sin ε̄)·(−sin 2π·3·c + sin 2π·8·c), base 0/90/180/270° for VE/SS/AE/WS). Since R1 the shipped RA is the target longitude by construction; the device itself is deleted (plan 09 step 7a).
 <!-- /generated:calcmap-cardinal-spread -->

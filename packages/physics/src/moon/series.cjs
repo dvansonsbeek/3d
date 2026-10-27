@@ -11,8 +11,8 @@
  *
  * Full scene form: 60 longitude + 60 latitude terms with E/E² scaling on
  * M-bearing terms, A1 (Venus, Meeus-observed rate — the 18V−16E−M′
- * near-resonance makes it hypersensitive; no lattice identity), A2/A3
- * (D2-derived lattice rates, CHAIN-INTEGRATED under deep time through
+ * near-resonance makes it hypersensitive; no chain identity), A2/A3
+ * (D2-derived rates, CHAIN-INTEGRATED under deep time through
  * their identified content), all six latitude corrections, the EoC-half
  * subtraction (the off-centre orbit geometry already provides half the
  * equation of centre), and the two-term ellipse distance.
@@ -26,7 +26,7 @@
 
 'use strict';
 
-// Plan 06 R3 item 1: the DERIVED series-extension tail (the D2 planetary and
+// The DERIVED series-extension tail (the D2 planetary and
 // node terms, moon/series-extension.cjs) is part of the ONE scene Moon —
 // formerly added by the besselian tier alone, so the rendered Moon and the
 // eclipse-location Moon were two different Moons. The truncated finder forms
@@ -98,8 +98,6 @@ function createMoonSeries({ constants, fns }) {
       const nAps = apsidalOfDateCyclesBetween(yA0, yA);
       // A3 is the STAR-referenced lunar longitude (Meeus' rate 481,266.484 °/cy
       // ≡ 360°/sidereal month): the chain's sidereal-orbit count directly.
-      // Plan 09 step 5c — it was the tropical count minus the counter's 13/H
-      // precession turns (0.086 % slow on the precession).
       const nSid = siderealOrbitsBetween(yA0, yA);
       const nJ = jupiterOrbitsBetween(yA0, yA);
       if (nT !== null && nAps !== null && nSid !== null && nJ !== null) {
@@ -175,9 +173,8 @@ function createMoonSeries({ constants, fns }) {
    *  Returns everything the scene blocks write:
    *  thetaAddRad — the hierarchy θ increment (EoC-half-subtracted Σl);
    *  lonDeg — full ecliptic longitude (GEOMETRIC, mean equinox of date)
-   *  incl. the derived series-extension tail. (The fitted mean-longitude
-   *  anchor moonMeeusLpCorrection was retired to 0 at plan 06 R3 item 1 and
-   *  its parameter deleted at plan 11 step 2: measured against Horizons' apparent
+   *  incl. the derived series-extension tail. (No fitted mean-longitude
+   *  anchor — doc 109 §23: measured against Horizons' apparent
    *  Moon over 1970–2049 the series needs no anchor, −1.0″ ± 1.5″ flat in
    *  elongation; the former +32.75″ was the eclipse tier's mean Sun
    *  compensated — its aberration κ, the I2 long inequality and the trend-ΔT

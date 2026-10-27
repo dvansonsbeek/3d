@@ -56,7 +56,7 @@ export function assembleSunAndEclipses(ctx) {
     const cyclesTo = (year) => {
       const dy = year - 2000;
       const s = dy >= 0 ? 1 : -1, a = Math.abs(dy);
-      // WARM THE SAMPLER TO THE TARGET FIRST (plan 06 R4, measured): the
+      // WARM THE SAMPLER TO THE TARGET FIRST (measured): the
       // table below grows outward in 1-yr / 100-yr steps, and every step
       // beyond ~1.6 Myr enlarged the one-family sampler's >2-Myr tier just
       // past its span, rebuilding the whole deep integration about every 32
@@ -131,7 +131,7 @@ export function assembleSunAndEclipses(ctx) {
     * (648000 / Math.PI);
   // FQ-5 N3 — the completion's carriers are FRAMEWORK-derived from the
   // model's own planet period records (the Moon-elongation rate from the
-  // sidereal month/year identity). Plan 06 I2 — the carriers are SIDEREAL
+  // sidereal month/year identity). The carriers are SIDEREAL
   // (measured): the records' orbitalPeriodInputDays are OF-DATE periods (their
   // rates sit +1.39..1.62°/cy above the VSOP sidereal mean motions — the
   // framework precession plus input rounding), and a perturbation argument
@@ -169,7 +169,7 @@ export function assembleSunAndEclipses(ctx) {
     },
     sunLonDegAt: /** @param {number} jdUT */ (jdUT) => eclipseFinders.sunLonDegAt(jdUT),
     sunCompletionDeg: sunPlanetaryCompletionDeg,
-    // plan 06 R3 item 1: the location tier on APPARENT places — the Sun's derived κ
+    // The location tier on APPARENT places — the Sun's derived κ
     // (the same helper the cardinal instants use), the Moon's relative light-time
     // inside the besselian; the series-extension tail now lives in sceneEvalAt.
     sunAberrationDegAt: /** @param {number} year */ (year) => late.sunAberrationArcsecAt(year) / 3600,

@@ -12,8 +12,8 @@ import { DEEP_MODES_ARTIFACT } from '../moon/deep-modes-artifact.cjs';
 export function assembleDeepTimeChain(ctx) {
   const { C, F, late, startmodelYear } = ctx;
   // The GIA α channel (the lagged response to the L1 ice history, with the R2
-  // lattice pin and the exact-argument memo), the Layer-0 bundle, the cited
-  // Earth–Moon distance history (plan 12 option A), the ΔT cycle stack (all
+  // pin and the exact-argument memo), the Layer-0 bundle, the cited
+  // Earth–Moon distance history, the ΔT cycle stack (all
   // channels ON here), |s₃|, the LOD/ΔT core and the lunar month chain are
   // assembled once in deltat/deep-time-chain.js from this context's constants
   // and fitted coefficients (so a counterfactual context flows through them);
@@ -39,7 +39,7 @@ export function assembleDeepTimeChain(ctx) {
    *  integration actually turns the pole at: the inertial secular rate of date × the solar-torque factor at
    *  e(t) × J₂(t)/J₂₀ × cos ε(t)/cos ε₀ (ds/dt = α (ŝ·n̂)(ŝ×n̂): the azimuthal rate about n̂ is α cos ε).
    *  The secular rate here is the CONSTANT's scaling (lunisolarTorqueRate…), not the published rate of
-   *  date: the hybrid's own ε(t) carries the ONE cosine, so the cited mean obliquity's factor (plan 12 §8)
+   *  date: the hybrid's own ε(t) carries the ONE cosine, so the cited mean obliquity's factor
    *  does not enter twice — inside the ζ-series span the hybrid IS the model's obliquity of date.
    *  Measured (2026-10): the dominant obliquity line of the model's own ε(t) over the last 5 Myr sits at
    *  this mean minus |s₃| (40,938 fitted vs 40,936 predicted), NOT at the J2000 beat (41,098) — the pole

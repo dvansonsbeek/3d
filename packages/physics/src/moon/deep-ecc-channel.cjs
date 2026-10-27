@@ -12,30 +12,24 @@
  * — the constant remainder pins the unresolved short/ultra-long content at
  * the JPL J2000 seed anchor, so e(J2000) is exact by construction.
  *
- * DOMAIN (decision (ii), proper physics — no mixed device): the ENTIRE
- * lunar chain reads THIS channel — eccAt (the Δe² argument terms),
- * channelIntegral (perigee/node of-date rates), modulation (the
- * month/precession chain and its integrated cycle counts), eFactorAt (the
- * Meeus E-factor). The Sun/clock machinery (eclipse Sun equation of
- * centre, besselian Sun distance, cardinal braid) stays on the H/3 law
- * (moon/ecc-channel.cjs) — a CERTIFICATION split, not a physics one: the
- * two e's agree within 4.2e-5 wherever the domains overlap, and the H/3
- * line keeps its E18 role as the epoch-local tangent inside the fitted
- * clock stack.
+ * DOMAIN (decision (ii)): the ENTIRE lunar chain reads THIS channel — eccAt
+ * (the Δe² argument terms), channelIntegral (perigee/node of-date rates),
+ * modulation (the month/precession chain and its integrated cycle counts),
+ * eFactorAt (the Meeus E-factor). Earth's eccentricity of date is the
+ * N-body series on every other path as well (plan 21: one e-vector of date
+ * on every surface).
  *
- * MEASURED at adoption (banked in the plan record): vs the H/3 law the
- * attractor-mean modulation shifts are +2,526 ppm (perigee channel,
- * s = 2.407) and +1,067 ppm (node, s = 1.018) — month/LOD shifts of
- * ~10–25 ppm class, all 41 paleo anchors in bands; the ancient eclipse
- * stack's cycle counts shift (χ² IMPROVES — recorded with its
- * explanation: this e is La2004-corroborated in-era, 3× closer than the
- * H/3 line; theory-corroborated, never tuned). Beyond ~5 Myr the table is
- * spectrum-class (phases decohere) — the quasi-periodic ATTRACTOR (mean e
- * and the 405-kyr-class beat structure) is the claim, never a pointwise
- * ephemeris.
+ * MEASURED at adoption (banked in the plan record): the attractor-mean
+ * modulation shifts were +2,526 ppm (perigee channel) and +1,067 ppm (node)
+ * against the single-line law it replaced — month/LOD shifts of ~10–25 ppm
+ * class, all 41 paleo anchors in bands; the ancient eclipse stack's cycle
+ * counts shift (χ² IMPROVES — recorded with its explanation: this e is
+ * La2004-corroborated in-era; theory-corroborated, never tuned). Beyond
+ * ~5 Myr the table is spectrum-class (phases decohere) — the quasi-periodic
+ * ATTRACTOR (mean e and the 405-kyr-class beat structure) is the claim,
+ * never a pointwise ephemeris.
  *
- * LOAD-BEARING conventions (carried VERBATIM from the era channel —
- * moon/ecc-channel.cjs — so the certified numerics match):
+ * LOAD-BEARING conventions (the certified numerics):
  *  - channelIntegral uses composite Simpson with step ≤ ~4,000 yr
  *    (N ≥ 2, even);
  *  - modulation(tMa, s) takes age in Myr, positive = past, ≡ 1 at J2000;
@@ -63,7 +57,8 @@
  *
  * — ż_J2000 is the run's own z-rate at J2000 (script-written into the
  * artifact by generate.mjs from the banked series: "we are the source"),
- * T_q the H/12 taper the arguments' rate anchors ride. Inside the canon it
+ * T_q the arguments' secular-completion taper (SECULAR_COMPLETION_TAPER_YEARS,
+ * the one the rate anchors ride). Inside the canon it
  * restores the run's slope exactly; beyond ±T_q it is a constant vector
  * offset of ~3e-3, the size of the table's own spectrum-class scatter
  * there, never a growing polynomial. Absent the two fields (an older

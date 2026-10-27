@@ -145,6 +145,19 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         distanceKmAtYear: (year: number) => number;
         siderealMonthDaysAtYear: (year: number) => number;
         synodicMonthDays: number;
+        eccSensitivities: Readonly<{
+            perigeeEffective: number;
+            nodeEffective: number;
+            perigeePhysical: number;
+            nodePhysical: number;
+            kappaPerCy: number;
+            frameT2DegPerCy2: number;
+            generalPrecessionDegPerCy: number;
+            perigeeRateOfDateDegPerCy: number;
+            nodeRateOfDateDegPerCy: number;
+            perigeeRateIcrfDegPerCy: number;
+            nodeRateIcrfDegPerCy: number;
+        }>;
         lonDegAtJD: (jd: number) => number;
         betaDegAtJD: (jd: number) => number;
         distanceKmAtJD: (jd: number) => number;

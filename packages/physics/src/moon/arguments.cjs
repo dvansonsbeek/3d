@@ -20,8 +20,12 @@
  *    with p the IAU general precession.
  *
  * Construction (docs/66 §1, abridged): linear rates are observational J2000
- * anchors; perigee/node ride the PHASE-AWARE e_E channel integral (s_ϖ
- * 2.407 / s_Ω 1.018, Meeus-effective); Lp's planetary T² remainder rides
+ * anchors; perigee/node ride the PHASE-AWARE e_E channel integral on the
+ * PHYSICAL sensitivities (s_ϖ 2.479 / s_Ω 0.867 — derived from the
+ * Meeus-effective 2.407 / 1.018 by removing the frame's T²;
+ * moon/ecc-sensitivities.cjs, the ONE home) plus the model's own precession
+ * of date, pFix, the ONE frame term every of-date longitude carries (plan 23
+ * — so M′ and F are frame-free at every epoch); Lp's planetary T² remainder rides
  * the bounded e_E² carrier + the obliquity-line carrier (K_PL derived
  * lazily from the closed v4 budget — zero new constants); D and M are
  * identity-composed (D ≡ Lp − L_sun, M ≡ L_sun − ϖ_sun) on the injected
@@ -37,6 +41,8 @@
 // reform). ONE home — time/calendar.cjs; re-exported here for the readers
 // that import it from the arguments module.
 const { jdToDecimalYear } = require('../time/calendar.cjs');
+// The Meeus Ch. 47 argument rates — ONE home (plan 23; the sensitivities' derivation reads the same set).
+const { MEEUS_ARGUMENT_RATES_DEG_PER_CY } = require('./ecc-sensitivities.cjs');
 
 /**
  * @typedef {{Lp: number, D: number, M: number, Mp: number, F: number}} MoonArgsDeg
@@ -59,6 +65,7 @@ const SECULAR_COMPLETION_TAPER_YEARS = 27943.083333333332;
  *     elpEarthFigureJ2ArcsecPerCy2: number,
  *     elpGeneralPrecessionPA_T2ArcsecPerCy2: number,
  *     eccE0: number,
+ *     moonEccSensitivities: ReturnType<typeof import('./ecc-sensitivities.cjs').deriveMoonEccSensitivities>,
  *   },
  *   fns: {
  *     eccAt: (tYr: number) => number,
@@ -94,8 +101,9 @@ function createMoonArguments({ constants, fns }) {
     j2000JD, julianCenturyDays,
     eccentricityJ2000, eccentricityDotJ2000, eccentricityDotDotJ2000,
     elpEarthFigureJ2ArcsecPerCy2, elpGeneralPrecessionPA_T2ArcsecPerCy2,
-    eccE0,
+    eccE0, moonEccSensitivities,
   } = constants;
+  if (!moonEccSensitivities) throw new Error('moon/arguments: constants.moonEccSensitivities is required (the deep-time chain\'s derived pair — plan 23)');
   const {
     eccAt, channelIntegral, computeObliquityEarth, jdToSIyear,
     sunMeanLonDegAtJdTT, sunPerihelionLonDegAtJdTT,
@@ -108,17 +116,26 @@ function createMoonArguments({ constants, fns }) {
   const bundle = (() => {
     const LP0 = 218.3164477, D0 = 297.8501921, M0 = 357.5291092,
           MP0 = 134.9633964, F0 = 93.2720950;
-    const LPR = 481267.88123421, DR = 445267.1114034, MR = 35999.0502909,
-          MPR = 477198.8675055, FR = 483202.0175233;
+    const { Lp: LPR, D: DR, M: MR, Mp: MPR, F: FR } = MEEUS_ARGUMENT_RATES_DEG_PER_CY;   // ONE home (plan 23)
     const WDOT = LPR - MPR;   // perigee ϖ̇ of-date (+4069.0137) = ϖ̇_ICRF + p
     const NDOT = LPR - FR;    // node   Ω̇ of-date (−1934.1363) = Ω̇_ICRF + p
     // e_E channel Taylor CHECKS (documented J2000 reference values — the live
     // path is the phase-aware channelIntegral; T2_*/T3_* are NOT consumed):
     const E0 = eccentricityJ2000, EDOT0 = eccentricityDotJ2000;
     const KAPPA = 3 * E0 * EDOT0 / (1 - E0 * E0);
-    // v4 frame attribution: FRAME-EFFECTIVE exponents (physical pair after
-    // removing the IAU ṗ_A frame term: s_ϖ 2.479 / s_Ω 0.867).
-    const S_W = 2.407, S_N = 1.018;
+    // The sensitivities (plan 23; moon/ecc-sensitivities.cjs, the ONE home). The
+    // Meeus-EFFECTIVE pair S_W/S_N reproduces Meeus's of-date T² exactly — the
+    // documented check below. The live channel runs the PHYSICAL pair
+    // S_W_PHYS/S_N_PHYS (the frame's T² removed; the three-body lab's pure-gravity
+    // values) on the ICRF rates W_ICRF/N_ICRF, and the frame rides separately:
+    // the Meeus polynomial p₀·T + T2F·T² in the snapshot branch (so its T² is
+    // Meeus-exact as before), the model's own precession of date (pFix) in the
+    // deep branch — ONE frame term on L′, ϖ and Ω alike.
+    const SENS = moonEccSensitivities;
+    const S_W = SENS.perigeeEffective, S_N = SENS.nodeEffective;
+    const S_W_PHYS = SENS.perigeePhysical, S_N_PHYS = SENS.nodePhysical;
+    const W_ICRF = SENS.perigeeRateIcrfDegPerCy, N_ICRF = SENS.nodeRateIcrfDegPerCy;
+    const P0 = SENS.generalPrecessionDegPerCy, T2F = SENS.frameT2DegPerCy2;
     const T2_W = S_W * WDOT * KAPPA / 2;   // −0.010318 °/cy² (Meeus ϖ −0.010320)
     const T2_N = S_N * NDOT * KAPPA / 2;   // +0.0020752 °/cy² (Meeus Ω +0.0020753)
     const EDDOT0 = eccentricityDotDotJ2000;
@@ -130,7 +147,7 @@ function createMoonArguments({ constants, fns }) {
     const T2_LP_TIDAL = (-25.86 / 3600) / 2;
     const T2_LP_PLANETARY = -0.0015786 - T2_LP_TIDAL;   // +7.247″/cy²
     const T2_LP = T2_LP_TIDAL + T2_LP_PLANETARY;
-    return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N };
+    return { LP0, D0, M0, MP0, F0, LPR, DR, MR, WDOT, NDOT, T2_W, T2_N, T3_W, T3_N, T2_LP, T2_LP_TIDAL, S_W, S_N, S_W_PHYS, S_N_PHYS, W_ICRF, N_ICRF, P0, T2F };
   })();
 
   // ── Bounded Lp carriers (K_PL / C_OBL derived lazily — zero new constants)
@@ -234,6 +251,23 @@ function createMoonArguments({ constants, fns }) {
     return O.C * sum * h / 3;
   }
   const obliquityCarrier = makeDeepCarrier(obliquityIntegrand, obliquityCarrierDense);
+
+  /** The frame share's REMAINDER for ϖ and Ω (plan 23). The physical exponents gave
+   *  up the frame's T² the Meeus-effective pair carried (T2F, Lieske's); pFix
+   *  supplies the model's own in-window acceleration (ṗΔ_eff/2, self-measured);
+   *  the difference rides the obliquity carrier's integrand, exactly as L′'s
+   *  figure+frame part does — so every of-date longitude's T² stays Meeus-exact
+   *  and ONE frame term (pFix + this remainder) rides L′, ϖ and Ω alike. Bounded
+   *  (the obliquity cycle), ~0.1° at most. Without the (d′) pair (pdSlope 0) the
+   *  whole Lieske share rides here and pFix is 0 — the same frame, one carrier.
+   *  @param {number} T @returns {number} */
+  function frameRemainder(T) {
+    if (T === 0) return 0;
+    const pdHalf = rateCompInit().pdSlopeDegPerCy2 / 2;
+    const t2Obl = (elpEarthFigureJ2ArcsecPerCy2 + elpGeneralPrecessionPA_T2ArcsecPerCy2) / 3600 - pdHalf;   // L′'s carrier normalization (oblInit)
+    const t2Rem = bundle.T2F - pdHalf;
+    return t2Obl === 0 ? 0 : obliquityCarrier(T) * (t2Rem / t2Obl);
+  }
 
   // ── Secular-ë completion carrier (ṅ campaign, plan §12i item 0 (c)) ──────
   // The certified snapshot's Lp T³/T⁴ tail is DERIVED physics (v4 D3,
@@ -446,18 +480,22 @@ function createMoonArguments({ constants, fns }) {
     if (Ntrop === null || Naps === null || Nnod === null) return null;   // tidal-lock guard
     const Tj = (jd - j2000JD) / julianCenturyDays;
     const dy = y - argsY0;
-    // pFix rides Lp ONLY: the obliquity carrier's PA reduction compensates
-    // its ṗΔ·T²/2 there, keeping total Lp T² certified. The apsidal/nodal
-    // chains' own curvature is ALREADY certified-consistent (v4 checks;
-    // pre-(d′) isolation −0.20/+0.13″/cy²), so ϖ/Ω take only the tapered
-    // rate anchors — which self-measure and absorb their Δp rate share.
-    // Deep time: Mp/F inherit Lp's bounded pFix oscillation uncancelled
-    // (physically p-free args; bounded, display-class — documented).
-    const pF = rateCompInit().pFix(dy);
+    // ONE equinox for the three of-date longitudes (plan 23): pFix = ∫(p_dyn − p_kin),
+    // the model's own precession of date beyond the chains' kinematic mean, rides
+    // L′, ϖ AND Ω alike, so the frame-free arguments M′ = L′ − ϖ and F = L′ − Ω
+    // cancel it exactly at every epoch. The apsidal/nodal chains run the PHYSICAL
+    // exponents (the frame's T² is no longer frozen inside them); the Lieske share
+    // they gave up minus pFix's in-window T² rides the obliquity carrier as
+    // frameRemainder, as L′'s figure+frame part does, so ϖ and Ω stay Meeus-exact
+    // in T²; the tapered rate anchors self-measure. (Before plan 23 pFix rode L′ only while the chains
+    // carried the frame share in the Meeus-effective exponents: in the window the
+    // two agreed to 0.006″/cy², beyond it M′ and F inherited the whole wobble —
+    // measured 2.5° at ±10 kyr, 39° at −1 Myr.)
+    const pF = rateCompInit().pFix(dy), fr = frameRemainder(Tj);
     const Lp = A.LP0 + 360 * Ntrop + planetaryCarrier(Tj) + obliquityCarrier(Tj)
       + lpSecularCompletion(Tj) + pF;
-    const w = (A.LP0 - A.MP0) + 360 * Naps;                      // perigee ϖ (of-date, advance)
-    const om = (A.LP0 - A.F0) - 360 * Nnod;                      // node Ω (of-date, regression)
+    const w = (A.LP0 - A.MP0) + 360 * Naps + pF + fr;            // perigee ϖ (of-date, advance)
+    const om = (A.LP0 - A.F0) - 360 * Nnod + pF + fr;            // node Ω (of-date, regression)
     const Lsun = sunMeanLonDegAtJdTT(jd);          // the certified Sun's mean longitude (unwrapped)
     const ws = sunPerihelionLonDegAtJdTT(jd) + 180;   // the Sun's perihelion = Earth's mean ϖ of date + 180° (wrapped; M wraps)
     void A;
@@ -503,8 +541,13 @@ function createMoonArguments({ constants, fns }) {
     const Tc = Math.max(-100, Math.min(100, T));
     const Tc2 = Tc * Tc, Tc3 = Tc2 * Tc, Tc4 = Tc3 * Tc;
     const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
-    const w = (A.LP0 - A.MP0) + A.WDOT * (T + channelIntegral(T, A.S_W));   // perigee ϖ (of-date)
-    const om = (A.LP0 - A.F0) + A.NDOT * (T + channelIntegral(T, A.S_N));   // node Ω (of-date)
+    // Perigee and node (of-date), plan 23: the ICRF rate on the PHYSICAL channel
+    // exponent plus the Meeus polynomial's frame, p₀·T + T2F·T² (clamped with the
+    // other tails) — the T² is Meeus-exact as before, the frame share no longer
+    // rides the eccentricity channel's wiggle. The deep branch carries the model's
+    // own precession of date (pFix) in its place.
+    const w = (A.LP0 - A.MP0) + A.W_ICRF * (T + channelIntegral(T, A.S_W_PHYS)) + A.P0 * T + A.T2F * Tc2;   // perigee ϖ (of-date)
+    const om = (A.LP0 - A.F0) + A.N_ICRF * (T + channelIntegral(T, A.S_N_PHYS)) + A.P0 * T + A.T2F * Tc2;   // node Ω (of-date)
     const Lsun = sunMeanLonDegAtJdTT(jdTT);               // the certified Sun's mean longitude of date
     const ws = sunPerihelionLonDegAtJdTT(jdTT) + 180;     // the Sun's perihelion of date
     return {
@@ -520,12 +563,13 @@ function createMoonArguments({ constants, fns }) {
     const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
     /** @param {number} x */
     const wrap = (x) => ((x % 360) + 360) % 360;
+    const R = MEEUS_ARGUMENT_RATES_DEG_PER_CY;   // the rates' ONE home (plan 23)
     return {
-      Lp: wrap(218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000),
-      D:  wrap(297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
-      M:  wrap(357.5291092 +  35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000),
-      Mp: wrap(134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000),
-      F:  wrap( 93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000),
+      Lp: wrap(218.3164477 + R.Lp * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000),
+      D:  wrap(297.8501921 + R.D * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000),
+      M:  wrap(357.5291092 + R.M * T - 0.0001536 * T2 + T3 / 24490000),
+      Mp: wrap(134.9633964 + R.Mp * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000),
+      F:  wrap( 93.2720950 + R.F * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000),
     };
   }
 

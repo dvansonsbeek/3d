@@ -33,7 +33,7 @@ export function assembleOneSourceMovement(ctx: import("./year-day-lengths.js").C
         periOfDateDegAt: (year: number) => number;
         /** The hybrid's obliquity at a decimal year, degrees — the banked series inside its span, the α(t)-coupled ζ-tail integration beyond (the deep sampler grows ~0.1 s/Myr). @param {number} year @returns {number} */
         epsAt: (year: number) => number;
-        /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span (plan 12 §8.5); null without a series. */
+        /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span; null without a series. */
         obliquityHybridDomainYears: [number, number] | null;
         /** The precession of date's two factors at a decimal year (the factory's own — ONE home). @param {number} year @returns {{solarTorque: number, ellipticity: number}} */
         precessionOfDateFactorsAt: (year: number) => {

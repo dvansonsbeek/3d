@@ -177,6 +177,19 @@ export function createDeepTimeChain(deps: {
         apsidalMeetsNodalSecondsAtAge: (tMa: number) => number | null;
         lunarLevelingSecondsAtAge: (tMa: number) => number | null;
     };
+    moonEccSensitivities: Readonly<{
+        perigeeEffective: number;
+        nodeEffective: number;
+        perigeePhysical: number;
+        nodePhysical: number;
+        kappaPerCy: number;
+        frameT2DegPerCy2: number;
+        generalPrecessionDegPerCy: number;
+        perigeeRateOfDateDegPerCy: number;
+        nodeRateOfDateDegPerCy: number;
+        perigeeRateIcrfDegPerCy: number;
+        nodeRateIcrfDegPerCy: number;
+    }>;
     meanMoonDistanceMetresAtAge: (tMa: number) => number | null;
     meanMoonDistanceAtAge: (tMa: number) => number | null;
     meanLodSecondsAtAge: (tMa: number) => number | null;
@@ -238,14 +251,6 @@ export function createDeepTimeChain(deps: {
     /** @param {number} tMa @param {number} periodJ2000Seconds @returns {number} */
     meanEarthPlanetSynodicPeriodAtAge: (tMa: number, periodJ2000Seconds: number) => number;
 }>;
-/**
- * Moon-channel eccentricity sensitivities (perigee/node), the [g/g₀]^s
- * exponents of the factored deep-time law — Meeus-effective (S_N moved
- * 1.0 → 1.018 with the v4 frame-attribution batch). ONE home since B2 (they
- * were literals in model.js, tools/lib/deep-time.js and script.js `_FW_MOON`).
- */
-export const MOON_ECC_SENSITIVITY_PERIGEE: 2.407;
-export const MOON_ECC_SENSITIVITY_NODE: 1.018;
 /**
  * The ΔT stack's switches. `resonator` gates the swing's δLOD terms; the
  * swing's ΔT term is gated by `resonatorDeltaT` when given (the Node twin

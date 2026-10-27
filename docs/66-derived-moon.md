@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.0
+modelVersion: v27.1
 coefficients: sha256:1d7ef7b022b91f6c
 status: current
 ---
@@ -88,13 +88,27 @@ classical constant:
   ϖ(T) = ϖ₀ + ϖ̇₀·(T + ∫₀ᵀ[(g(e_E(t))/g₀)^s − 1]dt) — the rate speeds up and
   slows down with the e_E phase; the frozen-κ T²/T³ Taylor coefficients
   remain in the code as documented J2000 checks against Meeus. The
-  sensitivities s_ϖ = 2.407 and s_Ω = 1.018, constant across orders, are
-  the Meeus-EFFECTIVE pair: every of-date Meeus T² contains the IAU
-  precession acceleration ṗ_A T² (+1.1054″/cy², IAU2006), and removing that
-  frame term gives the PHYSICAL exponents s_ϖ 2.479 / s_Ω 0.867 — which
-  the 3-body laboratory reproduces from pure gravity at 100.3% / 101.5%
-  (`tools/explore/v4-frame-audit.js`). The effective form runs in the
-  runtime (exact vs Meeus by construction).
+  sensitivities come in two forms (ONE home, `moon/ecc-sensitivities.cjs`,
+  plan 23): the Meeus-EFFECTIVE pair s_ϖ = <!--v:moonEccSensitivityPerigeeEffective-->2.407<!--/v--> /
+  s_Ω = <!--v:moonEccSensitivityNodeEffective-->1.018<!--/v--> reproduces every
+  of-date Meeus T² exactly — and each of those T² contains the equinox's own
+  acceleration, the general precession's T² term
+  (<!--v:moonEccSensitivityFrameT2ArcsecPerCy2-->1.11113<!--/v-->″/cy², Lieske
+  1976, the frame ELP's polynomials embed), a bookkeeping share that has
+  nothing to do with Earth's eccentricity. Removing it by the T² identity
+  s_phys = (s_eff·Ẋ_of-date·κ/2 − T2_frame)/(Ẋ_ICRF·κ/2) gives the PHYSICAL
+  pair s_ϖ <!--v:moonEccSensitivityPerigeePhysical-->2.480<!--/v--> /
+  s_Ω <!--v:moonEccSensitivityNodePhysical-->0.866<!--/v--> — derived from the
+  shipped constants, never typed — which the 3-body laboratory reproduces
+  from pure gravity at 100.3% / 101.5% (`tools/explore/v4-frame-audit.js`).
+  Since plan 23 the runtime carries the PHYSICAL pair in the channel on the
+  ICRF rates, and the frame share rides separately as ONE term on every
+  of-date longitude alike: the Meeus polynomial's p₀T + T2_frame·T² in the
+  snapshot branch (Meeus-exact T² as before), the model's own precession of
+  date (pFix, below) in the deep branch. The frame-free arguments
+  M′ = L′ − ϖ and F = L′ − Ω therefore cancel it exactly at every epoch
+  (the `create-model-parity` counterfactual: +1″/yr on the dynamical
+  precession moves L′, ϖ and Ω and leaves M′ and F within 1e-3″ to −1 Myr).
 - **e_E itself — the engine's own deep z-vector.** The lunar
   channel's eccentricity history is the ±10-Myr deep mode table
   (doc 109 §17, `moon/deep-ecc-channel.cjs`), anchored exactly at the JPL
@@ -170,7 +184,8 @@ classical constant:
   honest statement of the multi-mode e(t) divergence, not a claim of
   zero.
   The of-date RATES are completed the same way (the rate-completion pair
-  in `fwArgsDeep`): (i) `pFix = ∫(p_dyn − p_kin) dy` on Lp — p_dyn the
+  in `fwArgsDeep`): (i) `pFix = ∫(p_dyn − p_kin) dy` on Lp, ϖ AND Ω alike
+  (plan 23 — ONE equinox for the three of-date longitudes) — p_dyn the
   DYNAMICAL axial precession, the published precession period of date
   (the one-family beat inside its window, the composed clock beyond;
   epoch-valid at any age; exposed as
@@ -178,16 +193,26 @@ classical constant:
   chain's sidereal and tropical years the chains embed (one equinox turn per
   T_p(t)). Natively BOUNDED at deep time;
   two-tier cumulative table, frozen beyond ±1 Myr. Its in-window ṗΔ·T²/2
-  (the model-native precession acceleration, 0.658″/cy² — 60% of
-  Lieske's) is REMOVED from the obliquity-carrier normalization so the
-  total Lp T² stays the certified, DE441-validated budget. (ii)
+  (the model-native precession acceleration, self-measured as a secant over
+  the ancient span: 1.069″/cy², 96% of Lieske's 1.111) is REMOVED from the
+  obliquity-carrier normalization so the total Lp T² stays the certified,
+  DE441-validated budget; for ϖ and Ω the same remainder (the Lieske share
+  the physical exponents gave up minus pFix's in-window T²) rides the
+  obliquity carrier's integrand as `frameRemainder`, so their T² stays
+  Meeus-exact too and the frame term is the same function on all three. (ii)
   SELF-MEASURED residual rate anchors on all five of-date compositions
   (±25-yr central difference of the raw compositions vs the certified
   bundle rates at build), applied through the same cos² taper — full in
-  the historical window, frozen ≤ ~0.9° at deep time. ϖ/Ω deliberately
-  do NOT carry pFix: their chains' own curvature is already
-  certified-consistent, and pFix there double-counts the acceleration
-  (measured −1.5″/cy²). Certified state of the completed deep branch:
+  the historical window, frozen ≤ ~0.9° at deep time. Before plan 23 pFix
+  rode Lp only while the apsidal/nodal chains carried the frame share frozen
+  inside the Meeus-effective exponents: in the window the two agreed to
+  0.006″/cy², beyond it M′ and F inherited the whole equinox wobble
+  uncancelled — measured 2.5° at ±10 kyr, 5° at ±20 kyr, 39° at −1 Myr
+  (0.22° of lunar latitude at 10 kyr) — and ϖ/Ω carried a 3% share of the
+  eccentricity channel's own excursion that was never theirs (tens of
+  degrees at 25 kyr). The measured change in the window: M′ −6″ / F −9″
+  around 0 AD, +76″ / +57″ at −3000 (≈ 8″ of lunar longitude, 16 s of
+  eclipse time), zero on L′, D and M. Certified state of the completed deep branch:
   ≤0.06″/cy linears and ≤0.18″/cy² quadratics on ALL five arguments;
   dense-DE441 reads deep ≡ canon in const/linear/quadratic; at the −135
   eclipse instant deep−canon = +8.9″, with the residual vs DE441 there
@@ -220,8 +245,8 @@ classical constant:
   construction, so no polynomial reaches deep time and the bounded-harmonic
   claim is untouched. The rate completion is likewise bounded: the pFix
   table freezes beyond ±1 Myr, the five rate anchors freeze at the
-  taper edge (≤ ~0.9°), and Mp/F inherit Lp's bounded pFix oscillation
-  uncancelled at deep time (physically p-free arguments; display-class).
+  taper edge (≤ ~0.9°), and Mp and F are frame-free at every epoch (plan
+  23: the same pFix on L′, ϖ and Ω cancels in them exactly).
   The scene Moon is prograde at every epoch out to ±1 Gyr by construction.
 
 Certified references of the framework-native default: argument drift vs
@@ -251,10 +276,12 @@ each element's T², but node and perigee share one ė: with the observed
 ė₀ = −4.204e-5/cy the node requires s_Ω = 1.018 and the perigee ratio then
 yields s_ϖ = 2.407 with no freedom — the Meeus-effective pair. First-principles status:
 the laboratory derives the PHYSICAL exponents from pure gravity
-(2.486/0.880) and the of-date record minus the IAU frame acceleration
-requires 2.479/0.867 — agreement 100.3%/101.5%. The runtime's effective
-pair absorbs the frame term and is exact vs Meeus by construction: the
-sensitivities are attributed, not fitted.
+(2.486/0.880) and the of-date record minus the frame acceleration
+requires <!--v:moonEccSensitivityPerigeePhysical-->2.480<!--/v-->/<!--v:moonEccSensitivityNodePhysical-->0.866<!--/v-->
+(derived in `moon/ecc-sensitivities.cjs` from the shipped pair, κ and the
+Lieske T²) — agreement 100.3%/101.5%. The runtime carries the physical pair
+and the frame term separately (plan 23): the sensitivities are attributed,
+not fitted, and the frame is the model's own precession of date.
 
 **The eclipse Sun's eccentricity.** The certified eclipse chain's Sun takes
 its eccentricity from the banked N-body series plus the derived mean-element
@@ -801,7 +828,7 @@ the measured MPP02-vs-JPL comparison floor (~0.33″); dense 2-day JPL
 arbiter λ 2.22″ / β 0.38″; the 179-syzygy fleet Δ-instrument improving;
 NASA centerlines mean <!--v:centerlinesMeanArcsec-->6.2<!--/v-->″ / max
 <!--v:centerlinesMaxArcsec-->10.7<!--/v-->″; audit verdicts 3/13/5/0/5;
-Babylon −135 BestGap <!--v:babylon135BestGapKm-->152<!--/v--> km
+Babylon −135 BestGap <!--v:babylon135BestGapKm-->154<!--/v--> km
 (doc 103). What remains is genuinely floor: the ~0.8″ λ post-census
 residual (sub-0.04″ deep dust + beyond-3-body), the doctrine-blocked
 ~5e-5 parameter class (the three biggest Meeus head amplitudes off by

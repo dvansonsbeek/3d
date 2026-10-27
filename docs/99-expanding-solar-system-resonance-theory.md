@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.0
+modelVersion: v27.1
 coefficients: sha256:1d7ef7b022b91f6c
 status: current
 ---
@@ -316,12 +316,18 @@ Earth's eccentricity:
 rate(t) = [Brown-m² mean of the inertial chain] × [g(t)/g₀]^s,   g = (1 − e_E²)^(−3/2)
 ```
 
-with s_Ω = 1.018 (derived — the leading-order value 1 already reproduces
-Meeus's empirical node T² to 1.8% with no fitting; the shipped 1.018 makes
-the node channel Meeus-exact) and s_ϖ = 2.407 (anchored, the
-Clairaut-amplified apsidal sensitivity; constant across the T²/T³ orders —
-an independent check; the lab-derived physical exponents are 0.867/2.479,
-the 2.407/1.018 pair being their frame-effective Meeus-convention form). e_E(t) is the model's own N-body eccentricity of date (the deep-mode channel, decision (ii) of plan 02 §8). The former H/3 fluctuation line that stood here — e(t) = base·(1 + cos θ(t)/2) on the inclination wheel's phase, whose J2000 eccentricity (−0.9 %) and rate (+1.7 %) were predictions — is deleted at plan 09 step 6; doc 109 §22 keeps the record, and the scene keeps its J2000 phase as a recorded pose. The modulation is bounded at every epoch
+with the PHYSICAL sensitivities s_Ω = <!--v:moonEccSensitivityNodePhysical-->0.866<!--/v--> and
+s_ϖ = <!--v:moonEccSensitivityPerigeePhysical-->2.480<!--/v--> (the Clairaut-amplified
+apsidal sensitivity), derived from the Meeus-effective pair
+<!--v:moonEccSensitivityPerigeeEffective-->2.407<!--/v--> / <!--v:moonEccSensitivityNodeEffective-->1.018<!--/v-->
+— the values that reproduce Meeus's of-date T² exactly — by removing the
+equinox's own acceleration those T² embed (doc 66 §1; the three-body
+laboratory reproduces the physical pair from pure gravity at 100.3 % / 101.5 %).
+The frame term rides separately, as the model's own precession of date, on
+the mean longitude, the perigee and the node alike, so the frame-free
+arguments M′ and F cancel it at every epoch (plan 23). e_E(t) is the model's
+own N-body eccentricity of date (the deep-mode channel; doc 109 §23 for the
+retired single-line law). The modulation is bounded at every epoch
 (e ∈ [0.0077, 0.0231]: perigee within ±0.1%, node within ±0.04%), so the
 mean is the law and the modulation a bounded oscillation about it — while
 Meeus's empirical T² polynomial, correct locally, diverges without bound at

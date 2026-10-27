@@ -32,8 +32,8 @@ export function assembleOneSourceMovement(ctx) {
   // path; the npm package alone has no 8 MB series), the movement runs the
   // SERIES tier exactly like the browser — killing the mode-vs-series
   // value split (measured: 6 s on the anomalistic year at J2000).
-  // The ONE-SOURCE movement: the hybrid's ε(t) (plan 06 Phase 3 S3b — THE
-  // published obliquity) and the one-family year lengths, on the same
+  // The ONE-SOURCE movement: the hybrid's ε(t) (THE published obliquity) and
+  // the one-family year lengths, on the same
   // per-tier sampler.
   const oneSourceM = (() => {
     const AEarth = /** @type {any} */ (CHAIN_ARTIFACT).j2000AnchorElements.earth;
@@ -47,7 +47,7 @@ export function assembleOneSourceMovement(ctx) {
     // 108.6 ± 8.5).
     const seriesArt = /** @type {any} */ (secularSeriesArtifact);
     const sb = seriesArt && seriesArt.bodies && seriesArt.bodies.earth;
-    // Plan 12 §8.5 (owner): the hybrid's own domain is the banked ζ series' span (years; null
+    // The hybrid's own domain is the banked ζ series' span (years; null
     // without a series). Beyond it the ζ-mode tail carries the Quaternary mean with no tidal
     // evolution — the API refuses the obliquity there and serves the cited mean beside it.
     const obliquityHybridDomainYears = sb
@@ -73,13 +73,13 @@ export function assembleOneSourceMovement(ctx) {
       obliquityJ2000Deg: C.earthOrbital.obliquityJ2000_deg,
       // The CONSTANT's scaling (the torque period), not the published rate of date: the
       // integration's own ŝ·n̂ carries the obliquity's cosine, so the cited mean obliquity's
-      // factor (plan 12 §8 option (a)) must not enter twice. Bit-identical to the pre-§8 form.
+      // factor must not enter twice.
       axialPrecessionYearsAtYearFn: (yr) => deepLod.lunisolarTorquePeriodYearsAtAge((startmodelYear - yr) / 1e6) ?? axial0,
       // THE PRECESSION OF DATE: on top of the secular law above, the solar
       // torque at the eccentricity of date and the oblateness of date from
       // the GIA channel — both exactly 1 at J2000, so the J2000 anchor is
       // untouched. The channel is
-      // read PURE (alphaGia, not the lattice-pin-aware earthMoiFactorAtAge):
+      // read PURE (alphaGia, not the pinned earthMoiFactorAtAge):
       // the samplers are cached, their values must be pure in year.
       solarTorqueShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
       // options.giaEllipticityOfDate === false: the orbital forcing alone (the T1 line derivation).
@@ -100,7 +100,7 @@ export function assembleOneSourceMovement(ctx) {
       if (need > 2000000) {
         // The deep tier (5000-yr grid): walked in the queried DIRECTION only,
         // to two nodes past the query, and EXTENDED by the factory's shared
-        // walk when a deeper epoch arrives (plan 13 A1). It was built to
+        // walk when a deeper epoch arrives. It was built to
         // ±1.25·|t| in both directions and rebuilt from J2000 on every deeper
         // probe — bit-identical values, 4× the RK4 steps of one walk.
         const span = Math.ceil((Math.abs(t) + 2 * 5000) / 5000) * 5000;
@@ -127,7 +127,7 @@ export function assembleOneSourceMovement(ctx) {
       periOfDateDegAt: (year) => sampleAt(year).periOfDateDeg,
       /** The hybrid's obliquity at a decimal year, degrees — the banked series inside its span, the α(t)-coupled ζ-tail integration beyond (the deep sampler grows ~0.1 s/Myr). @param {number} year @returns {number} */
       epsAt: (year) => sampleAt(year).epsDeg,
-      /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span (plan 12 §8.5); null without a series. */
+      /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span; null without a series. */
       obliquityHybridDomainYears,
       /** The precession of date's two factors at a decimal year (the factory's own — ONE home). @param {number} year @returns {{solarTorque: number, ellipticity: number}} */
       precessionOfDateFactorsAt: (year) => hist.precessionOfDateFactorsAt(year - 2000),
@@ -139,7 +139,7 @@ export function assembleOneSourceMovement(ctx) {
   })();
   const yearLengthsM = oneSourceM.yearLengths;
   /** THE one-family tropical year of date in SI seconds: route B inside the
-   *  one-family window, the tidal-chain year beyond (plan 06 R1 — the Sun's
+   *  one-family window, the tidal-chain year beyond (the Sun's
    *  mean longitude, the cardinal instants and the published year lengths
    *  all ride this one function). @param {number} year @returns {number} */
   const oneFamilyTropicalYearSeconds = (year) => (Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS

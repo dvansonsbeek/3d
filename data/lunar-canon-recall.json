@@ -8,26 +8,26 @@
   "tightWindowMinutes": 15,
   "canonEvents": 12064,
   "modelEvents": 12147,
-  "matched": 12003,
-  "matchedTight": 9868,
-  "typeMismatch": 61,
+  "matched": 12002,
+  "matchedTight": 9869,
+  "typeMismatch": 62,
   "modelOnly": 83,
   "nasaOnly": 0,
   "recallPercent": 100,
-  "tightRecallPercent": 81.8,
+  "tightRecallPercent": 81.81,
   "typeAccuracyPercent": 99.49,
   "byEra": {
     "-2000..-1501": {
       "n": 1219,
-      "signedMedianMinutes": -6.4
+      "signedMedianMinutes": -6.42
     },
     "-1500..-1001": {
       "n": 1210,
-      "signedMedianMinutes": 5.98
+      "signedMedianMinutes": 5.97
     },
     "-1000..-501": {
       "n": 1200,
-      "signedMedianMinutes": 0.91
+      "signedMedianMinutes": 0.9
     },
     "-500..-1": {
       "n": 1191,
@@ -43,7 +43,7 @@
     },
     "1000..1499": {
       "n": 1217,
-      "signedMedianMinutes": -0.49
+      "signedMedianMinutes": -0.5
     },
     "1500..1999": {
       "n": 1216,
@@ -65,9 +65,9 @@
   "inputs": {
     "generator": "node tools/verify/lunar-canon-recall.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:0ca81ac7571f6897582e2fcebf808510d2cb7c9ee8379909032a996f30e9053c",
+      "data/core-mantle-resonator-stage1.json": "sha256:59b78951e9b44e596f1b1d23a00ac02d068c81925bcd4053c2890a35049fedd4",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "data/deltaT-4flag-fit.json": "sha256:921d0682b2c638c4752a951601fc01409b78d970cdc2c3c983d2413a4d06b974",
+      "data/deltaT-4flag-fit.json": "sha256:5f109edcdfef68b508178f2a52c41ae3b4b1459e074c1836ce0f652f7efccf0e",
       "data/nbody-secular-series.json": "sha256:bd7122a7a1d1a53ba7f66c05dc2a55a48aff0cdc6014472e49559f5715070e40",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:cfc9a64b09599709339dd750d69f259af5b280cbe9034bdab5d13ddcc6aa9f8b",
@@ -75,30 +75,30 @@
       "packages/physics/src/earth/year-lengths.cjs": "sha256:e61f895cded7dbf61754628196c4ddf8a1e0f15d056bdabca696f77864ff94d6",
       "packages/physics/src/eclipse/finders.cjs": "sha256:168755d5e01397b7f63f2ffa49101afe0da0046e5fbd9e7ef6d04be6d7f5d330",
       "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
-      "packages/physics/src/model/cardinal-instants.js": "sha256:66caad766e1a3fd80f52a2d235166a558d6eb2c15188463a76ef96f2e27449d3",
+      "packages/physics/src/model/cardinal-instants.js": "sha256:78cd252af6173f2127b81d8a49680452574fae63786be980f1f8fa96368248df",
       "packages/physics/src/model/context.js": "sha256:6d356f27e3f5cd8f88ec1e0035a032e641c65f4c4de4985262053ff28709de03",
-      "packages/physics/src/model/deep-time-chain.js": "sha256:2e1517e70cd5af0cdd4ea049764278b935c411f5f31b571621940c010284d41f",
+      "packages/physics/src/model/deep-time-chain.js": "sha256:fd0ffb4c4fb5c10ee13bc8af9f2c76246434da45829f8a9687ff86831f520474",
       "packages/physics/src/model/delta-t.js": "sha256:cac4dc717893e580bb8744e10ce4b0592f4a4bbbaa8ee58b613df866ab99d49c",
       "packages/physics/src/model/derived-constants.js": "sha256:c401d5dcd0879cea6b6ca010e2e9abc7ec9d9288d2ea88aabc29dc162f7fc99a",
       "packages/physics/src/model/earth-scalars.js": "sha256:292024c388ae42ad31976fd7b0cbc98b9736de06b3bc81b7a63667a6f2a959c5",
       "packages/physics/src/model/inv-plane-elements.js": "sha256:97fc18474b126f589d4e29fc69f9e2d59611577afffed1b2a884360fe37f3117",
-      "packages/physics/src/model/lunar-theory.js": "sha256:16f0904a6e090c8fe057233d1db6c30dfb93ef76c7a540ce574492188b9ecff5",
+      "packages/physics/src/model/lunar-theory.js": "sha256:e0b40af753c2b88d72784348becf495e20104c0b6aea1766c3937ff006b6d1da",
       "packages/physics/src/model/moon-epoch.js": "sha256:6ab1a890b71d8459333d4f8c99a386a030ae199855b308fbd3b926fb77c0daad",
-      "packages/physics/src/model/one-source-movement.js": "sha256:118a8de5cf8b27c3b19fae40d358791aba12b920d0638b263eec66fc59f7a63a",
+      "packages/physics/src/model/one-source-movement.js": "sha256:8cec12902a3901143f8dc23e7f1ca61d7f349c5b3775c752a8cf5bdc14ebe5cf",
       "packages/physics/src/model/planet-elements-of-date.js": "sha256:1069316fec3656c8dc8465314659d5ecf45238c4dce15992b5fdab4985a18731",
-      "packages/physics/src/model/planet-records.js": "sha256:944a79363b7520e3e37035e6710994d12a7f7c70c866887d670f81513affa716",
+      "packages/physics/src/model/planet-records.js": "sha256:0a062111bcd59414736f56b027306690dae054dc4b5ce86812b14f09ff312f7c",
       "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",
-      "packages/physics/src/model/published-periods.js": "sha256:245e65eb1acfe27a66cad6675a8ac717d153538e7fd09e47fde38a501daa2052",
-      "packages/physics/src/model/sun-and-eclipses.js": "sha256:d2d9e24fffeefcf98fad882ddd6380ca80e02bfd2a307b4c16979e93a2ff6efb",
-      "packages/physics/src/model/surface.js": "sha256:de0b6a7030d6357e92a2811b6f80857a8d29b027aee19fb68c4a9ba60cb13ecf",
+      "packages/physics/src/model/published-periods.js": "sha256:1e18f705212f7aeec39bcddeb9fadbba04e2fad2041a97874705f4076cd57189",
+      "packages/physics/src/model/sun-and-eclipses.js": "sha256:fd748ae296179cd48f4007d8e61217c101ffe41d6fe0f1a32ac04cfdccf75041",
+      "packages/physics/src/model/surface.js": "sha256:1d89e6a4d760a5958ad8db224e7b91b0a52e2347a330038d1ba952796d51511a",
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
-      "packages/physics/src/moon/arguments.cjs": "sha256:da666af19754f9bfa767aa61564ccc3e458773f6f1ce14d4dedd146ad1594bde",
-      "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7ce15d1c4f61f2ea730d7673d705a1eb2a31bff20b720cd00d8f1d34a3e85220",
-      "packages/physics/src/moon/month-chain.cjs": "sha256:26a20d998d4f028da23ea3260d3e065c7bf7293d51666e1d9125c057f65c48c9",
-      "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
-      "packages/physics/src/moon/series.cjs": "sha256:feb2174fce4bb446f2d699f750b8269c7d70a289107f3d9b639b85b634b2459b",
+      "packages/physics/src/moon/arguments.cjs": "sha256:73a6ac9593342364f3dcf37399a33c7810d060a1ecdda4c71d28da23a7f443fe",
+      "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:0990e5c8a72791a6141c147bf9c8742e440503d34a891e881692bee14308967a",
+      "packages/physics/src/moon/month-chain.cjs": "sha256:3465792a575f5d497e50fde8371d5a3273f727639e4eb994d1fe73743d961b14",
+      "packages/physics/src/moon/series-extension.cjs": "sha256:f93ac2d259b3abbffda1b0e5232e6b310854da38ad8bc2bb89a40195ee4d273b",
+      "packages/physics/src/moon/series.cjs": "sha256:161402138d58e7416847ca011ef9123ac71aebaf0591af6ccc3cc755e320fe69",
       "public/input/astro-reference.json": "sha256:c82738ae33b5460ca7bdc737032a04f5cd39d6186e78a41179a913a25595b955",
       "public/input/climate-formula-coefficients.json": "sha256:75589358ec492aed36585312d72f634f8498cc1d35114728ce93b0491ae2054b",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",

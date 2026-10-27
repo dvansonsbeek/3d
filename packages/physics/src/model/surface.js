@@ -94,7 +94,7 @@ export function assembleSurface(ctx) {
       // one-family inside the window, the tidal-chain mean beyond.
       tropicalYearSecondsAtYear: publishedTropicalYearSecondsAtYear,
     }),
-    // Plan 06 Phase 3 S3 → S5 — the lunisolar precession clock as a
+    // The lunisolar precession clock as a
     // first-class surface: Earth's spin clock, ONE home for its published
     // faces, spoken in PERIODS and their RATIOS — no unit, no integer.
     // ONE J2000 reading: every face reads 25,771.6 yr at J2000 — the
@@ -108,7 +108,7 @@ export function assembleSurface(ctx) {
     lunisolar: Object.freeze({
       /** The mean lunisolar precession period T_p(t), years — 1,296,000/the precession RATE of date (25,771.6 at J2000): THE published deep-time clock. @param {number} year @returns {number} */
       meanPeriodYearsAtYear: (year) => { const p = deepLod.lunisolarPrecessionPeriodYearsAtAge(yearToTMa(year)); return p === null ? certifiedAxialPrecessionJ2000Years() : p; },
-      /** THE PRECESSION RATE OF DATE ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0), ″/yr — the constant's scaling on the spin and the lunar torque times the cited mean obliquity's cosine (plan 12 §8 option (a); p₀ = 50.2880, the IAU 2006 input). @param {number} year @returns {number} */
+      /** THE PRECESSION RATE OF DATE ψ̇(t) = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] × cos ε̄(t)/cos ε̄(0), ″/yr — the constant's scaling on the spin and the lunar torque times the cited mean obliquity's cosine (p₀ = 50.2880, the IAU 2006 input). @param {number} year @returns {number} */
       meanRateArcsecPerYrAtYear: (year) => { const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(year)); return r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r; },
       /** THE PRECESSION CONSTANT OF DATE as a rate on the J2000 obliquity, ″/yr — the spin and torque scaling alone (the hybrid obliquity integration's integrand: its own ŝ·n̂ carries the cosine). @param {number} year @returns {number} */
       torqueRateArcsecPerYrAtYear: (year) => { const r = deepLod.lunisolarTorqueRateArcsecPerYrAtAge(yearToTMa(year)); return r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r; },
@@ -212,9 +212,9 @@ export function assembleSurface(ctx) {
       // its deep mean is the Quaternary mean on the tail's mean plane (plan 12
       // §8.3). The cited mean obliquity of date is `meanObliquityCitedDeg`.
       obliquityDeg: /** @param {number} year @returns {number} */ (year) => oneSourceM.epsAt(year),
-      /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span, ±10 Myr about J2000 (plan 12 §8.5: the published surfaces serve `obliquityDeg` inside it only; null without a series, i.e. a bare createModel()). */
+      /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span, ±10 Myr about J2000 (the published surfaces serve `obliquityDeg` inside it only; null without a series, i.e. a bare createModel()). */
       obliquityHybridDomainYears: oneSourceM.obliquityHybridDomainYears,
-      /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column; plan 12 §8 option (a)), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
+      /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
       meanObliquityCitedDeg: /** @param {number} year @returns {number} */ (year) => { const e = chain.meanObliquityCitedDegAtAge(yearToTMa(year)); return e === null ? NaN : e; },
       eccentricity: eccentricityAt,
       inclinationDeg,
@@ -234,7 +234,7 @@ export function assembleSurface(ctx) {
       siderealDaySeconds,
       stellarDaySeconds,
     }),
-    // Plan 06 R1: the instants are the crossings of the ONE Sun (the
+    // The instants are the crossings of the ONE Sun (the
     // certified completed Sun the scene renders), UT model-JD; the RA at a
     // crossing is the target longitude by construction (λ = 0/90/180/270 ⇒
     // RA = 0/90/180/270, any obliquity); the per-type year length is the
@@ -266,6 +266,10 @@ export function assembleSurface(ctx) {
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceKmAtYearOrNaN(year),
       siderealMonthDaysAtYear: moonSiderealMonthDaysAt,
       synodicMonthDays: moonSynodicMonthDays,
+      // The perigee/node eccentricity sensitivities (plan 23): the Meeus-effective
+      // pair the record fixes and the PHYSICAL pair the runtime derives from it
+      // (moon/ecc-sensitivities.cjs, the ONE home) — the registry's source.
+      eccSensitivities: chain.moonEccSensitivities,
       // The apparent-position chain (truncated Meeus Ch. 47 series on
       // framework-native arguments). JD(UT) axis — UT→TT applied internally.
       lonDegAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedLonDeg(jd),
@@ -288,7 +292,7 @@ export function assembleSurface(ctx) {
       sunLonCompletedDegAtJD: /** @param {number} jd @returns {number} */ (jd) =>
         eclipseFinders.sunLonDegAt(jd)
         - sunPlanetaryCompletionDeg((jdTTFromUT(jd) - j2000JD) / julianCenturyDays),
-      /** The APPARENT Sun (completed geometric − the derived aberration constant + the leading nutation terms on the model's own arguments) — the quantity Horizons' observer ecliptic longitude is; the cardinal instants are its crossings (plan 06 R1/I1). @param {number} jdUT @returns {number} */
+      /** The APPARENT Sun (completed geometric − the derived aberration constant + the leading nutation terms on the model's own arguments) — the quantity Horizons' observer ecliptic longitude is; the cardinal instants are its crossings. @param {number} jdUT @returns {number} */
       sunApparentLonDegAtJD: /** @param {number} jdUT @returns {number} */ (jdUT) => sunApparentLonDegAtJdUT(jdUT),
       findLunarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd),
       findSolarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd),

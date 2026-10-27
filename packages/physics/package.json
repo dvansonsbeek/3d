@@ -1,9 +1,9 @@
 {
   "name": "@essrt/physics",
-  "version": "25.0.1",
+  "version": "26.0.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
-    "modelVersion": "v27.0",
+    "modelVersion": "v27.1",
     "_note": "The model identity this package version ships (IP-unified-architecture §10: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
   },
   "type": "module",
@@ -39,6 +39,7 @@
     "./math/angles": { "types": "./types/math/angles.d.cts", "default": "./src/math/angles.cjs" },
     "./cardinal/one-source-structure": { "types": "./types/cardinal/one-source-structure.d.cts", "default": "./src/cardinal/one-source-structure.cjs" },
     "./moon/deep-ecc-channel": { "types": "./types/moon/deep-ecc-channel.d.cts", "default": "./src/moon/deep-ecc-channel.cjs" },
+    "./moon/ecc-sensitivities": { "types": "./types/moon/ecc-sensitivities.d.cts", "default": "./src/moon/ecc-sensitivities.cjs" },
     "./moon/deep-modes-artifact": { "types": "./types/moon/deep-modes-artifact.d.cts", "default": "./src/moon/deep-modes-artifact.cjs" },
     "./earth/deep-orbital-history": { "types": "./types/earth/deep-orbital-history.d.cts", "default": "./src/earth/deep-orbital-history.cjs" },
     "./earth/sidereal-year-channel": { "types": "./types/earth/sidereal-year-channel.d.cts", "default": "./src/earth/sidereal-year-channel.cjs" },

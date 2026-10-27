@@ -18,9 +18,9 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
             M0: number;
             MP0: number;
             F0: number;
-            LPR: number;
-            DR: number;
-            MR: number;
+            LPR: 481267.88123421;
+            DR: 445267.1114034;
+            MR: 35999.0502909;
             WDOT: number;
             NDOT: number;
             T2_W: number;
@@ -31,6 +31,12 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
             T2_LP_TIDAL: number;
             S_W: number;
             S_N: number;
+            S_W_PHYS: number;
+            S_N_PHYS: number;
+            W_ICRF: number;
+            N_ICRF: number;
+            P0: number;
+            T2F: number;
         };
         _rateCompletion: () => {
             rc: {
