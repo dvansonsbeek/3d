@@ -127,11 +127,12 @@ Longitude** categories plot these mean elements of date against Meeus's
 polynomials inside ±10 kyr and La2004 across ±250 kyr. Its two exhibit
 categories **Perihelion — osculating vs mean** and **Eccentricity — osculating
 vs mean** (plan 22) draw the osculating orbit beside the mean on their own
-short windows (1990–2030 up to 1000–2500): the osculating curve is the
+windows, shortest first (1990–2030, 1950–2050, 1800–2200, 1000–2500; the
+hover steps by 1, 5 or 10 years with the window): the osculating curve is the
 generated table `data/earth-osculating-wobble.json` — the model's own
 nine-body integration of the J2000 seed with the 1PN term and the lunar
-quadrupole over 1800–2200 every 10 days (`tools/verify/earth-osculating-wobble.js`,
-whose window mean of osculating − mean reads −0.44″ / 1.0e-7: the series is
+quadrupole over 1000–2500 every 20 days (`tools/verify/earth-osculating-wobble.js`,
+whose window mean of osculating − mean reads +0.39″ / 1.8e-7: the series is
 the mean element) — so a reader sees the few-hundred-arcsecond Jupiter wobble
 around the slowly turning mean, and in the residual view the wobble alone.
 

@@ -3731,7 +3731,7 @@ if (typeof window !== 'undefined') {
       meeusMeanObliquityRad: meeusMeanObliquityRad((yearToJDApprox(year) - j2000JD) / julianCenturyDays),
     }),
     refStephensonAt: (year, poly) => stephensonDeltaT(year, poly),
-    // plan 22 step 2 — the osculating-orbit exhibit table (null until it lands / outside 1800–2200)
+    // plan 22 step 2 — the osculating-orbit exhibit table (null until it lands / outside 1000–2500)
     oscWobbleAt: (year) => _oscWobbleAt(year),
     oscWobbleLoaded: () => _oscWobbleData !== null,
     // ── VFP "Inclination of all planets" smoke surface ───────────────────────
@@ -15071,7 +15071,7 @@ let _zetaSeriesEndYr = 0;
 }
 // PLAN 22 STEP 2 — the osculating-orbit exhibit. data/earth-osculating-wobble.json
 // (tools/verify/earth-osculating-wobble.js): the Earth–Moon barycentre's
-// OSCULATING e and ϖ every 10 days over 1800–2200 from the model's own nine-body
+// OSCULATING e and ϖ every 20 days over 1000–2500 from the model's own nine-body
 // integration (1PN + the lunar quadrupole), beside the series' MEAN at the same
 // instants, both ϖ on the equinox of date. Nothing in the model reads it — it is
 // the drawing the Framework Verification panel's "osculating vs mean" categories
@@ -15098,8 +15098,8 @@ let _oscWobbleData = null;   // {t[], oscE[], oscPomOfDateDeg[]} — decimal yea
   })();
 }
 /** The osculating element at a decimal year from the exhibit table (linear in the
- *  10-day grid; ϖ unwrapped across a 360° seam): {e, pomOfDateDeg}, or null outside
- *  1800–2200 / before the table lands. */
+ *  20-day grid; ϖ unwrapped across a 360° seam): {e, pomOfDateDeg}, or null outside
+ *  1000–2500 / before the table lands. */
 function _oscWobbleAt(year) {
   const d = _oscWobbleData;
   if (!d || year < d.t[0] || year > d.t[d.t.length - 1]) return null;
@@ -15536,28 +15536,32 @@ const VFP_CATEGORIES = [
   // and the wobble is 1/40 of the mean's drift over 1500 yr; the owner's point).
   // The osculating curve is the generated table data/earth-osculating-wobble.json
   // (the model's own nine-body integration with the 1PN term and the lunar
-  // quadrupole, 1800–2200, 10-day grid — _oscWobbleAt); the mean is the SAME
+  // quadrupole, 1000–2500, 20-day grid — _oscWobbleAt); the mean is the SAME
   // function the perihelion / eccentricity categories plot. Nothing in the
   // model changes here: a reader's picture of what "mean" averaged away.
+  // The tabs run from the shortest window to the longest (owner); their keys
+  // share the panel-wide current-window state with the standard tabs, so
+  // 'recent' is this category's shortest window. Sampling keeps ≥ 12 points
+  // per 11.9-yr cycle on every window (1500 samples = one per year on 1000–2500).
   {
     id: 'perihelion-wobble', group: 'Earth orbit', label: 'Perihelion — osculating vs mean', unit: '°', precision: 4,
-    frame: 'Longitude of Earth’s perihelion (degrees) from the equinox of date — the published MEAN orbit beside the OSCULATING orbit of the instant, 1800–2200',
+    frame: 'Longitude of Earth’s perihelion (degrees) from the equinox of date — the published MEAN orbit beside the OSCULATING orbit of the instant, 1000–2500',
     reading: 'Two things are both called Earth’s perihelion. The osculating one (reference) is the ellipse the Earth–Moon barycentre would follow if every other planet vanished this instant; the planets pull it about, so it swings a few hundred arcseconds up and down, mostly in Jupiter’s 11.9-year rhythm, with smaller ripples at the other synodic periods. The mean one (model) is that wobble averaged out — and it still moves: the slow slope of the model line is the perihelion advancing about 1,161″ per century against the stars. Every Earth value the model publishes, and the eclipse Sun’s equation of centre, read the mean; the wobble reaches the Sun’s longitude through the planetary terms. The residual view shows the wobble alone.',
     yLabel: 'degrees',
     residualLabel: 'arcseconds', residualScale: 3600,
     paperTitle: 'Perihelion — Osculating vs Mean',
     tabs: [
-      { key: 'recent', label: '1000 – 2500 AD', range: [1000, 2500], samples: 300 },
-      { key: 'era', label: '1800 – 2200 AD', range: [1800, 2200], samples: 600 },
-      { key: 'quaternary', label: '1950 – 2050 AD', range: [1950, 2050], samples: 300 },
-      { key: 'myr', label: '1990 – 2030 AD', range: [1990, 2030], samples: 300 },
+      { key: 'recent', label: '1990 – 2030 AD', range: [1990, 2030], samples: 300 },
+      { key: 'era', label: '1950 – 2050 AD', range: [1950, 2050], samples: 300 },
+      { key: 'quaternary', label: '1800 – 2200 AD', range: [1800, 2200], samples: 800 },
+      { key: 'myr', label: '1000 – 2500 AD', range: [1000, 2500], samples: 1500 },
     ],
     model: { name: 'This model (mean orbit of date)', color: '#f0b040',
       fn: year => _hybridSpinActive()
         ? _hybridSeriesSampleAt(year).periOfDateDeg
         : wrap360(_chainPerihelionEclLonDeg('earth', yearToJDApprox(year)) + (360 / _certifiedAxialPrecessionJ2000Years()) * (year - 2000)) },
     references: [
-      { name: 'Osculating orbit (model N-body, 1PN + lunar quadrupole)', color: '#4fc3f7', validYears: [1800, 2200],
+      { name: 'Osculating orbit (model N-body, 1PN + lunar quadrupole)', color: '#4fc3f7', validYears: [1000, 2500],
         fn: year => { const o = _oscWobbleAt(year); return o ? o.pomOfDateDeg : NaN; } },
     ],
     j2000extras: [
@@ -15567,21 +15571,21 @@ const VFP_CATEGORIES = [
   },
   {
     id: 'eccentricity-wobble', group: 'Earth orbit', label: 'Eccentricity — osculating vs mean', unit: '', precision: 8,
-    frame: 'Earth’s orbital eccentricity (dimensionless) — the published MEAN orbit beside the OSCULATING orbit of the instant, 1800–2200',
+    frame: 'Earth’s orbital eccentricity (dimensionless) — the published MEAN orbit beside the OSCULATING orbit of the instant, 1000–2500',
     reading: 'The same two orbits in eccentricity: the osculating ellipse (reference) breathes by about 2e-5 with Jupiter’s 11.9-year period and the other planets’ synodic terms; the mean (model) is the wobble averaged out and falls slowly today — about 4.2e-5 per century — on its way through the 100-kyr and 405-kyr cycles the longer windows of the Eccentricity category show. Over one century the drift of the mean and the swing of the osculating orbit are the same size, which is why both are visible here and neither is on the ±23-kyr window.',
     yLabel: 'eccentricity',
     residualLabel: 'eccentricity (dimensionless)', residualScale: 1,
     paperTitle: 'Eccentricity — Osculating vs Mean',
     tabs: [
-      { key: 'recent', label: '1000 – 2500 AD', range: [1000, 2500], samples: 300 },
-      { key: 'era', label: '1800 – 2200 AD', range: [1800, 2200], samples: 600 },
-      { key: 'quaternary', label: '1950 – 2050 AD', range: [1950, 2050], samples: 300 },
-      { key: 'myr', label: '1990 – 2030 AD', range: [1990, 2030], samples: 300 },
+      { key: 'recent', label: '1990 – 2030 AD', range: [1990, 2030], samples: 300 },
+      { key: 'era', label: '1950 – 2050 AD', range: [1950, 2050], samples: 300 },
+      { key: 'quaternary', label: '1800 – 2200 AD', range: [1800, 2200], samples: 800 },
+      { key: 'myr', label: '1000 – 2500 AD', range: [1000, 2500], samples: 1500 },
     ],
     model: { name: 'This model (mean orbit of date)', color: '#f0b040',
       fn: year => _sceneEccTargetAt(year) },
     references: [
-      { name: 'Osculating orbit (model N-body, 1PN + lunar quadrupole)', color: '#4fc3f7', validYears: [1800, 2200],
+      { name: 'Osculating orbit (model N-body, 1PN + lunar quadrupole)', color: '#4fc3f7', validYears: [1000, 2500],
         fn: year => { const o = _oscWobbleAt(year); return o ? o.e : NaN; } },
     ],
     j2000extras: [
@@ -19404,7 +19408,12 @@ function _vfpGenericAfterRender(bodyEl) {
       if (!r.width) return;
       const px = ((e.clientX - r.left) / r.width) * C.W;
       if (px < C.PAD.l || px > C.W - C.PAD.r) { hide(); return; }
-      const yr = Math.round((C.yearMin + ((px - C.PAD.l) / C.plotW) * (C.yearMax - C.yearMin)) / 10) * 10;
+      // the hover snaps to a step the window can show: 1 yr on a window up to 60 yr,
+      // 5 yr up to 200 yr, 10 yr beyond (the standard windows keep their 10-yr step;
+      // the exhibit categories' 1990–2030 and 1950–2050 windows read per year / per
+      // 5 years — owner, plan 22)
+      const spanYr = C.yearMax - C.yearMin, stepYr = spanYr <= 60 ? 1 : spanYr <= 200 ? 5 : 10;
+      const yr = Math.round((C.yearMin + ((px - C.PAD.l) / C.plotW) * spanYr) / stepYr) * stepYr;
       const cx = (C.PAD.l + ((yr - C.yearMin) / (C.yearMax - C.yearMin)) * C.plotW).toFixed(1);
       cursors.forEach((c) => { if (c) { c.setAttribute('x1', cx); c.setAttribute('x2', cx); c.setAttribute('visibility', 'visible'); } });
       // values only (owner: the Δ column is not needed — the residual chart

@@ -533,12 +533,14 @@ The `test:snapshot` chain also carries:
   — osculating vs mean" on their own windows (1990–2030 … 1000–2500), whose
   reference curve is the fetch-loaded table `data/earth-osculating-wobble.json`
   (the generator `earth-osculating-wobble.js`: the model's own nine-body
-  integration with the 1PN term and the lunar quadrupole, 1800–2200, 10-day
+  integration with the 1PN term and the lunar quadrupole, 1000–2500, 20-day
   grid; its `--write` REFUSES if the window mean of osculating − mean leaves
-  3″ / 5e-7 — the series IS the mean element, measured −0.44″ / 1.0e-7); the
-  golden pins the table at 1950 / 2000 / 2024 and its null outside the span
-  (`oscWobble.*`), waited for after the main pass so the wait cannot move the
-  timing of any other row.
+  3″ / 5e-7 — the series IS the mean element, measured +0.39″ / 1.8e-7 over
+  the whole span, −0.44″ / 1.0e-7 over 1800–2200); the golden pins the table
+  at 1200 / 1950 / 2000 / 2024 and its null outside the span (`oscWobble.*`),
+  waited for after the main pass so the wait cannot move the timing of any
+  other row. The hover snaps by 1, 5 or 10 years with the window's span
+  (≤ 60, ≤ 200, beyond) — the standard windows keep their 10-yr step.
 - **`reports-export`** — the three Reports exporters ("Days, Years &
   Precession", the RA test, "Solstices & Equinoxes") run headlessly against
   a stubbed SheetJS: each completes without a page error and yields its
