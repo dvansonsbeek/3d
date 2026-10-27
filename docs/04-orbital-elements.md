@@ -84,12 +84,47 @@ documented where it lives: [doc 11](11-length-day-year-formulas.md)
 [doc 40](40-architecture.md) (the one-source movement),
 [doc 99](99-expanding-solar-system-resonance-theory.md) (ESSRT).
 
-Earth's former orbital-plane wheels (the inclination oscillation and the
-node regression on the retired device's periods) were deleted at plan 07
-R5/R9 with the geometric device; Earth's invariable-plane
-inclination and node of date are the one-source engine reading on every
-surface (the panel, the API's `earth.inclinationDeg`/`ascendingNodeDeg`,
-the registry).
+Earth's invariable-plane inclination and node of date are the one-source
+engine reading on every surface (the panel, the API's
+`earth.inclinationDeg`/`ascendingNodeDeg`, the registry); the retired
+orbital-plane wheels are recorded in [doc 109 §23](109-model-nbody-engine.md).
+
+### Mean versus osculating — which element Earth publishes
+
+Two different things are both called "Earth's eccentricity" or "Earth's
+perihelion", and the model publishes one of them on every surface.
+
+The **osculating** element is the ellipse the Earth–Moon barycentre would
+follow if every other planet vanished at this instant. It is exact for the
+instant and it wobbles: the planets pull the barycentre's orbit about, and the
+osculating perihelion swings by a few hundred arcseconds with Jupiter's
+11.9-year period, with smaller terms at the other synodic periods. JPL's state
+vectors are osculating, and so is the planet chain's Earth anchor (the J2000
+seed).
+
+The **mean** element is that wobble averaged out. What remains is the slow
+motion: the perihelion advancing about 1,161″ per century against the fixed
+stars (Simon et al. 1994: 1,161.2), the eccentricity falling 4.2e-5 per
+century today, and over tens of thousands of years the Laplace–Lagrange swings
+that take e between about 0.005 and 0.06. "Mean" therefore does not mean
+constant — it is a function of time, and the averaging window decides which
+terms count as fast. The model's published e(t) and ϖ(t) are mean elements of
+date: the ±10-Myr N-body run averaged over 1 kyr in the frame co-rotating with
+the vector (a plain Cartesian average of a rotating, shrinking vector is biased
+at every node — [doc 111 §1.27](111-measured-traps-and-gate-origins.md)) and
+anchored at J2000 on its own node, where it reads
+<!--v:earthMeanPerihelionJ2000Deg-->102.9369<!--/v-->° and
+<!--v:earthMeanEccentricityJ2000-->0.0167083<!--/v--> against Simon's 102.9373°
+and 0.0167086. The eclipse Sun's equation of centre reads the same function;
+the fast wobble reaches the Sun's longitude through the planetary completion's
+direct terms, never through the elements. The band in between — periods from a
+decade or two up to about two thousand years, the Jupiter–Saturn great
+inequality among them — is carried by neither; it is worth 0.4″ on the Sun and
+is recorded, not modelled ([doc 109 §23.4](109-model-nbody-engine.md)).
+
+The Framework Verification panel's **Eccentricity** and **Perihelion
+Longitude** categories plot these mean elements of date against Meeus's
+polynomials inside ±10 kyr and La2004 across ±250 kyr.
 
 ### The Moon
 

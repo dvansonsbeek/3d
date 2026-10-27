@@ -96,6 +96,12 @@ The angle from the ascending node to the perihelion point, measured in the orbit
 ### Longitude of Perihelion (ϖ)
 The sum of the ascending node longitude and argument of periapsis: ϖ = Ω + ω. Measures the perihelion direction from the vernal equinox.
 
+### Osculating element
+The Keplerian element of the ellipse a body would follow if, at this instant, every other planet vanished. It is exact for that instant and wobbles from month to month as the planets pull: Earth's osculating perihelion swings by a few hundred arcseconds with Jupiter's 11.9-year period and by smaller amounts with the other planets' synodic periods. JPL's state vectors and WebGeoCalc's element tables are osculating.
+
+### Mean element (of date)
+The osculating element with that fast wobble averaged out, so what remains is the slow motion: the secular drift (Earth's perihelion advances about 1,161″ per century against the fixed stars) and, over tens of thousands of years, the Laplace–Lagrange swings. "Mean" does not mean constant — the mean element is a function of time, and which terms count as "fast" is set by the averaging window. The literature's mean elements (Simon et al. 1994, Meeus Table 31) are of this kind. Earth's published e(t) and ϖ(t) in this model are mean elements of date: the N-body series averaged over 1 kyr in the co-rotating frame and anchored at J2000 on its own node ([doc 110](110-calculation-map.md) chain 1.1). The eclipse Sun reads the same function; the fast wobble enters the Sun's longitude through the planetary completion's direct terms, never through the elements.
+
 ### Mean Anomaly (M)
 The fraction of the orbital period that has elapsed since perihelion, expressed as an angle. Increases uniformly with time.
 

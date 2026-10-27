@@ -519,33 +519,34 @@ export const VALUES = {
     render: (v) => Number(v).toFixed(7),
     note: 'Earth\'s eccentricity at J2000 — the series\' mean element (the eclipse Sun\'s e; Simon 1994: 0.0167086)',
   },
-  // ── The two J2000 conventions, labelled ────────────────────────────────
-  // The published Earth surface reads the SECULAR element of the one-source
-  // N-body series (≡ JPL's osculating J2000 seed state and La2004); the
-  // Calibration Inputs carry the IAU/Standish MEAN element (the 1800–2050
-  // fit, carrying the average of the short-period planetary terms). The gap
-  // is a convention, never reconciled — every surface names which it shows.
+  // ── The two J2000 mean elements, labelled ──────────────────────────────
+  // The published Earth surface reads the one-source N-body series — since plan
+  // 21 the MEAN element of date, the fast planetary wobble averaged out in the
+  // co-rotating frame and the J2000 anchor the series' own node (Simon 1994's
+  // class). The Calibration Inputs carry the IAU/Standish mean element — a
+  // 1800–2050 window fit, a different averaging. The gap between the two is a
+  // window convention, labelled — every surface names which it shows.
   earthSeriesEccJ2000: {
     get: () => oneMovement().e(2000),
     render: (v) => Number(v).toFixed(8),
-    note: 'the one-source series\' e at J2000 — the SECULAR element the Earth panel and scene read',
+    note: 'the one-source series\' e at J2000 — the MEAN element of date the Earth panel, the scene and the eclipse Sun read (Simon 1994: 0.0167086)',
   },
   earthSeriesPeriLongJ2000: {
     get: () => oneMovement().periOfDateDeg(2000),
     render: (v) => Number(v).toFixed(3),
     unit: '°',
-    note: 'the one-source series\' equinox-referenced ϖ of date at J2000 — the SECULAR element the Earth panel reads',
+    note: 'the one-source series\' equinox-referenced ϖ of date at J2000 — the MEAN element of date the Earth panel and the eclipse Sun read (Simon 1994: 102.937°)',
   },
   earthConventionGapEcc: {
     get: () => astro.earthOrbital.earthEccentricityJ2000 - oneMovement().e(2000),
     render: (v) => Number(v).toExponential(1),
-    note: 'IAU mean element − series secular element at J2000 (a convention gap, labelled not reconciled)',
+    note: 'IAU/Standish 1800–2050 mean element − the series\' J2000 mean element (two averaging windows, labelled not reconciled)',
   },
   earthConventionGapPeriArcsec: {
     get: () => (astro.earthOrbital.earthPerihelionLongitudeJ2000 - oneMovement().periOfDateDeg(2000)) * 3600,
     render: (v) => Number(v).toFixed(0),
     unit: '″',
-    note: 'IAU mean element − series secular element at J2000 (a convention gap, labelled not reconciled)',
+    note: 'IAU/Standish 1800–2050 mean element − the series\' J2000 mean element (two averaging windows, labelled not reconciled)',
   },
   earthEccSeriesVsLa2010aRms: {
     get: () => seriesVsLa2010a().eccRms,

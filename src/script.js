@@ -15372,7 +15372,7 @@ const VFP_CATEGORIES = [
     id: 'eccentricity', group: 'Earth orbit', label: 'Eccentricity', unit: '', precision: 8,
     defaultRef: 'La2004 (Laskar)',   // rms 2.1e-5 on ±23 kyr (Meeus 9.2e-5, Berger 1.9e-4)
     frame: 'Earth’s orbital eccentricity (dimensionless), of date',
-    reading: 'The one-source e of date is the modulus of the engine’s own eccentricity vector, the banked N-body series; its ~100-kyr and 405-kyr cycles are the beats of the secular g-modes. The era polynomial (Meeus) holds inside ±10 kyr; Berger 1978 and La2004 carry the cycles across the window.',
+    reading: 'The one-source e of date is the modulus of the engine’s own eccentricity vector, the banked N-body series; its ~100-kyr and 405-kyr cycles are the beats of the secular g-modes. The era polynomial (Meeus) holds inside ±10 kyr; Berger 1978 and La2004 carry the cycles across the window. What is plotted is the MEAN element of date: the ellipse Earth would follow if the other planets vanished this instant (the osculating ellipse) wobbles month by month as they pull — mostly with Jupiter’s 11.9-year period — and the series averages that wobble out, leaving the slow motion. “Mean” still moves: it is this curve. The same e(t) drives the eclipse Sun; the wobble reaches the Sun’s longitude through the planetary terms, not through the elements.',
     yLabel: 'eccentricity',
     residualLabel: 'eccentricity (dimensionless)', residualScale: 1,   // was 'AU' — e carries no unit
     primaryRef: 'Meeus',   // C-5: by name, index-shift-proof
@@ -15455,7 +15455,7 @@ const VFP_CATEGORIES = [
     id: 'perihelion', group: 'Earth orbit', label: 'Perihelion Longitude', unit: '°', precision: 3,
     defaultRef: 'La2004 (Laskar)',   // Meeus fits ±23 kyr slightly better (0.034° vs 0.091°) but ends at ±10 kyr
     frame: 'Longitude of Earth’s perihelion (degrees) from the equinox of date, wrapping at 360°',
-    reading: 'The one-source ϖ of date turns once per ~21 kyr against the moving equinox: the apsidal precession against the stars (~112 kyr) meeting the axial precession (~25.8 kyr). Meeus is the era polynomial; La2004 carries the same convention across the window.',
+    reading: 'The one-source ϖ of date turns once per ~21 kyr against the moving equinox: the apsidal precession against the stars (~112 kyr) meeting the axial precession (~25.8 kyr). Meeus is the era polynomial; La2004 carries the same convention across the window. This is the MEAN perihelion of date — the osculating perihelion (the ellipse of this instant) swings by a few hundred arcseconds with Jupiter’s 11.9-year period, and the series averages that wobble out, leaving the slow turn you see; at J2000 the mean agrees with Simon 1994’s classical mean element, where the Standish value is a 1800–2050 window mean. The eclipse Sun, the Earth panel and the API read this one ϖ(t).',
     yLabel: 'degrees',
     residualLabel: 'degrees', residualScale: 1,
     wrap360: true,
@@ -15476,9 +15476,13 @@ const VFP_CATEGORIES = [
       { name: 'La2004 (Laskar)', color: '#e53935', fn: perihelionLa2004, validYears: [-248000, 102000], sourceUrl: 'https://doi.org/10.1051/0004-6361:20041335' },
     ],
     j2000extras: [
-      // 102.947° is the IAU/Standish MEAN-elements convention, not an
-      // observation; the chain speaks the osculating/secular convention.
-      { name: 'IAU mean elements (Standish)', color: '#ef5350',
+      // Two J2000 mean elements, both labelled: Simon 1994 / Meeus Table 31.A
+      // (the classical mean element of date, which the series' own J2000 node
+      // agrees with since plan 21) and the IAU/Standish value, a 1800–2050
+      // window mean — a different averaging, not an observation.
+      { name: 'Simon 1994 / Meeus mean element', color: '#81c784',
+        value: () => perihelionMeeusEarth(2000) },
+      { name: 'IAU/Standish 1800–2050 mean element', color: '#ef5350',
         value: () => ASTRO_REFERENCE.perihelionLongitudeJ2000_deg },
     ],
   },
