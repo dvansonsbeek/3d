@@ -124,7 +124,16 @@ is recorded, not modelled ([doc 109 §23.4](109-model-nbody-engine.md)).
 
 The Framework Verification panel's **Eccentricity** and **Perihelion
 Longitude** categories plot these mean elements of date against Meeus's
-polynomials inside ±10 kyr and La2004 across ±250 kyr.
+polynomials inside ±10 kyr and La2004 across ±250 kyr. Its two exhibit
+categories **Perihelion — osculating vs mean** and **Eccentricity — osculating
+vs mean** (plan 22) draw the osculating orbit beside the mean on their own
+short windows (1990–2030 up to 1000–2500): the osculating curve is the
+generated table `data/earth-osculating-wobble.json` — the model's own
+nine-body integration of the J2000 seed with the 1PN term and the lunar
+quadrupole over 1800–2200 every 10 days (`tools/verify/earth-osculating-wobble.js`,
+whose window mean of osculating − mean reads −0.44″ / 1.0e-7: the series is
+the mean element) — so a reader sees the few-hundred-arcsecond Jupiter wobble
+around the slowly turning mean, and in the residual view the wobble alone.
 
 ### The Moon
 

@@ -66,6 +66,8 @@ const MANIFEST = [
     writes: 'data/sun-vs-horizons-summary.json (tracked; --write only — the model\'s apparent Sun and cardinal instants against the ±3000-yr Horizons TT cache; plain run = reproduction check)' },
   { n: 'equinox-vs-vondrak.js', class: 'generator', ms: 300000, slow: true,
     writes: 'data/equinox-vs-vondrak.json (tracked; --write only — the precession of date against its two theory referees: the equinox vs Vondrák 2011 over ±3000 yr beside the secular law alone, the obliquity vs La2004 over the last Myr; --write REFUSES if a precession-of-date term is missing; plain run = reproduction check)' },
+  { n: 'earth-osculating-wobble.js', class: 'generator', ms: 60000,
+    writes: 'data/earth-osculating-wobble.json (tracked; --write only — the EMB\'s osculating e and ϖ from the Horizons seed integrated as a nine-body system with the 1PN term and the lunar quadrupole, every 10 days over 1800–2200, beside the series\' mean; plain run = reproduction check). The Framework Verification exhibit "Perihelion — osculating vs mean" (plan 22 step 2); --write REFUSES if the window mean of (osculating − mean) exceeds 3″ / 5e-7' },
   { n: 'lunar-canon-recall.js', class: 'generator', ms: 300000, slow: true,
     writes: 'data/lunar-canon-recall.json (tracked; same convention as lunar-alignment: plain run = reproduction check, --write refuses on divergence, --rebaseline adopts). The lunar finder\'s COMPLETENESS over the whole NASA Five Millennium Canon −1999…+3000 on the UT axis (±3 h, same type; tight ≤15-min rate; signed median ΔT divergence per 500-yr era) — the former console button L-4, ~4.6 min' },
   { n: 'lunar-alignment.js', class: 'generator', ms: 82000, slow: true,

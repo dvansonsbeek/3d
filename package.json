@@ -5,12 +5,12 @@
     "packages/*"
   ],
   "scripts": {
-    "copy:refdata:dev": "mkdir -p dist-dev/data && cp data/nbody-secular-series.json dist-dev/data/ && rm -rf dist-dev/public && cp -r public dist-dev/public",
+    "copy:refdata:dev": "mkdir -p dist-dev/data && cp data/nbody-secular-series.json data/earth-osculating-wobble.json dist-dev/data/ && rm -rf dist-dev/public && cp -r public dist-dev/public",
     "prestart": "npm run copy:refdata:dev",
     "predev": "npm run copy:refdata:dev",
     "start": "parcel src/index.html --dist-dir dist-dev",
     "dev": "parcel src/index.html --dist-dir dist-dev",
-    "build": "rm -rf dist && parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data && cp data/nbody-secular-series.json dist/data/ && cp -r public dist/public",
+    "build": "rm -rf dist && parcel build src/index.html --dist-dir dist --public-url ./ --cache-dir .parcel-cache-build && mkdir -p dist/data && cp data/nbody-secular-series.json data/earth-osculating-wobble.json dist/data/ && cp -r public dist/public",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p jsconfig.json && node tools/types/emit-physics-types.mjs",
     "types:physics:write": "node tools/types/emit-physics-types.mjs --write",

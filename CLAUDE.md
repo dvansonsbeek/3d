@@ -229,10 +229,12 @@ window-mean prediction), `measure-rms-by-epoch.js` and `equinox-vs-vondrak.js`
 missing), the five campaign generators (cassini-results /
 lod-climate-correlation / eclipse-audit / lunar-alignment /
 lunar-canon-recall — the latter three REFUSE on divergence; `--write
---rebaseline` is the conscious re-measurement path) and the Horizons
-comparison (`sun-vs-horizons.js` — the Sun tier's swap gate). `npm run
-regen:cascade` lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (12 generators, 6 gates).
+--rebaseline` is the conscious re-measurement path), the Horizons
+comparison (`sun-vs-horizons.js` — the Sun tier's swap gate) and the
+panel's osculating-orbit exhibit table (`earth-osculating-wobble.js` —
+REFUSES if the lab's mean parts from the series'). `npm run regen:cascade`
+lists the stale generators in regeneration order; `npm run
+test:verify:list` the full classification (13 generators, 6 gates).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

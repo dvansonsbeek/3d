@@ -1461,6 +1461,14 @@
     "refCurve.meeusMeanObliquityRad@100000": 0.18666601957231377,
     "refSteph@-500": 9254.56139659826,
     "refSteph@1000": 89.98808517183328,
-    "refSteph@2000": 63.26276981192876
+    "refSteph@2000": 63.26276981192876,
+    "oscWobble.e@1950": 0.016749415919413917,
+    "oscWobble.pomOfDateDeg@1950": 102.09309295238097,
+    "oscWobble.e@2000": 0.016702436,
+    "oscWobble.pomOfDateDeg@2000": 102.91792099999998,
+    "oscWobble.e@2024": 0.016691011897810217,
+    "oscWobble.pomOfDateDeg@2024": 103.32419291970803,
+    "oscWobble.e@2500": null,
+    "oscWobble.pomOfDateDeg@2500": null
   }
 }

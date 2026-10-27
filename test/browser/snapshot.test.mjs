@@ -359,6 +359,21 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   return v;
 }, { YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_JDS, MOON_TMAS, MOON_CHAIN_PAIRS });
 
+// ── plan 22 step 2: the osculating-orbit exhibit table (data/earth-osculating-
+// wobble.json, fetch-loaded like the series) — pinned AFTER the main pass so the
+// wait for it cannot move the timing of any row above. Three instants inside
+// 1800–2200 and one outside (null: the reference is absent there by design).
+await s.page.waitForFunction(() => window.__test__.oscWobbleLoaded && window.__test__.oscWobbleLoaded(), null, { timeout: 60000 });
+Object.assign(measured, await s.page.evaluate(() => {
+  const T = window.__test__, v = {};
+  for (const y of [1950, 2000, 2024, 2500]) {
+    const o = T.oscWobbleAt(y);
+    v[`oscWobble.e@${y}`] = o ? o.e : null;
+    v[`oscWobble.pomOfDateDeg@${y}`] = o ? o.pomOfDateDeg : null;
+  }
+  return v;
+}));
+
 const pageErrors = s.errors.length;
 await s.dispose();
 

@@ -528,7 +528,17 @@ The `test:snapshot` chain also carries:
   renders EVERY Framework Verification category once (born from the
   Anomalistic Year category's only reference curve calling a function
   deleted at plan 18 — a ReferenceError on open that the default-open
-  category hid for weeks; the row fails on that build).
+  category hid for weeks; the row fails on that build). Since plan 22 the
+  category set includes the two exhibit categories "Perihelion / Eccentricity
+  — osculating vs mean" on their own windows (1990–2030 … 1000–2500), whose
+  reference curve is the fetch-loaded table `data/earth-osculating-wobble.json`
+  (the generator `earth-osculating-wobble.js`: the model's own nine-body
+  integration with the 1PN term and the lunar quadrupole, 1800–2200, 10-day
+  grid; its `--write` REFUSES if the window mean of osculating − mean leaves
+  3″ / 5e-7 — the series IS the mean element, measured −0.44″ / 1.0e-7); the
+  golden pins the table at 1950 / 2000 / 2024 and its null outside the span
+  (`oscWobble.*`), waited for after the main pass so the wait cannot move the
+  timing of any other row.
 - **`reports-export`** — the three Reports exporters ("Days, Years &
   Precession", the RA test, "Solstices & Equinoxes") run headlessly against
   a stubbed SheetJS: each completes without a page error and yields its
