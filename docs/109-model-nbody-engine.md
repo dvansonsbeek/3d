@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v27.0
-coefficients: sha256:5dbadf25f52e4749
+coefficients: sha256:1d7ef7b022b91f6c
 status: current
 ---
 
@@ -1001,13 +1001,18 @@ term of ϖ; (2) the Cartesian boxcar of a vector rotating at 1161 ″/cy while
 shrinking at ė = −4.2e-5/cy is biased at every node — |z| low by e·(ϖ̇W)²/24
 (2.2e-6) and by ë·W²/24 (1.1e-6), the direction by ė·ϖ̇·W²/(12e) (−24″) — so
 the shipped series was Simon 1994's mean element in rate, curvature and ė and
-not in its constant term. The in-between band of the e-vector (12 yr … 2 kyr:
-the great inequality at 6″-equivalent and lines at 2.6, 1.8 and 0.24 kyr, 12″
-rms in all) is worth 0.4″ on the Sun's longitude — recorded, not modelled; it
-is what the window constant had carried at its J2000 value, and the modern
-window's sd against Horizons gives it up (0.777 → 0.794″) while the ±3-kyr
-all-phase sd and the cardinal instants improve (2.2575 → 2.2554″, 1.0076 →
-1.0057 min). Since plan 21 the series' z filter is the centre value of a local
+not in its constant term. The in-between band of the e-vector (12 yr … 2 kyr,
+2.1e-6 rms after a linear detrend over ±3 kyr) sits on no named carrier — the
+great inequality 2λ_J − 5λ_S carries 0.37e-6, the Earth–Mars–Jupiter and
+Venus–Earth inequalities 0.10e-6 and 0.21e-6, together 1 % of its power and
+each ≤ 0.1″ on the Sun's longitude (plan 22) — recorded, not modelled. The new
+series matches the osculating window mean to 0.9″ / 1.4e-7; the Sun's elements
+moved by Δϖ −1.8″ and Δe +1.1e-7 in 1970–2049, 0.04″ of longitude, and that
+small shift, correlated with the existing residual, is the modern window's
+sd change against Horizons (0.777 → 0.794″ — plan 21 had read it as the band's
+J2000 value, wrong in magnitude) while the ±3-kyr all-phase sd and the
+cardinal instants improve (2.2575 → 2.2554″, 1.0076 → 1.0057 min). Since
+plan 21 the series' z filter is the centre value of a local
 quadratic fitted in the window's co-rotating frame, the anchor is the series'
 own J2000 node (`bodies.earth.zAnchorJ2000`, carried by the deep-modes embed),
 and the published Earth ϖ and e, the eclipse Sun, the cardinal braid and the

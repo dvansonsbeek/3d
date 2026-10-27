@@ -68,7 +68,7 @@
     "_obliquityJ2000Note": "IAU 2006 (84381.406 arcsec / 3600, Capitaine et al. 2003) — adopted at the 12e refit (full Step 0 + 6a-6e + corrections regeneration under this anchor; the prior IAU 1976/1980 deferral note is in git history).",
     "obliquityJ2000_deg": 23.439279444444445,
     "obliquityRate_arcsecPerCentury": -46.836769,
-    "_generalPrecessionJ2000Note": "IAU 2006 (P03, Capitaine et al. 2003): the general precession in longitude p_A at J2000, 5028.796195 arcsec per Julian century = 50.28796195 arcsec/yr (T_p = 25,771.575 yr). Plan 09: THE model's J2000 precession anchor p0 — the composed lunisolar clock's anchor, the hybrid obliquity's self-anchor and the climate line rates read it; before plan 09 the anchor was the retired year combs' beat at 2000 (25,771.395 yr, 8 ppm faster).",
+    "_generalPrecessionJ2000Note": "IAU 2006 (P03, Capitaine et al. 2003): the general precession in longitude p_A at J2000, 5028.796195 arcsec per Julian century = 50.28796195 arcsec/yr (T_p = 25,771.575 yr). Plan 09: THE model's J2000 precession anchor p0 — the composed lunisolar clock's anchor, the hybrid obliquity's self-anchor and the climate line rates read it; before plan 09 the anchor was the retired year combs' beat at 2000 (25,771.395 yr, 7 ppm faster — a precession-anchor reading; the sidereal year itself is right against DE441, plan 21).",
     "generalPrecessionJ2000_arcsecPerYr": 50.28796195,
     "earthEccentricityJ2000": 0.01671022,
     "earthEccentricityDotJ2000": -0.000042037,

@@ -41,9 +41,8 @@
       "plan-step label": 2
     },
     "code:packages/physics/src/earth/precession-composed.cjs": {
-      "H-divisor label": 8,
-      "comb / lattice": 1,
-      "plan-step label": 3
+      "H-divisor label": 1,
+      "plan-step label": 1
     },
     "code:packages/physics/src/earth/sidereal-year-channel.cjs": {
       "era device / K device": 2,

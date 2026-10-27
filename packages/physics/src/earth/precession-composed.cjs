@@ -27,24 +27,12 @@
  * 106.6 → 109.2 ″/yr against Lantink 2022's 108.6 ± 8.5; Farhat's own
  * precession column on the same table: 108.8).
  *
- * THE ANCHOR p₀ (plan 06 S5 — one J2000 precession reading): p₀ is the
- * model's DERIVED J2000 rate, 1,296,000/axial0 with axial0 the certified
- * year-length laws' beat at 2000 (sid/(sid − trop) = 25,771.4 yr = 50.2883
- * ″/yr, IAU 50.2879 to 8×10⁻⁶) — the SAME anchor the hybrid obliquity
- * self-anchors on. It is NOT 1,296,000/(H/13): H₀ = 335,317 was fitted on
- * the 1246 AD perihelion–solstice alignment (the perihelion-of-date beat),
- * so H₀/13 = 25,793.6 yr is the fit anchor's reading, 0.086 % slow, and
- * is not a period of anything the model computes (nor a window mean: the
- * published period averages 25,598 yr over ±26 kyr). The unit H(t) =
- * H_era/[torque term] (deltat/deep-time.cjs hAtAge) scales WITH the
- * composed period — H(t)/T_p(t) = H₀/axial0 = 13.011 at every epoch — but
- * is not 13 of them; the 13 is a fit-era label that leaves the physics.
- * The pre-Phase-3 structural clock 13·1,296,000/H_era(t) (pure ω-scaling,
- * H_era = H₀·LOD/LOD₀) survived as the FROZEN ERA CLOCK's named phase
- * convention (eraClockHAtAge) until plan 09 step 7a deleted it with the last
- * comb; its record (doc 110 chain 2, the paleo-anchors gate rows): it read 70.9 ″/yr against Lantink et al. 2022's 108.6 ± 8.5 at
- * 2.46 Ga and 65.2 against Meyers & Malinverno 2018's 85.79 ± 2.72 at
- * 1.4 Ga, where the composed rate reads 104.6 and 86.6.
+ * THE ANCHOR p₀ (one J2000 precession reading): p₀ = 1,296,000/axial0 with
+ * axial0 the IAU 2006 general precession p_A (50.28796 ″/yr, T_p =
+ * 25,771.575 yr — the input `generalPrecessionJ2000_arcsecPerYr`, plan 09;
+ * ONE home `certifiedAxialPrecessionJ2000Years`) — the SAME anchor the
+ * hybrid obliquity self-anchors on. The retired constructs that once read
+ * this anchor, and their records: doc 109 §23.
  *
  * Pure factory: the tidal chain is injected (each runtime's own LOD and
  * moon-distance evaluators), no artifact reads, no globals.

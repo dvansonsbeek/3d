@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v27.0
-coefficients: sha256:5dbadf25f52e4749
+coefficients: sha256:1d7ef7b022b91f6c
 status: current
 ---
 
@@ -416,11 +416,22 @@ so the model's N-body ecliptic contributes
 <!--v:equinoxPlanetaryPartM3000Arcsec-->+0.36<!--/v-->″ (≤ 0.4″ at every
 epoch) — the residual is LUNISOLAR. Inside ±1 kyr the model is within
 <!--v:equinoxVsIau2006InnerMaxArcsec-->0.17<!--/v-->″ of the IAU 2006 (P03)
-polynomials and the two referees agree to 0.06″; beyond it Vondrák is a fit
-to La93 (no secular J₂ change) joined to P03 (a J₂ rate of −3e-11/yr, the
-model's cited rate −2.7e-11/yr accounts for ~1.6″ of the 7.9″ over 5 kyr),
-so part of the curvature is the referee's own seam. A theory-vs-theory
-tension at the 10⁻⁴ level, with no observation at the 20″ level there.
+polynomials and the two referees agree to 0.06″. The lunisolar part, taken
+apart on the model's own integration one input at a time (plan 22): the whole
+J₂ history contributes +16.4″ at −3000 and the solar torque at the eccentricity
+of date +3.9″ (the secular law alone reads −28″); swapping the GIA J₂ channel
+for P03's constant rate (−3e-11/yr) moves the residual by 0.86″ — and makes
+the deep obliquity meaningless, La2004 rms 136″ over 200 kyr, because a
+constant rate extrapolated a million years is an era device; the tidal and
+lunar-distance factors of the composed torque are worth 0.25″. What remains,
+about −7″, is a J₂-doctrine gap: the model's J₂ history is anchored on the
+observed satellite J₂ rate, shaped by glacial rebound and constrained through
+the LOD/ΔT record, while the referee's long-term part (La93) carries no J₂
+change and its near part (P03) a constant rate — a seam of the same class as
+the J₂ term itself. No observation reaches the equinox at the 10″ level
+3,000 years ago (the ancient catalogues are arcminute-class), so the gap is a
+prediction of where the equinox was, not a measured error. A theory-vs-theory
+tension at the 10⁻⁴ level, recorded with its parts named.
 
 **The scene-wheel overlay (SW)**: the visible wheel Sun adds one term on top
 of its untouched legacy stack, δ = λ_certified − λ_realized (the wheel's own

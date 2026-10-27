@@ -65,10 +65,10 @@
   "inputs": {
     "generator": "node tools/verify/lunar-canon-recall.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:29e163394d994217e73b203d9c5c3fd6ed9981689cadee81cebd5c8ae7ae2b90",
+      "data/core-mantle-resonator-stage1.json": "sha256:0ca81ac7571f6897582e2fcebf808510d2cb7c9ee8379909032a996f30e9053c",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "data/deltaT-4flag-fit.json": "sha256:5dc84644947044bf8706fd8c7e95bea53bd9b931fa4772aa52614e7018694223",
-      "data/nbody-secular-series.json": "sha256:7314ffc3fb0b23def7abb3185e501a58bbe746734be0f731fac2131b835173ec",
+      "data/deltaT-4flag-fit.json": "sha256:921d0682b2c638c4752a951601fc01409b78d970cdc2c3c983d2413a4d06b974",
+      "data/nbody-secular-series.json": "sha256:bd7122a7a1d1a53ba7f66c05dc2a55a48aff0cdc6014472e49559f5715070e40",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:cfc9a64b09599709339dd750d69f259af5b280cbe9034bdab5d13ddcc6aa9f8b",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
@@ -99,8 +99,8 @@
       "packages/physics/src/moon/month-chain.cjs": "sha256:26a20d998d4f028da23ea3260d3e065c7bf7293d51666e1d9125c057f65c48c9",
       "packages/physics/src/moon/series-extension.cjs": "sha256:d295a78eaedb0246ff142ed726c57ec2353d183c0ccbd3d767157f19623c6461",
       "packages/physics/src/moon/series.cjs": "sha256:feb2174fce4bb446f2d699f750b8269c7d70a289107f3d9b639b85b634b2459b",
-      "public/input/astro-reference.json": "sha256:b568736717355903c8298422cf48128a3897743ea0b1c57d64f0823ce8b1813f",
-      "public/input/climate-formula-coefficients.json": "sha256:6c88fc36cefe5225a00daf9f8e009ad0f59bbb8f7a13a21b0394277c1782ff0f",
+      "public/input/astro-reference.json": "sha256:c82738ae33b5460ca7bdc737032a04f5cd39d6186e78a41179a913a25595b955",
+      "public/input/climate-formula-coefficients.json": "sha256:75589358ec492aed36585312d72f634f8498cc1d35114728ce93b0491ae2054b",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "tools/verify/lunar-canon-recall.js": "sha256:9f9662ba5bb3db0f223ddb9d35c198358de09d229f82429291e1451786dcb534"
     }
