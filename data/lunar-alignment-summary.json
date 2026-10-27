@@ -320,7 +320,7 @@
       },
       "-450": {
         "n": 193,
-        "signedMeanMinutes": -1.34
+        "signedMeanMinutes": -1.35
       },
       "-350": {
         "n": 186,
@@ -345,7 +345,7 @@
       "-750": -2.74,
       "-650": -1.96,
       "-550": -2.55,
-      "-450": -2.07,
+      "-450": -2.08,
       "-350": -1.52,
       "-250": -2.2,
       "-100": -0.98
@@ -505,12 +505,12 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 55.7,
+      "fullStack": 55.8,
       "minus_bond": 61.7,
-      "minus_hallstatt": 54.6,
+      "minus_hallstatt": 54.7,
       "minus_jose5": 56.7,
       "minus_jose4": 48.7,
-      "minus_resonator": 121.1,
+      "minus_resonator": 121.2,
       "noCycles": 81.1
     }
   },
@@ -552,7 +552,7 @@
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
-      "packages/physics/src/moon/arguments.cjs": "sha256:73a6ac9593342364f3dcf37399a33c7810d060a1ecdda4c71d28da23a7f443fe",
+      "packages/physics/src/moon/arguments.cjs": "sha256:4588096b1f3551327c60389e7f82b26a10cdb0ad0f02416d1c89cf9a55fbaf2f",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:0990e5c8a72791a6141c147bf9c8742e440503d34a891e881692bee14308967a",
       "packages/physics/src/moon/month-chain.cjs": "sha256:3465792a575f5d497e50fde8371d5a3273f727639e4eb994d1fe73743d961b14",
       "packages/physics/src/moon/series-extension.cjs": "sha256:f93ac2d259b3abbffda1b0e5232e6b310854da38ad8bc2bb89a40195ee4d273b",

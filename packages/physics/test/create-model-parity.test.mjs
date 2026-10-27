@@ -293,9 +293,11 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
     const a = base.argsAt(jd), b = cf.argsAt(jd);
     const dLp = w180(b.Lp - a.Lp) * 3600, dMp = w180(b.Mp - a.Mp) * 3600, dF = w180(b.F - a.F) * 3600;
     if (!(Math.abs(dLp) > 1)) failures.push(`frame-freedom probe inert @ ${y}: L′ moved only ${dLp.toFixed(3)}″ under +1″/yr of precession`);
-    // 1e-3″: the unwrapped compositions are ~1e6–1e8 degrees deep in time, so two ULPs of the
-    // difference are 1e-4″ — rounding, not a leak (the pre-plan-23 leak was degrees).
-    if (!(Math.abs(dMp) < 1e-3 && Math.abs(dF) < 1e-3)) failures.push(`M′/F are NOT frame-free @ ${y}: ΔM′ ${dMp.toExponential(2)}″ ΔF ${dF.toExponential(2)}″ under a counterfactual equinox (ΔL′ ${dLp.toFixed(1)}″)`);
+    // The tolerance is rounding, not physics: the unwrapped L′ is 360° × 13.4 million orbits
+    // per Myr (4.8e9° at −1 Myr, one ULP = 3.8e-3″), and M′ = L′ − ϖ is formed on it before
+    // the wrap — eight ULPs of that, floored at 1e-3″ (the pre-plan-23 leak was degrees).
+    const tol = Math.max(1e-3, 8 * 2.2e-16 * 360 * 13.4 * Math.abs(y - 2000) * 3600);
+    if (!(Math.abs(dMp) < tol && Math.abs(dF) < tol)) failures.push(`M′/F are NOT frame-free @ ${y}: ΔM′ ${dMp.toExponential(2)}″ ΔF ${dF.toExponential(2)}″ under a counterfactual equinox (ΔL′ ${dLp.toFixed(1)}″; tolerance ${tol.toExponential(1)}″)`);
   }
 }
 

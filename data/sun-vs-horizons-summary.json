@@ -112,7 +112,7 @@
         "century": -2300,
         "n": 3652,
         "mean": 2.466767,
-        "sd": 1.535719
+        "sd": 1.53572
       },
       {
         "century": -2200,
@@ -628,7 +628,7 @@
         "century": -600,
         "n": 400,
         "mean": -1.79916,
-        "sd": 0.661982
+        "sd": 0.661981
       },
       {
         "century": -500,
@@ -877,7 +877,7 @@
       "packages/physics/src/model/surface.js": "sha256:1d89e6a4d760a5958ad8db224e7b91b0a52e2347a330038d1ba952796d51511a",
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
-      "packages/physics/src/moon/arguments.cjs": "sha256:73a6ac9593342364f3dcf37399a33c7810d060a1ecdda4c71d28da23a7f443fe",
+      "packages/physics/src/moon/arguments.cjs": "sha256:4588096b1f3551327c60389e7f82b26a10cdb0ad0f02416d1c89cf9a55fbaf2f",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:0990e5c8a72791a6141c147bf9c8742e440503d34a891e881692bee14308967a",
       "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:ed30bde369cf0d50ecee1a22125f5fff1edd4cf6f15c1f17b1e16b04173b0eb4",
       "tools/explore/fetch-jpl-sun-longitude-tt.mjs": "sha256:e067a851ecb54bc3cf70afa9b1c8d48ea27219a8b6de4a05aedcd02e2447488c",

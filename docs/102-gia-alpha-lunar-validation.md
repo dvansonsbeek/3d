@@ -629,15 +629,15 @@ n = <!--v:lunarDenseNPlus1000-->38<!--/v-->; −400: ±<!--v:lunarDenseSeMinus40
 stack, out of sample (the cycle fit window is 1650–2017). The
 per-cycle ablation χ² (<!--v:lunarDenseCenturies-->13<!--/v--> centuries with n ≥ 5), under the certified
 framework-native Sun with the derived torque term, all from the governed
-artifact's `denseTargets.ablationChi2`: full stack <!--v:lunarDenseChi2FullStack-->55.7<!--/v-->
+artifact's `denseTargets.ablationChi2`: full stack <!--v:lunarDenseChi2FullStack-->55.8<!--/v-->
 (the Meeus-basis class, as it must be, since the torque term restores
-Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->121.1<!--/v--> — the
+Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->121.2<!--/v--> — the
 Core-mantle swing is confirmed outright by the eclipse record (removing
 it more than doubles the misfit)**; minus bond <!--v:lunarDenseChi2MinusBond-->61.7<!--/v--> — the
 Bond cycle is supported, not confirmed (removing it raises the misfit by
 about a tenth over those centuries); no cycles <!--v:lunarDenseChi2NoCycles-->81.1<!--/v-->
 (the stack takes a third off the misfit); minus
-jose5/hallstatt/jose4 = <!--v:lunarDenseChi2MinusJose5-->56.7<!--/v-->/<!--v:lunarDenseChi2MinusHallstatt-->54.6<!--/v-->/<!--v:lunarDenseChi2MinusJose4-->48.7<!--/v--> — the Joses and Hallstatt
+jose5/hallstatt/jose4 = <!--v:lunarDenseChi2MinusJose5-->56.7<!--/v-->/<!--v:lunarDenseChi2MinusHallstatt-->54.7<!--/v-->/<!--v:lunarDenseChi2MinusJose4-->48.7<!--/v--> — the Joses and Hallstatt
 receive no independent support from this corpus (removing Hallstatt or
 Jose4 even lowers the misfit; for the Joses, consistent with their
 ~179-yr period averaging out in century bins; for Hallstatt this stands

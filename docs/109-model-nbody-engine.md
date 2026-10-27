@@ -1055,6 +1055,28 @@ window move by degrees; no J2000 value moves). The literal twin of the pair
 in `moon/arguments.cjs` (a CJS module beside the ESM home) left with the
 one-home module; `MOON_ECC_SENSITIVITY_PERIGEE/NODE` are exported from it.
 
+Follow-up in the same version, from the owner's reading of the Node Regression
+panel (notches at every multiple of 2,000 years from J2000): the arguments'
+three bounded carriers — the planetary e² channel, the obliquity carrier and
+the secular-ë completion — were, inside ±250 kyr, ONE Simpson sum from J2000
+to T whose node count stepped with the span (every 2 kyr for the obliquity and
+the completion, every 8 kyr for the planetary carrier), so the accumulated
+discretisation error jumped at those spans: measured 0.3–6″ on the obliquity
+carrier (6.4″ at −200 kyr), 10–15″ on the planetary carrier (11″ at −6000, 15″
+at −22,000). On L′'s rate (17 million ″/yr) that was invisible; once the frame
+remainder rode Ω and ϖ, whose rates are 250 times smaller, each jump was a
+0.5-d notch on the node and perigee periods (the panel differences the
+argument over one year). All three carriers now ride one cumulative table per
+direction — 100-yr cells to ±250 kyr grown in 10-kyr chunks, the former 1-kyr
+tier beyond — continuous in value and in rate; the 378 notches of the
+−250 kyr … +100 kyr span became none (the six that remain sit at the chart's
+left edge, on the chain-cycle counts' own 1-kyr tier beyond ±250 kyr: a
+±0.3-d sawtooth per cell, pre-existing, `chain-cycles/index.cjs`). L′, and
+with it D, M′ and F alike, moved ≤ 1.2″ inside ±3 kyr, 6″ at −5000, 12″ at
+−25 kyr and −100 kyr, 42″ at −1 Myr — the removed kinks; ϖ and Ω by the same
+through the remainder. The lunar records re-baselined on the tiny window
+deltas; doc 66's "the certified numbers" for the in-era Simpson is gone with it.
+
 ## Related documents
 
 - [13-perihelion-precession.md](13-perihelion-precession.md) — §1.8: the projection identity, the transit test, the candidate slot

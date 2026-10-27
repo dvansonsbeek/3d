@@ -518,6 +518,24 @@ precession moves L′, ϖ, Ω and leaves M′/F within 1e-3″ to −1 Myr — t
 the derived pair. Doc 66's "0.658″/cy², 60 % of Lieske's" for pFix's T² was
 stale against the code (1.069, 96 %).
 
+**The follow-up the panel found** (the owner's Node Regression reading, same
+day): notches at every multiple of 2,000 years. The arguments' bounded
+carriers were, inside ±250 kyr, a single Simpson from J2000 to T whose node
+count stepped with the span, so the accumulated error jumped there — 0.3–6″
+on the obliquity carrier, 10–15″ on the planetary one at ±6 and ±22 kyr —
+invisible on L′'s rate and a 0.5-d notch on the node period once the
+remainder rode Ω. **The rule it adds:** an integral read at many endpoints is
+a cumulative table from the anchor with a fixed cell, never a whole-span
+quadrature whose node count depends on the endpoint — the value may be
+accurate at every T and its rate still jumps where N changes, and a
+derivative-reading surface (a period panel, a rate gate) sees the jump the
+value-reading surfaces hid. All three carriers now ride one table (100-yr
+cells to ±250 kyr); the plotted span's 378 notches became none; L′ moved
+≤ 1.2″ inside ±3 kyr and up to 42″ at −1 Myr (the removed kinks; doc 109
+§23.5). The chain-cycle counts' own 1-kyr tier beyond ±250 kyr shows the same
+class at ±0.3 d per cell on the node period — pre-existing, recorded, not
+yet changed.
+
 ---
 
 ## 2. The browser tier's gates and their origins

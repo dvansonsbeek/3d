@@ -163,59 +163,63 @@ function createMoonArguments({ constants, fns }) {
     return kPl;
   }
   // ── Deep-time carrier tables ────────────────────────────────────────────────
-  // In the era (|T| ≤ CARRIER_DENSE_CY = 250 kyr) each carrier is the Simpson
-  // sum below, untouched — the certified numbers. Beyond, the integral
-  // continues from the dense edge on a cumulative table of CARRIER_CELL_CY
-  // cells (1 kyr; per-cell 3-point Simpson, a 3-point Simpson over the
-  // partial last cell), grown in CARRIER_CHUNK cells in the direction asked
-  // for. The former form re-integrated the whole span from J2000 on EVERY
-  // call with N ∝ |T| nodes — 77 evaluations of the e channel at 300 kyr,
-  // 2,500 at 10 Myr, per lunar argument set and frame — the deep-time
-  // playback cost the owner measured (the loop's JS at 190 ms a frame).
-  const CARRIER_DENSE_CY = 2500, CARRIER_CELL_CY = 10, CARRIER_CHUNK = 2500;
+  // Every carrier is ∫₀ᵀ f dt on ONE cumulative table per direction: fine
+  // cells of CARRIER_FINE_CY (100 yr) to ±CARRIER_FINE_RANGE_CY (250 kyr),
+  // grown in CARRIER_FINE_CHUNK cells (10 kyr — an in-window call never
+  // samples deeper than it must), then CARRIER_CELL_CY cells (1 kyr) grown in
+  // CARRIER_CHUNK (the former deep tier, unchanged); per-cell 3-point Simpson
+  // and a 3-point Simpson over the partial last cell. Continuous in value AND
+  // in rate: the per-cell error is fixed by the cell, so nothing jumps when T
+  // grows. (Plan 23 follow-up, measured on the Node Regression panel: the
+  // in-era form was one Simpson from J2000 to T whose node count stepped every
+  // 2 kyr (obliquity) / 8 kyr (planetary), so the accumulated error jumped
+  // there — 0.3–6″ on the obliquity carrier at 20–250 kyr, 10–15″ on the
+  // planetary one at ±6/22 kyr — invisible on L′'s rate, a notch of 0.5 d on
+  // the node period once the remainder rode Ω. The earlier form that
+  // re-integrated the whole span on every call cost the deep-time playback
+  // 190 ms a frame — the owner's measurement behind the tables.)
+  const CARRIER_FINE_CY = 1, CARRIER_FINE_RANGE_CY = 2500, CARRIER_FINE_CHUNK = 100;
+  const CARRIER_CELL_CY = 10, CARRIER_CHUNK = 2500;
   /** @param {(t: number) => number} f the SCALED integrand per century
-   *  @param {(T: number) => number} dense the in-era Simpson (its value at ±CARRIER_DENSE_CY seeds the table)
-   *  @returns {(T: number) => number} */
-  function makeDeepCarrier(f, dense) {
-    /** @type {{ fwd: number[] | null, bwd: number[] | null }} */
+   *  @returns {(T: number) => number} ∫₀ᵀ f dt, T in Julian centuries (signed) */
+  function makeDeepCarrier(f) {
+    /** @type {{ fwd: {fine: number[], coarse: number[] | null} | null, bwd: {fine: number[], coarse: number[] | null} | null }} */
     const sides = { fwd: null, bwd: null };
+    const NF = CARRIER_FINE_RANGE_CY / CARRIER_FINE_CY;
+    /** The signed cell integral from t0 (nearer J2000) to t1. @param {number} t0 @param {number} t1 */
+    const cell = (t0, t1) => (f(t0) + 4 * f((t0 + t1) / 2) + f(t1)) * ((t1 - t0) / 6);
+    /** @param {{fine: number[]}} s @param {number} dir @param {number} upTo grow the fine table to this many cells */
+    const growFine = (s, dir, upTo) => {
+      for (let i = s.fine.length; i <= upTo; i++) s.fine.push(s.fine[i - 1] + cell(dir * (i - 1) * CARRIER_FINE_CY, dir * i * CARRIER_FINE_CY));
+    };
     return (T) => {
-      if (Math.abs(T) <= CARRIER_DENSE_CY) return dense(T);
-      const dir = T > 0 ? 1 : -1;
-      let cum = dir === 1 ? sides.fwd : sides.bwd;
-      if (!cum) { cum = [dense(dir * CARRIER_DENSE_CY)]; if (dir === 1) sides.fwd = cum; else sides.bwd = cum; }
-      const dist = Math.abs(T) - CARRIER_DENSE_CY;
-      const k = Math.floor(dist / CARRIER_CELL_CY);
-      let target = cum.length;
-      while (target < k + 2) target += CARRIER_CHUNK;
-      for (let i = cum.length; i < target; i++) {
-        const t0 = dir * (CARRIER_DENSE_CY + (i - 1) * CARRIER_CELL_CY), t1 = t0 + dir * CARRIER_CELL_CY;
-        cum.push(cum[i - 1] + dir * (f(t0) + 4 * f((t0 + t1) / 2) + f(t1)) * (CARRIER_CELL_CY / 6));
+      if (T === 0) return 0;
+      const dir = T > 0 ? 1 : -1, a = Math.abs(T);
+      let s = dir === 1 ? sides.fwd : sides.bwd;
+      if (!s) { s = { fine: [0], coarse: null }; if (dir === 1) sides.fwd = s; else sides.bwd = s; }
+      if (a <= CARRIER_FINE_RANGE_CY) {
+        const k = Math.floor(a / CARRIER_FINE_CY);
+        if (s.fine.length < k + 2) growFine(s, dir, Math.min(NF, Math.ceil((k + 1) / CARRIER_FINE_CHUNK) * CARRIER_FINE_CHUNK));
+        return s.fine[k] + cell(dir * k * CARRIER_FINE_CY, T);
       }
-      const ta = dir * (CARRIER_DENSE_CY + k * CARRIER_CELL_CY);
-      const hp = T - ta;
-      return cum[k] + (f(ta) + 4 * f(ta + hp / 2) + f(T)) * (hp / 6);
+      if (!s.coarse) { growFine(s, dir, NF); s.coarse = [s.fine[NF]]; }
+      const dist = a - CARRIER_FINE_RANGE_CY;
+      const k = Math.floor(dist / CARRIER_CELL_CY);
+      let target = s.coarse.length;
+      while (target < k + 2) target += CARRIER_CHUNK;
+      for (let i = s.coarse.length; i < target; i++) {
+        const t0 = dir * (CARRIER_FINE_RANGE_CY + (i - 1) * CARRIER_CELL_CY);
+        s.coarse.push(s.coarse[i - 1] + cell(t0, t0 + dir * CARRIER_CELL_CY));
+      }
+      return s.coarse[k] + cell(dir * (CARRIER_FINE_RANGE_CY + k * CARRIER_CELL_CY), T);
     };
   }
 
-  /** The planetary carrier's SCALED integrand, k_PL · (e² − e0²), per century. @param {number} t */
+  /** The planetary carrier's SCALED integrand, k_PL · (e² − e0²), per century
+   *  (e0 the channel's anchor CONST — not eccAt(0), which under integrated
+   *  phase carries the R3 drift correction, the 8.2-2 convention). @param {number} t */
   const planetaryIntegrand = (t) => { const e = eccAt(t * 100); return kPlValue() * (e * e - eccE0 * eccE0); };
-  /** @param {number} T @returns {number} */
-  function planetaryCarrierDense(T) {
-    if (T === 0) return 0;
-    const k = kPlValue();
-    // The channel's e0 anchor CONST — not eccAt(0), which under integrated
-    // phase carries the R3 drift correction (the 8.2-2 convention).
-    const e0sq = eccE0 * eccE0;
-    /** @param {number} t */
-    const f = (t) => { const e = eccAt(t * 100); return e * e - e0sq; };
-    const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
-    const h = T / N;
-    let sum = f(0) + f(T);
-    for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-    return k * sum * h / 3;
-  }
-  const planetaryCarrier = makeDeepCarrier(planetaryIntegrand, planetaryCarrierDense);
+  const planetaryCarrier = makeDeepCarrier(planetaryIntegrand);
 
   /** @type {{eps0: number, C: number} | null} */
   let obl = null;
@@ -238,19 +242,7 @@ function createMoonArguments({ constants, fns }) {
   }
   /** The obliquity carrier's SCALED integrand, C · (ε − ε0), per century. @param {number} t */
   const obliquityIntegrand = (t) => { const O = oblInit(); return O.C * (computeObliquityEarth(2000 + t * 100) - O.eps0); };
-  /** @param {number} T @returns {number} */
-  function obliquityCarrierDense(T) {
-    if (T === 0) return 0;
-    const O = oblInit();
-    /** @param {number} t */
-    const f = (t) => computeObliquityEarth(2000 + t * 100) - O.eps0;
-    const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 2000));
-    const h = T / N;
-    let sum = f(0) + f(T);
-    for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-    return O.C * sum * h / 3;
-  }
-  const obliquityCarrier = makeDeepCarrier(obliquityIntegrand, obliquityCarrierDense);
+  const obliquityCarrier = makeDeepCarrier(obliquityIntegrand);
 
   /** The frame share's REMAINDER for ϖ and Ω (plan 23). The physical exponents gave
    *  up the frame's T² the Meeus-effective pair carried (T2F, Lieske's); pFix
@@ -307,24 +299,20 @@ function createMoonArguments({ constants, fns }) {
       const d2Ch = (e2(10) - 2 * e2(0) + e2(-10)) / 100;
       secComp = { dd2: d2Sec - d2Ch, d3Sec, Tq: SECULAR_COMPLETION_TAPER_YEARS / 100 };
     }
-    const S = secComp;
-    /** @param {number} t */
-    const f = (t) => {
-      const q = Math.abs(t) / S.Tq;
-      if (q >= 1) return 0;
-      const env = Math.cos(Math.PI / 2 * q) ** 2;
-      return (0.5 * S.dd2 * t * t + S.d3Sec * t * t * t / 6) * env;
-    };
-    // Beyond the era the envelope has long closed (|t| ≥ Tq ≈ 279 cy → 0): the
-    // integral is the constant to ±Tq, so integrate exactly that span instead of
-    // N ∝ |T| nodes of zeros (in-era calls untouched).
-    if (Math.abs(T) > CARRIER_DENSE_CY) T = Math.sign(T) * S.Tq;
-    const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 2000));
-    const h = T / N;
-    let sum = f(0) + f(T);
-    for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-    return kPlValue() * sum * h / 3;
+    // Beyond the taper the envelope has closed (|t| ≥ Tq ≈ 279 cy → 0): the
+    // integral is the constant to ±Tq, so the table is read at ±Tq there.
+    const Tq = secComp.Tq;
+    return secCarrier(Math.abs(T) > Tq ? Math.sign(T) * Tq : T);
   }
+  /** The completion's SCALED integrand, k_PL · the tapered curvature difference, per century. @param {number} t */
+  const secIntegrand = (t) => {
+    const S = /** @type {{dd2: number, d3Sec: number, Tq: number}} */ (secComp);
+    const q = Math.abs(t) / S.Tq;
+    if (q >= 1) return 0;
+    const env = Math.cos(Math.PI / 2 * q) ** 2;
+    return kPlValue() * (0.5 * S.dd2 * t * t + S.d3Sec * t * t * t / 6) * env;
+  };
+  const secCarrier = makeDeepCarrier(secIntegrand);
 
   // ── Deep-time branch: always-chains (Stage B) ────────────────────────────
   /** @type {number | null} */
