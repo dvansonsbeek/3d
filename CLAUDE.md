@@ -261,7 +261,7 @@ derivation history and the retired fourth leg: doc 111 §3):
    prediction. A Precambrian section violating either half falsifies its tier.
 2. **Historical-era exactness** — the fail-proven gate suite: eclipses, the
    LOD/ΔT stack, cardinal points, the 45-anchor paleo bands (an unexplained
-   *improvement* fails too; the Mesoproterozoic 2.5–3.6σ gap to Zhou 2024's
+   *improvement* fails too; the Mesoproterozoic 1.8–2.6σ gap to Zhou 2024's
    precession constants is the stated open discrepancy).
 3. **Two-expansions μ-consistency** — the rock-measured long-eccentricity
    period tracks 405.6 kyr / μ^1.153 under the measured solar-mass history

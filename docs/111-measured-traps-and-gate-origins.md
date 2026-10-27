@@ -755,7 +755,7 @@ section violating any half falsifies the corresponding tier.
 (`eclipse-audit`), the LOD/ΔT stack, cardinal points, the 45-anchor paleo
 bands (`paleo-anchors`, where an unexplained *improvement* fails too —
 every row a test on the cited history; the documented bands name their
-cause, the Mesoproterozoic 2.5–3.6σ gap to Zhou 2024's precession constants
+cause, the Mesoproterozoic 1.8–2.6σ gap to Zhou 2024's precession constants
 being the stated open discrepancy).
 
 **(3) Two-expansions μ-consistency** — the rock-measured long-eccentricity

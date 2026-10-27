@@ -206,7 +206,7 @@ The model's parameters apply at **all epochs from the end of the cited Earth–M
 
 - **Wells 1963** (Devonian coral growth bands at 380 Ma): <!--v:anchorWellsFlagship380Pred-->402.83<!--/v--> days per year predicted against Wells's paleontological count of 400 (<!--v:anchorWellsFlagship380DeltaPct-->+0.71<!--/v--> %)
 - **Wu et al. 2024** (650-Myr cyclostratigraphy): the predicted day length and precession rate match the reconstruction across the Phanerozoic to within ~1 %
-- **The mid-Precambrian cyclostratigraphy** (Lantink 2022 at 2.46 Ga, Meyers & Malinverno 2018 at 1.4 Ga, Zhou 2024 at 1.2–1.6 Ga): the derived precession constant reads within 1–2 % at Joffre and Xiamaling, and 2.5–3.6σ below Zhou's two older sites — the stated open discrepancy, carried as documented bands, not fitted away
+- **The mid-Precambrian cyclostratigraphy** (Lantink 2022 at 2.46 Ga, Meyers & Malinverno 2018 at 1.4 Ga, Zhou 2024 at 1.2–1.6 Ga): the derived precession constant reads within 1–2 % at Joffre and Xiamaling, and 1.8–2.6σ below Zhou's two older sites — the stated open discrepancy, carried as documented bands, not fitted away
 
 The full evidence — the published anchors, per-anchor tolerances, the documented deviations and the gate that re-checks all of it on every CI run — is assembled in the [Deep-Time Validation Dossier (Doc 106)](docs/106-deep-time-validation-dossier.md). The deep-time layer carries NO fitted term: the Earth–Moon distance history is a cited physical input (Farhat 2022's ocean-tide solution, the AstroGeo22 ephemeris), the day length follows by angular-momentum conservation, the precession and the clock by the composed law, and every rock datum tests the result.
 
