@@ -1069,9 +1069,12 @@ remainder rode Ω and ϖ, whose rates are 250 times smaller, each jump was a
 argument over one year). All three carriers now ride one cumulative table per
 direction — 100-yr cells to ±250 kyr grown in 10-kyr chunks, the former 1-kyr
 tier beyond — continuous in value and in rate; the 378 notches of the
-−250 kyr … +100 kyr span became none (the six that remain sit at the chart's
-left edge, on the chain-cycle counts' own 1-kyr tier beyond ±250 kyr: a
-±0.3-d sawtooth per cell, pre-existing, `chain-cycles/index.cjs`). L′, and
+−250 kyr … +100 kyr span became none; the six that remained at the chart's
+left edge were the chain-cycle counts' own 1-kyr tier beyond ±250 kyr (a
+±0.3-d sawtooth per cell from its linear read, landing on the small
+difference of two large counts that the of-date node is), whose read is now
+a 3-point Simpson over the partial cell as well (`chain-cycles/index.cjs`;
+the dense 10-yr grid's byte-identical linear read stays). L′, and
 with it D, M′ and F alike, moved ≤ 1.2″ inside ±3 kyr, 6″ at −5000, 12″ at
 −25 kyr and −100 kyr, 42″ at −1 Myr — the removed kinks; ϖ and Ω by the same
 through the remainder. The lunar records re-baselined on the tiny window

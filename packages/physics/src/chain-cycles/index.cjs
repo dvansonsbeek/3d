@@ -28,7 +28,9 @@
  * NUMERICS ARE LOAD-BEARING: fixed 10-yr grid over ±250 kyr, per-cell
  * 3-point Simpson at build, LINEAR interpolation on read; beyond the dense
  * grid a COARSE cumulative table (1-kyr cells, the same per-cell Simpson,
- * anchored at the dense edge) grown lazily in 250-kyr chunks in the direction
+ * anchored at the dense edge; read with a 3-point Simpson over the partial
+ * cell, so the count's RATE is continuous — plan 23 follow-up, see the tier
+ * note below) grown lazily in 250-kyr chunks in the direction
  * asked for — the owner's playback at 1,000 yr/s past year 250,000 had fallen
  * to 190 ms of JS per frame: the former fallback, an adaptive Simpson of up to
  * 1,024 samples per call cached by exact year pair, re-integrated every one
@@ -136,9 +138,19 @@ function createChainCycleIntegrator({
   // Per chain and per direction, a cumulative table in COARSE_STEP cells that
   // starts at the dense edge with the edge's own value and grows by COARSE_CHUNK
   // years whenever a year beyond its reach is asked for. The cells are built
-  // with the same 3-point Simpson as the dense grid; the read is the same
-  // linear interpolation. The period laws vary on Myr scales at deep time, so
-  // 1-kyr cells hold the count to far below a cycle — the old fallback sampled
+  // with the same 3-point Simpson as the dense grid; the read is a 3-point
+  // Simpson over the partial cell from the cell's start (three integrand
+  // evaluations per read), NOT the dense grid's linear interpolation: a
+  // linear read makes the count's rate piecewise constant per cell, and the
+  // of-date node and perigee are SMALL differences of two large counts
+  // (N_drac − N_trop: 13.4 − 13.37 cycles/yr), so each table's per-cell slope
+  // step — 1e-6 of its own rate, the month's tidal drift over 1 kyr — landed
+  // fully on the difference: a ±0.3-d sawtooth per cell on the node period
+  // beyond ±250 kyr (measured on the Node Regression panel, plan 23
+  // follow-up). On the dense 10-yr grid the same step is 100× smaller and
+  // below every reader, so its linear read — the byte-identical in-window
+  // path — stays. The period laws vary on Myr scales at deep time, so 1-kyr
+  // cells hold the count to far below a cycle — the old fallback sampled
   // ~1 per kyr too, but re-did the whole span on every call.
   const COARSE_STEP = 1000, COARSE_CHUNK = 250000, COARSE_LIMIT_YEARS = 600e6;
   /** @typedef {{ cum: number[], ok: boolean }} CoarseSide */
@@ -178,9 +190,13 @@ function createChainCycleIntegrator({
     if (distance > COARSE_LIMIT_YEARS) return null;
     if (side.cum.length < Math.ceil(distance / COARSE_STEP) + 1) growCoarse(periodFnSeconds, side, edgeYear, dir, distance);
     if (!side.ok || side.cum.length < Math.ceil(distance / COARSE_STEP) + 1) return null;
-    const idxF = distance / COARSE_STEP;
-    const i = Math.floor(idxF);
-    return side.cum[i] + (idxF - i) * (side.cum[i + 1] - side.cum[i]);
+    const i = Math.floor(distance / COARSE_STEP);
+    // the partial cell from its start y0 to y: a 3-point Simpson, signed by (y − y0)
+    const y0 = edgeYear + dir * i * COARSE_STEP;
+    if (y === y0) return side.cum[i];
+    const f0 = integrandAt(periodFnSeconds, y0), fm = integrandAt(periodFnSeconds, (y0 + y) / 2), f1 = integrandAt(periodFnSeconds, y);
+    if (f0 === null || fm === null || f1 === null) return null;
+    return side.cum[i] + (f0 + 4 * fm + f1) * ((y - y0) / 6);
   }
   /** C(y) anywhere the tables reach: dense inside the grid, coarse beyond.
    *  @param {PeriodSecondsAtAge} periodFnSeconds @param {Float64Array} tab @param {number} y @returns {number | null} */

@@ -532,9 +532,15 @@ derivative-reading surface (a period panel, a rate gate) sees the jump the
 value-reading surfaces hid. All three carriers now ride one table (100-yr
 cells to ±250 kyr); the plotted span's 378 notches became none; L′ moved
 ≤ 1.2″ inside ±3 kyr and up to 42″ at −1 Myr (the removed kinks; doc 109
-§23.5). The chain-cycle counts' own 1-kyr tier beyond ±250 kyr shows the same
-class at ±0.3 d per cell on the node period — pre-existing, recorded, not
-yet changed.
+§23.5). The chain-cycle counts' own 1-kyr tier beyond ±250 kyr showed the
+same class as a ±0.3-d sawtooth per cell on the node period — its linear
+read made each count's rate piecewise constant, and the of-date node is a
+SMALL difference of two large counts (13.4 − 13.37 cycles/yr), so a slope
+step of 1e-6 of either count landed fully on it; that tier now reads a
+3-point Simpson over the partial cell (three integrand evaluations per read;
+`chain-cycles/index.cjs`), 102 kinks over −300…−240 kyr → none; the dense
+10-yr grid's linear read, 100× smaller in step and below every reader, stays
+byte-identical.
 
 ---
 
