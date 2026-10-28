@@ -200,7 +200,7 @@ export { createEclipseFinders } from './eclipse/finders.cjs';
  * even though the body is empty.
  *
  * @param {Constants} [constants]
- * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any, giaEllipticityOfDate?: boolean, spinCheckpointsArtifact?: any }} [opts]
+ * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any, giaEllipticityOfDate?: boolean, spinCheckpointsArtifact?: any, lunarCheckpointsArtifact?: any }} [opts]
  *   `laws` — research overrides for Earth's orbit laws (doc 109 §7); absent = the shipped laws, bit-identical. Not part of the hash.
  * @returns {Model}
  */
@@ -262,7 +262,10 @@ export const createModel = (constants = GENERATED, opts = {}) => {
   // there by construction, never trusted to the caller.
   const bankAllowed = hash === CONSTANTS_HASH && !(opts.laws && Object.keys(opts.laws).length) && opts.giaEllipticityOfDate !== false;
   const surfaces = assembleModel(ctx, FITTED, opts.laws ?? {}, opts.secularSeriesArtifact ?? null,
-    { giaEllipticityOfDate: opts.giaEllipticityOfDate !== false, spinCheckpointsArtifact: bankAllowed ? (opts.spinCheckpointsArtifact ?? null) : null });
+    { giaEllipticityOfDate: opts.giaEllipticityOfDate !== false,
+      spinCheckpointsArtifact: bankAllowed ? (opts.spinCheckpointsArtifact ?? null) : null,
+      // plan 25: the lunar cumulative bank rides the same guard (the prefixes are the shipped context's sums)
+      lunarCheckpointsArtifact: bankAllowed ? (opts.lunarCheckpointsArtifact ?? null) : null });
 
   return {
     constants: ctx,

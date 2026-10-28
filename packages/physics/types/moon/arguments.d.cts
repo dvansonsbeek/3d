@@ -33,6 +33,7 @@ export type MoonArgsDeg = {
  *     pDynDegPerYearAt?: (year: number) => number,
  *     pKinDegPerYearAt?: (year: number) => number,
  *   },
+ *   checkpoints?: { carriers?: Record<string, { fwd: number[], bwd: number[] }> } | null,
  * }} deps — fns are the ENGINE'S OWN chain wrappers (each engine's toggle
  *   semantics ride along); eccAt/channelIntegral are the shared moon ecc
  *   channel; constants are J2000-frozen injections. The OPTIONAL precession
@@ -47,7 +48,7 @@ export type MoonArgsDeg = {
  *   perihelion of date, wrapped — the arguments wrap M, and the rate anchors
  *   difference it over ±25 days wrapped to ±180°).
  */
-export function createMoonArguments({ constants, fns }: {
+export function createMoonArguments({ constants, fns, checkpoints }: {
     constants: {
         j2000JD: number;
         julianCenturyDays: number;
@@ -74,6 +75,12 @@ export function createMoonArguments({ constants, fns }: {
         pDynDegPerYearAt?: (year: number) => number;
         pKinDegPerYearAt?: (year: number) => number;
     };
+    checkpoints?: {
+        carriers?: Record<string, {
+            fwd: number[];
+            bwd: number[];
+        }>;
+    } | null;
 }): {
     argsAt: (jdTT: number) => MoonArgsDeg;
     fwArgs: (jdTT: number) => MoonArgsDeg;
@@ -108,6 +115,10 @@ export function createMoonArguments({ constants, fns }: {
         P0: number;
         T2F: number;
     };
+    recordCarrierPrefixes: (limitCy: number) => Record<string, {
+        fwd: number[];
+        bwd: number[];
+    }>;
     _rateCompletion: () => {
         rc: {
             ok: boolean;

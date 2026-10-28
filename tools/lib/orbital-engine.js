@@ -127,9 +127,10 @@ function _cardinalPkg() {
   try { artifact = require('../../data/nbody-secular-series.json'); } catch { artifact = undefined; }
   // PLAN 24: the spin-axis checkpoint bank beside the series — a deep cardinal read then
   // walks at most 250 kyr (bit-identical nodes; the purity gate's bank row). Absent → the full walk.
-  let bank;
+  let bank, lunarBank;
   try { bank = require('../../data/spin-axis-checkpoints.json'); } catch { bank = undefined; }
-  _cardinalPkgM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank } : undefined);
+  try { lunarBank = require('../../data/lunar-cumulative-checkpoints.json'); } catch { lunarBank = undefined; }   // plan 25
+  _cardinalPkgM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank, lunarCheckpointsArtifact: lunarBank } : undefined);
   return _cardinalPkgM;
 }
 

@@ -32,6 +32,7 @@ export function createModel(constants?: Constants, opts?: {
     secularSeriesArtifact?: any;
     giaEllipticityOfDate?: boolean;
     spinCheckpointsArtifact?: any;
+    lunarCheckpointsArtifact?: any;
 }): Model;
 export type Constants = Record<string, unknown> & {
     hash?: string;

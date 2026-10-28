@@ -65,8 +65,10 @@ const REQUIRED = [
   'data/equinox-vs-vondrak.json',
   // plan 22 step 2 — Earth's osculating orbit beside its mean, the panel exhibit:
   'data/earth-osculating-wobble.json',
-  // plan 24 — the spin-axis checkpoint bank (the walk's state every 250 kyr; a deep jump walks ≤ one spacing):
+  // plan 24 — the spin-axis checkpoint bank (the walk's state every 250 kyr; a deep point read walks ≤ one spacing):
   'data/spin-axis-checkpoints.json',
+  // plan 25 — the lunar cumulative bank (the lunar tables' coarse segment prefixes every 250 kyr):
+  'data/lunar-cumulative-checkpoints.json',
   // plan 12 §1b close-out — the shipped ΔT stack and the resonator amplitudes
   // (the joint fitter stamps both; a re-close is by hand — the cascade lists it):
   'data/deltaT-4flag-fit.json',

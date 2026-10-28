@@ -172,7 +172,10 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   schedule has ONE home and is gated against a finer walk at the deep ages.
   A walk pure in its state can be BANKED (its stored state + the rule
   reproduces the next state bit-for-bit); a walk with an accumulator cannot —
-  banking it ships two models. (§1.29)
+  banking it ships two models. A seat helps a POINT read, never a cumulative
+  integral; to bank a cumulative table give it a SEGMENTED association in
+  both paths (prefix + within-segment sum), so bank and no-bank are
+  bit-identical by construction — never a tolerance between them. (§1.29)
 
 ---
 
@@ -247,9 +250,12 @@ panel's osculating-orbit exhibit table (`earth-osculating-wobble.js` —
 REFUSES if the lab's mean parts from the series') and the spin-axis
 checkpoint bank (`spin-axis-bank.js --write`, ~25 min — REFUSES if a
 checkpoint does not resume bit-exactly or the step schedule parts from a
-10-yr walk at 100 Ma / 500 Ma / 2.46 Ga). `npm run regen:cascade`
+10-yr walk at 100 Ma / 500 Ma / 2.46 Ga) and the lunar cumulative bank
+(`lunar-cumulative-bank.js --write`, ~7 min — REFUSES if a segment prefix
+does not resume bit-exactly or the deep lunar longitude parts between the
+seated and the unseeded tables). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (14 generators, 6 gates).
+test:verify:list` the full classification (15 generators, 6 gates).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

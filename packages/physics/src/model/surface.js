@@ -15,7 +15,7 @@ export function assembleSurface(ctx) {
     eclipseFinders, evalClimateL1, frameworkDeltaTSecondsAtJD, inclinationDeg, j2000JD, jdFromYear, jdTTFromUT,
     julianCenturyDays, lodRealSeconds, meanLengthOfDay, meanSiderealYearDays, moonDistanceCorrected, moonDistanceKm,
     moonDistanceKmAtYearOrNaN, moonOrbitalShift, moonSeries, moonSiderealMonth, moonSiderealMonthDaysAt,
-    moonSynodicMonthDays, oneSourceM, planetAscNodeDeg, planetEccentricity, planetInclinationDeg, planetPerihelionDeg,
+    moonSynodicMonthDays, oneSourceM, recordLunarCumulativeBank, planetAscNodeDeg, planetEccentricity, planetInclinationDeg, planetPerihelionDeg,
     planetSpin, publishedAxialPrecessionYearsAtYear, publishedTropicalYearSecondsAtYear, s3ArcsecPerYr,
     siTropicalYearDays, siderealDaySeconds, siderealYearDays, spinAxisInertialRateMeanArcsecPerYr, stellarDaySeconds,
     sunApparentLonDegAtJdUT, sunEccentricityAt, sunL0Deg, sunMeanLongitudeDegAt, sunPerihelionDegAt,
@@ -275,6 +275,9 @@ export function assembleSurface(ctx) {
       lonDegAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedLonDeg(jd),
       betaDegAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedBetaDeg(jd),
       distanceKmAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedDistanceKm(jd),
+      // THE GENERATOR'S HOOK (plan 25; tools/verify/lunar-cumulative-bank.js): the lunar tables'
+      // coarse segment prefixes over ±limitYears — the bank's payload. Not an API surface.
+      recordCumulativeBank: recordLunarCumulativeBank,
     }),
     eclipse: Object.freeze({
       sunLonDegAtJD: /** @param {number} jd @returns {number} */ (jd) => eclipseFinders.sunLonDegAt(jd),

@@ -82,6 +82,7 @@ const SECULAR_COMPLETION_TAPER_YEARS = 27943.083333333332;
  *     pDynDegPerYearAt?: (year: number) => number,
  *     pKinDegPerYearAt?: (year: number) => number,
  *   },
+ *   checkpoints?: { carriers?: Record<string, { fwd: number[], bwd: number[] }> } | null,
  * }} deps — fns are the ENGINE'S OWN chain wrappers (each engine's toggle
  *   semantics ride along); eccAt/channelIntegral are the shared moon ecc
  *   channel; constants are J2000-frozen injections. The OPTIONAL precession
@@ -96,7 +97,7 @@ const SECULAR_COMPLETION_TAPER_YEARS = 27943.083333333332;
  *   perihelion of date, wrapped — the arguments wrap M, and the rate anchors
  *   difference it over ±25 days wrapped to ±180°).
  */
-function createMoonArguments({ constants, fns }) {
+function createMoonArguments({ constants, fns, checkpoints = null }) {
   const {
     j2000JD, julianCenturyDays,
     eccentricityJ2000, eccentricityDotJ2000, eccentricityDotDotJ2000,
@@ -179,11 +180,21 @@ function createMoonArguments({ constants, fns }) {
   // re-integrated the whole span on every call cost the deep-time playback
   // 190 ms a frame — the owner's measurement behind the tables.)
   const CARRIER_FINE_CY = 1, CARRIER_FINE_RANGE_CY = 2500, CARRIER_FINE_CHUNK = 100;
-  const CARRIER_CELL_CY = 10, CARRIER_CHUNK = 2500;
+  // PLAN 25 — the coarse tier in SEGMENTS of CARRIER_SEGMENT_CELLS cells (250 kyr, the lunar
+  // bank's checkpoint spacing): within a segment the cells sum from zero (S_k[j]), the segment
+  // prefixes P[k+1] = P[k] + S_k[last] are kept apart, and a value is the two-term sum
+  // P[k] + S_k[j] — so the bank's stored P[k] and a self-computed one are the same doubles in
+  // the same order (a seat, never a value; the purity gate's lunar rows). The former single
+  // running sum differed from this association at the rounding level beyond ±250 kyr only.
+  const CARRIER_CELL_CY = 10, CARRIER_SEGMENT_CELLS = 250, CARRIER_LIMIT_CY = 6000000;
+  /** @typedef {{ fine: number[], P: number[] | null, segs: Map<number, number[]>, banked: number }} CarrierSide */
+  /** @type {Map<string, { fwd: (limitCy: number) => number[], bwd: (limitCy: number) => number[] }>} */
+  const carrierRecorders = new Map();
   /** @param {(t: number) => number} f the SCALED integrand per century
+   *  @param {string} [name] the bank key (plan 25); an unnamed carrier never seats and never records
    *  @returns {(T: number) => number} ∫₀ᵀ f dt, T in Julian centuries (signed) */
-  function makeDeepCarrier(f) {
-    /** @type {{ fwd: {fine: number[], coarse: number[] | null} | null, bwd: {fine: number[], coarse: number[] | null} | null }} */
+  function makeDeepCarrier(f, name) {
+    /** @type {{ fwd: CarrierSide | null, bwd: CarrierSide | null }} */
     const sides = { fwd: null, bwd: null };
     const NF = CARRIER_FINE_RANGE_CY / CARRIER_FINE_CY;
     /** The signed cell integral from t0 (nearer J2000) to t1. @param {number} t0 @param {number} t1 */
@@ -192,34 +203,80 @@ function createMoonArguments({ constants, fns }) {
     const growFine = (s, dir, upTo) => {
       for (let i = s.fine.length; i <= upTo; i++) s.fine.push(s.fine[i - 1] + cell(dir * (i - 1) * CARRIER_FINE_CY, dir * i * CARRIER_FINE_CY));
     };
+    /** @param {1|-1} dir @returns {CarrierSide} */
+    const sideOf = (dir) => {
+      let s = dir === 1 ? sides.fwd : sides.bwd;
+      if (!s) { s = { fine: [0], P: null, segs: new Map(), banked: 0 }; if (dir === 1) sides.fwd = s; else sides.bwd = s; }
+      return s;
+    };
+    /** The coarse prefixes' seat: P[0] = the fine tier's edge value; the bank's array when it has
+     *  the same P[0] bit for bit (the same fine tier), else computed. @param {CarrierSide} s @param {1|-1} dir */
+    const coarseInit = (s, dir) => {
+      if (s.P) return;
+      growFine(s, dir, NF);
+      s.P = [s.fine[NF]];
+      const bankedCarrier = name && checkpoints && checkpoints.carriers ? checkpoints.carriers[name] : undefined;
+      const arr = bankedCarrier ? bankedCarrier[dir === 1 ? 'fwd' : 'bwd'] : undefined;
+      if (Array.isArray(arr) && arr.length > 1 && arr[0] === s.P[0]) { s.P = arr.slice(); s.banked = arr.length; }
+    };
+    /** Segment k's within-segment prefix sums (built once). @param {CarrierSide} s @param {1|-1} dir @param {number} k */
+    const segment = (s, dir, k) => {
+      let S = s.segs.get(k);
+      if (S) return S;
+      S = [0];
+      const base = CARRIER_FINE_RANGE_CY + k * CARRIER_SEGMENT_CELLS * CARRIER_CELL_CY;
+      for (let j = 1; j <= CARRIER_SEGMENT_CELLS; j++) {
+        const t0 = dir * (base + (j - 1) * CARRIER_CELL_CY);
+        S.push(S[j - 1] + cell(t0, t0 + dir * CARRIER_CELL_CY));
+      }
+      s.segs.set(k, S);
+      return S;
+    };
+    /** Make P[0..k] exist (segments before k summed from their own zero and chained, unless banked).
+     *  @param {CarrierSide} s @param {1|-1} dir @param {number} k */
+    const prefixesTo = (s, dir, k) => {
+      const P = /** @type {number[]} */ (s.P);
+      for (let m = P.length - 1; m < k; m++) P.push(P[m] + segment(s, dir, m)[CARRIER_SEGMENT_CELLS]);
+    };
+    if (name) {
+      carrierRecorders.set(name, {
+        fwd: (limitCy) => { const s = sideOf(1); coarseInit(s, 1); const K = Math.floor(Math.min(limitCy, CARRIER_LIMIT_CY) / (CARRIER_SEGMENT_CELLS * CARRIER_CELL_CY)); prefixesTo(s, 1, K); return /** @type {number[]} */ (s.P).slice(0, K + 1); },
+        bwd: (limitCy) => { const s = sideOf(-1); coarseInit(s, -1); const K = Math.floor(Math.min(limitCy, CARRIER_LIMIT_CY) / (CARRIER_SEGMENT_CELLS * CARRIER_CELL_CY)); prefixesTo(s, -1, K); return /** @type {number[]} */ (s.P).slice(0, K + 1); },
+      });
+    }
     return (T) => {
       if (T === 0) return 0;
       const dir = T > 0 ? 1 : -1, a = Math.abs(T);
-      let s = dir === 1 ? sides.fwd : sides.bwd;
-      if (!s) { s = { fine: [0], coarse: null }; if (dir === 1) sides.fwd = s; else sides.bwd = s; }
+      const s = sideOf(dir);
       if (a <= CARRIER_FINE_RANGE_CY) {
         const k = Math.floor(a / CARRIER_FINE_CY);
         if (s.fine.length < k + 2) growFine(s, dir, Math.min(NF, Math.ceil((k + 1) / CARRIER_FINE_CHUNK) * CARRIER_FINE_CHUNK));
         return s.fine[k] + cell(dir * k * CARRIER_FINE_CY, T);
       }
-      if (!s.coarse) { growFine(s, dir, NF); s.coarse = [s.fine[NF]]; }
+      coarseInit(s, dir);
       const dist = a - CARRIER_FINE_RANGE_CY;
-      const k = Math.floor(dist / CARRIER_CELL_CY);
-      let target = s.coarse.length;
-      while (target < k + 2) target += CARRIER_CHUNK;
-      for (let i = s.coarse.length; i < target; i++) {
-        const t0 = dir * (CARRIER_FINE_RANGE_CY + (i - 1) * CARRIER_CELL_CY);
-        s.coarse.push(s.coarse[i - 1] + cell(t0, t0 + dir * CARRIER_CELL_CY));
-      }
-      return s.coarse[k] + cell(dir * (CARRIER_FINE_RANGE_CY + k * CARRIER_CELL_CY), T);
+      const i = Math.floor(dist / CARRIER_CELL_CY);
+      const k = Math.floor(i / CARRIER_SEGMENT_CELLS), j = i - k * CARRIER_SEGMENT_CELLS;
+      if (/** @type {number[]} */ (s.P).length <= k) prefixesTo(s, dir, k);
+      const cellStart = /** @type {number[]} */ (s.P)[k] + segment(s, dir, k)[j];
+      return cellStart + cell(dir * (CARRIER_FINE_RANGE_CY + i * CARRIER_CELL_CY), T);
     };
+  }
+  /** THE GENERATOR'S HOOK (plan 25): every named carrier's coarse segment prefixes in both
+   *  directions, computed by the recursion above — the arrays the lunar bank stores.
+   *  @param {number} limitCy @returns {Record<string, { fwd: number[], bwd: number[] }>} */
+  function recordCarrierPrefixes(limitCy) {
+    /** @type {Record<string, { fwd: number[], bwd: number[] }>} */
+    const out = {};
+    for (const [n, r] of carrierRecorders) out[n] = { fwd: r.fwd(limitCy), bwd: r.bwd(limitCy) };
+    return out;
   }
 
   /** The planetary carrier's SCALED integrand, k_PL · (e² − e0²), per century
    *  (e0 the channel's anchor CONST — not eccAt(0), which under integrated
    *  phase carries the R3 drift correction, the 8.2-2 convention). @param {number} t */
   const planetaryIntegrand = (t) => { const e = eccAt(t * 100); return kPlValue() * (e * e - eccE0 * eccE0); };
-  const planetaryCarrier = makeDeepCarrier(planetaryIntegrand);
+  const planetaryCarrier = makeDeepCarrier(planetaryIntegrand, 'planetary');
 
   /** @type {{eps0: number, C: number} | null} */
   let obl = null;
@@ -242,7 +299,7 @@ function createMoonArguments({ constants, fns }) {
   }
   /** The obliquity carrier's SCALED integrand, C · (ε − ε0), per century. @param {number} t */
   const obliquityIntegrand = (t) => { const O = oblInit(); return O.C * (computeObliquityEarth(2000 + t * 100) - O.eps0); };
-  const obliquityCarrier = makeDeepCarrier(obliquityIntegrand);
+  const obliquityCarrier = makeDeepCarrier(obliquityIntegrand, 'obliquity');
 
   /** The frame share's REMAINDER for ϖ and Ω (plan 23). The physical exponents gave
    *  up the frame's T² the Meeus-effective pair carried (T2F, Lieske's); pFix
@@ -312,6 +369,7 @@ function createMoonArguments({ constants, fns }) {
     const env = Math.cos(Math.PI / 2 * q) ** 2;
     return kPlValue() * (0.5 * S.dd2 * t * t + S.d3Sec * t * t * t / 6) * env;
   };
+  // (unnamed — read only inside ±Tq ≈ 279 cy, the fine tier; its coarse tier never exists)
   const secCarrier = makeDeepCarrier(secIntegrand);
 
   // ── Deep-time branch: always-chains (Stage B) ────────────────────────────
@@ -570,6 +628,7 @@ function createMoonArguments({ constants, fns }) {
   // _rateCompletion: probe hook (instruments/verification) — the (d′) state:
   // whether the completion is live, its measured ṗΔ, and the five anchors.
   return { argsAt, fwArgs, fwArgsDeep, pureMeeusArgs, planetaryCarrier, obliquityCarrier, lpSecularCompletion, bundle,
+    recordCarrierPrefixes,
     _rateCompletion: () => ({ rc: rateCompInit(), anchors: anchorsInit() }) };
 }
 

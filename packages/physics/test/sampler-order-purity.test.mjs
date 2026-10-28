@@ -90,7 +90,7 @@ const check = (label, year, fresh, dirty) => {
   } else if (!withBank.bankLoaded) {
     failures.push('createOneSourceTier(): data/spin-axis-checkpoints.json not loaded — node tools/verify/spin-axis-bank.js --write');
   } else {
-    const BANK_EPOCHS = [-3000000, -137000000, -498000000];   // decimal-year offsets from 2000 (t)
+    const BANK_EPOCHS = [-3000000, -37000000, -137000000];   // decimal-year offsets from 2000 (t); the unseated walk to −137 Myr is the gate's cost (~27 s)
     /** @param {any} h @param {number} t */
     const sample = (h, t) => {
       const s = h.build(t, 0, 5000).at(t);
@@ -112,6 +112,21 @@ const check = (label, year, fresh, dirty) => {
     for (const t of BANK_EPOCHS) {
       check('model earth.obliquityDeg bank vs full walk', 2000 + t,
         m0.earth.obliquityDeg(2000 + t), m.earth.obliquityDeg(2000 + t));
+    }
+    // ── Twin 4 (plan 25): the LUNAR cumulative bank is a seat, not a value ──
+    // data/lunar-cumulative-checkpoints.json holds the lunar tables' coarse
+    // segment prefixes; a seated model sums one segment at most. The tables'
+    // association is the same with and without it, so the deep lunar longitude
+    // (the chain counts and the carriers behind L′, ϖ, Ω) must be bit-identical
+    // in either visit order — deepest first on the seated model, shallowest
+    // first on the unseated one (whose walk to −37 Myr is this block's cost).
+    const lunarArt = JSON.parse(readFileSync(join(ROOT, 'data', 'lunar-cumulative-checkpoints.json'), 'utf8'));
+    const ml = createModel(undefined, { secularSeriesArtifact: seriesArt, spinCheckpointsArtifact: bankArt, lunarCheckpointsArtifact: lunarArt });
+    const ml0 = createModel(undefined, { secularSeriesArtifact: seriesArt, spinCheckpointsArtifact: bankArt });
+    const LUNAR_JDS = [-3000000, -37000000].map((t) => 2451545 + t * 365.25 + 12345.678);
+    const seatedLon = Object.fromEntries([...LUNAR_JDS].reverse().map((jd) => [jd, ml.moon.lonDegAtJD(jd)]));
+    for (const jd of LUNAR_JDS) {
+      check('model moon.lonDegAtJD lunar bank vs unseeded tables', 2000 + (jd - 2451545) / 365.25, ml0.moon.lonDegAtJD(jd), seatedLon[jd]);
     }
   }
 }

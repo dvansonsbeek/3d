@@ -112,7 +112,15 @@ export function createApi() {
     spinCheckpointsArtifact = JSON.parse(readFileSync(
       new URL('../../../data/spin-axis-checkpoints.json', import.meta.url), 'utf8'));
   } catch { /* package-only install, or the bank not yet generated: the full walk */ }
-  const model = createModel(undefined, { secularSeriesArtifact, spinCheckpointsArtifact });
+  // PLAN 25 — the lunar cumulative bank: the lunar tables' coarse segment prefixes every
+  // 250 kyr, so a deep lunar read integrates one segment at most (bit-identical to the
+  // unseeded tables); absent, the tables integrate from J2000.
+  let lunarCheckpointsArtifact = null;
+  try {
+    lunarCheckpointsArtifact = JSON.parse(readFileSync(
+      new URL('../../../data/lunar-cumulative-checkpoints.json', import.meta.url), 'utf8'));
+  } catch { /* package-only install, or the bank not yet generated */ }
+  const model = createModel(undefined, { secularSeriesArtifact, spinCheckpointsArtifact, lunarCheckpointsArtifact });
   const id = model.identity;
 
   /** Derivations metadata: structural explanation per quantity (§7 "derivations"). */

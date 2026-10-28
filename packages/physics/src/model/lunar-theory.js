@@ -12,11 +12,15 @@ import { driver2PeriodSecondsAtAge } from '../planets/orbit-chain.cjs';
 /** @param {import('./time-axis.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleLunarTheory(ctx) {
   const {
-    C, F, late, EPOCH_PARAMS, axialPrecessionJ2000Days, chain, deepEcc, deepLod, meanDeltaTSecondsAtAge,
+    C, F, late, options, EPOCH_PARAMS, axialPrecessionJ2000Days, chain, deepEcc, deepLod, meanDeltaTSecondsAtAge,
     meanSiderealYearDays, meanSolarYearDays, meanTropicalYearJ2000Seconds, moonChain, moonDistanceKm,
     moonDistanceMetresAtAge, moonSiderealMonth, oneSourceM, startmodelJD, startmodelYear, sunPerihelionDegAt,
     yearFromJD,
   } = ctx;
+  // PLAN 25 — the lunar cumulative bank (data/lunar-cumulative-checkpoints.json, parsed, or null): the
+  // chain counts' and the carriers' coarse segment prefixes every 250 kyr. A seat, never a value — the
+  // tables' association is the same with and without it (the purity gate's lunar rows).
+  const lunarCheckpoints = options.lunarCheckpointsArtifact ?? null;
   // Wiring mirrors the engine call sites exactly — tools/lib/deep-time.js
   // (ecc channel, month chain, J2000 precession anchors),
   // tools/lib/scene-graph.js (chain-cycles, arguments, series) and
@@ -52,6 +56,7 @@ export function assembleLunarTheory(ctx) {
     ageAnchorYear: startmodelYear,
     tropicalYearJ2000Seconds: meanTropicalYearJ2000Seconds,   // the SI tick
     isDeepTime: () => true,
+    checkpoints: lunarCheckpoints,
   });
   /** @param {number} tMa @returns {number|null} */
   const nodalMonthPeriodFn = (tMa) => moonChain.nodalMonthSecondsAtAge(tMa);
@@ -64,6 +69,12 @@ export function assembleLunarTheory(ctx) {
   const jupiterT0Seconds = C.planetOrbitalElements.jupiter.orbitalPeriodInputDays * 86400;
   /** @param {number} tMa @returns {number} */
   const jupiterPeriodFn = (tMa) => driver2PeriodSecondsAtAge(tMa, jupiterT0Seconds, EPOCH_PARAMS.solarMassLossFracPerYear);
+  // The five chains the lunar bank keys (plan 25) — the SAME names in the Node scene twin and the browser.
+  chainCycles.nameChain('draconic', nodalMonthPeriodFn);
+  chainCycles.nameChain('tropical', tropicalMonthPeriodFn);
+  chainCycles.nameChain('anomalistic', anomalisticMonthPeriodFn);
+  chainCycles.nameChain('sidereal', siderealMonthPeriodFn);
+  chainCycles.nameChain('jupiter', jupiterPeriodFn);
   /** @param {number} a @param {number} b @returns {number|null} */
   const mcDraconic = (a, b) => chainCycles.cyclesBetween(nodalMonthPeriodFn, a, b);
   /** @param {number} a @param {number} b @returns {number|null} */
@@ -136,6 +147,24 @@ export function assembleLunarTheory(ctx) {
         return (sid === null || trop === null) ? 0 : 360 * (sid - trop) / sid;
       },
     },
+    checkpoints: lunarCheckpoints,   // plan 25: the carriers' coarse segment prefixes
+  });
+  /** THE GENERATOR'S HOOK (plan 25, tools/verify/lunar-cumulative-bank.js): the coarse segment
+   *  prefixes of the five named chains and the two named carriers over ±limitYears from their
+   *  edges — the payload of data/lunar-cumulative-checkpoints.json, computed by the tables' own
+   *  recursion on THIS context (never seated on a bank: the generator builds without one).
+   *  @param {number} limitYears */
+  const recordLunarCumulativeBank = (limitYears) => ({
+    chains: {
+      draconic: chainCycles.recordSegmentPrefixes(nodalMonthPeriodFn, limitYears),
+      tropical: chainCycles.recordSegmentPrefixes(tropicalMonthPeriodFn, limitYears),
+      anomalistic: chainCycles.recordSegmentPrefixes(anomalisticMonthPeriodFn, limitYears),
+      sidereal: chainCycles.recordSegmentPrefixes(siderealMonthPeriodFn, limitYears),
+      jupiter: chainCycles.recordSegmentPrefixes(jupiterPeriodFn, limitYears),
+    },
+    carriers: moonArgs.recordCarrierPrefixes(limitYears / 100),
+    segmentYears: chainCycles.coarseSegmentYears,
+    chainLimitYears: chainCycles.coarseLimitYears,
   });
 
   // UT→TT on the CALENDAR decimal-year coordinate (script.js Phase 9.16 —
@@ -212,6 +241,6 @@ export function assembleLunarTheory(ctx) {
     },
   });
 
-  return { frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays };
+  return { frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays, recordLunarCumulativeBank };
 }
 /** @typedef {import('./time-axis.js').Ctx & ReturnType<typeof assembleLunarTheory>} Ctx */

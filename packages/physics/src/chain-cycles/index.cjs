@@ -30,7 +30,9 @@
  * grid a COARSE cumulative table (1-kyr cells, the same per-cell Simpson,
  * anchored at the dense edge; read with a 3-point Simpson over the partial
  * cell, so the count's RATE is continuous — plan 23 follow-up, see the tier
- * note below) grown lazily in 250-kyr chunks in the direction
+ * note below) in 250-kyr SEGMENTS with separate segment prefixes (plan 25 —
+ * the lunar cumulative bank seats the prefixes, the association is the same
+ * with and without it), grown lazily in the direction
  * asked for — the owner's playback at 1,000 yr/s past year 250,000 had fallen
  * to 190 ms of JS per frame: the former fallback, an adaptive Simpson of up to
  * 1,024 samples per call cached by exact year pair, re-integrated every one
@@ -58,6 +60,7 @@
  *   gridStepYears?: number,
  *   gridAnchorYear?: number,
  *   maxCacheEntries?: number,
+ *   checkpoints?: { chains?: Record<string, { fwd: number[], bwd: number[] }> } | null,
  * }} deps — ageAnchorYear is the year whose age is 0 in the period
  *   functions' t_Ma coordinate (startmodelYear = 2000.5, the certified
  *   convention); tropicalYearJ2000Seconds is the length of ONE tick of the
@@ -79,6 +82,9 @@ function createChainCycleIntegrator({
   gridStepYears = 10,
   gridAnchorYear = 2000,
   maxCacheEntries = 512,
+  // PLAN 25 — the lunar cumulative bank (data/lunar-cumulative-checkpoints.json, parsed): per named
+  // chain the coarse tier's segment prefixes in both directions; null/absent = compute them.
+  checkpoints = null,
 }) {
   /** @type {WeakMap<PeriodSecondsAtAge, Map<string, number>>} */
   const caches = new WeakMap();
@@ -152,51 +158,122 @@ function createChainCycleIntegrator({
   // path — stays. The period laws vary on Myr scales at deep time, so 1-kyr
   // cells hold the count to far below a cycle — the old fallback sampled
   // ~1 per kyr too, but re-did the whole span on every call.
-  const COARSE_STEP = 1000, COARSE_CHUNK = 250000, COARSE_LIMIT_YEARS = 600e6;
-  /** @typedef {{ cum: number[], ok: boolean }} CoarseSide */
+  // PLAN 25 — THE SEGMENTED ASSOCIATION. The coarse table was ONE running sum
+  // from the dense edge; it is now SEGMENTS of COARSE_SEGMENT_CELLS cells
+  // (250 kyr, the checkpoint spacing of the lunar cumulative bank): inside a
+  // segment the cells sum from zero (S_k[j]), and the segment prefixes
+  // P[k+1] = P[k] + S_k[last] are kept apart, so the value at a cell is the
+  // two-term sum P[k] + S_k[j]. The lunar bank (data/lunar-cumulative-
+  // checkpoints.json) stores exactly the P[k] this recursion produces, and a
+  // runtime seated on it computes only the segment it reads — the SAME doubles
+  // in the SAME order as the no-bank path, so the bank is a seat, never a
+  // value (the sampler-purity gate's lunar rows pin it bit-exact). The former
+  // contiguous sum differed from this association at the rounding level
+  // beyond ±250 kyr (1e-16 of 650 million months, 0.02″ of lunar longitude);
+  // inside the dense grid nothing changed.
+  const COARSE_STEP = 1000, COARSE_SEGMENT_CELLS = 250, COARSE_LIMIT_YEARS = 600e6;
+  const COARSE_SEGMENT_YEARS = COARSE_STEP * COARSE_SEGMENT_CELLS;
+  /** @typedef {{ P: number[], segs: Map<number, number[]>, ok: boolean, banked: number }} CoarseSide
+   *  P[k] = the cumulative value at the start of segment k (P[0] = the dense edge's);
+   *  segs.get(k) = the within-segment prefix sums S_k[0..COARSE_SEGMENT_CELLS], S_k[0] = 0;
+   *  banked = how many P entries came from the bank (never recomputed). */
   /** @type {WeakMap<PeriodSecondsAtAge, { fwd: CoarseSide, bwd: CoarseSide }>} */
   const coarse = new WeakMap();
+  /** @type {WeakMap<PeriodSecondsAtAge, string>} */
+  const chainNames = new WeakMap();
   /** @param {PeriodSecondsAtAge} periodFnSeconds @param {number} y @returns {number | null} cycles per tick */
   const integrandAt = (periodFnSeconds, y) => {
     const tPeriodS = periodFnSeconds((ageAnchorYear - y) / 1e6);
     return tPeriodS === null ? null : tropicalYearJ2000Seconds / tPeriodS;
   };
-  /** Grow one side until it covers `distance` years from the dense edge (or fails on a null chain).
+  /** The within-segment prefix sums of segment k (built once; null on an undefined chain).
    *  @param {PeriodSecondsAtAge} periodFnSeconds @param {CoarseSide} side @param {number} edgeYear
-   *  @param {1|-1} dir @param {number} distance */
-  function growCoarse(periodFnSeconds, side, edgeYear, dir, distance) {
-    const need = Math.ceil(distance / COARSE_STEP) + 1;
-    let target = side.cum.length;
-    while (target < need) target += COARSE_CHUNK / COARSE_STEP;
-    for (let i = side.cum.length; i < target && side.ok; i++) {
-      const y0 = edgeYear + dir * (i - 1) * COARSE_STEP, y1 = y0 + dir * COARSE_STEP;
+   *  @param {1|-1} dir @param {number} k @returns {number[] | null} */
+  function segment(periodFnSeconds, side, edgeYear, dir, k) {
+    let S = side.segs.get(k);
+    if (S) return S;
+    S = [0];
+    const base = edgeYear + dir * k * COARSE_SEGMENT_YEARS;
+    for (let j = 1; j <= COARSE_SEGMENT_CELLS; j++) {
+      const y0 = base + dir * (j - 1) * COARSE_STEP, y1 = y0 + dir * COARSE_STEP;
       const f0 = integrandAt(periodFnSeconds, y0), fm = integrandAt(periodFnSeconds, (y0 + y1) / 2), f1 = integrandAt(periodFnSeconds, y1);
-      if (f0 === null || fm === null || f1 === null) { side.ok = false; break; }
-      side.cum.push(side.cum[i - 1] + dir * (f0 + 4 * fm + f1) * (COARSE_STEP / 6));
+      if (f0 === null || fm === null || f1 === null) { side.ok = false; return null; }
+      S.push(S[j - 1] + dir * (f0 + 4 * fm + f1) * (COARSE_STEP / 6));
     }
+    side.segs.set(k, S);
+    return S;
+  }
+  /** Make P[0..k] exist: segments before k are summed from their own zero and
+   *  chained — unless the bank supplied them. @param {PeriodSecondsAtAge} periodFnSeconds
+   *  @param {CoarseSide} side @param {number} edgeYear @param {1|-1} dir @param {number} k */
+  function prefixesTo(periodFnSeconds, side, edgeYear, dir, k) {
+    for (let m = side.P.length - 1; m < k && side.ok; m++) {
+      const S = segment(periodFnSeconds, side, edgeYear, dir, m);
+      if (!S) return;
+      side.P.push(side.P[m] + S[COARSE_SEGMENT_CELLS]);
+    }
+  }
+  /** The two sides of a chain's coarse tier, the bank's prefixes seated when the chain is named there.
+   *  @param {PeriodSecondsAtAge} periodFnSeconds @param {Float64Array} tab */
+  function coarseSides(periodFnSeconds, tab) {
+    let c = coarse.get(periodFnSeconds);
+    if (!c) {
+      c = { fwd: { P: [tab[tab.length - 1]], segs: new Map(), ok: true, banked: 0 }, bwd: { P: [tab[0]], segs: new Map(), ok: true, banked: 0 } };
+      const name = chainNames.get(periodFnSeconds);
+      const bankedChain = name && checkpoints && checkpoints.chains ? checkpoints.chains[name] : undefined;
+      if (bankedChain) {
+        // The bank's P[0] is the dense edge's value too: it must equal ours bit for bit
+        // (the same dense grid), or the bank was made on another configuration — refuse to seat.
+        for (const [key, side] of /** @type {Array<['fwd'|'bwd', CoarseSide]>} */ ([['fwd', c.fwd], ['bwd', c.bwd]])) {
+          const arr = bankedChain[key];
+          if (Array.isArray(arr) && arr.length > 1 && arr[0] === side.P[0]) { side.P = arr.slice(); side.banked = arr.length; }
+        }
+      }
+      coarse.set(periodFnSeconds, c);
+    }
+    return c;
   }
   /** C(y) beyond the dense grid, or null when the chain is undefined on the way there.
    *  @param {PeriodSecondsAtAge} periodFnSeconds @param {Float64Array} tab @param {number} y @returns {number | null} */
   function coarseAt(periodFnSeconds, tab, y) {
-    let c = coarse.get(periodFnSeconds);
-    if (!c) {
-      c = { fwd: { cum: [tab[tab.length - 1]], ok: true }, bwd: { cum: [tab[0]], ok: true } };
-      coarse.set(periodFnSeconds, c);
-    }
+    const c = coarseSides(periodFnSeconds, tab);
     const dir = y >= gridMaxYear ? 1 : -1;
     const side = dir === 1 ? c.fwd : c.bwd;
     const edgeYear = dir === 1 ? gridMaxYear : gridMinYear;
     const distance = Math.abs(y - edgeYear);
     if (distance > COARSE_LIMIT_YEARS) return null;
-    if (side.cum.length < Math.ceil(distance / COARSE_STEP) + 1) growCoarse(periodFnSeconds, side, edgeYear, dir, distance);
-    if (!side.ok || side.cum.length < Math.ceil(distance / COARSE_STEP) + 1) return null;
     const i = Math.floor(distance / COARSE_STEP);
+    const k = Math.floor(i / COARSE_SEGMENT_CELLS), j = i - k * COARSE_SEGMENT_CELLS;
+    if (side.P.length <= k) prefixesTo(periodFnSeconds, side, edgeYear, dir, k);
+    if (!side.ok || side.P.length <= k) return null;
+    const S = segment(periodFnSeconds, side, edgeYear, dir, k);
+    if (!S) return null;
+    const cellStart = side.P[k] + S[j];
     // the partial cell from its start y0 to y: a 3-point Simpson, signed by (y − y0)
     const y0 = edgeYear + dir * i * COARSE_STEP;
-    if (y === y0) return side.cum[i];
+    if (y === y0) return cellStart;
     const f0 = integrandAt(periodFnSeconds, y0), fm = integrandAt(periodFnSeconds, (y0 + y) / 2), f1 = integrandAt(periodFnSeconds, y);
     if (f0 === null || fm === null || f1 === null) return null;
-    return side.cum[i] + (f0 + 4 * fm + f1) * ((y - y0) / 6);
+    return cellStart + (f0 + 4 * fm + f1) * ((y - y0) / 6);
+  }
+  /** Name a chain so the lunar bank's prefixes can seat it (plan 25). The three twins name the
+   *  same five chains; an unnamed chain never seats and never records.
+   *  @param {string} name @param {PeriodSecondsAtAge} periodFnSeconds */
+  function nameChain(name, periodFnSeconds) { chainNames.set(periodFnSeconds, name); }
+  /** THE GENERATOR'S HOOK (plan 25): the segment prefixes P[0..K] of a chain's coarse tier in both
+   *  directions, computed by the recursion above from the chain's own dense edge — the arrays the
+   *  bank stores. K = the number of whole segments inside limitYears from the edge.
+   *  @param {PeriodSecondsAtAge} periodFnSeconds @param {number} limitYears
+   *  @returns {{ fwd: number[], bwd: number[], segmentYears: number } | null} */
+  function recordSegmentPrefixes(periodFnSeconds, limitYears) {
+    const tab = table(periodFnSeconds);
+    if (tab === null) return null;
+    const c = coarseSides(periodFnSeconds, tab);
+    const K = Math.floor(Math.min(limitYears, COARSE_LIMIT_YEARS) / COARSE_SEGMENT_YEARS);
+    prefixesTo(periodFnSeconds, c.fwd, gridMaxYear, 1, K);
+    prefixesTo(periodFnSeconds, c.bwd, gridMinYear, -1, K);
+    if (!c.fwd.ok || !c.bwd.ok) return null;
+    return { fwd: c.fwd.P.slice(0, K + 1), bwd: c.bwd.P.slice(0, K + 1), segmentYears: COARSE_SEGMENT_YEARS };
   }
   /** C(y) anywhere the tables reach: dense inside the grid, coarse beyond.
    *  @param {PeriodSecondsAtAge} periodFnSeconds @param {Float64Array} tab @param {number} y @returns {number | null} */
@@ -274,7 +351,7 @@ function createChainCycleIntegrator({
     return result;
   }
 
-  return { cyclesBetween };
+  return { cyclesBetween, nameChain, recordSegmentPrefixes, coarseSegmentYears: COARSE_SEGMENT_YEARS, coarseLimitYears: COARSE_LIMIT_YEARS };
 }
 
 module.exports = { createChainCycleIntegrator };

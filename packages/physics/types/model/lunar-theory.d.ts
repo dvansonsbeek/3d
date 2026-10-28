@@ -38,6 +38,10 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
             P0: number;
             T2F: number;
         };
+        recordCarrierPrefixes: (limitCy: number) => Record<string, {
+            fwd: number[];
+            bwd: number[];
+        }>;
         _rateCompletion: () => {
             rc: {
                 ok: boolean;
@@ -74,5 +78,40 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
         };
     };
     moonSynodicMonthDays: number;
+    recordLunarCumulativeBank: (limitYears: number) => {
+        chains: {
+            draconic: {
+                fwd: number[];
+                bwd: number[];
+                segmentYears: number;
+            } | null;
+            tropical: {
+                fwd: number[];
+                bwd: number[];
+                segmentYears: number;
+            } | null;
+            anomalistic: {
+                fwd: number[];
+                bwd: number[];
+                segmentYears: number;
+            } | null;
+            sidereal: {
+                fwd: number[];
+                bwd: number[];
+                segmentYears: number;
+            } | null;
+            jupiter: {
+                fwd: number[];
+                bwd: number[];
+                segmentYears: number;
+            } | null;
+        };
+        carriers: Record<string, {
+            fwd: number[];
+            bwd: number[];
+        }>;
+        segmentYears: number;
+        chainLimitYears: number;
+    };
 };
 export type Ctx = import("./time-axis.js").Ctx & ReturnType<typeof assembleLunarTheory>;

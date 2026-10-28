@@ -161,6 +161,41 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         lonDegAtJD: (jd: number) => number;
         betaDegAtJD: (jd: number) => number;
         distanceKmAtJD: (jd: number) => number;
+        recordCumulativeBank: (limitYears: number) => {
+            chains: {
+                draconic: {
+                    fwd: number[];
+                    bwd: number[];
+                    segmentYears: number;
+                } | null;
+                tropical: {
+                    fwd: number[];
+                    bwd: number[];
+                    segmentYears: number;
+                } | null;
+                anomalistic: {
+                    fwd: number[];
+                    bwd: number[];
+                    segmentYears: number;
+                } | null;
+                sidereal: {
+                    fwd: number[];
+                    bwd: number[];
+                    segmentYears: number;
+                } | null;
+                jupiter: {
+                    fwd: number[];
+                    bwd: number[];
+                    segmentYears: number;
+                } | null;
+            };
+            carriers: Record<string, {
+                fwd: number[];
+                bwd: number[];
+            }>;
+            segmentYears: number;
+            chainLimitYears: number;
+        };
     }>;
     eclipse: Readonly<{
         sunLonDegAtJD: (jd: number) => number;

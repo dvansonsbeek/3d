@@ -12,6 +12,7 @@ export type PeriodSecondsAtAge = (tMa: number) => (number | null);
  *   gridStepYears?: number,
  *   gridAnchorYear?: number,
  *   maxCacheEntries?: number,
+ *   checkpoints?: { chains?: Record<string, { fwd: number[], bwd: number[] }> } | null,
  * }} deps — ageAnchorYear is the year whose age is 0 in the period
  *   functions' t_Ma coordinate (startmodelYear = 2000.5, the certified
  *   convention); tropicalYearJ2000Seconds is the length of ONE tick of the
@@ -24,7 +25,7 @@ export type PeriodSecondsAtAge = (tMa: number) => (number | null);
  *   a plain correctness fix, the tick already is an SI tick);
  *   isDeepTime is read PER CALL so the engine's runtime toggle works.
  */
-export function createChainCycleIntegrator({ ageAnchorYear, tropicalYearJ2000Seconds, isDeepTime, gridMinYear, gridMaxYear, gridStepYears, gridAnchorYear, maxCacheEntries, }: {
+export function createChainCycleIntegrator({ ageAnchorYear, tropicalYearJ2000Seconds, isDeepTime, gridMinYear, gridMaxYear, gridStepYears, gridAnchorYear, maxCacheEntries, checkpoints, }: {
     ageAnchorYear: number;
     tropicalYearJ2000Seconds: number;
     isDeepTime: () => boolean;
@@ -33,6 +34,20 @@ export function createChainCycleIntegrator({ ageAnchorYear, tropicalYearJ2000Sec
     gridStepYears?: number;
     gridAnchorYear?: number;
     maxCacheEntries?: number;
+    checkpoints?: {
+        chains?: Record<string, {
+            fwd: number[];
+            bwd: number[];
+        }>;
+    } | null;
 }): {
     cyclesBetween: (periodFnSeconds: PeriodSecondsAtAge, yearA: number, yearB: number) => number | null;
+    nameChain: (name: string, periodFnSeconds: PeriodSecondsAtAge) => void;
+    recordSegmentPrefixes: (periodFnSeconds: PeriodSecondsAtAge, limitYears: number) => {
+        fwd: number[];
+        bwd: number[];
+        segmentYears: number;
+    } | null;
+    coarseSegmentYears: number;
+    coarseLimitYears: number;
 };

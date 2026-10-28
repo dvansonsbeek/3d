@@ -51,12 +51,15 @@ const _FW_A3_RATE = 360 * 36525 / C.moonSiderealMonth;
 // gap class as the Phase 9.13 Moon mirror). One period fn per planet, stable
 // identity, so the shared chain-cycles tables key correctly.
 const _mcPlanet = {};
+/** @type {Record<string, (t_Ma: number) => number>} the planets' period fns (plan 25: Jupiter's is a named bank chain) */
+const _planetPeriodFn = {};
 const { driver2PeriodSecondsAtAge } = _req('@essrt/physics/planets/orbit-chain');
 for (const _pk of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
   const T0 = C.planets[_pk].orbitalPeriodInputDays * 86400;
   // 8.3 L6: Driver 2 shared; one period fn per planet (stable identity for
   // the chain-cycles tables).
   const periodFn = (t_Ma) => driver2PeriodSecondsAtAge(t_Ma, T0, DT.SOLAR_MASS_LOSS_FRAC_PER_YR);
+  _planetPeriodFn[_pk] = periodFn;
   _mcPlanet[_pk] = (a, b) => _moonChainCyclesTools(periodFn, a, b);
 }
 const _mcJupiter = _mcPlanet.jupiter;   // the deep-time A2 argument feed (unchanged identity semantics)
@@ -89,6 +92,7 @@ function _moonArgsM() {
     const DTmod = DT;   // perf: the top-level binding — no per-call module resolution
     const AR = C.ASTRO_REFERENCE;
     _moonArgsMTools = createMoonArguments({
+      checkpoints: _lunarBank(),   // plan 25: the carriers' coarse segment prefixes (a seat, never a value)
       constants: {
         j2000JD: C.j2000JD, julianCenturyDays: 36525,
         eccentricityJ2000: AR.earthEccentricityJ2000,
@@ -168,6 +172,16 @@ const _jdToSIyearTools = (jd) => C.startmodelYear + (jd - C.startmodelJD) / _SI_
 //   (the table still anchors C(2000) = 0 — grid anchor ≠ age anchor,
 //   deliberately, cf. the phase machinery's anchor pair).
 const { createChainCycleIntegrator } = _req('@essrt/physics/chain-cycles');
+// PLAN 25 — the lunar cumulative bank (data/lunar-cumulative-checkpoints.json): the five chain
+// counts' and the two carriers' coarse segment prefixes every 250 kyr; a deep lunar read then
+// integrates one segment at most, bit-identical to the unseeded tables. Absent → computed.
+let _lunarBankM;
+function _lunarBank() {
+  if (_lunarBankM === undefined) {
+    try { _lunarBankM = require('../../data/lunar-cumulative-checkpoints.json'); } catch { _lunarBankM = null; }
+  }
+  return _lunarBankM;
+}
 let _chainCyclesM = null;
 function _chainCyclesT() {
   if (_chainCyclesM === null) {
@@ -175,7 +189,14 @@ function _chainCyclesT() {
       ageAnchorYear: C.startmodelYear,
       tropicalYearJ2000Seconds: C.meanSolarYearDays * C.meanLengthOfDay,   // the SI tick
       isDeepTime: () => DEEP_TIME_ENABLED,
+      checkpoints: _lunarBank(),
     });
+    // the five bank chains, the SAME names as the package model and the browser (plan 25)
+    _chainCyclesM.nameChain('draconic', DT.meanNodalMonthAtAge);
+    _chainCyclesM.nameChain('tropical', DT.meanTropicalMonthAtAge);
+    _chainCyclesM.nameChain('anomalistic', DT.meanAnomalisticMonthAtAge);
+    _chainCyclesM.nameChain('sidereal', DT.meanMoonSiderealMonthAtAge);
+    _chainCyclesM.nameChain('jupiter', _planetPeriodFn.jupiter);
   }
   return _chainCyclesM;
 }
@@ -676,7 +697,7 @@ function _e5Tier() {
     // PLAN 24: seated on the spin-axis checkpoint bank when present (a seat, never a value).
     let bank;
     try { bank = require('../../data/spin-axis-checkpoints.json'); } catch { bank = undefined; }
-    _e5TierM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank } : undefined);
+    _e5TierM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank, lunarCheckpointsArtifact: _lunarBank() ?? undefined } : undefined);
   }
   return _e5TierM;
 }

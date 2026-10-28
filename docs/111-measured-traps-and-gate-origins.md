@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.2
+modelVersion: v27.3
 coefficients: sha256:a1e5567e03d1936e
 status: current
 ---
@@ -590,6 +590,22 @@ question (a seeded running sum is not bit-identical to the contiguous one;
 the deep lunar phase is a 1e-11 quantity in any case). The rule: price a
 "the jump is now fast" claim on the FULL jump, not on the quantity the bank
 holds, and gate the one the bank guarantees.
+
+**The cumulative-integral corollary (plan 25).** A seat helps a point read,
+never a cumulative integral: the lunar tables integrate from J2000 and read
+the integrand at every cell, so with the spin bank seated a deep lunar read
+still cost 0.21 s per Myr (84 s at −400 Myr). Banking a cumulative sum has
+its own identity question — a seeded running sum is a DIFFERENT association
+of the same cells and not bit-identical to the contiguous one. **The rule:**
+give the table a segmented association in BOTH paths (within-segment sums
+from zero, segment prefixes kept apart, a value = prefix + partial), so the
+bank supplies exactly the prefixes the runtime would compute itself and
+bank and no-bank are bit-identical by construction; price the one-time
+association change (here 1–2 ULP of the cycle count beyond ±250 kyr, 0.016″
+of lunar longitude at −3 Myr, nothing inside the dense tier) and record it,
+rather than gating a tolerance between two paths that would then be two
+models. Measured after: 84 s → 2.9 s at −400 Myr in Node (the dense
+±250-kyr grid build, ~1.9 s, is the pre-existing floor of every deep read).
 
 **The second measurement the bank made possible — convergence is not
 prediction.** Two bank runs in one cascade, on the two sides of the climate

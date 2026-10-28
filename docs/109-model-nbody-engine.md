@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.2
+modelVersion: v27.3
 coefficients: sha256:a1e5567e03d1936e
 status: current
 ---
@@ -564,6 +564,33 @@ scene's genesis handling changed with it — an age beyond the cited
 history's last sample (4,429 Ma) is held AT the edge with one console note,
 where it used to be refused per frame and left the scene at whichever epoch
 it had last reached.
+
+**The lunar cumulative bank (plan 25, model v27.3) — the other half of the
+deep jump.** The spin seat buys a point read; the lunar arguments integrate
+from J2000: the five chain counts (the draconic, tropical, anomalistic and
+sidereal months, Jupiter — `chain-cycles/index.cjs`) and the two bounded Lp
+carriers (planetary e², obliquity — `moon/arguments.cjs`) are cumulative
+tables of 1-kyr cells beyond the dense ±250-kyr tier, each cell reading ε(t)
+and e(t), so a deep lunar read still forced the whole walk (measured with
+the spin bank: 0.21 s per Myr in Node, 84 s at −400 Myr). Their coarse tiers
+are now 250-kyr SEGMENTS with separate segment prefixes P[k] — a value is the
+two-term sum P[k] + the within-segment sum — and
+`data/lunar-cumulative-checkpoints.json` (`tools/verify/lunar-cumulative-bank.js
+--write`, ~7 min) stores every table's P[k] in both directions over ±600 Myr
+(the chain-cycle limit), computed by the tables' own recursion on the shipped
+context. A runtime seated on it sums one segment at most and reads the SAME
+doubles in the SAME order as without it: a seat, never a value — the
+generator REFUSES unless every 20th prefix resumes bit-exactly and the deep
+lunar longitude reads bit-identically with and without the bank at 3, 37 and
+137 Ma; `test:sampler-purity`'s lunar rows pin it on the package model in
+both visit orders. The one-time price: the former single running sum differed
+from the segmented association at the rounding level beyond ±250 kyr — 1–2 ULP
+of the cycle count, 0.001″ of lunar longitude at −300 kyr, 0.016″ at −3 Myr;
+nothing inside the dense tier moved. Measured after: the lunar longitude at
+−400 Myr in Node 84 s → 2.9 s, of which ~1.9 s is the dense ±250-kyr grid
+every deep read has always paid once. The deep lunar PHASE keeps its physical
+class — a 1e-11 relative quantity, reproducible, not converged beyond
+~10 Myr; the bank makes it fast and bit-identical, not more meaningful.
 
 **What the deep obliquity's value means after the step is converged.** The
 bank was generated twice in the same cascade — once on the pre-refit GIA
