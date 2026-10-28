@@ -188,7 +188,7 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
   // running sum differed from this association at the rounding level beyond ±250 kyr only.
   const CARRIER_CELL_CY = 10, CARRIER_SEGMENT_CELLS = 250, CARRIER_LIMIT_CY = 6000000;
   /** @typedef {{ fine: number[], P: number[] | null, segs: Map<number, number[]>, banked: number }} CarrierSide */
-  /** @type {Map<string, { fwd: (limitCy: number) => number[], bwd: (limitCy: number) => number[] }>} */
+  /** @type {Map<string, { fwd: (limitCy: number) => number[], bwd: (limitCy: number) => number[], status: () => { fwd: {banked: number, edge: number, bankEdge: number | null}, bwd: {banked: number, edge: number, bankEdge: number | null} } }>} */
   const carrierRecorders = new Map();
   /** @param {(t: number) => number} f the SCALED integrand per century
    *  @param {string} [name] the bank key (plan 25); an unnamed carrier never seats and never records
@@ -209,15 +209,20 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
       if (!s) { s = { fine: [0], P: null, segs: new Map(), banked: 0 }; if (dir === 1) sides.fwd = s; else sides.bwd = s; }
       return s;
     };
-    /** The coarse prefixes' seat: P[0] = the fine tier's edge value; the bank's array when it has
-     *  the same P[0] bit for bit (the same fine tier), else computed. @param {CarrierSide} s @param {1|-1} dir */
+    /** The coarse prefixes' seat: P[0] = the fine tier's edge value; the bank's array when its P[0]
+     *  agrees with ours to a RELATIVE 1e-7 (another configuration is refused; a bit-exact check
+     *  refused every seat in the browser, whose V8 differs from Node's at the last bit — doc 111
+     *  §1.29 — and the carriers then walked the whole span), else computed.
+     *  @param {CarrierSide} s @param {1|-1} dir */
     const coarseInit = (s, dir) => {
       if (s.P) return;
       growFine(s, dir, NF);
       s.P = [s.fine[NF]];
       const bankedCarrier = name && checkpoints && checkpoints.carriers ? checkpoints.carriers[name] : undefined;
       const arr = bankedCarrier ? bankedCarrier[dir === 1 ? 'fwd' : 'bwd'] : undefined;
-      if (Array.isArray(arr) && arr.length > 1 && arr[0] === s.P[0]) { s.P = arr.slice(); s.banked = arr.length; }
+      // (relative 1e-7: the obliquity carrier's edge differs between Chromium and Node by 2.4e-9 — its
+      // integrand is a difference of nearly equal obliquities; a counterfactual's class is ≥ 1e-6)
+      if (Array.isArray(arr) && arr.length > 1 && Math.abs(arr[0] - s.P[0]) <= 1e-7 * Math.max(1, Math.abs(s.P[0]))) { s.P = arr.slice(); s.banked = arr.length; }
     };
     /** Segment k's within-segment prefix sums (built once). @param {CarrierSide} s @param {1|-1} dir @param {number} k */
     const segment = (s, dir, k) => {
@@ -239,9 +244,11 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
       for (let m = P.length - 1; m < k; m++) P.push(P[m] + segment(s, dir, m)[CARRIER_SEGMENT_CELLS]);
     };
     if (name) {
+      const bankSide = (/** @type {1|-1} */ dir) => { const bc = checkpoints && checkpoints.carriers ? checkpoints.carriers[name] : undefined; const arr = bc ? bc[dir === 1 ? 'fwd' : 'bwd'] : undefined; return Array.isArray(arr) ? arr[0] : null; };
       carrierRecorders.set(name, {
         fwd: (limitCy) => { const s = sideOf(1); coarseInit(s, 1); const K = Math.floor(Math.min(limitCy, CARRIER_LIMIT_CY) / (CARRIER_SEGMENT_CELLS * CARRIER_CELL_CY)); prefixesTo(s, 1, K); return /** @type {number[]} */ (s.P).slice(0, K + 1); },
         bwd: (limitCy) => { const s = sideOf(-1); coarseInit(s, -1); const K = Math.floor(Math.min(limitCy, CARRIER_LIMIT_CY) / (CARRIER_SEGMENT_CELLS * CARRIER_CELL_CY)); prefixesTo(s, -1, K); return /** @type {number[]} */ (s.P).slice(0, K + 1); },
+        status: () => { const f = sideOf(1), b = sideOf(-1); coarseInit(f, 1); coarseInit(b, -1); return { fwd: { banked: f.banked, edge: /** @type {number[]} */ (f.P)[0], bankEdge: bankSide(1) }, bwd: { banked: b.banked, edge: /** @type {number[]} */ (b.P)[0], bankEdge: bankSide(-1) } }; },
       });
     }
     return (T) => {
@@ -269,6 +276,15 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
     /** @type {Record<string, { fwd: number[], bwd: number[] }>} */
     const out = {};
     for (const [n, r] of carrierRecorders) out[n] = { fwd: r.fwd(limitCy), bwd: r.bwd(limitCy) };
+    return out;
+  }
+  /** THE SEAT DIAGNOSTIC (plan 25): per named carrier and direction, whether the bank seated and the two
+   *  edge values compared (the fine tier's, the bank's). Forces each carrier's fine tier and coarse init.
+   *  @returns {Record<string, { fwd: {banked: number, edge: number, bankEdge: number | null}, bwd: {banked: number, edge: number, bankEdge: number | null} }>} */
+  function carrierSeatStatus() {
+    /** @type {Record<string, any>} */
+    const out = {};
+    for (const [n, r] of carrierRecorders) out[n] = r.status();
     return out;
   }
 
@@ -628,7 +644,7 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
   // _rateCompletion: probe hook (instruments/verification) — the (d′) state:
   // whether the completion is live, its measured ṗΔ, and the five anchors.
   return { argsAt, fwArgs, fwArgsDeep, pureMeeusArgs, planetaryCarrier, obliquityCarrier, lpSecularCompletion, bundle,
-    recordCarrierPrefixes,
+    recordCarrierPrefixes, carrierSeatStatus,
     _rateCompletion: () => ({ rc: rateCompInit(), anchors: anchorsInit() }) };
 }
 

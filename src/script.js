@@ -2164,6 +2164,9 @@ const _moonArgsM = (() => {
   const get = () => {
     if (!m) {
       m = createMoonArguments({
+        // PLAN 25: the carriers' coarse segment prefixes (a seat, never a value; null until the fetch lands).
+        // Twins: packages/physics lunar-theory.js (options.lunarCheckpointsArtifact), tools/lib scene-graph.js (_lunarBank()).
+        checkpoints: _lunarBankData ?? undefined,
         constants: {
           j2000JD, julianCenturyDays,
           eccentricityJ2000: ASTRO_REFERENCE.eccentricityJ2000,
@@ -2518,16 +2521,28 @@ function meanLunarLevelingCycleAtAge(t_Ma) { return _moonChain().lunarLevelingSe
  *  Serves the Moon chains AND the planet OrbitalCyclesBetween family. */
 const _chainCycles = (() => {
   let m = null;
-  return () => {
+  const get = () => {
     if (!m) {
       m = createChainCycleIntegrator({
         ageAnchorYear: J2000_CALENDAR_YEAR,
         tropicalYearJ2000Seconds: MEAN_TROPICAL_YEAR_J2000_S,   // the SI tick
         isDeepTime: () => DEEP_TIME_MODE_ENABLED,
+        // PLAN 25: the counts' coarse segment prefixes (a seat, never a value; null until the fetch lands)
+        checkpoints: _lunarBankData ?? undefined,
       });
+      // the five bank chains — the SAME names as the package model (lunar-theory.js) and the Node scene twin
+      m.nameChain('draconic', meanNodalMonthAtAge);
+      m.nameChain('tropical', meanTropicalMonthAtAge);
+      m.nameChain('anomalistic', meanAnomalisticMonthAtAge);
+      m.nameChain('sidereal', meanMoonSiderealMonthAtAge);
+      m.nameChain('jupiter', meanJupiterOrbitalPeriodSeconds);
     }
     return m;
   };
+  // The bank's landing rebuilds the integrator (its tables then seat); the dense ±250-kyr
+  // grid and every in-window value are byte-identical either way.
+  get.reset = () => { m = null; };
+  return get;
 })();
 function _moonChainCycles(periodFnSeconds, yearA, yearB) {
   return _chainCycles().cyclesBetween(periodFnSeconds, yearA, yearB);
@@ -3757,6 +3772,11 @@ if (typeof window !== 'undefined') {
     // and the scene's one-source ε at a decimal year — the bank-seated read the row times.
     spinBankLoaded: () => _spinBankData !== null,
     earthObliquityHybridAt: (year) => _epsHybridSeriesAt(year),
+    // plan 25: the lunar cumulative bank has landed (the perf gate's full-jump row waits on both banks),
+    // and the seat diagnostic — per named chain and carrier, whether the bank's prefixes seated in THIS
+    // runtime and the two edge values compared (the perf gate asserts every seat took).
+    lunarBankLoaded: () => _lunarBankData !== null,
+    lunarSeatStatus: () => ({ chains: _chainCycles().seatStatus(), carriers: _moonArgsM().carrierSeatStatus() }),
     // Perf-gate surface (the R9 class): force ONE resample of every chain
     // planet's orbit ring at jd — the 10-yr JD condition and the 250-ms
     // wall-clock floor bypassed — and return its wall time (ringMs, 7 × 257
@@ -15157,6 +15177,42 @@ let _spinBankData = null;   // {spacingYr, checkpoints:[{t, s:[x,y,z]}]}
     console.warn('spin-axis checkpoint bank not reachable — deep jumps walk from J2000 (same numbers, longer first wait)');
   })();
 }
+// PLAN 25 — the lunar cumulative bank. data/lunar-cumulative-checkpoints.json
+// (tools/verify/lunar-cumulative-bank.js): the lunar tables' coarse segment
+// prefixes every 250 kyr — the five chain counts and the two Lp carriers that
+// integrate from J2000 and read ε/e at every 1-kyr cell, which is what still
+// forced the whole spin walk on a deep jump with the spin bank seated
+// (measured: 0.21 s per Myr in Node, ~240 s headless at −400 Myr). Seated, the
+// tables sum one segment at most and read the SAME doubles in the SAME order
+// as without the bank (a seat, never a value; the purity gate's lunar rows).
+// Loaded like the series; until it lands the tables integrate from J2000.
+let _lunarBankData = null;   // {chains:{name:{fwd,bwd}}, carriers:{name:{fwd,bwd}}, meta}
+{
+  (async () => {
+    const candidates = ['data/lunar-cumulative-checkpoints.json', REPO_RAW_URL + 'data/lunar-cumulative-checkpoints.json'];
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const a = await res.json();
+        if (!a.chains || !a.carriers || !a.chains.draconic || !Array.isArray(a.chains.draconic.bwd)) continue;
+        _lunarBankData = { chains: a.chains, carriers: a.carriers, meta: a.meta };
+        // Rebuild every holder of a lunar table so the next evaluation seats:
+        // the arguments factory (its carriers), the chain-cycle integrator (its
+        // counts), the package tier model (its own instances of both), and the
+        // umbra tier's one-JD memo with it (a paused frame re-reads the same JD).
+        _moonArgsM.reset();
+        _chainCycles.reset();
+        _tierUmbraModel = null;
+        _umbraTierMemo.jd = NaN;
+        positionChanged = true;
+        console.log(`lunar cumulative bank loaded from ${url} (${Object.keys(a.chains).length} chains + ${Object.keys(a.carriers).length} carriers, ${a.chains.draconic.bwd.length} prefixes per side) — a deep lunar read sums ≤ one segment`);
+        return;
+      } catch { /* try the next candidate */ }
+    }
+    console.warn('lunar cumulative bank not reachable — the lunar tables integrate from J2000 (same numbers, longer first wait)');
+  })();
+}
 /** The osculating element at a decimal year from the exhibit table (linear in the
  *  20-day grid; ϖ unwrapped across a 360° seam): {e, pomOfDateDeg}, or null outside
  *  1000–2500 / before the table lands. */
@@ -25434,7 +25490,8 @@ function _tierModelB() {
     // too) — otherwise the package model's own walk to −400 Myr is 8 M steps (~200 s)
     // beside the scene factory's seated one (measured: the perf row read 220 s).
     _tierUmbraModel = createModel(undefined, _planetSeriesData
-      ? { secularSeriesArtifact: _planetSeriesData, spinCheckpointsArtifact: _spinBankData ?? undefined }
+      ? { secularSeriesArtifact: _planetSeriesData, spinCheckpointsArtifact: _spinBankData ?? undefined,
+          lunarCheckpointsArtifact: _lunarBankData ?? undefined }   // plan 25: its own lunar tables seat too
       : undefined);
   }
   return _tierUmbraModel;

@@ -583,7 +583,15 @@ doubles in the SAME order as without it: a seat, never a value — the
 generator REFUSES unless every 20th prefix resumes bit-exactly and the deep
 lunar longitude reads bit-identically with and without the bank at 3, 37 and
 137 Ma; `test:sampler-purity`'s lunar rows pin it on the package model in
-both visit orders. The one-time price: the former single running sum differed
+both visit orders. Within one runtime, that is: the seat's sanity check (the
+bank's first prefix against the table's own dense-edge value) is a relative
+one (1e-7), because Chromium's and Node's Math differ at the last bit — a
+bit-exact check refused every seat in the browser and the tables walked the
+whole span (215 s at −400 Myr with both banks "landed"); the chain counts
+agree across the runtimes to the last bit, the obliquity carrier (an
+integrand of nearly equal obliquities) to 2.4e-9. The perf gate asserts that
+every seat took. Seated, the browser's deep lunar tables carry Node's
+last-bit arithmetic, as its deep spin walk already does. The one-time price: the former single running sum differed
 from the segmented association at the rounding level beyond ±250 kyr — 1–2 ULP
 of the cycle count, 0.001″ of lunar longitude at −300 kyr, 0.016″ at −3 Myr;
 nothing inside the dense tier moved. Measured after: the lunar longitude at

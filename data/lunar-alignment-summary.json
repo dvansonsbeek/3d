@@ -552,7 +552,7 @@
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
       "packages/physics/src/moon/apparent.cjs": "sha256:5a63a95cf8d26c4d44e7b7acd4308cbd7240aa2bcee70d04c70b273413090335",
-      "packages/physics/src/moon/arguments.cjs": "sha256:85379a5338f3ef463de42b4f92a17af0eed40ed5211fdf3d9a6c86912f2d622b",
+      "packages/physics/src/moon/arguments.cjs": "sha256:fc0f2573abd2bfddd28f6b6233167366d51049722466386be878ce57879c79b5",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:0990e5c8a72791a6141c147bf9c8742e440503d34a891e881692bee14308967a",
       "packages/physics/src/moon/month-chain.cjs": "sha256:3465792a575f5d497e50fde8371d5a3273f727639e4eb994d1fe73743d961b14",
       "packages/physics/src/moon/series-extension.cjs": "sha256:f93ac2d259b3abbffda1b0e5232e6b310854da38ad8bc2bb89a40195ee4d273b",

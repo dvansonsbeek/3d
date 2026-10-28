@@ -119,6 +119,18 @@ export function createMoonArguments({ constants, fns, checkpoints }: {
         fwd: number[];
         bwd: number[];
     }>;
+    carrierSeatStatus: () => Record<string, {
+        fwd: {
+            banked: number;
+            edge: number;
+            bankEdge: number | null;
+        };
+        bwd: {
+            banked: number;
+            edge: number;
+            bankEdge: number | null;
+        };
+    }>;
     _rateCompletion: () => {
         rc: {
             ok: boolean;

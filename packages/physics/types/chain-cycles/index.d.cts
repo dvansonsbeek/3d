@@ -48,6 +48,18 @@ export function createChainCycleIntegrator({ ageAnchorYear, tropicalYearJ2000Sec
         bwd: number[];
         segmentYears: number;
     } | null;
+    seatStatus: () => Record<string, {
+        fwd: {
+            banked: number;
+            edge: number;
+            bankEdge: number | null;
+        };
+        bwd: {
+            banked: number;
+            edge: number;
+            bankEdge: number | null;
+        };
+    } | null>;
     coarseSegmentYears: number;
     coarseLimitYears: number;
 };

@@ -606,6 +606,21 @@ of lunar longitude at −3 Myr, nothing inside the dense tier) and record it,
 rather than gating a tolerance between two paths that would then be two
 models. Measured after: 84 s → 2.9 s at −400 Myr in Node (the dense
 ±250-kyr grid build, ~1.9 s, is the pre-existing floor of every deep read).
+**Its cross-runtime corollary:** "bit-identical" holds within one runtime; a
+seat's sanity check that compares a banked value with the runtime's own
+must be a relative one, because the browser's V8 and Node's differ at the
+last bit (the cross-engine finding above) — the first browser run with both
+banks landed still took 215 s at −400 Myr, every lunar seat silently refused
+by a bit-exact check of the dense-edge value; at a 1e-9 bound the five chain
+counts and the planetary carrier seated (their edges agree to the last bit)
+and the obliquity carrier still did not (2.4e-9: its integrand is a
+difference of nearly equal obliquities, which amplifies ε's last-bit split),
+116 s. The bound is 1e-7 (a counterfactual's class is ≥ 1e-6) and the perf
+gate now asserts that every seat TOOK, by name — a refused seat is a
+full-span walk and must fail loudly, not hide in a time. The browser tier's
+profiler, not a gate, found the first case: the perf row read the number,
+the CPU profile named the walk under `computeObliquityEarth`; the seat
+diagnostic (`lunarSeatStatus`) named the table.
 
 **The second measurement the bank made possible — convergence is not
 prediction.** Two bank runs in one cascade, on the two sides of the climate

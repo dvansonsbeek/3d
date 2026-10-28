@@ -119,11 +119,30 @@ try {
   });
   console.log(`      spin read ms (first one-source ε at −400 Myr, bank seated): ${deepSpin.toFixed(0)}`);
   gate('spin read: first ε(−400M) on the checkpoint bank', deepSpin, 2000, 'ms');
+  // ── 0c. THE FULL PHANEROZOIC JUMP (plan 25): with BOTH banks landed the lunar
+  // tables sum one segment at most, so the whole scene jump to −400 Myr is the
+  // spin seat + the lunar seat + the dense ±250-kyr grid every deep read pays
+  // once (~2 s in Node). Measured 2026-10-28 headless: ~240 s before the lunar
+  // bank seated (the tables' whole-span walk), ≤ the limit after. Absolute, for
+  // the same reason as 0b: a missing bank must not hide behind a slow near jump.
+  await sim.page.waitForFunction(() => window.__test__.lunarBankLoaded(), null, { timeout: 60000 });
+  // Every lunar seat must TAKE in this runtime (the bank's edge vs the table's own, a relative
+  // 1e-7): the first run with both banks "landed" still read 215 s because a bit-exact check
+  // silently refused the obliquity carrier's seat (Chromium vs Node, 2.4e-9) — a refused seat
+  // is a full-span walk, so it fails here by name instead of hiding in the time.
+  const seats = await sim.page.evaluate(() => window.__test__.lunarSeatStatus());
+  const unseated = [];
+  for (const [kind, tables] of Object.entries(seats)) for (const [name, st] of Object.entries(tables)) {
+    if (!st) { unseated.push(`${kind}.${name} (undefined chain)`); continue; }
+    for (const dir of ['fwd', 'bwd']) if (!(st[dir].banked > 0)) unseated.push(`${kind}.${name}.${dir} (edge ${st[dir].edge} vs bank ${st[dir].bankEdge})`);
+  }
+  gate(`lunar bank: every seat took (${unseated.length ? 'unseated: ' + unseated.join(', ') : 'all 7 tables × 2 directions'})`, unseated.length, 0, 'unseated');
   const deepCold = await sim.page.evaluate((jd) => {
     const T = window.__test__;
     const t0 = performance.now(); T.sceneSunRaDecAt(jd); return performance.now() - t0;
   }, jdOf(-400000000));
-  console.log(`      (record only) full scene jump ms to −400 Myr after the spin read: ${deepCold.toFixed(0)} — the lunar cumulative tables' walk, not the spin seat`);
+  console.log(`      full scene jump ms to −400 Myr (both banks seated, after the spin read): ${deepCold.toFixed(0)}`);
+  gate('full jump: first scene jump to −400 Myr on both banks', deepCold, 15000, 'ms');
   // Bring the scene back to a modern epoch (measured 2026-09-26): the cold
   // jump leaves o.julianDay at −5.34 Myr, and every hybridSpinProbe below
   // restores that JD after its own jump — so each update paid the
