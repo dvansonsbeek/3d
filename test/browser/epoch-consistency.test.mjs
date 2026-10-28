@@ -21,9 +21,18 @@
  * ±1–5 Myr).
  */
 import { openSimulator } from './harness.mjs';
+import { meanYearInDaysAtAge } from '../../tools/lib/deep-time.js';
 
 const EPOCHS_MA = [-5, -1, 1, 5];
 const TOL_DAYS = 0.002;
+// The Predictions panel's "Model (LOD days)" solar row (the one-source tropical
+// year over the Layer-4 day) against the engine's published solar-day count
+// (meanYearInDaysAtAge: the tidal-chain mean year over the same day — the
+// registry's daysPerYearAt… rows). The two years differ by the one-source
+// family's secular correction, ≤ 1e-5 d here; the tolerance sits far above
+// that and far below a unit slip (a year over 86,400 s instead of the day of
+// date reads 365.2 where the count is 366–382).
+const TOL_LOD_DAYS = 0.002;
 
 const s = await openSimulator();
 
@@ -57,6 +66,8 @@ const rows = await s.page.evaluate(({ EPOCHS_MA }) => {
       // ...and again at J2000 scene state — must be bit-equal (purity).
       lodRealPure: T.computeLodRealSecondsAtEpoch(year),
       lodRealMutated,
+      // The panel's LOD-days solar row as a pure function of the year.
+      solarLodDays: T.yearLodDaysAtYear(year).solar,
     });
   }
   return out;
@@ -89,6 +100,17 @@ for (const r of rows) {
   if (!ok) fail++;
   console.log(`${ok ? '  ok ' : 'FAIL '} ${String(r.t).padStart(4)} Ma  lodReal purity`
     + `         ${Number(r.lodRealPure).toFixed(9)} s ${ok ? '(bit-equal)' : `vs mutated ${r.lodRealMutated}`}`);
+}
+
+// The LOD-days row (the Predictions panel's solar-day count of date) against the
+// engine's meanYearInDaysAtAge — the unit pin: SI days ≠ LOD days.
+for (const r of rows) {
+  const engine = meanYearInDaysAtAge(r.t);
+  const d = r.solarLodDays - engine;
+  const ok = Number.isFinite(d) && Math.abs(d) <= TOL_LOD_DAYS;
+  if (!ok) fail++;
+  console.log(`${ok ? '  ok ' : 'FAIL '} ${String(r.t).padStart(4)} Ma  LOD days (solar)      `
+    + ` panel ${Number(r.solarLodDays).toFixed(6)}  engine ${engine.toFixed(6)}  Δ ${Number(d).toExponential(2)} d`);
 }
 
 if (fail) {

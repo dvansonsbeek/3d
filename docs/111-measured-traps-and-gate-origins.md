@@ -696,7 +696,11 @@ is served as a band — §1.29).
 `npm run test:browser` runs the `src/script.js` golden masters in headless
 Chromium — the only tier that guards Phase 8, which dissolves that file —
 plus the epoch-consistency gate (pure f(Y) evaluators ≡ the epoch-anchor
-chain at ±1/±5 Myr; the golden master cannot catch that class), plus
+chain at ±1/±5 Myr; the golden master cannot catch that class — and, since
+the Predictions panel grew its "Model (LOD days)" rows, the panel's solar-day
+count of date ≡ the engine's `meanYearInDaysAtAge` at the same epochs: the
+unit pin, SI days ≠ LOD days, born from the owner reading 365.23 "days" at
+195 Ma where the day of date gives 382), plus
 `test:perf` — the deep-time performance gate (RATIO thresholds, deep vs
 in-table cost, runner-speed independent; born from four ungated ratio
 regressions, one owner-bisected at 28×; plus two travel-speed rows the

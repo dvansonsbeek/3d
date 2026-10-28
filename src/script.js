@@ -3494,6 +3494,18 @@ if (typeof window !== 'undefined') {
     anomalisticYearDaysOfDate,
     // Delegation gate (Phase 20.2): the ONE Layer-4 composite, pure.
     computeLodRealSecondsAtEpoch,
+    // The Predictions panel's "Model (LOD days)" rows as a pure function of the
+    // year — the one-source year rows over the Layer-4 day, the same formula the
+    // panel's update applies to its displayed rows; the epoch-consistency gate
+    // pins the solar count to the engine's meanYearInDaysAtAge.
+    yearLodDaysAtYear: (year) => {
+      const lod = computeLodRealSecondsAtEpoch(year);
+      return {
+        solar: _cardinalYearSeconds(year, 'MEAN') / lod,
+        sidereal: _siderealYearOneSourceSeconds(year) / lod,
+        anomalistic: _cardinalYearSeconds(year, 'ANOM') / lod,
+      };
+    },
     // The four globals recomputeEpochAnchors mutates, read live (the kinematic
     // sidereal year is a J2000 constant — "kinematic" is f(2000), not an epoch state).
     anchors: () => ({
@@ -5877,6 +5889,11 @@ let predictions = {
   siderealYearDays: 0,
   anomalisticYearDays: 0,
   anomalisticYearSeconds: 0,
+  // the year rows over the solar day OF DATE (LOD_real) — the day count the
+  // rock record measures (coral/rhythmite day counts; the registry's daysPerYearAt… rows)
+  solarYearLodDays: 0,
+  siderealYearLodDays: 0,
+  anomalisticYearLodDays: 0,
   perihelionPrecession: 0,
   axialPrecession: 0,
   // The lunisolar clock rows, in periods and ratios:
@@ -21635,24 +21652,33 @@ function setupGUI() {
     label: 'Model (sec)', readonly: true, format: fmt2sec
   }), 'Mean tropical (solar) year OF DATE in SI seconds — the one-source movement’s analytic mean (equinox rate + λ̇ correction; the Tropical Year chart’s line). ONE FAMILY with the sidereal/anomalistic rows, so the precession beats recompute exactly. The scene-MEASURED cardinal mean lives in the Days & Years report (agrees to sub-0.5 s). Before the series has loaded the row reads the mode-table fallback.');
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearDays', {
-    label: 'Model (days)', readonly: true, format: fmt8
-  }), 'Mean tropical (solar) year OF DATE in SI days (seconds / 86400). Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
+    label: 'Model (SI days)', readonly: true, format: fmt8
+  }), 'Mean tropical (solar) year OF DATE in SI days of exactly 86,400 s (seconds / 86,400) — the IAU convention, NOT the day of date (at 200 Ma the day is ~82,500 s). The LOD-days row below counts the days of date. Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
+  addTooltip(yearsFolder.addBinding(predictions, 'solarYearLodDays', {
+    label: 'Model (LOD days)', readonly: true, format: fmt8
+  }), 'Mean tropical (solar) year OF DATE in solar days OF DATE — the seconds row over the Solar Day (s) row (LOD_real): the number of solar days in a year, the quantity coral and rhythmite day counts record (365.24 today, ~382 at 200 Ma — the registry\'s daysPerYearAt… rows and the paper\'s day-count table). Before the series has loaded the row reads the fallback family.');
 
   const siderealYrFolder = astroFolder.addFolder({ title: 'Sidereal Year' });
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
   }), 'Sidereal year OF DATE in SI seconds — the one-source λ̇ channel over the mass-loss law (the same evaluator the Sidereal Year chart and the API serve; = the IAU 31,558,149.7635 s at J2000 by anchor). Before the series has loaded the row reads the mode-table fallback.');
   addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearDays', {
-    label: 'Model (days)', readonly: true, format: fmt8
-  }), 'Sidereal year OF DATE in SI days (seconds / 86400). Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
+    label: 'Model (SI days)', readonly: true, format: fmt8
+  }), 'Sidereal year OF DATE in SI days of exactly 86,400 s (seconds / 86,400) — the IAU convention, not the day of date. Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
+  addTooltip(siderealYrFolder.addBinding(predictions, 'siderealYearLodDays', {
+    label: 'Model (LOD days)', readonly: true, format: fmt8
+  }), 'Sidereal year OF DATE in solar days OF DATE — the seconds row over the Solar Day (s) row (LOD_real). Before the series has loaded the row reads the fallback family.');
 
   const anomalisticFolder = astroFolder.addFolder({ title: 'Anomalistic Year' });
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
   }), 'Anomalistic year OF DATE in SI seconds (perihelion to perihelion) — the one-source cardinal structure the API serves: the engine’s own apsidal rate ϖ̇ + the λ̇ correction. Before the series has loaded this row is NaN.');
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearDays', {
-    label: 'Model (days)', readonly: true, format: v => v.toFixed(9)
-  }), 'Anomalistic year OF DATE in SI days (seconds / 86400). Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
+    label: 'Model (SI days)', readonly: true, format: v => v.toFixed(9)
+  }), 'Anomalistic year OF DATE in SI days of exactly 86,400 s (seconds / 86,400) — the IAU convention, not the day of date. Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
+  addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearLodDays', {
+    label: 'Model (LOD days)', readonly: true, format: fmt8
+  }), 'Anomalistic year OF DATE in solar days OF DATE — the seconds row over the Solar Day (s) row (LOD_real). Before the series has loaded the row reads the fallback family.');
 
   const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points', expanded: false });
   addFolderTooltip(cpFolder, 'Predicted instants of the solstices and equinoxes from the one-source movement — the certified Sun’s apparent crossings on the composed precession clock and the N-body series’ elements of date; the cardinal-point gates read them against JPL Horizons (−3000 … +2000). See doc 11.');
@@ -21668,8 +21694,8 @@ function setupGUI() {
       label: 'RA (\u00B0)', readonly: true, format: v => v.toFixed(6)
     }), 'Right Ascension where the cardinal point occurs. Fully derived (zero fitted constants).');
     addTooltip(sub.addBinding(predictions, 'cp' + cp + 'YearLen', {
-      label: 'Year Length (d)', readonly: true, format: v => v.toFixed(8)
-    }), 'Time between consecutive events of this type. SS is shortest (~\u221251s), WS is longest (~+47s).');
+      label: 'Year Length (LOD d)', readonly: true, format: v => v.toFixed(8)
+    }), 'Time between consecutive events of this type, in solar days OF DATE: the difference of the two UT instants, and a day on the UT axis is one mean solar day of date (LOD_real) \u2014 so this row reads ~382 at 200 Ma, the same unit as the Model (LOD days) rows of the year folders, not the SI day of 86,400 s. SS is shortest (~\u221251s), WS is longest (~+47s) today.');
   }
   addTooltip(cpFolder.addBinding(predictions, 'cpSolsticeObliquity', {
     label: 'Observed Obliquity (\u00B0)', readonly: true, format: v => v.toFixed(6)
@@ -34824,6 +34850,10 @@ function updatePredictions() {
     ? _cardinalYearSeconds(engineYear, 'MEAN')
     : o.solarYearSeconds;
   if (_hybridSpinActive()) predictions.solarYearDays = predictions.solarYearSeconds / SECONDS_PER_DAY;
+  // The year in solar days OF DATE: the displayed seconds row over the displayed
+  // Solar Day (s) row — the panel's own ratio, so the three rows stay consistent
+  // by construction (the browser gate pins it to the engine's meanYearInDaysAtAge).
+  predictions.solarYearLodDays = predictions.solarYearSeconds / predictions.lodReal;
   // Axial precession = sid_sec / (sid_sec − sol_sec). Both sec values consistently
   // derived from measured days × o.lodKinematic, equal to the pure days ratio.
   o.axialPrecession = computeAxialPrecessionYears(o.siderealYearSeconds, o.solarYearDays, o.lodKinematic);
@@ -34898,6 +34928,7 @@ function updatePredictions() {
   predictions.siderealYearDays = _hybridSpinActive()
     ? predictions.siderealYearSeconds / SECONDS_PER_DAY
     : o.siderealYearDays;
+  predictions.siderealYearLodDays = predictions.siderealYearSeconds / predictions.lodReal;
   // Anomalistic year in days = MEASURED (Fourier-fitted) directly, no round-trip.
   // Anomalistic year in seconds = MEASURED days × meanlengthofday (framework kinematic day unit).
   {
@@ -34914,6 +34945,7 @@ function updatePredictions() {
     predictions.anomalisticYearDays = _hybridSpinActive()
       ? predictions.anomalisticYearSeconds / SECONDS_PER_DAY
       : o.anomalisticYearDays;
+    predictions.anomalisticYearLodDays = predictions.anomalisticYearSeconds / predictions.lodReal;
   }
 
   o.perihelionPrecession = o.anomalisticYearSeconds/(o.anomalisticYearSeconds-o.solarYearSeconds);
