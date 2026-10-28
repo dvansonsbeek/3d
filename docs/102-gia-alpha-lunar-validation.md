@@ -195,8 +195,13 @@ degree n = 2 (dominant ice-sheet mode) inflates this by geometric factor
 This provides the *timescale* — but the model goes further and provides
 the *driver*. Instead of parameterising α(t) as a sum of viscoelastic
 relaxation exponentials with amplitudes fit to boundary conditions, the
-model binds α(t) directly to the L1 orbital layer of the canonical
-Climate Formula (LR04 post-MPT regime; see [doc 92](92-climate-formula.md)).
+model binds α(t) directly to the ice-volume history built from the L1
+orbital layer of the canonical Climate Formula — each LR04 regime's lines
+inside its own fit window (the eclipse era sits in the post-MPT one), the
+405-kyr line left out of the ice proxy, and beyond the record the cited ice
+inventory's baseline (see [doc 92](92-climate-formula.md); the channel's
+form is in [doc 110](110-calculation-map.md) and
+[doc 111 §1.30](111-measured-traps-and-gate-origins.md)).
 One physical mechanism, two observables — the same L1 orbital signal that
 drives ice-mass cycles in the δ¹⁸O record also drives α on the same
 timescale, with a single coupling coefficient set from independent
@@ -247,10 +252,13 @@ fitted to eclipses):
    and gives model dLOD/dt at J2000 = 1.77 ms/century, matching
    IERS observation of 1.75 ms/century within 1%.
 
-**3. L1 orbital layer** — Climate Formula LR04 post-MPT regime coefficients
-   (see [doc 92 § Regime coefficients](92-climate-formula.md)). Fit
-   independently to LR04 δ¹⁸O record via ridge regression; no eclipse
-   data enters the L1 fit.
+**3. L1 orbital layer** — Climate Formula LR04 regime coefficients, each
+   applied inside its own fit window (the eclipse era: the post-MPT set;
+   see [doc 92 § Regime coefficients](92-climate-formula.md)), with the
+   405-kyr line left out of the ice proxy; beyond the LR04 record the
+   cited ice inventory's baseline (`astro-reference` `giaIceInventory`).
+   Fit independently to the LR04 δ¹⁸O record via ridge regression; no
+   eclipse data enters the L1 fit.
 
 The coupling k (registry `alphaClimateScale`, derived at runtime) is fixed
 by the −1.35 × 10⁻¹¹/yr Cox & Chao/Peltier target; τ is the one measured
@@ -1381,8 +1389,10 @@ What we are NOT claiming:
    mean |residual| is the structural disagreement on top of the noise
    floor.
 
-2. **α(t) is driven by the L1 orbital layer of the canonical Climate
-   Formula** (see § "The physical constants and modern calibration").
+2. **α(t) is driven by the ice-volume history built from the L1 orbital
+   layer of the canonical Climate Formula** — each regime inside its
+   fitted window, the cited ice inventory's baseline beyond the record
+   (see § "The physical constants and modern calibration").
    The L1 layer captures the Milankovitch orbital forcing of glacial
    cycles; the higher climate layers (L2, the 405-kyr carbon-thermostat family; L3, the boundary-condition steps)
    are not currently coupled into α(t). For the historical eclipse

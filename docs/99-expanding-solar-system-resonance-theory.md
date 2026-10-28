@@ -1516,7 +1516,7 @@ Drivers 1 and 2 are independent in physics: tidal coupling drives Moon recession
 
 The PGR section above explains why PGR is **negligible for deep-time work** (>10⁵ yr) — it averages out over multiple ice-age cycles. But for the **historical eclipse window** (last 2-3 millennia, well within the Quaternary), PGR is the dominant *non*-tidal contributor to Earth's rotation evolution. Eclipse-timing data from this window can resolve effects of order 1-2 milliseconds in LOD that a pure-tidal model alone misses. The L-5b and L-7 validation work (lunar 270 events + solar 89 events from Stephenson, Morrison & Hohenkerk 2016) is anchored in this window and required a non-tidal correction to reach competitive accuracy.
 
-The correction is implemented as a **time-varying** Earth polar moment coefficient α(t) (anchor value <!--v:alphaJ2000-->0.3306947<!--/v--> at J2000, IERS Conventions 2010), evolving through an **L1-orbital-coupled α(t)** correction: α is tied directly to the L1 orbital layer of the canonical Climate Formula, so the same orbital forcing that drives ice-mass cycles also drives Earth's polar moment on the same timescale. **Anchored on the Cox & Chao 2002 satellite measurement of dα/dt at J2000; zero parameters fitted to eclipse data.** (Note: PGR and GIA refer to the same physical process — post-glacial mantle reflow — viewed from the rotation-rate community vs the satellite-gravimetry community; both terms appear in this document and in the literature.)
+The correction is implemented as a **time-varying** Earth polar moment coefficient α(t) (anchor value <!--v:alphaJ2000-->0.3306947<!--/v--> at J2000, IERS Conventions 2010), evolving through an **L1-orbital-coupled α(t)** correction: α is tied directly to the ice-volume history built from the L1 orbital layer of the canonical Climate Formula (each LR04 regime inside its own fit window; the cited ice inventory's baseline beyond the record), so the same orbital forcing that drives ice-mass cycles also drives Earth's polar moment on the same timescale. **Anchored on the Cox & Chao 2002 satellite measurement of dα/dt at J2000; zero parameters fitted to eclipse data.** (Note: PGR and GIA refer to the same physical process — post-glacial mantle reflow — viewed from the rotation-rate community vs the satellite-gravimetry community; both terms appear in this document and in the literature.)
 
 #### What α is and why it varies
 
@@ -1587,7 +1587,7 @@ Literature uncertainty: ±10% range across published estimates of dJ₂/dt (vari
 
 The GIA relaxation timescale follows from Maxwell rheology: `τ_Maxwell = η/μ` with `μ_mantle ≈ 1.5 × 10¹¹ Pa` (shear modulus from seismic body-wave velocities) and `η_mantle ≈ 10²¹ Pa·s` (mantle viscosity from post-glacial rebound inversions), giving `τ_Maxwell ≈ 210 yr`. Continental-ice-load response at spherical-harmonic degree n = 2 (dominant ice-sheet mode) inflates this by geometric factor ~20-30, giving `τ ≈ 4-6 kyr` — the kyr scale on which α evolves.
 
-This gives the *timescale*. The shipped α(t) implementation goes further and provides the *driver*: instead of parameterising α(t) as a sum of relaxation exponentials with amplitudes fit to boundary conditions, the model binds α(t) directly to the L1 orbital layer of the canonical Climate Formula. See **§ Refinement: climate-driven α(t)** below for the implementation.
+This gives the *timescale*. The shipped α(t) implementation goes further and provides the *driver*: instead of parameterising α(t) as a sum of relaxation exponentials with amplitudes fit to boundary conditions, the model binds α(t) directly to the ice-volume history built from the L1 orbital layer of the canonical Climate Formula. See **§ Refinement: climate-driven α(t)** below for the implementation.
 
 #### Validation result
 
@@ -1636,7 +1636,7 @@ today. Its in-era slope had been carried by the fitted comb lines the T1
 test retired; the physical L1 cannot carry it and the lagged form closes
 the eclipse record better (full-window RMS 21.3 s vs 28.8 s). The calibration (k derived at runtime from the Cox & Chao rate, τ measured through the joint fitter) and its record are doc 102's; the sign rule that survives is the paragraph below.
 
-The model binds α(t) to the L1 orbital layer of the canonical Climate Formula ([docs/92-climate-formula.md](92-climate-formula.md)). The physical chain is:
+The model binds α(t) to the ice-volume history V(t) built from the L1 orbital layer of the canonical Climate Formula ([docs/92-climate-formula.md](92-climate-formula.md)): each LR04 regime's fitted lines inside its own window (post-MPT 0–1 Ma, iNHG–MPT 1–2.7 Ma, pre-iNHG 2.7–5.3 Ma, joined smoothly over ±50 kyr — a fitted line set is never extrapolated beyond its window, [doc 111 §1.30](111-measured-traps-and-gate-origins.md)), the 405-kyr line left out of the ice proxy (the sea-level stack says it is not ice), and beyond the record today's ice state plus the cited ice inventory's baseline (Greenland absent before the Northern-Hemisphere glaciation, all ice before the Antarctic one; the ice-free J₂ sits 1.7 × 10⁻⁴ above today's). The physical chain is:
 
 ```
 Planetary eigenmodes → Milankovitch orbital forcing →
@@ -1648,7 +1648,7 @@ orbital → ice; Peltier ICE-6G_C for ice → J₂; Chao 2016 for α → LOD;
 Cheng et al. 2011 for the modern-era LAGEOS J₂ transition confirming that
 ice-mass changes measurably shift Earth's oblateness at decadal timescales
 (the underlying mechanism, not the 100-kyr cycle itself). The same L1
-orbital signal that best-fits LR04 δ¹⁸O over 0–1 Myr also drives α
+orbital signal that fits LR04 δ¹⁸O inside each regime's window also drives α
 oscillations at the same periodicity — one mechanism, two observables.
 
 **Do not derive this sign from the surface water redistribution.** "Warm →
