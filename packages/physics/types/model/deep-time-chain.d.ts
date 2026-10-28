@@ -5,6 +5,7 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
         alphaAt: (year: number) => number;
         j2RatioAt: (year: number) => number;
         laggedL1PermilAt: (year: number) => number;
+        iceBaselinePermilAt: (year: number) => number;
         kPerPermille: number;
         relaxationKyr: number;
         laggedL1Terms: Array<{
@@ -12,6 +13,7 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
             a: number;
             b: number;
         }>;
+        glacialSwingPermil: number;
     };
     chain: Readonly<{
         meanSolarYearDays: number;
@@ -64,6 +66,7 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
             alphaAt: (year: number) => number;
             j2RatioAt: (year: number) => number;
             laggedL1PermilAt: (year: number) => number;
+            iceBaselinePermilAt: (year: number) => number;
             kPerPermille: number;
             relaxationKyr: number;
             laggedL1Terms: Array<{
@@ -71,6 +74,7 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
                 a: number;
                 b: number;
             }>;
+            glacialSwingPermil: number;
         };
         earthMoiFactorAtAge: (tMa: number) => number;
         withLatticeAlpha: (build: () => void) => void;

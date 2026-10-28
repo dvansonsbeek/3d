@@ -15,7 +15,7 @@ export function assembleSurface(ctx) {
     eclipseFinders, evalClimateL1, frameworkDeltaTSecondsAtJD, inclinationDeg, j2000JD, jdFromYear, jdTTFromUT,
     julianCenturyDays, lodRealSeconds, meanLengthOfDay, meanSiderealYearDays, moonDistanceCorrected, moonDistanceKm,
     moonDistanceKmAtYearOrNaN, moonOrbitalShift, moonSeries, moonSiderealMonth, moonSiderealMonthDaysAt,
-    moonSynodicMonthDays, oneSourceM, recordLunarCumulativeBank, planetAscNodeDeg, planetEccentricity, planetInclinationDeg, planetPerihelionDeg,
+    moonSynodicMonthDays, oneSourceM, recordLunarCumulativeBank, recordSunCumulativeBank, lunarSeatStatus, sunSeatStatus, planetAscNodeDeg, planetEccentricity, planetInclinationDeg, planetPerihelionDeg,
     planetSpin, publishedAxialPrecessionYearsAtYear, publishedTropicalYearSecondsAtYear, s3ArcsecPerYr,
     siTropicalYearDays, siderealDaySeconds, siderealYearDays, spinAxisInertialRateMeanArcsecPerYr, stellarDaySeconds,
     sunApparentLonDegAtJdUT, sunEccentricityAt, sunL0Deg, sunMeanLongitudeDegAt, sunPerihelionDegAt,
@@ -214,6 +214,20 @@ export function assembleSurface(ctx) {
       obliquityDeg: /** @param {number} year @returns {number} */ (year) => oneSourceM.epsAt(year),
       /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span, ±10 Myr about J2000 (the published surfaces serve `obliquityDeg` inside it only; null without a series, i.e. a bare createModel()). */
       obliquityHybridDomainYears: oneSourceM.obliquityHybridDomainYears,
+      /** THE OBLIQUITY BAND at a decimal year — the hybrid ε sampled over one beat period centred on the
+       *  year (41 samples): {minDeg, maxDeg, periodYears}. The quantity the model PREDICTS at deep time
+       *  (plan 26 §2M.5, measured): the obliquity VALUE is linearly sensitive at 450″ per 1e-6 of the
+       *  precession constant at 100 Ma (2,000″ at 500 Ma) — the ice-free baseline alone is known to the
+       *  1e-4 class — so beyond ~20 Myr the value is the integration on its inputs and the BAND (its
+       *  amplitude and period, the falsification leg's statement) is the claim. @param {number} year */
+      obliquityBandAt: /** @param {number} year @returns {{minDeg: number, maxDeg: number, periodYears: number}} */ (year) => {
+        const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(year));
+        const psiDot = r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r;
+        const periodYears = 1296000 / (psiDot * (certifiedAxialPrecessionJ2000Years() / oneSourceM.axialPrecessionYearsLunisolarJ2000) - s3ArcsecPerYr);
+        let minDeg = Infinity, maxDeg = -Infinity;
+        for (let i = 0; i <= 40; i++) { const e = oneSourceM.epsAt(year + (i / 40 - 0.5) * periodYears); if (e < minDeg) minDeg = e; if (e > maxDeg) maxDeg = e; }
+        return { minDeg, maxDeg, periodYears };
+      },
       /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
       meanObliquityCitedDeg: /** @param {number} year @returns {number} */ (year) => { const e = chain.meanObliquityCitedDegAtAge(yearToTMa(year)); return e === null ? NaN : e; },
       eccentricity: eccentricityAt,
@@ -276,8 +290,11 @@ export function assembleSurface(ctx) {
       betaDegAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedBetaDeg(jd),
       distanceKmAtJD: /** @param {number} jd @returns {number} */ (jd) => moonSeries.truncatedDistanceKm(jd),
       // THE GENERATOR'S HOOK (plan 25; tools/verify/lunar-cumulative-bank.js): the lunar tables'
-      // coarse segment prefixes over ±limitYears — the bank's payload. Not an API surface.
-      recordCumulativeBank: recordLunarCumulativeBank,
+      // coarse segment prefixes over ±limitYears — the bank's payload (plan 26 pickup: plus the
+      // Sun's mean-longitude table, `sun.meanLongitude`). Not an API surface.
+      recordCumulativeBank: /** @param {number} limitYears */ (limitYears) => ({ ...recordLunarCumulativeBank(limitYears), sun: { meanLongitude: recordSunCumulativeBank(limitYears) } }),
+      // THE SEAT DIAGNOSTIC: every banked table's seat in this runtime (the perf gate asserts them).
+      bankSeatStatus: () => ({ ...lunarSeatStatus(), sun: { meanLongitude: sunSeatStatus() } }),
     }),
     eclipse: Object.freeze({
       sunLonDegAtJD: /** @param {number} jd @returns {number} */ (jd) => eclipseFinders.sunLonDegAt(jd),

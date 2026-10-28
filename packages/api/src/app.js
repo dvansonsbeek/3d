@@ -132,7 +132,7 @@ export function createApi() {
     inclinationPrecession: { formula: 'T_aps(J2000) = 360°/ϖ̇ — the ONE movement’s own apsidal rate of date at 2000, the perihelion against the stars', periodYears: model.lunisolar.apsidalPeriodYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'inclPrecYears', status: 'current' },
     perihelionPrecession: { formula: 'T_peri(J2000) = 1/(1/T_p + 1/T_aps) — the perihelion-of-date beat of the one-family route at 2000', periodYears: model.lunisolar.periOfDatePeriodYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'periPrecYears', status: 'current' },
     eclipticPrecession: { formula: 'T_s₃ = 1,296,000/|s₃| — the dominant nodal mode of Earth’s orbit from the banked deep secular modes', periodYears: model.lunisolar.nodalPeriodYears, doc: 'docs/110-calculation-map.md', registryKey: 'eclPrecYears', status: 'current' },
-    obliquityCycle: { formula: 'T_obl(J2000) = 2π/(ψ̇ᵢₙ − |s₃|) — the obliquity beat of the spin axis’s inertial precession rate (the general precession plus the planetary mean; the rate the hybrid obliquity integrates on) against the nodal mode, at the J2000 instant (falsification leg 1). A dated record sees the beat of the pole rate’s mean over its own window — registry obliqCycleRealized*Years (40,927 yr over the LR04 record)', periodYears: model.lunisolar.obliquityBeatYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'obliqCycleYears', status: 'current' },
+    obliquityCycle: { formula: 'T_obl(J2000) = 2π/(ψ̇ᵢₙ − |s₃|) — the obliquity beat of the spin axis’s inertial precession rate (the general precession plus the planetary mean; the rate the hybrid obliquity integrates on) against the nodal mode, at the J2000 instant (falsification leg 1). A dated record sees the beat of the pole rate’s mean over its own window — registry obliqCycleRealized*Years (40,927 yr over the LR04 record). The BAND (amplitude and period) is the deep-time claim, never the obliquity VALUE: measured (plan 26), the value is linearly sensitive at 450″ per 1e-6 of the precession constant at 100 Ma — /earth serves obliquityBand beside obliquityDeg inside the hybrid’s ±10-Myr domain', periodYears: model.lunisolar.obliquityBeatYearsAtYear(2000), doc: 'docs/110-calculation-map.md', registryKey: 'obliqCycleYears', status: 'current' },
     bondCycle: { formula: 'ΔT-stack component, period 1,466 yr stated in years (the shipped coefficients) — a fitted millennial line of the ΔT stack; the ~1.5-kyr oscillation is real', periodYears: FITTED_COEFFICIENTS.DT_STACK.bond.period_yr, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'bondYr', status: 'current' },
     hallstattCycle: { formula: 'ΔT-stack component, period 2,430 yr stated in years (the shipped coefficients) — a fitted millennial line of the ΔT stack', periodYears: FITTED_COEFFICIENTS.DT_STACK.hallstatt.period_yr, doc: 'docs/104-millennial-rotation-swing.md', registryKey: 'hallstattYr', status: 'current' },
   });
@@ -283,9 +283,13 @@ export function createApi() {
       // (Farhat et al. 2022's column, a Myr-scale mean) is served to the history's end, 4,429 Ma.
       const dom = model.earth.obliquityHybridDomainYears;
       const inObliquityDomain = (/** @type {number} */ y) => !dom || (y >= dom[0] && y <= dom[1]);
+      // The obliquity BAND beside the value (plan 26): one beat period's min/max about the year — the
+      // quantity the model predicts at depth; the value is linearly sensitive at 450″ per 1e-6 of the
+      // precession constant at 100 Ma, so beyond ~20 Myr it is the integration on its inputs, not a claim.
       const rows = t.years.map((y) => ({
         year: y,
         obliquityDeg: inObliquityDomain(y) ? model.earth.obliquityDeg(y) : null,
+        obliquityBand: inObliquityDomain(y) ? model.earth.obliquityBandAt(y) : null,
         meanObliquityCitedDeg: model.earth.meanObliquityCitedDeg(y),
         eccentricity: model.earth.eccentricity(y),
         inclinationDeg: model.earth.inclinationDeg(y),

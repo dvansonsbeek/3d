@@ -176,6 +176,13 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   integral; to bank a cumulative table give it a SEGMENTED association in
   both paths (prefix + within-segment sum), so bank and no-bank are
   bit-identical by construction — never a tolerance between them. (§1.29)
+- **A fitted line cluster is never extrapolated beyond its window** — the GIA
+  channel's post-MPT set scored R² −26 on the older LR04 windows and oscillated
+  at ±7e-4 at random phase for the whole deep past; window each regime (C¹
+  joins), carry no orbital term where no proxy exists, and reference a deep
+  baseline to TODAY's state, never to a window mean (the Antarctic-only era
+  read as more ice than today). The deep obliquity VALUE is 450″ per 1e-6 of
+  the precession constant at 100 Ma — a band, never a value. (§1.30)
 
 ---
 

@@ -41,6 +41,12 @@ export type Options = {
             fwd: number[];
             bwd: number[];
         }>;
+        sun?: {
+            meanLongitude?: {
+                fwd: number[];
+                bwd: number[];
+            };
+        };
     } | null;
 };
 /**

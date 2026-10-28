@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.3
-coefficients: sha256:a1e5567e03d1936e
+modelVersion: v27.4
+coefficients: sha256:76157eae2501907c
 status: current
 ---
 
@@ -230,7 +230,7 @@ The composed precession rate ψ̇ = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_
 The mean lunisolar precession period T_p = 2π/ψ̇ lengthens
     (25,771 yr now, 21,699 yr Devonian, 28,208 yr in 200 Myr — generated table below)
     ↓
-The obliquity beat 2π/(ψ̇ᵢₙ − |s₃|) lengthens with it (<!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr now, <!--v:obliqBeatDevonianKyr-->30.6<!--/v--> Devonian, <!--v:obliqBeat200MyrFutureKyr-->48.0<!--/v--> in 200 Myr; ψ̇ᵢₙ the spin axis's inertial rate — a record sees its WINDOW MEAN, with the pole's of-date factors: <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr over the LR04 record, measured on the model's own ε(t) and on La2004's)
+The obliquity beat 2π/(ψ̇ᵢₙ − |s₃|) lengthens with it (<!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> kyr now, <!--v:obliqBeatDevonianKyr-->30.6<!--/v--> Devonian, <!--v:obliqBeat200MyrFutureKyr-->48.0<!--/v--> in 200 Myr; ψ̇ᵢₙ the spin axis's inertial rate — a record sees its WINDOW MEAN, with the pole's of-date factors: <!--v:obliqCycleRealizedLr04Years-->~40,924<!--/v--> yr over the LR04 record, measured on the model's own ε(t) and on La2004's)
     ↓
 The climate formula's precession-band lines p + g_i and p + s_i scale with ψ̇(t).
 The eccentricity-band lines |g_i − g_j| do NOT scale — MEASURED: the 405-kyr
@@ -771,7 +771,7 @@ length-of-day stack) changes it too; the channel is scaled on the observed
 dJ₂/dt (<!--v:j2RateJ2000Per1e11Yr-->−2.7<!--/v--> ×10⁻¹¹ /yr, Cox & Chao 2002) and is bounded, ±<!--v:precOfDateEllipticityAmpLastMyrPct-->0.02<!--/v--> %, with
 no secular part. Theory against theory: the equinox of date holds
 <!--v:equinoxVsVondrakMaxAbsArcsec-->7.9<!--/v-->″ of Vondrák et al. (2011) over ±3000 yr where the secular law alone
-reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->28.1<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->14.8<!--/v-->″ rms of La2004 over the last
+reads <!--v:equinoxSecularOnlyMaxAbsArcsec-->28.1<!--/v-->″, and the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->14.9<!--/v-->″ rms of La2004 over the last
 million years where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->80.4<!--/v-->″
 ([doc 110 §2.3](110-calculation-map.md) carries the formulas). The deep-time
 rows above, the precession gates at 1.4 and 2.46 Ga and the obliquity beat
@@ -1231,7 +1231,7 @@ Two layers: a CITED distance history and exact conservation on it (plan 12 optio
 |---:|---:|---:|---:|---:|---:|
 | 0 (Modern) | 86,400.0 | 24.000 | 384,399 | 25,772 | 41.10 |
 | 380 (Devonian) | 78,331.4 | 21.759 | 368,549 | 21,235 | 30.64 |
-| 550 (Cambrian) | 75,630.7 | 21.009 | 362,576 | 19,747 | 27.63 |
+| 550 (Cambrian) | 75,630.8 | 21.009 | 362,576 | 19,747 | 27.63 |
 | 1,000 (Mesoproterozoic) | 69,779.4 | 19.383 | 348,253 | 16,584 | 21.80 |
 | 2,500 (Archean) | 60,404.2 | 16.779 | 320,391 | 11,745 | 14.13 |
 | 4,429 (Earth-Moon genesis — the cited history's end) | 19,820.9 | 5.506 | 39,509 | 9 | — |

@@ -907,7 +907,7 @@
   "generator": "node tools/verify/nbody-secular.js --write",
   "files": {
    "packages/physics/src/planets/keplerian-chain.cjs": "sha256:8a0ca8debaf6eea263bd40f631bc5bdd7041307c37c3cd5e5844dd6b62e624c7",
-   "public/input/astro-reference.json": "sha256:c82738ae33b5460ca7bdc737032a04f5cd39d6186e78a41179a913a25595b955",
+   "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
    "tools/explore/j2000-state.mjs": "sha256:a0a87301e21a02399ab7b8ed16d9b7930a485c49d1b2bbafa9dfc552f552600d",
    "tools/explore/k45-residual-naff.mjs": "sha256:228eb4874adca9171d61c1697ffbbaac3ce82891476a34762bf882840ccae406",
    "tools/explore/k45e-amplitude-solve.mjs": "sha256:8682a7ebd72bd98b60019b1c097f1791ec6e5ecea97d1798b929ce46b4ae1837",

@@ -131,12 +131,17 @@ try {
   // silently refused the obliquity carrier's seat (Chromium vs Node, 2.4e-9) — a refused seat
   // is a full-span walk, so it fails here by name instead of hiding in the time.
   const seats = await sim.page.evaluate(() => window.__test__.lunarSeatStatus());
-  const unseated = [];
-  for (const [kind, tables] of Object.entries(seats)) for (const [name, st] of Object.entries(tables)) {
-    if (!st) { unseated.push(`${kind}.${name} (undefined chain)`); continue; }
-    for (const dir of ['fwd', 'bwd']) if (!(st[dir].banked > 0)) unseated.push(`${kind}.${name}.${dir} (edge ${st[dir].edge} vs bank ${st[dir].bankEdge})`);
-  }
-  gate(`lunar bank: every seat took (${unseated.length ? 'unseated: ' + unseated.join(', ') : 'all 7 tables × 2 directions'})`, unseated.length, 0, 'unseated');
+  const unseated = []; let seatCount = 0;
+  const walk = (/** @type {any} */ node, /** @type {string} */ path) => {
+    if (node && typeof node === 'object' && 'fwd' in node && 'bwd' in node && node.fwd && 'banked' in node.fwd) {
+      for (const dir of ['fwd', 'bwd']) { seatCount++; if (!(node[dir].banked > 0)) unseated.push(`${path}.${dir} (edge ${node[dir].edge} vs bank ${node[dir].bankEdge})`); }
+      return;
+    }
+    if (node === null) { unseated.push(`${path} (undefined chain)`); return; }
+    for (const [k, v] of Object.entries(node)) walk(v, `${path}.${k}`);
+  };
+  walk(seats, 'seat');
+  gate(`lunar bank: every seat took (${unseated.length ? 'unseated: ' + unseated.join(', ') : seatCount + ' seats — the scene\'s 7 tables and the package model\'s 8, both directions'})`, unseated.length, 0, 'unseated');
   const deepCold = await sim.page.evaluate((jd) => {
     const T = window.__test__;
     const t0 = performance.now(); T.sceneSunRaDecAt(jd); return performance.now() - t0;

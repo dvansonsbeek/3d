@@ -64,26 +64,75 @@ export function laggedL1Terms(l1Terms: Array<{
     b: number;
 }>;
 /**
+ * The GIA channel — the polar moment's LAGGED response to the ICE-VOLUME history
+ * (holisticuniverse plans 06 and 26). The solid Earth responds to an ice load
+ * through the mantle's viscoelastic relaxation, so
+ *
+ *   α(t) = α₀ − k · [ V(t) − V(2000) ],   J₂(t)/J₂₀ = 1 − k_J · [ V(t) − V(2000) ]
+ *
+ * with V(t) the ice-volume history in the channel's currency (‰ of the LR04-fitted
+ * orbital response — the orbital part of benthic δ¹⁸O IS ice volume: the sea-level
+ * stack and LR04 agree on one ratio, ~67 m/‰, across the precession, obliquity and
+ * eccentricity bands; plan 26 §2M.2), and k, k_J DERIVED at construction so that
+ * dα/dt(J2000) and dJ₂/dt(J2000) equal the observed rates (Peltier's ICE-6G LOD
+ * coupling, Cox & Chao 2002 satellite gravimetry) — no stored scale, no J₂→α
+ * factor. k > 0 is the direct-load sign (an uncompensated ice load lowers α); after
+ * a rapid deglaciation V − ⟨V⟩ < 0, α sits above equilibrium and relaxes for ~τ —
+ * today's −0.35 ms/cy non-tidal drift is that tail. τ was MEASURED against the
+ * historical ΔT record through the joint fitter (optimum 5–6 kyr, the degree-2
+ * Maxwell estimate; the plan 06 record).
+ *
+ * V(t) = Σ_r w_r(t)·L1′_r(t) + B(t)  (plan 26), where
+ *   - L1′_r is regime r's fitted L1 line set (its own fit window of the LR04 record:
+ *     post-MPT 0–1 Ma, iNHG–MPT 1–2.7 Ma, pre-iNHG 2.7–5.3 Ma), lagged by τ (each
+ *     line Ĉ′ = Ĉ·iωτ/(1+iωτ), so the evaluator stays a sinusoid sum), with the
+ *     405-kyr line left out of the ice proxy (not ice: the sea-level ratio there is
+ *     24 m/‰); w_r is a C¹ window on the regime's fit window with smoothstep joins
+ *     of ±joinHalfKyr at the regime boundaries — a fitted line set is NEVER
+ *     extrapolated beyond its window (measured: the post-MPT set is a degenerate
+ *     cluster outside it, R² −26, amplitude 3× the record, and the former channel
+ *     oscillated at ±7e-4 at random phase for the whole deep past; plan 26 §2M.1).
+ *     Beyond the last window the orbital part is zero (no proxy, no claim).
+ *   - B(t) is the ice BASELINE relative to today, in metres of sea-level equivalent
+ *     from the cited inventory (Greenland's 7.4 m absent before the NH glaciation,
+ *     the whole 65 m absent before the Antarctic glaciation; astro-reference
+ *     giaIceInventory), converted to ‰ by the LGM-to-present swing of the post-MPT
+ *     lagged response (its range over the last 800 kyr ↔ the 120-m LGM drop) — the
+ *     same response per unit of ice the J2000 rates normalise. Less ice → lighter
+ *     δ¹⁸O → V < 0 → α and J₂ ABOVE their present values (polar mass moved into the
+ *     oceans raises C and J₂): the ice-free Earth sits at +1.7·10⁻⁴ of J₂/J₂₀.
+ *
+ * The single-regime form (l1Terms + yStdDenormalization, no windows, no baseline)
+ * is the pre-plan-26 channel and stays available (the research twins).
+ *
  * @param {{
- *   l1Terms: Array<{period_kyr: number, a: number, b: number}>,
- *   yStdDenormalization: number,
+ *   l1Terms?: Array<{period_kyr: number, a: number, b: number}>,
+ *   yStdDenormalization?: number,
+ *   regimes?: Array<{ l1Terms: Array<{period_kyr: number, a: number, b: number}>, yStdDenormalization: number, windowKyr: [number, number] }>,
+ *   joinHalfKyr?: number,
+ *   excludePeriodsAboveKyr?: number,
+ *   iceInventory?: { lgmSeaLevelDropM: number, presentIceSeaLevelM: number, greenlandSeaLevelM: number, nhGlaciationOnsetMa: number, nhGlaciationWidthMyr: number, eotMa: number, eotWidthMyr: number },
  *   relaxationKyr: number,
  *   alphaGiaRateJ2000PerYr: number,
  *   alphaJ2000: number,
  *   j2RateJ2000PerYr?: number,
  *   j2J2000?: number,
- * }} cfg - relaxationKyr, alphaGiaRateJ2000PerYr and j2RateJ2000PerYr are
+ * }} cfg - relaxationKyr, alphaGiaRateJ2000PerYr and j2RateJ2000PerYr are the
  *   assembled deepTime block (DEFAULT_CONSTANTS.deepTime: τ the banked record
- *   data/deep-time-fitted.json, the rate derived from astro-reference
- *   giaCoxChaoPeltier — plan 11 step 1); alphaJ2000 the IERS
- *   moment-of-inertia factor; j2J2000 Earth's J₂ (astro-reference)
+ *   data/deep-time-fitted.json, the rates derived from astro-reference
+ *   giaCoxChaoPeltier — plan 11 step 1); alphaJ2000 the IERS moment-of-inertia
+ *   factor; j2J2000 Earth's J₂ (astro-reference). `regimes` ordered young → old
+ *   (the first holds J2000 and sets the normalisation); `iceInventory` the
+ *   deepTime.iceInventory block (astro-reference giaIceInventory).
  * @returns {{
  *   alphaAt: (year: number) => number,
  *   j2RatioAt: (year: number) => number,
  *   laggedL1PermilAt: (year: number) => number,
+ *   iceBaselinePermilAt: (year: number) => number,
  *   kPerPermille: number,
  *   relaxationKyr: number,
  *   laggedL1Terms: Array<{period_kyr: number, a: number, b: number}>,
+ *   glacialSwingPermil: number,
  * }}
  *
  * THE SAME REDISTRIBUTION, ITS SECOND OBSERVABLE — j2RatioAt(year) = J₂(t)/J₂₀.
@@ -92,21 +141,41 @@ export function laggedL1Terms(l1Terms: Array<{
  * consumer is the spin integration, earth/deep-orbital-history). The J₂ side
  * is scaled on its OWN observation, exactly as the α side is on its rate:
  *
- *   J₂(t) = J₂₀ − k_J · [ L1'(t) − L1'(2000) ],   k_J = −(dJ₂/dt)_obs / (dL1'/dt)₂₀₀₀
+ *   J₂(t) = J₂₀ − k_J · [ V(t) − V(2000) ],   k_J = −(dJ₂/dt)_obs / (dV/dt)₂₀₀₀
  *
  * so dJ₂/dt(J2000) IS the observed satellite rate (Cox & Chao 2002) by
- * construction, and the J₂→α conversion factor never enters. A constant
- * dJ₂/dt would be a rate valid at a point used across a span; this is the
- * history. Bounded: ±5·10⁻⁴ over the glacial cycles, no secular part.
- * Without the two constants the ratio is 1 at every year.
+ * construction. A constant dJ₂/dt would be a rate valid at a point used
+ * across a span; this is the history. Inside the Quaternary the ratio is
+ * bounded, ±3·10⁻⁴ over the glacial cycles; beyond the record it is the
+ * baseline's constant. Without the two constants the ratio is 1 at every year.
  */
-export function createAlphaGiaChannel({ l1Terms, yStdDenormalization, relaxationKyr, alphaGiaRateJ2000PerYr, alphaJ2000, j2RateJ2000PerYr, j2J2000 }: {
-    l1Terms: Array<{
+export function createAlphaGiaChannel({ l1Terms, yStdDenormalization, regimes, joinHalfKyr, excludePeriodsAboveKyr, iceInventory, relaxationKyr, alphaGiaRateJ2000PerYr, alphaJ2000, j2RateJ2000PerYr, j2J2000 }: {
+    l1Terms?: Array<{
         period_kyr: number;
         a: number;
         b: number;
     }>;
-    yStdDenormalization: number;
+    yStdDenormalization?: number;
+    regimes?: Array<{
+        l1Terms: Array<{
+            period_kyr: number;
+            a: number;
+            b: number;
+        }>;
+        yStdDenormalization: number;
+        windowKyr: [number, number];
+    }>;
+    joinHalfKyr?: number;
+    excludePeriodsAboveKyr?: number;
+    iceInventory?: {
+        lgmSeaLevelDropM: number;
+        presentIceSeaLevelM: number;
+        greenlandSeaLevelM: number;
+        nhGlaciationOnsetMa: number;
+        nhGlaciationWidthMyr: number;
+        eotMa: number;
+        eotWidthMyr: number;
+    };
     relaxationKyr: number;
     alphaGiaRateJ2000PerYr: number;
     alphaJ2000: number;
@@ -116,6 +185,7 @@ export function createAlphaGiaChannel({ l1Terms, yStdDenormalization, relaxation
     alphaAt: (year: number) => number;
     j2RatioAt: (year: number) => number;
     laggedL1PermilAt: (year: number) => number;
+    iceBaselinePermilAt: (year: number) => number;
     kPerPermille: number;
     relaxationKyr: number;
     laggedL1Terms: Array<{
@@ -123,4 +193,5 @@ export function createAlphaGiaChannel({ l1Terms, yStdDenormalization, relaxation
         a: number;
         b: number;
     }>;
+    glacialSwingPermil: number;
 };

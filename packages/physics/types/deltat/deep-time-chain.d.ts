@@ -88,6 +88,7 @@ export function createDeepTimeChain(deps: {
         alphaAt: (year: number) => number;
         j2RatioAt: (year: number) => number;
         laggedL1PermilAt: (year: number) => number;
+        iceBaselinePermilAt: (year: number) => number;
         kPerPermille: number;
         relaxationKyr: number;
         laggedL1Terms: Array<{
@@ -95,6 +96,7 @@ export function createDeepTimeChain(deps: {
             a: number;
             b: number;
         }>;
+        glacialSwingPermil: number;
     };
     earthMoiFactorAtAge: (tMa: number) => number;
     withLatticeAlpha: (build: () => void) => void;

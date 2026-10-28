@@ -125,5 +125,31 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
         segmentYears: number;
         chainLimitYears: number;
     };
+    lunarSeatStatus: () => {
+        chains: Record<string, {
+            fwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+            bwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+        } | null>;
+        carriers: Record<string, {
+            fwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+            bwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+        }>;
+    };
 };
 export type Ctx = import("./time-axis.js").Ctx & ReturnType<typeof assembleLunarTheory>;

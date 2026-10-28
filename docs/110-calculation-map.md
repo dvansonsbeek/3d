@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.3
-coefficients: sha256:a1e5567e03d1936e
+modelVersion: v27.4
+coefficients: sha256:76157eae2501907c
 status: current
 ---
 
@@ -130,7 +130,7 @@ Earth's spin × the solar + lunar torques on the recession history).
 | step | quantity | formula | inputs | code |
 | --- | --- | --- | --- | --- |
 | 1 | Moon distance a_M(t) | a₀ · r(t), r the CITED history's ratio a(t)/a(0) (Farhat et al. 2022, AstroGeo22, 0–4,429 Ma at 1 Myr) on a monotone cubic Hermite with the J2000 end-slope = the LLR α₁; forward of J2000 the LLR rate held; null beyond 4,429 Ma (plan 12 option A — no fitted term) | the AstroGeo22 table; α₁; a₀ = 384,399.07 km | `deltat/moon-distance-history.cjs` |
-| 2 | Earth's moment-of-inertia factor α(t) | α_J2000 − k·[L1(t) − ⟨L1⟩_τ(t)] — the GIA channel: the polar moment's LAGGED response to the ice history the L1 lines proxy (τ the mantle relaxation time; k derived at construction from the observed dJ₂/dt, no stored scale; `climate/l1-orbital` `createAlphaGiaChannel`); α_J2000 = 0.330695 | the L1 climate formula | `deltat/deep-time-chain.js` `alphaGia` (the model reads it through `model/deep-time-chain.js`; twin `tools/lib/deep-time.js`) |
+| 2 | Earth's moment-of-inertia factor α(t) | α_J2000 − k·[V(t) − V(2000)] — the GIA channel: the polar moment's LAGGED response to the ICE-VOLUME history V(t) = the three LR04 regimes' L1 line sets each inside its own fit window (C¹ joins; the 405-kyr line out — not ice), lagged by τ, plus the cited inventory's baseline beyond the record (Greenland absent before 2.58–2.90 Ma, all ice before 33.5–34.0 Ma; `astro-reference giaIceInventory`, converted by the 120-m LGM swing); k derived at construction from the observed dJ₂/dt, no stored scale (`climate/l1-orbital` `createAlphaGiaChannel`, plan 26); α_J2000 = 0.330695 | the L1 climate formula's three LR04 regimes + the ice inventory | `deltat/deep-time-chain.js` `alphaGia` (the model reads it through `model/deep-time-chain.js`; twin `tools/lib/deep-time.js`) |
 | 3 | day length LOD(t) | 2π·I(t) / (L_EM(t) − L_M(t)), I = α·M_E·R_E², L_M = m_M·√(GM_EM·a_M)·√(1 − e_M²) — angular-momentum conservation in the Earth–Moon system; L_EM constant (the solar channels that once made it time-dependent beyond the era were deleted at plan 12 option A) | steps 1–2; L_EM from Layer 0 (chain 1's √(1 − e_M²) factor) | `deltat/deep-time.cjs` 80–86; L_EM `layer0/derive-params.js` 63–64 |
 | 4 | spin rate ω(t) | 2π / LOD(t) | step 3 | (implicit) |
 | 5 | the spin factor ω₀/ω(t) = LOD(t)/LOD₀ | **LOD(t)/LOD_J2000** | LOD_J2000 = ω₀ = 86,400 s (the SI day — plan 09; the device's kinematic day read 86,399.99968) | `earth/precession-composed` (the ω₀/ω factor of 2.3) |
@@ -194,14 +194,17 @@ F_sun is the solar-share row below evaluated of date — the same
 (1 − e²)^(−3/2), with e(t) the one-source eccentricity the integration
 already carries. J₂(t)/J₂₀ is the GIA channel's second observable
 (`climate/l1-orbital.cjs` `j2RatioAt`): the ice-age mass redistribution the
-length-of-day side carries as α(t), read in its own observable — k_J is
+length-of-day side carries as α(t), read in its own observable, on the same
+ice-volume history (plan 26: the windowed LR04 regimes inside the record,
+the inventory's baseline beyond — +2.0·10⁻⁵ in the Antarctic-only era,
++1.74·10⁻⁴ before the Antarctic glaciation) — k_J is
 fixed by the OBSERVED dJ₂/dt (input `j2RateJ2000PerYr`, Cox & Chao 2002:
 <!--v:j2RateJ2000Per1e11Yr-->−2.7<!--/v--> ×10⁻¹¹ /yr), so the J₂→α conversion of the length-of-day side never
 enters. Measured (`tools/verify/equinox-vs-vondrak.js`, theory against
 theory): the equinox of date sits within <!--v:equinoxVsVondrakMaxAbsArcsec-->7.9<!--/v-->″ of Vondrák et al. (2011)
 over ±3000 yr (<!--v:equinoxVsVondrakMaxAbsInnerArcsec-->0.6<!--/v-->″ inside −500…+2500) where the secular law alone reads
 <!--v:equinoxSecularOnlyMaxAbsArcsec-->28.1<!--/v-->″ — the whole of the Sun's former ancient residual against Horizons;
-the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->14.8<!--/v-->″ rms against La2004 over the last million years
+the obliquity holds <!--v:obliqVsLa2004RmsLastMyrArcsec-->14.9<!--/v-->″ rms against La2004 over the last million years
 where the secular law alone reads <!--v:obliqSecularOnlyVsLa2004RmsLastMyrArcsec-->80.4<!--/v-->″ (La2004 integrates the same
 eccentricity-dependent torque). Over the last Myr F_sun averages
 +<!--v:precOfDateSolarTorqueMeanLastMyrPct-->0.032<!--/v--> % (the mean e² sits above today's — <!--v:precOfDateEquinoxShiftAtM1MyrDeg-->4.2<!--/v-->° of equinox at −1 Myr) and
@@ -251,7 +254,7 @@ one-source movement):
 | 1246 | **25857.09** | 50.1216 | 25771.6 | 23.53705 |
 | 2000 | **25771.58** | 50.2880 | 25771.6 | 23.43928 |
 | 5000 | **25447.75** | 50.9279 | 25771.6 | 23.06397 |
-| 10000 | **25110.55** | 51.6118 | 25771.7 | 22.65350 |
+| 10000 | **25110.54** | 51.6118 | 25771.7 | 22.65350 |
 <!-- /generated:calcmap-ofdate-precession -->
 
 ### 2.5 Findings from this chain — resolved
@@ -305,7 +308,7 @@ fitter's lunar counts ride the real-valued product).
 | 1246 | 365.256418 | 365.256362 | 365.242293 | 365.242236 | 365.259666 | 365.259610 |
 | 2000 | 365.256363 | 365.256363 | 365.242190 | 365.242190 | 365.259637 | 365.259637 |
 | 5000 | 365.256134 | 365.256366 | 365.241781 | 365.242014 | 365.259499 | 365.259731 |
-| 10000 | 365.255706 | 365.256371 | 365.241160 | 365.241826 | 365.259298 | 365.259963 |
+| 10000 | 365.255706 | 365.256371 | 365.241160 | 365.241826 | 365.259297 | 365.259963 |
 <!-- /generated:calcmap-year-lengths-of-date -->
 
 ### 3.3 The day lengths
@@ -320,14 +323,14 @@ fitter's lunar counts ride the real-valued product).
 <!-- generated:calcmap-day-lengths -->
 | year | LOD kinematic of date = the Layer-0 tidal mean (s) | sidereal day (s) | stellar day (s) |
 |---|---|---|---|
-| -10000 | 86399.76259 | 86163.8568 | 86163.8651 |
+| -10000 | 86399.76257 | 86163.8568 | 86163.8651 |
 | -2584 | 86399.91956 | 86164.0136 | 86164.0219 |
 | -584 | 86399.95491 | 86164.0455 | 86164.0539 |
 | 0 | 86399.96506 | 86164.0620 | 86164.0704 |
 | 1246 | 86399.98674 | 86164.0853 | 86164.0936 |
 | 2000 | 86400.00000 | 86164.0917 | 86164.1001 |
 | 5000 | 86400.05509 | 86164.1432 | 86164.1516 |
-| 10000 | 86400.15740 | 86164.2546 | 86164.2630 |
+| 10000 | 86400.15741 | 86164.2546 | 86164.2630 |
 <!-- /generated:calcmap-day-lengths -->
 
 ### 3.4 Findings from this chain — resolved
@@ -429,7 +432,7 @@ hybrid and the K law at the exact years):
 
 dε/dt at J2000 (″/cy): hybrid series -46.79 (the published ε, S3b) · IAU 2006 -46.84 · banked verdict integrations: era-tier ζ -48.00, full-tier ζ -38.91 (data/obliquity-hybrid-verdict.json).
 α at J2000 (″/yr): p₀/cos ε₀ = 54.811 with p₀ = the IAU 2006 general precession p_A (plan 09 — the form the registry and the shipped hybrid use) · 54.811 in the verdict artifact (ψ̇ = the of-date beat 50.288 ″/yr) — the two J2000 precession readings of chain 2, finding 2.
-Banked window rms vs La2004 (″), hybrid on the series / the same hybrid on the 18-mode table: ±13 kyr 50 / 530 · ±50 kyr 427 / 389 · ±130 kyr 488 / 381 · ±270 kyr 490 / 453 (era-tier ζ). La2004 is a THEORY reference, not an observation.
+Banked window rms vs La2004 (″), hybrid on the series / the same hybrid on the 18-mode table: ±13 kyr 50 / 530 · ±50 kyr 427 / 389 · ±130 kyr 488 / 381 · ±270 kyr 490 / 452 (era-tier ζ). La2004 is a THEORY reference, not an observation.
 <!-- /generated:calcmap-obliquity-values -->
 
 The beat at the deep anchors, both ψ̇ readings:
@@ -438,10 +441,10 @@ The beat at the deep anchors, both ψ̇ readings:
 | age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \|s₃\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqPrecScaled*Kyr` |
 |---|---|---|---|---|---|
 | 0 | **25771.575** | 25772.126 | 50.288 | 41.22 | 41.22 |
-| 380 | **21235.375** | 21237.506 | 61.030 | 30.73 | 33.97 |
-| 650 | **18435.128** | 18438.036 | 70.301 | 25.19 | 29.49 |
-| 1400 | **14976.924** | 14981.564 | 86.533 | 19.15 | 23.96 |
-| 2460 | **11863.274** | 11869.497 | 109.245 | 14.34 | 18.98 |
+| 380 | **21235.382** | 21237.513 | 61.030 | 30.73 | 33.97 |
+| 650 | **18435.141** | 18438.049 | 70.301 | 25.19 | 29.49 |
+| 1400 | **14976.931** | 14981.570 | 86.533 | 19.15 | 23.96 |
+| 2460 | **11863.280** | 11869.503 | 109.245 | 14.34 | 18.98 |
 
 s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.6 yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The third column is the deep chain’s tidal-mean year pair: since plan 09 step 5d its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row). Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the fifth column; `obliqPrecScaled*Kyr` is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii).
 <!-- /generated:calcmap-obliquity-beat -->
@@ -522,7 +525,7 @@ The four events and the year lengths (live, generated):
 <!-- generated:calcmap-cardinal-events -->
 | year | VE | SS | AE | WS | SS→SS interval (d) | `yearLengthDays(SS)` (d, the crossing interval — the same quantity since R1) | mean of four (d) | one-family mean tropical year (s) | e |
 |---|---|---|---|---|---|---|---|---|---|
-| -10000 | -10000 03-19 12:22 | -10000 06-16 06:27 | -10000 09-13 14:45 | -10000 12-16 11:59 | 365.244426 | 365.244426 | 365.243550 | 31556957.03 | 0.01964 |
+| -10000 | -10000 03-19 12:22 | -10000 06-16 06:27 | -10000 09-13 14:44 | -10000 12-16 11:59 | 365.244426 | 365.244426 | 365.243550 | 31556957.03 | 0.01964 |
 | -2584 | -2584 03-21 18:02 | -2584 06-23 22:08 | -2584 09-22 04:19 | -2584 12-19 16:15 | 365.243911 | 365.243911 | 365.242785 | 31556947.70 | 0.01835 |
 | -584 | -584 03-21 04:50 | -584 06-23 08:32 | -584 09-23 08:01 | -584 12-20 20:20 | 365.241643 | 365.241643 | 365.242534 | 31556938.72 | 0.01771 |
 | 0 | 0 03-20 15:53 | 0 06-22 15:02 | 0 09-23 01:49 | 0 12-20 18:26 | 365.243502 | 365.243502 | 365.242458 | 31556935.80 | 0.01750 |

@@ -135,10 +135,20 @@ export function createDeepTimeChain(deps) {
   });
 
   // ── α(t): the GIA channel (lagged L1 response), the memo and the lattice pin ──
-  const CLIMATE_REGIME = F.CLIMATE_FORMULA_COEFFS.regimes['lr04-post-mpt'];
+  // PLAN 26 — the ice-volume history: the three LR04 regimes each inside its own fit window
+  // (nothing extrapolated), the 405-kyr line out of the ice proxy, the cited inventory's
+  // baseline beyond the record (Greenland absent before the NH glaciation, all ice before the
+  // Antarctic one). ONE home: climate/l1-orbital.cjs; every twin reads this chain.
+  const CLIMATE_REGIMES = F.CLIMATE_FORMULA_COEFFS.regimes;
+  const iceRegimes = ['lr04-post-mpt', 'lr04-inhg-mpt', 'lr04-pre-inhg'].map((k) => {
+    const r = CLIMATE_REGIMES[k];
+    return { l1Terms: r.L1, yStdDenormalization: r.denormalization.y_std, windowKyr: /** @type {[number, number]} */ ([r.window_kyr[0], r.window_kyr[1]]) };
+  });
   const alphaGia = createAlphaGiaChannel({
-    l1Terms: CLIMATE_REGIME.L1,
-    yStdDenormalization: CLIMATE_REGIME.denormalization.y_std,
+    regimes: iceRegimes,
+    joinHalfKyr: 50,
+    excludePeriodsAboveKyr: 400,   // the 405-kyr line is not ice (plan 26 §2M.2: 24 m/‰ against ~67 everywhere else)
+    iceInventory: C.deepTime.iceInventory,
     relaxationKyr: C.deepTime.alphaGiaRelaxationKyr,
     alphaGiaRateJ2000PerYr: C.deepTime.alphaGiaRateJ2000PerYr,
     alphaJ2000: earthMoiFactorJ2000,

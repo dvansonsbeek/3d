@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.3
-coefficients: sha256:a1e5567e03d1936e
+modelVersion: v27.4
+coefficients: sha256:76157eae2501907c
 status: current
 ---
 
@@ -468,9 +468,9 @@ era-local/deep-global tension the eccentricity story showed, resolved
 the same way. Fourth (v23.0), **the realized period is gated**: the
 shipped model's own ε(t) over the LR04 record, fitted with the full line
 set p + sᵢ and one free p, reads
-<!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v--> yr against the
+<!--v:obliqCycleRealizedFitLr04Years-->~40,916<!--/v--> yr against the
 one-home prediction from the window mean of the pole rate with its
-of-date factors, <!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v--> yr
+of-date factors, <!--v:obliqCycleRealizedLr04Years-->~40,924<!--/v--> yr
 (`createModel().lunisolar.obliquityPeriodRealizedYears`; the generator
 REFUSES beyond 0.1 %, fail-proven), with La2004's series on the same fit
 at <!--v:obliqCycleLa2004FitLr04Years-->~40,900<!--/v--> yr — the J2000
@@ -591,7 +591,14 @@ whole span (215 s at −400 Myr with both banks "landed"); the chain counts
 agree across the runtimes to the last bit, the obliquity carrier (an
 integrand of nearly equal obliquities) to 2.4e-9. The perf gate asserts that
 every seat took. Seated, the browser's deep lunar tables carry Node's
-last-bit arithmetic, as its deep spin walk already does. The one-time price: the former single running sum differed
+last-bit arithmetic, as its deep spin walk already does. Plan 26 added the
+Sun's mean-longitude table to the same bank (`sun.meanLongitude`: 100-yr
+cells, 2,500 per segment — it was 10 of the 12 s of a seated deep jump, the
+tidal-chain year evaluated through the GIA sinusoids at 4 million cells),
+and found the browser's eclipse finders holding the Sun deps of the model
+instance alive at their creation: a bank landing rebuilt the tier model but
+not the finders, so the first frame after a deep jump walked 400 Myr through
+the eclipse Sun's eccentricity (102 s); every landing now rebuilds them too. The one-time price: the former single running sum differed
 from the segmented association at the rounding level beyond ±250 kyr — 1–2 ULP
 of the cycle count, 0.001″ of lunar longitude at −300 kyr, 0.016″ at −3 Myr;
 nothing inside the dense tier moved. Measured after: the lunar longitude at
@@ -617,8 +624,54 @@ error (318″ at 100 Ma, the collapse at 4 Ga) and left a physical-input
 sensitivity of the same size at 100 Ma: the deep ε and equinox are
 reproducible, bit-exact and gated, and are read as the model's integration on
 its inputs, not as an arcsecond-class prediction beyond ~10 Myr (where the
-sensitivity stays below 1″). The GIA factor's deep-time form is the open
-decision this measurement puts a number on (plan 24 §5).
+sensitivity stays below 1″). Measured directly (plan 26 §2M.5, a constant
+offset of the J₂ factor beyond 3 Ma walked to −500 Myr): the deep obliquity
+VALUE is linearly sensitive at 450″ per 10⁻⁶ of the precession constant at
+100 Ma and 2,000″ at 500 Ma (0.5″ at 10 Ma per 10⁻⁷), the equinox 2.3° per
+10⁻⁶ at 100 Ma — not chaos, a resonance: 10⁻⁶ of the rate is 1.4° of
+precession phase per 100 Myr, and the obliquity is the beat of that phase
+with the orbital nodes. The ice-free baseline alone is known to the 10⁻⁴
+class, so beyond ~20 Myr the obliquity VALUE is undetermined by degrees
+whatever the channel's form; the BAND — its amplitude and period, the
+falsification leg's statement — is the claim. The API serves
+`obliquityBand` beside `obliquityDeg` inside the hybrid's ±10-Myr domain, the
+scene's "Obliquity cycle" row says it, `createModel().earth.obliquityBandAt`
+is the one home.
+
+**The ice-age channel as physics (plan 26, model v27.4).** The GIA channel —
+α(t) of the LOD/spin chain and J₂(t)/J₂₀ of the spin walk, one redistribution
+in two observables — read ONE fitted L1 line set, the post-MPT regime's
+(0–1,000 kyr of LR04), extrapolated to every epoch. Measured (plan 26 §2M.1):
+outside its window that set is a DEGENERATE solution — the closely spaced
+lines (29.0/29.6/29.8 kyr; 94.9–105 kyr) fit the window by cancellation and
+de-phase beyond it (R² −26 on the older LR04 windows, amplitude 3× the
+record), so the channel oscillated at ±7·10⁻⁴ at random phase for the whole
+deep past (the doc's "bounded ±5·10⁻⁴" was the in-window figure), and a
+Quaternary ice fit decided the Precambrian pole. The channel is now an
+ICE-VOLUME history V(t) in its own currency: the three LR04 regimes
+(post-MPT, iNHG–MPT 1,000–2,700 kyr, pre-iNHG 2,700–5,320 kyr — each with
+its own fitted amplitudes: the orbital ice response grows toward the
+present, eccentricity-band 0.66 → 0.70 → 1.56 ‰ as the planet cooled) each
+applied INSIDE its own fit window with C¹ joins of ±50 kyr, the 405-kyr
+line left out of the ice proxy (the sea-level stack and LR04 agree on one
+ratio, ~67 m/‰, across the precession, obliquity and eccentricity bands —
+the orbital δ¹⁸O IS ice volume — and on 24 m/‰ for the 405-kyr band, which
+is therefore not), and beyond the record no orbital term (no proxy, no
+claim) but a BASELINE from the cited ice inventory (`astro-reference
+giaIceInventory`): Greenland's 7.4 m of sea-level equivalent absent before
+the Northern-Hemisphere glaciation (2.58–2.90 Ma), all 65 m absent before the
+Antarctic one (the Eocene–Oligocene transition, 33.5–34.0 Ma), converted to
+the channel's currency by the LGM-to-present swing of the fitted response
+(120 m). The deep state is TODAY's ice minus what was absent — the first
+draft referenced the Quaternary window mean and read the Antarctic-only era
+as more ice than today. Result: J₂/J₂₀ − 1 = +2.0·10⁻⁵ in the Antarctic-only
+era and +1.74·10⁻⁴ before 34 Ma (plan 26 §2M.4's +1.7·10⁻⁴ estimate, between
+the rigid-Earth +4·10⁻³ and the deep-compensation +7·10⁻⁵ bounds; the same
+fraction of α's glacial swing, 2.8·10⁻⁷ of α — the deep LOD effect is
+negligible); the historical era moved by 3·10⁻⁹ of the factor (the 405-kyr
+line), the Quaternary by ≤ 1.7·10⁻⁶; the normalisation is unchanged (the
+observed J2000 rates over the fitted slope, no J₂→α factor). The deep walk
+no longer depends on the climate fit's phase.
 
 ## 19. The solar-system spin landscape on the engine's own node lines (C-4)
 

@@ -294,6 +294,16 @@
     "c22E6": 22.4261,
     "cMR2": 0.392728
   },
+  "giaIceInventory": {
+    "_description": "The ice-volume inventory the GIA channel's DEEP-TIME baseline is built from (plan 26; climate/l1-orbital.cjs createAlphaGiaChannel). The channel's orbital part is the LR04-fitted L1 response in its three regime windows (post-MPT, iNHG-MPT, pre-iNHG — each applied inside its own fitted window with C1 joins; nothing extrapolated), scaled on the observed J2000 rates (giaCoxChaoPeltier). Its baseline — how much ice the Earth carried relative to today before the Northern-Hemisphere glaciation and before the Antarctic one — is this inventory in metres of sea-level equivalent, converted to the channel's own currency by the LGM-to-present swing of the fitted L1 response (the same response per unit of ice the J2000 rates normalise; measured 2M.2 of plan 26: the sea-level stack and LR04 agree on ~67 m/permil across the orbital bands, so the orbital delta-18O IS ice volume). Values: the LGM sea-level drop 120 m (Spratt & Lisiecki 2016 stack, the record the ratio was measured on; Lambeck et al. 2014 give 125-134 m); present grounded ice 65 m of sea-level equivalent (Antarctica 58.3 + Greenland 7.4 m, IPCC AR6 / Morlighem et al. 2017, 2020); Greenland alone 7.4 m; the NH glaciation onset 2.7 Ma (the iNHG; the Quaternary's base 2.58 Ma, ICS) — the transition from the Quaternary base to full absence of NH ice taken over 2.58-2.90 Ma; the Antarctic glaciation at the Eocene-Oligocene transition 34.0 Ma (Oi-1, 33.7-33.9 Ma; Westerhold et al. 2020 CENOGRID step), its transition taken over 33.5-34.0 Ma. Before 34 Ma the Earth is ice-free: the channel's two observables sit at their ice-free constant (+1.7e-4 of J2/J2_0 and the same fraction of alpha's glacial swing, the plan-26 estimate between the rigid +4e-3 and the deep-compensation +7e-5 bounds). ANCHOR class: a counterfactual over the inventory is legitimate.",
+    "lgmSeaLevelDropM": 120,
+    "presentIceSeaLevelM": 65,
+    "greenlandSeaLevelM": 7.4,
+    "nhGlaciationOnsetMa": 2.58,
+    "nhGlaciationWidthMyr": 0.32,
+    "eotMa": 33.5,
+    "eotWidthMyr": 0.5
+  },
   "giaCoxChaoPeltier": {
     "_description": "GIA observation anchors: Cox & Chao (2002, Science 297) satellite-gravimetry dJ2/dt and the Peltier ICE-6G LOD-coupling axisymmetric-GIA J2-to-alpha conversion factor. MODEL INPUTS since plan 11 step 1 (anchor class — they were a registry-only citation block while model-parameters deepTime carried copies): the GIA channel's two J2000 rates are DERIVED from them by tools/constants/generate.mjs into DEFAULT_CONSTANTS.deepTime — j2RateJ2000PerYr = dJ2DtPerYr (the OBSERVED dJ2/dt, the scale of J2(t)/J2_0 the spin integration multiplies into the precession rate; plan 06 §9 item 10) and alphaGiaRateJ2000PerYr = dJ2DtPerYr / j2ToAlphaFactor (the dalpha/dt the channel's coupling k is derived from at runtime; exact in binary). Every runtime reads the derived pair through the generated module; the registry keeps coxChaoDJ2Dt / giaJ2ToAlphaFactor / dAlphaDtJ2000 as the citation rows.",
     "dJ2DtPerYr": -2.7e-11,

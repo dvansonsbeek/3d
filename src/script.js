@@ -3776,7 +3776,9 @@ if (typeof window !== 'undefined') {
     // and the seat diagnostic — per named chain and carrier, whether the bank's prefixes seated in THIS
     // runtime and the two edge values compared (the perf gate asserts every seat took).
     lunarBankLoaded: () => _lunarBankData !== null,
-    lunarSeatStatus: () => ({ chains: _chainCycles().seatStatus(), carriers: _moonArgsM().carrierSeatStatus() }),
+    lunarSeatStatus: () => ({ chains: _chainCycles().seatStatus(), carriers: _moonArgsM().carrierSeatStatus(),
+      // the package tier model's own tables (its chains, carriers and the Sun's mean-longitude table — plan 26 pickup)
+      package: _tierModelB().moon.bankSeatStatus() }),
     // Perf-gate surface (the R9 class): force ONE resample of every chain
     // planet's orbit ring at jd — the 10-yr JD condition and the 250-ms
     // wall-clock floor bypassed — and return its wall time (ringMs, 7 × 257
@@ -15069,8 +15071,14 @@ let _zetaSeriesEndYr = 0;
         // Measured: the package model built WITHOUT this artifact
         // is a different hybrid — its certified Sun parts from the API's by
         // 75″ at 0 AD and 377″ at −2500 (the recorded 3c trap, third
-        // instance). Rebuild the tier model on the shipped configuration.
+        // instance). Rebuild the tier model on the shipped configuration —
+        // AND the eclipse finders, which captured the previous instance's
+        // frameworkSunDeps at their creation (plan 26 pickup, measured: the
+        // finders kept an unseated model after the banks landed and the render
+        // loop's lighting update walked 400 Myr on the first frame after a deep
+        // jump — 102 s under the eclipse Sun's eccentricityAt).
         _tierUmbraModel = null;
+        _eclipseM = null;
         // The Moon-argument factory froze its obliquity-carrier normalisation
         // and rate anchors on the first frame from the pre-series ε — rebuild
         // it on the hybrid now that the series is here
@@ -15166,8 +15174,10 @@ let _spinBankData = null;   // {spacingYr, checkpoints:[{t, s:[x,y,z]}]}
         _epsSeriesDeepRangeYr = { [-1]: 0, [1]: 0 };
         // The package tier model walks its own one-source movement: rebuild it seated
         // on the bank too, and drop the umbra tier's one-JD memo with it (a paused frame
-        // re-reads the same JD; a memo hit would keep the unseated model alive).
+        // re-reads the same JD; a memo hit would keep the unseated model alive) — and the
+        // eclipse finders, which hold the instance's Sun deps (plan 26 pickup).
         _tierUmbraModel = null;
+        _eclipseM = null;
         _umbraTierMemo.jd = NaN;
         positionChanged = true;
         console.log(`spin-axis checkpoint bank loaded from ${url} (${a.checkpoints.length} states every ${a.spacingYr / 1000} kyr) — a deep jump walks ≤ one spacing`);
@@ -15196,7 +15206,7 @@ let _lunarBankData = null;   // {chains:{name:{fwd,bwd}}, carriers:{name:{fwd,bw
         if (!res.ok) continue;
         const a = await res.json();
         if (!a.chains || !a.carriers || !a.chains.draconic || !Array.isArray(a.chains.draconic.bwd)) continue;
-        _lunarBankData = { chains: a.chains, carriers: a.carriers, meta: a.meta };
+        _lunarBankData = { chains: a.chains, carriers: a.carriers, sun: a.sun, meta: a.meta };   // sun: the Sun's mean-longitude table (plan 26)
         // Rebuild every holder of a lunar table so the next evaluation seats:
         // the arguments factory (its carriers), the chain-cycle integrator (its
         // counts), the package tier model (its own instances of both), and the
@@ -15204,6 +15214,7 @@ let _lunarBankData = null;   // {chains:{name:{fwd,bwd}}, carriers:{name:{fwd,bw
         _moonArgsM.reset();
         _chainCycles.reset();
         _tierUmbraModel = null;
+        _eclipseM = null;   // the finders hold the instance's Sun deps (plan 26 pickup)
         _umbraTierMemo.jd = NaN;
         positionChanged = true;
         console.log(`lunar cumulative bank loaded from ${url} (${Object.keys(a.chains).length} chains + ${Object.keys(a.carriers).length} carriers, ${a.chains.draconic.bwd.length} prefixes per side) — a deep lunar read sums ≤ one segment`);
@@ -27652,7 +27663,7 @@ const planetStats = {
        tpLink: true},
       {label : () => `Obliquity cycle (derived beat)`,
        value : [ { v: () => 1296000 / ((1296000 / predictions.axialPrecession) * _spinAxisInertialFactor() - _s3ArcsecPerYr()), dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The model's DERIVED obliquity period: 2π/(ψ̇ᵢₙ − |s₃|) — the beat of the spin axis's INERTIAL precession rate of date (the one-source axial rate × the hybrid's self-anchor factor: the general precession plus the planetary mean the N-body ecliptic's motion carries, +0.097″/yr at J2000) against the engine's own dominant nodal mode s₃ (the banked deep secular modes, −18.851″/yr — the same partner the published obliqCycleYears and the Framework Verification chart use; the chain's of-date node tangent in the row below is a different, windowed quantity). 41,098 yr at J2000, the instantaneous limit — a dated record sees the beat of the pole rate's mean over its own window (faster spin, lower mean obliquity, higher mean eccentricity in the past): 40,927 yr over the LR04 record, the climate formula's p+s₀ line (registry obliqCycleRealized*Years); the general rate alone read 41,224. Matches the observed Milankovitch obliquity band (~41 kyr) and is gate-pinned in 40–42.5 kyr (the obliquity-hybrid verdict); doc 109 §18 carries the deep-time prediction split (registry obliqBeat*Kyr).`]},
+       hover : [`The model's DERIVED obliquity period: 2π/(ψ̇ᵢₙ − |s₃|) — the beat of the spin axis's INERTIAL precession rate of date (the one-source axial rate × the hybrid's self-anchor factor: the general precession plus the planetary mean the N-body ecliptic's motion carries, +0.097″/yr at J2000) against the engine's own dominant nodal mode s₃ (the banked deep secular modes, −18.851″/yr — the same partner the published obliqCycleYears and the Framework Verification chart use; the chain's of-date node tangent in the row below is a different, windowed quantity). 41,098 yr at J2000, the instantaneous limit — a dated record sees the beat of the pole rate's mean over its own window (faster spin, lower mean obliquity, higher mean eccentricity in the past): 40,927 yr over the LR04 record, the climate formula's p+s₀ line (registry obliqCycleRealized*Years); the general rate alone read 41,224. Matches the observed Milankovitch obliquity band (~41 kyr) and is gate-pinned in 40–42.5 kyr (the obliquity-hybrid verdict); doc 109 §18 carries the deep-time prediction split (registry obliqBeat*Kyr). At deep time the BAND (this period and the obliquity's amplitude) is the model's claim, never the obliquity VALUE: measured (plan 26), the value is linearly sensitive at 450″ per 1e-6 of the precession constant at 100 Ma (2,000″ at 500 Ma), and the ice-free baseline alone is known to the 1e-4 class — beyond ~20 Myr the obliquity readout is the integration on its inputs.`]},
       {label : () => `Apsidal meets Axial (Perihelion precession)`,
        value : [ { v: () => predictions.perihelionPrecession, dec:2, sep:',' },{ small: 'years' }],
        hover : [`The two counter-rotations meet: the prograde apsidal motion (the Duration row above) and the retrograde axial precession close on each other, so the rates ADD — 1/T = 1/T_axial + 1/T_apsidal ≈ 20.9 kyr, the climatic-precession beat that paces the Milankovitch precession band. Computed as the beat of the ONE-SOURCE anomalistic and tropical years — the same value the Predictions panel shows.`],

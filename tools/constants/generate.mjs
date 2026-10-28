@@ -188,6 +188,10 @@ const CLASSIFICATION = {
     // were a registry-only citation block while model-parameters deepTime
     // carried copies of the derived values.
     giaCoxChaoPeltier: 'anchor',
+    // The ice-volume inventory (plan 26): the GIA channel's deep-time BASELINE
+    // (deepTime.iceInventory, assembled below) — cited sea-level equivalents and
+    // glaciation ages; a counterfactual over them is legitimate — anchor.
+    giaIceInventory: 'anchor',
     // GRAIL/LLR lunar gravity citations (Williams 2014) — Cassini lab inputs
     // and registry keys; never model inputs.
     moonGrailWilliams2014: 'target',
@@ -241,8 +245,13 @@ const readData = (f) => JSON.parse(readFileSync(join(ROOT, 'data', f), 'utf8'));
  *   dtStackTaper*HalfwidthYr data/deltaT-4flag-fit.json shipped_taper — the
  *                            ΔT stack's application window rides the stack's
  *                            own artifact (its fitter writes it)
+ *   iceInventory             astro-reference giaIceInventory (plan 26): the GIA
+ *                            channel's deep-time baseline — the cited ice inventory
+ *                            in metres of sea-level equivalent and the glaciation
+ *                            ages, passed through as one block
  *
- * Key order is the former block's, so the emitted shape is unchanged.
+ * Key order is the former block's, so the emitted shape is unchanged (the
+ * inventory block appended).
  * @param {Record<string, any>} astro @returns {Record<string, unknown>}
  */
 function assembleDeepTime(astro) {
@@ -255,6 +264,10 @@ function assembleDeepTime(astro) {
   need(typeof fitted.alphaGiaRelaxationKyr === 'number', 'data/deep-time-fitted.json alphaGiaRelaxationKyr is missing');
   need(dtFit.shipped_taper && typeof dtFit.shipped_taper.full_halfwidth_yr === 'number' && typeof dtFit.shipped_taper.total_halfwidth_yr === 'number',
     'data/deltaT-4flag-fit.json carries no shipped_taper — re-run the Step-7c fitter (DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write)');
+  const ice = astro.giaIceInventory;
+  for (const k of ['lgmSeaLevelDropM', 'presentIceSeaLevelM', 'greenlandSeaLevelM', 'nhGlaciationOnsetMa', 'nhGlaciationWidthMyr', 'eotMa', 'eotWidthMyr']) {
+    need(typeof ice?.[k] === 'number', `astro-reference giaIceInventory.${k} is missing`);
+  }
   return {
     alpha1PerMa: astro.moonReference.moonRecessionAlpha1PerMa,
     alphaGiaRateJ2000PerYr: gia.dJ2DtPerYr / gia.j2ToAlphaFactor,
@@ -262,6 +275,15 @@ function assembleDeepTime(astro) {
     j2RateJ2000PerYr: gia.dJ2DtPerYr,
     dtStackTaperFullHalfwidthYr: dtFit.shipped_taper.full_halfwidth_yr,
     dtStackTaperTotalHalfwidthYr: dtFit.shipped_taper.total_halfwidth_yr,
+    iceInventory: {
+      lgmSeaLevelDropM: ice.lgmSeaLevelDropM,
+      presentIceSeaLevelM: ice.presentIceSeaLevelM,
+      greenlandSeaLevelM: ice.greenlandSeaLevelM,
+      nhGlaciationOnsetMa: ice.nhGlaciationOnsetMa,
+      nhGlaciationWidthMyr: ice.nhGlaciationWidthMyr,
+      eotMa: ice.eotMa,
+      eotWidthMyr: ice.eotWidthMyr,
+    },
   };
 }
 

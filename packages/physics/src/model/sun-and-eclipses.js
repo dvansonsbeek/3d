@@ -11,11 +11,14 @@ import { computeCarrierRatesDegPerCy, createSunPlanetaryCompletion } from '../ec
 /** @param {import('./lunar-theory.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleSunAndEclipses(ctx) {
   const {
-    C, F, late, MASS_RATIO_EARTH_MOON, currentAUDistance, frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT,
+    C, F, late, options, MASS_RATIO_EARTH_MOON, currentAUDistance, frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT,
     julianCenturyDays, meanSiderealYearDays, meanSolarYearDays, moonArgs, moonDistanceKm, moonSeries,
     moonSiderealMonthInput, moonSynodicMonthDays, obliquityDeg, oneFamilyTropicalYearSeconds, sunEccentricityAt,
     sunPerihelionDegAt, yearFromJD,
   } = ctx;
+  // PLAN 26 pickup — the Sun's mean-longitude table seats on the lunar cumulative bank too
+  // (its `sun.meanLongitude` section): the same segmented association, a seat never a value.
+  const sunBank = options.lunarCheckpointsArtifact && options.lunarCheckpointsArtifact.sun ? options.lunarCheckpointsArtifact.sun.meanLongitude : null;
   // The certified Sun — assembled from the model's own laws, ZERO fitted Sun
   // constants: e(t) and ϖ(t) are the eclipse Sun's mean elements of date
   // (earth-scalars.js: the one-source series plus the derived mean offset);
@@ -43,15 +46,42 @@ export function assembleSunAndEclipses(ctx) {
     const JULIAN_YEAR_S = 365.25 * 86400;
     const tropSec = oneFamilyTropicalYearSeconds;
     const FINE_SPAN = 20000, COARSE_STEP = 100;
-    /** cycles from 2000 to 2000 ± i·step (fwd/bwd tiers) */
-    /** @type {number[]} */ const fwdFine = [0];
-    /** @type {number[]} */ const bwdFine = [0];
-    /** @type {number[]} */ const fwdCoarse = [];
-    /** @type {number[]} */ const bwdCoarse = [];
+    // PLAN 26 pickup — the coarse tier in SEGMENTS of COARSE_SEGMENT_CELLS cells (250 kyr, the
+    // lunar bank's spacing): within a segment the cells sum from zero (S_k[j]), the prefixes
+    // P[k+1] = P[k] + S_k[last] are kept apart, a value is P[k] + S_k[j] + the partial cell —
+    // the same doubles in the same order with and without the bank's prefixes (a seat, never a
+    // value). Measured before: this table was 10 of the 12 s of a seated deep jump to −400 Myr
+    // (4 M cells of the tidal-chain year through the GIA sinusoids).
+    const COARSE_SEGMENT_CELLS = 2500, SEAT_REL_TOL = 1e-7;
+    /** @typedef {{ fine: number[], P: number[] | null, segs: Map<number, number[]>, banked: number }} SunSide */
+    /** @type {SunSide} */ const fwd = { fine: [0], P: null, segs: new Map(), banked: 0 };
+    /** @type {SunSide} */ const bwd = { fine: [0], P: null, segs: new Map(), banked: 0 };
     /** UNSIGNED trapezoid cycles over the span between two years (Julian
      *  years → SI seconds over the one-family year); the caller applies the
      *  direction sign. @param {number} ya @param {number} yb @returns {number} */
     const segAbs = (ya, yb) => 0.5 * (Math.abs(yb - ya) * JULIAN_YEAR_S) * (1 / tropSec(ya) + 1 / tropSec(yb));
+    /** @param {SunSide} side @param {1|-1} s @param {number} upto grow the fine table to this many cells */
+    const growFine = (side, s, upto) => { const fine = side.fine; while (fine.length <= upto) { const k = fine.length; fine.push(fine[k - 1] + s * segAbs(2000 + s * (k - 1), 2000 + s * k)); } };
+    /** The coarse prefixes' seat: P[0] = the fine edge; the bank's array when its P[0] agrees to SEAT_REL_TOL. @param {SunSide} side @param {1|-1} s */
+    const coarseInit = (side, s) => {
+      if (side.P) return;
+      growFine(side, s, FINE_SPAN);
+      side.P = [side.fine[FINE_SPAN]];
+      const arr = sunBank ? sunBank[s === 1 ? 'fwd' : 'bwd'] : undefined;
+      if (Array.isArray(arr) && arr.length > 1 && Math.abs(arr[0] - side.P[0]) <= SEAT_REL_TOL * Math.max(1, Math.abs(side.P[0]))) { side.P = arr.slice(); side.banked = arr.length; }
+    };
+    /** Segment k's within-segment prefix sums (built once). @param {SunSide} side @param {1|-1} s @param {number} k */
+    const segment = (side, s, k) => {
+      let S = side.segs.get(k);
+      if (S) return S;
+      S = [0];
+      const base = FINE_SPAN + k * COARSE_SEGMENT_CELLS * COARSE_STEP;
+      for (let j = 1; j <= COARSE_SEGMENT_CELLS; j++) { const y0 = 2000 + s * (base + (j - 1) * COARSE_STEP); S.push(S[j - 1] + s * segAbs(y0, y0 + s * COARSE_STEP)); }
+      side.segs.set(k, S);
+      return S;
+    };
+    /** Make P[0..k] exist (segments before k summed from their own zero and chained, unless banked). @param {SunSide} side @param {1|-1} s @param {number} k */
+    const prefixesTo = (side, s, k) => { const P = /** @type {number[]} */ (side.P); for (let m = P.length - 1; m < k; m++) P.push(P[m] + segment(side, s, m)[COARSE_SEGMENT_CELLS]); };
     /** signed cycles from 2000 to `year` @param {number} year @returns {number} */
     const cyclesTo = (year) => {
       const dy = year - 2000;
@@ -65,22 +95,36 @@ export function assembleSunAndEclipses(ctx) {
       // clamped target builds the tier at its final span; the grid stores
       // are endpoint-independent, so every value is bit-identical.
       tropSec(2000 + s * Math.min(a, ONE_FAMILY_WINDOW_YEARS));
-      const fine = s > 0 ? fwdFine : bwdFine;
-      const growFine = (/** @type {number} */ upto) => { while (fine.length <= upto) { const k = fine.length; fine.push(fine[k - 1] + s * segAbs(2000 + s * (k - 1), 2000 + s * k)); } };
+      const side = s > 0 ? fwd : bwd;
       if (a <= FINE_SPAN) {
         const i = Math.floor(a), f = a - i;
-        growFine(i + 1);
-        return fine[i] + f * (fine[i + 1] - fine[i]);
+        growFine(side, s, i + 1);
+        return side.fine[i] + f * (side.fine[i + 1] - side.fine[i]);
       }
-      growFine(FINE_SPAN);
-      const coarse = s > 0 ? fwdCoarse : bwdCoarse;
-      if (coarse.length === 0) coarse.push(fine[FINE_SPAN]);
+      coarseInit(side, s);
       const c = (a - FINE_SPAN) / COARSE_STEP, ci = Math.floor(c), cf = c - ci;
-      while (coarse.length <= ci + 1) { const k = coarse.length; const y0 = 2000 + s * (FINE_SPAN + (k - 1) * COARSE_STEP); coarse.push(coarse[k - 1] + s * segAbs(y0, y0 + s * COARSE_STEP)); }
-      return coarse[ci] + cf * (coarse[ci + 1] - coarse[ci]);
+      const k = Math.floor(ci / COARSE_SEGMENT_CELLS), j = ci - k * COARSE_SEGMENT_CELLS;
+      if (/** @type {number[]} */ (side.P).length <= k) prefixesTo(side, s, k);
+      const S = segment(side, s, k);
+      const P = /** @type {number[]} */ (side.P);
+      const v0 = P[k] + S[j];
+      // the next cell's start (the segment's next entry, or the next segment's first prefix)
+      const v1 = j + 1 <= COARSE_SEGMENT_CELLS ? P[k] + S[j + 1] : (prefixesTo(side, s, k + 1), P[k + 1] + segment(side, s, k + 1)[0]);
+      return v0 + cf * (v1 - v0);
     };
-    return /** @param {number} year @returns {number} */ (year) => sunL0Deg + 360 * cyclesTo(year);
+    /** THE GENERATOR'S HOOK (plan 26 pickup): the coarse segment prefixes in both directions over ±limitYears from the fine edge. @param {number} limitYears */
+    const recordSunCumulativeBank = (limitYears) => {
+      const K = Math.floor(limitYears / (COARSE_SEGMENT_CELLS * COARSE_STEP));
+      coarseInit(fwd, 1); coarseInit(bwd, -1); prefixesTo(fwd, 1, K); prefixesTo(bwd, -1, K);
+      return { fwd: /** @type {number[]} */ (fwd.P).slice(0, K + 1), bwd: /** @type {number[]} */ (bwd.P).slice(0, K + 1) };
+    };
+    /** THE SEAT DIAGNOSTIC: whether the bank seated and the two edge values compared, per direction. */
+    const sunSeatStatus = () => { coarseInit(fwd, 1); coarseInit(bwd, -1); const b = (/** @type {'fwd'|'bwd'} */ d) => sunBank && Array.isArray(sunBank[d]) ? sunBank[d][0] : null; return { fwd: { banked: fwd.banked, edge: /** @type {number[]} */ (fwd.P)[0], bankEdge: b('fwd') }, bwd: { banked: bwd.banked, edge: /** @type {number[]} */ (bwd.P)[0], bankEdge: b('bwd') } }; };
+    const fn = /** @param {number} year @returns {number} */ (year) => sunL0Deg + 360 * cyclesTo(year);
+    return Object.assign(fn, { recordSunCumulativeBank, sunSeatStatus });
   })();
+  const recordSunCumulativeBank = sunMeanLongitudeDegAt.recordSunCumulativeBank;
+  const sunSeatStatus = sunMeanLongitudeDegAt.sunSeatStatus;
   // The lunar arguments' Sun perihelion of date is the eclipse Sun's mean
   // perihelion (`sunPerihelionDegAt`) read DIRECTLY, wrapped.
   // Every consumer wraps the argument it enters (M = Lsun − ϖ − 180) or
@@ -194,6 +238,6 @@ export function assembleSunAndEclipses(ctx) {
     },
   });
 
-  return { besselian, eclipseFinders, sunL0Deg, sunMeanLongitudeDegAt, sunPlanetaryCompletionDeg, sunTropicalRateDegPerCy };
+  return { besselian, eclipseFinders, sunL0Deg, sunMeanLongitudeDegAt, sunPlanetaryCompletionDeg, sunTropicalRateDegPerCy, recordSunCumulativeBank, sunSeatStatus };
 }
 /** @typedef {import('./lunar-theory.js').Ctx & ReturnType<typeof assembleSunAndEclipses>} Ctx */

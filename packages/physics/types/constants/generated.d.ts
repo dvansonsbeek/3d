@@ -2,14 +2,14 @@
 // Gives the TypeScript website full type safety at the boundary (§2g) while
 // packages/physics stays JavaScript.
 
-export declare const CONSTANTS_HASH: "da713fc2d846767d";
+export declare const CONSTANTS_HASH: "9addcabf870241ee";
 
 export declare const MODEL_VERSION: string;
 
 export declare const PREPRINT_DOI: string;
 
 export declare const DEFAULT_CONSTANTS: {
-  readonly hash: "da713fc2d846767d";
+  readonly hash: "9addcabf870241ee";
   readonly additionalBodiesReference: {
     "pluto": {
       "orbitalPeriodInputDays": number;
@@ -88,6 +88,15 @@ export declare const DEFAULT_CONSTANTS: {
     "j2RateJ2000PerYr": number;
     "dtStackTaperFullHalfwidthYr": number;
     "dtStackTaperTotalHalfwidthYr": number;
+    "iceInventory": {
+      "lgmSeaLevelDropM": number;
+      "presentIceSeaLevelM": number;
+      "greenlandSeaLevelM": number;
+      "nhGlaciationOnsetMa": number;
+      "nhGlaciationWidthMyr": number;
+      "eotMa": number;
+      "eotWidthMyr": number;
+    };
   };
   readonly earthOrbital: {
     "j2000EpochYear": number;
@@ -110,6 +119,15 @@ export declare const DEFAULT_CONSTANTS: {
   readonly giaCoxChaoPeltier: {
     "dJ2DtPerYr": number;
     "j2ToAlphaFactor": number;
+  };
+  readonly giaIceInventory: {
+    "lgmSeaLevelDropM": number;
+    "presentIceSeaLevelM": number;
+    "greenlandSeaLevelM": number;
+    "nhGlaciationOnsetMa": number;
+    "nhGlaciationWidthMyr": number;
+    "eotMa": number;
+    "eotWidthMyr": number;
   };
   readonly moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {

@@ -46,8 +46,41 @@ export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
         }>;
     };
     sunL0Deg: any;
-    sunMeanLongitudeDegAt: (year: number) => number;
+    sunMeanLongitudeDegAt: ((year: number) => number) & {
+        recordSunCumulativeBank: (limitYears: number) => {
+            fwd: number[];
+            bwd: number[];
+        };
+        sunSeatStatus: () => {
+            fwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+            bwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+        };
+    };
     sunPlanetaryCompletionDeg: (T: number) => number;
     sunTropicalRateDegPerCy: number;
+    recordSunCumulativeBank: (limitYears: number) => {
+        fwd: number[];
+        bwd: number[];
+    };
+    sunSeatStatus: () => {
+        fwd: {
+            banked: number;
+            edge: number;
+            bankEdge: number | null;
+        };
+        bwd: {
+            banked: number;
+            edge: number;
+            bankEdge: number | null;
+        };
+    };
 };
 export type Ctx = import("./lunar-theory.js").Ctx & ReturnType<typeof assembleSunAndEclipses>;

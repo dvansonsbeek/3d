@@ -241,6 +241,8 @@ export function assembleLunarTheory(ctx) {
     },
   });
 
-  return { frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays, recordLunarCumulativeBank };
+  /** THE SEAT DIAGNOSTIC (plan 25/26): every named lunar table's seat in this runtime. */
+  const lunarSeatStatus = () => ({ chains: chainCycles.seatStatus(), carriers: moonArgs.carrierSeatStatus() });
+  return { frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays, recordLunarCumulativeBank, lunarSeatStatus };
 }
 /** @typedef {import('./time-axis.js').Ctx & ReturnType<typeof assembleLunarTheory>} Ctx */

@@ -39,7 +39,24 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         gravitationalConstantKm3KgS2: any;
     }>;
     sun: Readonly<{
-        meanLongitudeDegAt: (year: number) => number;
+        meanLongitudeDegAt: ((year: number) => number) & {
+            recordSunCumulativeBank: (limitYears: number) => {
+                fwd: number[];
+                bwd: number[];
+            };
+            sunSeatStatus: () => {
+                fwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+                bwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+            };
+        };
         perihelionLongitudeDegAt: (year: number) => number;
     }>;
     epoch: Readonly<{
@@ -87,6 +104,11 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         perihelionLongitudeDeg: (year: number) => number;
         obliquityDeg: (year: number) => number;
         obliquityHybridDomainYears: [number, number] | null;
+        obliquityBandAt: (year: number) => {
+            minDeg: number;
+            maxDeg: number;
+            periodYears: number;
+        };
         meanObliquityCitedDeg: (year: number) => number;
         eccentricity: (year: number) => number;
         inclinationDeg: (year: number) => number;
@@ -162,6 +184,12 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         betaDegAtJD: (jd: number) => number;
         distanceKmAtJD: (jd: number) => number;
         recordCumulativeBank: (limitYears: number) => {
+            sun: {
+                meanLongitude: {
+                    fwd: number[];
+                    bwd: number[];
+                };
+            };
             chains: {
                 draconic: {
                     fwd: number[];
@@ -196,6 +224,46 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
             segmentYears: number;
             chainLimitYears: number;
         };
+        bankSeatStatus: () => {
+            sun: {
+                meanLongitude: {
+                    fwd: {
+                        banked: number;
+                        edge: number;
+                        bankEdge: number | null;
+                    };
+                    bwd: {
+                        banked: number;
+                        edge: number;
+                        bankEdge: number | null;
+                    };
+                };
+            };
+            chains: Record<string, {
+                fwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+                bwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+            } | null>;
+            carriers: Record<string, {
+                fwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+                bwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+            }>;
+        };
     }>;
     eclipse: Readonly<{
         sunLonDegAtJD: (jd: number) => number;
@@ -225,7 +293,24 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
             tropicalRateDegPerCy: number;
             eccentricityAt: (year: number) => number;
             perihelionLongitudeDegAt: (year: number) => number;
-            meanLongitudeDegAt: (year: number) => number;
+            meanLongitudeDegAt: ((year: number) => number) & {
+                recordSunCumulativeBank: (limitYears: number) => {
+                    fwd: number[];
+                    bwd: number[];
+                };
+                sunSeatStatus: () => {
+                    fwd: {
+                        banked: number;
+                        edge: number;
+                        bankEdge: number | null;
+                    };
+                    bwd: {
+                        banked: number;
+                        edge: number;
+                        bankEdge: number | null;
+                    };
+                };
+            };
         }>;
         umbraGroundAtJD: (jd: number) => {
             latDeg: number;

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.3
-coefficients: sha256:a1e5567e03d1936e
+modelVersion: v27.4
+coefficients: sha256:76157eae2501907c
 status: current
 ---
 
@@ -315,12 +315,12 @@ re-closed, Step 7c).
 
 **Second measurement (v23.0): a RECORD sees the pole rate's mean over its
 own window, not the J2000 instant.** The dominant obliquity line of the
-model's own ε(t) over the LR04 window sits at <!--v:obliqCycleRealizedFitLr04Years-->~40,919<!--/v--> yr (La2004's series:
+model's own ε(t) over the LR04 window sits at <!--v:obliqCycleRealizedFitLr04Years-->~40,916<!--/v--> yr (La2004's series:
 40,900; the two agree at every window), not at the J2000 beat 41,098: the
 pole turned faster in the past (tidal spin +0.06 ″/yr over 5 Myr, lower
 mean obliquity +0.05, higher mean eccentricity +0.015 — the three of-date
 factors the spin integration already multiplies), and the window mean
-<!--v:spinAxisInertialRateMeanLr04ArcsecPerYr-->50.517<!--/v--> predicts the fitted period to 0.02 % (<!--v:obliqCycleRealizedLr04Years-->~40,927<!--/v-->). The records'
+<!--v:spinAxisInertialRateMeanLr04ArcsecPerYr-->50.519<!--/v--> predicts the fitted period to 0.02 % (<!--v:obliqCycleRealizedLr04Years-->~40,924<!--/v-->). The records'
 "+0.12…+0.20 ″/yr on the obliquity lines" was this mean. ONE home
 `lunisolar.spinAxisInertialRateMeanArcsecPerYr` /
 `obliquityPeriodRealizedYears`; the obliquity lines ride the LR04-window
@@ -620,7 +620,16 @@ gate now asserts that every seat TOOK, by name — a refused seat is a
 full-span walk and must fail loudly, not hide in a time. The browser tier's
 profiler, not a gate, found the first case: the perf row read the number,
 the CPU profile named the walk under `computeObliquityEarth`; the seat
-diagnostic (`lunarSeatStatus`) named the table.
+diagnostic (`lunarSeatStatus`) named the table. The third case needed an
+UNMINIFIED bundle to name its caller: with every seat taking, a 102-s walk
+still ran AFTER the jump, in the render loop's lighting update, through the
+browser's eclipse finders — which held the `frameworkSunDeps` of the model
+instance alive when they were created and were never rebuilt when a bank
+landed (the tier model was). **The rule it adds:** every holder of a model
+instance's surface is rebuilt on an artifact landing, not only the instance;
+grep the captures (`_tierUmbraModel.`) when adding a landing handler. And the
+Sun's mean-longitude table (100-yr cells over the whole span) was the next
+10 s — seated the same way (plan 26).
 
 **The second measurement the bank made possible — convergence is not
 prediction.** Two bank runs in one cascade, on the two sides of the climate
@@ -654,6 +663,34 @@ re-rolling the roundings.
 
 ---
 
+### 1.30 A fitted line cluster is never extrapolated beyond its window — and a baseline is referenced to TODAY's state, not to a window mean
+
+**Measured** (plan 26, 2026-10-28). The GIA channel read the post-MPT L1 set
+(28 lines fitted on 0–1,000 kyr of LR04, R² 0.785 there) at every epoch.
+Scored on the other LR04 windows with each window's own mean removed: R²
+−26.1 and −26.3, rms 1.5 ‰ against a 0.3-‰ record — the closely spaced lines
+(29.0/29.6/29.8 kyr; 94.9–105 kyr) fit the window by cancellation and
+de-phase beyond it; the channel's J₂ excursion read 1.7·10⁻⁴ inside the
+window and 6.9–7.5·10⁻⁴ beyond, at random phase. The other regimes behave
+the same way outside theirs (iNHG–MPT: 0.48 at home, −3.2 / −6.9 away). **The
+rule:** a fitted harmonic set is a description of its window; applied
+elsewhere it is noise with the record's units, however bounded it looks
+inside — window it (C¹ joins), and where no proxy exists carry no orbital
+term. **The second finding, the same change:** the deep baseline was first
+written as "the inventory's metres below ZERO", and zero was the regime's
+window mean, not today's interglacial ice state — the Antarctic-only era read
+as MORE ice than today (−7.8·10⁻⁶ instead of +2.0·10⁻⁵). A baseline relative
+to the present is referenced to the present's value of the oscillation it
+joins (`todayPermil`), so that the deep state is "today's ice minus what was
+absent". **Measured consequences:** the era moves 3·10⁻⁹ (the 405-kyr line,
+not ice, left the proxy: 24 m/‰ against ~67 for every orbital band), the
+Quaternary ≤ 1.7·10⁻⁶, the deep state sits at +1.74·10⁻⁴ before the
+Antarctic glaciation and +2.0·10⁻⁵ after it; the deep obliquity's VALUE
+moves by degrees (its sensitivity, 450″ per 10⁻⁶ at 100 Ma, is the reason it
+is served as a band — §1.29).
+
+---
+
 ## 2. The browser tier's gates and their origins
 
 `npm run test:browser` runs the `src/script.js` golden masters in headless
@@ -684,8 +721,11 @@ with the spin-axis checkpoint bank landed must take ≤ 2 s, where the walk
 from J2000 at the converged step takes ~200 s: a ratio row would let a
 missing bank hide behind a slow near read, §1.29. The row was first written
 on the FULL scene jump and read 220 s with the bank seated — which is how the
-lunar cumulative tables' whole-span walk was found; the full jump is printed
-beside the row for the record, not gated).
+lunar cumulative tables' whole-span walk was found; since plan 25's seat the
+full jump is gated again, ≤ 15 s, behind a row that asserts EVERY bank seat
+took in the browser — the scene's seven tables and the package model's eight,
+both directions — because a silently refused seat is a full-span walk that
+would only show as a slow number).
 
 The `test:snapshot` chain also carries:
 

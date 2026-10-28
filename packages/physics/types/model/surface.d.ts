@@ -26,7 +26,24 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
     }>;
     sun: Readonly<{
         /** Mean longitude of date, degrees, unwrapped — L0 + 360·∫dt/T_trop (the one-family tropical year). @param {number} year @returns {number} */
-        meanLongitudeDegAt: (year: number) => number;
+        meanLongitudeDegAt: ((year: number) => number) & {
+            recordSunCumulativeBank: (limitYears: number) => {
+                fwd: number[];
+                bwd: number[];
+            };
+            sunSeatStatus: () => {
+                fwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+                bwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+            };
+        };
         /** The Sun's mean perihelion longitude of date (Earth's ϖ, mean elements), degrees, wrapped to [0, 360). @param {number} year @returns {number} */
         perihelionLongitudeDegAt: (year: number) => number;
     }>;
@@ -125,6 +142,17 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
         obliquityDeg: (year: number) => number;
         /** The hybrid's own domain, [yearFrom, yearTo] — the banked ζ series' span, ±10 Myr about J2000 (the published surfaces serve `obliquityDeg` inside it only; null without a series, i.e. a bare createModel()). */
         obliquityHybridDomainYears: [number, number] | null;
+        /** THE OBLIQUITY BAND at a decimal year — the hybrid ε sampled over one beat period centred on the
+         *  year (41 samples): {minDeg, maxDeg, periodYears}. The quantity the model PREDICTS at deep time
+         *  (plan 26 §2M.5, measured): the obliquity VALUE is linearly sensitive at 450″ per 1e-6 of the
+         *  precession constant at 100 Ma (2,000″ at 500 Ma) — the ice-free baseline alone is known to the
+         *  1e-4 class — so beyond ~20 Myr the value is the integration on its inputs and the BAND (its
+         *  amplitude and period, the falsification leg's statement) is the claim. @param {number} year */
+        obliquityBandAt: (year: number) => {
+            minDeg: number;
+            maxDeg: number;
+            periodYears: number;
+        };
         /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
         meanObliquityCitedDeg: (year: number) => number;
         eccentricity: (year: number) => number;
@@ -201,6 +229,12 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
         betaDegAtJD: (jd: number) => number;
         distanceKmAtJD: (jd: number) => number;
         recordCumulativeBank: (limitYears: number) => {
+            sun: {
+                meanLongitude: {
+                    fwd: number[];
+                    bwd: number[];
+                };
+            };
             chains: {
                 draconic: {
                     fwd: number[];
@@ -234,6 +268,46 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
             }>;
             segmentYears: number;
             chainLimitYears: number;
+        };
+        bankSeatStatus: () => {
+            sun: {
+                meanLongitude: {
+                    fwd: {
+                        banked: number;
+                        edge: number;
+                        bankEdge: number | null;
+                    };
+                    bwd: {
+                        banked: number;
+                        edge: number;
+                        bankEdge: number | null;
+                    };
+                };
+            };
+            chains: Record<string, {
+                fwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+                bwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+            } | null>;
+            carriers: Record<string, {
+                fwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+                bwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+            }>;
         };
     }>;
     eclipse: Readonly<{
@@ -269,7 +343,24 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
             tropicalRateDegPerCy: number;
             eccentricityAt: (year: number) => number;
             perihelionLongitudeDegAt: (year: number) => number;
-            meanLongitudeDegAt: (year: number) => number;
+            meanLongitudeDegAt: ((year: number) => number) & {
+                recordSunCumulativeBank: (limitYears: number) => {
+                    fwd: number[];
+                    bwd: number[];
+                };
+                sunSeatStatus: () => {
+                    fwd: {
+                        banked: number;
+                        edge: number;
+                        bankEdge: number | null;
+                    };
+                    bwd: {
+                        banked: number;
+                        edge: number;
+                        bankEdge: number | null;
+                    };
+                };
+            };
         }>;
         umbraGroundAtJD: (jd: number) => {
             latDeg: number;

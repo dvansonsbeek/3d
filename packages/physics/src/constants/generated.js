@@ -36,17 +36,17 @@
  * carry it so a counterfactual is reproducible (§2d).
  * @type {string}
  */
-export const CONSTANTS_HASH = "da713fc2d846767d";
+export const CONSTANTS_HASH = "9addcabf870241ee";
 
 /** Model version label — single source: public/input/model-version.json (§10 two-axis scheme). */
-export const MODEL_VERSION = "v27.3";
+export const MODEL_VERSION = "v27.4";
 
 /** Canonical preprint DOI — single source: public/input/model-version.json. */
 export const PREPRINT_DOI = "10.21203/rs.3.rs-8758810/v4";
 
 /** @type {Readonly<Record<string, unknown>>} */
 export const DEFAULT_CONSTANTS = Object.freeze({
-  hash: "da713fc2d846767d",
+  hash: "9addcabf870241ee",
   additionalBodiesReference: {
     "pluto": {
       "orbitalPeriodInputDays": 90465,
@@ -124,7 +124,16 @@ export const DEFAULT_CONSTANTS = Object.freeze({
     "alphaGiaRelaxationKyr": 6,
     "j2RateJ2000PerYr": -2.7e-11,
     "dtStackTaperFullHalfwidthYr": 300000,
-    "dtStackTaperTotalHalfwidthYr": 400000
+    "dtStackTaperTotalHalfwidthYr": 400000,
+    "iceInventory": {
+      "lgmSeaLevelDropM": 120,
+      "presentIceSeaLevelM": 65,
+      "greenlandSeaLevelM": 7.4,
+      "nhGlaciationOnsetMa": 2.58,
+      "nhGlaciationWidthMyr": 0.32,
+      "eotMa": 33.5,
+      "eotWidthMyr": 0.5
+    }
   },
   earthOrbital: {
     "j2000EpochYear": 2000,
@@ -147,6 +156,15 @@ export const DEFAULT_CONSTANTS = Object.freeze({
   giaCoxChaoPeltier: {
     "dJ2DtPerYr": -2.7e-11,
     "j2ToAlphaFactor": 2
+  },
+  giaIceInventory: {
+    "lgmSeaLevelDropM": 120,
+    "presentIceSeaLevelM": 65,
+    "greenlandSeaLevelM": 7.4,
+    "nhGlaciationOnsetMa": 2.58,
+    "nhGlaciationWidthMyr": 0.32,
+    "eotMa": 33.5,
+    "eotWidthMyr": 0.5
   },
   moonMeeus: {
     "elpW1T2Decomposition_arcsecPerCy2": {
