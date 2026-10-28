@@ -66,6 +66,8 @@ const MANIFEST = [
     writes: 'data/sun-vs-horizons-summary.json (tracked; --write only — the model\'s apparent Sun and cardinal instants against the ±3000-yr Horizons TT cache; plain run = reproduction check)' },
   { n: 'equinox-vs-vondrak.js', class: 'generator', ms: 300000, slow: true,
     writes: 'data/equinox-vs-vondrak.json (tracked; --write only — the precession of date against its two theory referees: the equinox vs Vondrák 2011 over ±3000 yr beside the secular law alone, the obliquity vs La2004 over the last Myr; --write REFUSES if a precession-of-date term is missing; plain run = reproduction check)' },
+  { n: 'spin-axis-bank.js', class: 'generator', ms: 120000, slow: true,
+    writes: 'data/spin-axis-checkpoints.json (tracked; --write only, ~25 min — the spin-axis walk\'s exact state every 250 kyr over the cited history and +1 Gyr at the converged step schedule, with three REFUSE gates: seat-and-resume bit-exact, the schedule vs a 10-yr step at 100 Ma / 500 Ma / 2.46 Ga, the J2000 anchor; plain run = ±5 Myr re-walked and compared bit-exactly)' },
   { n: 'earth-osculating-wobble.js', class: 'generator', ms: 60000,
     writes: 'data/earth-osculating-wobble.json (tracked; --write only — the EMB\'s osculating e and ϖ from the Horizons seed integrated as a nine-body system with the 1PN term and the lunar quadrupole, every 20 days over 1000–2500, beside the series\' mean; plain run = reproduction check). The Framework Verification exhibit "Perihelion — osculating vs mean" (plan 22 step 2); --write REFUSES if the window mean of (osculating − mean) exceeds 3″ / 5e-7' },
   { n: 'lunar-canon-recall.js', class: 'generator', ms: 300000, slow: true,

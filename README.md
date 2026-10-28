@@ -159,7 +159,7 @@ npm run check             # the full gate chain (~4.4 min): lint, typecheck, bou
 npm run check:docs        # scoped tier (~30 s) for docs/registry/marker edits;
                           # tools/lib and packages/physics edits take the full chain
 npm run test:browser      # golden masters in headless Chromium (~2.5 min, builds first)
-npm run test:verify:list  # how the tools/verify scripts classify (6 gates, 13 generators)
+npm run test:verify:list  # how the tools/verify scripts classify (6 gates, 14 generators)
 npm run values:package    # packaged @essrt/model-values vs the live registry
 npm run check:artifacts   # campaign artifacts vs their recorded input hashes
 ```

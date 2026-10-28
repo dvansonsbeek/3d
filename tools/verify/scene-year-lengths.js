@@ -65,7 +65,11 @@ const BRIDGE = P.FITTED_COEFFICIENTS.DT_ANCHOR.deltaTStartSeconds;   // the join
 const M = DOH.createOneSourceMovement();
 if (!M) { console.error('FAIL scene-year-lengths: data/nbody-secular-series.json is absent'); process.exit(1); }
 const YL = M.yearLengths;
-const model = P.createModel(undefined, { secularSeriesArtifact: JSON.parse(fs.readFileSync(path.join(ROOT, 'data/nbody-secular-series.json'), 'utf8')) });
+const model = P.createModel(undefined, {
+  secularSeriesArtifact: JSON.parse(fs.readFileSync(path.join(ROOT, 'data/nbody-secular-series.json'), 'utf8')),
+  // plan 24: the checkpoint bank (a seat, never a value; absent → the full walk)
+  spinCheckpointsArtifact: fs.existsSync(path.join(ROOT, 'data/spin-axis-checkpoints.json')) ? JSON.parse(fs.readFileSync(path.join(ROOT, 'data/spin-axis-checkpoints.json'), 'utf8')) : undefined,
+});
 const E = model.eclipse;
 const jdTT = (jd) => jd + (BRIDGE + DT.meanDeltaTSecondsAtAge((C.startmodelYear - jdToDecimalYear(jd)) / 1e6)) / 86400;
 const engineYear = (jd) => 2000 + (jdTT(jd) - C.j2000JD) / 365.25;

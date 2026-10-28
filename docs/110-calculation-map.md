@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.1
-coefficients: sha256:1d7ef7b022b91f6c
+modelVersion: v27.2
+coefficients: sha256:a1e5567e03d1936e
 status: current
 ---
 
@@ -373,6 +373,8 @@ frame. The Sun's declination at the June solstice is the scene's ε.
 | --- | --- | --- |
 | orbit normal n̂(t) | from Earth's ζ = sin(i/2)·e^{iΩ} modes (`nbody-deep-secular-modes.json`; era tier 8 terms, deep tier 16), JPL-seed anchored | `deep-orbital-history.cjs` 179–187 |
 | spin-axis law | dŝ/dt = α(t)·(ŝ·n̂)·(ŝ×n̂), RK4, unit-renormalised each step | 273–290 |
+| the step (plan 24) | 5 yr inside ±50 kyr; beyond, the largest of 50/25/20/10/5/4/2/1 yr with 100·h ≤ T_p at the 1,000-yr cell's near edge (converged: 0.10″ in ε at 100 Ma vs a 10-yr walk; the former fixed 250 yr read 318″ there, ε collapsed at 4 Ga) | `hStepAt`, `walkFrom` |
+| the checkpoint bank (plan 24) | the continuous walk's exact ŝ every 250 kyr, −4,425 … +1,000 Myr; a runtime seats on the nearest checkpoint on its near side and walks ≤ one spacing — nodes bit-identical to the full walk's (`test:sampler-purity` bank row) | `data/spin-axis-checkpoints.json` ← `tools/verify/spin-axis-bank.js --write`; `build`'s `cover` |
 | α(t) | ψ̇(t)/cos ε₀ × K_LUNI, ψ̇(t) = 2π/T_p(t) from the injected axial-precession evaluator — the composed lunisolar period `lunisolarPrecessionPeriodYearsAtAge` (chain 2.1 step 6; the comb pair's route A was deleted at plan 09; constant α when no evaluator is injected) | 189–203, 272 |
 | K_LUNI | the self-anchor: a ±0.5-yr probe of the integrated equinox rate at J2000 is corrected onto the target 360°/T_p(J2000); a ratio ≈ 1 with no new constant | 243–271 |
 | ŝ(0) | built FROM n̂(0): tilt ε₀ (IAU 23.4392794°) about the equinox direction projected into the orbit plane — ε(J2000) ≡ ε₀ by construction, frame-invariant | 234–242 |
@@ -437,8 +439,8 @@ The beat at the deep anchors, both ψ̇ readings:
 |---|---|---|---|---|---|
 | 0 | **25771.575** | 25772.126 | 50.288 | 41.22 | 41.22 |
 | 380 | **21235.375** | 21237.506 | 61.030 | 30.73 | 33.97 |
-| 650 | **18435.129** | 18438.036 | 70.301 | 25.19 | 29.49 |
-| 1400 | **14976.924** | 14981.563 | 86.533 | 19.15 | 23.96 |
+| 650 | **18435.128** | 18438.036 | 70.301 | 25.19 | 29.49 |
+| 1400 | **14976.924** | 14981.564 | 86.533 | 19.15 | 23.96 |
 | 2460 | **11863.274** | 11869.497 | 109.245 | 14.34 | 18.98 |
 
 s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = -18.8506 ″/yr (amplitude 0.00832); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = 25771.6 yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The third column is the deep chain’s tidal-mean year pair: since plan 09 step 5d its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row). Registry keys `obliqBeatJ2000Kyr`/`obliqBeat1400MaKyr`/`obliqBeat2460MaKyr` are the fifth column; `obliqPrecScaled*Kyr` is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii).

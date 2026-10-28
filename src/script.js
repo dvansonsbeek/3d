@@ -3364,10 +3364,23 @@ function meeusVsIntegratorDiagnostic(jd) {
 // Expose for console access
 if (typeof window !== 'undefined') window.meeusVsIntegratorDiagnostic = meeusVsIntegratorDiagnostic;
 let   currentEpoch_t_Ma   = 0;
+let   _genesisClampNoted  = false;   // plan 24: the one console note when an age is held at the history's edge
 // DEEP_TIME_MODE_ENABLED (feature flag) declared in A5 Research toggles at top of file
 
 /** Apply the full deep-time chain at age t_Ma (positive = past). */
 function setEpochByAge(t_Ma) {
+  // PLAN 24 — the genesis clamp. The cited Earth–Moon history ends at its last
+  // sample (the lunar age, _moonChain().spanMa = 4,429 Ma); beyond it every
+  // Moon-tier quantity is null and the epoch used to be REFUSED — the scene
+  // scrubbed past genesis kept whatever epoch it had last reached, silently,
+  // with a warning per frame. Now an age past the edge is held AT the edge:
+  // the anchors read the history's last state, the console says so once, and
+  // the scene beyond genesis is explicitly the genesis state, not a stale one.
+  if (t_Ma > 0 && meanMoonDistanceAtAge(t_Ma) === null) {
+    const edge = _moonChain().spanMa;
+    if (!_genesisClampNoted) { _genesisClampNoted = true; console.warn(`setEpochByAge(${t_Ma}): beyond the cited Earth–Moon history (${edge} Ma) — epoch held at its edge`); }
+    t_Ma = edge;
+  }
   // Skip redundant work if already at this epoch (the auto-hook fires every frame).
   if (Math.abs(t_Ma - currentEpoch_t_Ma) < 1e-9) return true;
 
@@ -3740,6 +3753,10 @@ if (typeof window !== 'undefined') {
     oscWobbleLoaded: () => _oscWobbleData !== null,
     // ── VFP "Inclination of all planets" smoke surface ───────────────────────
     vfpPISeriesLoaded: () => _planetSeriesData !== null,
+    // plan 24: the spin-axis checkpoint bank has landed (the perf gate's deep cold-jump row waits on it),
+    // and the scene's one-source ε at a decimal year — the bank-seated read the row times.
+    spinBankLoaded: () => _spinBankData !== null,
+    earthObliquityHybridAt: (year) => _epsHybridSeriesAt(year),
     // Perf-gate surface (the R9 class): force ONE resample of every chain
     // planet's orbit ring at jd — the 10-yr JD condition and the 250-ms
     // wall-clock floor bypassed — and return its wall time (ringMs, 7 × 257
@@ -15101,6 +15118,45 @@ let _oscWobbleData = null;   // {t[], oscE[], oscPomOfDateDeg[]} — decimal yea
     console.warn('earth-osculating-wobble artifact not reachable — the "osculating vs mean" categories draw the mean alone');
   })();
 }
+// PLAN 24 — the spin-axis checkpoint bank. data/spin-axis-checkpoints.json
+// (tools/verify/spin-axis-bank.js): the one-source movement's RK4 spin-axis walk,
+// its exact state every 250 kyr over the cited history and +1 Gyr. With the bank
+// a deep jump seats the walk on the nearest checkpoint on its near side and walks
+// at most one spacing (~5,000 steps) instead of from J2000 — every node bit-
+// identical to the full walk's (the sampler-purity gate's bank row). Loaded like
+// the series; until it lands (or without it) the factory walks from J2000 at the
+// same converged schedule, so the numbers never depend on the bank, only the wait.
+let _spinBankData = null;   // {spacingYr, checkpoints:[{t, s:[x,y,z]}]}
+{
+  (async () => {
+    const candidates = ['data/spin-axis-checkpoints.json', REPO_RAW_URL + 'data/spin-axis-checkpoints.json'];
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const a = await res.json();
+        if (!Number.isFinite(a.spacingYr) || !Array.isArray(a.checkpoints) || !a.checkpoints.length) continue;
+        _spinBankData = { spacingYr: a.spacingYr, checkpoints: a.checkpoints };
+        // Rebuild the one-source history on the bank: the factory is pure in
+        // (ŝ, t), so every sampler it rebuilds reads the same nodes — only a
+        // deep jump's first wait changes. Modern-tier samplers are unaffected
+        // (the bank is never consulted inside the fine zone).
+        _deepHistSeriesM = null;
+        _epsSeriesSamplers.clear();
+        _epsSeriesDeepRangeYr = { [-1]: 0, [1]: 0 };
+        // The package tier model walks its own one-source movement: rebuild it seated
+        // on the bank too, and drop the umbra tier's one-JD memo with it (a paused frame
+        // re-reads the same JD; a memo hit would keep the unseated model alive).
+        _tierUmbraModel = null;
+        _umbraTierMemo.jd = NaN;
+        positionChanged = true;
+        console.log(`spin-axis checkpoint bank loaded from ${url} (${a.checkpoints.length} states every ${a.spacingYr / 1000} kyr) — a deep jump walks ≤ one spacing`);
+        return;
+      } catch { /* try the next candidate */ }
+    }
+    console.warn('spin-axis checkpoint bank not reachable — deep jumps walk from J2000 (same numbers, longer first wait)');
+  })();
+}
 /** The osculating element at a decimal year from the exhibit table (linear in the
  *  20-day grid; ϖ unwrapped across a 360° seam): {e, pomOfDateDeg}, or null outside
  *  1000–2500 / before the table lands. */
@@ -15217,6 +15273,10 @@ function _deepHistSeries() {
       // tools/lib/deep-orbital-history.js (identical deps).
       solarTorqueShareJ2000: PRECESSION_SOLAR_SHARE_J2000,
       dynamicalEllipticityRatioAtYearFn: (yr) => _alphaGia().j2RatioAt(yr),
+      // PLAN 24 — the checkpoint bank (null until it lands: the full walk then).
+      // Twins: packages/physics createModel({spinCheckpointsArtifact}) and
+      // tools/lib createOneSourceTier (reads data/spin-axis-checkpoints.json).
+      spinCheckpoints: _spinBankData ?? undefined,
     });
   }
   return _deepHistSeriesM;
@@ -25370,7 +25430,12 @@ let _tierUmbraModel = null;
  *  −2500; the fetch resets the memo so the model is rebuilt on arrival). */
 function _tierModelB() {
   if (_tierUmbraModel === null) {
-    _tierUmbraModel = createModel(undefined, _planetSeriesData ? { secularSeriesArtifact: _planetSeriesData } : undefined);
+    // PLAN 24: seated on the checkpoint bank once it lands (the fetch resets this memo
+    // too) — otherwise the package model's own walk to −400 Myr is 8 M steps (~200 s)
+    // beside the scene factory's seated one (measured: the perf row read 220 s).
+    _tierUmbraModel = createModel(undefined, _planetSeriesData
+      ? { secularSeriesArtifact: _planetSeriesData, spinCheckpointsArtifact: _spinBankData ?? undefined }
+      : undefined);
   }
   return _tierUmbraModel;
 }

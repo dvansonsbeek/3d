@@ -166,6 +166,13 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   the wrong carrier, and a difference of two of-date longitudes is physical
   only when both carry the same frame term (M′ and F inherited L′'s pFix:
   2.5° at 10 kyr, 39° at −1 Myr, unseen by the ±3-kyr gates). (§1.28)
+- **An integration step is chosen against the shortest period IN THE DOMAIN,
+  not at the anchor** — the spin walk's fixed 250 yr was converged over ±1 Myr
+  and 318″ wrong at 100 Ma, ε collapsed at 4 Ga (T_p 25,772 → 598 yr); the
+  schedule has ONE home and is gated against a finer walk at the deep ages.
+  A walk pure in its state can be BANKED (its stored state + the rule
+  reproduces the next state bit-for-bit); a walk with an accumulator cannot —
+  banking it ships two models. (§1.29)
 
 ---
 
@@ -237,9 +244,12 @@ lunar-canon-recall — the latter three REFUSE on divergence; `--write
 --rebaseline` is the conscious re-measurement path), the Horizons
 comparison (`sun-vs-horizons.js` — the Sun tier's swap gate) and the
 panel's osculating-orbit exhibit table (`earth-osculating-wobble.js` —
-REFUSES if the lab's mean parts from the series'). `npm run regen:cascade`
+REFUSES if the lab's mean parts from the series') and the spin-axis
+checkpoint bank (`spin-axis-bank.js --write`, ~25 min — REFUSES if a
+checkpoint does not resume bit-exactly or the step schedule parts from a
+10-yr walk at 100 Ma / 500 Ma / 2.46 Ga). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (13 generators, 6 gates).
+test:verify:list` the full classification (14 generators, 6 gates).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

@@ -673,7 +673,10 @@ function _e5Tier() {
     // Sun is the shipped configuration.
     let artifact;
     try { artifact = require('../../data/nbody-secular-series.json'); } catch { artifact = undefined; }
-    _e5TierM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact } : undefined);
+    // PLAN 24: seated on the spin-axis checkpoint bank when present (a seat, never a value).
+    let bank;
+    try { bank = require('../../data/spin-axis-checkpoints.json'); } catch { bank = undefined; }
+    _e5TierM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank } : undefined);
   }
   return _e5TierM;
 }

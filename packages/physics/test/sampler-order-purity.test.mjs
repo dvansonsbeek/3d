@@ -18,6 +18,7 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { createModel } from '../src/index.js';
 
 const require = createRequire(import.meta.url);
@@ -68,6 +69,49 @@ const check = (label, year, fresh, dirty) => {
         fresh.cardinal.anomalisticYearSeconds(y), dirty.cardinal.anomalisticYearSeconds(y));
       check('engine epsDeg', y, fresh.epsDeg(y), dirty.epsDeg(y));
       check('engine e', y, fresh.e(y), dirty.e(y));
+    }
+  }
+}
+
+// ── Twin 3 (plan 24): the checkpoint BANK is a seat, not a value ──────────
+// data/spin-axis-checkpoints.json holds the spin-axis walk's state every
+// 250 kyr; a deep read seats its walk on the nearest checkpoint and walks at
+// most one spacing. The walk is pure in (ŝ, t) — a node computed from a banked
+// state must be the node the continuous walk from J2000 computes, bit-exact,
+// in either visit order and on both twins. Three deep epochs: inside the
+// 1000-yr tier, inside the 5000-yr tier near a checkpoint, and deep in the
+// Phanerozoic where the full walk is ~10 M steps (the bank's whole point).
+{
+  const lib = require(join(ROOT, 'tools', 'lib', 'deep-orbital-history.js'));
+  const withBank = lib.createOneSourceTier();
+  const noBank = lib.createOneSourceTier({ bank: false });
+  if (!withBank || !noBank) {
+    failures.push('createOneSourceTier returned null — series artifact missing');
+  } else if (!withBank.bankLoaded) {
+    failures.push('createOneSourceTier(): data/spin-axis-checkpoints.json not loaded — node tools/verify/spin-axis-bank.js --write');
+  } else {
+    const BANK_EPOCHS = [-3000000, -137000000, -498000000];   // decimal-year offsets from 2000 (t)
+    /** @param {any} h @param {number} t */
+    const sample = (h, t) => {
+      const s = h.build(t, 0, 5000).at(t);
+      return [s.epsDeg, s.e, s.periOfDateDeg];
+    };
+    // order 1: deepest first on the banked instance, shallowest first on the continuous one
+    const a = Object.fromEntries([...BANK_EPOCHS].reverse().map((t) => [t, sample(withBank, t)]));
+    const b = Object.fromEntries(BANK_EPOCHS.map((t) => [t, sample(noBank, t)]));
+    for (const t of BANK_EPOCHS) {
+      for (let i = 0; i < 3; i++) {
+        check(`bank-seated vs continuous walk [${['epsDeg', 'e', 'periOfDateDeg'][i]}]`, 2000 + t, b[t][i], a[t][i]);
+      }
+    }
+    // the package twin, seated on the same bank, reads the same nodes
+    const bankArt = JSON.parse(readFileSync(join(ROOT, 'data', 'spin-axis-checkpoints.json'), 'utf8'));
+    const seriesArt = JSON.parse(readFileSync(join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
+    const m = createModel(undefined, { secularSeriesArtifact: seriesArt, spinCheckpointsArtifact: bankArt });
+    const m0 = createModel(undefined, { secularSeriesArtifact: seriesArt });
+    for (const t of BANK_EPOCHS) {
+      check('model earth.obliquityDeg bank vs full walk', 2000 + t,
+        m0.earth.obliquityDeg(2000 + t), m.earth.obliquityDeg(2000 + t));
     }
   }
 }

@@ -12,8 +12,8 @@
     "unit": "arcsec (model − Horizons)",
     "all": {
       "n": 219152,
-      "mean": 2.503368,
-      "sd": 2.255413
+      "mean": 2.503363,
+      "sd": 2.255412
     },
     "window1970to2049": {
       "n": 2922,
@@ -26,21 +26,21 @@
         "from": -3000,
         "to": -2000,
         "n": 36525,
-        "mean": 1.954441,
-        "sd": 1.804534
+        "mean": 1.954425,
+        "sd": 1.804535
       },
       {
         "from": -2000,
         "to": -1000,
         "n": 36526,
-        "mean": 3.667602,
+        "mean": 3.667592,
         "sd": 1.486074
       },
       {
         "from": -1000,
         "to": 0,
         "n": 36525,
-        "mean": 4.505487,
+        "mean": 4.505484,
         "sd": 1.192472
       },
       {
@@ -69,199 +69,199 @@
       {
         "century": -3000,
         "n": 3653,
-        "mean": 0.761553,
+        "mean": 0.761535,
         "sd": 1.828214
       },
       {
         "century": -2900,
         "n": 3652,
-        "mean": 0.961623,
+        "mean": 0.961606,
         "sd": 1.729522
       },
       {
         "century": -2800,
         "n": 3653,
-        "mean": 1.767196,
+        "mean": 1.767178,
         "sd": 1.714668
       },
       {
         "century": -2700,
         "n": 3652,
-        "mean": 1.453631,
+        "mean": 1.453614,
         "sd": 1.693842
       },
       {
         "century": -2600,
         "n": 3653,
-        "mean": 1.743975,
+        "mean": 1.743959,
         "sd": 1.588239
       },
       {
         "century": -2500,
         "n": 3652,
-        "mean": 2.147874,
+        "mean": 2.147859,
         "sd": 1.603237
       },
       {
         "century": -2400,
         "n": 3653,
-        "mean": 2.144333,
+        "mean": 2.144318,
         "sd": 1.581144
       },
       {
         "century": -2300,
         "n": 3652,
-        "mean": 2.466767,
+        "mean": 2.466753,
         "sd": 1.53572
       },
       {
         "century": -2200,
         "n": 3653,
-        "mean": 2.812894,
+        "mean": 2.812881,
         "sd": 1.575712
       },
       {
         "century": -2100,
         "n": 3652,
-        "mean": 3.28471,
+        "mean": 3.284697,
         "sd": 1.550858
       },
       {
         "century": -2000,
         "n": 3653,
-        "mean": 2.958615,
+        "mean": 2.958602,
         "sd": 1.485516
       },
       {
         "century": -1900,
         "n": 3652,
-        "mean": 3.80436,
+        "mean": 3.804349,
         "sd": 1.530232
       },
       {
         "century": -1800,
         "n": 3653,
-        "mean": 3.447177,
+        "mean": 3.447166,
         "sd": 1.535089
       },
       {
         "century": -1700,
         "n": 3652,
-        "mean": 3.13997,
+        "mean": 3.139959,
         "sd": 1.452578
       },
       {
         "century": -1600,
         "n": 3653,
-        "mean": 3.842801,
+        "mean": 3.842791,
         "sd": 1.419737
       },
       {
         "century": -1500,
         "n": 3653,
-        "mean": 3.231683,
+        "mean": 3.231673,
         "sd": 1.401283
       },
       {
         "century": -1400,
         "n": 3652,
-        "mean": 3.706108,
+        "mean": 3.7061,
         "sd": 1.414427
       },
       {
         "century": -1300,
         "n": 3653,
-        "mean": 4.015117,
+        "mean": 4.01511,
         "sd": 1.336484
       },
       {
         "century": -1200,
         "n": 3652,
-        "mean": 4.085466,
+        "mean": 4.085459,
         "sd": 1.355985
       },
       {
         "century": -1100,
         "n": 3653,
-        "mean": 4.44474,
+        "mean": 4.444733,
         "sd": 1.222566
       },
       {
         "century": -1000,
         "n": 3652,
-        "mean": 4.435369,
+        "mean": 4.435363,
         "sd": 1.222467
       },
       {
         "century": -900,
         "n": 3653,
-        "mean": 4.906176,
+        "mean": 4.906171,
         "sd": 1.179793
       },
       {
         "century": -800,
         "n": 3652,
-        "mean": 4.106499,
+        "mean": 4.106495,
         "sd": 1.131937
       },
       {
         "century": -700,
         "n": 3653,
-        "mean": 4.67263,
+        "mean": 4.672627,
         "sd": 1.165461
       },
       {
         "century": -600,
         "n": 3652,
-        "mean": 4.452143,
+        "mean": 4.45214,
         "sd": 1.209171
       },
       {
         "century": -500,
         "n": 3653,
-        "mean": 4.002649,
+        "mean": 4.002646,
         "sd": 1.138114
       },
       {
         "century": -400,
         "n": 3652,
-        "mean": 4.887348,
+        "mean": 4.887345,
         "sd": 1.153502
       },
       {
         "century": -300,
         "n": 3653,
-        "mean": 4.302889,
+        "mean": 4.302887,
         "sd": 1.137247
       },
       {
         "century": -200,
         "n": 3652,
-        "mean": 4.630784,
+        "mean": 4.630783,
         "sd": 1.139556
       },
       {
         "century": -100,
         "n": 3653,
-        "mean": 4.658382,
+        "mean": 4.65838,
         "sd": 1.086222
       },
       {
         "century": 0,
         "n": 3653,
-        "mean": 4.527502,
+        "mean": 4.5275,
         "sd": 1.05255
       },
       {
         "century": 100,
         "n": 3652,
-        "mean": 4.271751,
+        "mean": 4.27175,
         "sd": 1.02347
       },
       {
         "century": 200,
         "n": 3653,
-        "mean": 3.958746,
+        "mean": 3.958745,
         "sd": 0.993922
       },
       {
@@ -279,7 +279,7 @@
       {
         "century": 500,
         "n": 3652,
-        "mean": 3.876457,
+        "mean": 3.876456,
         "sd": 1.040066
       },
       {
@@ -315,7 +315,7 @@
       {
         "century": 1100,
         "n": 3652,
-        "mean": 2.90684,
+        "mean": 2.906839,
         "sd": 0.738081
       },
       {
@@ -423,7 +423,7 @@
       {
         "century": 2900,
         "n": 3653,
-        "mean": -2.698867,
+        "mean": -2.698866,
         "sd": 0.7006
       }
     ]
@@ -432,7 +432,7 @@
     "unit": "minutes (model − Horizons, TT)",
     "all": {
       "n": 24001,
-      "mean": -1.017166,
+      "mean": -1.017164,
       "sd": 1.005724
     },
     "perMillennium": [
@@ -440,21 +440,21 @@
         "from": -3000,
         "to": -2000,
         "n": 4000,
-        "mean": -0.803239,
+        "mean": -0.803233,
         "sd": 0.847102
       },
       {
         "from": -2000,
         "to": -1000,
         "n": 4000,
-        "mean": -1.49048,
+        "mean": -1.490476,
         "sd": 0.731271
       },
       {
         "from": -1000,
         "to": 0,
         "n": 4000,
-        "mean": -1.821685,
+        "mean": -1.821684,
         "sd": 0.641402
       },
       {
@@ -483,164 +483,164 @@
       {
         "century": -3000,
         "n": 400,
-        "mean": -0.316712,
+        "mean": -0.316705,
         "sd": 0.853053
       },
       {
         "century": -2900,
         "n": 400,
-        "mean": -0.40263,
+        "mean": -0.402623,
         "sd": 0.809672
       },
       {
         "century": -2800,
         "n": 400,
-        "mean": -0.733982,
+        "mean": -0.733975,
         "sd": 0.818827
       },
       {
         "century": -2700,
         "n": 400,
-        "mean": -0.594019,
+        "mean": -0.594012,
         "sd": 0.821629
       },
       {
         "century": -2600,
         "n": 400,
-        "mean": -0.720863,
+        "mean": -0.720856,
         "sd": 0.778741
       },
       {
         "century": -2500,
         "n": 400,
-        "mean": -0.878027,
+        "mean": -0.878021,
         "sd": 0.76792
       },
       {
         "century": -2400,
         "n": 400,
-        "mean": -0.881031,
+        "mean": -0.881025,
         "sd": 0.77688
       },
       {
         "century": -2300,
         "n": 400,
-        "mean": -1.014585,
+        "mean": -1.014579,
         "sd": 0.756963
       },
       {
         "century": -2200,
         "n": 400,
-        "mean": -1.145235,
+        "mean": -1.145229,
         "sd": 0.775722
       },
       {
         "century": -2100,
         "n": 400,
-        "mean": -1.34531,
+        "mean": -1.345304,
         "sd": 0.743578
       },
       {
         "century": -2000,
         "n": 400,
-        "mean": -1.202576,
+        "mean": -1.202571,
         "sd": 0.730653
       },
       {
         "century": -1900,
         "n": 400,
-        "mean": -1.548696,
+        "mean": -1.548691,
         "sd": 0.768163
       },
       {
         "century": -1800,
         "n": 400,
-        "mean": -1.406578,
+        "mean": -1.406574,
         "sd": 0.73428
       },
       {
         "century": -1700,
         "n": 400,
-        "mean": -1.275555,
+        "mean": -1.27555,
         "sd": 0.711949
       },
       {
         "century": -1600,
         "n": 400,
-        "mean": -1.568895,
+        "mean": -1.568891,
         "sd": 0.716441
       },
       {
         "century": -1500,
         "n": 400,
-        "mean": -1.31344,
+        "mean": -1.313436,
         "sd": 0.696153
       },
       {
         "century": -1400,
         "n": 400,
-        "mean": -1.502529,
+        "mean": -1.502525,
         "sd": 0.711771
       },
       {
         "century": -1300,
         "n": 400,
-        "mean": -1.62615,
+        "mean": -1.626147,
         "sd": 0.678134
       },
       {
         "century": -1200,
         "n": 400,
-        "mean": -1.660287,
+        "mean": -1.660284,
         "sd": 0.683297
       },
       {
         "century": -1100,
         "n": 400,
-        "mean": -1.800091,
+        "mean": -1.800088,
         "sd": 0.652734
       },
       {
         "century": -1000,
         "n": 400,
-        "mean": -1.799404,
+        "mean": -1.799402,
         "sd": 0.642903
       },
       {
         "century": -900,
         "n": 400,
-        "mean": -1.983741,
+        "mean": -1.983739,
         "sd": 0.660717
       },
       {
         "century": -800,
         "n": 400,
-        "mean": -1.657626,
+        "mean": -1.657624,
         "sd": 0.613425
       },
       {
         "century": -700,
         "n": 400,
-        "mean": -1.893801,
+        "mean": -1.893799,
         "sd": 0.641165
       },
       {
         "century": -600,
         "n": 400,
-        "mean": -1.79916,
+        "mean": -1.799159,
         "sd": 0.661981
       },
       {
         "century": -500,
         "n": 400,
-        "mean": -1.619768,
+        "mean": -1.619767,
         "sd": 0.614792
       },
       {
         "century": -400,
         "n": 400,
-        "mean": -1.97604,
-        "sd": 0.635153
+        "mean": -1.976039,
+        "sd": 0.635154
       },
       {
         "century": -300,
@@ -657,7 +657,7 @@
       {
         "century": -100,
         "n": 400,
-        "mean": -1.878984,
+        "mean": -1.878983,
         "sd": 0.609209
       },
       {
@@ -669,13 +669,13 @@
       {
         "century": 100,
         "n": 400,
-        "mean": -1.72911,
+        "mean": -1.729109,
         "sd": 0.589924
       },
       {
         "century": 200,
         "n": 400,
-        "mean": -1.599314,
+        "mean": -1.599313,
         "sd": 0.583557
       },
       {
@@ -846,13 +846,13 @@
     "generator": "node tools/verify/sun-vs-horizons.js --write",
     "files": {
       "data/jpl-sun-ecliptic-longitude-tt.json": "sha256:1b3ef502d849b1a3cbffca70e91fe7ed29b6331073688b81addf617a9e8d5ed5",
-      "data/nbody-secular-series.json": "sha256:bd7122a7a1d1a53ba7f66c05dc2a55a48aff0cdc6014472e49559f5715070e40",
+      "data/nbody-secular-series.json": "sha256:4ec81c2fe6b00bd317d755749546f113c0fdb1ab1ad541bb2ac7265a22436a32",
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:2cc864c563ca816df4ccc01f651bd67fde8f29215b6670f8f8842b5d4f68445f",
       "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
       "packages/physics/src/deltat/deep-time.cjs": "sha256:a152284d8ca8eb0a433fe6bab7e270c833ad4aae7e0184725a21646df9f9fbbc",
       "packages/physics/src/deltat/moon-distance-artifact.cjs": "sha256:ab04d079bb05ff14bc76e346afeb5c53ce28caed1b728542566967e81c638b90",
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
-      "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:cfc9a64b09599709339dd750d69f259af5b280cbe9034bdab5d13ddcc6aa9f8b",
+      "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:f8cf54bec82be03ee0bace3c939fdaa8a68969b4d286ceea3e5e4c02eeaabf83",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
       "packages/physics/src/earth/sidereal-year-channel.cjs": "sha256:3fbcfb4ef5e0a6faeaf8f14d3d77e48cbc1804315d9535a902e5b936e26e5732",
       "packages/physics/src/earth/year-lengths.cjs": "sha256:e61f895cded7dbf61754628196c4ddf8a1e0f15d056bdabca696f77864ff94d6",
@@ -860,7 +860,7 @@
       "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:aab1e8c685ea1a461832e6fbd62ef3520af78a1bb3cf8db5556852e29023f63d",
       "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
       "packages/physics/src/model/cardinal-instants.js": "sha256:78cd252af6173f2127b81d8a49680452574fae63786be980f1f8fa96368248df",
-      "packages/physics/src/model/context.js": "sha256:6d356f27e3f5cd8f88ec1e0035a032e641c65f4c4de4985262053ff28709de03",
+      "packages/physics/src/model/context.js": "sha256:44a2e85f655cc6d57f231fe9f4929ecd27db409126d0a583bfb020f18ad418c0",
       "packages/physics/src/model/deep-time-chain.js": "sha256:fd0ffb4c4fb5c10ee13bc8af9f2c76246434da45829f8a9687ff86831f520474",
       "packages/physics/src/model/delta-t.js": "sha256:cac4dc717893e580bb8744e10ce4b0592f4a4bbbaa8ee58b613df866ab99d49c",
       "packages/physics/src/model/derived-constants.js": "sha256:c401d5dcd0879cea6b6ca010e2e9abc7ec9d9288d2ea88aabc29dc162f7fc99a",
@@ -868,7 +868,7 @@
       "packages/physics/src/model/inv-plane-elements.js": "sha256:97fc18474b126f589d4e29fc69f9e2d59611577afffed1b2a884360fe37f3117",
       "packages/physics/src/model/lunar-theory.js": "sha256:e0b40af753c2b88d72784348becf495e20104c0b6aea1766c3937ff006b6d1da",
       "packages/physics/src/model/moon-epoch.js": "sha256:6ab1a890b71d8459333d4f8c99a386a030ae199855b308fbd3b926fb77c0daad",
-      "packages/physics/src/model/one-source-movement.js": "sha256:8cec12902a3901143f8dc23e7f1ca61d7f349c5b3775c752a8cf5bdc14ebe5cf",
+      "packages/physics/src/model/one-source-movement.js": "sha256:83b917aea8d7af2d4af500e6da90f93ecc80247eeb148a1a65cd66dd2fe40101",
       "packages/physics/src/model/planet-elements-of-date.js": "sha256:1069316fec3656c8dc8465314659d5ecf45238c4dce15992b5fdab4985a18731",
       "packages/physics/src/model/planet-records.js": "sha256:0a062111bcd59414736f56b027306690dae054dc4b5ce86812b14f09ff312f7c",
       "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",

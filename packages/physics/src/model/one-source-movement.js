@@ -12,7 +12,7 @@ import { CHAIN_ARTIFACT } from '../planets/chain-artifact.js';
 export function assembleOneSourceMovement(ctx) {
   const {
     C, options, secularSeriesArtifact, EPOCH_PARAMS, alphaGia, certifiedAxialPrecessionJ2000Years, dayLengthSeconds,
-    deepLod, dtCycleLodCorrectionSum, meanSolarYearDays, startmodelYear, yearToTMa,
+    deepLod, dtCycleLodCorrectionSum, meanSolarYearDays, yearToTMa,
   } = ctx;
   // The cardinal INSTANTS are the crossings of the one Sun the scene renders
   // and the eclipse chain certifies (cardinal-instants.js); the cardinal
@@ -74,7 +74,12 @@ export function assembleOneSourceMovement(ctx) {
       // The CONSTANT's scaling (the torque period), not the published rate of date: the
       // integration's own ŝ·n̂ carries the obliquity's cosine, so the cited mean obliquity's
       // factor must not enter twice.
-      axialPrecessionYearsAtYearFn: (yr) => deepLod.lunisolarTorquePeriodYearsAtAge((startmodelYear - yr) / 1e6) ?? axial0,
+      // The age is yearToTMa(yr) — the ONE mapping (J2000 = 2000.0 on the engine year axis,
+      // as the factory's own t and the browser's and tools/lib's twins read it). Plan 24
+      // measured the former (startmodelYear − yr)/1e6, a 0.5-yr offset, as a twin split of
+      // 1e-6″ at −100 kyr / 7e-6″ at −1 Myr in ε — invisible to every gate until the bank,
+      // walked by the tools/lib twin, had to be bit-identical to this walk.
+      axialPrecessionYearsAtYearFn: (yr) => deepLod.lunisolarTorquePeriodYearsAtAge(yearToTMa(yr)) ?? axial0,
       // THE PRECESSION OF DATE: on top of the secular law above, the solar
       // torque at the eccentricity of date and the oblateness of date from
       // the GIA channel — both exactly 1 at J2000, so the J2000 anchor is
@@ -84,6 +89,10 @@ export function assembleOneSourceMovement(ctx) {
       solarTorqueShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
       // options.giaEllipticityOfDate === false: the orbital forcing alone (the T1 line derivation).
       dynamicalEllipticityRatioAtYearFn: options.giaEllipticityOfDate === false ? undefined : alphaGia.j2RatioAt,
+      // PLAN 24 — the spin-axis checkpoint bank (data/spin-axis-checkpoints.json, loaded by the
+      // API and the Node scene beside the series; never part of the hash): a deep jump walks at
+      // most one spacing from the nearest banked state, bit-identical to the continuous walk.
+      spinCheckpoints: options.spinCheckpointsArtifact ?? undefined,
     });
     // PER-TIER ROUTING (the anomalistic-contamination fix): one sampler PER
     // grid tier, built on first entry and KEPT — a query always reads the

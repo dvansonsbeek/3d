@@ -90,6 +90,7 @@ function createCoRotatingAnchoredModeSum(modes, anchor) {
  *   axialPrecessionYearsAtYearFn?: (year: number) => number,
  *   solarTorqueShareJ2000?: number,
  *   dynamicalEllipticityRatioAtYearFn?: (year: number) => number,
+ *   spinCheckpoints?: { spacingYr: number, checkpoints: ReadonlyArray<{t: number, s: number[]}> },
  * }} deps — mode tables from the governed deep artifact (choose the ζ tier
  *   per consumer: era = its own 8-term extraction, deep = the 16-term
  *   table; NEVER a slice); anchors from the chain artifact's one home; the
@@ -115,6 +116,14 @@ function createDeepOrbitalHistory({
   axialPrecessionYearsJ2000, obliquityJ2000Deg,
   axialPrecessionYearsAtYearFn,
   solarTorqueShareJ2000, dynamicalEllipticityRatioAtYearFn,
+  // PLAN 24 — the checkpoint bank: the walk's exact state (ŝ, t) every `spacingYr`
+  // from J2000 over the model's domain, written by the continuous walk
+  // (tools/verify/spin-axis-bank.js, data/spin-axis-checkpoints.json). A build
+  // seats its walk on the nearest checkpoint on the near side of the query and
+  // walks at most one spacing — the same step sequence as the continuous walk,
+  // so every node is bit-identical (the purity gate's bank row). Absent, the
+  // walk runs from S0 as before.
+  spinCheckpoints,
 }) {
   const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 
@@ -551,23 +560,91 @@ function createDeepOrbitalHistory({
     };
   }
 
-  /** The factory's walks, one per step size — see build(). @type {Map<number, { grid: Map<number, any>, frontier: Record<number, { s: number[], t: number }> }>} */
+  // ── THE STEP SCHEDULE — ONE place, the generator's and every runtime's (plan 24) ──
+  // 5-yr RK4 inside ±50 kyr (the certified-precision zone, unchanged). Beyond:
+  // the largest divisor of 1000 up to 50 yr that keeps ≥ 100 steps per
+  // precession cycle of the torque period at the 1000-yr cell's near edge —
+  // 50 yr over the whole ±500-Myr validity domain and to ~3.5 Ga (T_p ≥ 5 kyr),
+  // shrinking toward genesis (T_p 598 yr at 4.4 Ga → 5-yr steps). Constant per
+  // 1000-yr cell and an integer, so the walk lands exactly on every grid node
+  // (1000, 5000) and on the bank's (250 kyr), and t stays exact.
+  // MEASURED (plan 24, 2026-10): the former fixed 250-yr step was outside RK4's
+  // asymptotic regime beyond a few Myr — against a 50-yr walk the obliquity
+  // parted by 0.8″ at 5 Ma, 318″ at 100 Ma, 0.12° at 500 Ma, 2° at 2.46 Ga, and
+  // at 4 Ga the axis had collapsed onto the orbit normal (ε 0.07°); the equinox
+  // phase by 9° at 100 Ma. The 50-yr walk IS converged: 0.10″ / 10″ at 100 Ma
+  // against a 10-yr walk (ratios 3,000–30,000 where fourth order predicts 625).
+  // STRICT < so the walk switches AT the ±50,000 boundary (a grid node).
+  const STEP_CANDIDATES = [50, 25, 20, 10, 5, 4, 2, 1];
+  let stepCellKey = NaN, stepCellH = 5;
+  const hStepAt = (/** @type {number} */ t) => {
+    const a = Math.abs(t);
+    if (a < 50000) return 5;
+    const cellKey = (t < 0 ? -1 : 1) * Math.floor(a / 1000) * 1000;
+    if (cellKey === stepCellKey) return stepCellH;
+    const Tp = axialPrecessionYearsAtYearFn ? axialPrecessionYearsAtYearFn(2000 + cellKey) : axialPrecessionYearsJ2000;
+    let h = 1;
+    for (const c of STEP_CANDIDATES) if (c * 100 <= Tp) { h = c; break; }
+    stepCellKey = cellKey; stepCellH = h;
+    return h;
+  };
+  /** One RK4 walk from (s, t) to tEnd (|tEnd| ≥ |t|, same side of J2000), the schedule's steps
+   *  — or a FIXED step for a diagnostic (the generator's convergence row); returns the end state.
+   *  @param {number[]} s @param {number} t @param {number} tEnd @param {number} [fixedStepYr]
+   *  @returns {{ s: number[], t: number }} */
+  function walkFrom(s, t, tEnd, fixedStepYr) {
+    const dir = tEnd < t ? -1 : 1;
+    while (dir < 0 ? t > tEnd : t < tEnd) {
+      const h = fixedStepYr ?? hStepAt(t);
+      s = rk4(s, t, dir * h);
+      t += dir * h;
+    }
+    return { s, t };
+  }
+  /** The continuous walk's states at every multiple of spacingYr from J2000 to tEndYr (one
+   *  direction) — the bank generator's instrument; no grid is built.
+   *  @param {number} tEndYr @param {number} spacingYr @returns {Array<{t: number, s: number[]}>} */
+  function recordStates(tEndYr, spacingYr) {
+    const dir = tEndYr < 0 ? -1 : 1;
+    /** @type {Array<{t: number, s: number[]}>} */ const out = [];
+    let s = S0A, t = 0;
+    while (dir < 0 ? t > tEndYr : t < tEndYr) {
+      const h = hStepAt(t);
+      s = rk4(s, t, dir * h);
+      t += dir * h;
+      if (t % spacingYr === 0) out.push({ t, s: s.slice() });
+    }
+    return out;
+  }
+  // The bank, indexed by t (years from J2000; both directions).
+  /** @type {Map<number, number[]> | null} */
+  const bank = spinCheckpoints && spinCheckpoints.checkpoints ? new Map(spinCheckpoints.checkpoints.map((/** @type {{t: number, s: number[]}} */ c) => [c.t, c.s])) : null;
+  const bankSpacing = spinCheckpoints && bank ? spinCheckpoints.spacingYr : 0;
+
+  /** The factory's walks, one per grid step: the shared node grid and, per direction, the
+   *  COVERED SEGMENTS — contiguous node ranges [from, to] (|t|) each with the live frontier
+   *  state at `to` (plan 24: a frontier per direction became segments, so a seated walk can
+   *  start anywhere and a later nearer query fills its own gap).
+   *  @typedef {{ from: number, to: number, s: number[], t: number }} Seg
+   *  @type {Map<number, { grid: Map<number, any>, segs: Record<number, Seg[]> }>} */
   const walks = new Map();
   /**
-   * Integrate once over [min(t0,t1,0), max(t0,t1,0)] and return a sampler
-   * on a stepYr grid (linear interpolation; angles interpolated on the
-   * wrapped difference). t in years from J2000, negative = past.
+   * Return a sampler on a stepYr grid over [min(t0,t1,0), max(t0,t1,0)]:
+   * the nodes around the far ends are built now (linear interpolation of the
+   * scalars, C1 on the angles); any node the sampler meets missing is built on
+   * demand. t in years from J2000, negative = past.
    * @param {number} t0Yr @param {number} t1Yr @param {number} stepYr
    */
   function build(t0Yr, t1Yr, stepYr) {
     const tMin = Math.min(t0Yr, t1Yr, 0), tMax = Math.max(t0Yr, t1Yr, 0);
-    // D1 stepping contract: a build reaching beyond the ±50-kyr fine zone
-    // integrates at 250-yr steps there, so its grid must be 250-aligned or
-    // at() would meet missing keys. Fail loud, not subtly coarse.
-    if (Math.max(Math.abs(tMin), Math.abs(tMax)) > 50000 && stepYr % 250 !== 0) {
-      throw new Error(`deep-orbital-history: builds beyond ±50 kyr need stepYr % 250 === 0 (got ${stepYr})`);
+    // The stepping contract: beyond the ±50-kyr fine zone the walk steps on
+    // STEP_CANDIDATES, every one a divisor of 100, so a grid there must be
+    // 100-aligned (the samplers' 1000/5000, the series generator's 500-yr seam
+    // probe) or at() would meet missing keys. Fail loud, not subtly coarse.
+    if (Math.max(Math.abs(tMin), Math.abs(tMax)) > 50000 && stepYr % 100 !== 0) {
+      throw new Error(`deep-orbital-history: builds beyond ±50 kyr need stepYr % 100 === 0 (got ${stepYr})`);
     }
-    // ONE WALK PER STEP SIZE, EXTENDED, NEVER RESTARTED (plan 13 A1, measured):
+    // ONE WALK PER GRID STEP, EXTENDED, NEVER RESTARTED (plan 13 A1, measured):
     // every caller's tier routing asked for `build(span, -span, step)` and
     // rebuilt from J2000 whenever a deeper epoch arrived, so the four deep
     // fixture anchors (380…2460 Ma) walked ~49 million RK4 steps — 14 of the
@@ -575,56 +652,68 @@ function createDeepOrbitalHistory({
     // ~5 million. The walk is a pure function of t from the fixed J2000 state
     // S0, so continuing a stored walk from its last (s, t) yields the SAME
     // step sequence as a fresh walk to the farther end: bit-identical nodes
-    // (the sampler-order-purity gate pins this). The grid and the two
-    // direction frontiers live on the factory, keyed by stepYr; a returned
-    // sampler reads the shared grid, which only ever gains nodes.
+    // (the sampler-order-purity gate pins this). PLAN 24: the same purity lets
+    // a walk start from a BANKED state — a checkpoint IS the continuous walk's
+    // state at that t — so a query seats on the nearest checkpoint on its near
+    // side and walks at most one spacing (250 kyr: ~5,000 steps) instead of
+    // from J2000 (−4.43 Gyr: 17.7 million steps at the former step, ~90
+    // million at this one).
     let w = walks.get(stepYr);
     const S0 = S0A;
-    // D1-revised adaptive stepping: 5-yr RK4 near the era (the certified-
-    // precision zone), 250-yr beyond ±50 kyr — still 103 steps per
-    // precession cycle and ≥196 samples of the fastest ζ mode (49 kyr), so
-    // the integration stays deep in RK4's convergence regime while ±500 Myr
-    // becomes a seconds-class one-time build (measured: coarse-vs-fine
-    // agree to <1e-4° at ±1 Myr — the generator's regression gate).
-    // STRICT < so the walk switches AT the ±50,000 boundary (50,000 is
-    // 250-aligned; switching one fine-step later would leave the coarse walk
-    // permanently off-grid — measured: every key beyond ±50 kyr missing).
-    const hStepAt = (/** @type {number} */ t) => (Math.abs(t) < 50000 ? 5 : 250);
     if (!w) {
-      w = { grid: new Map(), frontier: { [-1]: { s: S0, t: 0 }, [1]: { s: S0, t: 0 } } };
+      w = { grid: new Map(), segs: { [-1]: [], [1]: [] } };
       walks.set(stepYr, w);
     }
     const grid = w.grid;
-    for (const dir of [-1, +1]) {
-      const end = dir < 0 ? tMin : tMax;
-      const front = w.frontier[dir];
-      if (dir < 0 ? end >= front.t : end <= front.t) continue;   // already walked this far
-      let s = front.s, t = front.t;
-      // Each stored node also carries the equinox-node RATE (deg/yr) from a
-      // ±2.5-yr central difference on the integrator's own state — the C1
-      // (Hermite) interpolation input. Linear interpolation of the node
-      // longitude made the realized equinox rate PIECEWISE-CONSTANT per
-      // grid cell — the report's per-year precession column showed flat
-      // centuries with steps at the 1700/1800/1900/2000 cell edges
-      // (measured; the levels were the real wobble at 100-yr resolution,
-      // the staircase was this interpolation order).
-      // The perihelion longitude of date gets the same C1 treatment (2026-09,
-      // owner-found): linear interpolation of periOfDateDeg made the
-      // movement's year-over-year apsidal rate — the anomalistic year, the
-      // Prec. cell — a staircase of ±0.1 s across the 100-yr cells, reading
-      // 365.2596375 d at 2000.0 and 365.2596390 d at 2000.5, and the panel's
-      // apsidal beat 111,494 where the registry read 111,548.
-      const storeWithRate = (/** @type {number} */ key, /** @type {number[]} */ sv, /** @type {number} */ tv) => {
-        const smp = sampleAt(sv, tv);
-        const hR = 2.5;
-        const lp = eqLonsOnlyDeg(rk4(sv, tv, +hR), tv + hR);
-        const lm = eqLonsOnlyDeg(rk4(sv, tv, -hR), tv - hR);
-        smp.equinoxLonRateDegPerYr = (((lp.proj - lm.proj + 540) % 360) - 180) / (2 * hR);
-        smp.generalPrecessionLonRateDegPerYr = (((lp.general - lm.general + 540) % 360) - 180) / (2 * hR);
-        smp.periOfDateRateDegPerYr = (((lp.peri - lm.peri + 540) % 360) - 180) / (2 * hR);
-        grid.set(key, smp);
-      };
-      if (t === 0 && !grid.has(0)) storeWithRate(0, s, 0);
+    // Each stored node also carries the equinox-node RATE (deg/yr) from a
+    // ±2.5-yr central difference on the integrator's own state — the C1
+    // (Hermite) interpolation input. Linear interpolation of the node
+    // longitude made the realized equinox rate PIECEWISE-CONSTANT per
+    // grid cell — the report's per-year precession column showed flat
+    // centuries with steps at the 1700/1800/1900/2000 cell edges
+    // (measured; the levels were the real wobble at 100-yr resolution,
+    // the staircase was this interpolation order).
+    // The perihelion longitude of date gets the same C1 treatment (2026-09,
+    // owner-found): linear interpolation of periOfDateDeg made the
+    // movement's year-over-year apsidal rate — the anomalistic year, the
+    // Prec. cell — a staircase of ±0.1 s across the 100-yr cells, reading
+    // 365.2596375 d at 2000.0 and 365.2596390 d at 2000.5, and the panel's
+    // apsidal beat 111,494 where the registry read 111,548.
+    const storeWithRate = (/** @type {number} */ key, /** @type {number[]} */ sv, /** @type {number} */ tv) => {
+      const smp = sampleAt(sv, tv);
+      const hR = 2.5;
+      const lp = eqLonsOnlyDeg(rk4(sv, tv, +hR), tv + hR);
+      const lm = eqLonsOnlyDeg(rk4(sv, tv, -hR), tv - hR);
+      smp.equinoxLonRateDegPerYr = (((lp.proj - lm.proj + 540) % 360) - 180) / (2 * hR);
+      smp.generalPrecessionLonRateDegPerYr = (((lp.general - lm.general + 540) % 360) - 180) / (2 * hR);
+      smp.periOfDateRateDegPerYr = (((lp.peri - lm.peri + 540) % 360) - 180) / (2 * hR);
+      grid.set(key, smp);
+    };
+    if (!grid.has(0)) storeWithRate(0, S0, 0);
+    /** Make the nodes up to |t| = need exist in direction dir: a covering segment, or a walk
+     *  seated on the nearest start on the near side — an existing segment's frontier or a bank
+     *  checkpoint, whichever is nearer — storing nodes at exact grid multiples on the way.
+     *  @param {1|-1} dir @param {number} need */
+    const cover = (dir, need) => {
+      if (need === 0) return;
+      const segs = w.segs[dir];
+      for (const sg of segs) if (sg.from <= need && need <= sg.to) return;
+      /** @type {{ a: number, s: number[], t: number, seg: Seg | null }} */
+      let start = { a: 0, s: S0, t: 0, seg: null };
+      for (const sg of segs) if (sg.to <= need && sg.to > start.a) start = { a: sg.to, s: sg.s, t: sg.t, seg: sg };
+      if (bank) {
+        for (let a = Math.floor(need / bankSpacing) * bankSpacing; a > start.a; a -= bankSpacing) {
+          const cs = bank.get(dir * a);
+          if (cs) { start = { a, s: cs, t: dir * a, seg: null }; break; }
+        }
+      }
+      let s = start.s, t = start.t;
+      const end = dir * need;
+      // A seat on a bank checkpoint IS a walk state at an exact t: when that t is a grid
+      // multiple its node must be stored too — a query at the checkpoint itself (need ===
+      // the seat; the loop below then takes no step) found no node otherwise (measured:
+      // the fixture recorder at +250 kyr and the docs writer at −1 Myr threw).
+      if (start.seg === null && start.a > 0 && Math.abs(t - Math.round(t / stepYr) * stepYr) < 1e-6 && !grid.has(Math.round(t / stepYr) * stepYr)) storeWithRate(Math.round(t / stepYr) * stepYr, s, t);
       while (dir < 0 ? t > end : t < end) {
         const H_STEP = hStepAt(t);
         s = rk4(s, t, dir * H_STEP);
@@ -632,19 +721,40 @@ function createDeepOrbitalHistory({
         // Store ONLY at EXACT step multiples: an off-grid sample under a
         // ROUNDED key collides with (or shifts) a real grid node (measured
         // during C-3: build(+200, …, 1000) stored ε(+200) under key 0,
-        // clobbering the t = 0 sample by 94″; and the D1 variable step made
-        // the old |t % stepYr| < H_STEP/2 window store 250-yr samples under
-        // 100-yr keys, 50 yr off). Exact alignment is guaranteed by the
-        // guard below (coarse builds use 250-aligned grids; the 50,000-yr
-        // zone boundary is itself 250-aligned, so the walk stays on-grid).
+        // clobbering the t = 0 sample by 94″). Exact alignment is guaranteed
+        // by the schedule (integer divisors of 100 beyond the 50,000-yr zone
+        // boundary, itself a grid node) and the guard above.
         if (Math.abs(t - Math.round(t / stepYr) * stepYr) < 1e-6) storeWithRate(Math.round(t / stepYr) * stepYr, s, t);
       }
-      w.frontier[dir] = { s, t };
+      const to = Math.abs(t);
+      let seg = start.seg;
+      if (seg) { seg.to = to; seg.s = s; seg.t = t; } else { seg = { from: start.a, to, s, t }; segs.push(seg); }
+      // merge the segments this walk reached (their nodes are the same nodes)
+      for (let i = segs.length - 1; i >= 0; i--) {
+        const o = segs[i];
+        if (o === seg || o.from > seg.to || o.to < seg.from) continue;
+        if (o.to > seg.to) { seg.to = o.to; seg.s = o.s; seg.t = o.t; }
+        if (o.from < seg.from) seg.from = o.from;
+        segs.splice(i, 1);
+      }
+    };
+    for (const dir of /** @type {Array<1|-1>} */ ([-1, 1])) {
+      const end = dir < 0 ? tMin : tMax;
+      if (end !== 0) cover(dir, Math.abs(end));
     }
+    /** The two grid nodes around tYr, built on demand. @param {number} k0 @param {number} k1 */
+    const ensureNodes = (k0, k1) => {
+      for (const k of [k0, k1]) {
+        if (k === 0 || grid.has(k)) continue;
+        if (Math.abs(k) > Math.max(Math.abs(tMin), Math.abs(tMax)) + stepYr) continue;   // beyond the built range: the throw below says so
+        cover(k < 0 ? -1 : 1, Math.abs(k));
+      }
+    };
     return {
       /** @param {number} tYr */
       at(tYr) {
         const k0 = Math.floor(tYr / stepYr) * stepYr, k1 = k0 + stepYr;
+        ensureNodes(k0, k1);
         const a = grid.get(k0), b = grid.get(k1) ?? a;
         if (!a) throw new Error(`deep-orbital-history: ${tYr} outside the built range`);
         const f = (tYr - k0) / stepYr;
@@ -685,6 +795,14 @@ function createDeepOrbitalHistory({
 
   return {
     build,
+    // PLAN 24 — the bank generator's instruments: the continuous walk's states at a spacing,
+    // a pure walk from a given state (the seat-and-resume self-check; a fixed step for the
+    // convergence row), the step the schedule takes at t, and the state the walk starts from.
+    recordStates,
+    walkFrom,
+    stepYearsAt: hStepAt,
+    stateJ2000: S0A,
+    bankLoaded: bank !== null,
     alphaArcsecPerYr: ALPHA * R2D * 3600,   // the injected GENERAL-anchor form (input echo, unchanged semantics)
     // D4e diagnostics: the self-anchored lunisolar rate actually integrated.
     alphaLunisolarArcsecPerYr: ALPHA * K_LUNI * R2D * 3600,

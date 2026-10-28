@@ -186,11 +186,11 @@
       "kick_coefficients_s": [
         {
           "cos": 0,
-          "sin": 621.6213108466346
+          "sin": 621.6253091372357
         },
         {
           "cos": 0,
-          "sin": 1.2866895294935952
+          "sin": 1.2850007806442048
         }
       ],
       "T0_lattice_n": 685,
@@ -207,9 +207,9 @@
           "retired": "RETIRED (plan 06 D7 follow-up, 2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS)."
         }
       ],
-      "rms_s": 21.414677831410778,
-      "raw_at_j2000_s": -83.11825338761497,
-      "lod_raw_at_j2000_s_per_day": 0.0004964519119797189,
+      "rms_s": 21.41469844571876,
+      "raw_at_j2000_s": -83.11960900896855,
+      "lod_raw_at_j2000_s_per_day": 0.0004964512181330436,
       "deep_time_checks_s": {
         "900": -245.8439379884609,
         "2000": -82.32559425279462,
@@ -319,7 +319,7 @@
       "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:f85dd33c548b107e2983c9bd550897895229ee451ed83c9ff83033bc1bccfd8a",
       "packages/physics/src/earth/precession-composed.cjs": "sha256:69f2c3795c67f4019671e727f1ae53909cefa3bfa74fb8cf19dec912777385f1",
       "public/input/astro-reference.json": "sha256:c82738ae33b5460ca7bdc737032a04f5cd39d6186e78a41179a913a25595b955",
-      "public/input/climate-formula-coefficients.json": "sha256:75589358ec492aed36585312d72f634f8498cc1d35114728ce93b0491ae2054b",
+      "public/input/climate-formula-coefficients.json": "sha256:30e7755a2c07616ccd81528314880897e2a4501fd85d10e284652b4bf9d03a9c",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
       "tools/lib/constants.js": "sha256:46fefc52fd50260f64d5ea57e01c46958d949dd1d16c030e86379904aabaa57d",

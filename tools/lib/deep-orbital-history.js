@@ -78,11 +78,19 @@ function createDeepOrbitalHistory() {
  * the factory's inputs itself. Returns null when the series artifact is absent.
  * @returns {ReturnType<import('../../packages/physics/src/earth/deep-orbital-history.cjs').createDeepOrbitalHistory> | null}
  */
-function createOneSourceTier() {
+function createOneSourceTier(opts = {}) {
   let seriesArt;
   try {
     seriesArt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
   } catch (e) { return null; }
+  // PLAN 24 — the spin-axis checkpoint bank (data/spin-axis-checkpoints.json, the generator
+  // tools/verify/spin-axis-bank.js): a deep jump seats its walk on the nearest checkpoint and
+  // walks at most one spacing, bit-identical to the continuous walk. Absent → the full walk.
+  // The generator itself builds with { bank: false } — it IS the continuous walk.
+  let spinCheckpoints;
+  if (opts.bank !== false) {
+    try { spinCheckpoints = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'spin-axis-checkpoints.json'), 'utf8')); } catch (e) { spinCheckpoints = undefined; }
+  }
   const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-deep-secular-modes.json'), 'utf8'));
   const { CHAIN_ARTIFACT } = require('../../packages/physics/src/planets/chain-artifact.js');
   const { createDeepOrbitalHistory: factory } = require('../../packages/physics/src/earth/deep-orbital-history.cjs');
@@ -118,6 +126,7 @@ function createOneSourceTier() {
     // src/script.js _deepHistSeries (identical deps).
     solarTorqueShareJ2000: DT.PRECESSION_SOLAR_SHARE_J2000,
     dynamicalEllipticityRatioAtYearFn: DT.j2RatioAtYear,
+    spinCheckpoints,
   });
 }
 

@@ -104,7 +104,15 @@ export function createApi() {
     secularSeriesArtifact = JSON.parse(readFileSync(
       new URL('../../../data/nbody-secular-series.json', import.meta.url), 'utf8'));
   } catch { /* package-only install: mode-tail tier */ }
-  const model = createModel(undefined, { secularSeriesArtifact });
+  // PLAN 24 — the spin-axis checkpoint bank beside the series: a deep-epoch
+  // read walks at most 250 kyr from the nearest banked state (bit-identical to
+  // the full walk); absent, the full walk serves.
+  let spinCheckpointsArtifact = null;
+  try {
+    spinCheckpointsArtifact = JSON.parse(readFileSync(
+      new URL('../../../data/spin-axis-checkpoints.json', import.meta.url), 'utf8'));
+  } catch { /* package-only install, or the bank not yet generated: the full walk */ }
+  const model = createModel(undefined, { secularSeriesArtifact, spinCheckpointsArtifact });
   const id = model.identity;
 
   /** Derivations metadata: structural explanation per quantity (§7 "derivations"). */
@@ -419,6 +427,9 @@ export function createApi() {
       }
       /** @type {ReturnType<typeof createModel>} */
       let cf;
+      // NO bank here: the checkpoints are the SHIPPED context's walk; an altered constant
+      // changes α(t) and the counterfactual must walk its own (createModel ignores the
+      // bank under altered constants or laws anyway — the guard in index.js).
       try { cf = createModel(altered, { secularSeriesArtifact }); } catch (e) {
         return problem(422, 'validation-target-injection', 'Validation targets cannot be injected', String(e instanceof Error ? e.message : e));
       }

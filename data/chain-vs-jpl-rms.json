@@ -341,7 +341,7 @@
       "data/jpl-cache.json": "sha256:221582af7d1e956fd20e58a2b32f2c956a6d1ec1f8d17d3f24c7730a269205d1",
       "packages/physics/src/planets/chain-artifact.js": "sha256:b488a0dca38cc2bdc573cb9d63ec94853885a9153338aa1ab8d7204d7f41c1a1",
       "packages/physics/src/planets/keplerian-chain.cjs": "sha256:8a0ca8debaf6eea263bd40f631bc5bdd7041307c37c3cd5e5844dd6b62e624c7",
-      "tools/lib/scene-graph.js": "sha256:1ee2a14f96b685fe9ab4aa30e4365ce7eab3c29049ff93377608f6825164929b",
+      "tools/lib/scene-graph.js": "sha256:361983f041d90abbbb98ec8525974cbf59e61ab9a8ac2b58cf1517437714413a",
       "tools/verify/measure-rms-by-epoch.js": "sha256:3dc686d3c90224b63a28275a9961be32dafbb87ce301cbc851f579ad2c5035a8"
     }
   }

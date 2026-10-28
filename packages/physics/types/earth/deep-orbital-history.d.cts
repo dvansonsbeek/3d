@@ -15,6 +15,7 @@
  *   axialPrecessionYearsAtYearFn?: (year: number) => number,
  *   solarTorqueShareJ2000?: number,
  *   dynamicalEllipticityRatioAtYearFn?: (year: number) => number,
+ *   spinCheckpoints?: { spacingYr: number, checkpoints: ReadonlyArray<{t: number, s: number[]}> },
  * }} deps — mode tables from the governed deep artifact (choose the ζ tier
  *   per consumer: era = its own 8-term extraction, deep = the 16-term
  *   table; NEVER a slice); anchors from the chain artifact's one home; the
@@ -34,7 +35,7 @@
  *   factors on the precession constant (see alphaAtGeneral below); absent,
  *   the constant is the secular law alone, bit-identical.
  */
-export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSeries, anchorE, anchorPeriEclipticDeg, anchorInclEclipticDeg, anchorAscNodeEclipticDeg, axialPrecessionYearsJ2000, obliquityJ2000Deg, axialPrecessionYearsAtYearFn, solarTorqueShareJ2000, dynamicalEllipticityRatioAtYearFn, }: {
+export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSeries, anchorE, anchorPeriEclipticDeg, anchorInclEclipticDeg, anchorAscNodeEclipticDeg, axialPrecessionYearsJ2000, obliquityJ2000Deg, axialPrecessionYearsAtYearFn, solarTorqueShareJ2000, dynamicalEllipticityRatioAtYearFn, spinCheckpoints, }: {
     zModes: ReadonlyArray<{
         omegaRadPerYr: number;
         re: number;
@@ -66,6 +67,13 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
     axialPrecessionYearsAtYearFn?: (year: number) => number;
     solarTorqueShareJ2000?: number;
     dynamicalEllipticityRatioAtYearFn?: (year: number) => number;
+    spinCheckpoints?: {
+        spacingYr: number;
+        checkpoints: ReadonlyArray<{
+            t: number;
+            s: number[];
+        }>;
+    };
 }): {
     build: (t0Yr: number, t1Yr: number, stepYr: number) => {
         /** @param {number} tYr */
@@ -85,6 +93,17 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
             generalPrecessionLonRateDegPerYr: number;
         };
     };
+    recordStates: (tEndYr: number, spacingYr: number) => Array<{
+        t: number;
+        s: number[];
+    }>;
+    walkFrom: (s: number[], t: number, tEnd: number, fixedStepYr?: number) => {
+        s: number[];
+        t: number;
+    };
+    stepYearsAt: (t: number) => number;
+    stateJ2000: number[];
+    bankLoaded: boolean;
     alphaArcsecPerYr: number;
     alphaLunisolarArcsecPerYr: number;
     axialPrecessionYearsLunisolarJ2000: number;

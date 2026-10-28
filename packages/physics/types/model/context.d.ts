@@ -16,9 +16,19 @@ export type Laws = {
  * FORCING alone. The T1 exporter derives the climate lines' obliquity rate on it, so the lines
  * cannot depend on their own fit (v23.0; measured 3e-5 of the rate, 2–3 yr of period). Default true =
  * the shipped physics.
+ * `spinCheckpointsArtifact` (plan 24): the parsed spin-axis checkpoint bank — the walk's exact state
+ * every 250 kyr; a deep read then walks at most one spacing, bit-identical to the full walk. Null =
+ * the full walk from J2000.
  */
 export type Options = {
     giaEllipticityOfDate?: boolean;
+    spinCheckpointsArtifact?: {
+        spacingYr: number;
+        checkpoints: ReadonlyArray<{
+            t: number;
+            s: number[];
+        }>;
+    } | null;
 };
 /**
  * The forward bindings — what an early slice reads at call time from a later one. Typed by the

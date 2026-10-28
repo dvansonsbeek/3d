@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.1
-coefficients: sha256:1d7ef7b022b91f6c
+modelVersion: v27.2
+coefficients: sha256:a1e5567e03d1936e
 status: current
 ---
 
@@ -823,7 +823,7 @@ Reading:
    (were +0.009 / +0.059 / +0.069 on the J2000 rate); the pre-iNHG remainder
    is the regime's own window mean sitting
    above the record-wide one
-   (<!--v:spinAxisInertialRateMeanPreInhgArcsecPerYr-->50.564<!--/v--> ″/yr —
+   (<!--v:spinAxisInertialRateMeanPreInhgArcsecPerYr-->50.563<!--/v--> ″/yr —
    a per-regime line set would carry it; the shipped set carries ONE window,
    the record's, the rule "derive over the window the rows are used in"). The
    climatic-precession lines alone want

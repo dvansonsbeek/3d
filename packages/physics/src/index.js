@@ -200,7 +200,7 @@ export { createEclipseFinders } from './eclipse/finders.cjs';
  * even though the body is empty.
  *
  * @param {Constants} [constants]
- * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any, giaEllipticityOfDate?: boolean }} [opts]
+ * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any, giaEllipticityOfDate?: boolean, spinCheckpointsArtifact?: any }} [opts]
  *   `laws` — research overrides for Earth's orbit laws (doc 109 §7); absent = the shipped laws, bit-identical. Not part of the hash.
  * @returns {Model}
  */
@@ -251,8 +251,18 @@ export const createModel = (constants = GENERATED, opts = {}) => {
   // opts.giaEllipticityOfDate — false builds the one-source history on the
   // orbital forcing alone (no ice-driven J₂(t) factor): the T1 line derivation
   // (see assembleModel). Default true = the shipped physics. Never part of the hash.
+  // opts.spinCheckpointsArtifact — plan 24: the spin-axis checkpoint bank
+  // (data/spin-axis-checkpoints.json, parsed), the walk's exact state every
+  // 250 kyr; a deep POINT read then walks at most one spacing (a cumulative
+  // lunar table still integrates from J2000). Never part of the
+  // hash: it is the governed artifact of the walk this context runs, and the
+  // nodes it yields are bit-identical to the full walk's (the purity gate).
+  // The bank is the SHIPPED context's walk: under altered constants (a counterfactual) or
+  // research law overrides α(t) differs and the walk must be its own — the bank is ignored
+  // there by construction, never trusted to the caller.
+  const bankAllowed = hash === CONSTANTS_HASH && !(opts.laws && Object.keys(opts.laws).length) && opts.giaEllipticityOfDate !== false;
   const surfaces = assembleModel(ctx, FITTED, opts.laws ?? {}, opts.secularSeriesArtifact ?? null,
-    { giaEllipticityOfDate: opts.giaEllipticityOfDate !== false });
+    { giaEllipticityOfDate: opts.giaEllipticityOfDate !== false, spinCheckpointsArtifact: bankAllowed ? (opts.spinCheckpointsArtifact ?? null) : null });
 
   return {
     constants: ctx,

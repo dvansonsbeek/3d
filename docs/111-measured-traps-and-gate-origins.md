@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.1
-coefficients: sha256:1d7ef7b022b91f6c
+modelVersion: v27.2
+coefficients: sha256:a1e5567e03d1936e
 status: current
 ---
 
@@ -109,7 +109,10 @@ central differences) became grid-segment averages — the anomalistic year
 read +2.6 s, visit-order dependent, and 18 browser goldens were recorded
 contaminated (exposed by the early-recorded "Fresh" twin of the same JD).
 Per-tier routing + the fail-proven `test:sampler-purity` gate pin the
-class: values pure in `year`.
+class: values pure in `year`. Since plan 24 the gate's third block pins the
+spin-axis checkpoint bank as a seat, not a value: the banked instance and the
+continuous walk read bit-identical nodes at −3, −137 and −498 Myr in either
+visit order, on the engine binding and the package model alike (§1.29).
 
 ### 1.11 A displayed rate must name its window
 
@@ -542,6 +545,82 @@ step of 1e-6 of either count landed fully on it; that tier now reads a
 10-yr grid's linear read, 100× smaller in step and below every reader, stays
 byte-identical.
 
+### 1.29 A step converged where it was measured is not converged where the period shrinks — and a walk that is pure in its state can be banked, never a walk that accumulates
+
+**Measured** (plan 24, 2026-10-27). The spin-axis walk's RK4 step was a fixed
+250 yr, chosen when the hybrid was banked over ±1 Myr and converged there.
+The torque period it integrates shortens from 25,772 yr at J2000 to 21,029
+at 500 Ma, 12,036 at 2.5 Ga, 4,903 at 3.5 Ga and 598 yr at 4.4 Ga, so the
+same step went from a hundred samples per cycle to two. Against a 50-yr walk
+of the identical law the obliquity parted by 0.8″ at 5 Ma, 6.3″ at 25 Ma,
+318″ at 100 Ma, 440″ at 500 Ma, 1,159″ at 1 Ga, 7,121″ at 2.46 Ga, and at
+4 Ga the axis had collapsed onto the orbit normal (ε 0.07°); the equinox
+phase by 101″ at 5 Ma, 1° at 25 Ma, 9° at 100 Ma. No gate saw it: the verdict
+scores ±1 Myr, the paleo anchors read the precession RATE (the composed law,
+not the walk), and the 2.46-Ga obliquity-period fork is a pre-registered
+prediction with no datum yet. The 50-yr walk is converged (0.10″ / 10″ at
+100 Ma against 10 yr). **The rule:** an integration step is chosen against
+the shortest period IN THE DOMAIN, not at the anchor — state the steps per
+period at the far edge, and gate the schedule against a finer walk at the
+deep ages, not where the record happens to be. **The construction:** the
+step schedule in one home (5 yr inside ±50 kyr; beyond, the largest divisor
+of 1,000 up to 50 yr with ≥ 100 steps per period, per 1,000-yr cell), which
+makes the walk to genesis 88 million steps (~15 min) — affordable once, not
+per jump. Hence the bank: the walk is pure in (ŝ, t) (a node from the state
+alone, nothing accumulates, the J2000 anchor an exact state), so its state
+every 250 kyr is a seat a runtime resumes from and reaches the SAME nodes
+bit-exactly — proven on the record (seat-and-resume per 20th checkpoint) and
+on both Node twins (`test:sampler-purity` bank row, −3/−137/−498 Myr, with
+and without the bank, both visit orders). The tell for whether a walk can be
+banked: does a stored state plus the step rule reproduce the next stored
+state bit-for-bit? A walk that carries an accumulator, a cached rate or a
+grid-dependent phase cannot be (doc 111 §1.10's class), and banking it would
+ship two models. The first ε read at −400 Myr: ~200 s from J2000 in the
+browser at the converged step, ≤ 2 s seated (`test:perf`'s absolute row —
+absolute, because a missing bank would hide behind the ratio form). **What
+the seat does NOT buy, measured:** the full scene jump to −400 Myr still
+takes ~220 s headless (84 s in Node) with the bank landed — the lunar
+cumulative tables (the chain-cycle counts' 1-kyr coarse tier, the three
+carriers) integrate from J2000 to the target and read ε/e at every cell, so
+the sampler needs nodes over the WHOLE span and the walk is paid anyway; a
+seat helps a point read, never a cumulative integral. The remedy is the
+TODO's original clause — bank the cumulative sums beside the spin states, so
+a deep table starts at the nearest checkpoint's value — with its own
+question (a seeded running sum is not bit-identical to the contiguous one;
+the deep lunar phase is a 1e-11 quantity in any case). The rule: price a
+"the jump is now fast" claim on the FULL jump, not on the quantity the bank
+holds, and gate the one the bank guarantees.
+
+**The second measurement the bank made possible — convergence is not
+prediction.** Two bank runs in one cascade, on the two sides of the climate
+refit the converged walk itself caused (the obliquity-band L1 periods moved
+0.6–1.2 ppm, so the GIA J₂(t)/J₂₀ differs by 1.4e-6 at 100 Ma between the
+sets), differ by 135″ in ε at 100 Ma, 401″ at 500 Ma, 1.8° at 2.46 Ga and
+127° of equinox phase there — a thousand times the step's convergence. **The
+rule:** a converged integration of a given α(t) is not a converged VALUE;
+state the sensitivity of the deep quantity to its inputs' class (here 1e-6 in
+the precession constant → 135″ at 100 Ma) beside the step convergence, and
+say beyond which age the input class dominates (~10 Myr here, where the
+sensitivity passes 1″). The two runs are the measurement; a single run would
+have shipped the bit-exact gates and never seen it.
+
+**Three latent defects the same change exposed, all measured and fixed in
+it.** (i) A seat exactly AT a checkpoint that is also a grid node took no
+step, so the seat's node was never stored and `at()` threw "outside the
+built range" — test bank code at ALIGNED epochs. (ii) The package slice
+mapped the engine year to an age with `startmodelYear` (2000.5) where its
+own `yearToTMa`, tools/lib and the browser use 2000 — a 1e-6″ twin split in ε
+at −100 kyr, invisible until the bank walked by one twin had to seat the
+other bit-exactly (`test:sampler-purity` block 3). (iii) The cross-engine
+gate's in-era solstice rows (2 ULP of the JD) read 1.5–11.5 ULP apart at
+−4000/−2000 once the constants moved: the hybrid's K_LUNI self-anchor divides
+a one-year equinox-longitude difference (0.0139°) by itself, amplifying the
+runtimes' last-bit Math differences (7 of 120 canaries differ between
+HeadlessChrome 151 and Node 22) to a ~1e-12 relative rate, which 84° of
+walked precession at −4000 turns into 1e-10 d; the row's tolerance now names
+it (16 ULP), the mechanism being pre-plan-06 and the constants' move merely
+re-rolling the roundings.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -568,7 +647,14 @@ readonly rows are LOOP-DRIVEN (tickers disposed after setupGUI, the
 visible rows re-read on the 5-Hz DOM tick), so a paused page emits ~0 pane
 change events where the polling build emitted ~4,800 in 3 s (limit 5), and
 a visible monitor must still change while playing; fail-proven via
-`ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix builds).
+`ESSRT_PERF_TIGHTEN=0.01` and on the pre-fix builds; plus, since plan 24,
+the one ABSOLUTE row — the first one-source ε at −400 Myr on a fresh page
+with the spin-axis checkpoint bank landed must take ≤ 2 s, where the walk
+from J2000 at the converged step takes ~200 s: a ratio row would let a
+missing bank hide behind a slow near read, §1.29. The row was first written
+on the FULL scene jump and read 220 s with the bank seated — which is how the
+lunar cumulative tables' whole-span walk was found; the full jump is printed
+beside the row for the record, not gated).
 
 The `test:snapshot` chain also carries:
 

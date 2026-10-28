@@ -11,9 +11,11 @@
  * (test:snapshot runs first in the chain).
  *
  * Expectations, calibrated from measurement:
- *   - solstice JDs (in era, |year| ≤ 50 kyr): within 2 ULP of the compared
- *     JD (9.3e-10 d at JD 4e6, 3.7e-9 d at JD 1.37e7 — year 32682, the
- *     largest in-era probe) — the two engines share the §10 evaluation
+ *   - solstice JDs (in era, |year| ≤ 50 kyr): within 16 ULP of the compared
+ *     JD (9.3e-10 d at JD 2.6e5 — year −4000; 3e-8 d at JD 1.37e7 — year
+ *     32682, the largest in-era probe; 2 ULP until plan 24, whose cascade
+ *     re-rolled the roundings to 1.5–11.5 ULP at −4000/−2000 through the
+ *     hybrid's K_LUNI self-anchor, see ERA_JD_ULPS) — the two engines share the §10 evaluation
  *     form and the integrated-phase convention and read bit-exact (Object.is)
  *     from Phase 7.2 to v16.1; the v16.2 running-mean re-bank moved the
  *     hybrid's series inputs and three cardinal instants at year 6000 came
@@ -27,8 +29,9 @@
  *     gap turned out to be OPERATION-ORDER divergence between the two
  *     hand-mirrors (per-div phaseAdvance vs 2π·div·c), not the twins; the
  *     shared @essrt/physics/cardinal implementation dissolved it. In era a
- *     year length is the difference of two JDs, so it is allowed the same
- *     2 ULP of the JD (v22.0: 1–2 ULP measured at 32682 only).
+ *     year length is the difference of two JDs, so it is allowed twice the
+ *     JD's tolerance (v22.0: 1–2 ULP measured at 32682 only; plan 24: up to
+ *     11.5 ULP per JD at −4000, the difference up to 23).
  *   - RA: bit-exact since the integrated-phase migration (same reason).
  *   - DEEP solstice JDs (|year| > 50 kyr): within 1e-6 d (0.1 s), NOT
  *     bit-exact — plan 06 R3 item 2, measured: headless Chromium's V8 and
@@ -62,10 +65,15 @@ const fixture = JSON.parse(readFileSync(
 
 const DEEP_YEARS = 50000;   // beyond the certified fine zone the runtimes' Math differs at the last bit (header)
 const DEEP_JD_TOL_DAYS = 1e-6;
-// In-era solstice JDs and year lengths: 2 ULP of the compared JD (header: 1 ULP
-// measured at year 6000 after the v16.2 re-bank, 1–2 ULP at 32682 after v22.0).
+// In-era solstice JDs and year lengths: 16 ULP of the compared JD (header: 1 ULP
+// measured at year 6000 after the v16.2 re-bank, 1–2 ULP at 32682 after v22.0,
+// 1.5–11.5 ULP at −4000 / −2000 after plan 24's cascade — the hybrid's K_LUNI
+// self-anchor divides a one-year equinox-longitude difference (0.0139°) by
+// itself, so the runtimes' last-bit Math differences become a ~1e-12 relative
+// rate split, and 84° of walked precession at −4000 turns that into 1e-10 d;
+// the mechanism is pre-plan-06, the constants' move re-rolled the roundings).
 // The ULP is the JD's, not a fixed 1e-9 d — a JD of 1.37e7 has a 1.86e-9-d ULP.
-const ERA_JD_ULPS = 2;
+const ERA_JD_ULPS = 16;
 const ulpOf = (x) => Math.pow(2, Math.floor(Math.log2(Math.abs(x))) - 52);
 const eraJdTolDays = (jd) => ERA_JD_ULPS * ulpOf(jd);
 const jdOfYear = (year) => 2451545 + (year - 2000) * 365.25;
@@ -163,9 +171,10 @@ for (const [key, browserVal] of Object.entries(fixture)) {
   } else {
     const d = Math.abs(browserVal - nodeVal);
     if (Object.is(browserVal, nodeVal)) { exact++; continue; }
-    // Year lengths and RAs: in era, 2 ULP of the year's JD (the length is a
-    // difference of two JDs; RAs have read bit-exact throughout).
-    const tol = (m && Math.abs(Number(m[2])) > DEEP_YEARS) ? DEEP_YL_TOL_DAYS : eraJdTolDays(jdOfYear(Number(m[2])));
+    // Year lengths and RAs: in era, TWICE the JD tolerance (the length is a
+    // difference of two independently rounded JDs — measured 1.5–11.5 ULP each
+    // at −4000 after plan 24, the difference up to 23; RAs have read bit-exact throughout).
+    const tol = (m && Math.abs(Number(m[2])) > DEEP_YEARS) ? DEEP_YL_TOL_DAYS : 2 * eraJdTolDays(jdOfYear(Number(m[2])));
     if (d <= tol) { withinTol++; continue; }
     console.log(`  DIVERGED (>${tol}) ${key}  Δ=${d.toExponential(3)}`);
     failures++;

@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from the fit artifacts under data/.
 
-export declare const COEFFICIENTS_HASH: "1d7ef7b022b91f6c";
+export declare const COEFFICIENTS_HASH: "a1e5567e03d1936e";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly BALANCE_PRESETS: Array<Array<number | string>>;
@@ -310,7 +310,7 @@ export declare const FITTED_COEFFICIENTS: {
             "ratio": number;
             "label": string;
           };
-          "39.5560": {
+          "39.5561": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
@@ -324,7 +324,7 @@ export declare const FITTED_COEFFICIENTS: {
             "ratio": number;
             "label": string;
           };
-          "40.9239": {
+          "40.9240": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;

@@ -100,6 +100,30 @@ try {
   }, { near: jdOf(-100000), deep: jdOf(-5340000) });
   console.log(`      cold jump ms (first eval on a fresh page): −100k ${cold.nearMs.toFixed(0)} · −5.34M ${cold.deepMs.toFixed(0)}`);
   gate('cold jump: first(−5.34M) / first(−100k) ratio', cold.deepMs / cold.nearMs, 8, 'x');
+  // ── 0b. THE PHANEROZOIC SPIN READ (plan 24): the first one-source ε at −400 Myr
+  // on a fresh page with the spin-axis checkpoint bank landed. Without the bank
+  // this is the converged-step walk from J2000 (~8 M RK4 steps, ~200 s in the
+  // browser); seated it is ≤ one 250-kyr spacing (~5,000 steps) plus the
+  // 5000-yr sampler's grid. An absolute row — the bank's whole point is the
+  // wait, so the ratio form would hide a missing bank behind a slow near read.
+  // Measured 2026-10-28: the FULL scene jump to −400 Myr is NOT this row — the
+  // lunar cumulative tables (chain-cycle counts, the three carriers) integrate
+  // from J2000 and read ε/e at every 1-kyr cell, so they need the walk over the
+  // whole span (84 s in Node, ~220 s headless at −400 Myr) whatever the seat;
+  // banking those cumulative sums is the open decision (plan 24 §5). The full
+  // jump is printed below for the record, not gated.
+  await sim.page.waitForFunction(() => window.__test__.spinBankLoaded(), null, { timeout: 60000 });
+  const deepSpin = await sim.page.evaluate(() => {
+    const T = window.__test__;
+    const t0 = performance.now(); T.earthObliquityHybridAt(-400000000 + 2000); return performance.now() - t0;
+  });
+  console.log(`      spin read ms (first one-source ε at −400 Myr, bank seated): ${deepSpin.toFixed(0)}`);
+  gate('spin read: first ε(−400M) on the checkpoint bank', deepSpin, 2000, 'ms');
+  const deepCold = await sim.page.evaluate((jd) => {
+    const T = window.__test__;
+    const t0 = performance.now(); T.sceneSunRaDecAt(jd); return performance.now() - t0;
+  }, jdOf(-400000000));
+  console.log(`      (record only) full scene jump ms to −400 Myr after the spin read: ${deepCold.toFixed(0)} — the lunar cumulative tables' walk, not the spin seat`);
   // Bring the scene back to a modern epoch (measured 2026-09-26): the cold
   // jump leaves o.julianDay at −5.34 Myr, and every hybridSpinProbe below
   // restores that JD after its own jump — so each update paid the

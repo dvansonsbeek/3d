@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.1
-coefficients: sha256:1d7ef7b022b91f6c
+modelVersion: v27.2
+coefficients: sha256:a1e5567e03d1936e
 status: current
 ---
 
@@ -522,6 +522,68 @@ PERIOD itself is undiscriminated, so this is a pre-registered prediction
 awaiting a precisely dated Precambrian obliquity band, stated before any
 such measurement is compared. **Read the live fork values from the keys,
 never this paragraph.**
+
+**The integration step and the checkpoint bank (plan 24, model v27.2).**
+The walk's RK4 step was a fixed 250 yr from the hybrid's first banking —
+converged inside the ±1-Myr window the verdict scores, and never measured
+beyond it. Measured against a 50-yr walk of the same law: the obliquity
+parted by 0.8″ at 5 Ma, 6″ at 25 Ma, 318″ at 100 Ma, 0.12° at 500 Ma, 2° at
+2.46 Ga, and at 4 Ga the axis had collapsed onto the orbit normal (ε 0.07°);
+the equinox phase by 1° at 25 Ma and 9° at 100 Ma. The cause is the torque
+period itself: T_p(t) shortens from 25,772 yr at J2000 to 12,000 yr at 2.5 Ga
+and 600 yr at 4.4 Ga, so a step that resolves the J2000 precession a
+hundred times per cycle resolves it twice per cycle at genesis — RK4 is
+outside its asymptotic regime there, and the error is the step, not the
+physics. The 50-yr walk is converged (0.10″ in ε and 10″ in phase at 100 Ma
+against a 10-yr walk; the ratios between step halvings read 3,000–30,000,
+far above the 16 the fourth order predicts, because the dominant error was
+the collapse, not the truncation). The step now rides a schedule in ONE
+place (`deep-orbital-history.cjs`, read by the generator and every
+runtime): 5 yr inside ±50 kyr, beyond it the largest divisor of 1,000 among
+50/25/20/10/5/4/2/1 yr that keeps at least 100 steps per torque period at
+the 1,000-yr cell's near edge — 50 yr to ~3.5 Ga, finer only where T_p
+shrinks below 5 kyr — so the walk lands exactly on the samplers' 1,000- and
+5,000-yr grids and on the bank's 250-kyr spacing. That walk from J2000 to
+genesis is 88 million steps (~15 min in Node), which is why it ships with
+its bank: `data/spin-axis-checkpoints.json` (generator
+`tools/verify/spin-axis-bank.js --write`) holds the continuous walk's exact
+unit vector every 250 kyr from −4,425 Myr to +1,000 Myr. The walk is pure
+in (ŝ, t) — a node is computed from the state alone, nothing accumulates —
+so a runtime seated on the nearest checkpoint on its near side walks at most
+one spacing (~5,000 steps, ~50 ms) for a POINT read of ε, the equinox or e —
+the lunar cumulative tables (chain-cycle counts, carriers) integrate from
+J2000 and still need the walk over the whole span, so a full scene jump to
+−400 Myr stays at the walk's cost (~220 s headless) until those sums are
+banked too — and yields nodes bit-identical to the full walk's; `test:sampler-purity`'s bank row pins that identity on both
+Node twins at −3, −137 and −498 Myr, the generator's own gates pin
+seat-and-resume bit-exactness on the record and the schedule against a
+10-yr walk over the last 2 Myr before 100 Ma, 500 Ma and 2.46 Ga (REFUSE
+beyond 1″ / 60″). The bank is a seat, never a value: absent, every twin
+walks from J2000 at the same schedule and reads the same numbers. The
+scene's genesis handling changed with it — an age beyond the cited
+history's last sample (4,429 Ma) is held AT the edge with one console note,
+where it used to be refused per frame and left the scene at whichever epoch
+it had last reached.
+
+**What the deep obliquity's value means after the step is converged.** The
+bank was generated twice in the same cascade — once on the pre-refit GIA
+channel, once on the climate lines re-derived on the converged walk (the
+obliquity-band periods moved 0.6–1.2 ppm; J₂(t)/J₂₀ then differs by 1.5e-9
+at −1 Myr, 1.4e-6 at −100 Myr, 7.9e-6 at −500 Myr between the two sets).
+Same code, same step: the two walks differ by Δε 0.07″ at 5 Ma, 0.18″ at
+25 Ma, 135″ at 100 Ma, 401″ at 500 Ma, 1.8° at 2.46 Ga, and in equinox phase
+by 0.8° at 100 Ma and 127° at 2.46 Ga. The step convergence is a statement
+about integrating a GIVEN α(t); the obliquity VALUE at deep time is sensitive
+to α(t) at the 1e-6 class (a 5e-7 mean rate difference over 100 Myr is 1.4° of
+phase and 135″ of ε), and the GIA channel beyond the Quaternary — the lagged
+L1 sinusoids evaluated at an effectively arbitrary phase — carries exactly
+that class of unconstrained input. So the converged walk removed a numerical
+error (318″ at 100 Ma, the collapse at 4 Ga) and left a physical-input
+sensitivity of the same size at 100 Ma: the deep ε and equinox are
+reproducible, bit-exact and gated, and are read as the model's integration on
+its inputs, not as an arcsecond-class prediction beyond ~10 Myr (where the
+sensitivity stays below 1″). The GIA factor's deep-time form is the open
+decision this measurement puts a number on (plan 24 §5).
 
 ## 19. The solar-system spin landscape on the engine's own node lines (C-4)
 
