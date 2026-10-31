@@ -5972,7 +5972,13 @@ const baseCamDistance = camera.position.length();
 const scene = new THREE.Scene();
 scene.background = new THREE.Color( o.background );
 
-const renderer = new THREE.WebGLRenderer({ antialias: URL_FLAGS.get('aa') !== '0' });
+// Multisampling a 2× HiDPI buffer (7 Mpx) is what the owner's GPU missed every
+// third vsync (758 long frames/min, p95 33.5 ms, the scene stepping 23 ms; AA off
+// at the same ratio: 7/min, 16.8 ms) while that buffer already supersamples —
+// so antialiasing is off at an effective pixel ratio ≥ 2 and on below it;
+// `?aa=1` / `?aa=0` force it either way (doc 52 Part 4b).
+const ANTIALIAS = URL_FLAGS.has('aa') ? URL_FLAGS.get('aa') !== '0' : getOptimizedPixelRatio() < 2;
+const renderer = new THREE.WebGLRenderer({ antialias: ANTIALIAS });
 renderer.shadowMap.enabled = URL_FLAGS.get('shadows') !== '0';
 renderer.shadowMap.type = THREE.PCFShadowMap;
 
@@ -22322,7 +22328,7 @@ function _perfRecord(gapMs, jsMs) {
     `JS ${q(_perf.js, 0.5).toFixed(1)} ms (p95 ${q(_perf.js, 0.95).toFixed(1)}) · long frames ${_perf.longFrames} · ` +
     `pixel ratio ${renderer.getPixelRatio().toFixed(2)} (device ${(window.devicePixelRatio || 1).toFixed(2)}${lowPerformanceMode ? ', LOW mode' : ''}, switches ${_perf.switches}) · ` +
     `${c.width}×${c.height} px · ${info.calls} draw calls · ${(info.triangles / 1000).toFixed(0)}k tri · step ${smoothedDeltaMs.toFixed(1)} ms · ` +
-    `aa ${URL_FLAGS.get('aa') === '0' ? 'off' : 'on'} · shadows ${URL_FLAGS.get('shadows') === '0' ? 'off' : 'on'} · ${o.Run ? 'playing' : 'paused'}`;
+    `aa ${ANTIALIAS ? 'on' : 'off'} · shadows ${URL_FLAGS.get('shadows') === '0' ? 'off' : 'on'} · ${o.Run ? 'playing' : 'paused'}`;
   _perf.el.textContent = _perf.line;
 }
 

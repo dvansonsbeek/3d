@@ -467,10 +467,15 @@ Clicking the line copies it, with the browser's user-agent string appended,
 to the clipboard and to the console, ready to paste into a report. It is off
 without the flag and runs nothing then. Three more flags are the A/B levers
 for a GPU-bound frame rate, each a fixed setting for that page load:
-`dpr=1.5` a fixed pixel ratio (the default caps the device's at 2), `aa=0`
-antialiasing off, `shadows=0` shadow maps off; the readout names the
-antialiasing and shadow state so a pasted line says which configuration it
-measured. Reading it: JavaScript time
+`dpr=1.5` a fixed pixel ratio (the default caps the device's at 2), `aa=0` /
+`aa=1` antialiasing forced off / on, `shadows=0` shadow maps off; the readout
+names the antialiasing and shadow state in effect so a pasted line says which
+configuration it measured. Antialiasing defaults to OFF at an effective pixel
+ratio of 2 or more and ON below it: the owner's four readings (ratio 2 and
+1.5, each with and without multisampling) put the whole GPU cost in the
+multisampled 7-megapixel buffer — 758 long frames a minute and a 23-ms scene
+step at ratio 2 with it, 7 long frames and a 16.7-ms step without — while a
+2× buffer already supersamples every CSS pixel four times. Reading it: JavaScript time
 near the frame gap means the model is the cost; JavaScript at a few
 milliseconds with a long frame gap means the draw is; a rising switch count
 means the pixel-ratio hysteresis is oscillating.
