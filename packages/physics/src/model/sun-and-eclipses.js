@@ -11,7 +11,7 @@ import { computeCarrierRatesDegPerCy, createSunPlanetaryCompletion } from '../ec
 /** @param {import('./lunar-theory.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleSunAndEclipses(ctx) {
   const {
-    C, F, late, options, MASS_RATIO_EARTH_MOON, currentAUDistance, frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT,
+    C, F, late, options, MASS_RATIO_EARTH_MOON, currentAUDistance, frameworkDeltaTSecondsAtJD, j2000JD,
     julianCenturyDays, meanSiderealYearDays, meanSolarYearDays, moonArgs, moonDistanceKm, moonSeries,
     moonSiderealMonthInput, moonSynodicMonthDays, obliquityDeg, oneFamilyTropicalYearSeconds, sunEccentricityAt,
     sunPerihelionDegAt, yearFromJD,
@@ -217,7 +217,7 @@ export function assembleSunAndEclipses(ctx) {
     // (the same helper the cardinal instants use), the Moon's relative light-time
     // inside the besselian; the series-extension tail now lives in sceneEvalAt.
     sunAberrationDegAt: /** @param {number} year */ (year) => late.sunAberrationArcsecAt(year) / 3600,
-    deltaTSecondsAt: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
+    deltaTSecondsAt: frameworkDeltaTSecondsAtJD,   // the ONE ΔT (doc 111 §1.31), never a JD difference
     obliquityDegAt: obliquityDeg,
     eccentricityAt: sunEccentricityAt,
     perihelionLongitudeDegAt: sunPerihelionDegAt,

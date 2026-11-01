@@ -17,6 +17,8 @@ import { createModel, createSiderealYearChannel } from '../src/index.js';
 const require = createRequire(import.meta.url);
 const ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const dt = require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
+const C = require(join(ROOT, 'tools', 'lib', 'constants.js'));
+const { jdToDecimalYear } = require('@essrt/physics/moon/arguments');
 // The SHIPPED configuration: the governed secular-series artifact, as the API
 // and both scene engines load it. The Node engine's lunar chain reads the
 // one-source ε (layer A / 3c), which rides the banked series inside ±10 Myr;
@@ -143,7 +145,13 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
     check('moonLonDeg', jd, model.moon.lonDegAtJD(jd), MS.truncatedLonDeg(jd), 0);
     check('moonBetaDeg', jd, model.moon.betaDegAtJD(jd), MS.truncatedBetaDeg(jd), 0);
     check('moonDistanceKm', jd, model.moon.distanceKmAtJD(jd), MS.truncatedDistanceKm(jd), 0);
-    check('frameworkDeltaT', jd, model.eclipse.deltaTSecondsAtJD(jd), dt.frameworkDeltaT(jd), 0);
+    // The finders' ΔT is the engine's ΔT read on the CALENDAR axis — the one
+    // bridge the scene twin and the Moon ride (doc 111 §1.31). The engine's
+    // legacy dt.frameworkDeltaT keeps the snapshot's linear 365.2422-d year
+    // count (tools/lib/deep-time.js is a hashed input of the N-body series)
+    // and is no longer a finder axis anywhere: the two part at 2.14e-5 of the
+    // span before 1582 (0.2 s here at 0 AD, 1.9 d at −1 Myr).
+    check('frameworkDeltaT', jd, model.eclipse.deltaTSecondsAtJD(jd), dt.meanDeltaTSecondsAtAge((C.startmodelYear - jdToDecimalYear(jd)) / 1e6), 0);
   }
 }
 

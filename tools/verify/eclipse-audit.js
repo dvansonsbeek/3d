@@ -350,7 +350,11 @@ const finders = createEclipseFinders({
   // and umbra chain use (model.js), so finder UT and umbra ground track stay
   // a matched pair. Never rebuild these deps locally.
   frameworkSun: TIER.eclipse.frameworkSunDeps,
-  deltaTSecondsAt: (jd) => DT.frameworkDeltaT(jd),
+  // The model's ONE calendar-axis ΔT bridge (the Sun, the Moon and the besselian
+  // tier on one clock — doc 111 §1.31). The engine twin DT.frameworkDeltaT keeps
+  // the snapshot's linear 365.2422-d year count (tools/lib/deep-time.js is a
+  // hashed input of the N-body series) and is no longer a finder axis anywhere.
+  deltaTSecondsAt: (jd) => TIER.eclipse.deltaTSecondsAtJD(jd),
   getSynodicMonthDays: () => C.moonSynodicMonth,
   getSunDistanceKm: () => C.currentAUDistance,
   constants: {

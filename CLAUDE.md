@@ -183,6 +183,12 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   baseline to TODAY's state, never to a window mean (the Antarctic-only era
   read as more ice than today). The deep obliquity VALUE is 450″ per 1e-6 of
   the precession constant at 100 Ma — a band, never a value. (§1.30)
+- **A clock has ONE age axis** — the certified Sun's ΔT read its age off a
+  linear 365.2422-d year count while the Moon, the frame and the scene bridge
+  read the calendar year: 2.14e-5 of the span apart, 1.2 s of TT at −3000 and
+  1.9 days at −1 Myr, a Sun on its own clock that every deep gate on that axis
+  called exact. Name the axis of every bridge; gate a tier's clock against
+  ANOTHER tier's events, never its own (`scene-year-lengths` deep rows). (§1.31)
 
 ---
 
@@ -219,8 +225,9 @@ when `tools/lib` collapses to adapters.
 
 **Scoped tiers** (measured step by step, plan 18 step 0: the full chain
 4.4 min, of which `test:fixtures` 2.0 min — 1.8 of it the plan-06 baseline's
-four deep-time rows — and `test:verify` 1.1 min — 56 s of it the
-scene-sampled `scene-year-lengths` gate; the browser tier 2.5 min with no
+four deep-time rows — and `test:verify` ~3.3 min — 185 s of it the
+scene-sampled `scene-year-lengths` gate since its four deep rows (the rows
+that found the certified Sun's third clock, §1.31); the browser tier 2.5 min with no
 single hotspot). Pick by what the change touches; CI runs `npm run check`
 itself on every push:
 

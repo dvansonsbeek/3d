@@ -76,7 +76,7 @@
         "century": -2900,
         "n": 3652,
         "mean": 0.961151,
-        "sd": 1.729522
+        "sd": 1.729523
       },
       {
         "century": -2800,
@@ -106,7 +106,7 @@
         "century": -2400,
         "n": 3653,
         "mean": 2.143923,
-        "sd": 1.581144
+        "sd": 1.581145
       },
       {
         "century": -2300,
@@ -118,7 +118,7 @@
         "century": -2200,
         "n": 3653,
         "mean": 2.812512,
-        "sd": 1.575712
+        "sd": 1.575713
       },
       {
         "century": -2100,
@@ -130,7 +130,7 @@
         "century": -2000,
         "n": 3653,
         "mean": 2.958262,
-        "sd": 1.485516
+        "sd": 1.485517
       },
       {
         "century": -1900,
@@ -148,7 +148,7 @@
         "century": -1700,
         "n": 3652,
         "mean": 3.139663,
-        "sd": 1.452578
+        "sd": 1.452579
       },
       {
         "century": -1600,
@@ -160,7 +160,7 @@
         "century": -1500,
         "n": 3653,
         "mean": 3.231407,
-        "sd": 1.401282
+        "sd": 1.401283
       },
       {
         "century": -1400,
@@ -178,7 +178,7 @@
         "century": -1200,
         "n": 3652,
         "mean": 4.085237,
-        "sd": 1.355985
+        "sd": 1.355986
       },
       {
         "century": -1100,
@@ -220,7 +220,7 @@
         "century": -500,
         "n": 3653,
         "mean": 4.002522,
-        "sd": 1.138115
+        "sd": 1.138114
       },
       {
         "century": -400,
@@ -232,7 +232,7 @@
         "century": -300,
         "n": 3653,
         "mean": 4.302783,
-        "sd": 1.137247
+        "sd": 1.137246
       },
       {
         "century": -200,
@@ -256,7 +256,7 @@
         "century": 100,
         "n": 3652,
         "mean": 4.271689,
-        "sd": 1.02347
+        "sd": 1.023469
       },
       {
         "century": 200,
@@ -394,7 +394,7 @@
         "century": 2400,
         "n": 3652,
         "mean": -0.71904,
-        "sd": 0.841232
+        "sd": 0.841233
       },
       {
         "century": 2500,
@@ -412,7 +412,7 @@
         "century": 2700,
         "n": 3653,
         "mean": -1.675363,
-        "sd": 0.826687
+        "sd": 0.826688
       },
       {
         "century": 2800,
@@ -441,7 +441,7 @@
         "to": -2000,
         "n": 4000,
         "mean": -0.803066,
-        "sd": 0.847107
+        "sd": 0.847108
       },
       {
         "from": -2000,
@@ -514,7 +514,7 @@
         "century": -2500,
         "n": 400,
         "mean": -0.877855,
-        "sd": 0.76792
+        "sd": 0.767921
       },
       {
         "century": -2400,
@@ -664,7 +664,7 @@
         "century": 0,
         "n": 400,
         "mean": -1.82764,
-        "sd": 0.579981
+        "sd": 0.57998
       },
       {
         "century": 100,
@@ -700,7 +700,7 @@
         "century": 600,
         "n": 400,
         "mean": -1.513221,
-        "sd": 0.595203
+        "sd": 0.595202
       },
       {
         "century": 700,
@@ -866,14 +866,14 @@
       "packages/physics/src/model/derived-constants.js": "sha256:c401d5dcd0879cea6b6ca010e2e9abc7ec9d9288d2ea88aabc29dc162f7fc99a",
       "packages/physics/src/model/earth-scalars.js": "sha256:292024c388ae42ad31976fd7b0cbc98b9736de06b3bc81b7a63667a6f2a959c5",
       "packages/physics/src/model/inv-plane-elements.js": "sha256:97fc18474b126f589d4e29fc69f9e2d59611577afffed1b2a884360fe37f3117",
-      "packages/physics/src/model/lunar-theory.js": "sha256:1c288743d132088eb65393715c364ee20b46ee4fa4a072b725a910f4c5d29162",
+      "packages/physics/src/model/lunar-theory.js": "sha256:2a007daf4a653f819313ca007c48a6b247b32e12cb48a49c2d3f617da5124bd5",
       "packages/physics/src/model/moon-epoch.js": "sha256:6ab1a890b71d8459333d4f8c99a386a030ae199855b308fbd3b926fb77c0daad",
       "packages/physics/src/model/one-source-movement.js": "sha256:83b917aea8d7af2d4af500e6da90f93ecc80247eeb148a1a65cd66dd2fe40101",
       "packages/physics/src/model/planet-elements-of-date.js": "sha256:1069316fec3656c8dc8465314659d5ecf45238c4dce15992b5fdab4985a18731",
       "packages/physics/src/model/planet-records.js": "sha256:0a062111bcd59414736f56b027306690dae054dc4b5ce86812b14f09ff312f7c",
       "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",
       "packages/physics/src/model/published-periods.js": "sha256:1e18f705212f7aeec39bcddeb9fadbba04e2fad2041a97874705f4076cd57189",
-      "packages/physics/src/model/sun-and-eclipses.js": "sha256:6d532202482617774f56c68d2266cb4e65aee27f01a0fbd7b8122ecb468a0aba",
+      "packages/physics/src/model/sun-and-eclipses.js": "sha256:be53e08d31255b4866cdc5788042a386727deca57b24f71dd78855cc8adac796",
       "packages/physics/src/model/surface.js": "sha256:1a6658724d91c4fe4dd4ab75ab5e88c64444403b7424622c0593f2a253419395",
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",

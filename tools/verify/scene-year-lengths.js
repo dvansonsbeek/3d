@@ -57,9 +57,23 @@ const { jdToDecimalYear } = rq('@essrt/physics/moon/arguments');
 
 const REPORT = process.argv.includes('--report');
 const PLANT = process.env.ESSRT_SCENE_YEARS_PLANT === '1' ? 0.1 : 0;
-const EPOCHS = [-4000, 10000];
+// The two era epochs, plus four DEEP rows (the A-section review, 2026-11-01):
+// the gate run at ±100 kyr and ±1 Myr found every level exact and all three
+// measured years long by ONE common amount (+0.18 s at −1 Myr) — the
+// certified Sun's ΔT age rode a linear 365.2422-d year count while the Moon,
+// the frame and this gate ride the calendar axis (doc 111 §1.31). The deep
+// rows pin the Sun to the model's one clock where the era rows cannot see it.
+const EPOCHS = [-4000, 10000, -100000, 100000, -1000000, 1000000];
 const HALF = 100;
 const TOL = { yearS: 0.030, raArcsec: 0.30, epsArcsec: 0.001, e: 1e-6, periArcsec: 3.0, instantS: 8.0, axialYr: 0.3 };
+// The deep rows' year tolerance: the four-cardinal mean cancels the equation
+// of centre's first orders, but with ϖ moving across the window it leaves
+// ~0.04 s where e reaches 0.05 (+1 Myr; measured 0.0003 s at −4000, −0.02 s
+// at −1 Myr) — an estimator floor of the six scene event types, not the
+// model (36 synthetic targets bring it to 0.01 s). Far below the third-clock
+// class it guards (0.05–0.18 s) and the unit slip (seconds).
+const TOL_DEEP_YEAR_S = 0.050;
+const DEEP = (ep) => Math.abs(ep) > 25000;
 
 const BRIDGE = P.FITTED_COEFFICIENTS.DT_ANCHOR.deltaTStartSeconds;   // the joint fit's anchor (plan 14: its own artifact)
 const M = DOH.createOneSourceMovement();
@@ -183,9 +197,10 @@ for (const ep of EPOCHS) {
   const sid = 360 / lsq(tEv, pbar);
   const anom = (yr.PERI + yr.APH) / 2;
   const sidLaw = wMean(YL.siderealYearSecondsAtYear, 'SS') + PLANT, tropLaw = wMean(YL.tropicalYearSecondsAtYear, 'SS'), anomLaw = wMean(YL.anomalisticYearSecondsAtYear, 'PERI');
-  check('sidereal year, scene − law', sid - sidLaw, TOL.yearS, 's');
-  check('mean tropical year, scene − law', trop - tropLaw, TOL.yearS, 's');
-  check('anomalistic year, scene − law', anom - anomLaw, TOL.yearS, 's');
+  const tolYear = DEEP(ep) ? TOL_DEEP_YEAR_S : TOL.yearS;
+  check('sidereal year, scene − law', sid - sidLaw, tolYear, 's');
+  check('mean tropical year, scene − law', trop - tropLaw, tolYear, 's');
+  check('anomalistic year, scene − law', anom - anomLaw, tolYear, 's');
   check('axial precession from the scene pair − law', sid * trop / ((sid - trop) * JY) - wMean(YL.axialPrecessionYearsAtYear, 'SS'), TOL.axialYr, 'Julian yr');
   if (REPORT) lines.push(`  scene: sidereal ${(sid / 86400).toFixed(9)} d · tropical ${(trop / 86400).toFixed(9)} d · anomalistic ${(anom / 86400).toFixed(9)} d`);
 }

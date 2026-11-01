@@ -24,11 +24,11 @@
    "modelFit": {
     "pArcsecPerYr": 50.52500000000019,
     "periodYr": 40916.301650735,
-    "rmsArcsec": 723.3799688594783
+    "rmsArcsec": 723.3799786476285
    },
    "modelPredicted": {
-    "pMeanArcsecPerYr": 50.51868893979572,
-    "periodYr": 40924.45576148823
+    "pMeanArcsecPerYr": 50.518688938082946,
+    "periodYr": 40924.45576370164
    },
    "la2004Fit": {
     "pArcsecPerYr": 50.53800000000019,
@@ -44,76 +44,76 @@
    "13": {
     "hybridRmsArcsec": 529.2476571088214,
     "hybridCorr": 0.9948674108026703,
-    "modeTableRmsArcsec": 529.6364332752229,
-    "modeTableCorr": 0.9948223466251843
+    "modeTableRmsArcsec": 529.6364333510404,
+    "modeTableCorr": 0.9948223466159241
    },
    "50": {
     "hybridRmsArcsec": 388.515271151428,
     "hybridCorr": 0.998130176502265,
-    "modeTableRmsArcsec": 388.81702314167654,
-    "modeTableCorr": 0.9981071963623498
+    "modeTableRmsArcsec": 388.81702350455544,
+    "modeTableCorr": 0.9981071963762546
    },
    "130": {
     "hybridRmsArcsec": 379.90727214756583,
     "hybridCorr": 0.9961814700400722,
-    "modeTableRmsArcsec": 381.01095775685945,
-    "modeTableCorr": 0.9960953644055611
+    "modeTableRmsArcsec": 381.01095781001686,
+    "modeTableCorr": 0.996095364502796
    },
    "270": {
     "hybridRmsArcsec": 429.2581106565938,
     "hybridCorr": 0.9924615522020998,
-    "modeTableRmsArcsec": 452.476451308275,
-    "modeTableCorr": 0.9909036900559833
+    "modeTableRmsArcsec": 452.47644687420177,
+    "modeTableCorr": 0.9909036904580442
    },
    "600": {
     "hybridRmsArcsec": 586.3751287544526,
     "hybridCorr": 0.9732954970595473,
-    "modeTableRmsArcsec": 645.0558014306167,
-    "modeTableCorr": 0.966358536811723
+    "modeTableRmsArcsec": 645.0557890597744,
+    "modeTableCorr": 0.9663585384682464
    },
    "1000": {
     "hybridRmsArcsec": 685.9804515878168,
     "hybridCorr": 0.948335558436917,
-    "modeTableRmsArcsec": 767.887265639426,
-    "modeTableCorr": 0.9328766068713495
+    "modeTableRmsArcsec": 767.8872500441146,
+    "modeTableCorr": 0.9328766101778018
    }
   },
   "windowsEra": {
    "13": {
     "hybridRmsArcsec": 49.944157102338636,
     "hybridCorr": 0.9998292700143777,
-    "modeTableRmsArcsec": 529.6364332752229,
-    "modeTableCorr": 0.9948223466251843
+    "modeTableRmsArcsec": 529.6364333510404,
+    "modeTableCorr": 0.9948223466159241
    },
    "50": {
     "hybridRmsArcsec": 426.79760627742786,
     "hybridCorr": 0.9905694392337773,
-    "modeTableRmsArcsec": 388.81702314167654,
-    "modeTableCorr": 0.9981071963623498
+    "modeTableRmsArcsec": 388.81702350455544,
+    "modeTableCorr": 0.9981071963762546
    },
    "130": {
     "hybridRmsArcsec": 488.2114773546891,
     "hybridCorr": 0.9820574949968871,
-    "modeTableRmsArcsec": 381.01095775685945,
-    "modeTableCorr": 0.9960953644055611
+    "modeTableRmsArcsec": 381.01095781001686,
+    "modeTableCorr": 0.996095364502796
    },
    "270": {
     "hybridRmsArcsec": 489.73940495182984,
     "hybridCorr": 0.9821222319932994,
-    "modeTableRmsArcsec": 452.476451308275,
-    "modeTableCorr": 0.9909036900559833
+    "modeTableRmsArcsec": 452.47644687420177,
+    "modeTableCorr": 0.9909036904580442
    },
    "600": {
     "hybridRmsArcsec": 547.831379914776,
     "hybridCorr": 0.9724534889428793,
-    "modeTableRmsArcsec": 645.0558014306167,
-    "modeTableCorr": 0.966358536811723
+    "modeTableRmsArcsec": 645.0557890597744,
+    "modeTableCorr": 0.9663585384682464
    },
    "1000": {
     "hybridRmsArcsec": 643.8617845834913,
     "hybridCorr": 0.9496615204774437,
-    "modeTableRmsArcsec": 767.887265639426,
-    "modeTableCorr": 0.9328766068713495
+    "modeTableRmsArcsec": 767.8872500441146,
+    "modeTableCorr": 0.9328766101778018
    }
   }
  },
@@ -135,14 +135,14 @@
    "packages/physics/src/model/derived-constants.js": "sha256:c401d5dcd0879cea6b6ca010e2e9abc7ec9d9288d2ea88aabc29dc162f7fc99a",
    "packages/physics/src/model/earth-scalars.js": "sha256:292024c388ae42ad31976fd7b0cbc98b9736de06b3bc81b7a63667a6f2a959c5",
    "packages/physics/src/model/inv-plane-elements.js": "sha256:97fc18474b126f589d4e29fc69f9e2d59611577afffed1b2a884360fe37f3117",
-   "packages/physics/src/model/lunar-theory.js": "sha256:1c288743d132088eb65393715c364ee20b46ee4fa4a072b725a910f4c5d29162",
+   "packages/physics/src/model/lunar-theory.js": "sha256:2a007daf4a653f819313ca007c48a6b247b32e12cb48a49c2d3f617da5124bd5",
    "packages/physics/src/model/moon-epoch.js": "sha256:6ab1a890b71d8459333d4f8c99a386a030ae199855b308fbd3b926fb77c0daad",
    "packages/physics/src/model/one-source-movement.js": "sha256:83b917aea8d7af2d4af500e6da90f93ecc80247eeb148a1a65cd66dd2fe40101",
    "packages/physics/src/model/planet-elements-of-date.js": "sha256:1069316fec3656c8dc8465314659d5ecf45238c4dce15992b5fdab4985a18731",
    "packages/physics/src/model/planet-records.js": "sha256:0a062111bcd59414736f56b027306690dae054dc4b5ce86812b14f09ff312f7c",
    "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",
    "packages/physics/src/model/published-periods.js": "sha256:1e18f705212f7aeec39bcddeb9fadbba04e2fad2041a97874705f4076cd57189",
-   "packages/physics/src/model/sun-and-eclipses.js": "sha256:6d532202482617774f56c68d2266cb4e65aee27f01a0fbd7b8122ecb468a0aba",
+   "packages/physics/src/model/sun-and-eclipses.js": "sha256:be53e08d31255b4866cdc5788042a386727deca57b24f71dd78855cc8adac796",
    "packages/physics/src/model/surface.js": "sha256:1a6658724d91c4fe4dd4ab75ab5e88c64444403b7424622c0593f2a253419395",
    "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
    "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",

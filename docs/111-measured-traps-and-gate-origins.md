@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.4
+modelVersion: v27.5
 coefficients: sha256:76157eae2501907c
 status: current
 ---
@@ -689,6 +689,50 @@ Antarctic glaciation and +2.0·10⁻⁵ after it; the deep obliquity's VALUE
 moves by degrees (its sensitivity, 450″ per 10⁻⁶ at 100 Ma, is the reason it
 is served as a band — §1.29).
 
+### 1.31 A clock has ONE age axis — a third one hides from every gate that rides it
+
+**Measured** (the A-section review, 2026-11-01). The scene-year-lengths gate,
+run at ±100 kyr and ±1 Myr instead of its −4000/+10,000, found every level
+exact (RA ≤ 0.23″, the solstice declination against ε 10⁻⁸″, e 2·10⁻⁷, the
+perihelion 1.5″, the published cardinal instants ≤ 6 s) and all three measured
+years — sidereal, tropical AND anomalistic — long by ONE common amount:
++0.18 s at −1 Myr, +0.05 at −100 kyr, +0.005 at −25 kyr, +0.08 at +1 Myr.
+Three years with different physics sharing one offset is the time axis, not
+the orbit. Ruled out by measurement: the Sun's mean-longitude table (≡ the
+law to 3 ms at every epoch), the gate's own age mapping (0.03 s), every
+bridge's rate (the scene's, the package's `jdTTFromUT`, the epoch section —
+all within 1 ms/yr of each other). Synthetic crossings pinned it: events of
+the mean-longitude table matched the laws everywhere; events of the eclipse
+tier's longitude reproduced the gate exactly. **The cause:** the eclipse
+tier's ΔT (`frameworkDeltaTSecondsAtJD`, the clock of the certified Sun the
+scene displays and the finders search on) read its age off a LINEAR count of
+365.2422-d years from the model start, while the Moon, the frame, the
+besselian tier and the scene bridge read the CALENDAR decimal year — 365.25-d
+years before 1582. Two age axes 2.14·10⁻⁵ apart: 0.04 yr at −3000, 21 yr at
+−1 Myr, 9,000 yr at −400 Myr, times the ΔT rate — the certified Sun sat 1.2 s
+of TT from the Moon at −3000, 108 s (4.4″) at −25 kyr, 1.9 d (1.9°) at −1 Myr,
+850 yr at −400 Myr. In the era below every referee (the canon floor is 20 min);
+at depth a Sun on its own clock against the Moon and the planets, and a deep
+eclipse list searched with it. **Why no gate saw it:** every deep Sun check
+was a tautology on that axis — the published cardinal instants, the RA at the
+cardinals and the perihelion level compare the eclipse tier's Sun with itself
+or with the frame its longitude is defined in; the era rows of the one gate
+that measures against the LAWS sit where the gap is a millisecond. **The
+fix:** one ΔT — `frameworkDeltaTSecondsAtJD` computed directly on the
+calendar age, and the UT→TT bridge, the finders and the besselian dependency
+all read it (never recovered as a JD difference: two JDs near 2.4 million
+subtract to 1e-5 s of round-off, which broke the bit-exact parity pin on the
+first cut), the audit's referee reads the model's bridge, and the gate
+carries the deep rows (±100 kyr, ±1 Myr; the
+four-cardinal estimator's floor of ~0.04 s at e = 0.05 named in its
+tolerance). The Node twin `frameworkDeltaT` keeps the snapshot's linear count
+— `tools/lib/deep-time.js` is a hashed input of the N-body series — and is no
+longer a finder axis anywhere. **The rule:** a model has as many clocks as it
+has age mappings; name the axis of every bridge at the boundary (the three
+year axes of plan 06 — calendar, engine, SI-tropical count — are three
+CLOCKS when a ΔT reads them), and gate a tier's clock against another tier's
+events, never against its own.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -869,10 +913,14 @@ formulas, the registry two frozen values of retired laws. Fail-proven via
 + the plan-06 baseline — the clock-carrying quantities on the ±26-kyr
 wander window and the deep-time anchors, bit-exact across the
 lunisolar-clock restatement. The fifth model gate, `scene-year-lengths.js`,
-samples the Node scene twin at −4000 and +10,000 with the solar-measurements
-exporter's own event definitions and pins the measured sidereal, tropical
-and anomalistic years of date to the one-family laws within 30 ms
-(fail-proven via `ESSRT_SCENE_YEARS_PLANT=1`).
+samples the Node scene twin at −4000 and +10,000 — and, since the A-section
+review, at ±100 kyr and ±1 Myr — with the solar-measurements exporter's own
+event definitions and pins the measured sidereal, tropical and anomalistic
+years of date to the one-family laws within 30 ms in the era and 50 ms on the
+deep rows (the four-cardinal estimator's ~0.04-s floor at e = 0.05; the deep
+rows are the ones that saw the certified Sun's third clock, §1.31 — +0.18 s
+at −1 Myr where the era rows read a millisecond; fail-proven via
+`ESSRT_SCENE_YEARS_PLANT=1`).
 
 **The plant variables, one per fail-proven gate** (the list CLAUDE.md
 points to; each gate's header states its own plant in full):

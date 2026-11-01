@@ -13,8 +13,8 @@ import { driver2PeriodSecondsAtAge } from '../planets/orbit-chain.cjs';
 export function assembleLunarTheory(ctx) {
   const {
     C, F, late, options, EPOCH_PARAMS, axialPrecessionJ2000Days, chain, deepEcc, deepLod, meanDeltaTSecondsAtAge,
-    meanSiderealYearDays, meanSolarYearDays, meanTropicalYearJ2000Seconds, moonChain, moonDistanceKm,
-    moonDistanceMetresAtAge, moonSiderealMonth, oneSourceM, startmodelJD, startmodelYear, sunPerihelionDegAt,
+    meanSiderealYearDays, meanTropicalYearJ2000Seconds, moonChain, moonDistanceKm,
+    moonDistanceMetresAtAge, moonSiderealMonth, oneSourceM, startmodelYear, sunPerihelionDegAt,
     yearFromJD,
   } = ctx;
   // PLAN 25 — the lunar cumulative bank (data/lunar-cumulative-checkpoints.json, parsed, or null): the
@@ -170,20 +170,23 @@ export function assembleLunarTheory(ctx) {
   // UT→TT on the CALENDAR decimal-year coordinate (script.js Phase 9.16 —
   // a linear-year approximation here once cost ~5–6 s of ΔT and ~1e-3° of
   // Moon longitude at the Babylonian epochs)
-  /** @param {number} jd @returns {number} */
-  const jdTTFromUT = (jd) => {
-    const tMa = (startmodelYear - jdToDecimalYear(jd)) / 1e6;
-    const dT = meanDeltaTSecondsAtAge(tMa);
-    return Number.isFinite(dT) ? jd + dT / 86400 : jd;
-  };
-  // ΔT at a JD on the CALENDAR-year axis (mirrors deep-time frameworkDeltaT;
-  // NOT deltaTSeconds of delta-t.js, which adds the deltaTStart anchor)
+  // ONE ΔT on ONE age axis: the eclipse finders' Sun, the Moon, the besselian
+  // tier and the scene bridge all read it (NOT deltaTSeconds of delta-t.js,
+  // which adds the deltaTStart anchor). Until 2026-11 the finders' ΔT read its
+  // age off a linear 365.2422-d year count from the model start — 2.14e-5 of
+  // the span from the calendar axis before 1582: 1.2 s of TT at −3000, 108 s
+  // at −25 kyr, 1.9 d at −1 Myr — so the certified Sun ran on a third clock
+  // against the Moon and the planets, unseen by every gate on that axis
+  // (doc 111 §1.31). Computed directly, never recovered from a JD difference
+  // (two JDs near 2.4 million subtract to 1e-5 s of round-off).
   /** @param {number} jd @returns {number} */
   const frameworkDeltaTSecondsAtJD = (jd) => {
-    const decYear = startmodelYear + (jd - startmodelJD) / meanSolarYearDays;
-    const dT = meanDeltaTSecondsAtAge((startmodelYear - decYear) / 1e6);
+    const tMa = (startmodelYear - jdToDecimalYear(jd)) / 1e6;
+    const dT = meanDeltaTSecondsAtAge(tMa);
     return Number.isFinite(dT) ? dT : 0;
   };
+  /** @param {number} jd @returns {number} */
+  const jdTTFromUT = (jd) => jd + frameworkDeltaTSecondsAtJD(jd) / 86400;
 
   // Bounded Meeus E-factor from the ONE deep e (decision (ii); the
   // pure-Meeus polynomial A/B branch stays engine-local)
