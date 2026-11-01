@@ -34,7 +34,7 @@
  *     packages — regenerate + republish @essrt/model-values after a refit
  *     (npm run values:package:write). Then re-run
  *     tools/fit/validate-resonator.js.
- *   Shipped state (plan 06 T2 item — the ecliptic term on the nodal period):
+ *   Shipped state (the ecliptic term on the nodal period):
  *   USNO 86400.0021 (fit measured-day basis), deltaTStart 54.55, Espenak
  *   13.4 s, full-window 28.8 s; episode −1600 → +1600;
  *   resonator default-ON runtime-wide (opt-out DT_RESONATOR_DISABLED=1).
@@ -139,7 +139,7 @@ const C = require(path.join(TOOLS_LIB, 'constants.js'));
 // The artifact's own description — ONE string for the legacy and the joint
 // writers (the joint ship refreshes `_meta` and `config` from the code, so the
 // record follows the fitter and no fossil field survives a re-close).
-const META_DESCRIPTION = 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against the Stephenson 2016 residual. Four cycles — Bond 1,466 yr, Hallstatt 2,430 yr, 5×Jose 897 yr, 4×Jose 716 yr — plus the core-mantle resonator episode, fitted JOINTLY (--joint: one design matrix, the USNO/deltaTStart anchors re-optimised with the coefficients, hard closure at J2000, amplitude caps). The legacy single-shot cascade (Bond solo → +Hallstatt → +Jose5 → +Jose4) survives as a stage-wise diagnostic only (fit_metrics). The periods were selected on a retired lattice (plan 09; the records are in each cycle\'s `structural` string and docs/102); the Eddy (999 yr) and Emp862 (862 yr) candidates were tested as 5th/6th flags and rolled back — see the rollback notes in CONFIG.cycles. Narrative: docs/104; the flag audit: docs/105.';
+const META_DESCRIPTION = 'Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against the Stephenson 2016 residual. Four cycles — Bond 1,466 yr, Hallstatt 2,430 yr, 5×Jose 897 yr, 4×Jose 716 yr — plus the core-mantle resonator episode, fitted JOINTLY (--joint: one design matrix, the USNO/deltaTStart anchors re-optimised with the coefficients, hard closure at J2000, amplitude caps). The legacy single-shot cascade (Bond solo → +Hallstatt → +Jose5 → +Jose4) survives as a stage-wise diagnostic only (fit_metrics). The periods were selected on a retired divisor set (the records are in each cycle\'s `structural` string and docs/102); the Eddy (999 yr) and Emp862 (862 yr) candidates were tested as 5th/6th flags and rolled back — see the rollback notes in CONFIG.cycles. Narrative: docs/104; the flag audit: docs/105.';
 
 const CONFIG = {
   cycles: [
@@ -156,11 +156,11 @@ const CONFIG = {
       fit_stage:  'with_bond_hallstatt',
       target_amp_s: 50 },
     { name: 'jose4',    period_yr: 715.5337423312883,
-      structural: '4×Jose 179 yr = 715.5 yr; historical selection record: the former divisor 3749 (gcd 23). Cross-archive coherent in Steinhilber solar Φ + EPICA CO2 (the retired lattice harmonic scan, plan 09 step 7e — the record is docs/102). Also degenerate with Bond/2 at ~733 yr; 4×Jose is the tighter anchor (0.083 % vs 2.5 %).',
+      structural: '4×Jose 179 yr = 715.5 yr; historical selection record: the former divisor 3749 (gcd 23). Cross-archive coherent in Steinhilber solar Φ + EPICA CO2 (the retired harmonic scan — the record is docs/102). Also degenerate with Bond/2 at ~733 yr; 4×Jose is the tighter anchor (0.083 % vs 2.5 %).',
       fit_stage:  'with_bond_hallstatt_jose5',
       target_amp_s: 50 },
     { name: 'h253',     period_yr: 1325.3636363636363,
-      structural: '1,325.4 yr; historical selection record: the former divisor 253 = 11·23 (gcd 23), the 184th harmonic of the retired perihelion-family divisor. Identified 2026-07-22 by the L-5b §14 post-4-flag residual scan (flat ΔR² = 0.031 peak over divisors 2015–2024, the gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98 → 17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, the retired lattice scan); Steinhilber marginal (~95 % threshold); cap-only ship keeps the amplitude below the free fit.',
+      structural: '1,325.4 yr; historical selection record: the former divisor 253 = 11·23 (gcd 23), the 184th harmonic of the retired perihelion-family divisor. Identified 2026-07-22 by the L-5b §14 post-4-flag residual scan (flat ΔR² = 0.031 peak over divisors 2015–2024, the gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98 → 17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, the retired harmonic scan); Steinhilber marginal (~95 % threshold); cap-only ship keeps the amplitude below the free fit.',
       fit_stage:  'frozen_residual_after_D',
       target_amp_s: 75 },
     // Eddy (999.45 yr) TESTED AND ROLLED BACK 2026-07-12: the 5-cycle joint fit
@@ -1230,7 +1230,7 @@ function main() {
     const fitPhantom = fitCycles(years, residualFinal, [2024], null, sampleWeights);
     const ph = fitPhantom.cycles[0];
     const polyOnly = fitCycles(years, residualFinal, [], null, sampleWeights);
-    console.log('── Post-closure phantom check (8H/2024 line vs final shipped residual) ──');
+    console.log('── Post-closure phantom check (the retired phantom line vs final shipped residual) ──');
     console.log(`  phantom amp = ${ph.amplitude.toFixed(2)} s  (Bond-only closure historically ~73–85 s; target ≲ 12 s)`);
     console.log(`  final shipped-stack residual RMS (poly-detrended) = ${polyOnly.rms_post.toFixed(1)} s (all)  ${polyOnly.rms_post_modern ? polyOnly.rms_post_modern.toFixed(1) + ' s (≥1600)' : ''}`);
     console.log('');
@@ -1802,7 +1802,7 @@ function runJointMode() {
   rb.impulse_consistent = true;
   rb.drive_tones[0].amp_s = toneAmp;
   rb.drive_tones[0].retired = COMP.res_tone ? undefined
-    : ('RETIRED (plan 06 D7 follow-up, 2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA '
+    : ('RETIRED (2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA '
        + 'channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase '
        + 'kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS).');
   // Raw (unanchored) resonator value + implied δLOD at J2000 — the closure
@@ -1818,7 +1818,7 @@ function runJointMode() {
   rb.lod_raw_at_j2000_s_per_day = 86400 * resDCdy / MEAN_TROPICAL_YEAR_J2000_S;
   rb.rms_s = best.rmsFull;
   rb.status = ('JOINT WORLD SHIPPED (--joint --write): the two impulse kicks from the joint '
-    + 'equality-constrained fit, the drive tone retired at amplitude 0 (plan 06 D7 follow-up); '
+    + 'equality-constrained fit, the drive tone retired at amplitude 0; '
     + 'phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.');
   console.log(`  deltaTStart = ${best.dts.toFixed(4)} s (ships inside data/deltaT-4flag-fit.json → FIT.DT_ANCHOR)`);
 

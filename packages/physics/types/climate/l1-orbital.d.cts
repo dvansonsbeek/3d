@@ -39,16 +39,15 @@ export function evalClimateL1OrbitalPermil(year: number, regime: ClimateL1Regime
  * with ⟨L1⟩_τ the causal exponential average over the PAST (time constant τ).
  * Every L1 line passes that filter as a line, Ĉ' = Ĉ · iωτ/(1 + iωτ) with
  * Ĉ = a + ib in physical time, so the evaluator stays a sinusoid sum and each
- * runtime's lattice-α pin and memo are untouched. k > 0 is the direct-load
+ * runtime's α pin and memo are untouched. k > 0 is the direct-load
  * sign (an uncompensated ice load lowers α); after a rapid deglaciation
  * L1 − ⟨L1⟩ < 0, α sits above equilibrium and relaxes for ~τ — today's
  * −0.35 ms/cy non-tidal drift is that tail. k is DERIVED at construction so
  * that dα/dt(J2000) equals the satellite-gravimetry rate (Cox & Chao 2002
  * dJ₂/dt ÷ the Peltier J₂→α factor): no stored scale. τ was MEASURED against
  * the historical ΔT record through the joint fitter (optimum 5–6 kyr,
- * the degree-2 Maxwell estimate; plan 06 D7 record). Replaces the
- * instantaneous α ∝ L1 law, which had the deglacial transient's sign and
- * timing backwards and depended on fitted comb lines the T1 test retired.
+ * the degree-2 Maxwell estimate). Replaces the instantaneous α ∝ L1 law,
+ * which had the deglacial transient's sign and timing backwards (doc 109 §23).
  *
  * @param {Array<{period_kyr: number, a: number, b: number}>} l1Terms
  * @param {number} relaxationKyr - τ in kyr
@@ -120,7 +119,7 @@ export function laggedL1Terms(l1Terms: Array<{
  * }} cfg - relaxationKyr, alphaGiaRateJ2000PerYr and j2RateJ2000PerYr are the
  *   assembled deepTime block (DEFAULT_CONSTANTS.deepTime: τ the banked record
  *   data/deep-time-fitted.json, the rates derived from astro-reference
- *   giaCoxChaoPeltier — plan 11 step 1); alphaJ2000 the IERS moment-of-inertia
+ *   giaCoxChaoPeltier); alphaJ2000 the IERS moment-of-inertia
  *   factor; j2J2000 Earth's J₂ (astro-reference). `regimes` ordered young → old
  *   (the first holds J2000 and sets the normalisation); `iceInventory` the
  *   deepTime.iceInventory block (astro-reference giaIceInventory).

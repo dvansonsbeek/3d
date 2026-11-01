@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // DEEP-TIME CHAIN — the Node twin of the browser's mean*AtAge family
 //
-// Since plan 13 B2 the chain is assembled ONCE in
+// The chain is assembled ONCE in
 // @essrt/physics/deltat/deep-time-chain (the GIA α channel, the Layer-0
 // bundle, the cited Moon-distance history, the ΔT cycle stack, |s₃|, the
 // LOD/ΔT core and the lunar month chain, from the generated constants and
@@ -151,7 +151,7 @@ function _cumulIntegralJ2000IdxGet() { return Math.round((C.startmodelYear - _CU
 function _cumulIntegralLength() { return Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1; }
 
 // Year↔JD under deep time: ONE implementation, @essrt/physics/phase/deep-calendar;
-// each engine builds it from its own grid, days-per-year source and lattice-α pin.
+// each engine builds it from its own grid, days-per-year source and α pin.
 const { createDeepCalendar } = _req('@essrt/physics/phase/deep-calendar');
 let _deepCalM = null;
 function _deepCal() {
@@ -180,8 +180,8 @@ function yearToJDDeepTime(year) { return _deepCal().yearToJD(year); }
 // Scene time coordinate ↔ JD (R4): `pos` counts tropical years since startmodelJD;
 // under deep time the conversion is the INTEGRAL of the drifting rate (the
 // rectangle form doubles the accumulated drift). Operation-for-operation the
-// browser twin's (Gate C). Real α(t), not the lattice reference — a physical
-// time conversion, not a lattice count. Out of domain → null, the caller falls back.
+// browser twin's (Gate C). Real α(t), not the pinned reference — a physical
+// time conversion, not a count. Out of domain → null, the caller falls back.
 let _cumulPosTable = null;
 const _posDpy = (year) => meanTropicalYearDaysAtAge((C.startmodelYear - year) / 1e6);
 let _posAnchorLo = null, _posAnchorDy0 = null;

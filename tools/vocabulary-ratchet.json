@@ -1,56 +1,11 @@
 {
   "_comment": "Retired-vocabulary RATCHET (plan 06 D3). Counts may only go DOWN. Regenerate: node tools/check-vocabulary.mjs --write",
   "files": {
-    "code:packages/physics/src/climate/l1-orbital.cjs": {
-      "comb / lattice": 3,
-      "plan-step label": 2
-    },
-    "code:packages/physics/src/deltat/cycles.cjs": {
-      "H-divisor label": 3,
-      "plan-step label": 2
-    },
-    "code:packages/physics/src/deltat/deep-time-chain.js": {
-      "comb / lattice": 4,
-      "plan-step label": 4
-    },
-    "code:packages/physics/src/deltat/deep-time.cjs": {
-      "comb / lattice": 1
-    },
     "code:packages/physics/src/earth/deep-orbital-history.cjs": {
-      "comb / lattice": 2,
-      "plan-step label": 5
-    },
-    "code:packages/physics/src/earth/mean-obliquity-history.cjs": {
-      "plan-step label": 2
-    },
-    "code:packages/physics/src/earth/precession-composed.cjs": {
-      "H-divisor label": 1,
-      "plan-step label": 1
+      "comb / lattice": 1
     },
     "code:packages/physics/src/planets/keplerian-chain.cjs": {
       "plan-step label": 1
-    },
-    "code:packages/fitting/src/dt-corrections-fit.cjs": {
-      "H-divisor label": 1,
-      "comb / lattice": 3,
-      "plan-step label": 4
-    },
-    "code:packages/fitting/src/sun-planetary-completion-fit.cjs": {
-      "plan-step label": 2
-    },
-    "code:tools/lib/constants.js": {
-      "comb / lattice": 1,
-      "deletion narrative": 1,
-      "plan-step label": 3
-    },
-    "code:tools/lib/deep-time.js": {
-      "comb / lattice": 3,
-      "plan-step label": 1
-    },
-    "code:tools/lib/python/constants_scripts.py": {
-      "comb / lattice": 2,
-      "deletion narrative": 2,
-      "plan-step label": 6
     },
     "code:tools/verify/deep-secular-modes.js": {
       "H-divisor label": 1,
@@ -60,23 +15,7 @@
       "comb / lattice": 6
     },
     "code:tools/verify/secular-series.js": {
-      "era device / K device": 1,
-      "comb / lattice": 4,
-      "plan-step label": 3
-    },
-    "code:tools/fit/python/_dump_constants.js": {
-      "H-divisor label": 1,
-      "era device / K device": 1,
-      "comb / lattice": 1,
-      "deletion narrative": 6,
-      "plan-step label": 10
-    },
-    "code:tools/fit/python/load_constants.py": {
-      "H-divisor label": 2,
-      "era device / K device": 2,
-      "comb / lattice": 3,
-      "deletion narrative": 5,
-      "plan-step label": 6
+      "comb / lattice": 3
     }
   }
 }

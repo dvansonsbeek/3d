@@ -12,8 +12,8 @@ Data sources:
   - Masses: JPL DE440 (solar mass units)
   - J2000 eccentricities: NASA Planetary Fact Sheet
   - Base eccentricities: the model's midpoint predictions
-  - Inclination amplitudes: RETIRED with the ψ law (plan 07 R5) — the
-    N-body chain carries a planet's inclination of date
+  - Inclination amplitudes: RETIRED (doc 109 §23) — the N-body chain carries
+    a planet's inclination of date
   - Semi-major axes: NASA Planetary Fact Sheet (AU)
   - Orbital periods: Derived from semi-major axes (years)
   - Oscillation period fractions: the model's (T_osc/H = a/b)
@@ -21,7 +21,7 @@ Data sources:
 Framework (2025):
   - Single ψ-constant for all 8 planets
   - Pure Fibonacci divisors d ∈ {3, 5, 21, 34}
-  - Saturn sole anti-phase planet (MAX inclination at balanced year)
+  - Saturn sole anti-phase planet (MAX inclination at the phase origin)
   - Six laws: Inclination Amplitude, Inclination Balance, Eccentricity Balance,
     Perihelion Argument, Eccentricity Formation, and Precession Rate
 """
@@ -45,12 +45,12 @@ from load_constants import C as _C
 
 PHI = (1 + math.sqrt(5)) / 2  # Golden ratio ≈ 1.618034
 J2000_YEAR = 2000
-BALANCE_YEAR = _C['balancedYear']   # plan 07 R10: 2000 — the combs' phase origin is J2000
+BALANCE_YEAR = _C['balancedYear']   # 2000 — the phase origin is J2000
 
 # Model reference point
 _START_MODEL_JD = _C['startmodelJD']
 JUNE_SOLSTICE_2000_JD = _C['ASTRO_REFERENCE']['juneSolstice2000_JD']
-_START_MODEL_YEAR = _C['startmodelYear']   # plan 11 step 5: the epoch itself (correctionDays is deleted)
+_START_MODEL_YEAR = _C['startmodelYear']   # the epoch itself
 _MEAN_SOLAR_YEAR = _C['meanSolarYearDays']
 BALANCED_JD = _C['balancedJD']
 
@@ -178,7 +178,7 @@ ECC_J2000["Earth"] = _C['ASTRO_REFERENCE']['earthEccentricityJ2000']
 # the observed values the N-body chain is anchored on.
 
 AXIAL_TILT = {p['name']: p['axialTiltJ2000'] for p in _C['planets'].values()}
-AXIAL_TILT["Earth"] = _C['ASTRO_REFERENCE']['obliquityJ2000_deg']   # the IAU 2006 J2000 anchor (plan 11 step 4: was the K scaffold's mean tilt)
+AXIAL_TILT["Earth"] = _C['ASTRO_REFERENCE']['obliquityJ2000_deg']   # the IAU 2006 J2000 anchor
 
 LONGITUDE_PERIHELION = {p['name']: p['longitudePerihelion'] for p in _C['planets'].values()}
 LONGITUDE_PERIHELION["Earth"] = _C['ASTRO_REFERENCE']['earthPerihelionLongitudeJ2000']  # 102.947
@@ -240,10 +240,7 @@ INCL_J2000["Earth"] = 1.5787  # Souami & Souchay 2012
 OMEGA_J2000 = {p['name']: p['ascendingNodeInvPlane'] for p in _C['planets'].values()}
 OMEGA_J2000["Earth"] = _C['earthAscendingNodeInvPlane']  # 284.51
 
-# (Plan 07 R8: INCL_CYCLE_ANCHOR — the per-planet phase anchors of the retired
-# ψ inclination law (model-parameters inclinationCycleAnchor) — left with the
-# law's inputs. Earth's anchor, EARTH_INCL_CYCLE_ANCHOR, stays: it phases the
-# eccentricity channel and is R10's subject.)
+# (the retired ψ inclination law's per-planet phase anchors: doc 109 §23)
 
 # J2000 orbital inclination to ecliptic (from constants.js eclipticInclinationJ2000)
 INCL_ECLIPTIC = {p['name']: round(p['eclipticInclinationJ2000'], 3) for p in _C['planets'].values()}
@@ -297,8 +294,8 @@ FIB_SET = set(FIB_MATCH)
 def xi(planet, use_j2000=True):
     """Mass-weighted eccentricity: ξ = e × √m
 
-    Plan 07 R6: the `use_j2000=False` branch read ECC_BASE, the retired K
-    law's construction. The observed J2000 eccentricity is now the only
+    The `use_j2000=False` branch once read ECC_BASE, a retired construction
+    (doc 109 §23). The observed J2000 eccentricity is now the only
     source, and the parameter is kept only so existing call sites still work.
     """
     e = ECC_J2000[planet]

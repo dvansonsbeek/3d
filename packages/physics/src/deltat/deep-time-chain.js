@@ -1,5 +1,5 @@
 /**
- * THE DEEP-TIME CHAIN — ONE assembly (holisticuniverse plan 13 B2).
+ * THE DEEP-TIME CHAIN — ONE assembly.
  *
  * Before B2 three runtimes assembled the same chain by hand from the same
  * factories — `packages/physics/src/model.js`, `tools/lib/deep-time.js`
@@ -12,7 +12,7 @@
  * theirs (the browser's research toggles and snapshot mode, the Node
  * engine's env gates and scene grid, the model's one-source movement).
  *
- * Bit-identity rule (plan 13 §2.6): every operation here is the twins'
+ * Bit-identity rule: every operation here is the twins'
  * operation in the twins' order — floating point is not associative, and
  * the goldens pin the values.
  *
@@ -134,7 +134,7 @@ export function createDeepTimeChain(deps) {
     generalPrecessionArcsecPerYr: C.earthOrbital.generalPrecessionJ2000_arcsecPerYr,
   });
 
-  // ── α(t): the GIA channel (lagged L1 response), the memo and the lattice pin ──
+  // ── α(t): the GIA channel (lagged L1 response), the memo and the α pin ──
   // PLAN 26 — the ice-volume history: the three LR04 regimes each inside its own fit window
   // (nothing extrapolated), the 405-kyr line out of the ice proxy, the cited inventory's
   // baseline beyond the record (Greenland absent before the NH glaciation, all ice before the
@@ -155,9 +155,9 @@ export function createDeepTimeChain(deps) {
     j2RateJ2000PerYr: C.deepTime.j2RateJ2000PerYr,
     j2J2000: C.physicalConstants.earthJ2,
   });
-  // R2 — the α lattice reference: while a lattice table is being BUILT α is
-  // held at its J2000 reference, or the lattice defines itself in terms of
-  // its own output. Save/restore under try/finally.
+  // The α reference: while a table is being BUILT α is held at its J2000
+  // reference, or the table defines itself in terms of its own output.
+  // Save/restore under try/finally.
   let latticeAlphaRef = false;
   /** @param {() => void} build */
   const withLatticeAlpha = (build) => { const prev = latticeAlphaRef; latticeAlphaRef = true; try { build(); } finally { latticeAlphaRef = prev; } };
@@ -210,7 +210,7 @@ export function createDeepTimeChain(deps) {
     alpha1PerMa: EPOCH_PARAMS.alpha1PerMa,
   });
   // The cited mean obliquity ε̄(t) — the second column of the same history
-  // (plan 12 §8 option (a)): the precession RATE of date is the constant's
+  // the precession RATE of date is the constant's
   // scaling × cos ε̄(t)/cos ε̄(0); the hybrid keeps integrating on the constant.
   const meanObliquity = createMeanObliquityHistory({ table: deps.moonDistanceArtifact });
 
@@ -431,7 +431,7 @@ export function createDeepTimeChain(deps) {
     meanLodHoursAtAge: deepLod.lodHoursAtAge,
     meanLunisolarPrecessionRateArcsecPerYrAtAge: deepLod.lunisolarPrecessionRateArcsecPerYrAtAge,
     meanLunisolarPrecessionPeriodYearsAtAge,
-    // the constant's scaling alone (the hybrid's integrand), the rate's obliquity factor and the cited mean (plan 12 §8)
+    // the constant's scaling alone (the hybrid's integrand), the rate's obliquity factor and the cited mean
     meanLunisolarTorqueRateArcsecPerYrAtAge: deepLod.lunisolarTorqueRateArcsecPerYrAtAge,
     meanLunisolarTorquePeriodYearsAtAge: deepLod.lunisolarTorquePeriodYearsAtAge,
     precessionObliquityFactorAtAge: deepLod.precessionObliquityFactorAtAge,

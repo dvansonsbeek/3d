@@ -9,7 +9,7 @@
  * INJECTED, by design:
  *  - moonDistanceMetresAtAge — the 8.2 moon month-chain (each engine's own
  *    factory wiring).
- *  - moiFactorAtAge — the L1-orbital-coupled GIA α(t). The lattice-α pin
+ *  - moiFactorAtAge — the L1-orbital-coupled GIA α(t). The α pin
  *    machinery (_withLatticeAlpha) is ENGINE STATE and stays there.
  *  - cycleLodSumAt / swingLodAt / swingLodRateAt — the engine-GATED
  *    cycle-stack sums (flags are engine dispatch).

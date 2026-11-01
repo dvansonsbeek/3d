@@ -3,7 +3,7 @@
  *
  * The four anchored millennial ΔT corrections (Bond 1,466 yr, Hallstatt
  * 2,430 yr, Jose5 897 yr, Jose4 716 yr — fitted periods STATED IN YEARS,
- * plan 06 T5: the former 8H/n labels carry no information; Jose5/Jose4 are
+ * the retired divisor labels carry no information; Jose5/Jose4 are
  * a COUPLED PAIR, fitted jointly), their implied δLOD twins (the d/dy of
  * each correction: physical consistency between the corrected ΔT curve and
  * the LOD curve), and the Core-mantle swing episode (Resonator driver:
@@ -44,8 +44,7 @@
  * @property {number} taperTotalHalfwidthYears - zero beyond
  * @property {number} tropicalYearSecondsJ2000 - δLOD denominator (variation ≤1e-8 in-window)
  * @property {Record<string, CycleSpec>} cycles - keyed bond/hallstatt/jose5/jose4; each
- *   period in YEARS (the fit file's `period_yr` — the former 8H/n divisor is
- *   gone from the runtime, plan 06 T5 / layer B item 3)
+ *   period in YEARS (the fit file's `period_yr`)
  * @property {{ t0Years: number, q: number, kicks: ResonatorKick[],
  *   tones: ResonatorTone[] }} resonator - T₀ and the tones' periods in years
  */
@@ -82,7 +81,7 @@ function createDeltaTCycles(deps) {
     return -0.5 * Math.PI * Math.sin(Math.PI * u) / width * sign;
   }
 
-  // Per-cycle derived constants — period = 8H/N, ω = 2π/period, and the
+  // Per-cycle derived constants — ω = 2π/period, and the
   // J2000 anchor value (the correction is exactly 0 at year 2000 by
   // construction: taper·(raw − raw@2000)).
   /** @type {Record<string, {omega: number, cosC: number, sinC: number, rawAtJ2000: number}>} */

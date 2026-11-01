@@ -16,8 +16,7 @@
  * shim tools/lib/deep-orbital-history.js (the deep insolation extractor),
  * and the browser's published ε surfaces (VFP chart, Earth-panel row) via
  * the generated deep-modes embed. The ERA machinery (frame conversions,
- * lunar D5, besselian) rode the comb-era fitted ε law until plan 09 deleted
- * it (measured at the time: the hybrid differed from that law by 5″ rms in
+ * lunar D5, besselian) rode a retired fitted ε law (doc 109 §23; measured at the time: the hybrid differed from that law by 5″ rms in
  * 1900–2100 / 19.5″ in 1600–2400, mostly hybrid-side); since then every
  * surface reads this hybrid — the one obliquity of date.
  *
@@ -102,7 +101,7 @@ function createCoRotatingAnchoredModeSum(modes, anchor) {
  *   over 1900–2100/1600–2400 vs the era tier's 0.31″/0.63″, and 0.0396°
  *   vs La2004 over −200 kyr vs the deep tier's 0.069° — the C-1 verdict,
  *   plan 02) and zetaModes serves only as the TAIL beyond the span, joined
- *   to the series at each edge so n̂ is continuous there (plan 12 §8.3 — the
+ *   to the series at each edge so n̂ is continuous there (the
  *   J2000-point anchor left a 1.6° step at −10 Myr that kicked the hybrid's
  *   mean obliquity +0.9° for the whole tail; far outside every certified window).
  *   solarTorqueShareJ2000 and
@@ -189,7 +188,7 @@ function createDeepOrbitalHistory({
     const nS = sq.length, tEndYr = t0Yr + (nS - 1) * stepYr;
     const li = mkSeriesCubic(t0Yr, stepYr, nS);
     const R = [zetaAnchor[0] - li(sq, 0), zetaAnchor[1] - li(sp, 0)];
-    // THE TAIL JOINS THE SERIES AT EACH SEAM (plan 12 §8.3, measured 2026-10).
+    // THE TAIL JOINS THE SERIES AT EACH SEAM (measured).
     // The mode-sum tail anchored to the J2000 POINT reached the span edges
     // 1.61° (past) / 0.74° (future) away from the series — its ~70-kyr phases
     // drift over 10 Myr (the extraction residual) and its J2000 anchor misses
@@ -309,7 +308,7 @@ function createDeepOrbitalHistory({
   // model's own deep-time rate — α(t) = ψ̇(t)/cos ε₀ — and the integrated
   // deep-time obliquity IS the sharpened falsification-leg-1 form (the
   // beat 2π/(ψ̇(t) − |s₃|), ψ̇ the COMPOSED lunisolar rate the injecting
-  // engines build from earth/precession-composed (plan 06 D6), s₃
+  // engines build from earth/precession-composed, s₃
   // dynamical). No new constants: ψ̇(t)'s J2000 anchor is the same
   // certified year-length machinery; only its deep-time scaling is injected. Absent the option, α stays constant (the
   // pre-D1 ±Myr-class behavior, bit-identical).
@@ -317,8 +316,7 @@ function createDeepOrbitalHistory({
     ? (/** @type {number} */ t) =>
         ((2 * Math.PI) / axialPrecessionYearsAtYearFn(2000 + t)) / Math.cos(EPS0)
     : () => ALPHA;
-  // THE PRECESSION OF DATE (plan 06 §9 item 10 — owner: "adopt it in the
-  // model"). The secular law above scales the J2000 rate on the tidal history;
+  // THE PRECESSION OF DATE (owner: "adopt it in the model"). The secular law above scales the J2000 rate on the tidal history;
   // the torque of date carries two more factors, both exactly 1 at J2000:
   //
   //   SOLAR TORQUE — ∝ (1 − e²)^(−3/2): the Sun's share f_S of the torque is
@@ -644,7 +642,7 @@ function createDeepOrbitalHistory({
     if (Math.max(Math.abs(tMin), Math.abs(tMax)) > 50000 && stepYr % 100 !== 0) {
       throw new Error(`deep-orbital-history: builds beyond ±50 kyr need stepYr % 100 === 0 (got ${stepYr})`);
     }
-    // ONE WALK PER GRID STEP, EXTENDED, NEVER RESTARTED (plan 13 A1, measured):
+    // ONE WALK PER GRID STEP, EXTENDED, NEVER RESTARTED (measured):
     // every caller's tier routing asked for `build(span, -span, step)` and
     // rebuilt from J2000 whenever a deeper epoch arrived, so the four deep
     // fixture anchors (380…2460 Ma) walked ~49 million RK4 steps — 14 of the

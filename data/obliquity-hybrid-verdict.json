@@ -123,10 +123,10 @@
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/nbody-deep-secular-modes.json": "sha256:87c325fac77d94a45e1381b62a2a4c5cd8253bc4765c8d497a1d9f5466649ccc",
-   "data/nbody-secular-series.json": "sha256:aaa4564c01f738aefa1360431e05b9f50292ddc934d188c0d19bde246d26dbf4",
-   "packages/physics/src/deltat/deep-time.cjs": "sha256:a152284d8ca8eb0a433fe6bab7e270c833ad4aae7e0184725a21646df9f9fbbc",
-   "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:f8cf54bec82be03ee0bace3c939fdaa8a68969b4d286ceea3e5e4c02eeaabf83",
-   "packages/physics/src/earth/precession-composed.cjs": "sha256:69f2c3795c67f4019671e727f1ae53909cefa3bfa74fb8cf19dec912777385f1",
+   "data/nbody-secular-series.json": "sha256:6113b6151cc08880bc450e5ca933dfd769f7c8fe9a750abacf2f01fd67f9c638",
+   "packages/physics/src/deltat/deep-time.cjs": "sha256:78d5f7b04ecfc2f8a681a50bbf70491cbd4beab9530989c3eda02b92319b28d7",
+   "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:f323f6c1014d004aa9b3b8268998851fcc39346f1fab3a2daec038fc4b3c5ea3",
+   "packages/physics/src/earth/precession-composed.cjs": "sha256:448b2327fc6f3a6994bfc5cc514fec3dc7ceae2037312ae8343b57b7f948252a",
    "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
    "packages/physics/src/model/cardinal-instants.js": "sha256:78cd252af6173f2127b81d8a49680452574fae63786be980f1f8fa96368248df",
    "packages/physics/src/model/context.js": "sha256:c99fce52a908d3ea174c207b64fa2f9104cc697ce6634b129484efdb14ac82d2",
@@ -147,7 +147,7 @@
    "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
    "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:b1d5d59f64af940b6acc1f4c6880c7b2813566dd7099275e61e33ea1b8de5a6b",
-   "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
+   "tools/lib/deep-time.js": "sha256:1d956689f66c8e1301b997d5ca8209076454760d277ecfa9481c5753a0b2e5c0",
    "tools/verify/obliquity-hybrid.js": "sha256:a65260b9420519fcbbbd94ecae507cf64be7eddf10366a8ab0a870016c7b0bbb"
   }
  }

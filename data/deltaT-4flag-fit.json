@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against the Stephenson 2016 residual. Four cycles — Bond 1,466 yr, Hallstatt 2,430 yr, 5×Jose 897 yr, 4×Jose 716 yr — plus the core-mantle resonator episode, fitted JOINTLY (--joint: one design matrix, the USNO/deltaTStart anchors re-optimised with the coefficients, hard closure at J2000, amplitude caps). The legacy single-shot cascade (Bond solo → +Hallstatt → +Jose5 → +Jose4) survives as a stage-wise diagnostic only (fit_metrics). The periods were selected on a retired lattice (plan 09; the records are in each cycle's `structural` string and docs/102); the Eddy (999 yr) and Emp862 (862 yr) candidates were tested as 5th/6th flags and rolled back — see the rollback notes in CONFIG.cycles. Narrative: docs/104; the flag audit: docs/105.",
+    "description": "Sub-Milankovitch millennial ΔT correction stack (periods stated in years) fit against the Stephenson 2016 residual. Four cycles — Bond 1,466 yr, Hallstatt 2,430 yr, 5×Jose 897 yr, 4×Jose 716 yr — plus the core-mantle resonator episode, fitted JOINTLY (--joint: one design matrix, the USNO/deltaTStart anchors re-optimised with the coefficients, hard closure at J2000, amplitude caps). The legacy single-shot cascade (Bond solo → +Hallstatt → +Jose5 → +Jose4) survives as a stage-wise diagnostic only (fit_metrics). The periods were selected on a retired divisor set (the records are in each cycle's `structural` string and docs/102); the Eddy (999 yr) and Emp862 (862 yr) candidates were tested as 5th/6th flags and rolled back — see the rollback notes in CONFIG.cycles. Narrative: docs/104; the flag audit: docs/105.",
     "generator": "tools/fit/dt-corrections-fit.js --joint",
     "dt_corrections_disabled": true
   },
@@ -30,14 +30,14 @@
       {
         "name": "jose4",
         "period_yr": 715.5337423312883,
-        "structural": "4×Jose 179 yr = 715.5 yr; historical selection record: the former divisor 3749 (gcd 23). Cross-archive coherent in Steinhilber solar Φ + EPICA CO2 (the retired lattice harmonic scan, plan 09 step 7e — the record is docs/102). Also degenerate with Bond/2 at ~733 yr; 4×Jose is the tighter anchor (0.083 % vs 2.5 %).",
+        "structural": "4×Jose 179 yr = 715.5 yr; historical selection record: the former divisor 3749 (gcd 23). Cross-archive coherent in Steinhilber solar Φ + EPICA CO2 (the retired harmonic scan — the record is docs/102). Also degenerate with Bond/2 at ~733 yr; 4×Jose is the tighter anchor (0.083 % vs 2.5 %).",
         "fit_stage": "with_bond_hallstatt_jose5",
         "target_amp_s": 50
       },
       {
         "name": "h253",
         "period_yr": 1325.3636363636363,
-        "structural": "1,325.4 yr; historical selection record: the former divisor 253 = 11·23 (gcd 23), the 184th harmonic of the retired perihelion-family divisor. Identified 2026-07-22 by the L-5b §14 post-4-flag residual scan (flat ΔR² = 0.031 peak over divisors 2015–2024, the gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98 → 17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, the retired lattice scan); Steinhilber marginal (~95 % threshold); cap-only ship keeps the amplitude below the free fit.",
+        "structural": "1,325.4 yr; historical selection record: the former divisor 253 = 11·23 (gcd 23), the 184th harmonic of the retired perihelion-family divisor. Identified 2026-07-22 by the L-5b §14 post-4-flag residual scan (flat ΔR² = 0.031 peak over divisors 2015–2024, the gcd-compliant flank chosen) — see data/deltaT-h253-fifth-cycle-scan.json (GO verdict: medieval 990-bump window 98 → 17 s, no ancient regression). EPICA CO2 significant (amp 5.9 ppm vs p95 2.9, the retired harmonic scan); Steinhilber marginal (~95 % threshold); cap-only ship keeps the amplitude below the free fit.",
         "fit_stage": "frozen_residual_after_D",
         "target_amp_s": 75
       }
@@ -94,8 +94,8 @@
   "collinearity_warnings": [],
   "optimum": {
     "usno_target_lod_s": 86400.0012,
-    "deltaTStart": 56.07646640871722,
-    "espenak_rms_s": 12.453198992405644,
+    "deltaTStart": 56.076469640025074,
+    "espenak_rms_s": 12.453199342290164,
     "selected_by": "joint mode (--joint --write; flags + resonator, hard closure, caps)"
   },
   "usno_anchor": {
@@ -126,44 +126,44 @@
     "bond": {
       "lattice_n": 1830,
       "period_yr": 1465.8666666666666,
-      "cos_coeff_s": 165.1715730508658,
-      "sin_coeff_s": 329.7228368112766,
-      "raw_at_j2000_s": 139.42863094745888,
-      "amplitude_s": 368.7801481356788,
-      "phase_deg": 63.39184870856544,
+      "cos_coeff_s": 165.1715430456932,
+      "sin_coeff_s": 329.7228371964552,
+      "raw_at_j2000_s": 139.42865099240365,
+      "amplitude_s": 368.7801350411589,
+      "phase_deg": 63.39185290341678,
       "source": "Stage D anchored fit (USNO LOD constraint active)",
       "joint_mode": true
     },
     "hallstatt": {
       "lattice_n": 1104,
       "period_yr": 2429.8333333333335,
-      "cos_coeff_s": -63.689394432312135,
-      "sin_coeff_s": 48.41137301136342,
-      "raw_at_j2000_s": -71.62941193053629,
-      "amplitude_s": 80,
-      "phase_deg": 142.76092751521693,
+      "cos_coeff_s": -63.689399417801674,
+      "sin_coeff_s": 48.41136645251531,
+      "raw_at_j2000_s": -71.6294082616843,
+      "amplitude_s": 80.00000000000001,
+      "phase_deg": 142.76093341563887,
       "target_amp_source": "CAPPED from anchored quad-fit free amp 100.73 s → 80 s prior",
       "joint_mode": true
     },
     "jose5": {
       "lattice_n": 2989,
       "period_yr": 897.469387755102,
-      "cos_coeff_s": -41.089111803726816,
-      "sin_coeff_s": 28.490084085183714,
-      "raw_at_j2000_s": 22.69343924370235,
-      "amplitude_s": 50.00000000000001,
-      "phase_deg": 145.26360242587327,
+      "cos_coeff_s": -41.08910665904429,
+      "sin_coeff_s": 28.49009150497207,
+      "raw_at_j2000_s": 22.69344728906976,
+      "amplitude_s": 49.99999999999999,
+      "phase_deg": 145.26359207951714,
       "target_amp_source": "CAPPED from anchored quad-fit free amp 86.44 s → 50 s prior",
       "joint_mode": true
     },
     "jose4": {
       "lattice_n": 3749,
       "period_yr": 715.5337423312883,
-      "cos_coeff_s": 38.29144754673731,
-      "sin_coeff_s": -32.152216794110245,
-      "raw_at_j2000_s": 41.57884157892491,
+      "cos_coeff_s": 38.29144659320045,
+      "sin_coeff_s": -32.15221792971797,
+      "raw_at_j2000_s": 41.57884240251297,
       "amplitude_s": 50,
-      "phase_deg": -40.01920436430514,
+      "phase_deg": -40.01920606352349,
       "target_amp_source": "unconstrained: quad-fit free amp 47.06 s (below 50 s prior — no cap applied)",
       "joint_mode": true
     }
@@ -176,22 +176,22 @@
     "generator": "DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write <a FIT — re-close by hand, then npm run regen:cascade --run>",
     "files": {
       "data/astrogeo22-earth-moon.json": "sha256:77d87c4e0c3543ef4cdaca1482e065dcff5457b694fa519a58061cf013d4461b",
-      "data/core-mantle-resonator-stage1.json": "sha256:eaa58f052134b2957ad0e55b88270be8473cf002f7d0f9a475193781a84bbdcf",
+      "data/core-mantle-resonator-stage1.json": "sha256:a16e7e909de3b1cc6a573336e0a1ae8d611b530ac3e9009e31e74d0ea4fbe48b",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "packages/fitting/src/dt-corrections-fit.cjs": "sha256:1a5f3fdbdcdd77613a70cdc824515e4d008432c29e295abaa1d78833b5ec0f10",
-      "packages/physics/src/climate/l1-orbital.cjs": "sha256:338c2987d7107e66fcdac81c8cc55b99197030b6b6240dda9f469b36682ef837",
-      "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
-      "packages/physics/src/deltat/deep-time-chain.js": "sha256:38e2c2baa52b67dbb6db46f5caec2248026f815a2e9d092cb2daab0dc3753b6d",
-      "packages/physics/src/deltat/deep-time.cjs": "sha256:a152284d8ca8eb0a433fe6bab7e270c833ad4aae7e0184725a21646df9f9fbbc",
+      "packages/fitting/src/dt-corrections-fit.cjs": "sha256:97034bec0079f07093c00f7d0f48d870bf6496d2d2f150cac000b3bddf91fd0a",
+      "packages/physics/src/climate/l1-orbital.cjs": "sha256:f15c92118c12c0e4d7904fe1e793703749594a4668f3f7ad8611632c82710e22",
+      "packages/physics/src/deltat/cycles.cjs": "sha256:d1a2571146ccf675c22a8d685900b84d5bee6764b32731dc4e43b32a1a81d2f3",
+      "packages/physics/src/deltat/deep-time-chain.js": "sha256:3cbf95a63c90723c304aa2b6b2994aa2bedd2db4fc8d86c03a89f2902ccbd1c6",
+      "packages/physics/src/deltat/deep-time.cjs": "sha256:78d5f7b04ecfc2f8a681a50bbf70491cbd4beab9530989c3eda02b92319b28d7",
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
-      "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:f85dd33c548b107e2983c9bd550897895229ee451ed83c9ff83033bc1bccfd8a",
-      "packages/physics/src/earth/precession-composed.cjs": "sha256:69f2c3795c67f4019671e727f1ae53909cefa3bfa74fb8cf19dec912777385f1",
+      "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:78dac2b3854c55a6ce63b8cfd409e5c9a06b0924d9e1b9f5bf88202ea5461555",
+      "packages/physics/src/earth/precession-composed.cjs": "sha256:448b2327fc6f3a6994bfc5cc514fec3dc7ceae2037312ae8343b57b7f948252a",
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
-      "public/input/climate-formula-coefficients.json": "sha256:72186eb767b1cc3928d276db376a2e90dc2bbd7213951e4aedb0aa6c40404ad5",
+      "public/input/climate-formula-coefficients.json": "sha256:931c2445fc993bd79e33d99c542cd49b34828f98b6cfda9964b22e222a3912ad",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
-      "tools/lib/constants.js": "sha256:46fefc52fd50260f64d5ea57e01c46958d949dd1d16c030e86379904aabaa57d",
-      "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd"
+      "tools/lib/constants.js": "sha256:fc23b637b6642d4e173d513b023d608278a6889c667bf56bae0ae5a23e9e18b0",
+      "tools/lib/deep-time.js": "sha256:1d956689f66c8e1301b997d5ca8209076454760d277ecfa9481c5753a0b2e5c0"
     }
   }
 }

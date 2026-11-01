@@ -11,23 +11,14 @@ const path = require('path');
 const C = require(path.join(__dirname, '..', '..', 'lib', 'constants'));
 
 const output = {
-  // Foundational (plan 09 step 7c: the frozen era unit H and the device's
-  // rounded mean-tropical-year input left the model; the research scripts
-  // that scan the retired 8H/n lattice carry 335,317 as a named record)
+  // Foundational
   perihelionalignmentYear: C.perihelionalignmentYear,
-  startmodelJD: C.startmodelJD,     // plan 11 step 5: from astro-reference timeReference.sceneEpochJD
-  startmodelYear: C.startmodelYear, // plan 11 step 5: from astro-reference timeReference.sceneEpochYear (correctionDays is deleted)
-  // (plan 11 step 2: correctionSun, eccentricityBase, earthInvPlaneInclinationMean,
-  // eccentricityDerivedMean and perihelionPhaseOffset — scene-scaffold constants
-  // with no reader left — are deleted; temperatureGraphMostLikely left at plan 07 R10;
-  // plan 11 step 4: startAngleModel left with the K-device scaffold)
+  startmodelJD: C.startmodelJD,     // from astro-reference timeReference.sceneEpochJD
+  startmodelYear: C.startmodelYear, // from astro-reference timeReference.sceneEpochYear
   useVariableSpeed: C.useVariableSpeed,
 
-  // Earth parameters (plan 11 step 4: the K-device scaffold's pose —
-  // earthtiltMean, earthInvPlaneInclinationAmplitude, earthRAAngle,
-  // eccentricityAmplitude, kDeviceWheelPhaseAtJ2000Cycles — is deleted; the
-  // scene's world frame is the J2000 ecliptic. eccentricityAmplitudeK left at
-  // plan 07 R6.)
+  // Earth parameters (the scene's world frame is the J2000 ecliptic; the
+  // retired scaffold pose: doc 109 §23)
   earthAscendingNodeInvPlane: C.earthAscendingNodeInvPlane,
   perihelionRefJD: C.perihelionRefJD,
 
@@ -38,9 +29,7 @@ const output = {
   balancedJD: C.balancedJD,
   eocEccentricity: C.eocEccentricity,
 
-  // (plan 09 step 7a: the fitted cardinal record CARDINAL_POINT_ANCHORS /
-  //  CARDINAL_POINT_HARMONICS is deleted)
-  axialPrecessionJ2000Years: C.axialPrecessionJ2000Years,   // plan 09: the IAU p_A anchor as a period
+  axialPrecessionJ2000Years: C.axialPrecessionJ2000Years,   // the IAU p_A anchor as a period
 
   // Physical & astronomical constants
   currentAUDistance: C.currentAUDistance,
@@ -50,13 +39,13 @@ const output = {
   massRatioDE440: C.massRatioDE440,
 
   // Deep-time physics anchors (astro-reference.json physicalConstants + the
-  // generated module's assembled deepTime block — plan 11 step 1: astro-reference
+  // generated module's assembled deepTime block — astro-reference
   // moonRecessionAlpha1PerMa / giaCoxChaoPeltier, data/deep-time-fitted.json,
   // the ΔT fit artifact's shipped_taper — read through tools/lib/constants.js)
   EARTH_MOI_FACTOR: C.EARTH_MOI_FACTOR,
   SOLAR_LUMINOSITY_W: C.SOLAR_LUMINOSITY_W,
   SOLAR_WIND_KG_PER_S: C.SOLAR_WIND_KG_PER_S,
-  ALPHA_1: C.ALPHA_1,   // the LLR rate — the cited distance history's J2000 slope (plan 12 option A: ALPHA_3/ALPHA_4 and RECESSION_REGIME are deleted)
+  ALPHA_1: C.ALPHA_1,   // the LLR rate — the cited distance history's J2000 slope (the cited input)
   ALPHA_CLIMATE_SCALE: C.ALPHA_CLIMATE_SCALE,
   ALPHA_GIA_RATE_J2000_PER_YR: C.ALPHA_GIA_RATE_J2000_PER_YR,
   ALPHA_GIA_RELAXATION_KYR: C.ALPHA_GIA_RELAXATION_KYR,

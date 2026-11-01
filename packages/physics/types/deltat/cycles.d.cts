@@ -28,8 +28,7 @@ export type DeltaTCyclesDeps = {
     tropicalYearSecondsJ2000: number;
     /**
      * - keyed bond/hallstatt/jose5/jose4; each
-     * period in YEARS (the fit file's `period_yr` — the former 8H/n divisor is
-     * gone from the runtime, plan 06 T5 / layer B item 3)
+     * period in YEARS (the fit file's `period_yr`)
      */
     cycles: Record<string, CycleSpec>;
     /**
@@ -53,8 +52,7 @@ export type DeltaTCyclesDeps = {
  * @property {number} taperTotalHalfwidthYears - zero beyond
  * @property {number} tropicalYearSecondsJ2000 - δLOD denominator (variation ≤1e-8 in-window)
  * @property {Record<string, CycleSpec>} cycles - keyed bond/hallstatt/jose5/jose4; each
- *   period in YEARS (the fit file's `period_yr` — the former 8H/n divisor is
- *   gone from the runtime, plan 06 T5 / layer B item 3)
+ *   period in YEARS (the fit file's `period_yr`)
  * @property {{ t0Years: number, q: number, kicks: ResonatorKick[],
  *   tones: ResonatorTone[] }} resonator - T₀ and the tones' periods in years
  */

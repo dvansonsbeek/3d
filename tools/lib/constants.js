@@ -200,7 +200,7 @@ const meanSiderealDay = (meanSolarYearDays / (meanSolarYearDays + 1)) * meanLeng
 // ASCENSION (along the equator), and m = p·cos(ε). MEAN family, so the mean
 // obliquity. Mirrors STELLAR_DAY_RA_PROJECTION in src/script.js — keep in sync.
 const STELLAR_DAY_RA_PROJECTION =
-  Math.cos(ASTRO_REFERENCE.obliquityJ2000_deg * Math.PI / 180);   // plan 09: the IAU ε₀ input (the retired comb's fitted mean sat 0.03° lower; 2e-11 of the stellar day)
+  Math.cos(ASTRO_REFERENCE.obliquityJ2000_deg * Math.PI / 180);   // the IAU ε₀ input
 // The equinox regresses one turn per T_p — the certified p_A period
 // (axialPrecessionJ2000Years).
 const meanStellarDay = (meanSiderealDay / axialPrecessionJ2000Years) / (meanSolarYearDays + 1)
@@ -339,7 +339,7 @@ const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
 const { computeSecularShape } = require('@essrt/physics/planets/secular-shape');
 const { computeObliquityJ2000Deg } = require('@essrt/physics/planets/spin-channel');
 // (CHAIN_DATA — the governed artifact — is loaded above the planet records,
-// which read their perihelion period from it since plan 07 R1.)
+// which read their perihelion period from it.)
 for (const [key, p] of Object.entries(planets)) {
   if (CHAIN_DATA.secularModes && CHAIN_DATA.secularModes[key]) {
     p.wobblePeriod = computeSecularShape(CHAIN_DATA, key).beatYears;
@@ -350,7 +350,7 @@ for (const [key, p] of Object.entries(planets)) {
 // chain. The DERIVED J2000 obliquity is the spin channel's reading (the IAU
 // pole against the chain's J2000 plane, acute form), and the fixtures pin it.
 for (const [key, p] of Object.entries(planets)) {
-  if (!massFraction[key]) continue;   // the seven carriers (R8: the fibonacciD guard went with the divisor)
+  if (!massFraction[key]) continue;   // the seven carriers
   const A = CHAIN_DATA.j2000AnchorElements[key];
   const eps = computeObliquityJ2000Deg({
     spin: astroRef.planetSpinPhysical[key],
@@ -384,7 +384,7 @@ const _CHAIN_ARTIFACT = require('../../data/nbody-secular-frequencies.json');
 function computePlanetDerived(key) {
   const p = planets[key];
   const g = derivePlanetGeometry({
-    key,   // the ellipse family is the law's own taxonomy (plan 11 step 3)
+    key,   // the ellipse family is the geometry's own taxonomy
     ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, p.orbitalPeriodInputDays),
     // The scene's ellipse geometry reads the OBSERVED J2000 eccentricity, the
     // value the chain is anchored on.
@@ -415,7 +415,7 @@ function computeAdditionalDerived(key) {
   // only {N, a, period} for the minor bodies — part of the S-P6 coverage gap;
   // the ellipse family for pluto/halleys/eros is NEW capability here).
   const g = derivePlanetGeometry({
-    key,   // the minor bodies' ellipse family is the law's own (body-name branches; Eros' type default lives there since plan 11 step 2)
+    key,   // the minor bodies' ellipse family is the geometry's own (body-name branches; Eros' type default lives there)
     ...scaffoldOrbitInputs(key, _CHAIN_ARTIFACT, b.orbitalPeriodInputDays),
     orbitalEccentricityBase: b.orbitalEccentricityBase,
     longitudePerihelion: b.longitudePerihelion,

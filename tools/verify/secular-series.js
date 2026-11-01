@@ -232,7 +232,7 @@ const liRaw = (arr, tt) => {
 // ±10,000,000 (a multiple of every cadence, so anchoring at the first raw
 // sample was the same grid); the running-mean dump has no half-window end
 // samples and spans ±9,999,945 — anchoring at its first sample put every
-// node off the cadence lattice and extrapolated the last 390 yr (fidelity
+// node off the cadence grid and extrapolated the last 390 yr (fidelity
 // 3.2e-4 at the end, 6e-6 everywhere else). Beyond the last node the
 // consumers hand over to the mode tail, as they always did.
 // NO NODE INSIDE THE BOXCAR'S EDGE ZONE either: within half a filter width
@@ -538,14 +538,14 @@ const mkTier = (withAxialFn) => createDeepOrbitalHistory({
   // and feeding it into α double-counts it (measured: −200-kyr ε rms vs
   // La2004 3.5×-ed to 0.14° and ±1 Myr diverged 1.05°; the refuse-gate
   // caught it). The withAxialFn=false twin is the α₀ regression control.
-  // Plan 12 §8: the TORQUE period — the constant's scaling, not the published
+  // The TORQUE period — the constant's scaling, not the published
   // rate of date T_p(t): the integration's own ŝ·n̂ carries the obliquity's
   // cosine, so the cited mean obliquity's factor must not enter twice (twin of
   // model.js, tools/lib/deep-orbital-history.js, src/script.js _deepHistSeries).
   axialPrecessionYearsAtYearFn: withAxialFn
-    ? (yr) => model.lunisolar.torquePeriodYearsAtYear(yr)   // plan 09 step 5c: the composed period directly (was period₀·H(t)/H₀, the same to 2e-16)
+    ? (yr) => model.lunisolar.torquePeriodYearsAtYear(yr)   // the composed period directly
     : undefined,
-  // THE PRECESSION OF DATE (plan 06 §9 item 10) — the shipped movement's two
+  // THE PRECESSION OF DATE — the shipped movement's two
   // of-date factors, from the package surface (the solar share and the GIA
   // channel's J₂ ratio), so this verdict describes the movement that ships.
   // The α₀ control twin stays on the bare constant.
@@ -815,7 +815,7 @@ const artifact = {
       myrMaxAbsDiffDeg: maxMyrAlphaDiff,
       deepDeepBandDeg: [ddMin, ddMax],
       forkRows,
-      note: 'D1-revised: α(t) = ψ̇(t)/cos ε₀ (the model\'s own H(t) machinery). In-era it is a numerical no-op (gate ≤0.01″); the forkRows are the RENDERED falsification leg 1 — the hybrid beat vs the K device\'s H-scaled curve at deep time',
+      note: 'D1-revised: α(t) = ψ̇(t)/cos ε₀ (the model\'s own composed precession). In-era it is a numerical no-op (gate ≤0.01″); the forkRows are the RENDERED falsification leg 1 — the hybrid beat vs the retired spin-only curve at deep time',
     },
     z: {
       eVsLa2004Rms200Kyr: e200.rms, eVsLa2004Rms1000Kyr: e1000.rms, eVsLa2004Max1000Kyr: e1000.max,

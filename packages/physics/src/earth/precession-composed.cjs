@@ -13,7 +13,7 @@
  * (1 − e²)^(−3/2) eccentricity factors and the lunar-inclination factor
  * 1 − 3/2·sin² i_M; ≈ 0.316, the textbook value). At J2000 every factor is 1.
  *
- * THE RATE OF DATE vs THE CONSTANT (plan 12 §8, option (a)): the law above
+ * THE RATE OF DATE vs THE CONSTANT: the law above
  * scales the precession CONSTANT α(t) ∝ ω(t)·[torque term] — the rate at the
  * J2000 obliquity. The precession RATE is α(t)·cos ε̄(t), so the published
  * rate carries one more factor, the cited mean obliquity's cos ε̄(t)/cos ε̄(0)
@@ -107,8 +107,8 @@ function createComposedPrecession(deps) {
     const a = deps.moonDistanceMetresAtAge(tMa);
     return a === null || !(a > 0) ? null : Math.pow(deps.moonDistanceJ2000Metres / a, 3);
   };
-  /** The torque term f_S + (1 − f_S)·(a₀/a_M)³ — the factor the unit H(t)
-   * divides the spin-scaled H_era by (deltat/deep-time.cjs; layer0 spells the
+  /** The torque term f_S + (1 − f_S)·(a₀/a_M)³ — the bracket of the composed
+   * precession rate (deltat/deep-time.cjs; layer0 spells the
    * SAME operations, the layer0 gate holds them bit-identical).
    * @param {number} tMa */
   const torqueTermAtAge = (tMa) => {

@@ -27,7 +27,7 @@
  *   over 1900–2100/1600–2400 vs the era tier's 0.31″/0.63″, and 0.0396°
  *   vs La2004 over −200 kyr vs the deep tier's 0.069° — the C-1 verdict,
  *   plan 02) and zetaModes serves only as the TAIL beyond the span, joined
- *   to the series at each edge so n̂ is continuous there (plan 12 §8.3 — the
+ *   to the series at each edge so n̂ is continuous there (the
  *   J2000-point anchor left a 1.6° step at −10 Myr that kicked the hybrid's
  *   mean obliquity +0.9° for the whole tail; far outside every certified window).
  *   solarTorqueShareJ2000 and

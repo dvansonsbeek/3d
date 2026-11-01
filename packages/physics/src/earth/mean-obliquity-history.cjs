@@ -1,6 +1,6 @@
 /**
  * The mean obliquity of date ε̄(t) — the SECOND column the model reads from the
- * cited Earth–Moon history (plan 12 §8, option (a)): Farhat, Auclair-Desrotour,
+ * cited Earth–Moon history: Farhat, Auclair-Desrotour,
  * Boué & Laskar 2022's own mean obliquity, carried in
  * data/astrogeo22-earth-moon.json beside the distance.
  *
@@ -13,7 +13,7 @@
  * lunar tidal torque through the Laplace-plane transition — the same
  * ocean-dissipation physics option A declined to model for the distance. The
  * published solution that computes ε̄(t) alongside a(t) is the input, as the
- * distance is. Measured (plan 12 §8.1): the factor cos ε̄(t)/cos ε̄(0) closes
+ * distance is. Measured: the factor cos ε̄(t)/cos ε̄(0) closes
  * the composed rate to Farhat's own precession column from −2.0 % to +0.4 % at
  * 2.46 Ga and moves every paleo precession referee toward its source.
  *

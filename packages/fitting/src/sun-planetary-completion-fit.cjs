@@ -71,7 +71,7 @@ const model = createModel(DEFAULT_CONSTANTS);
 const C = DEFAULT_CONSTANTS;
 const D2R = Math.PI / 180;
 const BRIDGE = FITTED_COEFFICIENTS.DT_ANCHOR.deltaTStartSeconds / 86400;   // the joint fit's anchor (plan 14: its own artifact)
-const LP = 0;   // the fitted mean-longitude anchor, retired to 0 at plan 06 R3 item 1; its key left the inputs at plan 11 step 2
+const LP = 0;   // the fitted mean-longitude anchor, retired to 0 (doc 109 §23)
 const N = C.physicalConstants.nutationLeadingTermsArcsec;
 const wrap = wrap180;   // math/angles — the residuals wrapped here are arcsecond-class
 

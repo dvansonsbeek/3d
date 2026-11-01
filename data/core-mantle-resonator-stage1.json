@@ -186,11 +186,11 @@
       "kick_coefficients_s": [
         {
           "cos": 0,
-          "sin": 621.7626681923387
+          "sin": 621.7631759521315
         },
         {
           "cos": 0,
-          "sin": 1.2261073289861468
+          "sin": 1.2258869612656293
         }
       ],
       "T0_lattice_n": 685,
@@ -204,12 +204,12 @@
           "phi_locked_rad": -0.4616152283022974,
           "amp_s": 0,
           "phase_convention": "cos(2π·dn/8H·y − φ_locked), kick-1-envelope-shared",
-          "retired": "RETIRED (plan 06 D7 follow-up, 2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS)."
+          "retired": "RETIRED (2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS)."
         }
       ],
-      "rms_s": 21.415496276103237,
-      "raw_at_j2000_s": -83.16660511537269,
-      "lod_raw_at_j2000_s_per_day": 0.0004964253716765174,
+      "rms_s": 21.41549856640277,
+      "raw_at_j2000_s": -83.16678012888845,
+      "lod_raw_at_j2000_s_per_day": 0.0004964252700334126,
       "deep_time_checks_s": {
         "900": -245.8439379884609,
         "2000": -82.32559425279462,
@@ -220,7 +220,7 @@
         "-801": 0
       },
       "regeneration_rule": "drive-tone menu = Δn difference tones of the ACTIVE flag set (any count); refit this script after any stack change (3rd/5th cycle)",
-      "status": "JOINT WORLD SHIPPED (--joint --write): the two impulse kicks from the joint equality-constrained fit, the drive tone retired at amplitude 0 (plan 06 D7 follow-up); phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.",
+      "status": "JOINT WORLD SHIPPED (--joint --write): the two impulse kicks from the joint equality-constrained fit, the drive tone retired at amplitude 0; phases/epochs/T0/Q remain the Stage-1/3 convention. Default-ON.",
       "impulse_consistent": true
     },
     "resonator_free_reference": {
@@ -310,20 +310,20 @@
     "files": {
       "data/astrogeo22-earth-moon.json": "sha256:77d87c4e0c3543ef4cdaca1482e065dcff5457b694fa519a58061cf013d4461b",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "packages/fitting/src/dt-corrections-fit.cjs": "sha256:1a5f3fdbdcdd77613a70cdc824515e4d008432c29e295abaa1d78833b5ec0f10",
-      "packages/physics/src/climate/l1-orbital.cjs": "sha256:338c2987d7107e66fcdac81c8cc55b99197030b6b6240dda9f469b36682ef837",
-      "packages/physics/src/deltat/cycles.cjs": "sha256:da684bd21865005f05ceec845683f1549efc17d5b11aeac2cf362b3f8e52bf99",
-      "packages/physics/src/deltat/deep-time-chain.js": "sha256:38e2c2baa52b67dbb6db46f5caec2248026f815a2e9d092cb2daab0dc3753b6d",
-      "packages/physics/src/deltat/deep-time.cjs": "sha256:a152284d8ca8eb0a433fe6bab7e270c833ad4aae7e0184725a21646df9f9fbbc",
+      "packages/fitting/src/dt-corrections-fit.cjs": "sha256:97034bec0079f07093c00f7d0f48d870bf6496d2d2f150cac000b3bddf91fd0a",
+      "packages/physics/src/climate/l1-orbital.cjs": "sha256:f15c92118c12c0e4d7904fe1e793703749594a4668f3f7ad8611632c82710e22",
+      "packages/physics/src/deltat/cycles.cjs": "sha256:d1a2571146ccf675c22a8d685900b84d5bee6764b32731dc4e43b32a1a81d2f3",
+      "packages/physics/src/deltat/deep-time-chain.js": "sha256:3cbf95a63c90723c304aa2b6b2994aa2bedd2db4fc8d86c03a89f2902ccbd1c6",
+      "packages/physics/src/deltat/deep-time.cjs": "sha256:78d5f7b04ecfc2f8a681a50bbf70491cbd4beab9530989c3eda02b92319b28d7",
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
-      "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:f85dd33c548b107e2983c9bd550897895229ee451ed83c9ff83033bc1bccfd8a",
-      "packages/physics/src/earth/precession-composed.cjs": "sha256:69f2c3795c67f4019671e727f1ae53909cefa3bfa74fb8cf19dec912777385f1",
+      "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:78dac2b3854c55a6ce63b8cfd409e5c9a06b0924d9e1b9f5bf88202ea5461555",
+      "packages/physics/src/earth/precession-composed.cjs": "sha256:448b2327fc6f3a6994bfc5cc514fec3dc7ceae2037312ae8343b57b7f948252a",
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
-      "public/input/climate-formula-coefficients.json": "sha256:72186eb767b1cc3928d276db376a2e90dc2bbd7213951e4aedb0aa6c40404ad5",
+      "public/input/climate-formula-coefficients.json": "sha256:931c2445fc993bd79e33d99c542cd49b34828f98b6cfda9964b22e222a3912ad",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
-      "tools/lib/constants.js": "sha256:46fefc52fd50260f64d5ea57e01c46958d949dd1d16c030e86379904aabaa57d",
-      "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd"
+      "tools/lib/constants.js": "sha256:fc23b637b6642d4e173d513b023d608278a6889c667bf56bae0ae5a23e9e18b0",
+      "tools/lib/deep-time.js": "sha256:1d956689f66c8e1301b997d5ca8209076454760d277ecfa9481c5753a0b2e5c0"
     }
   }
 }
