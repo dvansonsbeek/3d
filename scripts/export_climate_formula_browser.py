@@ -36,9 +36,15 @@ Run:    python3 scripts/export_climate_formula_browser.py
 """
 
 import json
+import os
 from pathlib import Path
 
-import numpy as np
+# ONE BLAS thread before numpy loads: the ridge solve's reduction order depends on the thread count
+# (measured 1 vs 16 threads: 109 coefficients at 1e-14 relative on identical inputs) — a governed
+# artifact regenerated on another machine must reproduce byte for byte. The fit takes ~1 s either way.
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+import numpy as np  # noqa: E402
 
 # Re-use loaders + ClimateFormula + L1/L2 constants from the canonical formula
 import sys

@@ -80,14 +80,19 @@ Run:    python3 scripts/milankovitch_climate_formula.py
 """
 
 import json
+import os
 import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional, Union
 
-import numpy as np
-from scipy.signal import detrend, find_peaks
+# ONE BLAS thread before numpy loads (the browser export pins the same): the ridge solve's reduction
+# order depends on the thread count — 1 vs 16 threads differ at 1e-14 relative on identical inputs.
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+import numpy as np  # noqa: E402
+from scipy.signal import detrend, find_peaks  # noqa: E402
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DATA_DIR = SCRIPT_DIR.parent / "data"

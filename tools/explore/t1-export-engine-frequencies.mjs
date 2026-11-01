@@ -83,7 +83,20 @@ const lr04WindowYears = [2000 - lr04LastAgeKyr * 1000, 2000];
 // ⟨cos ε⟩). The forcing lines must not contain the climate response; the published realized period
 // (the registry, the hybrid verdict's gate) keeps the full physics, 2–3 yr of period apart.
 const mForcing = createModel(undefined, { secularSeriesArtifact: require(join(ROOT, SERIES_REL)), giaEllipticityOfDate: false });
-const pInertialMeanLr04 = mForcing.lunisolar.spinAxisInertialRateMeanArcsecPerYr(lr04WindowYears[0], lr04WindowYears[1]);
+// THE LOOP, CUT HERE (doc 111 §1.32): this mean reads the climate formula's coefficients through α(t)
+// in the LOD of date that scales the torque rate (the ellipticity switch leaves the J₂ factor out of
+// the product, not α(t) out of ω(t)); the lines feed the climate export, whose coefficients come back
+// through the embed. Measured: 3e-12 ″/yr in → 1.7e-13 in the coefficients → 4e-14 back (gain 0.013
+// per pass, each pass a by-hand ΔT re-close). The coefficients are NOT declared as an input — a
+// whole-file hash would never settle. Recorded at the mean's physical precision instead: one 500-yr
+// step of window edge is worth 8e-6 ″/yr, the step itself 7e-6, the loop ≤ 3e-12 — 1e-9 sits between,
+// so one cascade reaches the fixed point by construction.
+const P_MEAN_QUANTA_PER_ARCSEC_PER_YR = 1e9;   // the precision 1e-9 ″/yr, as a divisor: n / 1e9 is the double nearest the decimal
+const pInertialMeanLr04Raw = mForcing.lunisolar.spinAxisInertialRateMeanArcsecPerYr(lr04WindowYears[0], lr04WindowYears[1]);
+const pMeanQuanta = pInertialMeanLr04Raw * P_MEAN_QUANTA_PER_ARCSEC_PER_YR;
+const pInertialMeanLr04 = Math.round(pMeanQuanta) / P_MEAN_QUANTA_PER_ARCSEC_PER_YR;
+// the distance to the nearest rounding boundary — a value within the loop's jitter of one is reported, never silent
+const boundaryDistance = (0.5 - Math.abs(pMeanQuanta - Math.round(pMeanQuanta))) / P_MEAN_QUANTA_PER_ARCSEC_PER_YR;
 
 const out = {
   _description: 'T1 inputs — the engine’s own precession rates and Earth’s z / ζ secular modes (deep mode table). p = the general precession in longitude (the of-date precession beat at J2000, createModel().epoch.axialPrecessionYearsAtYear): the equinox along the ecliptic of date, the rate the climatic-precession lines p + g_i carry. pInertial = the spin axis’s inertial precession rate at J2000 (createModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000, the self-anchored rate the hybrid obliquity integrates on: p plus the planetary mean). pInertialMeanLr04 = the REALIZED pole rate over the LR04 record window (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr over lr04WindowKyr with ellipticity:false — the inertial rate of date × solar torque at e(t) × cos ε(t)/cos ε₀, averaged; the ice-driven J₂(t)/J₂₀ factor is left out because it rides the climate formula’s own fit, 3e-5 of the rate): the rate the obliquity lines pInertialMeanLr04 + s_i carry — a record sees the window mean, not the J2000 instant. Consumed by scripts/l1_physical_lines.py and scripts/t1_beat_model_vs_comb.py.',
@@ -100,6 +113,7 @@ const out = {
 };
 
 console.log(`p = ${out.pArcsecPerYr.toFixed(4)} ″/yr (T_p = ${Tp.toFixed(2)} yr) · pInertial = ${out.pInertialArcsecPerYr.toFixed(4)} ″/yr (${TpInertial.toFixed(2)} yr) · pInertialMeanLr04 = ${pInertialMeanLr04.toFixed(4)} ″/yr over 0–${lr04LastAgeKyr} kyr · ${z.length} z modes · ${zeta.length} ζ modes`);
+console.log(`pInertialMeanLr04 raw ${pInertialMeanLr04Raw} → recorded ${pInertialMeanLr04} (precision ${1 / P_MEAN_QUANTA_PER_ARCSEC_PER_YR} ″/yr;${boundaryDistance.toExponential(2)} ″/yr from the nearest rounding boundary${boundaryDistance < 1e-11 ? ' — WITHIN THE LOOP JITTER: the next cascade may flip the last digit' : ''})`);
 if (process.argv.includes('--write')) {
   writeFileSync(join(ROOT, OUT_REL), `${JSON.stringify(out, null, 1)}\n`);
   console.log(`wrote ${OUT_REL}`);

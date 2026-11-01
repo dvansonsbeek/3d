@@ -189,6 +189,14 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   1.9 days at −1 Myr, a Sun on its own clock that every deep gate on that axis
   called exact. Name the axis of every bridge; gate a tier's clock against
   ANOTHER tier's events, never its own (`scene-year-lengths` deep rows). (§1.31)
+- **An artifact that reads the coefficients it feeds is a LOOP** — the T1
+  pole rate read the climate coefficients through α(t) in the torque rate's
+  LOD and fed the lines those coefficients are fitted on: three recorded
+  values on identical declared inputs, each a different embed, gain 0.013 per
+  pass and a by-hand ΔT re-close per pass. A whole-file hash never settles, so
+  the loop is cut at the SOURCE: record the quantity at its physical
+  precision (1e-9 ″/yr against a window edge worth 8e-6), and pin ONE BLAS
+  thread in a fitting script (1 vs 16 threads: 1e-14 on identical inputs). (§1.32)
 
 ---
 

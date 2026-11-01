@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
 modelVersion: v27.5
-coefficients: sha256:066d8818b9fc3496
+coefficients: sha256:f208ad9b25f7164d
 status: current
 ---
 
@@ -732,6 +732,44 @@ has age mappings; name the axis of every bridge at the boundary (the three
 year axes of plan 06 — calendar, engine, SI-tropical count — are three
 CLOCKS when a ΔT reads them), and gate a tier's clock against another tier's
 events, never against its own.
+
+### 1.32 An artifact that reads the coefficients it feeds is a loop — cut it at the source, never declare it
+
+**Measured** (the vocabulary cascade, 2026-11-01, first read as a run-to-run
+non-reproducibility). The T1 export's realized pole rate over the LR04
+window — the rate the obliquity lines carry — was recorded at three values
+across three cascades on identical declared inputs: 50.519061940870934,
+…87394, …87398 ″/yr. Every link proved deterministic: three Node processes
+reproduce the mean bit-for-bit; the Python climate export reproduces itself
+bit-for-bit on a fixed thread count. **The cause:** the forcing-only mean
+reads the climate formula's coefficients — through the GIA α(t) channel in
+the LOD of date that scales the composed torque rate (the ellipticity switch
+leaves the J₂ factor out of the PRODUCT, not α(t) out of ω(t)) — and those
+coefficients are what the lines it feeds come back as, through the embed.
+Each recorded value was computed on a different embed; the artifact was
+fresh by hash and stale by value, because the coefficients are not in its
+inputs block. The loop's gain, measured on the scratchpad twins: 3·10⁻¹² ″/yr
+into the rate moves 698 coefficients by at most 1.7·10⁻¹³ (linearly: 10⁻⁹ →
+7.4·10⁻¹¹, 10⁻⁶ → 7.4·10⁻⁸), which comes back as 4·10⁻¹⁴ in the rate — 0.013
+per pass, convergent, but each pass is a by-hand ΔT re-close (deltaTStart by
+a few µs) and a campaign re-baseline for nothing physical. A second hazard
+found on the way: the export's ridge solve is BLAS-thread-count dependent —
+one thread against sixteen moves 109 coefficients at 10⁻¹⁴ relative on
+identical inputs, so a regeneration on another machine moved the governed
+hash while every input hash stayed fresh. **Why not declare the
+dependency:** the freshness gate hashes whole file bytes; an artifact
+declaring the coefficients it feeds is re-stamped after every export,
+re-stales the lines, re-stales the export, and never settles. **The fix:**
+the rate is recorded at its physical precision — one 500-yr step of window
+edge is worth 8·10⁻⁶ ″/yr, the step itself 7·10⁻⁶, the loop ≤ 3·10⁻¹²; 10⁻⁹
+sits between, so one cascade reaches the fixed point by construction (the
+exporter prints the raw value and its distance to the nearest rounding
+boundary, and says so when that distance is within the loop's jitter); and
+the two climate scripts pin ONE BLAS thread before numpy loads. **The rule:**
+a governed artifact's inputs are what it READS, including the embed it reads
+through `createModel`; when what it reads is what it feeds, the loop is cut
+at the source by recording the quantity at its physical precision, never by
+declaring the input and never by a tolerance downstream.
 
 ---
 
