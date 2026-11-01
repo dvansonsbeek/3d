@@ -2,10 +2,9 @@
  * The secular SHAPE of a planet's eccentricity vector z = e·e^{iϖ} from the
  * governed artifact's mode table: the dominant mode, the largest companion
  * and their beat — the planet's own eccentricity cycle (the |e| wobble
- * period). ONE home (plan 06 Phase 7 commit 2): the planet panels'
- * "Eccentricity Cycle (g-mode beat)" row, and the period the K device's
- * retired axial-vs-obliquity "wobble" beat is replaced by in both scene
- * twins. Its own module so the governed chain module (a hashed input of the
+ * period). ONE home: the planet panels' "Eccentricity Cycle (g-mode beat)"
+ * row in both scene twins (the retired axial-vs-obliquity "wobble" beat it
+ * replaced: doc 109 §23). Its own module so the governed chain module (a hashed input of the
  * N-body artifacts) stays untouched.
  */
 

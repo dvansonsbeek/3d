@@ -53,14 +53,13 @@ const rows = await s.page.evaluate(({ EPOCHS_MA }) => {
       // What the epoch-anchor chain says at this epoch (the mutated globals).
       // The sidereal anchor is the ONE remaining sidereal-year global (the
       // "kinematic" twin is a J2000 constant since the year/day collapse).
-      // (plan 09 step 5d: the anchor chain carries no anomalistic year — its
-      // H/16 identity is deleted; the anomalistic law's purity is pinned by
-      // the fifth gate and the sampler-purity gate.)
+      // (the anchor chain carries no anomalistic year; the anomalistic law's
+      // purity is pinned by the fifth gate and the sampler-purity gate.)
       sidKinAnchor: a.meansiderealyearlengthinDays,
       solAnchor: a.meansolaryearlengthinDays,
       // What the pure f(Y) evaluators say at the same year, J2000 scene state.
-      // plan 09: the year lengths of date in days of the epoch (the published
-      // SI year lengths over the kinematic day of date; the retired combs are gone)
+      // the year lengths of date in days of the epoch (the published SI year
+      // lengths over the kinematic day of date)
       sidEval: T.siderealYearDaysOfDate(year),
       solEval: T.tropicalYearDaysOfDate(year),
       // ...and again at J2000 scene state — must be bit-equal (purity).

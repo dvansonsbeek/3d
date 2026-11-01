@@ -53,8 +53,8 @@ export const deriveEpochParams = (raw) => {
   const dmDtTotalKgS = raw.solarLuminosityW / (cSiMPerS * cSiMPerS) + raw.solarWindKgPerS;
 
   // J2000 anchors. Plan 09: ω₀ is the SI day (an input, 86,400 s); the
-  // identifier keeps its historical name — the H/13 kinematic-day
-  // construction it once named (86,399.99968 s) is deleted.
+  // identifier keeps its historical name (the kinematic-day construction it
+  // once named is the record, doc 109 §23).
   const lodNowH13Seconds = raw.lodJ2000Seconds;
   const solarMassLossFracPerYear = dmDtTotalKgS * raw.meanSiderealYearSeconds / raw.sunMassKg;
 
@@ -72,8 +72,8 @@ export const deriveEpochParams = (raw) => {
     + (moonMassKg * Math.sqrt(gmEarthMoonM3S2 * moonDistanceNowM) * moonEccentricityFactor);
   const moonLockDistanceM = (totalAngularMomentumKgM2S / (moonMassKg * Math.sqrt(gmEarthMoonM3S2) * moonEccentricityFactor)) ** 2;
 
-  // The solar fraction of the J2000 precession torque (plan 06 Phase 3): the
-  // unit H(t) ≡ 13·T_p,composed = H_era(t) / [f_S + (1 − f_S)(a₀/a_M(t))³].
+  // The solar fraction of the J2000 precession torque — the share in the
+  // composed precession rate's bracket [f_S + (1 − f_S)(a₀/a_M(t))³].
   const precessionSolarShareJ2000 = computeSolarTorqueShare({
     gmSunKm3S2: raw.gmSunKm3S2, auKm: raw.astronomicalUnitKm, earthEccentricity: raw.earthOrbitalEccentricityJ2000,
     gmMoonKm3S2: raw.gmMoonAloneKm3S2, moonDistanceKm: raw.moonDistanceKm, moonEccentricity: raw.moonOrbitalEccentricity,
@@ -96,7 +96,7 @@ export const deriveEpochParams = (raw) => {
     solarMassLossFracPerYear,
     precessionSolarShareJ2000,
     // p₀, the composed precession rate's J2000 anchor — the tropical year of
-    // date's equinox term (plan 09 step 5d; the same expression the deep-time
+    // date's equinox term (the same expression the deep-time
     // factory's composed module resolves, so the twins stay bit-identical)
     precessionRateJ2000ArcsecPerYr: 1296000 / raw.axialPrecessionJ2000Years,
   });

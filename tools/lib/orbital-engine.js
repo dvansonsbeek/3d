@@ -2,7 +2,7 @@
 // ORBITAL ENGINE — the Node tools' Earth-and-planet element readers
 // Extracted from src/script.js for the Node tools.
 //
-// What is left here after plan 18 T2 (thirteen exports nobody read were
+// What is left here after the third maintenance round (thirteen exports nobody read were
 // deleted, two of them the retired 13/8 and 13/5 period ratios):
 //   OBLIQUITY   — a planet's axial tilt of date from the spin channel
 //   PRECESSION  — the axial precession period from a year/day pair

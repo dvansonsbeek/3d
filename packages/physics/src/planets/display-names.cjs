@@ -1,9 +1,9 @@
 /**
  * PLANET_DISPLAY_NAMES — the seven chain planets' presentation names, keyed
- * by the model's planet key (plan 11 step 6).
+ * by the model's planet key.
  *
- * The one leaf `public/input/model-parameters.json` still carried when the
- * file was deleted. A display name is presentation, not a model parameter:
+ * The one leaf the retired input file still carried when it was retired
+ * (doc 109 §23). A display name is presentation, not a model parameter:
  * not injectable, not hashed, not a degree of freedom — so it is code, not an
  * input. ONE home here: the Node constants (`tools/lib/constants.js`
  * `C.planets[key].name`), the package model (`model.planets.record(key).name`,

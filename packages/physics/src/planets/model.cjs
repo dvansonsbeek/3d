@@ -7,15 +7,12 @@
  *   inputs     the chain's g-mode beat (wobble) and the spin channel's
  *              derived J2000 obliquity, carried on the record since plan 06
  *              Phase 7 commit 2
- *   geometry   (the ellipse family — geometry.cjs's own taxonomy since
- *              plan 11 step 3 — on the OBSERVED J2000 eccentricity; minor
- *              bodies use their record's base)
+ *   geometry   (the ellipse family — geometry.cjs's own taxonomy — on the
+ *              OBSERVED J2000 eccentricity; minor bodies use their record's base)
  *
- * The ψ and K amplitude laws that opened this chain (ψ constant →
- * inclination amplitude/mean; K constant → eccentricity amplitude/base/
- * phase) are DELETED — K at plan 07 R6, ψ at plan 07 R5. A planet's
- * inclination and eccentricity of date have one home, the N-body chain
- * (model.js planetChainElementsAt).
+ * A planet's inclination and eccentricity of date have one home, the N-body
+ * chain (model.js planetChainElementsAt); the amplitude laws that once opened
+ * this chain are the record, doc 109 §23.
  *
  * THIN BY DESIGN. This is the composition surface, not a rewiring: both
  * engines keep their existing direct call sites, and the runtime channels
@@ -46,13 +43,13 @@ const { derivePlanetGeometry, scaffoldOrbitInputs } = require('./geometry.cjs');
  * @property {number} [ascendingNode]
  * @property {number} [rotationPeriodDays]
  * @property {number} [orbitalEccentricityBase] - minor bodies: JSON input;
- *   carriers: ignored (the K law derives it)
+ *   carriers: ignored (the chain carries their eccentricity of date)
  * @property {number} [orbitDistanceOverride]
  */
 
 /**
  * @typedef {Object} PlanetModelEnv
- * @property {any} [chainArtifact] - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements (plan 09 step 7b)
+ * @property {any} [chainArtifact] - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements
  * @property {number} meanSolarYearDays
  * @property {number} balancedYear
  * @property {number} systemResetN
@@ -78,11 +75,6 @@ const { derivePlanetGeometry, scaffoldOrbitInputs } = require('./geometry.cjs');
  * @returns {{ bodies: Record<string, PlanetModelRecord> }}
  */
 function createPlanetModel(env, bodies) {
-  // Plan 07 R6: kConstant, the System-Reset eccentricityAnchor
-  // (balancedYear − systemResetN·H) and the t2000 phase it fed went with the
-  // eccentricity law; plan 07 R5: psiConstant (ψ = 3·A_earth·√(m_E/m_☉),
-  // from env.calibration) went with the inclination law.
-
   const geomEnv = {
     meanSolarYearDays: env.meanSolarYearDays,
     currentAUDistanceKm: env.currentAUDistanceKm,
@@ -96,25 +88,20 @@ function createPlanetModel(env, bodies) {
     /** @type {PlanetModelRecord} */
     const rec = /** @type {PlanetModelRecord} */ ({});
 
-    // Plan 06 Phase 7 commit 2: the K law's cycle period and obliquity input
-    // are INPUTS of the record now — the chain's own g-mode beat
-    // (keplerian-chain computeSecularShape) and the derived J2000 obliquity
-    // (spin-channel computeObliquityJ2000Deg); the device's integer axial and
-    // obliquity fractions are retired.
+    // The cycle period and the obliquity are INPUTS of the record — the chain's
+    // own g-mode beat (keplerian-chain computeSecularShape) and the derived
+    // J2000 obliquity (spin-channel computeObliquityJ2000Deg).
     if (b.wobblePeriodYears !== undefined) rec.wobblePeriodYears = b.wobblePeriodYears;
     if (b.obliquityMeanDeg !== undefined) rec.obliquityMeanDeg = b.obliquityMeanDeg;
 
-    // Plan 07 R6: the K law's eccentricityAmplitude / eccentricityBase /
-    // eccentricityPhaseJ2000Deg stood here. With the law gone, the ellipse
-    // geometry below reads the OBSERVED J2000 eccentricity where it used to
-    // read the law's System-Reset base — the observation the chain is
-    // anchored on, not a construction. The additional bodies' base is their
-    // observed J2000 eccentricity too (astro-reference additionalBodiesReference;
-    // plan 11 step 2 deleted the stored copy).
+    // The ellipse geometry below reads the OBSERVED J2000 eccentricity — the
+    // observation the chain is anchored on, not a construction. The additional
+    // bodies' base is their observed J2000 eccentricity too (astro-reference
+    // additionalBodiesReference).
 
     rec.geometry = derivePlanetGeometry({
-      key,   // the ellipse family is the law's own taxonomy (geometry.cjs SCAFFOLD_ELLIPSE_FAMILY, plan 11 step 3)
-      // plan 09 step 7b: the chain's J2000 elements where the artifact has the body, else the observed period input
+      key,   // the ellipse family is the geometry's own taxonomy (geometry.cjs SCAFFOLD_ELLIPSE_FAMILY)
+      // the chain's J2000 elements where the artifact has the body, else the observed period input
       ...scaffoldOrbitInputs(key, env.chainArtifact, b.orbitalPeriodInputDays),
       orbitalEccentricityBase: b.orbitalEccentricityBase !== undefined
         ? b.orbitalEccentricityBase : b.orbitalEccentricityJ2000,

@@ -35,22 +35,19 @@ const DT_STACK = [
 function measure() {
   const v = {};
 
-  // Anchors that pin the engine's identity. (plan 09 step 7c: `anchor.H` — the
-  // frozen era unit — left with the unit.)
+  // Anchors that pin the engine's identity.
   v['anchor.perihelionAlignmentYear'] = C.perihelionalignmentYear;
-  // (plan 11 step 5: `anchor.correctionDays` left with the correction; the
-  // epoch itself is pinned through every JD-anchored row)
+  // (the epoch itself is pinned through every JD-anchored row)
   v['anchor.sceneEpochJD'] = C.startmodelJD;
   v['anchor.meanSiderealYearSeconds'] = C.meanSiderealYearSeconds;
 
   // THREE distinct day lengths — never collapse these (CLAUDE.md).
-  //   SI 86400 (definition) · LOD_mean (H/13 identity) · LOD_real (physical)
+  //   SI 86400 (definition) · LOD_mean (the kinematic day) · LOD_real (physical)
   v['lod.meanKinematicSeconds'] = DT.LOD_NOW_H13_S;
   v['lod.meanAtAge0'] = DT.meanLodSecondsAtAge(0);
 
   // Deep-time behaviour away from the anchor — the anchor alone is a tautology.
   for (const t of AGES_MA) {
-    // (plan 09 step 7b: the `deeptime.H@tMa` probes — the unit — left with meanHAtAge)
     v[`deeptime.lodSeconds@${t}Ma`] = DT.meanLodSecondsAtAge(t);
   }
 
@@ -60,10 +57,7 @@ function measure() {
 
   // ─── Cardinal points — the Node engine's delegates to createModel().cardinal ─
   // ALL FOUR types on the same deep-year grid the browser fixture uses (the
-  // Phase 7 extraction gate's grid; plan 06 R1 moved the values to the one
-  // Sun's crossings). Plan 09 step 7a: the raw integrated-phase primitive
-  // `phase.cycles@y` (the frozen era clock's counter at divisor 1) left with
-  // the counter.
+  // one Sun's crossings).
   const OE = require(join(ROOT, 'tools/lib/orbital-engine.js'));
   const CP_YEARS = [-302635, -100000, -25000, -2000, 0, 1000, 2000, 3000, 6000, 32682];
   for (const y of CP_YEARS) {
@@ -112,9 +106,8 @@ function measure() {
     for (const fn of MOON_ATAGE) v[`moonAtAge.${fn}@${t}Ma`] = DT[fn](t);
   }
 
-  // The e_E channel — the KNOWN S1 divergence point (tools: linear snapshot
-  // phase; browser: integrated H/3). Pinned so the alignment commit shows
-  // exactly these values moving, and nothing else.
+  // The e_E channel — pinned so an alignment commit shows exactly these
+  // values moving, and nothing else.
   for (const tYr of [-102000, -27000, -2584, 0, 100, 30000, 102000]) {
   }
 
@@ -160,18 +153,14 @@ function measure() {
   for (const k of P7) {
     for (const y of P_YEARS) {
       v[`planetObliq.${k}@${y}`] = OE.computePlanetObliquity(k, y);
-      // (Plan 07 R5: planetAscNode — the device's linear year-2000 node,
-      // orientation.ascendingNodeInvPlaneLinearAt — left with the law; 49 rows.)
     }
     const d = C.derived ? C.derived[k] : null;
     if (d) for (const [n, val] of Object.entries(d)) {
       if (typeof val === 'number') v[`planetDerived.${k}.${n}`] = val;
     }
     const p = C.planets[k];
-    // Plan 07 R6: eccAmp and eccBase left with the K law (14 rows); plan 07
-    // R5: inclAmp and inclMean left with the ψ law (14 rows). wobblePeriod is
-    // the chain's g-mode beat, not a law output, and obliquityMean is the
-    // spin channel's derived J2000 value.
+    // wobblePeriod is the chain's g-mode beat, not a law output, and
+    // obliquityMean is the spin channel's derived J2000 value.
     v[`planetLaw.${k}.wobblePeriod`] = p.wobblePeriod;
     v[`planetLaw.${k}.obliquityMean`] = p.obliquityMean;
   }

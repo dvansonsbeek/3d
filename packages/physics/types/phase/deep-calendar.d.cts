@@ -13,7 +13,7 @@ export type DeepCalendar = {
     siYearToJD: (ySI: number) => number;
     /**
      * builds the ∫ daysPerYear dt table
-     * (idempotent; under the lattice α).
+     * (idempotent; under the pinned α).
      */
     ensureCumulDaysTable: () => void;
     /**
@@ -38,7 +38,7 @@ export type DeepCalendar = {
  *   at −302,635 and grows quadratically).
  * @property {(ySI: number) => number} siYearToJD the exact inverse of jdToSIyear.
  * @property {() => void} ensureCumulDaysTable builds the ∫ daysPerYear dt table
- *   (idempotent; under the lattice α).
+ *   (idempotent; under the pinned α).
  * @property {(year: number) => (number | null)} yearToJD calendar year → JD,
  *   integrating days-per-year from startModelYear; null outside the table
  *   domain or past the tidal-lock asymptote; startModelJD exactly at

@@ -8,7 +8,7 @@
  * day's excess over 86,400 s. Before plan 09 they were not — the integrand ran
  * on the physics base (meanLodSecondsAtAge, 86,399.9997 s at J2000) while the
  * pane ran on the kinematic base (86,400.0001 s), a constant 0.43 ms/day
- * split across 1700–2100 (hu TODO, measured 2026-10-04). Plan 09 step 4c made
+ * split across 1700–2100 (measured). The kinematic-day restatement made
  * the kinematic day of date the Layer-0 tidal mean, exactly ω₀ at J2000, and
  * the split closed; re-measured: < 1 µs/day at every 25-yr sample. A closed
  * gap gets a gate (CLAUDE.md), so the two bases cannot part again unseen.

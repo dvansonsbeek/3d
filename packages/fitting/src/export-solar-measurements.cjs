@@ -17,12 +17,9 @@
  * No two-pass needed — each event is close to prevJD + meanYear.
  *
  * Downstream consumers: NONE in the fitting pipeline — the harmonic-clock
- * fits (obliquity, year-length, cardinal-point) are retired with their
- * coefficients FROZEN as the certified era clock (a harmonic re-fit against
- * the one-source movement is a cross-family fit, measured 30-60× RMS
- * blowup; scripts in tools/fit/archive/ — see "The frozen era clock" in
- * tools/fit/README.md). The window CSV is the living check of the
- * one-source movement (`npm run check:csv-smoke`, bit-exact).
+ * fits (obliquity, year-length, cardinal-point) are retired (doc 109 §23).
+ * The window CSV is the living check of the one-source movement
+ * (`npm run check:csv-smoke`, bit-exact).
  *
  * Usage:
  *   npm run fit:6a2                                                         # the window, −4000…+4000 (~25 min)
@@ -48,7 +45,7 @@ function getArg(name, defaultVal) {
 }
 
 const START_YEAR = parseFloat(getArg('start', String(C.balancedYear)));
-const END_YEAR = parseFloat(getArg('end', String(START_YEAR + 4000)));   // plan 09 step 7c: the window exporter's default span (the full-period file is retired)
+const END_YEAR = parseFloat(getArg('end', String(START_YEAR + 4000)));   // the window exporter's default span (the full-period file is retired)
 const OUTPUT_CSV = getArg('output', path.join(ROOT, 'data', '02-solar-measurements.csv'));
 
 // ─── Search parameters ───────────────────────────────────────────────────────
@@ -137,8 +134,8 @@ function findEquinox(type, prevJD) {
 /**
  * Find perihelion (min distance) or aphelion (max distance).
  */
-/** The anomalistic year OF DATE at a JD, days — the one-family law (plan 09
- *  step 4d; the Simon 1994 constant is gone); the sidereal year is the fallback
+/** The anomalistic year OF DATE at a JD, days — the one-family law; the
+ *  sidereal year is the fallback
  *  outside the law's window. A SEARCH PRIOR only — the measured instants are
  *  the finder's extrema, not this step. */
 function anomalisticYearDaysAtJD(jd) {
@@ -290,13 +287,13 @@ const DT = require(path.join(TOOLS_LIB, 'deep-time.js'));
   // One-source movement (Stage C-4b): the standing regeneration mode. A run
   // WITHOUT it produces the legacy K-movement CSV — valid only for
   // baseline-capture comparisons, never for a shipped 6c/6d fit basis.
-  // Plan 06 Phase 3 S3c: the one-source movement is the Node DEFAULT; SG_ONE_SOURCE=0 forces the K scene (diagnostic)
+  // the one-source movement is the Node DEFAULT; SG_ONE_SOURCE=0 forces the legacy scene (diagnostic)
   const osmOn = process.env.SG_ONE_SOURCE !== '0';
-  console.error(`One-source movement: ${osmOn ? 'ON (the default; SG_ONE_SOURCE=0 forces the K scene)' : 'OFF (SG_ONE_SOURCE=0 — K-scene diagnostic)'}`);
+  console.error(`One-source movement: ${osmOn ? 'ON (the default; SG_ONE_SOURCE=0 forces the legacy scene)' : 'OFF (SG_ONE_SOURCE=0 — legacy-scene diagnostic)'}`);
   if (!osmOn) {
     console.error('');
-    console.error('  ⚠  K-MOVEMENT CSV. Since Stage C-4b the shipped fit basis is the');
-    console.error('     one-source movement (the default since plan 06 Phase 3 S3c). Only run');
+    console.error('  ⚠  LEGACY-MOVEMENT CSV. The shipped fit basis is the');
+    console.error('     one-source movement (the default). Only run');
     console.error('     with SG_ONE_SOURCE=0 to capture a legacy-baseline comparison window.');
     console.error('');
   }
@@ -310,19 +307,15 @@ const DT = require(path.join(TOOLS_LIB, 'deep-time.js'));
   }
 }
 
-// (Plan 09 step 7a: the integrated-phase `Cycle` column (R15) — the unit's
-// cycles from the balanced year to each row's event JD, the phase variable the
-// retired comb fitters read (`Model Year` is a chaining-step counter: a
-// tropical year for SS/WS/VE/AE, an anomalistic one for PERI/APH) — is
-// deleted with the counter `cyclesBetweenYears`; no fitter reads this CSV.)
+// (`Model Year` is a chaining-step counter: a tropical year for SS/WS/VE/AE,
+// an anomalistic one for PERI/APH; no fitter reads this CSV.)
 
 console.error(`Solar measurements export: 1-year steps, ${startYear} to ${endYear}`);
 console.error(`Total: ${totalYears} years × 6 types = ~${totalYears * 6} rows`);
 console.error(`Output: ${OUTPUT_CSV}`);
 
 // ─── Window report ─────────────────────────────────────────────────────────
-// A plain year window (plan 09 step 5d; the former "H-balanced bracket" —
-// the span between two integer-phase events of the retired unit — is gone).
+// A plain year window.
 // `startYear`/`endYear` are chaining-step counts, not instants; the calendar
 // JDs of the window's ends are reported for the record.
 {
@@ -488,5 +481,4 @@ console.error(`Total rows: ${allRows.length}`);
 for (const [type, cnt] of Object.entries(typeCounts)) {
   console.error(`  ${type}: ${cnt} rows`);
 }
-// (plan 09 step 7a: the per-type "achieved cycle span" report left with the Cycle column)
 console.error(`CSV: ${OUTPUT_CSV}`);

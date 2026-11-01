@@ -43,12 +43,9 @@ export const createDerivedViews = ({ primitives: L0 }) => {
   const tropicalYearDays = perDay(L0.tropicalYearSeconds);
   const siderealYearDays = perDay(L0.siderealYearSeconds);
 
-  // (Plan 09 step 5d: `anomalisticYearDays` — the H/16 device identity — and
-  // `siderealYearDaysViaLattice` — the tropical year inverted through the
-  // H/(H − 13) identity, kept to measure the browser's former two sidereal
-  // globals against each other — left with the identities: the tropical year
-  // of date is one equinox turn per T_p(t), and the anomalistic year of date
-  // is published from the series' apsidal rate inside the one-family window.)
+  // (the tropical year of date is one equinox turn per T_p(t), and the
+  // anomalistic year of date is published from the series' apsidal rate
+  // inside the one-family window; the retired identities: doc 109 §23)
 
   return Object.freeze({
     tropicalYearDays,

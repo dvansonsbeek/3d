@@ -44,7 +44,7 @@ const readData = (f) => JSON.parse(readFileSync(join(ROOT, 'data', f), 'utf8'));
  * @type {string[]}
  */
 const MIGRATED = [
-  // Phase 5f block 1 — model.foundational: every leaf left the JSON (the scene
+  // model.foundational: every leaf moved out of the retired input file (the scene
   // epoch is astro.timeReference.sceneEpochJD / sceneEpochYear, covered by the
   // 'astro.timeReference' prefix below); any return fails this gate below.
 
@@ -54,7 +54,7 @@ const MIGRATED = [
   // re-running was a no-op ("0.010524 | 0.010524 | none"), and the bounded-moon
   // derivation records "bit-identical (0.8086/0.010524/0.0015), FULL GATES
   // PASSED". tools/lib always used 0.010524; only the browser copy had drifted.
-  // (The Moon's start angles and moonMeeusLpCorrection left the JSON; their
+  // (The Moon's start angles and moonMeeusLpCorrection are retired inputs; their
   // return fails below.)
 
   // Phase 5f block 4 — astro.physicalConstants. Listed per-path rather than by
@@ -100,9 +100,8 @@ const MIGRATED = [
   'astro.earthOrbital.sunMeanLongitudeJ2000_deg',
   'astro.earthOrbital.perihelionPassageJ2000_JD',
   'astro.earthOrbital.juneSolstice2000_JD',
-  // (plan 09 step 6: earthInclinationCycleAnchor — the retired eccentricity law's 21.77° — left the inputs;
-  //  the scene's K-device inclination phase at J2000 is the recorded pose kDeviceInclinationPhaseJ2000Deg)
-  // (plan 14 step 1: deltaTStart left astro-reference — it is the joint fit's OUTPUT and
+  // (earthInclinationCycleAnchor — the retired eccentricity law's 21.77° — is a retired input, doc 109 §23)
+  // (deltaTStart is the joint fit's OUTPUT, not an input: it
   //  lives in data/deltaT-4flag-fit.json, embedded as FIT.DT_ANCHOR.deltaTStartSeconds)
   'astro.earthOrbital.sunTilt',
 
@@ -254,7 +253,7 @@ const NOT_IN_SCRIPT = {
     + 'moontilt labs (tools/explore, which carry local copies) and the model-values '
     + 'registry; the browser never quotes them.',
   'astro.giaCoxChaoPeltier':
-    'GIA observation anchors (Cox & Chao dJ2/dt, Peltier factor) — plan 11 step 1: the '
+    'GIA observation anchors (Cox & Chao dJ2/dt, Peltier factor) — the '
     + 'GIA channel\'s two J2000 rates are DERIVED from them into the assembled deepTime '
     + 'block (generate.mjs assembleDeepTime); script.js reads K.deepTime.j2RateJ2000PerYr / '
     + '.alphaGiaRateJ2000PerYr, never the literals. The registry quotes them as citations.',
@@ -262,7 +261,7 @@ const NOT_IN_SCRIPT = {
     'Chapront (2002) obliquity citation values — consumed only by the model-values '
     + 'registry (obliqChapront* keys) for the Model-vs-literature tables; the browser '
     + 'never quotes them',
-  'astro.knownValues': 'validation targets for the model-values registry (the comb-era moon-cycles.js reader was deleted at plan 09 step 7e)',
+  'astro.knownValues': 'validation targets for the model-values registry (no runtime reader)',
   'astro.physicalConstants.gmstMeanSiderealT0Deg': 'the GMST polynomial has ONE home, eclipse/besselian.cjs computeGmstDeg; '
     + 'script.js reads createModel().eclipse.gmstDegAtJD (the five diagnostics that carried inline copies, two with a cubic term).',
   'astro.physicalConstants.gmstMeanSiderealRateDegPerDay': 'see gmstMeanSiderealT0Deg — the ONE GMST.',
@@ -270,8 +269,7 @@ const NOT_IN_SCRIPT = {
   'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2': 'ELP W1 T^2 budget — analysis only, tools/explore/v4-kpl-budget.js',
   'astro.cardinalPointAnchors': 'the observed USNO 2000 cardinal instants (UTC, minute precision) — reference data, '
     + 'no runtime reader (the cardinal instants are createModel().cardinal); quoted by the pipeline verifier\'s '
-    + 'informational rows, doc 110 and the model-values registry (cardinalAnchor*2000JD). Until plan 06 R4d the '
-    + 'VE/AE entries were retired-device anchors 112 min off these instants.',
+    + 'informational rows, doc 110 and the model-values registry (cardinalAnchor*2000JD).',
   // Three entries were REMOVED from here after review — all three were wrong,
   // and all three hid a real copy in script.js:
   //   alpha1PerMa                   -> script.js ALPHA_1, identical
@@ -484,7 +482,7 @@ for (const r of masked) {
 }
 
 // ── the retired input FILE — a ratchet on its RETURN ──────────────────────────
-// public/input/model-parameters.json is DELETED. Its leaves moved to
+// public/input/model-parameters.json is a RETIRED input (doc 109 §23). Its leaves moved to
 // astro-reference (the scene epoch), to data/ (the fitted deep-time block,
 // ASSEMBLED by generate.mjs from its three homes) or to code (the planets'
 // display names — presentation, not a parameter), or were retired with the
@@ -493,12 +491,12 @@ for (const r of masked) {
 // Fail-proven: ESSRT_LITERALS_PLANT=1 plants the hit.
 const retiredHits = [];
 if (existsSync(join(ROOT, 'public/input/model-parameters.json'))) {
-  retiredHits.push('public/input/model-parameters.json RETURNED (plan 11 step 6: deleted — the scene epoch is astro-reference timeReference, the planets\' names are @essrt/physics planets/display-names, the deep-time block is assembled by generate.mjs; every other leaf retired at plan 07 R8/R10, plan 09 step 7c and plan 11 steps 1–5)');
+  retiredHits.push('public/input/model-parameters.json RETURNED (a retired input — the scene epoch is astro-reference timeReference, the planets\' names are @essrt/physics planets/display-names, the deep-time block is assembled by generate.mjs; every other leaf retired with its construction, doc 109 §23)');
 }
 if (process.env.ESSRT_LITERALS_PLANT === '1') retiredHits.push('public/input/model-parameters.json (PLANTED)');
 for (const p of retiredHits) {
   console.log(`\n  RETIRED INPUT RETURNED  ${p}`);
-  console.log('    the file left the source of truth at plan 11 step 6; its quantities live in astro-reference.json, the fit artifacts under data/ and the physics package.');
+  console.log('    the file is a retired input (doc 109 §23); its quantities live in astro-reference.json, the fit artifacts under data/ and the physics package.');
 }
 
 const bad = divergent.length + missing.length + stillLiteral.length + masked.length + retiredHits.length;

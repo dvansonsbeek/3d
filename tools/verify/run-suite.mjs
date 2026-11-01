@@ -2,8 +2,8 @@
  * The `tools/verify` suite runner (plan §5d).
  *
  * `tools/verify` holds GATES and GENERATORS only — every script here either
- * fails or writes (plan 13 A5: the narratives and the ascending-node
- * derivations, which print and never fail, moved to tools/explore/). A gate
+ * fails or writes (the narratives and the ascending-node derivations, which
+ * print and never fail, live in tools/explore/). A gate
  * has a failing exit path and runs in the suite; a generator rewrites a
  * tracked data/*.json under --write and MUST NOT run as a test (a plain
  * inventory run once silently rewrote 424 lines of a tracked preset file) —
@@ -29,24 +29,10 @@ const V = (n) => join(ROOT, 'tools/verify', n);
  * (liftable / narrative scripts no longer live here — tools/explore/)
  */
 const MANIFEST = [
-  // THE FIBONACCI-LAW RETIREMENT, COMPLETED (plan 07 R6). The balance suite
-  // was reclassified gate→narrative at the model restatement and is now
-  // DELETED with the psi/K laws it computed from — nine scripts:
-  // verify-laws, dual-balance-optimizer, config1-proof,
-  // configuration-analysis, eccentricity-balance, epoch-independence and
-  // balance-search on the eccentricity side; inclination-verification and
-  // inclination-optimization on the inclination side. Each read the retired
-  // construction directly (orbitalEccentricityBase — the K law's System-Reset
-  // output — or the psi law's amplitude and mean), so with the laws gone
-  // there is nothing for them to compute. Doc 109 is the engine-input
-  // re-evaluation that superseded them.
-  // The model's falsifiability rests on the three-falsifier criterion
-  // (CLAUDE.md §Verification), which never depended on these.
-  //
-  // (perihelion-projection-closure.js and predict-form-pinning.js — the two
-  // gates on the planet predict device — were deleted with it at plan 06 R8:
-  // the Earth-frame rate is now the projection formula applied to the chain's
-  // own apsidal motion, so there is no fitted surrogate left to close or pin.)
+  // (The retired balance suite and the planet predict device's two gates are
+  // the record, doc 109 §23. The model's falsifiability rests on the
+  // three-falsifier criterion (CLAUDE.md §Verification), which never
+  // depended on them.)
 
   { n: 'cassini-results.js', class: 'generator', ms: 8000,
     writes: 'data/cassini-moontilt-results.json (tracked; --write only — runs both Cassini labs live)' },
@@ -57,7 +43,7 @@ const MANIFEST = [
   { n: 'nbody-secular.js', class: 'generator', ms: 1200000, slow: true,
     writes: 'data/nbody-secular-frequencies.json (tracked; --write only — one 1-Myr WH frame=both run + NAFF, ~15-20 min). Engine-D g/s frequencies (A), 1800–2100 window rates (B), the derived 1PN supplement + the P8b Mercury closure assertion (Batch D of the restatement)' },
   { n: 'obliquity-hybrid.js', class: 'generator', ms: 90000, slow: true,
-    writes: 'data/obliquity-hybrid-verdict.json (tracked; --write only — runs the one-home Stage-C lab: the derived deps/dt(J2000) beside the IAU target, the two-tier eps-vs-La2004 window tables, the H/8 beat). A plain run only prints the banked verdict' },
+    writes: 'data/obliquity-hybrid-verdict.json (tracked; --write only — runs the one-home Stage-C lab: the derived deps/dt(J2000) beside the IAU target, the two-tier eps-vs-La2004 window tables, the J2000 obliquity beat). A plain run only prints the banked verdict' },
   { n: 'deep-secular-modes.js', class: 'generator', ms: 4800000, slow: true,
     writes: 'data/nbody-deep-secular-modes.json (tracked; --write only — needs the untracked ±10-Myr dump, produced by a separate 3.4-h run named in the header; then decimate + NAFF 18 terms, ~75 min). The two-tier deep-time Earth-z law + the T5c metronome verdict (engine-switch Stage B); NO consumer reads it until its T5d-revised gate passes. A plain run only prints the banked verdict' },
   { n: 'secular-series.js', class: 'generator', ms: 300000, slow: true,
@@ -86,7 +72,7 @@ const MANIFEST = [
   { n: 'scene-year-lengths.js', class: 'gate', ms: 52000,
     note: 'the scene is the reference (owner, 2026-09-30): the Node scene twin sampled with the solar-measurements exporter\'s own event definitions at −4000 and +10,000 (±100 yr) — RA, ε, e, the apsidal line, the published cardinal instants, and the sidereal/tropical/anomalistic years of date against the one-family laws to 30 ms (the planetary completion removed per event). Fail-proven via ESSRT_SCENE_YEARS_PLANT=1; the pre-restatement laws fail it (57 ms / 26 ms / 1.1 s at −4000)' },
   { n: 'deltat-slope-basis.js', class: 'gate', ms: 3000,
-    note: 'ONE day basis: the pane\'s LOD_real − 86,400 equals the slope the shipped ΔT integrates (dΔT/dt ÷ 365.25) to 2 µs/day and the physics-base twin to 0.1 µs/day at every 25-yr sample of 1700–2100 — the 0.43 ms/day two-bases split of the pre-plan-09 state, closed by plan 09 step 4c and re-measured gone; fail-proven via ESSRT_DT_SLOPE_PLANT=1' },
+    note: 'ONE day basis: the pane\'s LOD_real − 86,400 equals the slope the shipped ΔT integrates (dΔT/dt ÷ 365.25) to 2 µs/day and the physics-base twin to 0.1 µs/day at every 25-yr sample of 1700–2100 — the 0.43 ms/day two-bases split of the retired state, closed and re-measured gone; fail-proven via ESSRT_DT_SLOPE_PLANT=1' },
   { n: 'paleo-anchors.js', class: 'gate', ms: 2000,
     note: 'Phase 19 + plan 12 option A: 45 deep-time anchors — 40 chronology rows plus the five Precambrian precession rows (Wells 1963 · Winter 2020 · Pannella 1972 · Williams 2000 · Mitchell-Kirscher 2023 · Wu 2024 · Patterson · the mid-Precambrian set: Lantink 2022 + Weeli Wolli + Moodies + Zhou 2024 paired a+LOD+precession + Xiamaling + Nanfen) recomputed LIVE from the engine on the CITED distance history (Farhat 2022) vs data/paleo-validation-anchors.json — every row a test, nothing fitted to it; documented deviations (Williams 620 Ma, the Wu Pangea interval, three Wells rows, the Zhou precession rows) are BANDS with their cause named — an unexplained improvement fails too (the verify-laws precedent)' },
 

@@ -163,8 +163,8 @@ export function createPlanetSpinChannelFromArtifacts(deps: {
  * The DERIVED J2000 obliquity to the planet's own orbit, degrees: the angle
  * between the J2000 spin axis (angular-momentum sense — Venus ≈ 177°,
  * Uranus ≈ 98°) and the chain's J2000 orbit plane. Needs no mode table and
- * no integration — the load-time twins read it for the K device's
- * "mean obliquity" slot (commit 2 of Phase 7); the acute form is
+ * no integration — the load-time twins read it as the record's
+ * "mean obliquity" input; the acute form is
  * `min(ε, 180 − ε)`.
  * @param {{ spin: SpinInputs, anchorInclEclipticDeg: number,
  *   anchorAscNodeEclipticDeg: number, obliquityJ2000Deg: number }} p

@@ -140,9 +140,9 @@ for (const url of SAMPLE_REQUESTS) {
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;
   if (Math.abs(ss.jd - 2451716.575) > 0.1) failures.push(`SS 2000 JD: ${ss.jd}`);
   const val = dataOf('/v1/values/usnoLodJ2000');
-  if (val.value !== '86,400.0012') failures.push(`values/usnoLodJ2000: ${val.value}`);   // plan 09: ω₀ = the SI day removed the H/13 day's +0.32 ms/day bias from the raw ΔT integrand; the joint re-close's optimum moved 0022 → 0012 (Espenak RMS 14.06 → 12.45 s). v23.0: the obliquity lines on the realized pole rate moved the GIA α(t) channel and the joint re-close's optimum to 0022 (history: 0018 after the ecc-unification 7c re-close → 0020 → 0019 with the lagged GIA channel → 0021 with the ecliptic missing-motion term on the nodal period, plan 06 T2, held through v22.0)
+  if (val.value !== '86,400.0012') failures.push(`values/usnoLodJ2000: ${val.value}`);   // ω₀ = the SI day; the joint re-close's optimum (its history is the record, doc 109 §23)
   const deriv = dataOf('/v1/derivations/axialPrecession');
-  if ('latticeDivisor' in deriv) failures.push('derivations/axialPrecession must not serve a lattice divisor (no H on a published surface — plan 16)');
+  if ('latticeDivisor' in deriv) failures.push('derivations/axialPrecession must not serve a divisor (no H on a published surface)');
   if (Math.abs(deriv.periodYears - 25771.575) > 0.5) failures.push(`derivations/axialPrecession period: ${deriv.periodYears}`);
   // S6: the Earth-cycle rows carry the DYNAMICAL periods (the registry's values), never the device H/n.
   // (inclinationPrecession ≈ 111,634: the movement's own apsidal rate of date since 2026-09 — was the chain tangent's
@@ -168,7 +168,7 @@ for (const url of SAMPLE_REQUESTS) {
   // 1,296,000/g1, the same number the registry publishes as mercuryPeriPeriodICRF
   // — the two surfaces agreeing is the point.
   if (Math.round(merc.record.perihelionEclipticYears) !== 232437) failures.push(`mercury ecl period: ${merc.record.perihelionEclipticYears}`);
-  // …and the device's descriptors are gone from what is served.
+  // …and no retired descriptor is served.
   for (const gone of ['fibonacciD', 'antiPhase', 'inclinationCycleAnchor', 'wobblePeriod', 'ascendingNodeCyclesIn8H', 'orbitalEccentricityBase', 'orbitalEccentricityAmplitude', 'invPlaneInclinationAmplitude']) {
     if (gone in merc.record) failures.push(`device field still served: record.${gone}`);
   }

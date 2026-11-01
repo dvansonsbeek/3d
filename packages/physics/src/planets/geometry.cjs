@@ -12,10 +12,9 @@
  * bit-identity holds by construction; Node's last-ulp variants dissolve here
  * (the cardinal-extraction pattern).
  *
- * PLAN 09 STEP 7b: the device count is gone. The geometry used to quantize
- * every body's period onto the unit — N = round(H·mSY/input) orbits per
- * anchor interval, period H/N, a = (H/N)^(2/3) — a rounding of up to half a
- * count (2.5e-4 of Neptune's period). The caller now hands in the period in
+ * The retired device count (doc 109 §23) quantized every body's period onto
+ * its unit — a rounding of up to half a count (2.5e-4 of Neptune's period).
+ * The caller now hands in the period in
  * SI days directly (the chain's J2000 window mean motion for the seven chain
  * planets, the observed input for the no-chain bodies) and, where a chain
  * exists, the chain's J2000 semi-major axis; Kepler's a from the period is the
@@ -36,7 +35,7 @@
  * Saturn's scene-side negation of elipticOrbit (antiPhase) is a SCENE
  * convention and stays engine-side.
  *
- * THE ELLIPSE FAMILY IS A CODE TAXONOMY, ONE HOME HERE (plan 11 step 3):
+ * THE ELLIPSE FAMILY IS A CODE TAXONOMY, ONE HOME HERE:
  * `SCAFFOLD_ELLIPSE_FAMILY` names each body's branch. It left the inputs
  * (model-parameters.json `planets.<p>.type`) because it is not a model
  * parameter — it is the shape of the geocentric scaffold's wheel ellipses,
@@ -98,8 +97,8 @@ const SCAFFOLD_ELLIPSE_FAMILY = Object.freeze({
 function derivePlanetGeometry(body, env) {
   const { key, periodDays, semiMajorAxisAu, orbitalEccentricityBase: base,
           longitudePerihelion, ascendingNode, rotationPeriodDays, orbitDistanceOverride } = body;
-  // The ellipse family is the law's own taxonomy (plan 11 step 3: the
-  // scaffold `type` left the inputs for every body): Pluto and Halley take
+  // The ellipse family is the geometry's own taxonomy (the scaffold `type`
+  // is not an input): Pluto and Halley take
   // the body-name branches below, the rest read SCAFFOLD_ELLIPSE_FAMILY.
   const type = SCAFFOLD_ELLIPSE_FAMILY[key];
   const { meanSolarYearDays: mSY, currentAUDistanceKm: AU,

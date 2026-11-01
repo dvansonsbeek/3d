@@ -19,14 +19,14 @@ export type PlanetModelBody = {
     rotationPeriodDays?: number | undefined;
     /**
      * - minor bodies: JSON input;
-     * carriers: ignored (the K law derives it)
+     * carriers: ignored (the chain carries their eccentricity of date)
      */
     orbitalEccentricityBase?: number | undefined;
     orbitDistanceOverride?: number | undefined;
 };
 export type PlanetModelEnv = {
     /**
-     * - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements (plan 09 step 7b)
+     * - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements
      */
     chainArtifact?: any;
     meanSolarYearDays: number;
@@ -53,12 +53,12 @@ export type PlanetModelRecord = {
  * @property {number} [ascendingNode]
  * @property {number} [rotationPeriodDays]
  * @property {number} [orbitalEccentricityBase] - minor bodies: JSON input;
- *   carriers: ignored (the K law derives it)
+ *   carriers: ignored (the chain carries their eccentricity of date)
  * @property {number} [orbitDistanceOverride]
  */
 /**
  * @typedef {Object} PlanetModelEnv
- * @property {any} [chainArtifact] - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements (plan 09 step 7b)
+ * @property {any} [chainArtifact] - the governed engine-D chain artifact (CHAIN_ARTIFACT): the seven chain planets' scaffold a and period ride its J2000 elements
  * @property {number} meanSolarYearDays
  * @property {number} balancedYear
  * @property {number} systemResetN

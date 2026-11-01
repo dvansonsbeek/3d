@@ -1,5 +1,5 @@
 /**
- * THE PLANETS' SPIN CHANNEL — the ONE home (plan 06 Phase 7, ex-K8b-3).
+ * THE PLANETS' SPIN CHANNEL — the ONE home.
  *
  * The Earth channel composes its precession rate from the solar and lunar
  * torques on the model's own recession history (earth/precession-composed).
@@ -22,7 +22,7 @@
  * so the J2000 obliquity is DERIVED, not an input — its agreement with the
  * IAU tilt is the first check of every planet's row.
  *
- * What the numbers mean (plan 06 Phase 7 record): where a planet's C/MR²
+ * What the numbers mean: where a planet's C/MR²
  * was itself inferred from the measured precession rate (Mars, Venus,
  * Mercury — 'spin-inferred'), this channel's rate is a CLOSURE of that
  * inference through the model's own orbit (a, e, n); where C/MR² comes from
@@ -47,7 +47,7 @@
  * (keplerian-chain `computeSecularShape`) — the "wobble period" the K
  * device beat from its integer axial and obliquity fractions.
  *
- * Since plan 11 step 3 the channel also serves the POLE of date itself —
+ * The channel also serves the POLE of date itself —
  * `spinAxisEclipticJ2000AtYear` (the integrated ŝ(t), angular-momentum
  * sense) beside `orbitNormalEclipticJ2000AtYear` (n̂(t)) — so both scene
  * twins place each planet's rotation axis in world through the frame bridge
@@ -182,8 +182,8 @@ function spinAxisJ2000(spin, obliquityJ2000Deg) {
  * The DERIVED J2000 obliquity to the planet's own orbit, degrees: the angle
  * between the J2000 spin axis (angular-momentum sense — Venus ≈ 177°,
  * Uranus ≈ 98°) and the chain's J2000 orbit plane. Needs no mode table and
- * no integration — the load-time twins read it for the K device's
- * "mean obliquity" slot (commit 2 of Phase 7); the acute form is
+ * no integration — the load-time twins read it as the record's
+ * "mean obliquity" input; the acute form is
  * `min(ε, 180 − ε)`.
  * @param {{ spin: SpinInputs, anchorInclEclipticDeg: number,
  *   anchorAscNodeEclipticDeg: number, obliquityJ2000Deg: number }} p

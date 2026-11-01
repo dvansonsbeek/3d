@@ -134,7 +134,6 @@ export { computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorld
 // (survey order: geometry → channels → chains). The planets' elements of date
 // have one home, the N-body chain.
 export { derivePlanetGeometry, scaffoldOrbitInputs } from './planets/geometry.cjs';
-// (plan 09 step 6: eccentricityFromCycles / computeEccentricityIntegrated — the H/16 law-of-cosines eccentricity — are deleted; no runtime read them)
 export * as planetOrbitChain from './planets/orbit-chain.cjs';
 // P5/K4.6c — the engine-D Keplerian chain (pure evaluator + the embedded
 // governed artifact; the browser flag path consumes exactly these).
@@ -167,8 +166,6 @@ export { computeSolarTorqueShare, createComposedPrecession } from './earth/prece
 // The cited mean obliquity of date — the second column read from the Earth–Moon
 // history; the precession RATE of date carries its cos ε̄(t)/cos ε̄(0) on the constant.
 export { createMeanObliquityHistory } from './earth/mean-obliquity-history.cjs';
-// (planets/predict.cjs — the planet predictive-precession feature basis — was
-// retired at plan 06 R8 with PREDICT_COEFFS_PHYSICAL.)
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';

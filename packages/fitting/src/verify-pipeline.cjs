@@ -100,8 +100,8 @@ console.log('═══ Step 4: Earth geometry validation ═══');
 
 const sg = require(path.join(TOOLS_LIB, 'scene-graph.js'));
 // The package model on the shipped series artifact (the API's / audit's
-// configuration — plan 06 R1 measured that a model built WITHOUT the
-// artifact is a different hybrid): one instance for the cardinal instants
+// configuration — a model built WITHOUT the artifact is a different hybrid,
+// measured): one instance for the cardinal instants
 // and the one-family year lengths below.
 const pipelineModel = (() => {
   const { createModel } = require('@essrt/physics');
@@ -111,14 +111,12 @@ const pipelineModel = (() => {
 })();
 
 // Obliquity at the June 2000 solstice (from the scene-graph's Sun declination).
-// Plan 06 Phase 3 S3c: the reference is the IAU 2006 mean obliquity OF DATE at
-// the solstice instant — ε₀ + ε̇·T (T in Julian centuries from J2000.0; the T²
-// term is 4e-9″ here) — NOT the J2000.0 value: the obliquity falls 0.22″ between
-// January 1 and the solstice, and the one-source scene shows exactly that. The
-// former check compared the solstice declination with the J2000.0 value; it
-// passed only because the K device had been calibrated to hit the J2000.0
-// number at the solstice instant (a 0.22″ convention, not physics). Measured
-// residual under the one-source scene: 0.012″; tolerance 0.05″.
+// The reference is the IAU 2006 mean obliquity OF DATE at the solstice
+// instant — ε₀ + ε̇·T (T in Julian centuries from J2000.0; the T² term is
+// 4e-9″ here) — NOT the J2000.0 value: the obliquity falls 0.22″ between
+// January 1 and the solstice, and the one-source scene shows exactly that (a
+// J2000.0 reference is a 0.22″ convention, not physics). Measured residual:
+// 0.012″; tolerance 0.05″.
 const solsticeJ2000JD = C.ASTRO_REFERENCE.juneSolstice2000_JD;
 const obliqScene = sg.phiToDecDeg(sg.computePlanetPosition('sun', solsticeJ2000JD).dec);
 const solsticeT = (solsticeJ2000JD - 2451545.0) / 36525;
@@ -129,10 +127,10 @@ console.log(`  Obliquity at the June 2000 solstice: scene ${obliqScene.toFixed(6
 
 // Obliquity rate: the scene's solstice declination in 2100 minus 2000. The
 // 2100 instant is the model's OWN June-solstice crossing (createModel()
-// .cardinal, the apparent Sun at true UT) — plan 06 R4 follow-up: the former
+// .cardinal, the apparent Sun at true UT) — measured: the former
 // "2000 solstice + one mean tropical century" sat ~1.6 h from the true 2100
 // solstice, and the declination's curvature there read as a 0.06″ dip in
-// the rate (the K plane's node offset had compensated it by coincidence, so
+// the rate (a retired scene pose had compensated it by coincidence, so
 // the old 0.0005″ metric was luck); at the solstice itself the declination is
 // stationary, so the instant's minute-level precision is invisible.
 const solstice2100JD = pipelineModel.cardinal.jd(2100, 'SS');
@@ -164,19 +162,15 @@ if (ssFoundJD) {
 }
 
 // Eccentricity at J2000 — the ONE published e, the N-body series' secular
-// element (plan 09 step 6: the H/3 law through the Node engine left; plan 07
-// R10 before it: a private copy of the two-cosine K law on the retired phase
-// origin read 0.0027 off once the origin moved).
+// element (the retired eccentricity laws are the record, doc 109 §23).
 const eJ2000 = require('@essrt/physics').createModel().earth.eccentricity(2000);
 const eTarget = C.ASTRO_REFERENCE.earthEccentricityJ2000;
 const eError = Math.abs(eJ2000 - eTarget);
 check('e(J2000) vs IAU', eError, 0, 1e-4);
 console.log(`  e(J2000): ${eJ2000.toFixed(10)} (IAU: ${eTarget}, diff: ${eError.toExponential(2)})`);
 
-// (plan 09 step 4: the "perihelion longitude at J2000 from the raw harmonic
-// formula" and "ERD at J2000" rows left with the perihelion comb; the series'
-// ϖ of date against the IAU mean element is the registry plausibility row
-// periLongModel2000AD vs periLongJ2000, 0.02°.)
+// (the series' ϖ of date against the IAU mean element is the registry
+// plausibility row periLongModel2000AD vs periLongJ2000, 0.02°.)
 
 // Year lengths at J2000 vs IAU references
 const astroRef = JSON.parse(fs.readFileSync(
@@ -209,14 +203,14 @@ const tropWS = cardinalYearLength(2000, 'WS');
 const tropVE = cardinalYearLength(2000, 'VE');
 const tropAE = cardinalYearLength(2000, 'AE');
 const tropJ2000 = (tropSS + tropWS + tropVE + tropAE) / 4;
-// Plan 06 R1: the cardinal intervals are now the APPARENT crossings of the
+// The cardinal intervals are the APPARENT crossings of the
 // one Sun (nutation and the short-period terms included), so their single-
 // year 4-mean is NOT the mean tropical year — it scatters ±150 s around it,
 // as Meeus's own successive instants do. The mean-year check reads the ONE
 // year-length family (route B, SI seconds) against the IAU value; the
 // per-type intervals below stay informational.
 const oneFamilyTropDays = pipelineModel.epoch.tropicalYearSecondsAtYear(2000) / 86400;
-const tropDiffSec = (oneFamilyTropDays - C.meanSolarYearDays) * 86400;   // plan 09: vs the DERIVED J2000 tropical year (sidereal year + p_A), one home
+const tropDiffSec = (oneFamilyTropDays - C.meanSolarYearDays) * 86400;   // vs the DERIVED J2000 tropical year (sidereal year + p_A), one home
 // Tolerance: 10 s (the one-family year sits +0.03 s from IAU at J2000).
 check('Tropical year at J2000', Math.abs(tropDiffSec), 0, 10.0);
 console.log(`  Tropical year at J2000 (one-family): ${oneFamilyTropDays.toFixed(9)} d (derived J2000: ${C.meanSolarYearDays.toFixed(9)} d, diff: ${tropDiffSec >= 0 ? '+' : ''}${tropDiffSec.toFixed(3)}s); 4-mean of the 2000→2001 crossing intervals: ${tropJ2000.toFixed(6)} d (informational)`);
@@ -225,15 +219,9 @@ console.log(`    RA=90° (SS): ${tropSS.toFixed(9)} d (IAU: ${ylRef.tropicalYear
 console.log(`    RA=180°(AE): ${tropAE.toFixed(9)} d (IAU: ${ylRef.tropicalYearAE} d, diff: ${((tropAE - ylRef.tropicalYearAE)*86400).toFixed(2)}s)`);
 console.log(`    RA=270°(WS): ${tropWS.toFixed(9)} d (IAU: ${ylRef.tropicalYearWS} d, diff: ${((tropWS - ylRef.tropicalYearWS)*86400).toFixed(2)}s)`);
 
-// (Plan 09: the sidereal and anomalistic J2000 rows read the retired year
-// combs; the J2000 sidereal and anomalistic years are the IAU inputs now.)
-
 // ── Cardinal point JDs at J2000 (informational) ──
 // Reference: the registry's `cardinalPointAnchors` — the USNO "Earth's
 // Seasons" 2000 instants (UTC, minute precision; ONE home, astro-reference).
-// Plan 06 R4c/R4d: until R4d the registry's VE/AE entries were retired-device
-// anchors (05:43 / 19:19 UT), 112 min off the real equinoxes — corrected to
-// the USNO instants at R4d; these rows quote the registry again.
 const usnoCP2000 = C.ASTRO_REFERENCE.cardinalPointAnchors;
 console.log('  Cardinal point JDs at J2000 (vs USNO 2000, minute precision):');
 for (const type of ['SS', 'WS', 'VE', 'AE']) {
@@ -242,14 +230,9 @@ for (const type of ['SS', 'WS', 'VE', 'AE']) {
   console.log(`    ${type}: JD ${jd.toFixed(6)} (${jdToDate(jd)})  USNO: ${usnoCP2000[type].toFixed(4)}  diff: ${diffMin >= 0 ? '+' : ''}${diffMin.toFixed(2)} min`);
 }
 
-// (plan 09 step 7a: the harmonic term-count row left with the cardinal record)
-
-
-// (plan 11 step 2: the Earth-geometry regression compare against
-// tools/results/baselines.json — the retired optimizer's companion record —
-// is deleted with the file; the obliquity, its rate and the tropical year are
-// pinned by the fixtures and the registry's plausibility rows. The checks
-// above still FAIL on their own tolerances.)
+// (the obliquity, its rate and the tropical year are pinned by the fixtures
+// and the registry's plausibility rows; the checks above FAIL on their own
+// tolerances.)
 console.log(`  ✓ Earth geometry verified\n`);
 
 // (The chain-vs-JPL RMS has one home: the governed artifact

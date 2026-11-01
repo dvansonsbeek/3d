@@ -1,21 +1,20 @@
 #!/usr/bin/env node
 /**
- * Doc 99's generated tables — the deep-time clock, written by the engine
- * (holisticuniverse plan 06 Phase 4b).
+ * Doc 99's generated tables — the deep-time clock, written by the engine.
  *
  *   node tools/docs/render-doc99-tables.mjs --check    exit 1 if any block is stale
  *   node tools/docs/render-doc99-tables.mjs --write    re-render the blocks
  *
- * Doc 99 (ESSRT) used to carry hand-computed tables of "H(t)" and "8H(t)/n"
- * under the retired spin-only clock. Every NUMBER in these blocks is now
+ * Doc 99 (ESSRT) once carried hand-computed tables under the retired spin-only
+ * clock (doc 109 §23). Every NUMBER in these blocks is now
  * written by this script from the evaluators the model runs ("a number a doc
  * cannot reproduce from an artifact gets written BY the script" — CLAUDE.md):
  * the composed lunisolar precession period T_p(t) = 1,296,000/ψ̇(t) on its
- * J2000 anchor, the IAU 2006 general precession p_A (an input since plan 09),
+ * J2000 anchor, the IAU 2006 general precession p_A (an input),
  * the obliquity beat 2π/(ψ̇ − |s₃|), the tidal chain's LOD and Moon distance,
  * the day's ecliptic-precession term on the nodal period T_s₃, and the
  * climate formula's PHYSICAL
- * lines (data/l1-physical-lines.json, plan 06 T1): the precession-band lines
+ * lines (data/l1-physical-lines.json): the precession-band lines
  * p + g_i and p + s_i ride ψ̇(t); the eccentricity-band lines |g_i − g_j| do
  * not (μ = 1 — the solar-mass drift of the g-modes is ~0.02 % at 2.46 Ga).
  * Block markers follow tools/docs/render-calculation-map.mjs:
@@ -92,7 +91,7 @@ function blockClockThroughTime() {
     rows.push(`| ${b(ageLabel(t))} | ${b(f(lodHr(t), 2))} | ${b(th(Tp(t)))} | ${b(f(daysPerYr(t), 2))} | ${b(th(moonKm(t)))} | ${b(f(beatKyr(t), 2))} | ${ERA[String(t)] ?? ''} |`);
   }
   rows.push('');
-  rows.push(`T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] × cos ε̄(t)/cos ε̄(0) — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer, times the cited mean obliquity's cosine (ε̄(t) Farhat et al. 2022's own column of the same history, plan 12 §8: the precession RATE is the constant α(t) times cos ε̄(t), lower in the deep past — ${f(DT.meanObliquityCitedDegAtAge(380), 2)}° at the Devonian, ${f(DT.meanObliquityCitedDegAtAge(2460), 2)}° at 2.46 Ga; the factor is ${f(DT.precessionObliquityFactorAtAge(380), 4)} and ${f(DT.precessionObliquityFactorAtAge(2460), 4)} there); p₀ = ${f(p0, 4)} ″/yr, the IAU 2006 general precession p_A at J2000 — an input since plan 09 (T_p = ${th(Tp(0), 1)} Julian yr). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = ${f(s3, 4)} ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (H₀·LOD/LOD₀ ÷ 13) read 23,553 yr at the Devonian where the composed clock reads ${th(Tp(380))} — retired, and its counter deleted at plan 09 step 7a (the 23,553 is the last recorded value).`);
+  rows.push(`T_p(t) = 1,296,000/ψ̇(t) with ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] × cos ε̄(t)/cos ε̄(0) — Earth's spin (angular-momentum conservation on the recession history) carrying the solar and lunar torques, the lunar torque growing as the Moon was closer, times the cited mean obliquity's cosine (ε̄(t) Farhat et al. 2022's own column of the same history: the precession RATE is the constant α(t) times cos ε̄(t), lower in the deep past — ${f(DT.meanObliquityCitedDegAtAge(380), 2)}° at the Devonian, ${f(DT.meanObliquityCitedDegAtAge(2460), 2)}° at 2.46 Ga; the factor is ${f(DT.precessionObliquityFactorAtAge(380), 4)} and ${f(DT.precessionObliquityFactorAtAge(2460), 4)} there); p₀ = ${f(p0, 4)} ″/yr, the IAU 2006 general precession p_A at J2000 — an input (T_p = ${th(Tp(0), 1)} Julian yr). The obliquity beat is 1,296,000/(ψ̇ − |s₃|) with |s₃| = ${f(s3, 4)} ″/yr, the dominant nodal mode of Earth's orbit (the engine's deep secular modes; μ = 1). The spin-only clock the model carried before (doc 109 §23) read 23,553 yr at the Devonian where the composed clock reads ${th(Tp(380))} — retired (the 23,553 is the last recorded value).`);
   return rows.join('\n');
 }
 
@@ -115,7 +114,7 @@ function blockLines(lines, title) {
     rows.push(`| ${b(ageLabel(t))} | ${b(f(psiDot(t), 2))} | ${lines.map((l) => b(f(lineKyr(l, t), 2))).join(' | ')} |`);
   }
   rows.push('');
-  rows.push(`${title}: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the line's orbital frequency (fixed, μ = 1) and ψ̇(t) the precession rate of date the family carries — the composed general precession (the column) for the climatic-precession lines, the spin axis's inertial rate (the column times the hybrid's self-anchor factor ${f(kIn, 5)}, ${f(pIn, 3)} ″/yr at J2000) for the obliquity lines — the ${lines.length} lines are the physical L1 set of plan 06 T1 (\`data/l1-physical-lines.json\`, relative amplitude ≥ 0.1 within the family), not integer labels.`);
+  rows.push(`${title}: each line's period is 1,296,000/(ψ̇(t) + f_i) kyr with f_i the line's orbital frequency (fixed, μ = 1) and ψ̇(t) the precession rate of date the family carries — the composed general precession (the column) for the climatic-precession lines, the spin axis's inertial rate (the column times the hybrid's self-anchor factor ${f(kIn, 5)}, ${f(pIn, 3)} ″/yr at J2000) for the obliquity lines — the ${lines.length} lines are the physical L1 set (\`data/l1-physical-lines.json\`, relative amplitude ≥ 0.1 within the family), not integer labels.`);
   return rows.join('\n');
 }
 
@@ -188,8 +187,7 @@ function blockKeyEpochs() {
 
 // The day's ecliptic-precession term δ_LOD = LOD_mean/(T_s₃·mSY) on the shipped
 // chain (`h5Correction` — identifier kept; the divisor is the nodal period since
-// the plan 06 T2 restatement, mSY the year in SI days). (plan 09 step 7b deleted
-// the former `blockH5`, which evaluated the frozen device's H/5 form on the unit.)
+// the lunisolar-clock restatement, mSY the year in SI days).
 function blockEclipticLod() {
   const rows = ['| Age (Ma) | LOD_mean (s) | δ_LOD (ms) — the ecliptic-precession term | fractional δ/LOD |', '|---:|---:|---:|---:|'];
   for (const t of [-200, 0, 380, 1000]) {
@@ -216,7 +214,6 @@ function blockSummary() {
   line('Climatic-precession line p + g₅ (kyr)', (t) => f(lineKyr(g0, t), 2));
   line('Long-eccentricity metronome g₂ − g₅ (kyr, NOT scaled)', () => f(fam[0].periodKyr, 1));
   line('Short-eccentricity line g₄ − g₅ (kyr, NOT scaled)', () => f(ecc[0].periodKyr, 2));
-  // (plan 09 step 7a: the frozen era clock's day-count row H_era × days/yr left with the counter)
   return rows.join('\n');
 }
 

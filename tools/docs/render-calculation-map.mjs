@@ -77,7 +77,7 @@ function blockKpl() {
     `| T2_LP (Meeus L′ T² coefficient) | ${T2_LP} °/cy² | Meeus Ch. 47 polynomial, literal |`,
     `| T2_LP_TIDAL = (−25.86″/cy²)/2 | ${e(T2_LP_TIDAL, 6)} °/cy² | LLR tidal n̈/2 |`,
     `| t2obl = (J₂ figure + Lieske ṗ_A T²)/3600 | ${e(t2obl, 6)} °/cy² | astro-reference elpW1T2Decomposition: ${W.earthFigureJ2} + ${W.generalPrecessionPA_T2_Lieske1976} ″/cy² |`,
-    `| Δ(e²) per century at J2000 = e(+50 yr)² − e(−50 yr)² | ${e(de2, 6)} | the deep channel (the doc-66 value −2332 °/cy per e² was derived on the H/3 line's slope) |`,
+    `| Δ(e²) per century at J2000 = e(+50 yr)² − e(−50 yr)² | ${e(de2, 6)} | the deep channel (the doc-66 value −2332 °/cy per e² was derived on the retired single-line eccentricity law's slope, doc 109 §23) |`,
     `| **K_PL = 2·(T2_LP − T2_LP_TIDAL − t2obl)/Δ(e²)** | **${kPl.toFixed(2)} °/cy per e²** | arguments.cjs kPlValue() — the same budget numerator, the live channel's slope |`,
   ].join('\n');
 }
@@ -90,7 +90,7 @@ function blockLunarPeriods() {
   const DAY = 86400, YR = 365.25 * 86400;
   for (const t of [0, 0.002584, 0.01, 0.1, 1, 10, 380, 650]) {
     const sm = DT.meanMoonSiderealMonthAtAge(t), pp = DT.meanLunarPerigeePrecessionAtAge(t), np = DT.meanLunarNodePrecessionAtAge(t);
-    // plan 09 step 7b: the H(t) column — the unit — is the composed precession period now
+    // the T_p column is the composed precession period
     rows.push(`| ${t} | ${f(sm === null ? null : sm / DAY, 6)} | ${f(pp === null ? null : pp / YR, 5)} | ${f(np === null ? null : np / YR, 5)} | ${f(DT.meanLunisolarPrecessionPeriodYearsAtAge(t), 1)} | ${f(deep.modulation(t, S_W), 7)} | ${f(deep.modulation(t, S_N), 7)} |`);
   }
   return rows.join('\n');
@@ -109,11 +109,11 @@ function torqueSplit() {
   const lun = (C.GM_MOON_ALONE / C.moonDistance ** 3) * Math.pow(1 - C.moonOrbitalEccentricity ** 2, -1.5)
     * (1 - 1.5 * Math.sin(C.moonEclipticInclinationJ2000 * D2R) ** 2);
   // The share and p₀ are READ from the ONE home (the engine's composed-
-  // precession instance, plan 06 D6); the local sol/lun terms stay only to
+  // precession instance); the local sol/lun terms stay only to
   // show the derivation in the table. Divergence would be a stale twin.
   const fS = DT.PRECESSION_SOLAR_SHARE_J2000;
   if (Math.abs(fS - sol / (sol + lun)) > 1e-12) throw new Error(`torque share twin diverged: ${fS} vs ${sol / (sol + lun)}`);
-  const p0 = DT.precessionRateJ2000ArcsecPerYr();   // plan 09: the IAU 2006 p_A input (25,771.6 yr); S5 had the derived year-laws' beat, never H/13
+  const p0 = DT.precessionRateJ2000ArcsecPerYr();   // the IAU 2006 p_A input (25,771.6 yr)
   const eps0 = K.earthOrbital.obliquityJ2000_deg;
   return { eE, sol, lun, fS, p0, eps0, alpha: p0 / Math.cos(eps0 * D2R) };
 }
@@ -134,7 +134,7 @@ function blockTorqueSplit() {
 function blockTidalClock() {
   const s = torqueSplit();
   const rows = [
-    '| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | (a₀/a)³ | cos ε̄(t)/cos ε̄₀ (the cited mean obliquity, plan 12 §8) | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) |',
+    '| age (Ma) | a_M (km) | LOD (h) | ω/ω₀ = LOD₀/LOD | α (I/MR²) | (a₀/a)³ | cos ε̄(t)/cos ε̄₀ (the cited mean obliquity) | **T_p = 1,296,000/ψ̇ (yr)** | ψ̇ (″/yr) |',
     '|---|---|---|---|---|---|---|---|---|',
   ];
   const Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0);
@@ -144,22 +144,21 @@ function blockTidalClock() {
     const w = DT.LOD_NOW_H13_S / lod, lf = Math.pow(DT.A_MOON_NOW_M / a, 3);
     const pc = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);   // the ONE home's value — the RATE of date
     const Tp = DT.meanLunisolarPrecessionPeriodYearsAtAge(t);
-    const fe = DT.precessionObliquityFactorAtAge(t);                 // cos ε̄(t)/cos ε̄(0), the cited mean obliquity (plan 12 §8)
+    const fe = DT.precessionObliquityFactorAtAge(t);                 // cos ε̄(t)/cos ε̄(0), the cited mean obliquity
     if (Math.abs(pc - w * s.p0 * (s.fS + (1 - s.fS) * lf) * fe) > 1e-9) throw new Error(`composed ψ̇ twin diverged at ${t} Ma`);
     rows.push(`| ${t} | ${f(a / 1000, 0)} | ${f(lod / 3600, 3)} | ${f(w, 5)} | ${f(al, 6)} | ${f(lf, 4)} | ${f(fe, 5)} | **${f(Tp, 1)}** | ${f(pc, 2)} |`);
   }
   rows.push('');
-  rows.push(`T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = ${f(s.p0, 4)} ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input (plan 09) — \`@essrt/physics/earth/precession-composed\` built inside \`deltat/deep-time.cjs\`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows \`xiamaling-prec-1400\` / \`lantink-prec-2460\`).`);
+  rows.push(`T_p(t) is the composed lunisolar precession period on the model’s ONE J2000 reading — 1,296,000/ψ̇ with p₀ = 1,296,000/T_p(J2000) = ${f(s.p0, 4)} ″/yr, T_p(J2000) = 1,296,000/p_A on the IAU 2006 general precession input — \`@essrt/physics/earth/precession-composed\` built inside \`deltat/deep-time.cjs\`, one home: the hybrid precesses on it, the paleo-anchors gate checks the ψ̇ column. External readings for the ψ̇ column: IAU J2000 50.288 ″/yr (measured); Wu et al. 2024 at 650 Ma 67.64 ″/yr; Meyers & Malinverno 2018 at 1400 Ma 85.79 ± 2.72 ″/yr; Lantink et al. 2022 at 2460 Ma 108.6 ± 8.5 ″/yr (all three cyclostratigraphic inferences through an assumed astronomical model — theory-vs-inference, doc 99; the last two are gate rows \`xiamaling-prec-1400\` / \`lantink-prec-2460\`).`);
   return rows.join('\n');
 }
 
 function blockOfDatePrecession() {
   const one = DOH.createOneSourceMovement();
   const rows = [
-    '| year | **T_p (B) one-family (yr) — PUBLISHED** (`epoch.axialPrecessionYearsAtYear`, API/MCP) | p (B) (″/yr) | T_p composed (yr) — the deep-time clock, same J2000 anchor (the IAU p_A since plan 09) | ε, hybrid (°) |',
+    '| year | **T_p (B) one-family (yr) — PUBLISHED** (`epoch.axialPrecessionYearsAtYear`, API/MCP) | p (B) (″/yr) | T_p composed (yr) — the deep-time clock, same J2000 anchor (the IAU p_A) | ε, hybrid (°) |',
     '|---|---|---|---|---|',
   ];
-  // (plan 09: the (A) column — the frozen era device's comb-pair beat — left with the year combs)
   for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
     const b = m.yearLengths.axialPrecessionYearsAtYear(y);
     if (b !== m.epoch.axialPrecessionYearsAtYear(y)) throw new Error(`epoch.axialPrecessionYearsAtYear ≠ the one-family beat inside the window at ${y}`);
@@ -170,23 +169,21 @@ function blockOfDatePrecession() {
 
 // ── Chain 3 — the year lengths and the day ───────────────────────────────────
 function blockJ2000Identities() {
-  // Plan 09: the J2000 year and day anchors are the IAU inputs — the era
-  // device's H/8 snap, H/13 kinematic sidereal days and H/16 anomalistic
-  // identity are deleted; the J2000 precession anchor is the IAU p_A. (Step 7c:
-  // the device's rounded tropical-year input left model-parameters.json.)
-  const msy = require(join(ROOT, 'tools/lib/constants.js')).meanSolarYearDays;   // plan 09: DERIVED (sidereal year + p_A), one home
+  // The J2000 year and day anchors are the IAU inputs; the J2000 precession
+  // anchor is the IAU p_A (the retired identities: doc 109 §23).
+  const msy = require(join(ROOT, 'tools/lib/constants.js')).meanSolarYearDays;   // DERIVED (sidereal year + p_A), one home
   const sidD = K.yearLengthRef.siderealYear;
   const lod = K.yearLengthRef.solarDay;
-  const anom = m.yearLengths.anomalisticYearSecondsAtYear(2000) / 86400;   // plan 09 step 4d: the law of date at 2000 (the series' apsidal line), not an input
+  const anom = m.yearLengths.anomalisticYearSecondsAtYear(2000) / 86400;   // the law of date at 2000 (the series' apsidal line), not an input
   const pA = K.earthOrbital.generalPrecessionJ2000_arcsecPerYr;
   return [
     '| quantity | value | formula |',
     '|---|---|---|',
-    `| **meanSolarYearDays** | ${msy.toFixed(9)} | DERIVED in one home: 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d) — the beat of \`yearLengthRef.siderealYear\` and the IAU 2006 p_A per Julian year (\`computeMeanTropicalYearJ2000Days\`); the calendar's year axis (plan 09: was the Meeus & Savoie 1992 input 365.2421897, 66 ms shorter; before it the device's rounded input 365.2422 snapped onto its lattice, 365.242203646, +1.2 s — that input left model-parameters.json at step 7c) |`,
+    `| **meanSolarYearDays** | ${msy.toFixed(9)} | DERIVED in one home: 1/T = 1/T_sid + p_A/(1,296,000″·365.25 d) — the beat of \`yearLengthRef.siderealYear\` and the IAU 2006 p_A per Julian year (\`computeMeanTropicalYearJ2000Days\`); the calendar's year axis (the former inputs are the record, doc 109 §23) |`,
     `| sidereal year (days, IAU) | ${sidD} | \`yearLengthRef.siderealYear\` (astro-reference) |`,
-    `| **LOD_mean** (the kinematic day ω₀, s) | ${lod} | \`yearLengthRef.solarDay\` — the SI day (plan 09: was the retired device's kinematic identity, 86,399.99968 s) |`,
-    `| anomalistic year (days) | ${anom.toFixed(9)} | the one-family law of date at 2000 — the series' own apsidal rate 11.609 ″/yr on the sidereal year (plan 09 step 4d; the Simon 1994 mean element 365.259636 is a citation, 87 ms longer; before step 3 the device's anomalistic identity, 0.3 s low) |`,
-    `| **p₀, the J2000 precession anchor** | ${pA} ″/yr (T_p = ${(1296000 / pA).toFixed(3)} yr) | \`earthOrbital.generalPrecessionJ2000_arcsecPerYr\` — IAU 2006 p_A (plan 09) |`,
+    `| **LOD_mean** (the kinematic day ω₀, s) | ${lod} | \`yearLengthRef.solarDay\` — the SI day |`,
+    `| anomalistic year (days) | ${anom.toFixed(9)} | the one-family law of date at 2000 — the series' own apsidal rate 11.609 ″/yr on the sidereal year (the Simon 1994 mean element 365.259636 is a citation, 87 ms longer) |`,
+    `| **p₀, the J2000 precession anchor** | ${pA} ″/yr (T_p = ${(1296000 / pA).toFixed(3)} yr) | \`earthOrbital.generalPrecessionJ2000_arcsecPerYr\` — IAU 2006 p_A |`,
   ].join('\n');
 }
 
@@ -195,8 +192,7 @@ function blockYearLengthsOfDate() {
     '| year | sid, days of the epoch (`lengths.siderealYearDays`) | **sid one-family (SI d) — published** | trop, days of the epoch (`lengths.tropicalYearDays`) | **trop one-family (SI d) — published** | anom, days of the epoch (`lengths.anomalisticYearDays`) | **anom one-family (SI d) — published** |',
     '|---|---|---|---|---|---|---|',
   ];
-  // (plan 09: the (A) comb columns — the frozen era device's year-length combs — left with the combs;
-  // the days-of-the-epoch columns are the published SI years over the kinematic day of date)
+  // (the days-of-the-epoch columns are the published SI years over the kinematic day of date)
   for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
     const L = m.lengths, Y = m.yearLengths;
     rows.push(`| ${y} | ${f(L.siderealYearDays(y), 6)} | ${f(Y.siderealYearSecondsAtYear(y) / 86400, 6)} | ${f(L.tropicalYearDays(y), 6)} | ${f(Y.tropicalYearSecondsAtYear(y) / 86400, 6)} | ${f(L.anomalisticYearDays(y), 6)} | ${f(Y.anomalisticYearSecondsAtYear(y) / 86400, 6)} |`);
@@ -209,10 +205,8 @@ function blockDayLengths() {
     '| year | LOD kinematic of date = the Layer-0 tidal mean (s) | sidereal day (s) | stellar day (s) |',
     '|---|---|---|---|',
   ];
-  // (plan 09: the "LOD actual" column — the retired sidereal comb's ripple on the
-  // tidal mean — left with the comb, and the kinematic day of date IS the tidal mean;
-  // step 5b: the "measured solar day" and "RA day offset" columns left with the
-  // RA_DAY_OFFSET_MS comb — the equation of time's window term of an instrument.)
+  // (the kinematic day of date IS the tidal mean; the equation of time's window
+  // term is an instrument's, not a day length's — doc 109 §23)
   for (const y of [-10000, -2584, -584, 0, 1246, 2000, 5000, 10000]) {
     const L = m.lengths;
     rows.push(`| ${y} | ${f(L.dayLengthSeconds(y), 5)} | ${f(L.siderealDaySeconds(y), 4)} | ${f(L.stellarDaySeconds(y), 4)} |`);
@@ -237,11 +231,10 @@ function blockObliquityValues() {
     '| year | ε hybrid (°) | ε La2004 (°) | hybrid − La2004 (″) |',
     '|---|---|---|---|',
   ];
-  // (plan 09: the K law column — the retired 16-harmonic comb — left with the frozen era device)
   for (const y of [-48000, -28000, -20000, -10000, -2584, -584, 0, 1246, 2000, 5000, 10000, 20000, 30000, 50000]) {
     const h = one ? one.epsDeg(y) : null, l = la.has(y - 2000) ? la.get(y - 2000) : null;
     // the package hybrid and the Node one-source hybrid share the IAU J2000 anchor (S3b); their
-    // time anchors differ (2000.5 vs 2000 in the H(t) scaling) — measured residual 1.5e-10°, tolerance 1e-6°
+    // time anchors differ (2000.5 vs 2000 in the age scaling) — measured residual 1.5e-10°, tolerance 1e-6°
     if (h !== null && Math.abs(m.earth.obliquityDeg(y) - h) > 1e-6) throw new Error(`published ε ≠ the hybrid at ${y}: ${m.earth.obliquityDeg(y)} vs ${h}`);
     rows.push(`| ${y} | ${f(h, 5)} | ${f(l, 5)} | ${f(d(h, l), 0)} |`);
   }
@@ -249,7 +242,7 @@ function blockObliquityValues() {
   const rate = (fn) => (fn(2000.5) - fn(1999.5)) * 3600 * 100;
   rows.push('');
   rows.push(`dε/dt at J2000 (″/cy): hybrid series ${f(one ? rate(one.epsDeg) : null, 2)} (the published ε, S3b) · IAU 2006 ${f(K.earthOrbital.obliquityRate_arcsecPerCentury, 2)} · banked verdict integrations: era-tier ζ ${f(V.rateEraArcsecPerCy, 2)}, full-tier ζ ${f(V.rateFullArcsecPerCy, 2)} (data/obliquity-hybrid-verdict.json).`);
-  rows.push(`α at J2000 (″/yr): p₀/cos ε₀ = ${f(torqueSplit().alpha, 3)} with p₀ = the IAU 2006 general precession p_A (plan 09 — the form the registry and the shipped hybrid use) · ${f(V.alphaArcsecPerYr, 3)} in the verdict artifact (ψ̇ = the of-date beat ${f(V.psiDotH13ArcsecPerYr, 3)} ″/yr) — the two J2000 precession readings of chain 2, finding 2.`);
+  rows.push(`α at J2000 (″/yr): p₀/cos ε₀ = ${f(torqueSplit().alpha, 3)} with p₀ = the IAU 2006 general precession p_A (the form the registry and the shipped hybrid use) · ${f(V.alphaArcsecPerYr, 3)} in the verdict artifact (ψ̇ = the of-date beat ${f(V.psiDotH13ArcsecPerYr, 3)} ″/yr) — the two J2000 precession readings of chain 2, finding 2.`);
   rows.push(`Banked window rms vs La2004 (″), hybrid on the series / the same hybrid on the 18-mode table: ${['13', '50', '130', '270'].map((w) => `±${w} kyr ${f(V.windowsEra[w].hybridRmsArcsec, 0)} / ${f(V.windowsEra[w].modeTableRmsArcsec, 0)}`).join(' · ')} (era-tier ζ). La2004 is a THEORY reference, not an observation.`);
   return rows.join('\n');
 }
@@ -260,7 +253,7 @@ function blockObliquityBeat() {
     .filter((x) => Math.abs(x.omegaRadPerYr) > 1e-9).sort((a, b) => Math.hypot(b.re, b.im) - Math.hypot(a.re, a.im))[0];
   const s3 = Math.abs(z.omegaRadPerYr * 180 / Math.PI) * 3600;
   const rows = [
-    '| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 (plan 09 step 5d) | ψ̇ (″/yr) | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqPrecScaled*Kyr` |',
+    '| age (Ma) | **T_p(t) = 1,296,000/ψ̇, the composed period (yr)** | the deep chain’s year beat T_sid/(T_sid − T_trop) — T_p counted in sidereal years, + 1 | ψ̇ (″/yr) | beat 2π/(ψ̇ − \\|s₃\\|) (kyr) — the SHIPPED `obliqBeat*Kyr` form | beat(J2000)·T_p(t)/T_p(J2000) (kyr) — "obliquity period ∝ T_p", `obliqPrecScaled*Kyr` |',
     '|---|---|---|---|---|---|',
   ];
   const Tp0 = DT.meanLunisolarPrecessionPeriodYearsAtAge(0), pc0 = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(0), beat0 = 1296000 / (pc0 - s3);
@@ -268,13 +261,13 @@ function blockObliquityBeat() {
     const sid = DT.meanSiderealYearSecondsAtAge(t), trop = DT.meanTropicalYearSecondsAtAge(t);
     const TpPair = sid / (sid - trop), Tp = DT.meanLunisolarPrecessionPeriodYearsAtAge(t), pc = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);
     if (Math.abs(pc - 1296000 / Tp) > 1e-9) throw new Error(`T_p twins diverged at ${t} Ma`);
-    // plan 09 step 5d: the chain's tropical year is one equinox turn per T_p(t) (Julian years), so the
-    // sidereal/tropical beat is T_p·(Julian year/sidereal year) + 1 — the unit-count form of 2.1 step 4c
+    // the chain's tropical year is one equinox turn per T_p(t) (Julian years), so the
+    // sidereal/tropical beat is T_p·(Julian year/sidereal year) + 1
     if (Math.abs(TpPair - (Tp * 365.25 * 86400 / sid + 1)) > 1e-6 * Tp) throw new Error(`the deep chain's year beat ≠ T_p(t) in sidereal years at ${t} Ma`);
     rows.push(`| ${t} | **${f(Tp, 3)}** | ${f(TpPair, 3)} | ${f(pc, 3)} | ${f(1296000 / (pc - s3) / 1000, 2)} | ${f(beat0 * Tp / Tp0 / 1000, 2)} |`);
   }
   rows.push('');
-  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). Plan 06 D6 → Phase 3 → S5: ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = ${f(Tp0, 1)} yr, 1,296,000/p_A on the IAU 2006 input since plan 09). The third column is the deep chain’s tidal-mean year pair: since plan 09 step 5d its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row). Registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the fifth column; \`obliqPrecScaled*Kyr\` is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii).`);
+  rows.push(`s₃ = the dominant Earth ζ mode of data/nbody-deep-secular-modes.json = ${f(-s3, 4)} ″/yr (amplitude ${f(Math.hypot(z.re, z.im), 5)}); beat = 1,296,000/(ψ̇ᵢₙ − |s₃|) yr at an instant, ψ̇ᵢₙ the spin axis’s inertial rate; a RECORD sees the window mean of the pole rate with its of-date factors (createModel().lunisolar.spinAxisInertialRateMeanArcsecPerYr / obliquityPeriodRealizedYears — the obliquity lines ride the LR04-window mean, v23.0). ψ̇(t) is the composed lunisolar rate on the model’s one J2000 reading (T_p(J2000) = ${f(Tp0, 1)} yr, 1,296,000/p_A on the IAU 2006 input). The third column is the deep chain’s tidal-mean year pair: its tropical year removes one equinox turn per T_p(t), so the pair’s beat is T_p(t) counted in sidereal years, + 1 (asserted per row). Registry keys \`obliqBeatJ2000Kyr\`/\`obliqBeat1400MaKyr\`/\`obliqBeat2460MaKyr\` are the fifth column; \`obliqPrecScaled*Kyr\` is the sixth, the pure precession-scaling alternative "obliquity period ∝ T_p" — the J2000 beat held proportional to T_p(t), identical to the beat today and the discriminated alternative at depth (D8 iii).`);
   return rows.join('\n');
 }
 
@@ -284,11 +277,8 @@ const BLOCKS_CHAIN4 = {
 };
 
 // ── Chain 5 — the cardinal points ────────────────────────────────────────────
-// (Plan 09 step 7a: the frozen cardinal record's rebuild — `cardinalRebuilds`
-// on createCardinalModel with the CARDINAL_POINT_* coefficients, knocked out
-// term group by term group, and its two blocks `calcmap-cardinal-anchors` /
-// `calcmap-cardinal-decomposition` — is deleted with the evaluator and the
-// coefficients; doc 110 §5.5 keeps the last render as static text.)
+// (the retired cardinal record's two blocks are the record — doc 109 §23;
+// doc 110 §5.5 keeps their last render as static text)
 const CP_TYPES = /** @type {const} */ (['VE', 'SS', 'AE', 'WS']);
 
 /** Julian Day → 'YYYY-MM-DD hh:mm' — PROLEPTIC Gregorian at every epoch (Meeus
@@ -318,7 +308,7 @@ function blockCardinalEvents() {
     rows.push(`| ${y} | ${jd.map((v) => jdToDateString(v)).join(' | ')} | ${f(m.cardinal.jd(y + 1, 'SS') - m.cardinal.jd(y, 'SS'), 6)} | ${f(m.cardinal.yearLengthDays(y, 'SS'), 6)} | ${f(m.lengths.tropicalYearDays(y), 6)} | ${f(m.cardinalStructure.spreadSeconds(y).meanSeconds, 2)} | ${f(m.earth.eccentricity(y), 5)} |`);
   }
   rows.push('');
-  rows.push('Dates on the proleptic Gregorian calendar from the TRUE-UT JD of the APPARENT crossing of the one Sun (since plan 06 R3 item 2 the finder-axis root minus the deltaTStart bridge — before it the published instants were 0.9 min late) (plan 06 R1 — formerly the retired device\'s JD); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27\'s successive instants to seconds); the mean tropical year is the one-family column.');
+  rows.push('Dates on the proleptic Gregorian calendar from the TRUE-UT JD of the APPARENT crossing of the one Sun (the finder-axis root minus the deltaTStart bridge); the `year` argument is the calendar year of the event. The single-year intervals carry nutation and the short-period terms (they match Meeus ch. 27\'s successive instants to seconds); the mean tropical year is the one-family column.');
   return rows.join('\n');
 }
 
@@ -334,18 +324,18 @@ function blockCardinalSpread() {
     rows.push(`| ${y} | ${fr} | ${CP_TYPES.map((t) => f(s[t], 1)).join(' · ')} | ${f(m.cardinalStructure.anomalisticYearSeconds(y), 2)} | ${f(m.cardinal.raDeg(y, 'VE'), 4)} | ${f(m.earth.eccentricity(y), 5)} |`);
   }
   rows.push('');
-  rows.push('Retired device\'s RA formula constants: the record left with the K-device scaffold (plan 11 step 4 — earthtiltMean, the inclination amplitude A and earthRAAngle = 2A − A²/ε̄ are deleted; git history carries them; the form was base − earthRAAngle/sin ε̄ + (A/sin ε̄)·(−sin 2π·3·c + sin 2π·8·c), base 0/90/180/270° for VE/SS/AE/WS). Since R1 the shipped RA is the target longitude by construction; the device itself is deleted (plan 09 step 7a).');
+  rows.push('The shipped RA is the target longitude by construction (the one-source movement); the retired device\'s RA formula and its constants are the record, doc 109 §23.');
   return rows.join('\n');
 }
 
 const BLOCKS_CHAIN5 = {
-  // (calcmap-cardinal-anchors / calcmap-cardinal-decomposition: the frozen
-  //  record's blocks — deleted at plan 09 step 7a; doc 110 §5.5 keeps the last render)
+  // (calcmap-cardinal-anchors / calcmap-cardinal-decomposition: the retired
+  //  record's blocks — doc 109 §23; doc 110 §5.5 keeps the last render)
   'calcmap-cardinal-events': blockCardinalEvents,
   'calcmap-cardinal-spread': blockCardinalSpread,
 };
 
-/** Chain 6 — the planets' spin channel (plan 06 Phase 7): the derived constants per planet. */
+/** Chain 6 — the planets' spin channel: the derived constants per planet. */
 function blockPlanetSpin() {
   const rows = [
     '| planet | λ = C/MR² (class) | q | l | α ″/yr | ε₀ derived ° | ψ̇₀ ″/yr | T₀ yr | band ±1 Myr ° |',

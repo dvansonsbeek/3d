@@ -25,8 +25,8 @@
  * full-CSV compare caught the tracked 6a CSV stale against the
  * post-C-4b movement arcs (D4c/D4d-rev; SS@−997 off by 2.9 h).
  *
- * SCOPE NOTE. The 6a instrument is computeSunPositionFast. Since plan 06 R4
- * it rides the SAME engine Earth frame as the full scene (sun plane, apsidal
+ * SCOPE NOTE. The 6a instrument is computeSunPositionFast. It rides the SAME
+ * engine Earth frame as the full scene (sun plane, apsidal
  * wheel, the Sun at the certified longitude, the axis —
  * _applyEngineEarthFrame), so it IS the scene Sun: before R4 it was the bare
  * K wheel Sun, 8–18″ from the scene Sun in 2000 (measured), and no δ block

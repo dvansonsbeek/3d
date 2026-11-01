@@ -20,9 +20,9 @@
  * ── α IS INJECTED, AND THAT IS R2 ─────────────────────────────────────────
  * `alphaAtAgeMa` is a parameter, not an import. The Earth moment-of-inertia
  * factor rides on the climate L1 series, so hard-wiring it would drag the
- * climate formula into Layer 0 — but the deeper reason is R2: when BUILDING an
- * H-lattice table α must be held at its J2000 reference, or the lattice
- * defines itself in terms of its own output. The browser gets this right today
+ * climate formula into Layer 0 — and a table built on α must hold α at its
+ * J2000 reference, or the table defines itself in terms of its own output.
+ * The browser gets this right today
  * only by accident (a TDZ throw during table build); Node integrates the live
  * α(t) and lands 141.6 d away at cycle 0. Making α an argument turns that
  * accident into a decision the caller states out loud. R2 itself is a Phase C
@@ -63,9 +63,9 @@
  *   meanObliquityCosRatioAtAge?: (tMa: number) => number|null}} deps —
  *   moonDistanceMetresAtAge is the engine's cited distance history
  *   (deltat/moon-distance-history: Farhat et al. 2022 as a shape on the
- *   J2000 anchor; plan 12 option A — the layer0 quartic twin is deleted);
+ *   J2000 anchor — the cited input);
  *   meanObliquityCosRatioAtAge the cited mean obliquity's cos ε̄(t)/cos ε̄(0)
- *   (earth/mean-obliquity-history, plan 12 §8 option (a)) — OPTIONAL, absent → 1.
+ *   (earth/mean-obliquity-history) — OPTIONAL, absent → 1.
  * @returns {EpochPrimitives}
  */
 export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge, meanObliquityCosRatioAtAge }) => {
@@ -85,7 +85,7 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
 
   /**
    * cos ε̄(t)/cos ε̄(0) of the cited mean obliquity — the precession RATE's
-   * factor on the constant (plan 12 §8); 1 when no history is injected.
+   * factor on the constant; 1 when no history is injected.
    * @param {number} t age in Ma
    * @returns {number|null}
    */
@@ -105,11 +105,6 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
       / (p.totalAngularMomentumKgM2S
          - p.moonMassKg * Math.sqrt(p.gmEarthMoonM3S2 * a) * p.moonEccentricityFactor);
   };
-
-  // (Plan 09 step 7b: the unit H(t) = H₀·(LOD/LOD₀)/[f_S + (1 − f_S)(a₀/a_M)³]
-  // — `holisticH`, 13.011 composed precession periods, a fit constant's
-  // multiple of T_p(t) — and its spin-scaling factor (step 7a's `eraClockH`)
-  // are deleted. The physics is the composed precession rate below.)
 
   /**
    * Sidereal year. Driver 2 alone — solar mass loss via Kepler, `dT/T = -2 dM/M`
@@ -134,11 +129,9 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
    * over one year: one turn per the composed lunisolar precession period
    * T_p(t), i.e. 1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″ · Julian-year s) with
    * ψ̇(t) the RATE of date, spelled as (LOD₀/LOD(t))·p₀·[f_S + (1 − f_S)(a₀/a_M)³]
-   * × cos ε̄(t)/cos ε̄(0) — the cited mean obliquity's factor (plan 12 §8 option (a);
-   * injected, 1 when absent).
-   * Plan 09 step 5d: it was the unit's calendar convention sid·(1 − 13/H(t))
-   * (plan 06 D2 kept it as a named device), 0.086 % slow on the equinox term
-   * — 1.0 s of year at J2000, integrated by the deep JD↔year calendar. The
+   * × cos ε̄(t)/cos ε̄(0) — the cited mean obliquity's factor (injected, 1 when
+   * absent). (The retired calendar convention, doc 109 §23, read 0.086 % slow
+   * on the equinox term — 1.0 s of year at J2000.) The
    * SAME operations as deltat/deep-time.cjs tropicalYearSecondsFromLod (the
    * layer0 gate holds the twins bit-identical). Past the tidal chain's
    * domain the J2000 rate stands in.
@@ -159,8 +152,6 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
     const rate = (lod === null || !(lod > 0) || term === null || f === null) ? p0 : (p.lodNowH13Seconds / lod) * p0 * term * f;
     return 1 / (1 / sid + rate / (1296000 * 365.25 * 86400));
   };
-
-  // (plan 09 step 7a: the frozen comb family's tropical base T_sid·(1 − 13/H_era) is deleted)
 
   return Object.freeze({
     tMa,

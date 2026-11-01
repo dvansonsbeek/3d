@@ -9,7 +9,7 @@
  * the freshness gate (tools/verify/artifact-freshness.js) fails naming the ONE artifact
  * whose inputs moved. After an edit to public/input/astro-reference.json seven
  * artifacts go stale, and the downstream ones only surface one 17-minute check at a
- * time (plan 13 §1c) — because an artifact that is an INPUT of another will move it
+ * time — because an artifact that is an INPUT of another will move it
  * when regenerated. This script reads the same inputs blocks, adds the generated
  * constants module as a node (tools/constants/generate.mjs embeds several artifacts
  * and emits files that other generators hash), propagates staleness along the

@@ -56,27 +56,27 @@ const toolCall = (name, args) => {
   /** @type {Array<[string, object|undefined, (data: any) => string|null]>} */
   const QUERIES = [
     ['essrt_versions', undefined, (d) => (d.current ? null : 'no current version')],
-    // plan 09 step 7b: the unit H left the surface; the deep-time clock is the composed precession period
+    // the deep-time clock is the composed precession period
     // (21,699 yr at −380 Ma — the unit read 282,329 there, 13.011 of them)
-    // plan 12 §8 option (a): T_p is 1,296,000/the precession RATE of date — the cited mean obliquity's cos ε̄(t)/cos ε̄(0) on the constant's scaling; 21,396 → 21,235 at the Devonian
+    // T_p is 1,296,000/the precession RATE of date — the cited mean obliquity's cos ε̄(t)/cos ε̄(0) on the constant's scaling
     ['essrt_epoch', { year: -379998000 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 21235) < 1 && !('h' in d.epochs[0]) ? null : `Devonian T_p: ${d.epochs[0].axialPrecessionYears} h: ${d.epochs[0].h}`)],
     ['essrt_epoch', { jd: 2451545 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 25771.575) < 0.5 ? null : `T_p via jd: ${d.epochs[0].axialPrecessionYears}`)],
     ['essrt_cardinal_points', { year: 2000, types: 'SS' }, (d) => (Math.abs(d.years[0].points.SS.jd - 2451716.575) < 0.1 ? null : `SS JD: ${d.years[0].points.SS.jd}`)],
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],
-    // plan 12 §8.5 (owner): the hybrid obliquity is refused beyond the ζ series' ±10 Myr (null, never extrapolated); the cited mean of date is served beside it
+    // the hybrid obliquity is refused beyond the ζ series' ±10 Myr (null, never extrapolated); the cited mean of date is served beside it
     ['essrt_earth', { year: -379998000 }, (d) => (d.years[0].obliquityDeg === null && Math.abs(d.years[0].meanObliquityCitedDeg - 22.227) < 0.01 ? null : `Devonian obliquity: ${d.years[0].obliquityDeg}, cited ${d.years[0].meanObliquityCitedDeg}`)],
     ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
-    // R8: the chain's secular period 1,296,000/g1 (was the device's 8H/11 = 243,867)
+    // the chain's secular period 1,296,000/g1
     ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 232437 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
     ['essrt_bodies', { body: 'mercury' }, (d) => ('fibonacciD' in d.record || 'inclinationCycleAnchor' in d.record ? `device fields still served: ${Object.keys(d.record).join(',')}` : null)],
     ['essrt_bodies', { body: 'mercury', year: 2000 }, (d) => (Math.abs(d.at[0].invPlaneInclinationDeg - 6.3446) < 0.001 && /chain/.test(d.frames.source) ? null : `mercury elements not the chain's: ${JSON.stringify(d.at[0])}`)],   // v16.2: the chain, not the record's linear rates
-    ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0012' ? null : `usnoLodJ2000: ${d.value}`)],   // plan 09: ω₀ = the SI day; the joint re-close's optimum moved 0022 → 0012. v23.0: the obliquity lines on the realized pole rate moved the GIA α(t) channel and the joint re-close's optimum to 0022 (0021 since the plan 06 T2 ecliptic term, held through v22.0)
+    ['essrt_values', { key: 'usnoLodJ2000' }, (d) => (d.value === '86,400.0012' ? null : `usnoLodJ2000: ${d.value}`)],   // ω₀ = the SI day; the joint re-close's optimum (its history is the record, doc 109 §23)
     ['essrt_derivations', { quantity: 'axialPrecession' }, (d) => (Math.abs(d.periodYears - 25771.575) < 0.5 ? null : `period: ${d.periodYears}`)],   // plan 09: 1,296,000/p_A, the IAU 2006 input
     ['essrt_derivations', { quantity: 'inclinationPrecession' }, (d) => (Math.abs(d.periodYears - 111634) < 60 && d.status === 'current' ? null : `apsidal: ${d.periodYears} ${d.status}`)],   // ≈111,634 ± the series' own ripple (v16.2 running-mean re-bank + polar e-vector interpolation; was 111,580 on the point-sampled series): the movement's apsidal rate of date (2026-09; was the chain tangent's 111,570)
     ['essrt_climate', { year: 2000 }, (d) => (typeof d.years[0].l1OrbitalPermil === 'number' ? null : 'no L1 value')],
     ['essrt_cross_validation', { curve: 'obliquity-berger1978', year: 2000 }, (d) => (Math.abs(d.years[0].model - d.years[0].published) < 0.05 ? null : `Berger delta: ${d.years[0].delta}`)],
     ['essrt_eclipses', { kind: 'solar', startYear: 2024, stopYear: 2025 }, (d) => (d.count === 2 && d.events[0].type === 'Total' && Math.abs(d.events[0].jd - 2460409.263) < 0.01 ? null : `2024 solar: ${JSON.stringify(d.events?.map((/** @type {any} */ e) => e.type))}`)],
-    // plan 09 step 7b: the injected constant is the obliquity anchor (the unit H left the surface)
+    // the injected constant is the obliquity anchor
     ['essrt_counterfactual', { overrides: { 'earthOrbital.obliquityJ2000_deg': 23.5 }, year: 2000 }, (d) => (Math.abs(d.earth.obliquityDeg - 23.5) < 1e-6 ? null : `cf obliquity: ${d.earth.obliquityDeg}`)],
   ];
   for (const [name, args, verify] of QUERIES) {

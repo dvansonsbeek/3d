@@ -1,6 +1,6 @@
 /**
- * The J2000 mass chain and the Moon's J2000 periods — ONE home (holisticuniverse
- * plan 13 B3). Before B3 the mass chain (Moon Kepler → GM_EM → the Earth/Moon
+ * The J2000 mass chain and the Moon's J2000 periods — ONE home. Before it
+ * the mass chain (Moon Kepler → GM_EM → the Earth/Moon
  * split → the Sun) was computed in three places (model.js, tools/lib/
  * constants.js, src/script.js), and the Moon's derived periods in three more.
  *

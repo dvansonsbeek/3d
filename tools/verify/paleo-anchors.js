@@ -41,7 +41,7 @@ const PREDICT = {
   lodHr: (ageMa) => dt.meanLodSecondsAtAge(ageMa) / 3600,
   moonDistanceRE: (ageMa) => dt.meanMoonDistanceCorrectedAtAge(ageMa) / RE_KM,
   moonDistanceRawRE: (ageMa) => dt.meanMoonDistanceAtAge(ageMa) / RE_KM,
-  // Leg 1 (plan 06 D6/Phase 3; plan 12 §8): Earth's axial-precession RATE of
+  // Leg 1: Earth's axial-precession RATE of
   // date — the composed lunisolar constant on the spin and the lunar torque,
   // times the cited mean obliquity's cos ε̄(t)/cos ε̄(0). The rows' k is
   // TimeOpt's luni-solar precession rate (the rate, not the constant). Pure

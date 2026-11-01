@@ -2,7 +2,7 @@
  * Wobble-center solstice-direction gate (headless, hermetic).
  *
  * BORN WITH K8b-1 slice 1 (plan 02 §11): the owner found the legacy
- * H/13-clock marker 58° off the solstice sun at +1.1 Myr. The marker now
+ * retired-clock marker 58° off the solstice sun at +1.1 Myr. The marker now
  * rides GEOMETRY — the rendered spin axis (the polar line's own
  * orientation source) projected into the rendered sun plane — and this
  * gate pins the two constructions that make it correct at every epoch:

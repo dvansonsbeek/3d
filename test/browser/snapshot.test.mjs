@@ -97,10 +97,9 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   const a = T.anchors();
   for (const [k, n] of Object.entries(a)) v[`anchor.${k}`] = n;
 
-  // Cycles-tab perihelion breakdown (doc 13 §1.8): the lattice (ecliptic) rate,
+  // Cycles-tab perihelion breakdown (doc 13 §1.8): the ecliptic rate,
   // the equatorial projection excess, the obliquity-rate term and the
-  // Earth-frame RA rate (= their sum since plan 06 R8 retired the fitted
-  // surrogate) at J2000 for all seven planets, plus Mercury's relativistic
+  // Earth-frame RA rate (= their sum) at J2000 for all seven planets, plus Mercury's relativistic
   // advance from the model constants. The registry keys
   // (tools/docs/model-values.mjs predictiveMachinery) carry the same numbers;
   // this pins the browser's own evaluation of them.
@@ -115,10 +114,7 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   v['periFrames.mercury.grAdvance'] = T.relativisticPerihelionAdvanceArcsecCy('mercury');
 
   // The planets' ECLIPTIC ascending node of date — the chain's element
-  // (plan 07 R5: the asc-node integrator these keys pinned as
-  // `planetAscNodeDyn`, dΩ/dε = −sin Ω / tan i on the K device's tilts, is
-  // deleted; the value updateAscendingNodes writes is the chain's, and it was
-  // already — the integrator's writes were overwritten every frame).
+  // (the value updateAscendingNodes writes is the chain's).
   for (const p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
     for (const y of [-20000, -5000, 2000, 10000]) {
       v[`planetAscNodeEcl.${p}@${y}`] = T.planetAscNodeEclAt(p, y);
@@ -132,8 +128,7 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   for (const a of [0, 90]) v[`inclPathWorldAzimuthDeg@local${a}`] = T.visPathFrameProbe(a);
 
   for (const y of YEARS) {
-    // Plan 09 step 7c′: the Earth panel's ϖ of date = the published Sun tier
-    // (series + the osculating-mean offset, +0.0195° on the bare series).
+    // the Earth panel's ϖ of date = the published Sun tier (the one-source series)
     v[`earthPeriOfDateDeg@${y}`] = T.earthPeriOfDateDeg(2451545.0 + (y - 2000) * 365.25);
     v[`solarYearDays@${y}`] = T.computeSolarYearDaysFromCardinals(y);
     v[`siderealYearDays@${y}`] = T.siderealYearDaysOfDate(y);
@@ -183,7 +178,6 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   for (const [a2, b2] of MOON_CHAIN_PAIRS) {
     for (const [k, n] of Object.entries(T.moonChainCycles(a2, b2))) v[`moonChain.${k}@${a2}..${b2}`] = n;
   }
-  // (plan 09 step 6: the moonFwEcc@tYr rows — the H/3 eccentricity law — are retired)
   for (const Tc of [-30, 0, 30, 500]) {
     v[`moonChanInt.sW@${Tc}`] = T.fwChannelIntegral(Tc, 2.407);
     v[`moonChanInt.sN@${Tc}`] = T.fwChannelIntegral(Tc, 1.018);
@@ -216,8 +210,6 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   for (const k of P_ALL) {
     for (const [n, val] of Object.entries(T.planetDerived(k))) v[`planet.${k}.${n}`] = val;
   }
-  // (Plan 07 R6/R5: the planetLaw.* rows — the K law's eccAmp/eccBase/
-  // eccPhase and the ψ law's inclAmp/inclMean — left with the laws.)
   for (const k of P7) {
     const w = T.planetWobble(k);
     v[`planetWobble.${k}`] = w[0];
@@ -314,11 +306,10 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     v[`sceneSun.raDeg@${jd}`] = r.raDeg;
     v[`sceneSun.decDeg@${jd}`] = r.decDeg;
   }
-  // ── Plan 06 R9: the RENDERED planets (scene theta/phi of date + distance) ──
-  // The chain has been the ONLY planet path since K5, yet no golden pinned
-  // its output: R9 moved every planet (the chain had been read at the UT JD
-  // while the Sun rode TT — Mercury 9″ at J2000, 0.8° at −500) and this file
-  // did not notice. Same JDs as the sceneSun family; the cross-engine gate
+  // ── the RENDERED planets (scene theta/phi of date + distance) ──
+  // The chain is the ONLY planet path, and this golden pins its output (a
+  // planet read at the UT JD while the Sun rode TT once went unnoticed —
+  // Mercury 9″ at J2000, 0.8° at −500). Same JDs as the sceneSun family; the cross-engine gate
   // compares these rows with the Node engine's computePlanetPosition.
   for (const jd of [1355795.0, 2415020.5, 2451545.0, 2460409.262836, 2634166.0]) {
     for (const [name, s] of Object.entries(T.planetsSceneStateAt(jd))) {
@@ -346,9 +337,6 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     v[`refSteph@${y}`] = T.refStephensonAt(y, STEPH_TEST_POLY);
   }
 
-  // (Phase 9-0's sun-harmonics correction probes `sunLonCorr@…` left with the
-  // Step-0 comb at plan 09 step 5a — the comb had left every Sun path at plan
-  // 06 R4; the five rows are retired from the golden, not re-recorded as drift.)
 
   // The reset must be exact, or every anchor above is measured against a
   // drifting baseline. Recorded rather than asserted so the fixture shows it.
@@ -383,7 +371,7 @@ if (pageErrors) console.log(`  note: ${pageErrors} page error(s) during load`);
 if (write) {
   mkdirSync(dirname(OUT), { recursive: true });
   writeFileSync(OUT, `${JSON.stringify({
-    _comment: 'REGRESSION fixture — what src/script.js does today, through window.__test__. `anchor.*` and `f(Y)@year` are read at J2000; `epoch@tMa.*` re-reads the seven globals AT that epoch (they are meant to depend on it). epoch@0Ma equals anchor.* since B.3b: resetEpochToJ2000 restores the module-load seeds exactly, so the R16 hysteresis is gone and roundTripDrift.* keys no longer appear (they were recorded only when reset failed to restore). The 118 ms seed-vs-chain gap at J2000 is R1 fit basis and closes with the Phase C/D refit. Must never change unintentionally. Regenerate: npm run build && node test/browser/snapshot.test.mjs --write',
+    _comment: 'REGRESSION fixture — what src/script.js does today, through window.__test__. `anchor.*` and `f(Y)@year` are read at J2000; `epoch@tMa.*` re-reads the seven globals AT that epoch (they are meant to depend on it). epoch@0Ma equals anchor.*: resetEpochToJ2000 restores the module-load seeds exactly, so roundTripDrift.* keys never appear. Must never change unintentionally. Regenerate: npm run build && node test/browser/snapshot.test.mjs --write',
     _source: 'src/script.js via dist/, headless Chromium',
     values: measured,
   }, null, 2)}\n`);

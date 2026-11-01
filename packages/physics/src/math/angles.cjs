@@ -1,6 +1,6 @@
 /**
  * Angles — ONE home for the degree ↔ radian constants and the wraps
- * (holisticuniverse plan 13 B1). Before B1 the browser carried 27 local
+ * (ONE home). The browser once carried 27 local
  * `D2R`-style constants and twelve local wrap helpers in three ±180 forms;
  * the package itself a dozen private `D2R`s.
  *

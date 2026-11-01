@@ -45,8 +45,8 @@ const args = process.argv.slice(2);
 // chain into a complete run. That is not hypothetical. `--list`, typed in the
 // belief that it printed the step table, silently began refitting and had
 // rewritten the scene Sun's start angle, earthtiltMean, the eccentricity base
-// and four planets' start angles before it was noticed and killed (the Step-1
-// optimizer that did it is deleted).
+// and four planets' start angles before it was noticed and killed (that
+// optimizer is retired).
 //
 // So: an unknown flag is now an ERROR, not a full run, and `--all` must be asked
 // for by name. Every other tool here makes --write opt-in; the orchestrator that
@@ -58,7 +58,7 @@ if (!flag) {
   console.error('run-pipeline.js writes to public/input/*.json and data/*.json and takes ~45 minutes.');
   console.error('It will not run without an explicit flag.\n');
   console.error('  --list        show the steps and exit (writes nothing)');
-  console.error('  --phase1      (no step left — the Step-1 Sun optimizer is deleted, plan 11 step 2)');
+  console.error('  --phase1      (no step left — the Step-1 Sun optimizer is retired)');
   console.error('  --phase2      Steps 6a2-9 (~45 min)');
   console.error('  --all         Steps 6a2-9');
   console.error('  --from <step> resume from a step');

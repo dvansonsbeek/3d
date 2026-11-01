@@ -31,7 +31,7 @@
  * ~53-ms perihelion-calendar hint walk per update — see the reset below
  * the cold-jump row. Those readings were the artefact, not the update.)
  *
- * THE COLD-JUMP ROW (plan 06 R4 follow-up, a class the steady-state rows
+ * THE COLD-JUMP ROW (a class the steady-state rows
  * cannot see): the FIRST evaluation at a deep epoch on a fresh page builds
  * the one-family sampler's deep tier and the certified Sun's mean-longitude
  * table. Measured: that first jump to −5.34 Myr cost 22 s where the first

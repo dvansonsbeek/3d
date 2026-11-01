@@ -5,7 +5,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 // --- Date conversion ---
-// Plan 13 B1: ONE home — @essrt/physics/time/calendar (Meeus ch. 7 with the
+// ONE home — @essrt/physics/time/calendar (Meeus ch. 7 with the
 // 1582-10-15 reform). This module's former calendarToJD applied the Gregorian
 // correction to EVERY date (no reform), a behaviour difference the one-home
 // function removes; its readers in tools/lib never passed a pre-reform date.
@@ -92,15 +92,6 @@ function computeOrbitTilt(ascendingNode, eclipticInclinationJ2000) {
     orbitTiltb: Math.sin(angle) * (-eclipticInclinationJ2000),
   };
 }
-
-// (Plan 07 R5: computeInvPlaneInclinationAmplitude — the ψ law's amplitude,
-// PSI / (d × √m) — is deleted with the law. Plan 11 step 2:
-// computeInvPlaneInclinationMean — inclJ2000 − A·cos(the K inclination phase),
-// the scene's mean-inclination pose, overwritten from the chain every frame —
-// is deleted with its only reader.)
-
-// (plan 11 step 4: computeEarthRAAngle — the K-device scaffold's derived
-// 2A − A²/ε, the perihelion wheel's tilt — left with the scaffold.)
 
 module.exports = {
   jdToCalendar,

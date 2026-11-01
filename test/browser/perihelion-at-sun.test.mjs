@@ -2,12 +2,12 @@
  * Perihelion-at-Sun gate (headless, hermetic).
  *
  * BORN FROM the owner's Show/Hide audit: the "Real Perihelion" chip showed
- * the retired K device's pivot wheel, ~90° off the chain, and three sibling
+ * the retired device's pivot wheel, ~90° off the chain, and three sibling
  * chips (Ecliptic Dur. 1/2, Fixed Perihelion) showed the retired geometric
  * construction. The chain planets now carry a "Perihelion at Sun" marker
  * placed from the chain elements of date (Sun + a(1−e)·p̂ through the frame
  * bridge, the Planet Orbit Analysis' own P construction), and the device
- * chips are gone for them (Pluto, Halley's and Eros keep theirs: no chain).
+ * chips are retired for them (Pluto, Halley's and Eros keep theirs: no chain).
  *
  * The gate asserts, for Mercury and Jupiter at the landing epoch:
  *  1. the marker's distance from the Sun equals the chain's a(1−e);
@@ -68,7 +68,7 @@ try {
   const wrapd = (d) => ((d + 540) % 360) - 180;
   check('Moon perigee marker: distance = a(1−e)', !!mm && Math.abs(mm.perigee.distAU - mm.aPeriAU * PLANT) < 1e-9, mm ? `${mm.perigee.distAU.toFixed(9)} vs ${(mm.aPeriAU * PLANT).toFixed(9)} AU` : 'probe returned null');
   check('Moon perigee marker: longitude/latitude of date from L′ − M′ in the inclined plane', !!mm && Math.abs(wrapd(mm.perigee.lon - mm.perigeeExpectedLonDeg)) < 1e-6 && Math.abs(mm.perigee.lat - mm.perigeeExpectedLatDeg) < 1e-6, mm ? `λ ${mm.perigee.lon.toFixed(4)}° (exp ${mm.perigeeExpectedLonDeg.toFixed(4)}), β ${mm.perigee.lat.toFixed(4)}° (exp ${mm.perigeeExpectedLatDeg.toFixed(4)})` : '');
-  // Plan 11 step 3 — the Moon RING is engine-placed from the same arguments:
+  // The Moon RING is engine-placed from the same arguments:
   // the stack's apsidal arm points at the apogee (perigee at ϖ = L′ − M′), the
   // placed orbit plane's ascending node sits at Ω = L′ − F, the arm is a·e and
   // the plane's tilt the registry inclination — so ring ≡ markers ≡ the Moon.
@@ -80,7 +80,7 @@ try {
   check('Moon ring: the eccentric arm is a·e and the plane tilt the registry inclination', !!mr && Math.abs(mr.offsetScene - mr.offsetExpectedScene) < 1e-9 && Math.abs(mr.incDeg - mr.incExpectedDeg) < 1e-6, mr ? `arm ${mr.offsetScene.toFixed(9)} vs ${mr.offsetExpectedScene.toFixed(9)}, inc ${mr.incDeg.toFixed(6)}° vs ${mr.incExpectedDeg}°` : '');
   check('Moon ring ≡ markers: the ring node and the node marker share one longitude', !!mr && !!mm && Math.abs(wrapd(mr.nodeLonDeg - mm.ascNode.lon)) < 1e-6, mr && mm ? `${mr.nodeLonDeg.toFixed(7)}° vs ${mm.ascNode.lon.toFixed(7)}°` : '');
 
-  // Plan 11 step 3 — the planets' POLES: each chain planet's rotation axis is
+  // The planets' POLES: each chain planet's rotation axis is
   // placed in world from the spin channel's pole of date through the frame
   // bridge (Saturn: its rings are the axis's child; Venus: the retrograde
   // spinner, pole south of its orbit — the angular-momentum sense). The
@@ -98,8 +98,8 @@ try {
   }
   check('Venus spins about a pole south of its orbit (retrograde, angular-momentum sense)', await sim.page.evaluate(() => { const p = window.__test__.planetPoleProbe('Venus'); return !!p && p.spinRetrograde && p.obliquityChannelDeg > 90; }), '');
 
-  // Plan 11 step 4 — the world frame IS the J2000 ecliptic (the K-device
-  // scaffold's pose is gone): R's pole column is world Y exactly, the J2000
+  // The world frame IS the J2000 ecliptic (no scaffold pose): R's pole
+  // column is world Y exactly, the J2000
   // equinox sits at the one recorded view azimuth, and Earth's rendered axis is
   // the engine frame of date through R — the Earth placement itself, never
   // gated before. Fail-proven through the PLANT (the azimuth shifts 1°).
@@ -120,7 +120,7 @@ try {
   // The star and constellation catalogs (J2000 RA/Dec) are aligned once at
   // module init; they must sit on the J2000 equatorial frame through R. Born
   // from the owner's "the Sun is at 160° against the constellations where it
-  // was at 90°" after plan 11 step 4 (the axis's rest pose became 0 and the
+  // was at 90°" after the scaffold's retirement (the axis's rest pose became 0 and the
   // engine places it only at the first update, after the alignment). Measured
   // on the pre-fix build (then at the Node twin's azimuth 158.2265°): pole
   // tilt 23.4393° and equinox offset 68.2265° — the whole world-frame pose

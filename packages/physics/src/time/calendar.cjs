@@ -1,5 +1,5 @@
 /**
- * The civil calendar ↔ Julian Day — ONE home (holisticuniverse plan 13 B1).
+ * The civil calendar ↔ Julian Day — ONE home.
  *
  * Meeus, Astronomical Algorithms ch. 7, with the Gregorian reform at
  * 1582-10-15 (JD 2299160.5): a calendar date before the reform is a Julian
@@ -8,12 +8,12 @@
  * every historical record the model is gated on. Astronomical year
  * numbering throughout (year 0 = 1 BC).
  *
- * Before plan 13 B1 the browser carried eighteen copies of these two
+ * The browser once carried eighteen copies of these two
  * formulas and the Node twin two more; seven of the browser's date → JD
  * copies were deliberately proleptic-Julian for NASA canon dates and two
  * of their event tables also held a post-reform date (1654 Aug 12), which
  * those copies placed ten days late. The one-home function applies the
- * reform; the measured consequence is recorded in plan 13 §7.
+ * reform; the measured consequence is recorded in the archived plan-13 close-out.
  *
  * Pure functions, no model dependencies.
  */

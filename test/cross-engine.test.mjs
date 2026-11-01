@@ -34,7 +34,7 @@
  *     11.5 ULP per JD at −4000, the difference up to 23).
  *   - RA: bit-exact since the integrated-phase migration (same reason).
  *   - DEEP solstice JDs (|year| > 50 kyr): within 1e-6 d (0.1 s), NOT
- *     bit-exact — plan 06 R3 item 2, measured: headless Chromium's V8 and
+ *     bit-exact — measured: headless Chromium's V8 and
  *     Node's V8 differ at the last bit on 5–15 % of arguments for pow, exp,
  *     log, sin, cos, tan, atan2, cbrt, asin, acos, sinh, cosh (4,552 of
  *     64,000 randomized evaluations; hypot and sqrt identical —
@@ -84,18 +84,18 @@ const jdOfYear = (year) => 2451545 + (year - 2000) * 365.25;
 // moved the Moon (and with it the geocentric Sun) at that epoch; the
 // certified window stays bit-exact.
 const DEEP_YL_TOL_DAYS = 1e-7;
-// Plan 06 R5 — the Moon SERIES inputs (the shared Meeus series on the
+// The Moon SERIES inputs (the shared Meeus series on the
 // framework-native arguments, at the scene's true TT): browser moonScene
 // lon/lat/dist vs the Node engine at the same UT JD. Measured before the fix:
 // the browser's argument factory froze its obliquity-carrier normalisation on
-// the first frame from the K-comb fallback ε — 0.27″ at year 0, 6.7″ at
+// the first frame from the fallback ε — 0.27″ at year 0, 6.7″ at
 // ±100 kyr, 100″ at −5.34 Myr, invisible to every gate. Tolerance: the
 // twins are the same code on the same data; only the runtimes' last-bit Math
 // (header) separates them through the chain integrals — 0.002″ in-era,
 // 0.02″ at deep time (both measured ≥10× above the post-fix residual).
 const MOON_LON_TOL_ARCSEC = 0.002, MOON_LON_TOL_DEEP_ARCSEC = 0.02;
 const MOON_DIST_TOL_KM = 0.01;
-// Plan 06 R9 — the rendered PLANETS (the N-body element chain, the only
+// The rendered PLANETS (the N-body element chain, the only
 // planet path since K5, read at the engine year in both twins): browser
 // scenePlanet theta/phi/dist vs the Node engine's computePlanetPosition at
 // the same UT JD. Measured parity ≤0.004″ (the K4b record,

@@ -59,9 +59,9 @@ const REQUIRED = [
   'data/eclipse-audit-summary.json',
   // stamped at Batch D of the restatement (engine-D secular frequencies):
   'data/nbody-secular-frequencies.json',
-  // plan 06 I1 — the Sun and the cardinal instants against the ±3000-yr Horizons TT cache:
+  // the Sun and the cardinal instants against the ±3000-yr Horizons TT cache:
   'data/sun-vs-horizons-summary.json',
-  // plan 06 §9 item 10 — the precession of date against Vondrák 2011 and La2004:
+  // the precession of date against Vondrák 2011 and La2004:
   'data/equinox-vs-vondrak.json',
   // plan 22 step 2 — Earth's osculating orbit beside its mean, the panel exhibit:
   'data/earth-osculating-wobble.json',
@@ -69,7 +69,7 @@ const REQUIRED = [
   'data/spin-axis-checkpoints.json',
   // plan 25 — the lunar cumulative bank (the lunar tables' coarse segment prefixes every 250 kyr):
   'data/lunar-cumulative-checkpoints.json',
-  // plan 12 §1b close-out — the shipped ΔT stack and the resonator amplitudes
+  // the shipped ΔT stack and the resonator amplitudes
   // (the joint fitter stamps both; a re-close is by hand — the cascade lists it):
   'data/deltaT-4flag-fit.json',
   'data/core-mantle-resonator-stage1.json',
@@ -84,16 +84,14 @@ const REQUIRED = [
   'public/input/ice-core-data.json',
 ];
 
-// Artifacts STALE BY CONSTRUCTION (plan 06 R3 item 1 cleanup, owner-checked):
+// Artifacts STALE BY CONSTRUCTION (owner-checked):
 // their inputs block is kept as the record, but a freshness re-stamp would
 // certify a claim the model no longer makes, so the gate reports them as
 // NOTES and does not ask for regeneration. Each entry names the reason; the
 // way out is a re-derivation on current inputs or a retirement (R4), never a
 // re-stamp.
 const STALE_BY_CONSTRUCTION = {
-  // (data/planet-prediction-fit-stats.json sat here from plan 06 R3 — it scored
-  // the PREDICT_COEFFS_PHYSICAL arrays against a Step-3 export of the RETIRED
-  // geometric planet path — until R8 retired the device and deleted the artifact.)
+  // (empty since the retired planet path's fit-stats artifact left with it)
 };
 
 const DATA = path.join(ROOT, 'data');

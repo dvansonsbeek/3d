@@ -13,7 +13,7 @@
  *     boundaries, leap years under BOTH rules, the Revised-Julian mod-900
  *     century rule, ±1.5 Myr deep points), exact string equality against
  *     the pre-change recording.
- *  2. ROUND-TRIP EXACT — midnight-lattice JDs must convert to 00:00:00
+ *  2. ROUND-TRIP EXACT — midnight-grid JDs must convert to 00:00:00
  *     and invert to the same JD exactly.
  *  3. ROUND-TRIP TOLERANCE — fractional times invert within the seconds
  *     rounding (0.5 s).
@@ -54,7 +54,7 @@ try {
   }
   check(`goldens (${expected.length} curated offsets, both calendar rules, ±1.5 Myr)`, goldenBad === 0, firstBad || 'all exact');
 
-  // 2 — round-trip exact on the midnight lattice
+  // 2 — round-trip exact on the midnight grid
   const rnd = mulberry32(0xE55127);
   const midnightOffsets = Array.from({ length: 300 }, () => Math.round((rnd() - 0.5) * 2 * 547e6));
   const rt = await sim.page.evaluate((offs) => {
@@ -68,7 +68,7 @@ try {
     }
     return { bad, first };
   }, midnightOffsets);
-  check('round-trip EXACT on 300 midnight-lattice JDs (±1.5 Myr)', rt.bad === 0, rt.first || 'all exact');
+  check('round-trip EXACT on 300 midnight-grid JDs (±1.5 Myr)', rt.bad === 0, rt.first || 'all exact');
 
   // 3 — round-trip within seconds rounding for fractional times
   const fracOffsets = Array.from({ length: 200 }, () => (rnd() - 0.5) * 2 * 547e6);
