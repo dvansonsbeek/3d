@@ -45,9 +45,8 @@ const OUT_COEFFS_DTS = join(ROOT, 'packages/physics/src/constants/coefficients.d
 
 /**
  * Fitted coefficients emitted VERBATIM from the shipped fit artifacts under
- * data/ (§2j; EXTRA_COEFFICIENT_SOURCES below — public/input/fitted-
- * coefficients.json, the comb families' former home, was deleted at plan 11
- * step 1 after plan 09 had emptied it).
+ * data/ (§2j; EXTRA_COEFFICIENT_SOURCES below; the retired coefficient file is
+ * the record, doc 109 §23).
  *
  * A SEPARATE export and a separate file, because the lifecycle differs: model
  * parameters are chosen or measured and change deliberately; these are pipeline
@@ -70,12 +69,6 @@ const OUT_COEFFS_DTS = join(ROOT, 'packages/physics/src/constants/coefficients.d
  * Any rename or reshape script.js wants (divisor n -> period H/n) happens
  * THERE, visibly, not in a formatter here.
  */
-// (plan 09 deleted every comb family fitted-coefficients.json carried — the
-//  year-length, perihelion, obliquity, Sun-longitude and RA-day-offset combs
-//  on divisors of the retired unit, the Moon RA/Dec patches (plan 06 R3), the
-//  planet predict device (plan 06 R8) and last, at step 7a, the frozen
-//  cardinal record with its package evaluator; git history carries them, doc
-//  110 §5.2/§5.5 the frozen render. Plan 11 step 1 deleted the emptied file.)
 
 /**
  * The coefficient blocks, each from its OWN fit artifact. Same treatment —
@@ -105,11 +98,11 @@ const EXTRA_COEFFICIENT_SOURCES = [
 
   // The ΔT correction stack. FOUR channels — Bond, Hallstatt, Jose5, Jose4 —
   // and Jose5/Jose4 are a COUPLED PAIR, so a 3-channel source cannot describe
-  // the shipped stack. The superseded deltaT-3flag-fit.json was deleted for
+  // the shipped stack. The superseded deltaT-3flag-fit.json is retired for
   // exactly that reason: it carried bond.cos_coeff_s = 165.927 against the
   // 145.595 actually shipped.
   { dir: 'data', file: 'deltaT-4flag-fit.json', as: 'DT_STACK', pick: (j) => j.shipped_coefficients },
-  // Plan 14 step 1: the ΔT trend anchor at J2000 is the joint fit's OUTPUT and lives in the
+  // The ΔT trend anchor at J2000 is the joint fit's OUTPUT and lives in the
   // fit's own artifact — it had sat in astro-reference.json (an INPUT file the N-body node
   // hashes wholesale), so every by-hand re-close that moved it by a µs cost the 26-min
   // N-body re-stamp. Readers: FIT.DT_ANCHOR.deltaTStartSeconds (never K.earthOrbital).
@@ -130,12 +123,9 @@ const EXTRA_COEFFICIENT_SOURCES = [
  * map is an ERROR, not a default — silently including or excluding a new block
  * is exactly the failure this map exists to prevent.
  *
- * (plan 11 step 6: `model-parameters.json` — the model theory parameters — is
- * DELETED. Its blocks left one by one: `deepTime` is ASSEMBLED below from its
- * three homes (step 1); `additionalBodies` (step 2) and `perihelionPassageRef`
- * (step 3) went with the scaffold readers they fed; `earth` — the K-device
- * scaffold's recorded J2000 pose — went at step 4 (the world frame is the
- * J2000 ecliptic, earth/frame-of-date); `foundational`'s scene epoch moved to
+ * (`model-parameters.json` is a RETIRED input, doc 109 §23: `deepTime` is
+ * ASSEMBLED below from its three homes; the world frame is the J2000
+ * ecliptic, earth/frame-of-date; `foundational`'s scene epoch moved to
  * astro-reference `timeReference` at step 5; `moon` emptied across steps 2–3;
  * and `planets`' last leaf, the display names, is code —
  * planets/display-names.cjs — because a name is presentation, not a model
@@ -175,13 +165,13 @@ const CLASSIFICATION = {
     // Observed planetary spin-precession constants + obliquities (C-4 spin/
     // Cassini landscape citations, doc 109 §19) — comparison targets only.
     planetSpinObserved: 'target',
-    // The planets' spin-channel INPUTS (plan 06 Phase 7): J₂, C/MR², the IAU
+    // The planets' spin-channel INPUTS: J₂, C/MR², the IAU
     // pole and rotation rate, the regular satellites. Measured reality the
     // precession constant is DERIVED from (planets/spin-channel.cjs), so a
     // counterfactual over them is legitimate ("what if Saturn's moment of
     // inertia were the Ward–Hamilton band") — anchor, like planetOrbitalElements.
     planetSpinPhysical: 'anchor',
-    // Cox & Chao dJ2/dt + Peltier factor — ANCHOR since plan 11 step 1: the
+    // Cox & Chao dJ2/dt + Peltier factor — ANCHOR: the
     // GIA channel's two J2000 rates (deepTime.j2RateJ2000PerYr and
     // .alphaGiaRateJ2000PerYr) are DERIVED from them (assembleDeepTime), so
     // "what if dJ2/dt were otherwise" is a legitimate counterfactual. They
@@ -296,8 +286,8 @@ function assembleDeepTime(astro) {
 // a(t)/a(0) on the model's own J2000 anchor). Same two-gate guard as the chain
 // artifact: check:artifacts pins artifact ↔ source, this module's staleness
 // check pins embed ↔ artifact. The distance columns and the mean-obliquity
-// column are embedded — both READ (plan 12 option A: the distance as the ratio
-// a(t)/a(0); plan 12 §8 option (a): the obliquity as cos ε̄(t)/cos ε̄(0) on the
+// column are embedded — both READ (the distance as the ratio
+// a(t)/a(0); the obliquity as cos ε̄(t)/cos ε̄(0) on the
 // precession rate of date, earth/mean-obliquity-history); the solution's LOD
 // and precession columns stay in the data file as the cross-check they are.
 const MOON_DISTANCE_PATH = join(ROOT, 'data/astrogeo22-earth-moon.json');
@@ -316,7 +306,7 @@ function buildMoonDistanceArtifact() {
     aEarthRadii: c.aEarthRadii,
     aMinEarthRadii: c.aMinEarthRadii,
     aMaxEarthRadii: c.aMaxEarthRadii,
-    // plan 12 §8 option (a): the solution's mean obliquity — the second column the model READS
+    // the solution's mean obliquity — the second column the model READS
     obliquityDeg: c.obliquityDeg,
     obliquityMinDeg: c.obliquityMinDeg,
     obliquityMaxDeg: c.obliquityMaxDeg,
@@ -340,7 +330,7 @@ function emitMoonDistanceArtifact({ hash, payload }) {
  * interval, VERBATIM. deltat/moon-distance-history reads the distance as the
  * ratio a(t)/a(0) on the model's own J2000 anchor; earth/mean-obliquity-history
  * reads the obliquity as cos ε̄(t)/cos ε̄(0) on the precession rate of date
- * (plan 12 §8 option (a)). Two gates guard
+ * (the cited input). Two gates guard
  * the chain: check:artifacts pins artifact ↔ source file, generate.mjs check
  * mode pins this embed ↔ artifact. CJS for the .cjs deep-time consumers.
  */
@@ -401,7 +391,7 @@ function build() {
       if (!blocks.includes(b)) problems.push(`${file}: classified block "${b}" no longer exists — remove it`);
     }
   }
-  // the assembled block (plan 11 step 1) — injectable, hashed with the rest
+  // the assembled block — injectable, hashed with the rest
   if ('deepTime' in included) problems.push('astro-reference.json: block "deepTime" returned — it is ASSEMBLED here (assembleDeepTime); its leaves have their own homes');
   else included.deepTime = assembleDeepTime(read('astro-reference.json'));
 
@@ -452,11 +442,10 @@ ${refBlocks.map((b) => `  ${b}: ${JSON.stringify(reference[b], null, 2).split('\
  * GENERATED — do not edit. Regenerate:
  *   node tools/constants/generate.mjs --write
  *
- * Source of truth: public/input/astro-reference.json (model-parameters.json is
- * DELETED, plan 11 step 6 — its leaves have their homes); the deepTime block
- * is ASSEMBLED from astro-reference.json (moonReference.moonRecessionAlpha1PerMa,
- * giaCoxChaoPeltier), data/deep-time-fitted.json and data/deltaT-4flag-fit.json
- * shipped_taper (plan 11 step 1).
+ * Source of truth: public/input/astro-reference.json (the retired input file:
+ * doc 109 §23); the deepTime block is ASSEMBLED from astro-reference.json
+ * (moonReference.moonRecessionAlpha1PerMa, giaCoxChaoPeltier),
+ * data/deep-time-fitted.json and data/deltaT-4flag-fit.json shipped_taper.
  * Classification and rationale: tools/constants/generate.mjs
  *
  * Two exports, deliberately separate (§2d):
@@ -676,7 +665,7 @@ module.exports = { SIDEREAL_CHANNEL_ARTIFACT, SIDEREAL_CHANNEL_ARTIFACT_HASH };
 `;
 }
 
-// The Sun planetary completion's embedded data (plan 06 I3): the planets'
+// The Sun planetary completion's embedded data: the planets'
 // J2000 sidereal mean motions — the completion's CARRIERS — and the
 // e-vectors of date of Venus, Earth, Mars and Jupiter on a 1-kyr grid over
 // ±50 kyr — the D'Alembert long-period rows' amplitude/phase inputs. Both
@@ -726,7 +715,7 @@ function emitSunCompletionArtifact({ hash, payload }) {
  *   node tools/constants/generate.mjs --write
  *
  * Source: data/nbody-secular-series.json — the Sun planetary completion's
- * embedded data (plan 06 I3): planetLamDotJ2000DegPerYr, the planets' J2000
+ * embedded data: planetLamDotJ2000DegPerYr, the planets' J2000
  * sidereal mean motions from the model's own ±10-Myr run (the completion's
  * CARRIERS; the former carriers were the planet records' rounded of-date
  * periods minus p₀ — Venus 4.1″/yr, Jupiter 1.7″/yr off the run's own
@@ -757,7 +746,7 @@ function buildDeepModes(chainArt) {
   // read from the banked ±10-Myr series the mode table compresses — the
   // series' one home, a ±1-cadence-step central difference at the J2000
   // node (measured: the table's own ė was 19 % steep, the series' is the
-  // run's) — and the taper the arguments' rate anchors ride (H/12), so the
+  // run's) — and the taper the arguments' rate anchors ride, so the
   // three engines build the identical channel from the embed alone.
   const series = JSON.parse(readFileSync(SECULAR_SERIES_PATH, 'utf8'));
   const eb = series.bodies.earth;
@@ -775,9 +764,8 @@ function buildDeepModes(chainArt) {
     (eb.zQ[i0 + 1] - eb.zQ[i0 - 1]) / (2 * eb.stepYr),
     (eb.zP[i0 + 1] - eb.zP[i0 - 1]) / (2 * eb.stepYr),
   ];
-  // (plan 09 step 7c: the slope anchor's taper is the lunar arguments' recorded
-  // completion taper — ONE home, @essrt/physics moon/arguments.cjs; it was
-  // written as the retired era unit's twelfth, bit-identical)
+  // (the slope anchor's taper is the lunar arguments' recorded completion
+  // taper — ONE home, @essrt/physics moon/arguments.cjs)
   const slopeTaperYears = SECULAR_COMPLETION_TAPER_YEARS;
   return {
     hash,
@@ -840,7 +828,7 @@ function emitDeepModes({ hash, payload }) {
  * anchors' ONE home, plus the per-planet leading proper ζ modes (″/yr,
  * the C-4 s-lines for the zoom labels — doc 109 §19), plus the J2000
  * z-rate pair from data/nbody-secular-series.json (the slope anchor of
- * the deep eccentricity channel) and its H/12 taper. Two gates guard
+ * the deep eccentricity channel) and its taper. Two gates guard
  * the chain: check:artifacts pins artifact ↔ engine; generate.mjs
  * check mode pins this embed ↔ artifact.
  * CJS because the lunar-chain consumers are CommonJS modules.

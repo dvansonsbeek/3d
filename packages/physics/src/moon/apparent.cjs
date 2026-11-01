@@ -1,7 +1,7 @@
 /**
  * Moon scene position — the ecliptic → equatorial conversion of the series
- * output, THE shared implementation (Phase 8.2-7). Since plan 06 R3 item 1 it
- * is ONLY that conversion: the rendered Moon is the GEOMETRIC series Moon
+ * output, THE shared implementation. It is ONLY that conversion: the
+ * rendered Moon is the GEOMETRIC series Moon
  * (moon/series.cjs sceneEvalAt, the derived extension inside), on the same
  * convention as the rendered Sun and planets.
  *
@@ -21,7 +21,7 @@
  *    scene. Measured over 1970–2049: the bare series + extension against
  *    Horizons' APPARENT Moon (≡ geometric − 0.7″ for a co-moving body)
  *    −1.0″ ± 1.5″ flat in elongation; the D5-shifted rendered Moon +32.5″ +
- *    20″·cos D against the same. (Plan 06 R3 scene conventions — the
+ *    20″·cos D against the same. (The scene conventions — the
  *    earlier wording "wrong physics" over-reached: astrometric is a valid
  *    convention, applied on the wrong side of the boundary.)
  *  - the fitted RA/Dec patches MOON_CORRECTION (pure-Meeus A/B) and
@@ -42,8 +42,8 @@
 'use strict';
 
 /**
- * No dependencies since R3 item 1 (the former D5 optics constants and the
- * fitted-patch getters are gone); the factory shape is kept for the two
+ * No dependencies (the former D5 optics constants and the fitted-patch
+ * getters are retired); the factory shape is kept for the two
  * scene twins' call sites.
  * @param {object} [_deps] ignored
  */

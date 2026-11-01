@@ -39,8 +39,8 @@
 //     anomalistic year rode the planet chain's secular tangent — seconds
 //     from the scene's own perihelion passages within a few millennia,
 //     395 s at +25 kyr where e passes 0.0034.
-//   • The frozen era clock stays the certified era device (opt-out /
-//     era-certification record), not a member of this family.
+//   • The retired spin-only clock is the record (doc 109 §23), not a member
+//     of this family.
 
 const { wrap180 } = require('../math/angles.cjs');
 const { createCardinalStructure } = require('../cardinal/one-source-structure.cjs');
@@ -150,7 +150,7 @@ function createYearLengths({ sampleAt, massLossSiderealSecondsAtYearFn }) {
 }
 
 /**
- * The published of-date window (plan 06 Phase 3 S2): inside |year − 2000| ≤
+ * The published of-date window: inside |year − 2000| ≤
  * this span the one-family route is THE published year-length / precession
  * family (the banked tiers — 100-yr and 1000-yr grids, no unbounded sampler
  * growth); beyond it the published surfaces return the unit's SECULAR mean

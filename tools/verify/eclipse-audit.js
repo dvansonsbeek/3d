@@ -18,7 +18,7 @@
  *      entries) — the Espenak/Meeus polynomial sampled at its own events.
  *   3. Framework ΔT = meanDeltaTSecondsAtAge((2000 − year)/1e6) from
  *      tools/lib/deep-time.js — the joint world (pure-tidal Simpson
- *      integral + 4-flag H-lattice stack + Core-mantle swing), the same
+ *      integral + 4-flag harmonic stack + Core-mantle swing), the same
  *      chain the browser buttons call.
  *   4. Mean |residual| vs observation per model + events where the
  *      framework lands closer than NASA.
@@ -87,11 +87,11 @@ const { createModel } = require('@essrt/physics');
 // the ζ-mode tail alone and the audit measures a different Moon.
 const SECULAR_SERIES_ARTIFACT = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secular-series.json'), 'utf8'));
 // RESEARCH PROBE (doc 109 §7): ECLIPSE_AUDIT_LAWS=curvature:<ddot per cy²> replaces
-// Earth's eccentricity law by the shipped H/3 line plus a curvature correction
+// Earth's eccentricity law by the shipped mean eccentricity plus a curvature correction
 //   Δe(t) = ½ (ddot − ddot_H3) t²   (t in centuries from J2000; ddot_H3 measured
 //   from the shipped law), so value and slope at J2000 are untouched and only the
 // curvature — the term the secular dynamics put at ≈ −2.5e-7/cy² against the
-// H/3 line's −3.8e-8 — is tested against the eclipse record. Probe only: --write
+// shipped law's −3.8e-8 — is tested against the eclipse record. Probe only: --write
 // is refused under an override (the artifact must never carry a research law).
 const LAWS_SPEC = process.env.ECLIPSE_AUDIT_LAWS || '';
 const laws = (() => {
@@ -149,10 +149,7 @@ const INPUT_FILES = [
   'packages/physics/src/moon/apparent.cjs',
   'public/input/solar-eclipse-centerlines-nasa.json',
   'public/input/astro-reference.json',
-  // (plan 11 step 6: model-parameters.json is deleted — the scene epoch is
-  // astro-reference timeReference, hashed above)
-  // plan 11 step 1: the banked fitted deep-time record (τ_GIA, the recession
-  // regime) the ΔT stack's GIA channel rides; fitted-coefficients.json is deleted
+  // the banked fitted deep-time record (τ_GIA) the ΔT stack's GIA channel rides
   'data/deep-time-fitted.json',
   // v23.0 (measured): the tiers run on the SERIES-driven model (createModel with
   // data/nbody-secular-series.json) and the ΔT stack reads the climate

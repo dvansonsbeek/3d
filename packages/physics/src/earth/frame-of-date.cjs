@@ -27,7 +27,7 @@
  * at −3000, the rendered Sun −19″ in declination against Horizons at the
  * March 2000 equinox (+19″ in September; 0.1–1″ at the solstice).
  *
- * THE SCENE'S WORLD FRAME (plan 11 step 4) is the J2000 ecliptic itself:
+ * THE SCENE'S WORLD FRAME is the J2000 ecliptic itself:
  * world Y is the J2000 ecliptic pole and the J2000 equinox lies in the world
  * XZ plane at the view azimuth `SCENE_EQUINOX_VIEW_AZIMUTH_DEG` (atan2(x, z)).
  * `computeSceneWorldFrameJ2000` is the bridge R (ecliptic J2000 → world) both

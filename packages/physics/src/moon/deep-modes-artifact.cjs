@@ -11,7 +11,7 @@
  * anchors' ONE home, plus the per-planet leading proper ζ modes (″/yr,
  * the C-4 s-lines for the zoom labels — doc 109 §19), plus the J2000
  * z-rate pair from data/nbody-secular-series.json (the slope anchor of
- * the deep eccentricity channel) and its H/12 taper. Two gates guard
+ * the deep eccentricity channel) and its taper. Two gates guard
  * the chain: check:artifacts pins artifact ↔ engine; generate.mjs
  * check mode pins this embed ↔ artifact.
  * CJS because the lunar-chain consumers are CommonJS modules.

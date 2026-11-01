@@ -1,6 +1,6 @@
 /**
- * No dependencies since R3 item 1 (the former D5 optics constants and the
- * fitted-patch getters are gone); the factory shape is kept for the two
+ * No dependencies (the former D5 optics constants and the fitted-patch
+ * getters are retired); the factory shape is kept for the two
  * scene twins' call sites.
  * @param {object} [_deps] ignored
  */

@@ -10,7 +10,7 @@
  * interval, VERBATIM. deltat/moon-distance-history reads the distance as the
  * ratio a(t)/a(0) on the model's own J2000 anchor; earth/mean-obliquity-history
  * reads the obliquity as cos ε̄(t)/cos ε̄(0) on the precession rate of date
- * (plan 12 §8 option (a)). Two gates guard
+ * (the cited input). Two gates guard
  * the chain: check:artifacts pins artifact ↔ source file, generate.mjs check
  * mode pins this embed ↔ artifact. CJS for the .cjs deep-time consumers.
  */

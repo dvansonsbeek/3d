@@ -75,7 +75,7 @@ const PLANET_ELEMENT_FRAMES = Object.freeze({
   invPlaneInclinationDeg: 'inclination of the orbit plane to the model’s invariable plane',
   eccentricity: 'orbital eccentricity of date, the modulus of the chain’s secular eccentricity vector',
   epoch: 'the decimal year is read as the chain’s dynamical-time argument',
-  record: 'the body’s structural inputs (IAU J2000 longitude of perihelion, Souami & Souchay 2012 node and inclination, DE440 eccentricity, the orbital-period input, the axial tilt), the DERIVED J2000 obliquity, and the two secular PERIODS 1,296,000/g and 1,296,000/s from the same chain — apsidal prograde positive, nodal regression negative. R8: the retired device’s lattice descriptors are no longer served; for a value at an epoch read the at[] rows.',
+  record: 'the body’s structural inputs (IAU J2000 longitude of perihelion, Souami & Souchay 2012 node and inclination, DE440 eccentricity, the orbital-period input, the axial tilt), the DERIVED J2000 obliquity, and the two secular PERIODS 1,296,000/g and 1,296,000/s from the same chain — apsidal prograde positive, nodal regression negative. For a value at an epoch read the at[] rows.',
 });
 
 const EPOCH_SECTIONS = Object.freeze(['lod', 'alpha', 'deltaT', 'siderealYearSeconds', 'tropicalYearSeconds', 'moonDistanceKm', 'axialPrecessionYears']);
@@ -143,7 +143,7 @@ export function createApi() {
     constantsHash: id.constantsHash,
     coefficientsHash: id.coefficientsHash,
     citation: `doi:${id.preprintDoi}`,
-    validitySpan: { minYear: -498e6, maxYear: 502e6, note: 'refused outside, never extrapolated; the deep-time chain (day length, Moon distance, clock) runs on the cited Earth–Moon distance history — Farhat et al. 2022, AstroGeo22 — to 4,429 Ma, the paleo gate tests it to 3.2 Ga, and this API serves ±500 Myr (plan 12 option A); the hybrid obliquity (earth.obliquityDeg) is served inside the banked N-body series\' span only, ±10 Myr — null beyond, where the cited mean obliquity of date (earth.meanObliquityCitedDeg) stands (plan 12 §8.5)' },
+    validitySpan: { minYear: -498e6, maxYear: 502e6, note: 'refused outside, never extrapolated; the deep-time chain (day length, Moon distance, clock) runs on the cited Earth–Moon distance history — Farhat et al. 2022, AstroGeo22 — to 4,429 Ma, the paleo gate tests it to 3.2 Ga, and this API serves ±500 Myr (the cited input); the hybrid obliquity (earth.obliquityDeg) is served inside the banked N-body series\' span only, ±10 Myr — null beyond, where the cited mean obliquity of date (earth.meanObliquityCitedDeg) stands' },
   });
 
   /** @param {Record<string, string>} query @returns {{ years: number[], echo: Record<string, unknown> } | { problem: {status: number, headers: Record<string, string>, body: string} }} */

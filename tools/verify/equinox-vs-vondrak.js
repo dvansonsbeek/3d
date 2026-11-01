@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * THE PRECESSION OF DATE AGAINST ITS TWO THEORY REFEREES (plan 06 §9 item 10).
+ * THE PRECESSION OF DATE AGAINST ITS TWO THEORY REFEREES.
  *
  *   node tools/verify/equinox-vs-vondrak.js            reproduce + compare against the recorded artifact
  *   node tools/verify/equinox-vs-vondrak.js --write    (re)write data/equinox-vs-vondrak.json
@@ -31,9 +31,7 @@
  *
  * GATES UNDER --write (the adoption's result, so a dropped term cannot ship
  * unseen): |Δequinox| ≤ 10″ over ±3000 yr (measured max 7.9 with p₀ = the
- * IAU 2006 p_A — plan 09; 6.5 on the retired year combs' derived beat, which
- * sat 8 ppm above p_A and absorbed that much of the model's growth into the
- * past against both referees; the secular law alone reads 28), ≤ 1.0″ inside
+ * IAU 2006 p_A; the secular law alone reads 28), ≤ 1.0″ inside
  * −500…+2500 (measured 0.62 on p_A; 0.3 before); the obliquity within 20″ rms
  * of La2004 over the last Myr (measured 15.0 on p_A, 13.7 before; the secular
  * law alone 80).
@@ -61,7 +59,7 @@ const INPUT_FILES = [
   'data/nbody-secular-series.json',
   'data/nbody-deep-secular-modes.json',
   'data/la2004-earth-51myr-back.asc',
-  'public/input/astro-reference.json',   // (plan 11 step 6: model-parameters.json is deleted)
+  'public/input/astro-reference.json',
   'public/input/climate-formula-coefficients.json',
 ];
 
@@ -87,7 +85,7 @@ const seriesArt = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-secu
 const ART = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'nbody-deep-secular-modes.json'), 'utf8'));
 const AE = CHAIN_ARTIFACT.j2000AnchorElements.earth, eb = seriesArt.bodies.earth;
 const { DEEP_MODES_ARTIFACT } = require(path.join(ROOT, 'packages', 'physics', 'src', 'moon', 'deep-modes-artifact.cjs'));   // plan 21: the e/ϖ anchor is the series' own J2000 mean
-const axial0 = DT.certifiedAxialPrecessionJ2000Years();   // plan 09: the IAU p_A anchor (was the retired year combs' beat at 2000)
+const axial0 = DT.certifiedAxialPrecessionJ2000Years();   // the IAU p_A anchor
 const factory = (deps) => createDeepOrbitalHistory({
   zModes: ART.modes.earth.z, zetaModes: ART.modes.earth.zeta,
   zetaSeries: { t0Yr: seriesArt.t0Yr, stepYr: eb.stepYr, q: eb.zetaQ, p: eb.zetaP },
@@ -95,7 +93,7 @@ const factory = (deps) => createDeepOrbitalHistory({
   anchorE: DEEP_MODES_ARTIFACT.anchorE, anchorPeriEclipticDeg: DEEP_MODES_ARTIFACT.anchorPeriEclipticDeg,
   anchorInclEclipticDeg: AE.inclEclipticDeg, anchorAscNodeEclipticDeg: AE.ascNodeEclipticDeg,
   axialPrecessionYearsJ2000: axial0, obliquityJ2000Deg: C.ASTRO_REFERENCE.obliquityJ2000_deg,
-  axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarTorquePeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,   // plan 12 §8: the TORQUE period (the integration's own ŝ·n̂ carries the cosine); plan 09 step 5c: the composed period directly
+  axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarTorquePeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,   // the TORQUE period (the integration's own ŝ·n̂ carries the cosine); the composed period directly
   ...deps,
 });
 const SOLAR = { solarTorqueShareJ2000: DT.PRECESSION_SOLAR_SHARE_J2000 };

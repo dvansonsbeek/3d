@@ -19,13 +19,12 @@
 // preserved exactly.
 //
 // Scope: this channel is the sidereal year OF DATE everywhere — the
-// model/chart surfaces AND the scene: since plan 06 R1 the Sun's mean
+// model/chart surfaces AND the scene: the Sun's mean
 // longitude of date integrates the one-family tropical year (this channel
 // minus the movement's own general precession), so the scene's measured
 // sidereal angle reproduces this law (the scene-sampled gate,
-// tools/verify/scene-year-lengths.js). The frozen era clock's sidereal
-// year (mass-loss only, no planetary drift) is the certified era device,
-// not a member of this family.
+// tools/verify/scene-year-lengths.js). The mass-loss-only sidereal year
+// (no planetary drift) is a retired construct, not a member of this family.
 //
 // ESTIMATOR (2026-09): each banked node is the least-squares slope of a
 // quadratic fitted to the dump's unwrapped L over ±5 kyr — the former

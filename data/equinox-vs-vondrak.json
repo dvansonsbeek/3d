@@ -478,14 +478,14 @@
    "packages/physics/src/climate/l1-orbital.cjs": "sha256:338c2987d7107e66fcdac81c8cc55b99197030b6b6240dda9f469b36682ef837",
    "packages/physics/src/deltat/deep-time.cjs": "sha256:a152284d8ca8eb0a433fe6bab7e270c833ad4aae7e0184725a21646df9f9fbbc",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:f8cf54bec82be03ee0bace3c939fdaa8a68969b4d286ceea3e5e4c02eeaabf83",
-   "packages/physics/src/earth/frame-of-date.cjs": "sha256:a06a089d35b82e97d6fa3ea9255c36aff4df0f6ea32182f009cd8dd8a648cdce",
+   "packages/physics/src/earth/frame-of-date.cjs": "sha256:005e1ceaa82197d62c408d3ebda56692be934dee719433f5d428af63d2fba12b",
    "packages/physics/src/earth/precession-composed.cjs": "sha256:69f2c3795c67f4019671e727f1ae53909cefa3bfa74fb8cf19dec912777385f1",
    "packages/reference/src/published-curves.cjs": "sha256:a6a00fb07a194b80d01b8a41b68dae33282e3f5b98c088f480afa7b356ae1ad5",
    "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
    "public/input/climate-formula-coefficients.json": "sha256:72186eb767b1cc3928d276db376a2e90dc2bbd7213951e4aedb0aa6c40404ad5",
-   "tools/lib/deep-orbital-history.js": "sha256:0a067bb87459aaaea85030f59360a4acdc08f3a9d7f6f677fd06c6c908a9ddf5",
+   "tools/lib/deep-orbital-history.js": "sha256:797eee272c31c1d93c4acf82d50f4f26b28258db00d88f8cd5280c02e6768a8c",
    "tools/lib/deep-time.js": "sha256:598c6f00f711432b1545df01bc768f0e624722ac49caf53064d22b5d31b240bd",
-   "tools/verify/equinox-vs-vondrak.js": "sha256:77b6ed8ac6687e139f6acfd56ffcb9847dbbc9ee9e120d854238c4150b4c4fbc"
+   "tools/verify/equinox-vs-vondrak.js": "sha256:f8af6256701a923884bc6e001811b9beda09e6e76681e70bc4bae9be6fa1b807"
   }
  }
 }

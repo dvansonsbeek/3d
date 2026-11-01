@@ -58,8 +58,7 @@ function createDeepOrbitalHistory() {
  * browser's ?hybridSpin runs — the banked engine series inside ±10 Myr
  * (data/nbody-secular-series.json), the deep mode tables as the tail, and
  * α(t) = ψ̇(t)/cos ε₀ with the SECULAR scaling only — on the COMPOSED
- * lunisolar rate, period₀ / [ψ̇(t)/ψ̇₀] (plan 06 D6, the leg-1 claim; the
- * pre-D6 form was the structural period₀·H(t)/H₀; the instantaneous
+ * lunisolar rate, period₀ / [ψ̇(t)/ψ̇₀] (the leg-1 claim; the instantaneous
  * year-length beat double-counts the equinox wobble, the measured C-4b
  * catch).
  *
@@ -117,10 +116,10 @@ function createOneSourceTier(opts = {}) {
     // date (spin × [solar + lunar torque on the recession history]) — the
     // torque period, NOT the published rate of date: the integration's own
     // ŝ·n̂ carries the obliquity's cosine, so the cited mean obliquity's factor
-    // (plan 12 §8 option (a)) must not enter twice. Twins: packages/physics
+    // must not enter twice. Twins: packages/physics
     // model.js and src/script.js _deepHistSeries.
     axialPrecessionYearsAtYearFn: (yr) => DT.meanLunisolarTorquePeriodYearsAtAge((2000 - yr) / 1e6) ?? axial0,
-    // THE PRECESSION OF DATE (plan 06 §9 item 10): the solar torque at the
+    // THE PRECESSION OF DATE: the solar torque at the
     // eccentricity of date and the oblateness of date from the GIA channel —
     // both exactly 1 at J2000. Twins: packages/physics model.js and
     // src/script.js _deepHistSeries (identical deps).

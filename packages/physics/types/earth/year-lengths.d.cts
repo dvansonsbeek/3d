@@ -66,7 +66,7 @@ export function createYearLengths({ sampleAt, massLossSiderealSecondsAtYearFn }:
  *  @param {number} siderealYearDays @param {number} generalPrecessionArcsecPerJulianYr @returns {number} */
 export function computeMeanTropicalYearJ2000Days(siderealYearDays: number, generalPrecessionArcsecPerJulianYr: number): number;
 /**
- * The published of-date window (plan 06 Phase 3 S2): inside |year − 2000| ≤
+ * The published of-date window: inside |year − 2000| ≤
  * this span the one-family route is THE published year-length / precession
  * family (the banked tiers — 100-yr and 1000-yr grids, no unbounded sampler
  * growth); beyond it the published surfaces return the unit's SECULAR mean

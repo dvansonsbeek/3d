@@ -2,11 +2,10 @@
  * GENERATED — do not edit. Regenerate:
  *   node tools/constants/generate.mjs --write
  *
- * Source of truth: public/input/astro-reference.json (model-parameters.json is
- * DELETED, plan 11 step 6 — its leaves have their homes); the deepTime block
- * is ASSEMBLED from astro-reference.json (moonReference.moonRecessionAlpha1PerMa,
- * giaCoxChaoPeltier), data/deep-time-fitted.json and data/deltaT-4flag-fit.json
- * shipped_taper (plan 11 step 1).
+ * Source of truth: public/input/astro-reference.json (the retired input file:
+ * doc 109 §23); the deepTime block is ASSEMBLED from astro-reference.json
+ * (moonReference.moonRecessionAlpha1PerMa, giaCoxChaoPeltier),
+ * data/deep-time-fitted.json and data/deltaT-4flag-fit.json shipped_taper.
  * Classification and rationale: tools/constants/generate.mjs
  *
  * Two exports, deliberately separate (§2d):

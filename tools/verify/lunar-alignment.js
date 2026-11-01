@@ -64,10 +64,7 @@ const INPUT_FILES = [
   // Stage A′ of the engine-switch record):
   'packages/physics/src/moon/apparent.cjs',
   'packages/api/src/app.js',
-  // (plan 11 step 6: model-parameters.json is deleted — the scene epoch the
-  // integrators anchor on is astro-reference timeReference, hashed below)
-  // plan 11 step 1: the banked fitted deep-time record (τ_GIA, the recession
-  // regime) the ΔT stack's GIA channel rides; fitted-coefficients.json is deleted
+  // the banked fitted deep-time record (τ_GIA) the ΔT stack's GIA channel rides
   'data/deep-time-fitted.json',
   // THE REST OF WHAT THIS CAMPAIGN ACTUALLY RUNS ON (measured, 2026-09-30):
   // the deep-eccentricity slope anchor (e338d1bd) moved the per-century

@@ -66,7 +66,7 @@
  *   convention); tropicalYearJ2000Seconds is the length of ONE tick of the
  *   year axis the integrator is fed — the linear SI-year label, each tick
  *   exactly one J2000 tropical year of seconds — so it is the integrand's
- *   weight in BOTH branches (plan 09 step 7c′: the deep branch had weighted
+ *   weight in BOTH branches (measured: the deep branch had once weighted
  *   each tick by the tropical year OF DATE, adding that year's deep-time
  *   drift to every lunar count — ~5° of Moon at ±100 kyr, ~1.3 orbits at
  *   1 Ma — although the tick itself never changes length; the owner's call:
@@ -93,8 +93,7 @@ function createChainCycleIntegrator({
   /** @type {Map<PeriodSecondsAtAge, Float64Array | null>} */
   const tables = new Map();
 
-  // (plan 09 step 7c′: the exact-argument memo of the year-of-date weight
-  // left with the weight — the tick length is the constant below.)
+  // (the tick length is the constant below)
 
   /** Lazy cumulative table for one chain; null when the chain is undefined
    *  anywhere in range (→ Simpson fallback).

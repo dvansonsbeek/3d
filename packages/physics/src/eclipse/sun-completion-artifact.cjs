@@ -3,7 +3,7 @@
  *   node tools/constants/generate.mjs --write
  *
  * Source: data/nbody-secular-series.json — the Sun planetary completion's
- * embedded data (plan 06 I3): planetLamDotJ2000DegPerYr, the planets' J2000
+ * embedded data: planetLamDotJ2000DegPerYr, the planets' J2000
  * sidereal mean motions from the model's own ±10-Myr run (the completion's
  * CARRIERS; the former carriers were the planet records' rounded of-date
  * periods minus p₀ — Venus 4.1″/yr, Jupiter 1.7″/yr off the run's own
