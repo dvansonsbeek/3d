@@ -201,11 +201,16 @@ function createEclipseFinders(deps) {
    * Find all solar-eclipse-class conjunctions in [jdStart, jdEnd].
    * Events are timed at MINIMUM γ (NASA "greatest eclipse" convention).
    * @param {number} jdStart @param {number} jdEnd
+   * @param {{stepDays?: number}} [opts] the scan step in days (default: the J2000 synodic month / 60)
    * @returns {Array<{jd: number, beta: number, moonDistance_km: number,
    *   type: string, moonAppR_topo: number, sunAppR: number, moonSunRatio: number}>}
    */
-  function findSolarEclipsesInRange(jdStart, jdEnd) {
-    const STEP_DAYS = deps.getSynodicMonthDays() / 60;
+  function findSolarEclipsesInRange(jdStart, jdEnd, opts) {
+    // The scan step: a 60th of the synodic month — the J2000 month by default (every era
+    // caller, bit-identical), or the caller's month OF DATE (opts.stepDays) where the month
+    // is not the era's: 0.9 d at the Earth–Moon genesis against 29.5 d (doc 111 §1.35).
+    const stepOpt = (opts && typeof opts.stepDays === 'number' && Number.isFinite(opts.stepDays) && opts.stepDays > 0) ? opts.stepDays : null;
+    const STEP_DAYS = stepOpt !== null ? stepOpt : deps.getSynodicMonthDays() / 60;
     const _rad2deg = 180 / Math.PI;
     const R_EARTH_KM = K.rEarthMetres / 1000;
     const R_MOON_KM = K.moonDiameterKm / 2;

@@ -11,6 +11,12 @@ export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
             umbraKm: number;
             magnitude: number;
         };
+        shadowRadiiAt: (jdUT: number) => {
+            penumbraKm: number;
+            umbraKm: number;
+            gamma: number;
+            moonDistanceKm: number;
+        };
         localCircumstances: (jdGreatest: number, latDeg: number, lonDeg: number) => {
             kind: "none" | "partial" | "annular" | "total";
             magnitude: number;
@@ -35,7 +41,9 @@ export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
             magnitudeUmbral: number;
             magnitudePenumbral: number;
         }>;
-        findSolarEclipsesInRange: (jdStart: number, jdEnd: number) => Array<{
+        findSolarEclipsesInRange: (jdStart: number, jdEnd: number, opts?: {
+            stepDays?: number;
+        }) => Array<{
             jd: number;
             beta: number;
             moonDistance_km: number;

@@ -153,7 +153,9 @@ export function assembleLunarTheory(ctx) {
    *  prefixes of the five named chains and the two named carriers over ±limitYears from their
    *  edges — the payload of data/lunar-cumulative-checkpoints.json, computed by the tables' own
    *  recursion on THIS context (never seated on a bank: the generator builds without one).
-   *  @param {number} limitYears */
+   *  A number records ±limitYears; {past, future} records each direction to its own edge
+   *  (the navigable domain is asymmetric: −4,425 / +1,000 Myr).
+   *  @param {number | {past: number, future: number}} limitYears */
   const recordLunarCumulativeBank = (limitYears) => ({
     chains: {
       draconic: chainCycles.recordSegmentPrefixes(nodalMonthPeriodFn, limitYears),
@@ -162,7 +164,8 @@ export function assembleLunarTheory(ctx) {
       sidereal: chainCycles.recordSegmentPrefixes(siderealMonthPeriodFn, limitYears),
       jupiter: chainCycles.recordSegmentPrefixes(jupiterPeriodFn, limitYears),
     },
-    carriers: moonArgs.recordCarrierPrefixes(limitYears / 100),
+    // the carriers count centuries; a per-direction limit ({past, future}) passes through per side
+    carriers: moonArgs.recordCarrierPrefixes(typeof limitYears === 'number' ? limitYears / 100 : { past: limitYears.past / 100, future: limitYears.future / 100 }),
     segmentYears: chainCycles.coarseSegmentYears,
     chainLimitYears: chainCycles.coarseLimitYears,
   });

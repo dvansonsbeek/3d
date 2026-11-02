@@ -195,6 +195,11 @@ function createBesselian(deps) {
     const disc = B * B - A * Cq;
     if (disc < 0) return null;
     const s = (-B - Math.sqrt(disc)) / A;
+    // The hit must lie BEYOND the Moon along Sun→Moon (s > 0). At a lunar eclipse the Earth
+    // sits before the Moon on that line, both roots are negative and the near one is the
+    // SUNLIT face — the always-on umbra disc drew the Moon's umbra there at every lunar
+    // eclipse (2025-09-07 total: 8°S 101°W; doc 111 §1.33).
+    if (s < 0) return null;
     const hit = [M[0] + s * d[0], M[1] + s * d[1], M[2] + s * d[2]];
     const rho = Math.hypot(hit[0], hit[1]);
     const latDeg = Math.atan2(hit[2], (1 - F) * (1 - F) * rho) / D2R;
@@ -244,6 +249,27 @@ function createBesselian(deps) {
     // denominator — total events read >1 at the centre, annular <1.
     const magnitude = (penumbraKm - offsetKm) / (penumbraKm + umbraKm);
     return { offsetKm, penumbraKm, umbraKm, magnitude };
+  }
+
+  /** The shadow cone's radii on the FUNDAMENTAL plane (through the geocentre, normal to
+   *  the axis) at JD(UT) — the Besselian l₁ (penumbra) and l₂ (umbra, signed: >0 annular,
+   *  <0 total) in km — with γ (the axis's distance from the geocentre in Earth radii) and
+   *  the Moon's geocentric distance. The size of the umbra and penumbra a panel quotes;
+   *  the ground footprint is their projection onto the sphere (doc 111 §1.35).
+   *  @param {number} jdUT @returns {{penumbraKm: number, umbraKm: number, gamma: number, moonDistanceKm: number}} */
+  function shadowRadiiAt(jdUT) {
+    const { S, M } = bodiesAt(jdUT);
+    const dv = [M[0] - S[0], M[1] - S[1], M[2] - S[2]];
+    const dl = Math.hypot(dv[0], dv[1], dv[2]);
+    const d = [dv[0] / dl, dv[1] / dl, dv[2] / dl];            // Sun→Moon (toward Earth)
+    const along = -(M[0] * d[0] + M[1] * d[1] + M[2] * d[2]);  // Moon → the geocentre's plane, along the axis
+    const w = [M[0] + along * d[0], M[1] + along * d[1], M[2] + along * d[2]];   // the axis in that plane
+    return {
+      penumbraKm: R_MOON_KM + along * ((R_SUN_KM + R_MOON_KM) / dl),
+      umbraKm: along * ((R_SUN_KM - R_MOON_KM) / dl) - R_MOON_KM,
+      gamma: Math.hypot(w[0], w[1], w[2]) / R_E_KM,
+      moonDistanceKm: Math.hypot(M[0], M[1], M[2]),
+    };
   }
 
   /**
@@ -322,7 +348,7 @@ function createBesselian(deps) {
     return { kind, magnitude: Math.max(0, atMax.magnitude), maxJd, contacts, centralDurationSeconds };
   }
 
-  return { umbraGroundAt, shadowStateAt, localCircumstances, gmstDeg };
+  return { umbraGroundAt, shadowStateAt, shadowRadiiAt, localCircumstances, gmstDeg };
 }
 
 module.exports = { createBesselian, computeGmstDeg };

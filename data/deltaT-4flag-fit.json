@@ -176,7 +176,7 @@
     "generator": "DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write <a FIT — re-close by hand, then npm run regen:cascade --run>",
     "files": {
       "data/astrogeo22-earth-moon.json": "sha256:77d87c4e0c3543ef4cdaca1482e065dcff5457b694fa519a58061cf013d4461b",
-      "data/core-mantle-resonator-stage1.json": "sha256:39f6c345b44ee7f5a149b841c2bd46565720bceeb040e39f1338af1bf94ff681",
+      "data/core-mantle-resonator-stage1.json": "sha256:6e4307c4f9abfe8e6738684d2a4a2ef72f827d1606f7096a85576b34af5bae7a",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
       "packages/fitting/src/dt-corrections-fit.cjs": "sha256:97034bec0079f07093c00f7d0f48d870bf6496d2d2f150cac000b3bddf91fd0a",
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:f15c92118c12c0e4d7904fe1e793703749594a4668f3f7ad8611632c82710e22",
@@ -187,11 +187,11 @@
       "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:78dac2b3854c55a6ce63b8cfd409e5c9a06b0924d9e1b9f5bf88202ea5461555",
       "packages/physics/src/earth/precession-composed.cjs": "sha256:448b2327fc6f3a6994bfc5cc514fec3dc7ceae2037312ae8343b57b7f948252a",
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
-      "public/input/climate-formula-coefficients.json": "sha256:41fc60ceb2b2eaf43bd1c2ddc3051accebd8a6d745f1be6807721dec165f6606",
+      "public/input/climate-formula-coefficients.json": "sha256:e24feaef6bf7cd3f7ad48d1914b45581a0aa755891de8c31e26a97db92bc2d24",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
       "tools/lib/constants.js": "sha256:fc23b637b6642d4e173d513b023d608278a6889c667bf56bae0ae5a23e9e18b0",
-      "tools/lib/deep-time.js": "sha256:1d956689f66c8e1301b997d5ca8209076454760d277ecfa9481c5753a0b2e5c0"
+      "tools/lib/deep-time.js": "sha256:141b8d9373e932adc6b8cfcbca0a2d95f002a8e160a95d9eae3905968e4eae95"
     }
   }
 }

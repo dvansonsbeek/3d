@@ -119,6 +119,18 @@ try {
   });
   console.log(`      spin read ms (first one-source ε at −400 Myr, bank seated): ${deepSpin.toFixed(0)}`);
   gate('spin read: first ε(−400M) on the checkpoint bank', deepSpin, 2000, 'ms');
+  // ── 0b′. THE DEEP-EDGE SPIN READ (doc 111 §1.35): the same read at −4.4 Gyr, the
+  // navigable domain's deep end, after the −400 Myr one. The scene's deep tier once
+  // walked to 1.25 × (1.25 × |t|) — past the bank's deepest checkpoint for every
+  // query beyond 2.83 Gyr — and ran unseated from there: 63 s at −2.9 Gyr, 130 s at
+  // the position table's edge, where the seated read is 0.6 s (the deep step
+  // schedule's ~250-kyr walk). Absolute, for the same reason as 0b.
+  const edgeSpin = await sim.page.evaluate(() => {
+    const T = window.__test__;
+    const t0 = performance.now(); T.earthObliquityHybridAt(-4400000000 + 2000); return performance.now() - t0;
+  });
+  console.log(`      spin read ms (first one-source ε at −4.4 Gyr, bank seated): ${edgeSpin.toFixed(0)}`);
+  gate('spin read: first ε(−4.4G) on the checkpoint bank', edgeSpin, 5000, 'ms');
   // ── 0c. THE FULL PHANEROZOIC JUMP (plan 25): with BOTH banks landed the lunar
   // tables sum one segment at most, so the whole scene jump to −400 Myr is the
   // spin seat + the lunar seat + the dense ±250-kyr grid every deep read pays

@@ -1082,11 +1082,9 @@ function moveModel(graph, pos) {
       // (~4 yr of ΔT at +200 kyr → args differing by ~150° in ϖ).
       const _jdUTm = _jdFromPosTools(pos);
       const d = _jdTTToolsFromUT(_jdUTm) - C.j2000JD;
-      // Scene-ring item 2 (mirrors src/script.js): the series distance on the
-      // recession — the chain's a(t)/a₀ at the block's age (1 in snapshot mode).
-      const _aRatio = DEEP_TIME_ENABLED
-        ? DT.meanMoonDistanceAtAge((C.startmodelYear - jdToDecimalYear(_jdUTm)) / 1e6) / DT.meanMoonDistanceAtAge(0)
-        : 1;
+      // The series distance is the recession-scaled one already (moon/series.cjs
+      // fullDistanceKm, ONE home): the former a(t)/a₀ factor here applied it a
+      // second time (mirrors src/script.js; doc 111 §1.33).
       // Phase 8.2-6: the full evaluation lives in @essrt/physics/moon/series
       // (shared with the browser scene block — one implementation). The
       // engine keeps the pos→JD_TT conversion above and the node writes.
@@ -1097,7 +1095,7 @@ function moveModel(graph, pos) {
       nodes._meeusT = _sr.T;
       // Series distance — exposed on the computePlanetPosition result so
       // meters can pair override angles with the OVERRIDE distance.
-      nodes._meeusDistKm = _sr.distKm * _aRatio;
+      nodes._meeusDistKm = _sr.distKm;
     }
     if (nodes.isEllipse) {
       const x = Math.cos(θ) * nodes.a;

@@ -329,6 +329,33 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
             };
             centralDurationSeconds: number | null;
         };
+        shadowRadiiAtJD: (jdUT: number) => {
+            penumbraKm: number;
+            umbraKm: number;
+            gamma: number;
+            moonDistanceKm: number;
+        };
+        firstSolarEclipseAfterJD: (jdStart: number, opts?: {
+            maxDays?: number;
+        }) => {
+            ground: {
+                latDeg: number;
+                lonDeg: number;
+            } | null;
+            ageMa: number;
+            synodicMonthDays: number;
+            penumbraKm: number;
+            umbraKm: number;
+            gamma: number;
+            moonDistanceKm: number;
+            jd: number;
+            beta: number;
+            moonDistance_km: number;
+            type: string;
+            moonAppR_topo: number;
+            sunAppR: number;
+            moonSunRatio: number;
+        } | null;
     }>;
     climate: Readonly<{
         l1OrbitalPermil: (year: number) => number;

@@ -104,7 +104,9 @@ export function createEclipseFinders(deps: EclipseFinderDeps): {
         magnitudeUmbral: number;
         magnitudePenumbral: number;
     }>;
-    findSolarEclipsesInRange: (jdStart: number, jdEnd: number) => Array<{
+    findSolarEclipsesInRange: (jdStart: number, jdEnd: number, opts?: {
+        stepDays?: number;
+    }) => Array<{
         jd: number;
         beta: number;
         moonDistance_km: number;

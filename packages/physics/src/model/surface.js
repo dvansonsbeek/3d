@@ -339,6 +339,36 @@ export function assembleSurface(ctx) {
       /** THE ONE GMST — mean sidereal time at Greenwich, degrees, at a UT JD (eclipse/besselian.cjs computeGmstDeg; the observer tier's hour angle). @param {number} jdUT @returns {number} */
       gmstDegAtJD: (jdUT) => besselian.gmstDeg(jdUT),
       solarLocalCircumstances: /** @param {number} jdGreatest @param {number} latDeg @param {number} lonDeg */ (jdGreatest, latDeg, lonDeg) => besselian.localCircumstances(jdGreatest, latDeg, lonDeg),
+      /** The shadow cone's radii on the fundamental plane at JD(UT): the Besselian l₁/l₂ in km (the umbra
+       *  signed, <0 total), γ and the Moon's geocentric distance — the size of the umbra and penumbra. */
+      shadowRadiiAtJD: /** @param {number} jdUT */ (jdUT) => besselian.shadowRadiiAt(jdUT),
+      /** The first solar eclipse at or after a JD(UT), scanning forward with the synodic month OF DATE
+       *  (the finder's default step is the J2000 month: 29.5 d against 0.9 d at the Earth–Moon genesis,
+       *  where the Moon sits at 6 Earth radii). The caller names the start: the Earth–Moon genesis is
+       *  the navigable domain's past edge, which the scene twins own through their position table, so
+       *  it is passed in, never derived here. Returns the finder's event with the fundamental-plane
+       *  radii, the umbra ground point, the age and the month of date — or null inside maxDays.
+       *  A deep result is reproducible (the banks' seats), not a converged prediction: the lunar
+       *  inclination is the J2000 constant, the early Laplace-plane transition is not modelled.
+       *  @param {number} jdStart @param {{maxDays?: number}} [opts] */
+      firstSolarEclipseAfterJD: (jdStart, opts) => {
+        const maxDays = (opts && Number.isFinite(opts.maxDays)) ? /** @type {number} */ (opts.maxDays) : 400;
+        const yearStart = yearFromJD(jdStart);
+        if (yearStart === null || !chain) return null;
+        const synodicMonthSeconds = chain.meanSynodicMonthAtAge(yearToTMa(yearStart));
+        if (typeof synodicMonthSeconds !== 'number' || !Number.isFinite(synodicMonthSeconds)) return null;   // beyond the month chain's domain
+        const synodicMonthDays = synodicMonthSeconds / 86400;
+        const stepDays = synodicMonthDays / 60;
+        const windowDays = 4 * synodicMonthDays;
+        for (let jd0 = jdStart; jd0 < jdStart + maxDays; jd0 += windowDays) {
+          const events = eclipseFinders.findSolarEclipsesInRange(jd0, Math.min(jd0 + windowDays, jdStart + maxDays), { stepDays });
+          const ev = events.find((e) => e.jd >= jdStart);
+          if (ev) {
+            return { ...ev, ...besselian.shadowRadiiAt(ev.jd), ground: besselian.umbraGroundAt(ev.jd), ageMa: yearToTMa(yearFromJD(ev.jd)), synodicMonthDays };
+          }
+        }
+        return null;
+      },
     }),
     climate: Object.freeze({
       l1OrbitalPermil: evalClimateL1,

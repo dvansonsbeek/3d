@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.5
+modelVersion: v27.6
 coefficients: sha256:f208ad9b25f7164d
 status: current
 ---
@@ -576,8 +576,9 @@ the spin bank: 0.21 s per Myr in Node, 84 s at −400 Myr). Their coarse tiers
 are now 250-kyr SEGMENTS with separate segment prefixes P[k] — a value is the
 two-term sum P[k] + the within-segment sum — and
 `data/lunar-cumulative-checkpoints.json` (`tools/verify/lunar-cumulative-bank.js
---write`, ~7 min) stores every table's P[k] in both directions over ±600 Myr
-(the chain-cycle limit), computed by the tables' own recursion on the shipped
+--write`, ~25 min) stores every table's P[k] in both directions over the
+navigable domain (−4,425 / +1,000 Myr, `time/navigable-domain` — the spin
+bank's two edges), computed by the tables' own recursion on the shipped
 context. A runtime seated on it sums one segment at most and reads the SAME
 doubles in the SAME order as without it: a seat, never a value — the
 generator REFUSES unless every 20th prefix resumes bit-exactly and the deep

@@ -52,8 +52,11 @@ const DOH = require('../lib/deep-orbital-history');
 const OUT = path.join(ROOT, 'data', 'spin-axis-checkpoints.json');
 const WRITE = process.argv.includes('--write');
 const SPACING_YR = 250000;
-const DOMAIN_PAST_YR = -4425000000;    // the last checkpoint inside the cited history (null beyond 4,429 Ma)
-const DOMAIN_FUTURE_YR = 1000000000;   // the charts' full range
+// THE NAVIGABLE DOMAIN (ONE home, time/navigable-domain.cjs): the last checkpoint inside the cited
+// history (null beyond 4,429 Ma) and the charts' full range — the lunar bank and both pos tables read the same two numbers.
+const { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } = require('../../packages/physics/src/time/navigable-domain.cjs');
+const DOMAIN_PAST_YR = -NAVIGABLE_PAST_YEARS;
+const DOMAIN_FUTURE_YR = NAVIGABLE_FUTURE_YEARS;
 const INPUT_FILES = [
   'tools/verify/spin-axis-bank.js',
   'packages/physics/src/earth/deep-orbital-history.cjs',

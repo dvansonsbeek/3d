@@ -72,19 +72,17 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
 
   const v = {};
   // ── FRESH-STATE umbra pins — MUST run before any epoch call ──────────────
-  // The 2026-08 init-vs-heal split: earth.rotationPhase (the 20.3c sidereal-
-  // phase anchor) was set only by updateEarthForEpoch, which a fresh page
-  // never runs (the start date sits inside the auto-sync guard), so fresh
-  // pages computed the umbra chain un-anchored (+0.4928° lon ≈ 53 km at
-  // every ground point) while this harness healed the page before probing —
-  // masking the split from every gate.
+  // Born from the 2026-08 init-vs-heal split (a spin phase anchor set only by
+  // an epoch updater a fresh page never ran: +0.4928° lon ≈ 53 km at every
+  // ground point, masked by this harness healing the page before probing).
   // Since U2 the certified umbra (eclUmbraSceneAt) DELEGATES to the package
-  // tier and no longer reads scene spin — its fresh≡healed identity is
-  // trivial (kept as a delegation-regression probe). The SCENE-SPIN guard
-  // moved to the NASA-convention diagnostic (eclUmbraNASAAt), which still
-  // rides the scene chain incl. rotationPhase: its fresh value must equal
-  // the healed one recorded below, and it diverges ~0.49° lon if anyone
-  // reintroduces an init/heal split.
+  // tier — its fresh≡healed identity is a delegation-regression probe. The
+  // NASA-convention diagnostic (eclUmbraNASAAt) rides the scene chain — the
+  // rendered Sun, Moon and the Earth's spin, which since doc 111 §1.34 is the
+  // tier's GMST at the UT JD (no anchor left to split): its fresh value must
+  // equal the healed one recorded below. Its lat/lon are the radial
+  // projection of the axis's closest approach — a different point from where
+  // the axis pierces (93° at γ 0.34) — a scene-chain pin, never a position.
   {
     const uf = T.eclUmbraSceneAt(1671853.759762);
     v['ecl.umbraSceneFresh@1671853.759762.lat'] = uf ? uf.lat : null;

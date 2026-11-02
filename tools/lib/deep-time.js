@@ -144,8 +144,12 @@ function anomalisticYearDaysOfDate(year) {
 // ═══════════════════════════════════════════════════════════════════════════
 // THE DEEP-TIME GRID — the pos table and the deep calendar (the browser's twin)
 // ═══════════════════════════════════════════════════════════════════════════
-const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;
-const _CUMUL_INTEGRAL_YEAR_MAX = 500e6;
+// The grid spans THE NAVIGABLE DOMAIN (ONE home, @essrt/physics time/navigable-domain — the browser's
+// pos table reads the same two numbers; beyond the former ±500 Myr edge the two directions
+// extrapolated differently, doc 111 §1.33).
+const { NAVIGABLE_PAST_YEARS: _NAV_PAST, NAVIGABLE_FUTURE_YEARS: _NAV_FUTURE } = _req('@essrt/physics/time/navigable-domain');
+const _CUMUL_INTEGRAL_YEAR_MIN = -_NAV_PAST;
+const _CUMUL_INTEGRAL_YEAR_MAX = _NAV_FUTURE;
 const _CUMUL_INTEGRAL_STEP = 10000;
 function _cumulIntegralJ2000IdxGet() { return Math.round((C.startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP); }
 function _cumulIntegralLength() { return Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1; }

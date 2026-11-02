@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.5
+modelVersion: v27.6
 coefficients: sha256:f208ad9b25f7164d
 status: current
 ---
@@ -190,7 +190,7 @@ view, its orbit node rests and its rotation axis is ENGINE-PLACED every frame:
 |----------|-------|---------|
 | orbitRadius | 0 | Earth sits at the scene origin; every instrument measures from `earth.planetObj` (measuring from a displaced wobble centre would run the perihelion 8% fast — the offset chain carries the full e(t)·û(ϖ) itself). The visible wobble-centre marker is a display-only *child* of Earth at the literal radius `WOBBLE_MARKER_RADIUS_SCENE_UNITS` (the former Law-4 amplitude × 100), placed each frame from the rendered axis projected into the sun plane (the solstice direction); nothing reads it |
 | speed | 0 | nothing turns this node — the pivot frame is the fixed world frame; the axis of date is engine-placed |
-| rotationSpeed | 2π × sidereal rotations per SI year — **locked to the J2000 sidereal day** in both modes (see §14.4) | Daily spin |
+| rotationSpeed | 0 — the daily spin is **the tier's GMST at the scene's UT JD**, set every frame (`createModel().eclipse.gmstDegAtJD`; GMST = 270° + `rotation.y` under the Greenwich-at-−X chart; doc 111 §1.34) | Daily spin |
 | tilt | 0 (rest pose) | `earth.rotationAxis` takes [X = ŝ×ĝ, Y = ŝ, Z = ĝ] of date through R every frame; before the series artifact arrives the J2000 frame from the embedded anchors is placed, so the rest pose never renders |
 
 ### 5.2 Perihelion Precession 1 & 2
@@ -510,7 +510,7 @@ The dLOD/dt layers (L1 tidal baseline · L2 + GIA α(t) · L3 + 4-flag ΔT stack
 |---|---|---|
 | **Ephemeris & eclipse chain** | **Full Layer 4** | `meanDeltaTSecondsAtAge()` integrates the Layer-2 LOD (tidal + GIA) with the ecliptic missing-motion kinematic term (on the nodal period T_s₃, doc 11; the code identifier keeps its historical `h5` name), then adds the 4-flag stack + the Core-mantle swing post-integration (each component zero-anchored at J2000). Feeds `_eclDeltaT()` → JD_UT → JD_TT inside every Meeus wrapper (`_eclSunLon`, `_eclMoonLon`, …) and the TT-anchored planet integrators (`_currentYearSI_TT`). All validated rotation claims (26-event solar audit, 267-event lunar test, ΔT charts) run through this path. |
 | **Deep-time epoch anchors** | **Layer 2 only** | `recomputeEpochAnchors()` sets `meanlengthofday` from `meanLodSecondsAtAge()` (tidal + GIA). The stack + swing are a zero-mean ±ms *modulation* around the epoch mean, so folding them into the mean-LOD anchor would inject a phase-dependent offset into every derived day count. `meanLodSecondsWithCorrectionsAtAge()` exists for consistency with the corrected ΔT curve and is consumed only by the ESSRT modal display. |
-| **Visible scene-graph spin** | **None over time (J2000-locked)** | `earth.rotationSpeed` is a constant J2000 sidereal rate (`updateEarthForEpoch()`). The scene graph applies spin as `pos × rate` (a multiplier, not `∫dt/LOD(t)`), so an epoch-mutated rate would be retroactively applied to the whole elapsed span (~163° spurious drift — "eclipse over America renders over Turkey at −584"). The lock gives a stable JD ↔ orientation convention; it is explicitly **not** a ΔT claim — physically-correct orientation lives in the ephemeris chain above. |
+| **Visible scene-graph spin** | **The tier's GMST at the scene's UT JD** | The Earth's `rotation.y` is `createModel().eclipse.gmstDegAtJD(jdUT) − 270°` every frame — the ONE Earth rotation angle the certified umbra, the observer tier and the audits read (doc 111 §1.34), linear in UT; ΔT reaches the Sun and Moon reads, never the spin. It is explicitly **not** a deep-time rotation-phase claim: the formula's T² term is the IAU precession-in-RA polynomial, era-load-bearing and meaningless at −2 Gyr (its bounded twin is an open B entry). |
 
 In short: **the full corrected curve (Layer 4) governs all validated rotation physics, Layer 2 governs epoch means, and the rendered globe uses a fixed J2000 convention.** Deep-time LOD and precession-period evolution remains visible in the calculator displays and the ESSRT modal, which read `meanLodSecondsAtAge()` / `_axialPrecessionPeriodYearsAtAge()` directly.
 

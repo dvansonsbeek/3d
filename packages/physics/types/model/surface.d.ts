@@ -380,6 +380,44 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
             };
             centralDurationSeconds: number | null;
         };
+        /** The shadow cone's radii on the fundamental plane at JD(UT): the Besselian l₁/l₂ in km (the umbra
+         *  signed, <0 total), γ and the Moon's geocentric distance — the size of the umbra and penumbra. */
+        shadowRadiiAtJD: (jdUT: number) => {
+            penumbraKm: number;
+            umbraKm: number;
+            gamma: number;
+            moonDistanceKm: number;
+        };
+        /** The first solar eclipse at or after a JD(UT), scanning forward with the synodic month OF DATE
+         *  (the finder's default step is the J2000 month: 29.5 d against 0.9 d at the Earth–Moon genesis,
+         *  where the Moon sits at 6 Earth radii). The caller names the start: the Earth–Moon genesis is
+         *  the navigable domain's past edge, which the scene twins own through their position table, so
+         *  it is passed in, never derived here. Returns the finder's event with the fundamental-plane
+         *  radii, the umbra ground point, the age and the month of date — or null inside maxDays.
+         *  A deep result is reproducible (the banks' seats), not a converged prediction: the lunar
+         *  inclination is the J2000 constant, the early Laplace-plane transition is not modelled.
+         *  @param {number} jdStart @param {{maxDays?: number}} [opts] */
+        firstSolarEclipseAfterJD: (jdStart: number, opts?: {
+            maxDays?: number;
+        }) => {
+            ground: {
+                latDeg: number;
+                lonDeg: number;
+            } | null;
+            ageMa: number;
+            synodicMonthDays: number;
+            penumbraKm: number;
+            umbraKm: number;
+            gamma: number;
+            moonDistanceKm: number;
+            jd: number;
+            beta: number;
+            moonDistance_km: number;
+            type: string;
+            moonAppR_topo: number;
+            sunAppR: number;
+            moonSunRatio: number;
+        } | null;
     }>;
     climate: Readonly<{
         l1OrbitalPermil: (year: number) => number;

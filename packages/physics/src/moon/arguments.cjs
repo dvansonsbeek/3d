@@ -43,6 +43,8 @@
 const { jdToDecimalYear } = require('../time/calendar.cjs');
 // The Meeus Ch. 47 argument rates — ONE home (plan 23; the sensitivities' derivation reads the same set).
 const { MEEUS_ARGUMENT_RATES_DEG_PER_CY } = require('./ecc-sensitivities.cjs');
+// THE NAVIGABLE DOMAIN — ONE home: the carriers' coarse tiers' cap in both directions.
+const { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } = require('../time/navigable-domain.cjs');
 
 /**
  * @typedef {{Lp: number, D: number, M: number, Mp: number, F: number}} MoonArgsDeg
@@ -186,7 +188,8 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
   // P[k] + S_k[j] — so the bank's stored P[k] and a self-computed one are the same doubles in
   // the same order (a seat, never a value; the purity gate's lunar rows). The former single
   // running sum differed from this association at the rounding level beyond ±250 kyr only.
-  const CARRIER_CELL_CY = 10, CARRIER_SEGMENT_CELLS = 250, CARRIER_LIMIT_CY = 6000000;
+  // The carriers' coarse tiers reach THE NAVIGABLE DOMAIN (time/navigable-domain.cjs, ONE home), in centuries.
+  const CARRIER_CELL_CY = 10, CARRIER_SEGMENT_CELLS = 250, CARRIER_LIMIT_CY = Math.max(NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS) / 100;
   /** @typedef {{ fine: number[], P: number[] | null, segs: Map<number, number[]>, banked: number }} CarrierSide */
   /** @type {Map<string, { fwd: (limitCy: number) => number[], bwd: (limitCy: number) => number[], status: () => { fwd: {banked: number, edge: number, bankEdge: number | null}, bwd: {banked: number, edge: number, bankEdge: number | null} } }>} */
   const carrierRecorders = new Map();
@@ -271,11 +274,13 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
   }
   /** THE GENERATOR'S HOOK (plan 25): every named carrier's coarse segment prefixes in both
    *  directions, computed by the recursion above — the arrays the lunar bank stores.
-   *  @param {number} limitCy @returns {Record<string, { fwd: number[], bwd: number[] }>} */
+   *  @param {number | {past: number, future: number}} limitCy @returns {Record<string, { fwd: number[], bwd: number[] }>} */
   function recordCarrierPrefixes(limitCy) {
+    // the limit per direction (a number means both): the bank is ASYMMETRIC like the domain it covers
+    const lim = typeof limitCy === 'number' ? { past: limitCy, future: limitCy } : limitCy;
     /** @type {Record<string, { fwd: number[], bwd: number[] }>} */
     const out = {};
-    for (const [n, r] of carrierRecorders) out[n] = { fwd: r.fwd(limitCy), bwd: r.bwd(limitCy) };
+    for (const [n, r] of carrierRecorders) out[n] = { fwd: r.fwd(lim.future), bwd: r.bwd(lim.past) };
     return out;
   }
   /** THE SEAT DIAGNOSTIC (plan 25): per named carrier and direction, whether the bank seated and the two

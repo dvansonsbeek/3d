@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.5
+modelVersion: v27.6
 coefficients: sha256:f208ad9b25f7164d
 status: current
 ---
@@ -771,6 +771,189 @@ through `createModel`; when what it reads is what it feeds, the loop is cut
 at the source by recording the quantity at its physical precision, never by
 declaring the input and never by a tolerance downstream.
 
+### 1.33 A scene has ONE navigable domain — three tables with three edges, and a line–sphere root without its sign
+
+**Measured** (the owner's lunar-eclipse view at −2 Gyr, 2026-11-01, reproduced
+headlessly). One screenshot, four defects:
+
+1. **The umbra ground point had no side check.** `eclipse/besselian.cjs
+   umbraGroundAt` intersects the Sun→Moon line with the ellipsoid and took the
+   near root unconditionally; at a lunar eclipse the Earth lies BEFORE the Moon
+   on that line, both roots are negative and the near one is the sunlit face.
+   The always-on umbra disc and its halo drew the Moon's umbra there at every
+   lunar eclipse, era included (2025-09-07 total: 8°S 101°W; the owner's
+   event: 42°N 126°W) — the "penumbra" ring in the picture. The scene's
+   closest-approach twin (`umbraNASAConventionAtJd`) had the same blind spot.
+   Fix: a negative root is no hit (`s < 0` → null; `t_closest < 0` → null).
+   No solar event moves; the audit re-stamps.
+2. **Two clocks beyond ±500 Myr.** The engines' cumulative position tables
+   (JD ↔ scene position, 10-kyr cells) spanned ±500 Myr. Beyond the edge
+   `posFromJD` ran its within-cell Newton solve off the grid (one trapezoid
+   from the edge cell) while `jdFromPos` fell back to a linear J2000-year
+   count: the scene sat 44 kyr off at −700 Myr and 817 kyr off at −2 Gyr
+   (requested JD −730,229,465,119.25, panel −729,931,065,878.58). A jump "to
+   an eclipse" beyond ±500 Myr showed a random lunar phase — the big soft
+   dark disc in the picture is the Moon's shadow-map penumbra at that random,
+   near-new-moon instant, not an eclipse feature.
+3. **The rendered Moon carried a(t)/a₀ twice.** `moon/series.cjs
+   fullDistanceKm` scales the two-term distance by the recession at the
+   series' TT date (the one home); both scene twins multiplied by a(t)/a₀
+   again (`_meeusDistKm = _sr.distKm * _aRatio`). Measured identity: scene =
+   series × a(t)/a₀ to 1 km at −5.34 Myr and 3 km at −400 Myr; the series'
+   own 60-day mean at −400 Myr is 370,040 km against the cited 368,396.
+   Invisible in the era (0.05 % at −5 Myr), 4.3 % at −400 Myr, 14 % at −2 Gyr;
+   no gate read the Moon's distance at depth.
+4. **The jump was the unbanked carriers.** With both banks seated at −2 Gyr the
+   spin walk cost 0.02 s and the Moon's longitude 298 s in Node, 490 s in
+   Chromium: the lunar cumulative bank stopped at ±600 Myr and the two bounded
+   Lp carriers (`moon/arguments.cjs makeDeepCarrier`) integrated ε over the
+   remaining 1.4 Gyr at 0.21 s per Myr (the chains' Simpson fallback is cheap);
+   a second model instance of that walk ran Node out of heap.
+
+**The cause behind 2 and 4:** three tables had three edges — the position
+tables ±500 Myr, the lunar bank ±600 Myr, the spin bank −4,425/+1,000 Myr —
+and nothing named the one domain the scene can be taken to. **The fix:** ONE
+home, `@essrt/physics time/navigable-domain` (−4,425 Myr, the last spin
+checkpoint inside the cited Earth–Moon history; +1,000 Myr, the charts'
+range), read by both position tables, the chain and carrier caps, the lunar
+bank generator (now asymmetric, like the domain) and the spin bank generator.
+The Node twin's table over the whole domain builds in 0.38 s and closes the
+round trip to 1e-7 yr at −4.4 Gyr. The MODEL's validity stays ±500 Myr: the
+domain is where the scene can be looked at, not where the model is certified
+(the deep lunar phase is reproducible, not converged; the deep obliquity is a
+band). **The rule:** every table a deep jump reads is built or banked to the
+SAME named domain; beyond a table's edge the two directions of a round trip
+must share one extrapolation or refuse; and a screenshot's feature is
+attributed by reproduction (the headless harness, `__test__.jumpJD`), never by
+eye — the ring was a solar umbra, the disc a shadow map, and neither was the
+eclipse.
+
+### 1.34 A drawn body and its certified ground point share ONE rotation angle — two conventions agree only where both were calibrated
+
+**The observation.** At a solar eclipse near −2 Gyr (JD −730,229,465,078.06)
+the certified umbra ring sat about 90° of longitude east of the Moon's
+rendered shadow. The lunar-eclipse view of §1.33 had just been fixed; this was
+a different defect.
+
+**The measurement.** The scene spun the Earth by the scaffold rule
+`rotation.y = rotationSpeed × pos + phase` — a fixed number of sidereal turns
+per TROPICAL YEAR OF DATE (`pos` counts the year-of-date integral) plus a
+fitted half-day phase anchor — about the engine-placed pole of date, from the
+equinox of date. The certified umbra (and the observer tier, the eclipse
+audit, the API) maps its hit vector to a longitude with the tier's
+`computeGmstDeg(jdUT)` — linear in UT days plus the IAU T² term. Two Earth
+rotation angles, read against each other in Node (the Node twin's `posFromJD`
+is the browser's, gate-identical):
+
+| epoch | scene − tier | of which the IAU T² term | of which the year-of-date axis |
+|---|---|---|---|
+| 2024-04-08 (the eclipse) | +0.008° | 0 | +0.008° |
+| −3000 | −1.28° | 0.97° | −0.31° |
+| −100 kyr | −162° | 28° | −134° |
+| −1 Myr | −57° | 273° | −144° |
+| −400 Myr | −13° | 240° | −133° |
+| −2 Gyr (the owner's JD) | +95° | 270° | +6° |
+
+Two drifts, both random-phase beyond ~100 kyr: the tier's T² term (the IAU
+precession-in-RA polynomial — 0.97° at −3000, inside the audit's ground-km
+calibration, 270° at −2 Gyr where it means nothing) and the scene's
+turns-per-year rule against the tier's turns-per-UT-day (the year of date
+holds a different number of days: 7.8 % at the Devonian). The era's 0.008°
+(2 s of rotation) was the phase anchor's residual — calibrated at six modern
+eclipses and gated nowhere beyond them.
+
+**A false lead, measured on the way.** The scene-relative diagnostic
+`umbraNASAConventionAtJd` projects the shadow axis's CLOSEST-APPROACH point
+radially to the surface; at γ = 0.34 that is 60°N 163°E where the axis
+PIERCES the surface at 25°N 104°W (NASA's greatest-eclipse coordinates are
+the piercing point). Its γ is right; its latitude/longitude are a different
+point, 93° from the shadow at the 2024 eclipse — not a frame error, a
+definition. The snapshot goldens pin it as a scene-chain regression probe,
+nothing reads it as a position.
+
+**The fix.** ONE home: the scene's Earth spin IS the tier's GMST at the scene's
+UT JD (`createModel().eclipse.gmstDegAtJD`, `GMST = 270° + rotation.y` under
+the chart Greenwich-at-−X in the axis basis [ŝ×ĝ, ŝ, ĝ]); the scaffold rate,
+the phase anchor and the J2000 sidereal-day constant are deleted. The drawn
+Earth and the certified ground point now agree by construction at every JD;
+in the era the scene moved by its 0.008° residual (the snapshot goldens'
+scene-chain rows re-recorded). The epoch-consistency gate reads the spin
+through the frame probe after a jump and pins it to the tier's GMST at the
+2024 eclipse and at −700 Myr (1e-9°). **Open, recorded:** the T² term is a
+polynomial in deep time; its bounded replacement is the model's own
+accumulated precession in right ascension (the integral of ψ̇(t) cos ε(t) −
+χ̇(t) from J2000, banked with the spin walk), which must reproduce the IAU
+quadratic inside the audit's window before it can ship — a B entry.
+**The rule:** a body drawn from one convention and a point placed on it from
+another are aligned only where both were calibrated; the angle that maps a
+hit vector to a longitude has ONE home, and the gate reads it at an epoch the
+calibration never saw.
+
+### 1.35 The Earth–Moon genesis is not where the label says — the scene's deep clock, a tier span that overshot its bank, and a finder stepping the wrong month
+
+**The request.** Show the first solar eclipse after the Earth–Moon genesis
+(the cited history's end, 4,429 Ma) from the eclipse panel, with its umbra and
+penumbra. The search from the navigable domain's edge found nothing, and
+measuring why found three things.
+
+**(a) The scene's deep clock is split.** The scene's Julian Day is UT (the
+calendar date, the Earth's spin, the finders' axis); its position table counts
+that UT day count in SI-day years (`meanTropicalYearDaysAtAge`), and so does
+every label the position feeds (the Date, the Predictions panel's age). Every
+physics read adds ΔT and runs on TT. In the era ΔT is seconds; at deep time it
+is the accumulated difference between solar days and SI days, itself
+geological:
+
+| labelled epoch (UT axis) | ΔT | TT age the physics draws |
+|---|---|---|
+| −1 Myr | 123 yr | 1.000 Ma |
+| −2 Gyr (the owner's eclipse) | 341 Myr | 1.66 Ga |
+| −4.425 Gyr (the position table's edge) | 1.34 Gyr | 3.08 Ga |
+
+Confirmed on the Moon: at the −2 Gyr label the rendered Moon's 61-day mean
+distance is 335,614 km — the cited history at 1.66 Ga (335,222), not at 2.0 Ga
+(329,626) — while the Predictions row reads the labelled age. At the position
+edge the scene shows the 3.08-Ga system; the genesis (TT 4,425 Ma) lies beyond
+the navigable domain. A second symptom follows from the same mislabel: the
+ΔT bridge takes the LABELLED age (`_sceneJdTT` reads the calendar year of the
+UT JD), whose LOD is the 4.4-Ga one, so one Julian Day of the scene advances
+0.27 day of physics at the edge — the Sun moves 0.3°/d, the Moon 5.5°/d, and
+a search of 400 scene days covers 108 physical days. **Open, a design
+decision:** the position table integrates the year in solar days of date
+(`meanYearInDaysAtAge` — the Predictions panel's own "LOD days" row), so the
+UT day count's year equals the TT age; the era is unchanged to 1e-8; beyond it
+every position-labelled surface relabels by ΔT and the deep goldens re-record;
+a gate pins the scene's labelled age against the age the Moon series reads.
+Until then the deep labels are stated as UT-axis labels, not ages.
+
+**(b) A tier span that overshot its bank — the deep jump's slow half.** The
+scene's deep sampler walked the one-source movement to its TIER span,
+`_hybridTierSpan(need)` = 1.25 × a need already 1.25 × |t|: for every query
+beyond |t| = 2.83 Gyr that span passed the spin bank's deepest checkpoint
+(−4,425 Myr) and the walk ran unseated from there (the package's own rule
+walks to two grid nodes past the query). Measured on a fresh page (the hook
+`earthObliquityHybridAt`): 0.06 s at −2.8 Gyr, 63 s at −2.9 Gyr, 33 s more at
+−3.0 Gyr, 130 s for the first jump near the position edge — with the bank
+complete and seated, Node reading the same ages in 0.03 s. The fix is the
+package's rule; the values are bit-identical (23.3075929° at −2.9 Gyr before
+and after); the reads are 0.06 s, the edge jump 0.8 s, the −2 Gyr jump 2.1 s.
+The perf gate's row 0b′ reads ε at −4.4 Gyr on a fresh page (≤ 5 s absolute,
+the 63-s class far above it). **The rule:** a walk that seats on a bank is
+only as cheap as the farthest point it is asked for — a tier's growth factor
+is a request for that point; gate the DEEP end of every seat, not only the
+first bank epoch.
+
+**(c) A finder stepping the wrong month.** `findSolarEclipsesInRange` steps a
+60th of the J2000 synodic month; at the genesis the month is 0.9 days. The
+finder takes an optional step (`opts.stepDays`), every era caller unchanged
+and bit-identical; `eclipse.firstSolarEclipseAfterJD(jdStart)` scans with the
+synodic month OF DATE from the deep-time chain, and
+`eclipse.shadowRadiiAtJD` gives the Besselian l₁/l₂ on the fundamental plane
+(2024-04-08: umbra 65 km, penumbra 3,418 km; at the 3.08-Ga system the
+position edge shows: umbra 267 km, penumbra 3,215 km, the Moon at 321,469 km).
+The genesis search itself waits on (a): a first eclipse found "after the
+edge" today is the first eclipse of the 3.08-Ga system, 445 scene days in.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -782,10 +965,22 @@ chain at ±1/±5 Myr; the golden master cannot catch that class — and, since
 the Predictions panel grew its "Model (LOD days)" rows, the panel's solar-day
 count of date ≡ the engine's `meanYearInDaysAtAge` at the same epochs: the
 unit pin, SI days ≠ LOD days, born from the owner reading 365.23 "days" at
-195 Ma where the day of date gives 382), plus
+195 Ma where the day of date gives 382; and since §1.33 the navigable-domain
+rows: the Node twin's JD ↔ position round trip at the domain's edges, the
+browser's position at −700 Myr ≡ the twin's, and the scene Moon's distance at
+−400/−700 Myr ≡ the series' — born from the owner's lunar-eclipse view at
+−2 Gyr, where the scene sat 817 kyr off its instant and the Moon 14 % too
+close, with no row reading either; and since §1.34 the Earth-spin rows: the
+scene's spin after a jump, read through the frame probe, ≡ the tier's GMST at
+the same UT JD at the 2024 eclipse and at −700 Myr — born from the owner's
+solar-eclipse view at −2 Gyr, the umbra ring 95° of longitude from the Moon's
+shadow), plus
 `test:perf` — the deep-time performance gate (RATIO thresholds, deep vs
 in-table cost, runner-speed independent; born from four ungated ratio
-regressions, one owner-bisected at 28×; plus two travel-speed rows the
+regressions, one owner-bisected at 28×; since §1.35 the deep-edge spin read —
+the first one-source ε at −4.4 Gyr on a fresh page, absolute ≤ 5 s, born from
+the scene's tier span overshooting the bank's deepest checkpoint (63 s at
+−2.9 Gyr where the seated read is 0.06 s); plus two travel-speed rows the
 steady-state rows cannot see — the orbit-ring resample against the per-JD
 route and the Play-start delay on a fresh page — Play → the first frame that
 advances the scene (it first watched the day-granular date string, which at

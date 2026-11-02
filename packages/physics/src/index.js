@@ -115,6 +115,8 @@ export { MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE, deriveMoonEccS
 // The J2000 mass chain, the Moon's J2000 periods and the unit constants — ONE home.
 export { computeMassChainJ2000, computeMoonPeriodsJ2000 } from './earth/mass-chain.cjs';
 export { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, SECONDS_PER_JULIAN_YEAR } from './constants/units.cjs';
+// THE NAVIGABLE DOMAIN (time/navigable-domain.cjs, ONE home): how far every deep-jump table is built or banked.
+export { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } from './time/navigable-domain.cjs';
 // D4b: the one-source cardinal structure — the EoC layer (year lengths,
 // crossing offsets, the e(t)-proportional spread) on the movement's own
 // e(t)/ϖ(t). Absolute dates deliberately excluded (per-renderer mean chain).

@@ -115,7 +115,10 @@ export function createMoonArguments({ constants, fns, checkpoints }: {
         P0: number;
         T2F: number;
     };
-    recordCarrierPrefixes: (limitCy: number) => Record<string, {
+    recordCarrierPrefixes: (limitCy: number | {
+        past: number;
+        future: number;
+    }) => Record<string, {
         fwd: number[];
         bwd: number[];
     }>;

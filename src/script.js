@@ -15,6 +15,8 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS,
   DEG2RAD, RAD2DEG, wrap360, wrap180,
   computeMassChainJ2000, computeMoonPeriodsJ2000, SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR,
+  // the navigable domain (time/navigable-domain): the pos table's and the deep calendar's grid edges
+  NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS,
   // THE deep-time chain (the six browser factories it replaces: the GIA α channel,
   // the Layer-0 primitives, the recession history, the ΔT cycles, the deep e, the month chain)
   createDeepTimeChain } from '@essrt/physics';
@@ -219,14 +221,6 @@ function _chainLamDot0(k) {
 function _chainNOfDate(k, year) { return _chainLamDot0(k) * _chainLamRel(k, year) / _chainMassLossPeriodRatio(year); }
 const j2000JD = K.timeReference.j2000JD;                    // Standard J2000.0 epoch: Jan 1.5, 2000 TT (JD 2451545.0)
 const julianCenturyDays = K.timeReference.julianCenturyDays; // IAU Julian century (365.25 × 100 days)
-// Sidereal day at J2000 (≈ 86164.09 s). Derived from `solarDay × N/(N+1)` where
-// N = tropical days per year — this is the standard relationship between mean
-// solar and mean sidereal day (Earth completes N sidereal rotations per year
-// in solar-day units, or N+1 rotations relative to inertial space).
-// Used by earth.rotationSpeed (sidereal-frame base spin); on the DERIVED J2000
-// mean tropical year, ≡ the Node twin's meanSiderealDay.
-const _siderealDaySec_J2000 = SECONDS_PER_DAY * meansolaryearlengthinDays / (meansolaryearlengthinDays + 1);
-
 // ═══════════════════════════════════════════════════════════════════════════
 // F. DISPLAY-ONLY (not in JSON files)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2728,8 +2722,12 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 // arguments to the Meeus polynomial skeleton past +1 Myr, whose fitted T⁴ tail
 // cancels the lunar mean motion at year ~1,989,000 and REVERSES it beyond
 // (user-visible: Moon stationary at +2.0 Myr, retrograde at +2.1 Myr).
-const _CUMUL_INTEGRAL_YEAR_MIN = -500e6;
-const _CUMUL_INTEGRAL_YEAR_MAX = 500e6;
+// The grid spans THE NAVIGABLE DOMAIN (ONE home, @essrt/physics time/navigable-domain): beyond the
+// former ±500 Myr edge posFromJD extrapolated by one trapezoid from the edge cell and jdFromPos by a
+// linear count, so a jump to −700 Myr sat 44 kyr off, to −2 Gyr 817 kyr off (doc 111 §1.33). The
+// Node twin (tools/lib/deep-time.js) reads the same two numbers.
+const _CUMUL_INTEGRAL_YEAR_MIN = -NAVIGABLE_PAST_YEARS;
+const _CUMUL_INTEGRAL_YEAR_MAX = NAVIGABLE_FUTURE_YEARS;
 const _CUMUL_INTEGRAL_STEP     = 10000;
 // Grid geometry for the pos table below (the deep calendar computes the same
 // two numbers for its own table).
@@ -3107,43 +3105,10 @@ function _setCircularOrbitRadius(pd, r) {
   }
 }
 
-/** Mutate epoch-dependent fields on the `earth` object literal. */
+/** Mutate epoch-dependent fields on the `earth` object literal. The Earth's
+ *  spin is not one of them: it is the tier's GMST at the scene's UT JD every
+ *  frame (moveModel; doc 111 §1.34), and the axis is engine-placed. */
 function updateEarthForEpoch() {
-  // Earth rotation rate is locked to the J2000 sidereal day (the node's axis is
-  // engine-placed every frame and its orbit node rests at zero).
-  //
-  // Background: the scene graph applies `earth.rotationSpeed` as a single
-  // multiplier (`rotation = pos × rate`) rather than as the proper integral
-  // (`rotation = ∫_J2000^pos (1/LOD(t)) dt`). When deep-time mutates the
-  // rate to the local epoch's value, that local rate gets retroactively
-  // applied to the full elapsed interval since J2000, accumulating a large
-  // (~163°) drift over multi-millennium spans — the eclipse-over-America
-  // moves to noon-over-Turkey at year −584, etc.
-  //
-  // Locking the rate at J2000 here gives a stable JD ↔ Earth-orientation
-  // mapping consistent with the (pre-deep-time) "live" production behavior.
-  // It does NOT introduce ΔT physics into the scene graph (which would
-  // require the proper integration), but it removes the spurious drift.
-  // Deep-time LOD/year-length evolution remains correctly visible in the
-  // calculator displays and the ESSRT modal, which read `meanLodSecondsAtAge()`.
-  //
-  // Reference values used (all module-load `const`, never mutated):
-  //   meansolaryearlengthinDays      — the DERIVED J2000 mean tropical year in days
-  //   86400                          — J2000 mean solar day in seconds
-  //   SI_TROPICAL_YEAR_DAYS          — captured at module init from J2000
-  // (_siderealDaySec_J2000 hoisted to module scope in section E1 at top of file)
-  earth.rotationSpeed = Math.PI * 2 * SI_TROPICAL_YEAR_DAYS * SECONDS_PER_DAY / _siderealDaySec_J2000;
-  // 20.3c: sidereal-phase anchor correction — startmodelJD (2451716.5) is a
-  // MIDNIGHT-UT anchor, but the initial orientation was calibrated on the
-  // noon convention. The solar-day arithmetic hides the half-day slip (one
-  // solar day ≡ 1 JD exactly); the SIDEREAL excess accrued in that half day
-  // — 2π·0.5/tropical-year-days = π/365.2422 = 0.4928° = 118.3 s of
-  // rotation — displaced every ground point ~53 km west, CONSTANT across
-  // dates (measured at six modern eclipses: −1.98 min at every epoch,
-  // EoT-independent; EoT(anchor) = −1.72 min is excluded by 15 s). Derived
-  // constant, zero fit; it drives the rendered scene and the NASA-convention
-  // diagnostic (the certified umbra delegates to the tier).
-  earth.rotationPhase = -Math.PI / SI_TROPICAL_YEAR_DAYS;
   earth.size          = (diameters.earthDiameter / 2 / currentAUDistance) * 100;
 }
 
@@ -3945,7 +3910,9 @@ if (typeof window !== 'undefined') {
       return { poleColumn: [R[0][2], R[1][2], R[2][2]], poleIsWorldY: R[0][2] === 0 && R[1][2] === 1 && R[2][2] === 0,
         equinoxColumn: [R[0][0], R[1][0], R[2][0]],   // the view convention: the J2000 equinox along world +X (the solstice Sun at +90° in the top view)
         equinoxAzimuthDeg: Math.atan2(R[0][0], R[2][0]) / D2R, equinoxAzimuthLiteralDeg: SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
-        seriesLive: !!F, axisPoleChord: F ? axisY.distanceTo(toW(F.s)) : null, axisEquinoxChord: F ? axisZ.distanceTo(toW(F.g)) : null };
+        seriesLive: !!F, axisPoleChord: F ? axisY.distanceTo(toW(F.s)) : null, axisEquinoxChord: F ? axisZ.distanceTo(toW(F.g)) : null,
+        // the Earth's spin about ŝ from ĝ (doc 111 §1.34: GMST = 270° + this), with the UT JD it was set at
+        earthSpinDeg: earth.planetObj.rotation.y / D2R, julianDay: o.julianDay };
     },
     // Helper-visuals gate hook: focus a chain planet (the camera lands at the
     // body, inside the labels' fade-in distance) and report what the Planet
@@ -4513,15 +4480,7 @@ const earth = {
   name: "Earth",
   startPos: 0,
   speed: 0,   // the axis is ENGINE-PLACED every frame (R4), the pivot frame is the fixed world frame
-  rotationSpeed: Math.PI*2 * SI_TROPICAL_YEAR_DAYS * SECONDS_PER_DAY * (meansolaryearlengthinDays+1) / (meanlengthofday * meansolaryearlengthinDays),  // Phase 9.5b: sidereal rotations per SI year (LOD-aware); at J2000 ≡ 2π × (meansol+1) to ppm
-  // 20.3c sidereal-phase anchor — MATCHED PAIR with updateEarthForEpoch().
-  // MUST be initialized here:
-  // a fresh page never runs the epoch updaters (the start date sits inside
-  // the deep-time auto-sync guard's 1-yr threshold), and without it the
-  // umbra/ground chain runs un-anchored (+0.4928° lon ≈ 53 km on every
-  // ground point; the 26-event audit read 260/100/15 km where the certified
-  // chain reads 223/51/46 — measured 2026-08, the fresh-vs-healed split).
-  rotationPhase: -Math.PI/SI_TROPICAL_YEAR_DAYS,
+  rotationSpeed: 0,   // the spin is the tier's GMST at the scene's UT JD, set every frame in moveModel (doc 111 §1.34) — no scaffold rate, no phase anchor
   tilt: 0,   // ENGINE-PLACED — the rest pose before the first frame places the J2000 frame
   // ECCENTRICITY UNIFICATION (D6): the Earth wobble circle has radius 0 — the
   // wobble centre IS Earth, so Method A ≡ Method B and the exports are
@@ -15400,9 +15359,15 @@ function _hybridSeriesSampleAt(year) {
     // owner's 80-s deep jump were that forward walk (measured headless:
     // 86 → 65 s).
     const dir = t < 0 ? -1 : 1;
-    if (span > _epsSeriesDeepRangeYr[dir]) {
-      _epsSeriesDeepRangeYr[dir] = span;
-      _epsSeriesSamplers.set(key, _deepHistSeries().build(dir * span, 0, 5000));
+    // Walk to two grid nodes past the QUERY — the package's own rule — never to the
+    // tier's span: that span (1.25 × a need already 1.25 × |t|) passed the bank's
+    // deepest checkpoint (−4,425 Myr) for every query beyond |t| = 2.83 Gyr and the walk
+    // ran unseated from there: 0.06 s at −2.8 Gyr, 63 s at −2.9 Gyr, 130 s at the
+    // position table's edge (doc 111 §1.35).
+    const walkSpan = Math.ceil((Math.abs(t) + 2 * 5000) / 5000) * 5000;
+    if (walkSpan > _epsSeriesDeepRangeYr[dir]) {
+      _epsSeriesDeepRangeYr[dir] = walkSpan;
+      _epsSeriesSamplers.set(key, _deepHistSeries().build(dir * walkSpan, 0, 5000));
     }
   } else if (!_epsSeriesSamplers.has(key)) {
     _epsSeriesSamplers.set(key, _deepHistSeries().build(span, -span, _hybridGridStep(span)));
@@ -24567,9 +24532,8 @@ function solarNoonForJD(startJD, debug = false, cumulativeState = null) {
 async function measureSolarDayIntervals(startJD, numDays = 365) {
   // ── JD → seconds conversion constant ──────────────────────────────────────
   // The scene JD is a UT-like coordinate: one solar day = 1.000000000 JD by
-  // construction (earth.rotationSpeed is built from SI_TROPICAL_YEAR_DAYS,
-  // 86400 and _siderealDaySec_J2000, giving 86400.000007 SI s/day and NO ΔT —
-  // see the comment on updateEarthForEpoch). Verified to 1e-10 against the
+  // construction (the Earth's spin is the tier's GMST at the scene's UT JD —
+  // linear in UT, NO ΔT; doc 111 §1.34). Verified to 1e-10 against the
   // year-2000 and year-−399 reports.
   //
   // Converting that interval to SI seconds therefore needs the ACTUAL length
@@ -25623,6 +25587,10 @@ function umbraNASAConventionAtJd(jd) {
 
   // Closest approach: line P(t) = Moon + t·D, min |P|² at t* = -Moon·D.
   const t_closest = -_sceneUmbraMoonGeo.dot(_sceneUmbraDir);
+  // The closest approach must lie beyond the Moon along Sun→Moon; at a lunar eclipse the
+  // Earth sits before the Moon on that line (t < 0) and there is no umbra on Earth (the
+  // tier's umbraGroundAt refuses the same geometry — doc 111 §1.33).
+  if (t_closest < 0) return null;
   _sceneUmbraHit.copy(_sceneUmbraDir).multiplyScalar(t_closest).add(_sceneUmbraMoonGeo);
   const gamma = _sceneUmbraHit.length() / earth.size;
 
@@ -33637,14 +33605,14 @@ function moveModel(pos) {
       // Scene-ring item 2: the series' distance column carries the J2000 mean
       // distance, while the ring's radius rides the recession history — the
       // rendered Moon sat ~4 km inside/outside its ring at ±100 kyr, ~76 km at
-      // ±2 Myr. The rendered distance is scaled by the chain's a(t)/a₀ at the
-      // same age this block already uses for ΔT (1 in snapshot mode). Mirror:
-      // tools/lib/scene-graph.js.
-      let _aRatio = 1;
+      // ±2 Myr. The rendered distance is the series' own: moon/series.cjs
+      // fullDistanceKm already carries the recession a(t)/a₀ at the series' TT
+      // date (ONE home) — this block multiplied it by a(t)/a₀ a SECOND time
+      // (invisible in the era, 4.3 % at −400 Myr, 14 % at −2 Gyr; doc 111
+      // §1.33). Mirror: tools/lib/scene-graph.js.
       if (DEEP_TIME_MODE_ENABLED) {
         const decYear_d = julianDateToDecimalYear(o.julianDay);
         const t_Ma_d = (J2000_CALENDAR_YEAR - decYear_d) / 1e6;
-        _aRatio = meanMoonDistanceAtAge(t_Ma_d) / meanMoonDistanceAtAge(0);
         const deltaT_sec_d = meanDeltaTSecondsAtAge(t_Ma_d);
         if (Number.isFinite(deltaT_sec_d)) {
           // THE SCENE CLOCK IS TRUE TT: the model's absolute
@@ -33667,7 +33635,7 @@ function moveModel(pos) {
       obj._meeusLatRad = _sr.latRad;
       obj._meeusLonDeg = _sr.lonDeg;   // ecliptic longitude in degrees (geometric; the derived extension inside)
       obj._meeusT = _sr.T;             // store T for obliquity computation
-      obj._meeusDistKm = _sr.distKm * _aRatio;   // the series distance on the recession (1 at J2000; matches _meeusMoonDistance / eclipse dispatchers there)
+      obj._meeusDistKm = _sr.distKm;   // the series distance, recession included (≡ _meeusMoonDistance / the eclipse dispatchers)
     }
 
     // every orbit is a circle about its pivot offset (createPlanet: a = b = orbitRadius,
@@ -33676,23 +33644,25 @@ function moveModel(pos) {
     // elliptical branch and the Type-II/III eclipticPrecLayer offset never ran
     obj.orbitObj.rotation.y = θ;
 
-    // planet's own day-night spin (every rotationSpeed takes the constant-rate form)
-    if (obj.rotationSpeed) {
-      {
-        // Earth day-night spin uses the constant-J2000-rate model
-        // (obj.rotationSpeed × pos), i.e. as if Earth had always spun at
-        // 86,400 s/day. This is equivalent to standard GMST(UT1): the base
-        // spin is already at UT-anchored rate and gives Earth's actual
-        // rotation angle at that UT moment (LOD history is automatically
-        // incorporated in the definition of UT1). Sun and Moon inertial
-        // positions are separately advanced to their correct TT-time
-        // evaluation by the Meeus wrappers (`_eclSunLon`, `_eclMoonLon`,
-        // `_eclMoonBeta`, `_meeusMoon*`), which apply JD_UT → JD_TT
-        // internally. The eclipse alignment audit confirms this arrangement
-        // at the umbra-centerline level (a ΔT-rotation overlay would
-        // double-apply ΔT — measured ~47° over-rotation at year −135).
-        obj.planetObj.rotation.y = obj.rotationSpeed * pos + (obj.rotationPhase || 0);
+    // planet's own day-night spin
+    if (obj.name === 'Earth') {
+      // ONE Earth rotation angle (doc 111 §1.34): the tier's GMST at the scene's
+      // UT JD — the function the certified umbra, the observer tier and the
+      // audits read, so the drawn Earth and the certified ground point share it
+      // by construction. Linear in UT (UT1 IS the rotation; ΔT carries the LOD
+      // history into the Sun and Moon reads, never into the spin); its T² term
+      // is the IAU precession-in-RA polynomial — era-load-bearing (0.97° at
+      // −3000, inside the audit's ground km) and a recorded deep-time
+      // limitation (270° at −2 Gyr). The former scaffold spin — turns per
+      // tropical year of date plus a fitted phase anchor — agreed with the tier
+      // to 0.008° in the era and sat 95° from it at −2 Gyr: the umbra ring 95°
+      // of longitude from the Moon's shadow. Chart: Greenwich at core-local −X
+      // under the axis basis [ŝ×ĝ, ŝ, ĝ] gives GMST = 270° + rotation.y.
+      if (Number.isFinite(o.julianDay)) {
+        obj.planetObj.rotation.y = (_tierModelB().eclipse.gmstDegAtJD(o.julianDay) - 270) * (Math.PI / 180);
       }
+    } else if (obj.rotationSpeed) {
+      obj.planetObj.rotation.y = obj.rotationSpeed * pos + (obj.rotationPhase || 0);
     }
 
     // remember Earth’s anomaly for the zodiac strip

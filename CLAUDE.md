@@ -197,6 +197,34 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   the loop is cut at the SOURCE: record the quantity at its physical
   precision (1e-9 ″/yr against a window edge worth 8e-6), and pin ONE BLAS
   thread in a fitting script (1 vs 16 threads: 1e-14 on identical inputs). (§1.32)
+- **A scene has ONE navigable domain** — the position tables (±500 Myr), the
+  lunar bank (±600 Myr) and the spin bank (−4,425/+1,000 Myr) had three edges:
+  beyond the first the JD round trip did not close (817 kyr at −2 Gyr — a jump
+  "to an eclipse" showed a random phase), beyond the second a jump integrated ε
+  for 8 min. ONE home `time/navigable-domain`, every deep table built or
+  banked to it. Also found there: a line–sphere root taken without its sign
+  (a solar umbra on the sunlit face at every lunar eclipse) and a(t)/a₀
+  applied twice to the rendered Moon (14 % at −2 Gyr). Attribute a
+  screenshot's feature by headless reproduction, never by eye. (§1.33)
+- **A drawn body and its certified ground point share ONE rotation angle** —
+  the scene spun the Earth by turns per tropical year of date plus a fitted
+  phase anchor, the tier mapped the umbra with its GMST (linear in UT + the
+  IAU T²): 0.008° apart in the era, 95° at −2 Gyr (the ring 95° from the
+  shadow). The spin IS the tier's `gmstDegAtJD`; the gate reads it at an
+  epoch the calibration never saw. The T² term is a polynomial in deep time —
+  its bounded twin (the model's accumulated precession in RA) is an open B
+  entry. A "NASA-convention" point projected radially from the axis's closest
+  approach is a different point from where the axis pierces (93° at γ 0.34). (§1.34)
+- **The scene's deep labels are UT-axis labels, not ages** — the position
+  table counts the UT day count in SI-day years while every physics read runs
+  on TT = UT + ΔT, and deep ΔT is geological (341 Myr at the −2 Gyr label: the
+  rendered Moon is the 1.66-Ga one; 1.34 Gyr at the edge, which shows 3.08 Ga;
+  the genesis is outside the domain) — the solar-day-of-date integrand is the
+  open design decision. **A seated walk is only as cheap as the farthest point
+  asked for** — a tier's 1.25 × 1.25 growth passed the bank's deepest
+  checkpoint and walked unseated (63 s at −2.9 Gyr, 0.06 s at −2.8); gate the
+  DEEP end of every seat. A finder's step is the month OF DATE where the month
+  is not the era's (0.9 d at the genesis). (§1.35)
 
 ---
 

@@ -66,6 +66,12 @@ export function createBesselian(deps: BesselianDeps): {
         umbraKm: number;
         magnitude: number;
     };
+    shadowRadiiAt: (jdUT: number) => {
+        penumbraKm: number;
+        umbraKm: number;
+        gamma: number;
+        moonDistanceKm: number;
+    };
     localCircumstances: (jdGreatest: number, latDeg: number, lonDeg: number) => {
         kind: "none" | "partial" | "annular" | "total";
         magnitude: number;

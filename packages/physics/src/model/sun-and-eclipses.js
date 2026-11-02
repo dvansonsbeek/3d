@@ -114,9 +114,11 @@ export function assembleSunAndEclipses(ctx) {
     };
     /** THE GENERATOR'S HOOK (plan 26 pickup): the coarse segment prefixes in both directions over ±limitYears from the fine edge. @param {number} limitYears */
     const recordSunCumulativeBank = (limitYears) => {
-      const K = Math.floor(limitYears / (COARSE_SEGMENT_CELLS * COARSE_STEP));
-      coarseInit(fwd, 1); coarseInit(bwd, -1); prefixesTo(fwd, 1, K); prefixesTo(bwd, -1, K);
-      return { fwd: /** @type {number[]} */ (fwd.P).slice(0, K + 1), bwd: /** @type {number[]} */ (bwd.P).slice(0, K + 1) };
+      // the limit per direction (a number means both): the bank is ASYMMETRIC like the domain it covers
+      const lim = typeof limitYears === 'number' ? { past: limitYears, future: limitYears } : limitYears;
+      const Kf = Math.floor(lim.future / (COARSE_SEGMENT_CELLS * COARSE_STEP)), Kb = Math.floor(lim.past / (COARSE_SEGMENT_CELLS * COARSE_STEP));
+      coarseInit(fwd, 1); coarseInit(bwd, -1); prefixesTo(fwd, 1, Kf); prefixesTo(bwd, -1, Kb);
+      return { fwd: /** @type {number[]} */ (fwd.P).slice(0, Kf + 1), bwd: /** @type {number[]} */ (bwd.P).slice(0, Kb + 1) };
     };
     /** THE SEAT DIAGNOSTIC: whether the bank seated and the two edge values compared, per direction. */
     const sunSeatStatus = () => { coarseInit(fwd, 1); coarseInit(bwd, -1); const b = (/** @type {'fwd'|'bwd'} */ d) => sunBank && Array.isArray(sunBank[d]) ? sunBank[d][0] : null; return { fwd: { banked: fwd.banked, edge: /** @type {number[]} */ (fwd.P)[0], bankEdge: b('fwd') }, bwd: { banked: bwd.banked, edge: /** @type {number[]} */ (bwd.P)[0], bankEdge: b('bwd') } }; };

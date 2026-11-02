@@ -38,13 +38,16 @@
  * 1,024 samples per call cached by exact year pair, re-integrated every one
  * of the four Moon chains from the grid edge on every frame, each sample a
  * deep-time LOD/α evaluation. The adaptive Simpson remains only for a chain
- * undefined somewhere in range (null) or beyond the coarse limit (±600 Myr,
- * past the model's domain). An "analytically better" integrator here would
+ * undefined somewhere in range (null) or beyond the coarse limit (the navigable
+ * domain, time/navigable-domain.cjs). An "analytically better" integrator here would
  * detach the runtime from the certified numbers: the in-range path is
  * byte-identical to before.
  */
 
 'use strict';
+
+// THE NAVIGABLE DOMAIN — ONE home: the coarse tiers' cap in both directions.
+const { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } = require('../time/navigable-domain.cjs');
 
 /**
  * @typedef {(tMa: number) => (number | null)} PeriodSecondsAtAge
@@ -170,7 +173,9 @@ function createChainCycleIntegrator({
   // contiguous sum differed from this association at the rounding level
   // beyond ±250 kyr (1e-16 of 650 million months, 0.02″ of lunar longitude);
   // inside the dense grid nothing changed.
-  const COARSE_STEP = 1000, COARSE_SEGMENT_CELLS = 250, COARSE_LIMIT_YEARS = 600e6;
+  // The coarse tiers reach THE NAVIGABLE DOMAIN (time/navigable-domain.cjs, ONE home) in both
+  // directions; a chain undefined on the way (the Moon's genesis) returns null before the cap.
+  const COARSE_STEP = 1000, COARSE_SEGMENT_CELLS = 250, COARSE_LIMIT_YEARS = Math.max(NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS);
   const COARSE_SEGMENT_YEARS = COARSE_STEP * COARSE_SEGMENT_CELLS;
   // The seat's relative bound on the edge value (measured 2026-10-28: the chain counts agree across
   // Chromium and Node to the last bit, the obliquity carrier — an integrand of nearly equal
@@ -276,17 +281,20 @@ function createChainCycleIntegrator({
   /** THE GENERATOR'S HOOK (plan 25): the segment prefixes P[0..K] of a chain's coarse tier in both
    *  directions, computed by the recursion above from the chain's own dense edge — the arrays the
    *  bank stores. K = the number of whole segments inside limitYears from the edge.
-   *  @param {PeriodSecondsAtAge} periodFnSeconds @param {number} limitYears
+   *  @param {PeriodSecondsAtAge} periodFnSeconds @param {number | {past: number, future: number}} limitYears
    *  @returns {{ fwd: number[], bwd: number[], segmentYears: number } | null} */
   function recordSegmentPrefixes(periodFnSeconds, limitYears) {
     const tab = table(periodFnSeconds);
     if (tab === null) return null;
     const c = coarseSides(periodFnSeconds, tab);
-    const K = Math.floor(Math.min(limitYears, COARSE_LIMIT_YEARS) / COARSE_SEGMENT_YEARS);
-    prefixesTo(periodFnSeconds, c.fwd, gridMaxYear, 1, K);
-    prefixesTo(periodFnSeconds, c.bwd, gridMinYear, -1, K);
+    // the limit per direction (a number means both): the bank is ASYMMETRIC like the domain it covers
+    const lim = typeof limitYears === 'number' ? { past: limitYears, future: limitYears } : limitYears;
+    const Kf = Math.floor(Math.min(lim.future, COARSE_LIMIT_YEARS) / COARSE_SEGMENT_YEARS);
+    const Kb = Math.floor(Math.min(lim.past, COARSE_LIMIT_YEARS) / COARSE_SEGMENT_YEARS);
+    prefixesTo(periodFnSeconds, c.fwd, gridMaxYear, 1, Kf);
+    prefixesTo(periodFnSeconds, c.bwd, gridMinYear, -1, Kb);
     if (!c.fwd.ok || !c.bwd.ok) return null;
-    return { fwd: c.fwd.P.slice(0, K + 1), bwd: c.bwd.P.slice(0, K + 1), segmentYears: COARSE_SEGMENT_YEARS };
+    return { fwd: c.fwd.P.slice(0, Kf + 1), bwd: c.bwd.P.slice(0, Kb + 1), segmentYears: COARSE_SEGMENT_YEARS };
   }
   /** C(y) anywhere the tables reach: dense inside the grid, coarse beyond.
    *  @param {PeriodSecondsAtAge} periodFnSeconds @param {Float64Array} tab @param {number} y @returns {number | null} */

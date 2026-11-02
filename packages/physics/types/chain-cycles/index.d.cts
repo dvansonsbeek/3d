@@ -43,7 +43,10 @@ export function createChainCycleIntegrator({ ageAnchorYear, tropicalYearJ2000Sec
 }): {
     cyclesBetween: (periodFnSeconds: PeriodSecondsAtAge, yearA: number, yearB: number) => number | null;
     nameChain: (name: string, periodFnSeconds: PeriodSecondsAtAge) => void;
-    recordSegmentPrefixes: (periodFnSeconds: PeriodSecondsAtAge, limitYears: number) => {
+    recordSegmentPrefixes: (periodFnSeconds: PeriodSecondsAtAge, limitYears: number | {
+        past: number;
+        future: number;
+    }) => {
         fwd: number[];
         bwd: number[];
         segmentYears: number;
