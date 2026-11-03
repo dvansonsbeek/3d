@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.6
-coefficients: sha256:f208ad9b25f7164d
+modelVersion: v27.7
+coefficients: sha256:3afe3e8645567bc8
 status: current
 ---
 
@@ -954,6 +954,138 @@ position edge shows: umbra 267 km, penumbra 3,215 km, the Moon at 321,469 km).
 The genesis search itself waits on (a): a first eclipse found "after the
 edge" today is the first eclipse of the 3.08-Ga system, 445 scene days in.
 
+### 1.36 One deep clock — the UT clock counts solar days, and a bridge solved on the label is a bridge solved on the wrong instant
+
+**What plan 27 step A measured first (A1).** The chain's deep ΔT is a Simpson
+integral of the LOD history whose integrand was `(86400 − LOD) × yearS / 86400`
+— SI days per year. The UT clock counts SOLAR days: a year of date holds
+`yearS / LOD` of them, and ΔT grows by `86400 − LOD` per solar day, so the
+integrand is `(86400 − LOD) × yearS / LOD`. The two are one in the era and
+part at depth exactly as 86400/LOD does; the node cap (1,024 Simpson nodes)
+costs nothing — the capped and a 1-kyr Simpson of the same integrand agree to
+five digits at every age:
+
+| age | shipped ΔT (yr) | exact integral (yr) | exact / shipped |
+|---|---|---|---|
+| 1 Ma | 123.39 | 123.40 | 1.0002 |
+| 400 Ma | 1.874e7 | 2.003e7 | 1.069 |
+| 2 Ga | 3.414e8 | 4.313e8 | 1.263 |
+| 3.08 Ga | 6.720e8 | 9.097e8 | 1.354 |
+| 4.425 Ga (the genesis) | 1.345e9 | 2.321e9 | 1.726 |
+
+The position table rebuilt on solar days of date (§1.35 (a)'s candidate)
+reproduces the exact integral to four digits — the two are the same integral.
+The era differs by 2e-8 (the LOD day is 86,400.002 s).
+
+**The design, and what the measurements rejected on the way.** The scene's
+coordinate stays a tropical-year count of date (every scaffold motion is
+`speed × pos` per tropical year). Its TT instant is the position table (SI days
+per tropical year of date — the former twins' table, now ONE home in
+`phase/deep-calendar`, normalised, analytic partial cell, built and read under
+the SHIPPED α: the α-reference pin (`withLatticeAlpha`) moves the J2000 day by 3.7 ms and the era's UT
+count by 32 s in 24 years; the former twins built unpinned, 1.65 d apart from a
+pinned build at −400 Myr). The UT Julian Day — the solar-day count the UT clock
+keeps, the day the scene navigates and labels by — is that instant minus the
+engine's FULL ΔT, and a UT→year read solves that bridge implicitly. A second
+table of solar days per year, measured and rejected: it counts the MEAN day, so
+its UT axis parts from the civil one by the fitted era corrections (24 s in 24
+years, 1.3 h at −3000). The bridge has TWO ages, named: the raw integral is a
+function of the physical (TT) age the UT count has reached; the fitted era
+corrections (the Bond/Hallstatt/Jose cycles, the resonator) were fitted on the
+civil calendar year of the UT count and keep it (`meanDeltaTSecondsAtAges(tMaRaw,
+tMaCorrections)`); the raw age is read on the civil axis too (the proleptic
+Julian count before 1582, the engine's Julian-year axis to a constant 12.5 days
+— 1 s of raw integral at −3000 if read on the other, nothing at depth). The
+implicit solve is a Newton step with slope 86,400/LOD (solar days per SI day of
+date): the fixed point diverges where the UT clock outruns TT by more than 2×,
+beyond ~1 Gyr (−8e6 yr at −2 Gyr, +4e9 yr at the edge), and the inverse slope
+overshoots (measured both); it starts from the civil label's reading inside the
+era and from the table's deepest instant beyond it, where the label's age is
+outside the chain's domain (the UT count of 4.4 Ga of TT reads 6.7 Ga).
+
+**The raw integral itself.** A Newton solve calls the raw integral a dozen
+times per bridge read, and the chain's per-call Simpson cost 26 ms at the edge
+(1,024 nodes over 4.4 Gyr of LOD history, each node an α(t) read): the first
+gate run with it sat 18 minutes in one deep jump's finder scans. Its accuracy
+was uneven too — the node count `max(32, 10·T)` put 31-kyr nodes on a megayear:
+4e-5 of ΔT (two days) at −1 Myr, 3e-6 (6 kyr) at the genesis, while the era
+read 1e-10. The raw integral is now a lazily grown cumulative table: 100-yr
+cells to ±1 Myr, 10-kyr cells beyond, per-cell Simpson with its midpoint,
+read in O(1) with a Simpson over the partial cell — 3e-9 of ΔT at 24 yr
+(80 ns), 3e-8 at 300 yr, ≤ 1e-9 everywhere beyond, against a 1-yr/1-kyr
+Simpson; 0.04–0.08 ms per bridge call at any depth, the table to the genesis
+built in 0.3 s. One 10-kyr cell everywhere was measured first and rejected: the
+GIA channel's 20-kyr lines modulate the integrand, and a single quadratic over
+10 kyr read 341 s at −10 kyr (1e-3). The difference of the two position tables
+(SI days minus solar days) was measured and rejected as the integral's home
+too: two trapezoid tables' residues do not cancel (1.9 s at 24 yr, 2e4 s by
+10 kyr). The governed ΔT fit, re-closed on the new raw integral, moved its
+coefficients inside their 1e-6 noise (deltaTStart by 51 µs). The era
+campaigns, which refuse on any divergence, were re-baselined at the bridge's
+floor and nowhere else: the eclipse audit's full-precision mean residuals by
+18 µs (lunar, on 1,214 s) and 23 µs (solar, on 664 s) with every rounded row,
+count and centerline reproduced; the lunar alignment's canon geometry by 4 and
+5 µs; the canon recall by one event of ~12,000 across the tight threshold
+(9,868 → 9,869) and one era's signed median by 0.01 min — the bridge's 72 ms
+at −3000 rounding through a boundary. The N-body series re-stamped
+bit-identically.
+
+**The result.** The era bridge moves by 4e-7 s today, 5 ms at −135, 72 ms at
+−3000 — the label's own ΔT, the §1.31 class at its floor. The deep labels now
+mean the age the physics draws: the −2 Gyr label renders the 2.0-Ga system,
+the edge the 4.42-Ga one; round trips close to the double's resolution at
+every depth; the scene's Earth makes the year's own number of turns per year
+of date. The Date beyond ±3,000 yr of J2000 is the position's year written as
+a season date (the year's fraction on a 365.2422-day proleptic year's months;
+the Time field the solar day's clock as always); at the seam the two labels
+differ by ΔT(3 kyr) = 7 h, below the day resolution. The epoch-consistency
+gate reads, at −1 Myr, −400 Myr, −2 Gyr and the edge: the scene's year of date
+≡ the model's (two runtimes, 1e-6 yr), the TT instant of the position ≡ the UT
+JD plus the model's bridge, the Moon's ring ≡ the cited distance at the
+labelled age, and the browser's navigable range ≡ the twin's. **The rule:** a
+clock's bridge is solved on the instant it lands on, never on the label it
+starts from; the integrand's day is the day the clock counts; and a quantity
+with two fitted axes names both (`…AtAges(tMaRaw, tMaCorrections)`).
+
+**Two costs found by the gate at the edge.** (a) The spin sampler's reads were
+unclamped: a windowed display row sampling ±10 Myr around the navigable edge
+asked the spin walk for ages beyond the bank's deepest checkpoint, where it
+runs UNSEATED into physics the inputs no longer define — 3.4 s per read at
+−4,425.5 Myr, 15 s at −4,431 Myr, ε reading 0.8°. The jump itself returned in
+17 s; the next trivial call waited 22 minutes behind those frames, and the
+first gate run read as hung. The one-source movement's `sampleAt` and the
+browser's `_hybridSeriesSampleAt` now clamp the year to the navigable domain
+(`time/navigable-domain`, ONE home): beyond the edge a read is the edge's
+value in 0 ms. (b) The perihelion calendar — a scaffold display convention
+(year 0 at the perihelion–solstice alignment epoch, a Revised-Julian leap
+rule) reachable only through its test hooks — converted a JD by a year-by-year
+walk: 13 ms per Myr, 90 s of a first jump to the genesis. Retired with its
+gate; `perihelionalignmentJD`/`Year` stay as model constants. A first jump to
+the genesis on a fresh page is now the seats and the tables (17 s), the
+second 0.07 s. **The rule:** a sampler asked for an age outside the domain
+answers at the edge, never by walking there.
+
+**The gate's own third clock.** `scene-year-lengths.js` converted each scene
+event's UT instant to TT with a clock of its own — ΔT at the civil-label age,
+the convention this section retires — and its four deep rows, the ones that
+found the certified Sun's third clock (§1.31), now read the gate's: at ±1 Myr
+the label is 123 yr short of the TT age, so the gate's ΔT sat 8.8 days off and
+its slope was wrong by ΔT′² — 0.011″ on the solstice-ε row and −2.9 s on
+every year row at ±1 Myr, nothing at the era rows (ΔT′² is 1e-12 there). The
+gate reads the one bridge now; the §1.31 rule extends to the instrument: a
+gate converts the axis it samples with the SAME bridge the tier under test
+reads, and tests the motion, never a second conversion.
+
+**The price of a comment in a hashed file.** `deep-time-chain.js` is a
+recorded input of both banks and of the governed ΔT fit; a one-word comment
+change there (the vocabulary ratchet's finding) re-staled the banks directly
+(2.2 hours of bit-identical regeneration) and left the fit's input stamp
+stale, which the by-hand re-close moved with every coefficient reproduced;
+the constants embed came out byte-identical, so the stamp cost only the four
+campaigns' re-stamp (12 minutes), not a second bank run. A comment in a
+bank- or fit-hashed file is edited together with a physics change, never
+alone (plan 22's header-edit lesson, now measured on the banks).
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -974,7 +1106,13 @@ close, with no row reading either; and since §1.34 the Earth-spin rows: the
 scene's spin after a jump, read through the frame probe, ≡ the tier's GMST at
 the same UT JD at the 2024 eclipse and at −700 Myr — born from the owner's
 solar-eclipse view at −2 Gyr, the umbra ring 95° of longitude from the Moon's
-shadow), plus
+shadow; and since §1.36 the one-deep-clock rows at −1 Myr, −400 Myr, −2 Gyr
+and the navigable edge: the scene's year of date ≡ the model's year of the UT
+count, the TT instant of the position ≡ the UT JD plus the model's bridge, the
+Moon's ring ≡ the cited distance at the labelled age (each read after a
+rendered frame — the ring is the render loop's), and the browser's navigable
+range ≡ the twin's — born from the Earth–Moon genesis search landing on the
+3.08-Ga system), plus
 `test:perf` — the deep-time performance gate (RATIO thresholds, deep vs
 in-table cost, runner-speed independent; born from four ungated ratio
 regressions, one owner-bisected at 28×; since §1.35 the deep-edge spin read —

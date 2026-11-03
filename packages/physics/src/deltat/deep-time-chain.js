@@ -161,6 +161,12 @@ export function createDeepTimeChain(deps) {
   let latticeAlphaRef = false;
   /** @param {() => void} build */
   const withLatticeAlpha = (build) => { const prev = latticeAlphaRef; latticeAlphaRef = true; try { build(); } finally { latticeAlphaRef = prev; } };
+  /** The SHIPPED α (the climate-modulated channel, the LOD's own) forced for a build or a read,
+   *  whatever the caller's pin state: the position tables (plan 27) count the solar days the
+   *  shipped LOD gives — under the α-reference pin (withLatticeAlpha) the J2000 day is 3.7 ms off and the era's UT count
+   *  drifts 32 s in 24 years — and they must not inherit a pin from a caller's build.
+   *  @param {() => void} build */
+  const withShippedAlpha = (build) => { const prev = latticeAlphaRef; latticeAlphaRef = false; try { build(); } finally { latticeAlphaRef = prev; } };
   /** @type {Map<number, number>} */
   const alphaMemo = new Map();
   /** Exact-argument memo (pure dedupe, not a grid); the pin bypasses it. @param {number} tMa @returns {number} */
@@ -343,15 +349,21 @@ export function createDeepTimeChain(deps) {
   /** ΔT in SI seconds at age tMa, RELATIVE TO J2000 (0 at tMa = 0); the raw Simpson
    *  integral plus the post-integration terms the flags switch, added one by one in
    *  the twins' order (pre-summing would change the FP association). @param {number} tMa @returns {number} */
-  const meanDeltaTSecondsAtAge = (tMa) => {
-    if (tMa === 0) return 0;
+  const meanDeltaTSecondsAtAge = (tMa) => meanDeltaTSecondsAtAges(tMa, tMa);
+  /** The same ΔT with its TWO ages named (plan 27, doc 111 §1.36): the raw integral of the LOD
+   *  history is a function of the physical (TT) age, the fitted era corrections were fitted on
+   *  the civil calendar year of the UT count and keep that axis. One argument for both is the
+   *  era's reading; the UT→TT bridge passes the TT age the UT count has reached for the first.
+   *  @param {number} tMaRaw @param {number} tMaCorrections @returns {number} */
+  const meanDeltaTSecondsAtAges = (tMaRaw, tMaCorrections) => {
+    if (tMaRaw === 0 && tMaCorrections === 0) return 0;
     const f = flagsAt();
     const resonatorDeltaT = f.resonatorDeltaT ?? f.resonator;
-    const cacheKey = `${f.bond ? 'B' : '_'}${f.hallstatt ? 'H' : '_'}${f.jose5 ? 'J' : '_'}${f.jose4 ? 'W' : '_'}${resonatorDeltaT ? 'R' : '_'}:${tMa}`;
+    const cacheKey = `${f.bond ? 'B' : '_'}${f.hallstatt ? 'H' : '_'}${f.jose5 ? 'J' : '_'}${f.jose4 ? 'W' : '_'}${resonatorDeltaT ? 'R' : '_'}:${tMaRaw}:${tMaCorrections}`;
     const hit = deltaTCache.get(cacheKey);
     if (hit !== undefined) return hit;
-    let result = deepLod.deltaTRawSecondsAtAge(tMa);
-    const yearY = 2000 - tMa * 1e6;
+    let result = deepLod.deltaTRawSecondsAtAge(tMaRaw);
+    const yearY = 2000 - tMaCorrections * 1e6;
     if (f.bond) result += cycleDeltaT('bond', yearY);
     if (f.hallstatt) result += cycleDeltaT('hallstatt', yearY);
     if (f.jose5) result += cycleDeltaT('jose5', yearY);
@@ -422,7 +434,7 @@ export function createDeepTimeChain(deps) {
     certifiedAxialPrecessionJ2000Years, precessionRateJ2000ArcsecPerYr,
     EPOCH_PARAMS, ageAnchorYear,
     // the pieces
-    alphaGia, earthMoiFactorAtAge, withLatticeAlpha, j2RatioAtYear, iEarthAtAge,
+    alphaGia, earthMoiFactorAtAge, withLatticeAlpha, withShippedAlpha, j2RatioAtYear, iEarthAtAge,
     recession, meanObliquity, dtCycles, s3ArcsecPerYr, deepLod, l0, deepEcc, eCompModulation, moonChain, moonEccSensitivities,
     // the family
     meanMoonDistanceMetresAtAge: recession.distanceMetresAtAge,
@@ -440,7 +452,8 @@ export function createDeepTimeChain(deps) {
     meanTropicalYearSecondsAtAge: deepLod.tropicalYearSecondsAtAge,
     meanTropicalYearDaysAtAge: deepLod.tropicalYearDaysAtAge,
     meanYearInDaysAtAge: deepLod.yearInDaysAtAge,
-    meanDeltaTSecondsAtAge,
+    meanSolarDaySecondsAtAge: deepLod.solarDaySecondsAtAge,
+    meanDeltaTSecondsAtAge, meanDeltaTSecondsAtAges,
     bondCycleDeltaTCorrection: (/** @type {number} */ year) => cycleDeltaT('bond', year),
     hallstattCycleDeltaTCorrection: (/** @type {number} */ year) => cycleDeltaT('hallstatt', year),
     jose5CycleDeltaTCorrection: (/** @type {number} */ year) => cycleDeltaT('jose5', year),

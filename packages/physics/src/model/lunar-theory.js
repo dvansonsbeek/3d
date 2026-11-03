@@ -6,6 +6,7 @@
 import { createChainCycleIntegrator } from '../chain-cycles/index.cjs';
 import { J2000_JD, JULIAN_CENTURY_DAYS } from '../constants/units.cjs';
 import { createMoonArguments, jdToDecimalYear } from '../moon/arguments.cjs';
+import { createDeepCalendar } from '../phase/deep-calendar.cjs';
 import { createMoonSeries } from '../moon/series.cjs';
 import { driver2PeriodSecondsAtAge } from '../planets/orbit-chain.cjs';
 
@@ -14,7 +15,7 @@ export function assembleLunarTheory(ctx) {
   const {
     C, F, late, options, EPOCH_PARAMS, axialPrecessionJ2000Days, chain, deepEcc, deepLod, meanDeltaTSecondsAtAge,
     meanSiderealYearDays, meanTropicalYearJ2000Seconds, moonChain, moonDistanceKm,
-    moonDistanceMetresAtAge, moonSiderealMonth, oneSourceM, startmodelYear, sunPerihelionDegAt,
+    moonDistanceMetresAtAge, moonSiderealMonth, oneSourceM, siTropicalYearDays, startmodelJD, startmodelYear, sunPerihelionDegAt,
     yearFromJD,
   } = ctx;
   // PLAN 25 — the lunar cumulative bank (data/lunar-cumulative-checkpoints.json, parsed, or null): the
@@ -182,11 +183,34 @@ export function assembleLunarTheory(ctx) {
   // against the Moon and the planets, unseen by every gate on that axis
   // (doc 111 §1.31). Computed directly, never recovered from a JD difference
   // (two JDs near 2.4 million subtract to 1e-5 s of round-off).
+  // PLAN 27 (doc 111 §1.36): the AGE the ΔT reads is the age of the TT instant the UT
+  // count has reached — the UT Julian Day's solar-day count → the year of date (the
+  // calendar's solar-day position table) → that year's TT instant (its SI-day table) →
+  // the engine year (Julian from J2000). The former argument was the calendar year of the
+  // UT count itself: a label ΔT short, which is 8 ms of bridge at −3000, 11 days at
+  // −1 Myr and 340 Myr of age at the −2 Gyr label (the rendered Moon was the 1.66-Ga one).
+  // Outside the tables' domain the calendar label stands in, as before.
+  const deepCalendar = createDeepCalendar({
+    meanYearInDaysAtAgeMa: chain.meanYearInDaysAtAge,
+    meanTropicalYearDaysAtAgeMa: chain.meanTropicalYearDaysAtAge,
+    withLatticeAlpha: chain.withLatticeAlpha,
+    withShippedAlpha: chain.withShippedAlpha,
+    deltaTSecondsAtAges: chain.meanDeltaTSecondsAtAges,
+    startModelJD: startmodelJD,
+    startModelYear: startmodelYear,
+    startModelYearWithCorrection: startmodelYear,
+    siTropicalYearDays,
+  });
+  // Two ages, named: the RAW integral of the LOD history is a function of the physical (TT)
+  // age; the fitted era corrections the chain adds (the Bond/Hallstatt/Jose cycles, the
+  // resonator) were fitted on the civil calendar year of the UT count (the ΔT records' own
+  // axis) and keep it — the two agree to 8 ms at −3000 and part at depth (11 days at −1 Myr).
   /** @param {number} jd @returns {number} */
   const frameworkDeltaTSecondsAtJD = (jd) => {
-    const tMa = (startmodelYear - jdToDecimalYear(jd)) / 1e6;
-    const dT = meanDeltaTSecondsAtAge(tMa);
-    return Number.isFinite(dT) ? dT : 0;
+    const dT = deepCalendar.deltaTSecondsAtJdUT(jd);
+    if (dT !== null && Number.isFinite(dT)) return dT;
+    const fallback = meanDeltaTSecondsAtAge((startmodelYear - jdToDecimalYear(jd)) / 1e6);   // the civil reading, outside the table
+    return Number.isFinite(fallback) ? fallback : 0;
   };
   /** @param {number} jd @returns {number} */
   const jdTTFromUT = (jd) => jd + frameworkDeltaTSecondsAtJD(jd) / 86400;
@@ -249,6 +273,6 @@ export function assembleLunarTheory(ctx) {
 
   /** THE SEAT DIAGNOSTIC (plan 25/26): every named lunar table's seat in this runtime. */
   const lunarSeatStatus = () => ({ chains: chainCycles.seatStatus(), carriers: moonArgs.carrierSeatStatus() });
-  return { frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays, recordLunarCumulativeBank, lunarSeatStatus };
+  return { deepCalendar, frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays, recordLunarCumulativeBank, lunarSeatStatus };
 }
 /** @typedef {import('./time-axis.js').Ctx & ReturnType<typeof assembleLunarTheory>} Ctx */

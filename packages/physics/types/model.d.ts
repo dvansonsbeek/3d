@@ -18,6 +18,14 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         yearFromJD: (jd: number) => number;
         jdFromYear: (year: number) => number;
         siTropicalYearDays: number;
+        yearToJDUT: (year: number) => (number | null);
+        jdUTToYear: (jdUT: number) => (number | null);
+        yearToJDTT: (year: number) => (number | null);
+        jdTTToYear: (jd: number) => (number | null);
+        navigableYearRange: () => {
+            yearMin: number;
+            yearMax: number;
+        };
     }>;
     massChain: Readonly<{
         moonDistanceKm: any;

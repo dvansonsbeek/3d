@@ -165,6 +165,7 @@ export function createDeepTimeLod(deps: DeepTimeLodDeps): {
     tropicalYearDaysAtAge: (t_Ma: number) => number | null;
     tropicalYearSecondsFromLod: (t_Ma: number, LOD_s: number | null) => number;
     eclipticLodCorrectionSecondsAtAge: (t_Ma: number) => number | null;
+    solarDaySecondsAtAge: (t_Ma: number) => number | null;
     yearInDaysAtAge: (t_Ma: number) => number | null;
     deltaTRawSecondsAtAge: (t_Ma: number) => number;
     lodSecondsWithCorrectionsAtAge: (t_Ma: number) => number | null;

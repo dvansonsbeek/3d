@@ -94,8 +94,8 @@
   "collinearity_warnings": [],
   "optimum": {
     "usno_target_lod_s": 86400.0012,
-    "deltaTStart": 56.076471277566284,
-    "espenak_rms_s": 12.453199114353135,
+    "deltaTStart": 56.07641984766915,
+    "espenak_rms_s": 12.453196267263248,
     "selected_by": "joint mode (--joint --write; flags + resonator, hard closure, caps)"
   },
   "usno_anchor": {
@@ -107,7 +107,7 @@
       "fitted_sidereal_days_at_2000": 365.256363004,
       "h5_correction_s": 0.003440745803602852
     },
-    "shipped_sum_lod_at_j2000_s": -0.0022407458053580907,
+    "shipped_sum_lod_at_j2000_s": -0.0022407458053580968,
     "drift_from_target_s": -6.505213034913027e-19,
     "fit_stage": "D",
     "soft_constraint_weight": 1000000,
@@ -126,44 +126,44 @@
     "bond": {
       "lattice_n": 1830,
       "period_yr": 1465.8666666666666,
-      "cos_coeff_s": 165.17154638431563,
-      "sin_coeff_s": 329.7228335598115,
-      "raw_at_j2000_s": 139.42864605707047,
-      "amplitude_s": 368.78013328499304,
-      "phase_deg": 63.39185218658537,
+      "cos_coeff_s": 165.17184831729202,
+      "sin_coeff_s": 329.72287768362764,
+      "raw_at_j2000_s": 139.42848047926896,
+      "amplitude_s": 368.78030796739,
+      "phase_deg": 63.39181331520029,
       "source": "Stage D anchored fit (USNO LOD constraint active)",
       "joint_mode": true
     },
     "hallstatt": {
       "lattice_n": 1104,
       "period_yr": 2429.8333333333335,
-      "cos_coeff_s": -63.68939941732031,
-      "sin_coeff_s": 48.411366453148595,
-      "raw_at_j2000_s": -71.62940826203855,
+      "cos_coeff_s": -63.68932631167209,
+      "sin_coeff_s": 48.411462629891226,
+      "raw_at_j2000_s": -71.62946206080287,
       "amplitude_s": 80,
-      "phase_deg": 142.76093341506916,
+      "phase_deg": 142.7608468932201,
       "target_amp_source": "CAPPED from anchored quad-fit free amp 100.73 s → 80 s prior",
       "joint_mode": true
     },
     "jose5": {
       "lattice_n": 2989,
       "period_yr": 897.469387755102,
-      "cos_coeff_s": -41.0891062591658,
-      "sin_coeff_s": 28.490092081686615,
-      "raw_at_j2000_s": 22.693447914408413,
-      "amplitude_s": 50.00000000000001,
-      "phase_deg": 145.26359127533055,
+      "cos_coeff_s": -41.0891783668107,
+      "sin_coeff_s": 28.489988085999872,
+      "raw_at_j2000_s": 22.693335150635434,
+      "amplitude_s": 49.99999999999999,
+      "phase_deg": 145.26373628964822,
       "target_amp_source": "CAPPED from anchored quad-fit free amp 86.44 s → 50 s prior",
       "joint_mode": true
     },
     "jose4": {
       "lattice_n": 3749,
       "period_yr": 715.5337423312883,
-      "cos_coeff_s": 38.291445249445005,
-      "sin_coeff_s": -32.15221953005352,
-      "raw_at_j2000_s": 41.57884356314017,
-      "amplitude_s": 49.99999999999999,
-      "phase_deg": -40.01920845811767,
+      "cos_coeff_s": 38.291460126731565,
+      "sin_coeff_s": -32.15220181205212,
+      "raw_at_j2000_s": 41.578830713336735,
+      "amplitude_s": 50.00000000000001,
+      "phase_deg": -40.01918194654312,
       "target_amp_source": "unconstrained: quad-fit free amp 47.06 s (below 50 s prior — no cap applied)",
       "joint_mode": true
     }
@@ -176,22 +176,22 @@
     "generator": "DT_CORRECTIONS_DISABLED=1 node tools/fit/dt-corrections-fit.js --joint --write <a FIT — re-close by hand, then npm run regen:cascade --run>",
     "files": {
       "data/astrogeo22-earth-moon.json": "sha256:77d87c4e0c3543ef4cdaca1482e065dcff5457b694fa519a58061cf013d4461b",
-      "data/core-mantle-resonator-stage1.json": "sha256:6e4307c4f9abfe8e6738684d2a4a2ef72f827d1606f7096a85576b34af5bae7a",
+      "data/core-mantle-resonator-stage1.json": "sha256:c1186f5f80c6a34632a2ab001602f4b533519d8e4b12070d4024f8b1ab2c9ac1",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
       "packages/fitting/src/dt-corrections-fit.cjs": "sha256:97034bec0079f07093c00f7d0f48d870bf6496d2d2f150cac000b3bddf91fd0a",
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:f15c92118c12c0e4d7904fe1e793703749594a4668f3f7ad8611632c82710e22",
       "packages/physics/src/deltat/cycles.cjs": "sha256:d1a2571146ccf675c22a8d685900b84d5bee6764b32731dc4e43b32a1a81d2f3",
-      "packages/physics/src/deltat/deep-time-chain.js": "sha256:3cbf95a63c90723c304aa2b6b2994aa2bedd2db4fc8d86c03a89f2902ccbd1c6",
-      "packages/physics/src/deltat/deep-time.cjs": "sha256:78d5f7b04ecfc2f8a681a50bbf70491cbd4beab9530989c3eda02b92319b28d7",
+      "packages/physics/src/deltat/deep-time-chain.js": "sha256:e92e712523ee60b85be25b9d1bf5e05ff015e95ae10f036b5cb5f555d11f3a51",
+      "packages/physics/src/deltat/deep-time.cjs": "sha256:246d981862bdd3fa8e9bb73d7db1560fbbbfe25b80612cb81fd52612d6eae414",
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
       "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:78dac2b3854c55a6ce63b8cfd409e5c9a06b0924d9e1b9f5bf88202ea5461555",
       "packages/physics/src/earth/precession-composed.cjs": "sha256:448b2327fc6f3a6994bfc5cc514fec3dc7ceae2037312ae8343b57b7f948252a",
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
-      "public/input/climate-formula-coefficients.json": "sha256:e24feaef6bf7cd3f7ad48d1914b45581a0aa755891de8c31e26a97db92bc2d24",
+      "public/input/climate-formula-coefficients.json": "sha256:e7ac70f85c131c61a5de52a8a58dc5210d58954197c787dcfea948dc41020400",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
       "tools/lib/constants.js": "sha256:fc23b637b6642d4e173d513b023d608278a6889c667bf56bae0ae5a23e9e18b0",
-      "tools/lib/deep-time.js": "sha256:141b8d9373e932adc6b8cfcbca0a2d95f002a8e160a95d9eae3905968e4eae95"
+      "tools/lib/deep-time.js": "sha256:6d67fc7219205a835ec935b31bf97bc96b3eb8cac66217e375c4a74c740b6f8b"
     }
   }
 }

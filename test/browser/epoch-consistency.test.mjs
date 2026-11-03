@@ -39,18 +39,29 @@
  */
 import { createRequire } from 'node:module';
 import { openSimulator } from './harness.mjs';
-import { meanYearInDaysAtAge, posFromJD, jdFromPos } from '../../tools/lib/deep-time.js';
-import { createModel, NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } from '@essrt/physics';
+import { meanYearInDaysAtAge, meanMoonDistanceAtAge, meanAuAtAge, posFromJD, jdFromPos, navigablePosRange } from '../../tools/lib/deep-time.js';
+import { createModel } from '@essrt/physics';
 const require = createRequire(import.meta.url);
 
+// The edge JDs are the twin's OWN UT axis (doc 111 §1.36): a linear 365.25-day count overshoots
+// the future UT edge by the future ΔT (121 Myr of years at +1 Gyr — the former literal) and
+// undershoots the past one. The two exact edges pin the table's inclusive last node.
 const DOMAIN_EDGE_JDS = [
   2451545 - 700e6 * 365.25,                              // beyond the former table edge
-  2451545 - (NAVIGABLE_PAST_YEARS - 25e6) * 365.25,      // near the past edge
-  2451545 + (NAVIGABLE_FUTURE_YEARS - 1e6) * 365.25,     // near the future edge
+  jdFromPos(navigablePosRange().posMin + 25e6),          // near the past edge
+  jdFromPos(navigablePosRange().posMax - 1e6),           // near the future edge
+  jdFromPos(navigablePosRange().posMin),                 // the past edge itself
+  jdFromPos(navigablePosRange().posMax),                 // the future edge itself
 ];
 const TOL_ROUNDTRIP_DAYS = 1e-3, TOL_POS_YEARS = 1e-6, TOL_MOON_DIST_REL = 5e-5;
 const MOON_DIST_JDS = [2451545 - 400e6 * 365.25, 2451545 - 700e6 * 365.25];
 const SPIN_MODERN_JD = 2460409.262, TOL_SPIN_DEG = 1e-9;   // 2024-04-08 18:17 UT, the eclipse
+// THE ONE DEEP CLOCK (doc 111 §1.36): the UT JDs the twin's position table gives for four
+// positions (years of date since the scene epoch) — the labelled age must be the age the
+// physics draws, at −1 Myr, −400 Myr, −2 Gyr and 10 kyr inside the navigable edge.
+const CLOCK_POS = [-1e6, -400e6, -2000e6, navigablePosRange().posMin + 1e4];
+const CLOCK_JDS = CLOCK_POS.map((p) => jdFromPos(p));
+const TOL_CLOCK_YEAR = 1e-6, TOL_CLOCK_TT_DAYS = 1e-3, TOL_RING_REL = 1e-9, TOL_RANGE_YEARS = 1e-6;
 
 const EPOCHS_MA = [-5, -1, 1, 5];
 const TOL_DAYS = 0.002;
@@ -109,8 +120,24 @@ const domainRows = await s.page.evaluate(({ POS_JD, MOON_JDS, SPIN_JD }) => {
   const spin = [spinAt(SPIN_JD), spinAt(POS_JD)];
   const scenePos = T.scenePos();
   const moon = MOON_JDS.map((jd) => ({ jd, distKm: T.moonSceneState(jd).distKm }));
-  return { scenePos, moon, spin };
+  const range = T.navigablePosRange();
+  return { scenePos, moon, spin, range };
 }, { POS_JD: DOMAIN_EDGE_JDS[0], MOON_JDS: MOON_DIST_JDS, SPIN_JD: SPIN_MODERN_JD });
+// THE ONE DEEP CLOCK (doc 111 §1.36): at each UT JD the scene's position, its year of date, the
+// TT instant of that position, the Moon's ring radius and the placed Moon's distance. The ring
+// is sized by the epoch anchors, which the RENDER LOOP updates from the scene's year of date —
+// so each jump is followed by a rendered frame before the read (a read in the same tick sees
+// the previous epoch's ring: the one-jump-late artefact measured in plan 27).
+domainRows.clock = [];
+for (const jd of CLOCK_JDS) {
+  await s.page.evaluate((jd) => window.__test__.jumpJD(jd), jd);
+  await s.page.waitForTimeout(1500);
+  domainRows.clock.push(await s.page.evaluate((jd) => {
+    const T = window.__test__;
+    const pos = T.scenePos(); const ring = T.moonRingProbe();
+    return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm };
+  }, jd));
+}
 
 const pageErrors = s.errors.length;
 await s.dispose();
@@ -195,6 +222,36 @@ for (const jd of DOMAIN_EDGE_JDS) {
     if (!ok) fail++;
     console.log(`${ok ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Earth spin scene/tier GMST`
       + ` ${scene.toFixed(6)} / ${tier.toFixed(6)}°  Δ ${Number(d).toExponential(2)}°`);
+  }
+  // THE ONE DEEP CLOCK (doc 111 §1.36): (1) the scene's labelled year of date ≡ the model's
+  // year of the UT count (the package calendar, two runtimes); (2) the TT instant of the
+  // position ≡ the UT JD plus the model's bridge; (3) the Moon's ring ≡ the cited distance at
+  // the labelled age (the ring used to read the UT count's SI-day label: 95,882 km against a
+  // Moon at 321,601 at the edge); (4) the browser's navigable range ≡ the twin's.
+  for (const r of domainRows.clock) {
+    const modelYear = m.time.jdUTToYear(r.jd);
+    const dYear = r.year - modelYear;
+    const okYear = Number.isFinite(dYear) && Math.abs(dYear) <= TOL_CLOCK_YEAR;
+    if (!okYear) fail++;
+    console.log(`${okYear ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  year of date scene/model  ${r.year.toFixed(6)} / ${Number(modelYear).toFixed(6)}  Δ ${Number(dYear).toExponential(2)} yr`);
+    const jdTTModel = r.jd + m.eclipse.deltaTSecondsAtJD(r.jd) / 86400;
+    const dTT = r.jdTT - jdTTModel;
+    const okTT = Number.isFinite(dTT) && Math.abs(dTT) <= TOL_CLOCK_TT_DAYS;
+    if (!okTT) fail++;
+    console.log(`${okTT ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  TT instant position/bridge  Δ ${Number(dTT).toExponential(2)} d  (TT age ${((2451545 - jdTTModel) / 365.25 / 1e6).toFixed(3)} Ma)`);
+    const ageLabel = (2000.5 - r.year) / 1e6;
+    const ringKm = r.ringScene * meanAuAtAge(ageLabel) / 100, citedKm = meanMoonDistanceAtAge(ageLabel);
+    const relRing = (ringKm - citedKm) / citedKm;
+    const okRing = Number.isFinite(relRing) && Math.abs(relRing) <= TOL_RING_REL;
+    if (!okRing) fail++;
+    console.log(`${okRing ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Moon ring/cited a(t) at the label  ${ringKm.toFixed(1)} / ${citedKm.toFixed(1)} km  rel ${Number(relRing).toExponential(2)}  (placed Moon ${r.moonDistKm.toFixed(0)} km)`);
+  }
+  {
+    const twin = navigablePosRange();
+    const d = Math.max(Math.abs(domainRows.range.posMin - twin.posMin), Math.abs(domainRows.range.posMax - twin.posMax));
+    const ok = Number.isFinite(d) && d <= TOL_RANGE_YEARS;
+    if (!ok) fail++;
+    console.log(`${ok ? '  ok ' : 'FAIL '} navigable range browser/twin  [${domainRows.range.posMin}, ${domainRows.range.posMax}] / [${twin.posMin}, ${twin.posMax}]`);
   }
 }
 

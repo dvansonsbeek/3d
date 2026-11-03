@@ -206,9 +206,27 @@ function createDeepTimeLod(deps) {
 
   /** @param {number} t_Ma @returns {number|null} tropical seconds / LOD(t) */
   function yearInDaysAtAge(t_Ma) {
-    const LOD_s = lodSecondsAtAge(t_Ma);
-    if (LOD_s === null) return null;
-    return tropicalYearSecondsAtAge(t_Ma) / LOD_s;
+    // the SOLAR day of date (the kinematic mean LOD plus the ecliptic missing-motion term): the
+    // day the UT clock counts — the same day the ΔT integral divides by (doc 111 §1.36)
+    const day = solarDaySecondsAtAge(t_Ma);
+    if (day === null) return null;
+    return tropicalYearSecondsAtAge(t_Ma) / day;
+  }
+
+  /**
+   * The mean SOLAR day of date, seconds: the kinematic mean LOD plus the ecliptic
+   * missing-motion term below — the day the UT clock counts. ONE home: the days per
+   * year of date (the position tables' integrand) and the ΔT integral both divide by
+   * THIS day; the former ΔT integrand divided by 86,400 (SI days per year), 0.02 % low
+   * at 1 Ma, 7 % at 400 Ma, 26 % at 2 Ga, 42 % at the Earth–Moon genesis (doc 111 §1.36).
+   * @param {number} t_Ma @returns {number|null} seconds (null past tidal lock)
+   */
+  function solarDaySecondsAtAge(t_Ma) {
+    const lodMean = lodSecondsAtAge(t_Ma);
+    if (lodMean === null) return null;
+    const corr = eclipticLodCorrectionSecondsAtAge(t_Ma);
+    if (corr === null) return null;
+    return lodMean + corr;
   }
 
   /**
@@ -231,40 +249,81 @@ function createDeepTimeLod(deps) {
   }
 
   /**
-   * RAW ΔT integral relative to J2000 (0 at t=0 by convention) — Simpson
-   * over the kinematic LOD plus the ecliptic missing-motion term, WITHOUT the
-   * cycle corrections and WITHOUT a cache. The engines wrap this: flag-keyed
+   * The raw ΔT integrand at an age: seconds of ΔT per Myr of TT. ΔT grows by (86,400 − LOD)
+   * per SOLAR day, and a year of date holds yearS/LOD solar days — the UT clock counts solar
+   * days, never SI days (a former /86,400 read 0.02 % low at 1 Ma, 7 % at 400 Ma, 26 % at
+   * 2 Ga, 42 % at the genesis: doc 111 §1.36). The day is the solar day of date: the
+   * kinematic mean LOD plus the ecliptic "missing motion" — the solar day is measured against
+   * the Sun on the ECLIPTIC, whose plane turns on the invariable plane at the nodal rate s₃
+   * (period ≈ 68,751 yr, an orbital quantity), not in the inclination frame; ~3.4 ms at
+   * J2000; the fitted cycle stack closes Layer-4 LOD_real onto the USNO anchor. Spelled from
+   * the node's own lodMean and yearS — the same operations as eclipticLodCorrectionSecondsAtAge.
+   * @param {number} tau @returns {number} s/Myr (NaN past tidal lock)
+   */
+  function deltaTRawIntegrandAtAge(tau) {
+    const lodMean = lodSecondsAtAge(tau);
+    if (lodMean === null) return NaN;
+    const yearS = tropicalYearSecondsFromLod(tau, lodMean);
+    const lodH5Raw = lodMean + lodMean / (deps.nodalPeriodYearsFn() * (yearS / 86400));
+    return (86400 - lodH5Raw) * yearS * 1e6 / lodH5Raw;
+  }
+
+  /** Simpson over [a, b] on the integrand with a midpoint (exact for a quadratic). @param {number} a @param {number} b @returns {number} */
+  const simpsonCell = (a, b) => {
+    const f0 = deltaTRawIntegrandAtAge(a), fm = deltaTRawIntegrandAtAge((a + b) / 2), f1 = deltaTRawIntegrandAtAge(b);
+    return (f0 + 4 * fm + f1) * (b - a) / 6;
+  };
+  // The cumulative table of the raw integral, two tiers grown lazily outward from J2000 per
+  // direction: 100-yr cells to ±1 Myr (the era's precision — the GIA channel's 20-kyr lines
+  // modulate the integrand, and one 10-kyr Simpson cell read 341 s at −10 kyr, 1e-3 of ΔT),
+  // 10-kyr cells beyond — prefix sums of per-cell Simpson (quadratic in the integrand per
+  // cell), read in O(1) with a Simpson over the partial cell. The former per-call Simpson with
+  // ≤ 1,024 nodes read 4e-5 (two days) at −1 Myr on 31-kyr nodes and 3e-6 at the genesis on
+  // 4.3-Myr nodes, and cost 26 ms per uncached call at the edge — the UT→TT bridge's Newton
+  // solve (phase/deep-calendar) calls this a dozen times per read.
+  const DELTAT_FINE_CELL_MA = 1e-4, DELTAT_FINE_LIMIT_MA = 1, DELTAT_COARSE_CELL_MA = 0.01, DELTAT_SEGMENT_CELLS = 1000;
+  const DELTAT_FINE_CELLS = Math.round(DELTAT_FINE_LIMIT_MA / DELTAT_FINE_CELL_MA);
+  /** @typedef {{ fine: number[], coarse: number[] }} DeltaTTier the prefix sums at cell edges (index k = k cells from the tier's origin) */
+  /** @type {{ past: DeltaTTier, future: DeltaTTier }} */
+  const deltaTPrefix = { past: { fine: [0], coarse: [] }, future: { fine: [0], coarse: [] } };
+  /** @param {number[]} P @param {number} dir @param {number} originMa @param {number} cellMa @param {number} cells */
+  const growDeltaTPrefix = (P, dir, originMa, cellMa, cells) => {
+    const target = Math.ceil((cells + 1) / DELTAT_SEGMENT_CELLS) * DELTAT_SEGMENT_CELLS;
+    for (let k = P.length; k <= target; k++) {
+      const a = dir * (originMa + (k - 1) * cellMa), b = dir * (originMa + k * cellMa);
+      const prev = P[k - 1];
+      P.push(Number.isNaN(prev) ? NaN : prev + simpsonCell(a, b));
+    }
+  };
+  /**
+   * RAW ΔT integral relative to J2000 (0 at t = 0 by convention) — the cumulative table above
+   * plus the partial cell, WITHOUT the cycle corrections. The engines wrap this: flag-keyed
    * cache + their exact sequential post-integration adds (see the module header).
    * @param {number} t_Ma @returns {number} seconds (NaN past tidal lock)
    */
   function deltaTRawSecondsAtAge(t_Ma) {
     if (t_Ma === 0) return 0;
-    const absSpan = Math.abs(t_Ma);
-    let n = Math.max(32, Math.ceil(absSpan * 10));
-    if (n > 1024) n = 1024;
-    if (n % 2 === 1) n++;
-    const h = t_Ma / n;
-
-    let sum = 0;
-    for (let i = 0; i <= n; i++) {
-      const tau = i * h;
-      const lodMean = lodSecondsAtAge(tau);
-      if (lodMean === null) return NaN;
-      const yearS = tropicalYearSecondsFromLod(tau, lodMean);
-      // Ecliptic "missing motion" — the solar day is measured against the
-      // Sun on the ECLIPTIC, whose plane turns on the invariable plane at the
-      // nodal rate s₃ (period ≈ 68,751 yr, an orbital quantity), not in the
-      // inclination frame. Adds ~3.4 ms at J2000; the fitted cycle stack
-      // closes Layer-4 LOD_real onto the USNO anchor. Non-null: the helper
-      // can only be null when lodSecondsAtAge(tau) is null, which already
-      // returned NaN above. Spelled inline from the node's own lodMean and
-      // yearS — the same operations as eclipticLodCorrectionSecondsAtAge(tau).
-      const lodH5Raw = lodMean + lodMean / (deps.nodalPeriodYearsFn() * (yearS / 86400));
-      const integrand = (86400 - lodH5Raw) * yearS * 1e6 / 86400;
-      const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
-      sum += w * integrand;
+    if (!Number.isFinite(t_Ma)) return NaN;
+    const dir = t_Ma > 0 ? 1 : -1, tier = dir > 0 ? deltaTPrefix.past : deltaTPrefix.future;
+    const absT = Math.abs(t_Ma);
+    if (absT <= DELTAT_FINE_LIMIT_MA) {
+      const k = Math.floor(absT / DELTAT_FINE_CELL_MA);
+      if (tier.fine.length <= k) growDeltaTPrefix(tier.fine, dir, 0, DELTAT_FINE_CELL_MA, Math.min(k, DELTAT_FINE_CELLS));
+      const base = tier.fine[k];
+      if (base === undefined || Number.isNaN(base)) return NaN;
+      const edge = dir * k * DELTAT_FINE_CELL_MA;
+      return edge === t_Ma ? base : base + simpsonCell(edge, t_Ma);
     }
-    return (sum * h) / 3;
+    if (tier.coarse.length === 0) {
+      if (tier.fine.length <= DELTAT_FINE_CELLS) growDeltaTPrefix(tier.fine, dir, 0, DELTAT_FINE_CELL_MA, DELTAT_FINE_CELLS);
+      tier.coarse.push(tier.fine[DELTAT_FINE_CELLS]);   // the coarse tier's origin: the fine tier's end
+    }
+    const k = Math.floor((absT - DELTAT_FINE_LIMIT_MA) / DELTAT_COARSE_CELL_MA);
+    if (tier.coarse.length <= k) growDeltaTPrefix(tier.coarse, dir, DELTAT_FINE_LIMIT_MA, DELTAT_COARSE_CELL_MA, k);
+    const base = tier.coarse[k];
+    if (base === undefined || Number.isNaN(base)) return NaN;
+    const edge = dir * (DELTAT_FINE_LIMIT_MA + k * DELTAT_COARSE_CELL_MA);
+    return edge === t_Ma ? base : base + simpsonCell(edge, t_Ma);
   }
 
   /** Layer 3/4 LOD: tidal mean + the gated cycle δLOD sum.
@@ -362,7 +421,7 @@ function createDeepTimeLod(deps) {
     // the same law on a caller-supplied LOD (the browser's L1-α sensitivity sweep)
     tropicalYearSecondsFromLod,
     // the solar day's ecliptic missing-motion term on the nodal period (one home)
-    eclipticLodCorrectionSecondsAtAge,
+    eclipticLodCorrectionSecondsAtAge, solarDaySecondsAtAge,
     yearInDaysAtAge, deltaTRawSecondsAtAge, lodSecondsWithCorrectionsAtAge,
     dLodDtDecompositionAtAge,
   };

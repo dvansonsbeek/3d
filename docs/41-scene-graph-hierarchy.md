@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.6
-coefficients: sha256:f208ad9b25f7164d
+modelVersion: v27.7
+coefficients: sha256:3afe3e8645567bc8
 status: current
 ---
 
@@ -493,6 +493,8 @@ keeps its snapshot form for the no-chain bodies.
 
 The asymmetric time-base treatment (Moon-chain stays on UT, planet orbitals go to TT) is principled, not arbitrary: the eclipse-visibility validation was co-developed under the Moon-chain UT convention, while planets have no analogous validation tied to the time-base choice.
 
+**The one deep clock (plan 27, doc 111 §1.36).** The scene's time coordinate `pos` is a tropical-year count of date from the scene epoch; its TT instant is the package calendar's position table (`phase/deep-calendar`, SI days per tropical year of date, one home with the Node twin and the model's own bridge); the UT Julian Day the scene navigates and labels by — the solar-day count the UT clock keeps — is that instant minus the engine's full ΔT, and a UT→position read solves that bridge implicitly (`jdUTToYear`). So a label's age IS the age the physics draws: the epoch anchors, the Moon's ring and the Predictions rows read one age with the rendered Moon, Sun and frame. **The label seam:** inside ±3,000 yr of J2000 the Date is the civil calendar date of the UT Julian Day (`daysToDate`); beyond it the civil count of a UT day count is ΔT from the age drawn (123 yr at −1 Myr, 341 Myr at −2 Gyr), so the Date is the position's year written as a season date — the year's fraction on a 365.2422-day proleptic year's months (`sceneDateLabel`, inverse `posFromDateTime`), the Time (UTC) field the solar day's own clock as always. At the seam the two labels differ by ΔT(3 kyr) = 7 h, below the day resolution. The render loop derives `o.julianDay` from the position (`jdFromPos`), never from the strings.
+
 ### 15.3 Both modes use the same scene graph
 
 The scene-graph hierarchy from Parts 3, 7, and 8 is identical in both modes. The only difference is **how each node's rotation is computed each frame**:
@@ -508,7 +510,7 @@ The dLOD/dt layers (L1 tidal baseline · L2 + GIA α(t) · L3 + 4-flag ΔT stack
 
 | Consumer | Layers applied | Where / why |
 |---|---|---|
-| **Ephemeris & eclipse chain** | **Full Layer 4** | `meanDeltaTSecondsAtAge()` integrates the Layer-2 LOD (tidal + GIA) with the ecliptic missing-motion kinematic term (on the nodal period T_s₃, doc 11; the code identifier keeps its historical `h5` name), then adds the 4-flag stack + the Core-mantle swing post-integration (each component zero-anchored at J2000). Feeds `_eclDeltaT()` → JD_UT → JD_TT inside every Meeus wrapper (`_eclSunLon`, `_eclMoonLon`, …) and the TT-anchored planet integrators (`_currentYearSI_TT`). All validated rotation claims (26-event solar audit, 267-event lunar test, ΔT charts) run through this path. |
+| **Ephemeris & eclipse chain** | **Full Layer 4** | `meanDeltaTSecondsAtAge()` integrates the Layer-2 LOD (tidal + GIA) with the ecliptic missing-motion kinematic term (on the nodal period T_s₃, doc 11; the code identifier keeps its historical `h5` name), then adds the 4-flag stack + the Core-mantle swing post-integration (each component zero-anchored at J2000). Read through the ONE bridge (plan 27, doc 111 §1.36): the package calendar's implicit solve — the raw integral at the TT age the UT count has reached, the era corrections at the civil calendar year (`meanDeltaTSecondsAtAges(tMaRaw, tMaCorrections)`), a Newton step with slope 86,400/LOD — which `_sceneJdTT`, the Moon series, the model's finders, the besselian tier and the Node twin all call; the position table (SI days per tropical year of date, `phase/deep-calendar`, built and read under the shipped α) gives the TT instant of a position and the UT Julian Day is that instant minus the full ΔT. All validated rotation claims (26-event solar audit, 267-event lunar test, ΔT charts) run through this path. |
 | **Deep-time epoch anchors** | **Layer 2 only** | `recomputeEpochAnchors()` sets `meanlengthofday` from `meanLodSecondsAtAge()` (tidal + GIA). The stack + swing are a zero-mean ±ms *modulation* around the epoch mean, so folding them into the mean-LOD anchor would inject a phase-dependent offset into every derived day count. `meanLodSecondsWithCorrectionsAtAge()` exists for consistency with the corrected ΔT curve and is consumed only by the ESSRT modal display. |
 | **Visible scene-graph spin** | **The tier's GMST at the scene's UT JD** | The Earth's `rotation.y` is `createModel().eclipse.gmstDegAtJD(jdUT) − 270°` every frame — the ONE Earth rotation angle the certified umbra, the observer tier and the audits read (doc 111 §1.34), linear in UT; ΔT reaches the Sun and Moon reads, never the spin. It is explicitly **not** a deep-time rotation-phase claim: the formula's T² term is the IAU precession-in-RA polynomial, era-load-bearing and meaningless at −2 Gyr (its bounded twin is an open B entry). |
 

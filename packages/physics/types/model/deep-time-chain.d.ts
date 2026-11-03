@@ -78,6 +78,7 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
         };
         earthMoiFactorAtAge: (tMa: number) => number;
         withLatticeAlpha: (build: () => void) => void;
+        withShippedAlpha: (build: () => void) => void;
         j2RatioAtYear: (year: number) => number;
         iEarthAtAge: (tMa: number) => number;
         recession: {
@@ -118,6 +119,7 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
             tropicalYearDaysAtAge: (t_Ma: number) => number | null;
             tropicalYearSecondsFromLod: (t_Ma: number, LOD_s: number | null) => number;
             eclipticLodCorrectionSecondsAtAge: (t_Ma: number) => number | null;
+            solarDaySecondsAtAge: (t_Ma: number) => number | null;
             yearInDaysAtAge: (t_Ma: number) => number | null;
             deltaTRawSecondsAtAge: (t_Ma: number) => number;
             lodSecondsWithCorrectionsAtAge: (t_Ma: number) => number | null;
@@ -185,7 +187,9 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
         meanTropicalYearSecondsAtAge: (t_Ma: number) => number;
         meanTropicalYearDaysAtAge: (t_Ma: number) => number | null;
         meanYearInDaysAtAge: (t_Ma: number) => number | null;
+        meanSolarDaySecondsAtAge: (t_Ma: number) => number | null;
         meanDeltaTSecondsAtAge: (tMa: number) => number;
+        meanDeltaTSecondsAtAges: (tMaRaw: number, tMaCorrections: number) => number;
         bondCycleDeltaTCorrection: (year: number) => number;
         hallstattCycleDeltaTCorrection: (year: number) => number;
         jose5CycleDeltaTCorrection: (year: number) => number;
@@ -254,6 +258,7 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
         tropicalYearDaysAtAge: (t_Ma: number) => number | null;
         tropicalYearSecondsFromLod: (t_Ma: number, LOD_s: number | null) => number;
         eclipticLodCorrectionSecondsAtAge: (t_Ma: number) => number | null;
+        solarDaySecondsAtAge: (t_Ma: number) => number | null;
         yearInDaysAtAge: (t_Ma: number) => number | null;
         deltaTRawSecondsAtAge: (t_Ma: number) => number;
         lodSecondsWithCorrectionsAtAge: (t_Ma: number) => number | null;

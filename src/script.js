@@ -679,11 +679,6 @@ const ASTRO_REFERENCE = {
 };
 
 const perihelionalignmentJD = Math.round(startmodelJD - (meansolaryearlengthinDays * (startmodelYear - perihelionalignmentYear)));   // on the epoch itself
-// Perihelion-calendar walk-start hint (shared by dayToPerihelionCalendarDate
-// and dateToPerihelionJulianDay — see the docstring there). Declared HERE
-// because module-init code calls the converters long before their own
-// declarations run (the C1 hover-TDZ class).
-let _periCalHintYear = 0, _periCalHintDays = 0;
 // Sidereal year in days at J2000 — the IAU input (365.256363004); the same
 // value as meansiderealyearlengthinDays_kinematic below.
 let   meansiderealyearlengthinDays = ASTRO_REFERENCE.siderealYearJ2000;  // Phase 1: mutable for deep-time mode
@@ -2731,8 +2726,6 @@ const _CUMUL_INTEGRAL_YEAR_MAX = NAVIGABLE_FUTURE_YEARS;
 const _CUMUL_INTEGRAL_STEP     = 10000;
 // Grid geometry for the pos table below (the deep calendar computes the same
 // two numbers for its own table).
-function _cumulIntegralJ2000IdxGet() { return Math.round((startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP); }
-function _cumulIntegralLength() { return Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1; }
 
 // ───── The deep-time calendar — ONE home (year/day collapse) ─────
 // year → JD by the ∫ daysPerYear dt table on the deep-time grid and the
@@ -2752,7 +2745,10 @@ function _deepCal() {
   if (_deepCalM !== null) return _deepCalM;
   _deepCalM = createDeepCalendar({
     meanYearInDaysAtAgeMa: meanYearInDaysAtAge,
+    meanTropicalYearDaysAtAgeMa: meanTropicalYearDaysAtAge,
     withLatticeAlpha: _withLatticeAlpha,
+    withShippedAlpha: (build) => _dtc().withShippedAlpha(build),
+    deltaTSecondsAtAges: (tMaRaw, tMaCorrections) => _dtc().meanDeltaTSecondsAtAges(tMaRaw, tMaCorrections),
     startModelJD: startmodelJD,
     startModelYear: startmodelYear,
     startModelYearWithCorrection: startmodelYear,   // the SI-year label anchors on the epoch itself
@@ -2784,132 +2780,94 @@ function yearToJD(year) { return _deepCal().yearToJD(year); }
 //
 // Uses the REAL α(t), not the α reference: this is a physical time
 // conversion, not a table build.
-let _cumulPosTable = null;
-const _posDpy = (year) => meanTropicalYearDaysAtAge((startmodelYear - year) / 1e6);
-// Anchor cell: integer index and startmodelYear's offset (years) inside it.
-let _posAnchorLo = null, _posAnchorDy0 = null;
-function _posAnchorLoIdx() {
-  if (_posAnchorLo === null) {
-    _posAnchorLo = Math.floor((startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
-    _posAnchorDy0 = startmodelYear - (_CUMUL_INTEGRAL_YEAR_MIN + _posAnchorLo * _CUMUL_INTEGRAL_STEP);
-  }
-  return _posAnchorLo;
-}
-function _posAnchorDy() { _posAnchorLoIdx(); return _posAnchorDy0; }
+// PLAN 27 (doc 111 §1.36): the position table is the package calendar's — ONE home with the
+// Node twin and with the model's own UT→TT bridge. `pos` counts TROPICAL YEARS OF DATE since
+// the scene epoch; its TT instant is the table's (SI days); the UT Julian Day the scene
+// navigates and labels by is that instant minus the engine's full ΔT — the solar-day count
+// the UT clock keeps. The former local table integrated SI days per year and read the UT
+// count as if it were that integral, so beyond the era every position-fed label (the Date,
+// the epoch anchors, the Moon's ring) sat ΔT from the age the physics drew: 123 yr at
+// −1 Myr, 341 Myr at −2 Gyr (the rendered Moon was the 1.66-Ga one), 1.34 Gyr at the edge.
+// Out of the table's domain the linear count stands in, as before (plan 27 step B clamps).
 
-function _ensureCumulPosTable() {
-  if (_cumulPosTable !== null) return;
-  const N = _cumulIntegralLength();             // grid geometry
-  const j2000Idx = _cumulIntegralJ2000IdxGet();
-  _cumulPosTable = new Float64Array(N);
-
-  const dpy = _posDpy;
-
-  const gridYearAtJ2000Idx = _CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP;
-  _cumulPosTable[j2000Idx] = -(startmodelYear - gridYearAtJ2000Idx) * dpy(startmodelYear);
-
-  let prev = dpy(gridYearAtJ2000Idx);
-  for (let i = j2000Idx + 1; i < N; i++) {
-    const curr = dpy(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
-    _cumulPosTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulPosTable[i - 1]))
-      ? _cumulPosTable[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP : NaN;
-    prev = curr;
-  }
-  prev = dpy(gridYearAtJ2000Idx);
-  for (let i = j2000Idx - 1; i >= 0; i--) {
-    const curr = dpy(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
-    _cumulPosTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulPosTable[i + 1]))
-      ? _cumulPosTable[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP : NaN;
-    prev = curr;
-  }
-
-  // Normalise so jdFromPos(0) === startmodelJD exactly. Without this the anchor
-  // cell carries a partial-cell artifact (seeded by linear extrapolation, read
-  // by interpolation across a 10-kyr cell) worth a constant 37 s.
-  // Must use the SAME analytic sub-cell integration the reader uses.
-  const lo0n = _posAnchorLoIdx(), dy0n = _posAnchorDy();
-  const yLo0n = _CUMUL_INTEGRAL_YEAR_MIN + lo0n * _CUMUL_INTEGRAL_STEP;
-  const v0 = _cumulPosTable[lo0n] + 0.5 * (_posDpy(yLo0n) + _posDpy(startmodelYear)) * dy0n;
-  if (Number.isFinite(v0)) for (let i = 0; i < N; i++) _cumulPosTable[i] -= v0;
-}
-
-/** Scene time coordinate → Julian Date. pos = 0 returns startmodelJD exactly. */
+/** Scene time coordinate → the UT Julian Date. pos = 0 returns startmodelJD exactly. */
 function jdFromPos(pos) {
   if (!DEEP_TIME_MODE_ENABLED) return startmodelJD + pos / sDay;
   if (!Number.isFinite(pos)) return null;
-  _ensureCumulPosTable();
-  // Years from the anchor cell's lower edge — never via the absolute index
-  // fraction (idxF0 ~50,000 loses 1.1e-11, × STEP = 4e-5 d).
-  const lo0 = _posAnchorLoIdx();
-  const total = _posAnchorDy() + pos;
-  const k = Math.floor(total / _CUMUL_INTEGRAL_STEP);
-  const dyCell = total - k * _CUMUL_INTEGRAL_STEP;
-  const lo = lo0 + k;
-  if (lo < 0 || lo >= _cumulPosTable.length - 1) return startmodelJD + pos / sDay;
-  const a = _cumulPosTable[lo];
-  if (Number.isNaN(a)) return startmodelJD + pos / sDay;
-  // Integrate analytically across the partial cell: linear interpolation returns
-  // the cell's CHORD slope (the year length at the cell MIDPOINT), which on a
-  // 10-kyr grid is 18.6 ms of year length at J2000.
-  const yLo = _CUMUL_INTEGRAL_YEAR_MIN + lo * _CUMUL_INTEGRAL_STEP;
-  const f0 = _posDpy(yLo), f1 = _posDpy(yLo + dyCell);
-  if (f0 === null || f1 === null) return startmodelJD + pos / sDay;
-  return startmodelJD + a + 0.5 * (f0 + f1) * dyCell;
+  const jd = _deepCal().yearToJDUT(startmodelYear + pos);
+  return jd === null ? startmodelJD + pos / sDay : jd;
 }
 
-/** Julian Date → scene time coordinate. Exact inverse of jdFromPos.
- *  Seeded from the linear estimate — this is on the hot path. */
+/** The TT instant of a scene time coordinate (SI days of the same position). */
+function jdTTFromPos(pos) {
+  if (!DEEP_TIME_MODE_ENABLED) return startmodelJD + pos / sDay;
+  if (!Number.isFinite(pos)) return null;
+  const jd = _deepCal().yearToJDTT(startmodelYear + pos);
+  return jd === null ? startmodelJD + pos / sDay : jd;
+}
+
+/** UT Julian Date → scene time coordinate. Exact inverse of jdFromPos. */
 function posFromJD(jd) {
   if (!DEEP_TIME_MODE_ENABLED) return sDay * (jd - startmodelJD);
   if (!Number.isFinite(jd)) return null;
-  _ensureCumulPosTable();
-  const N = _cumulPosTable.length;
-  const target = jd - startmodelJD;
-  let lo = 0, hi = N - 1;
-  while (lo < N && Number.isNaN(_cumulPosTable[lo])) lo++;
-  while (hi >= 0 && Number.isNaN(_cumulPosTable[hi])) hi--;
-  if (lo >= hi) return sDay * (jd - startmodelJD);
-  if (target < _cumulPosTable[lo] || target > _cumulPosTable[hi]) return sDay * (jd - startmodelJD);
-
-  const guessYear = startmodelYear + target / SI_TROPICAL_YEAR_DAYS;
-  let g = Math.floor((guessYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
-  if (g < lo) g = lo; if (g > hi - 1) g = hi - 1;
-  if (_cumulPosTable[g] <= target && _cumulPosTable[g + 1] >= target) {
-    lo = g; hi = g + 1;
-  } else {
-    let span = 1, a = g, b = g;
-    while (span < N) {
-      a = Math.max(lo, g - span); b = Math.min(hi, g + span);
-      if (_cumulPosTable[a] <= target && _cumulPosTable[b] >= target) break;
-      span <<= 1;
-    }
-    lo = a; hi = b;
-    while (lo < hi - 1) {
-      const mid = (lo + hi) >> 1;
-      if (_cumulPosTable[mid] <= target) lo = mid; else hi = mid;
-    }
-  }
-  // Solve within the cell against the SAME analytic sub-integration jdFromPos
-  // uses, so the two are exact inverses.
-  const a2 = _cumulPosTable[lo];
-  const yLo = _CUMUL_INTEGRAL_YEAR_MIN + lo * _CUMUL_INTEGRAL_STEP;
-  const f0 = _posDpy(yLo);
-  let dy = (_cumulPosTable[hi] === a2) ? 0
-         : (target - a2) / (_cumulPosTable[hi] - a2) * _CUMUL_INTEGRAL_STEP * (hi - lo);
-  for (let it = 0; it < 4; it++) {
-    const f1 = _posDpy(yLo + dy);
-    if (f1 === null) break;
-    const g = a2 + 0.5 * (f0 + f1) * dy - target;
-    if (Math.abs(g) < 1e-11) break;
-    dy -= g / f1;
-  }
-  return (lo - _posAnchorLoIdx()) * _CUMUL_INTEGRAL_STEP - _posAnchorDy() + dy;
+  const year = _deepCal().jdUTToYear(jd);
+  return year === null ? sDay * (jd - startmodelJD) : year - startmodelYear;
 }
 
-/** Civil date+time → scene time coordinate. Deliberately routes through
- *  dateToDays (NOT dateTimeToJulianDay) to preserve its calendar convention
- *  for pre-GREGORIAN_START dates; only the day fraction comes from timeToPos. */
+/** The navigable position range {posMin, posMax} — the calendar's position table's finite extent. */
+function navigablePosRange() {
+  const r = _deepCal().navigableYearRange();
+  return { posMin: r.yearMin - startmodelYear, posMax: r.yearMax - startmodelYear };
+}
+
+// ── THE LABEL SEAM (plan 27, doc 111 §1.36) ──────────────────────────────────────────────
+// Inside ±DEEP_LABEL_SEAM_YEARS of J2000 the Date is the CIVIL calendar date of the UT Julian
+// Day (the records' axis, unchanged). Beyond it the civil count of a UT day count means
+// nothing — it is ΔT from the age the physics is drawn at — so the Date is the POSITION's
+// year (the tropical-year count of date, the age the scene renders) written as a date: the
+// year's fraction mapped onto a 365.2422-day proleptic year's months (a season date), the
+// Time (UTC) field the solar day's own clock as always. At the seam the two labels differ
+// by ΔT(3,000 yr) = 7 h, below the deep label's day resolution.
+const DEEP_LABEL_SEAM_YEARS = 3000;
+const _SEASON_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+/** The scene's year of date for a UT Julian Day: the civil decimal year inside the seam, the
+ *  position's year beyond (the age every epoch anchor and the Moon's ring then read). */
+function sceneYearOfDate(jdUT) {
+  const civil = julianDateToDecimalYear(jdUT);
+  if (!DEEP_TIME_MODE_ENABLED || Math.abs(civil - J2000_CALENDAR_YEAR) <= DEEP_LABEL_SEAM_YEARS) return civil;
+  const pos = posFromJD(jdUT);
+  return pos === null ? civil : startmodelYear + pos;
+}
+/** The Date string for a position: civil inside the seam, the season date of the position's year beyond. */
+function sceneDateLabel(pos) {
+  if (!DEEP_TIME_MODE_ENABLED || Math.abs(pos) <= DEEP_LABEL_SEAM_YEARS) return daysToDate(posToDays(pos));
+  const year = startmodelYear + pos;
+  const y = Math.floor(year);
+  let doy = Math.floor((year - y) * 365.2422);   // 0-based day of a 365.2422-day year
+  let m = 0;
+  while (m < 11 && doy >= _SEASON_MONTH_DAYS[m]) { doy -= _SEASON_MONTH_DAYS[m]; m++; }
+  const d = Math.min(doy + 1, _SEASON_MONTH_DAYS[m]);
+  return `${y}-${pad2(m + 1)}-${pad2(d)}`;
+}
+/** The inverse of the deep label: a season date's year fraction. */
+function _yearFractionFromSeasonDate(month, day) {
+  let doy = 0;
+  for (let i = 0; i < month - 1 && i < 12; i++) doy += _SEASON_MONTH_DAYS[i];
+  return (doy + (day - 1) + 0.5) / 365.2422;
+}
+/** Date+time → scene time coordinate. Inside the seam the civil route (dateToDays, NOT
+ *  dateTimeToJulianDay, to keep its pre-reform convention; the day fraction from timeToPos).
+ *  Beyond it the label is the position's year: the season date's fraction plus the time as a
+ *  fraction of the solar day of date. */
 function posFromDateTime(dateStr, timeStr) {
+  const dm = /^(-?\d+)-(\d{1,2})-(\d{1,2})$/.exec(dateStr);
+  const y = dm ? parseInt(dm[1], 10) : NaN;
+  if (DEEP_TIME_MODE_ENABLED && Number.isFinite(y) && Math.abs(y - J2000_CALENDAR_YEAR) > DEEP_LABEL_SEAM_YEARS) {
+    const year = y + _yearFractionFromSeasonDate(parseInt(dm[2], 10), parseInt(dm[3], 10));
+    const dayFraction = timeToPos(timeStr) / sDay;                       // the time as a fraction of a day
+    const daysPerYear = meanYearInDaysAtAge((startmodelYear - year) / 1e6);   // solar days in this year of date
+    return year - startmodelYear + (daysPerYear ? dayFraction / daysPerYear : 0);
+  }
   return posFromJD(startmodelJD + dateToDays(dateStr) + timeToPos(timeStr) / sDay);
 }
 
@@ -3214,7 +3172,13 @@ const STARTMODEL_YEAR_SI = _jdToSIyear(startmodelJD);
 function _sceneJdTT(jdUT) {
   let jdTT = jdUT;
   if (DEEP_TIME_MODE_ENABLED) {
-    const dT = meanDeltaTSecondsAtAge((J2000_CALENDAR_YEAR - julianDateToDecimalYear(jdUT)) / 1e6);
+    // PLAN 27 (doc 111 §1.36): the ONE bridge — the package calendar's implicit solve (the raw
+    // integral at the TT age the UT count has reached, the era corrections at the civil year),
+    // the function the model's finders, the besselian tier and the Node twin read; the civil
+    // reading outside the table, as before.
+    const bridged = _deepCal().deltaTSecondsAtJdUT(jdUT);
+    const dT = (bridged !== null && Number.isFinite(bridged)) ? bridged
+      : meanDeltaTSecondsAtAge((J2000_CALENDAR_YEAR - julianDateToDecimalYear(jdUT)) / 1e6);
     if (Number.isFinite(dT)) jdTT = jdUT + (deltaTStart + dT) / SECONDS_PER_DAY;
   }
   return jdTT;
@@ -4093,6 +4057,12 @@ if (typeof window !== 'undefined') {
     setTracing: (on) => { o.traceBtn = !!on; resetAllTraces(); },
     // The scene time coordinate — the perf gate's Play-start row watches it advance.
     scenePos: () => o.pos,
+    // plan 27 (doc 111 §1.36): the one deep clock's reads — the TT instant of a position, the
+    // navigable range, the scene's year of date for a UT JD (the label's axis)
+    jdTTFromPos: (pos) => jdTTFromPos(pos),
+    navigablePosRange: () => navigablePosRange(),
+    sceneYearOfDate: (jdUT) => sceneYearOfDate(jdUT),
+    sceneDateLabel: (pos) => sceneDateLabel(pos),
     // The perihelion-date rows' solve against the certified Sun it rides
     // (plan 20 §1b.11): the instant's JD, the Sun's longitude there and the target.
     perihelionDateProbe: () => {
@@ -4135,7 +4105,7 @@ if (typeof window !== 'undefined') {
         const px = base + i * stepPos;
         // one clock per sample — mirrors the tracePlanet fill loop
         o.julianDay = jdFromPos(px);
-        o.currentYear = julianDateToDecimalYear(o.julianDay);
+        o.currentYear = sceneYearOfDate(o.julianDay);
         moveModel(px);
         earth.containerObj.updateMatrixWorld();
         if (!_chainChainWorldPos(obj, o.julianDay, _tracePos)) {
@@ -4163,9 +4133,6 @@ if (typeof window !== 'undefined') {
     // calendar-conversion test can pin round-trip identity, boundary
     // behavior and ORDER-INDEPENDENCE (a stale hint would break the
     // order test) against goldens recorded before the change.
-    calPerihelionAt: (jd) => dayToPerihelionCalendarDate(jd),
-    calPerihelionJD: (dateStr, timeStr) => dateToPerihelionJulianDay(dateStr, timeStr),
-    calPerihelionEpochJD: () => perihelionalignmentJD,
     // K8b-1 wobble-center probe: world azimuths (around Earth) of the sun,
     // the marker, and the axis's in-plane lean, plus the dec-invariant
     // inputs — the baseline instrument for the solstice-direction fix and
@@ -5333,8 +5300,6 @@ const tracePlanets = [earthWobbleCenter, earthPerihelionFromEarth, mercuryPerihe
 //*************************************************************
 const GREGORIAN_START = { year: 1582, month: 10, day: 15};
 // Start of the Gregorian Calendar in Juliandate (2299160.5)
-const REVISION_START_JD = perihelionalignmentJD;
-// Start of the Revised Julian Calendar in Juliandate
 
 /* vertex: pass UV + world-space normal & position */
 const EARTH_VERT = `
@@ -15346,7 +15311,12 @@ let _epsSeriesDeepRangeYr = { [-1]: 0, [1]: 0 };   // the deep tier's walked spa
 /** The ONE evaluator's sample at a decimal year (per-tier grid cache):
  *  {epsDeg, e, periOfDateDeg, …} — series inside ±10 Myr, the α(H(t))
  *  mode-tail beyond. Both ε and e targets read THIS. */
-function _hybridSeriesSampleAt(year) {
+function _hybridSeriesSampleAt(yearIn) {
+  // PLAN 27 (doc 111 §1.36): a read is CLAMPED to the navigable domain — the spin bank's two
+  // edges (mirror of the package's one-source movement). Beyond the deepest checkpoint the walk
+  // ran unseated into physics the inputs no longer define: a windowed display row sampling
+  // ±10 Myr around the edge held the main thread for 22 minutes after every landing there.
+  const year = Math.max(2000 - NAVIGABLE_PAST_YEARS, Math.min(2000 + NAVIGABLE_FUTURE_YEARS, yearIn));
   const t = year - 2000;
   const need = Math.max(20000, Math.abs(t) * 1.25);
   const span = _hybridTierSpan(need);
@@ -22479,10 +22449,12 @@ function render(now) {
     if (uiElapsed >= 0.05) uiElapsed = 0;
     uiUpdateThisFrame = true;
     o.Day           = posToDays(o.pos);
-    o.Date          = daysToDate(o.Day);
+    o.Date          = sceneDateLabel(o.pos);
     o.Time          = posToTime(o.pos);
-    o.julianDay     = dateTimeToJulianDay(o.Date, o.Time);
-    o.currentYear = julianDateToDecimalYear(o.julianDay)
+    // PLAN 27 (doc 111 §1.36): the JD follows the POSITION — one mapping; the strings are its
+    // display (beyond the label seam the Date is a season date a civil parser would misread).
+    o.julianDay     = jdFromPos(o.pos);
+    o.currentYear = sceneYearOfDate(o.julianDay)
 
     // ───── deep-time auto-sync (gated on DEEP_TIME_MODE_ENABLED) ─────
     // When ON, mutate every deep-time global to the epoch implied by o.currentYear.
@@ -25360,7 +25332,7 @@ function forceSceneUpdate (mode) {
   o.Day           = posToDays(o.pos);
   o.Date          = daysToDate(o.Day);
   o.Time          = posToTime(o.pos);
-  o.currentYear   = julianDateToDecimalYear(o.julianDay); // Required for updatePredictions & updateAscendingNodes
+  o.currentYear   = sceneYearOfDate(o.julianDay); // Required for updatePredictions & updateAscendingNodes
 
   if (mode === 'light') {
     // Tier 1: Need sun.ra, sun.dec, sun.distAU (includes matrix updates)
@@ -31770,8 +31742,10 @@ function updatePosition() {
   // Derive pos from the JD this function already computes, rather than from a
   // second `sDay * days + timeToPos` path — that linear form is only exact for
   // a constant rate (see the pos↔JD block near yearToJD).
-  o.julianDay = dateTimeToJulianDay(o.Date, o.Time);
-  o.pos = posFromJD(o.julianDay);
+  // PLAN 27 (doc 111 §1.36): the strings are parsed on the label's own axis (civil inside the
+  // seam, the position's year beyond) and the JD follows the position — one mapping.
+  o.pos = posFromDateTime(o.Date, o.Time);
+  o.julianDay = jdFromPos(o.pos);
   o.Day = posToDays(o.pos);
   positionChanged = true; // Signal animation loop to update scene
 }
@@ -33448,7 +33422,7 @@ function tracePlanet(obj, pos) {
     iterations++;
     const _sampleJD = jdFromPos(nextPos);
     o.julianDay = _sampleJD;
-    o.currentYear = julianDateToDecimalYear(_sampleJD);
+    o.currentYear = sceneYearOfDate(_sampleJD);
     moveModel(nextPos);
     earth.containerObj.updateMatrixWorld();
     // P5/K5b — chain-driven objects (the seven planets + the perihelion
@@ -33525,7 +33499,7 @@ function moveModel(pos) {
     // bit-equivalent to the snapshot path at the modern epoch.
     let _currentYearSI_TT = _currentYearSI;
     if (DEEP_TIME_MODE_ENABLED) {
-      const _decYear_TT = julianDateToDecimalYear(o.julianDay);
+      const _decYear_TT = sceneYearOfDate(o.julianDay);
       const _tMa_TT     = (J2000_CALENDAR_YEAR - _decYear_TT) / 1e6;
       const _dT_s_TT    = meanDeltaTSecondsAtAge(_tMa_TT);
       if (Number.isFinite(_dT_s_TT)) {
@@ -33611,19 +33585,14 @@ function moveModel(pos) {
       // (invisible in the era, 4.3 % at −400 Myr, 14 % at −2 Gyr; doc 111
       // §1.33). Mirror: tools/lib/scene-graph.js.
       if (DEEP_TIME_MODE_ENABLED) {
-        const decYear_d = julianDateToDecimalYear(o.julianDay);
-        const t_Ma_d = (J2000_CALENDAR_YEAR - decYear_d) / 1e6;
-        const deltaT_sec_d = meanDeltaTSecondsAtAge(t_Ma_d);
-        if (Number.isFinite(deltaT_sec_d)) {
-          // THE SCENE CLOCK IS TRUE TT: the model's absolute
-          // ΔT is deltaTStart + curve (the published ΔT surface; the besselian
-          // and the registry instruments add the same bridge). The curve alone
-          // is the eclipse FINDERS' certified axis (_eclDeltaT), which had leaked
-          // into the scene: at true UT the scene Moon sat 30″ west (0.549″/s ×
-          // deltaTStart), the Sun 2.2″. Mirror: tools/lib/scene-graph.js
-          // _jdTTToolsFromUT.
-          d += (deltaTStart + deltaT_sec_d) / SECONDS_PER_DAY;   // JD_UT → JD_TT (absolute)
-        }
+        // THE SCENE CLOCK IS TRUE TT: the model's absolute ΔT is deltaTStart + curve (the
+        // published ΔT surface; the besselian and the registry instruments add the same
+        // bridge). The curve alone is the eclipse FINDERS' certified axis, which had leaked
+        // into the scene: at true UT the scene Moon sat 30″ west (0.549″/s × deltaTStart),
+        // the Sun 2.2″. PLAN 27 (doc 111 §1.36): the ONE bridge, _sceneJdTT — this block
+        // carried its own read of the curve at the label's age, a third bridge.
+        // Mirror: tools/lib/scene-graph.js _jdTTToolsFromUT.
+        d = _sceneJdTT(o.julianDay) - j2000JD;   // JD_UT → JD_TT (absolute), as days from J2000 TT
       }
       // The full production evaluation lives in
       // @essrt/physics/moon/series (args dispatch, E-factor, A1/A2/A3 with
@@ -36327,7 +36296,7 @@ function dayToDate(jd) {
  *
  * @param {number} day      — the input day count (may be fractional)
  * @param {'julianday'|'perihelionday'} inputKind
- * @param {'julian-gregorian-calendar'|'perihelion-calendar'} outputKind
+ * @param {'julian-gregorian-calendar'} outputKind (the former perihelion calendar — a display convention counting from the alignment epoch with a Revised Julian rule — was retired with plan 27: no surface read it)
  * @returns {{ calendar: string, date: string, time: string }}
  * @throws {TypeError|Error} on bad input
  */
@@ -36348,12 +36317,9 @@ function dayToDateNew(day, inputKind, outputKind) {
       `dayToDateNew: inputKind must be 'julianday' or 'perihelionday'`
     );
   }
-  if (
-    outputKind !== 'julian-gregorian-calendar' &&
-    outputKind !== 'perihelion-calendar'
-  ) {
+  if (outputKind !== 'julian-gregorian-calendar') {
     throw new TypeError(
-      `dayToDateNew: outputKind must be 'julian-gregorian-calendar' or 'perihelion-calendar'`
+      `dayToDateNew: outputKind must be 'julian-gregorian-calendar'`
     );
   }
 
@@ -36366,12 +36332,8 @@ function dayToDateNew(day, inputKind, outputKind) {
     jd = day + perihelionalignmentJD;  // perihelion-day 0 was exactly JD = perihelionalignmentJD
   }
 
-  // 4) Dispatch to the right formatter
-  if (outputKind === 'julian-gregorian-calendar') {
-    return dayToDate(jd);
-  } else {
-    return dayToPerihelionCalendarDate(jd);
-  }
+  // 4) The civil formatter
+  return dayToDate(jd);
 }
 
 /**
@@ -36468,204 +36430,9 @@ function dateTimeToJulianDay(dateStr, timeStr) {
   return jd0 + dayFraction;
 }
 
-/** Is a year leap under the old Julian rule? */
-function isJulianLeapYear(y) {
-  return (y % 4) === 0;
-}
-
-/** Is a year leap under the Revised-Julian rule? */
-function isRevisedJulianLeapYear(y) {
-  if (y % 4 !== 0) return false;
-  if (y % 100 !== 0) return true;
-  const r = y % 900;
-  return (r === 200 || r === 600);
-}
-
-/**
- * JD → Perihelion calendar date/time (astronomical years, fractional days).
- *
- * WALK-START HINT (plan 02 §11 round 10): the year walk below is a pure
- * prefix sum, so starting from any previously CORRECT (year, daysPassed)
- * pair yields the IDENTICAL result — the hint moves the walk's start
- * point, never its answer (pinned by the order-independence check in
- * test/browser/calendar-conversion.test.mjs, goldens recorded pre-change).
- * Cost falls from O(|epoch distance|) per call (2.46 ms at ±1.5 Myr — the
- * last unbounded-growth term in deep-time updates) to amortized O(Δ)
- * (measured 0.04 µs during playback); a fresh long jump pays one cold
- * walk. Integers throughout stay far below 2^53 — the arithmetic is exact.
- * (_periCalHintYear/_periCalHintDays are declared next to
- * perihelionalignmentJD — module-init callers reach this function before
- * this line runs: the C1 hover-TDZ class.)
- */
-function dayToPerihelionCalendarDate(jd) {
-  // 1) offset so that P=0 at perihelion epoch, integer days at midnight
-  const P = jd - perihelionalignmentJD + 0.5;
-  const Zabs = Math.floor(P);
-  const F = P - Zabs;
-  let   Z = Zabs - _periCalHintDays;   // rebased onto the hinted start
-
-  // 2) peel off whole years forward or backward (from the hinted start)
-  let year       = _periCalHintYear;
-  let daysPassed = _periCalHintDays;   // days from epoch to start of 'year'
-  let daysInYear;
-
-  if (Z >= 0) {
-    // move forward from year=0
-    while (true) {
-      const yearStartJD = perihelionalignmentJD + daysPassed;
-      const useRevised  = yearStartJD >= REVISION_START_JD;
-      const isLeap      = useRevised
-                         ? isRevisedJulianLeapYear(year)
-                         : isJulianLeapYear(year);
-      daysInYear = isLeap ? 366 : 365;
-
-      if (Z >= daysInYear) {
-        Z         -= daysInYear;
-        daysPassed+= daysInYear;
-        year++;
-      } else break;
-    }
-  } else {
-    // move backward from year=0
-    while (Z < 0) {
-      const prevYear = year - 1;
-      // start JD of that previous year:
-      //   = epoch JD + (daysPassed minus daysInPrevYear)
-      const useRevised = (perihelionalignmentJD + daysPassed) >= REVISION_START_JD;
-      const isLeapPrev = useRevised 
-                        ? isRevisedJulianLeapYear(prevYear)
-                        : isJulianLeapYear(prevYear);
-      daysInYear = isLeapPrev ? 366 : 365;
-
-      Z         += daysInYear;
-      daysPassed-= daysInYear;
-      year--;
-    }
-  }
-  _periCalHintYear = year;
-  _periCalHintDays = daysPassed;
-
-  // 3) now Z is day-of-year in [0 .. daysInYear-1]; F is time-fraction
-  //    determine leap-flag for THIS year:
-  const thisYearStartJD = perihelionalignmentJD + daysPassed;
-  const thisUseRevised  = thisYearStartJD >= REVISION_START_JD;
-  const thisIsLeap      = thisUseRevised
-                         ? isRevisedJulianLeapYear(year)
-                         : isJulianLeapYear(year);
-
-  // month/day extraction
-  const monthLengths = [31, thisIsLeap?29:28,31,30,31,30,31,31,30,31,30,31];
-  let  month = 1;
-  let  dayOfYear = Z;
-  for (const ml of monthLengths) {
-    if (dayOfYear >= ml) {
-      dayOfYear -= ml;
-      month++;
-    } else break;
-  }
-  const dayOfMonth = dayOfYear + 1;
-
-  // 4) time from F
-  let hh = Math.floor(F * 24);
-  let mm = Math.floor((F*24 - hh)*60);
-  let ss = Math.floor(((F*24 - hh)*60 - mm)*60 + 0.5);
-  if (ss >= 60) { ss -= 60; mm++; }
-  if (mm >= 60) { mm -= 60; hh++; }
-
-  // zero-pad
-  const p2 = n => n.toString().padStart(2,'0');
-  const p4 = n => {
-    const s = Math.abs(n).toString().padStart(4,'0');
-    return n<0 ? `-${s}` : s;
-  };
-
-  return {
-    calendar: 'Perihelion',
-    date:     `${p4(year)}-${p2(month)}-${p2(dayOfMonth)}`,
-    time:     `${p2(hh)}:${p2(mm)}:${p2(ss)}`
-  };
-}
-
-
-/*––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-  Helper: calendar‐date (perihelion) → Julian Day Number
-––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––*/
-
-function dateToPerihelionJulianDay(dateStr, timeStr) {
-  // parse date (allows "-YYYY")
-  const dm = /^(-?\d+)-(\d{1,2})-(\d{1,2})$/.exec(dateStr);
-  if (!dm) throw new TypeError(
-    `Invalid date "${dateStr}". Expected "YYYY-MM-DD" or "-YYYY-MM-DD".`
-  );
-  const Y = parseInt(dm[1], 10),
-        M = parseInt(dm[2], 10),
-        D = parseInt(dm[3], 10);
-  if (M < 1 || M > 12) throw new TypeError(`Invalid month ${M}`);
-  if (D < 1 || D > 31) throw new TypeError(`Invalid day ${D}`);
-
-  // parse time, special‐case "24:00:00"
-  const tm = /^(\d{1,2}):(\d{1,2}):(\d{1,2})$/.exec(timeStr);
-  if (!tm) throw new TypeError(
-    `Invalid time "${timeStr}". Expected "hh:mm:ss".`
-  );
-  let [ hh, mm, ss ] = tm.slice(1).map(x=>parseInt(x,10));
-  if (hh === 24 && mm === 0 && ss === 0) {
-    // midnight rollover → JD @ next midnight
-    return dateToPerihelionJulianDay(dateStr, '00:00:00') + 1;
-  }
-  if (hh<0||hh>23||mm<0||mm>59||ss<0||ss>59) {
-    throw new TypeError(`Invalid time components in "${timeStr}".`);
-  }
-
-  // 1) days since perihelion‐epoch to the START of year Y
-  // SAME prefix sum as dayToPerihelionCalendarDate (daysAcc at the start
-  // of `year` ≡ its daysPassed), so the two converters SHARE the walk
-  // hint: forward steps add days(year), backward steps subtract
-  // days(year−1) — from any correct (year, daysAcc) pair the result is
-  // identical to the cold walk from zero, in either direction and across
-  // zero (gated by the calendar-conversion round-trip + order checks).
-  let daysAcc = _periCalHintDays, year = _periCalHintYear;
-  for (; year < Y; year++) {
-    const startJD    = perihelionalignmentJD + daysAcc;
-    const useRevised = startJD >= REVISION_START_JD;
-    const isLeap     = useRevised
-                      ? isRevisedJulianLeapYear(year)
-                      : isJulianLeapYear(year);
-    daysAcc += (isLeap ? 366 : 365);
-  }
-  for (; year > Y; year--) {
-    const startJD    = perihelionalignmentJD + daysAcc;
-    const useRevised = startJD >= REVISION_START_JD;
-    const isLeap     = useRevised
-                      ? isRevisedJulianLeapYear(year-1)
-                      : isJulianLeapYear(year-1);
-    daysAcc -= (isLeap ? 366 : 365);
-  }
-  _periCalHintYear = year;
-  _periCalHintDays = daysAcc;
-
-  // 2) add days for the months BEFORE M in year Y
-  //    figure out if year Y is leap
-  const yearStartJD  = perihelionalignmentJD + daysAcc;
-  const useRevisedY  = yearStartJD >= REVISION_START_JD;
-  const isLeapY      = useRevisedY
-                      ? isRevisedJulianLeapYear(year)
-                      : isJulianLeapYear(year);
-  const monthLens    = [31, isLeapY?29:28,31,30,31,30,31,31,30,31,30,31];
-  let dayOfYear      = D - 1;
-  for (let m = 1; m < M; m++) {
-    dayOfYear += monthLens[m-1];
-  }
-
-  // 3) fold into a Julian Day Number
-  //    JD = periAlignJD + daysAcc + dayOfYear + timeFrac - 0.5
-  const timeFrac = hh/24 + mm/1440 + ss/SECONDS_PER_DAY;
-  return perihelionalignmentJD
-       + daysAcc
-       + dayOfYear
-       + timeFrac
-       - 0.5;
-}
+// (The perihelion calendar — a display convention counting from the alignment epoch with a
+// Revised Julian leap rule, its two converters and their walk hint — was retired with plan 27:
+// no surface read it; git history carries it.)
 
 //*************************************************************
 // Date functions

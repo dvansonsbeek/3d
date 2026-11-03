@@ -85,7 +85,16 @@ const model = P.createModel(undefined, {
   spinCheckpointsArtifact: fs.existsSync(path.join(ROOT, 'data/spin-axis-checkpoints.json')) ? JSON.parse(fs.readFileSync(path.join(ROOT, 'data/spin-axis-checkpoints.json'), 'utf8')) : undefined,
 });
 const E = model.eclipse;
-const jdTT = (jd) => jd + (BRIDGE + DT.meanDeltaTSecondsAtAge((C.startmodelYear - jdToDecimalYear(jd)) / 1e6)) / 86400;
+// PLAN 27 (doc 111 §1.36): the gate's own clock reads the ONE bridge — ΔT at the TT instant the
+// UT count has reached — the function the scene twin and the model's finders read. Its former
+// reading at the civil-label age was a THIRD clock (the §1.31 class, in the gate itself): at
+// ±1 Myr the label is 123 yr short of the TT age, 8.8 days of ΔT and a slope wrong by ΔT′² —
+// 0.011″ on the solstice-ε row and −2.9 s on every year row, invisible at the era rows.
+const jdTT = (jd) => {
+  const bridged = DT.deltaTSecondsAtJdUT(jd);
+  const curve = bridged !== null && Number.isFinite(bridged) ? bridged : DT.meanDeltaTSecondsAtAge((C.startmodelYear - jdToDecimalYear(jd)) / 1e6);
+  return jd + (BRIDGE + curve) / 86400;
+};
 const engineYear = (jd) => 2000 + (jdTT(jd) - C.j2000JD) / 365.25;
 const fin = (jd) => jd + BRIDGE / 86400;
 const w180 = (d) => ((d + 540) % 360 + 360) % 360 - 180;

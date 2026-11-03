@@ -51,13 +51,13 @@ const chain = P.createDeepTimeChain({
 });
 
 const {
-  EPOCH_PARAMS, earthMoiFactorAtAge, iEarthAtAge, withLatticeAlpha: _withLatticeAlpha,
+  EPOCH_PARAMS, earthMoiFactorAtAge, iEarthAtAge, withLatticeAlpha: _withLatticeAlpha, withShippedAlpha: _withShippedAlpha,
   certifiedAxialPrecessionJ2000Years, precessionRateJ2000ArcsecPerYr, j2RatioAtYear,
   meanMoonDistanceMetresAtAge, meanMoonDistanceAtAge, meanLodSecondsAtAge, meanLodHoursAtAge,
   meanLunisolarPrecessionRateArcsecPerYrAtAge, meanLunisolarPrecessionPeriodYearsAtAge,
   meanLunisolarTorqueRateArcsecPerYrAtAge, meanLunisolarTorquePeriodYearsAtAge, precessionObliquityFactorAtAge, meanObliquityCitedDegAtAge,
   meanAuAtAge, meanSiderealYearSecondsAtAge, meanTropicalYearSecondsAtAge, meanTropicalYearDaysAtAge, meanYearInDaysAtAge,
-  meanDeltaTSecondsAtAge,
+  meanDeltaTSecondsAtAge, meanDeltaTSecondsAtAges,
   bondCycleDeltaTCorrection, hallstattCycleDeltaTCorrection, jose5CycleDeltaTCorrection, jose4CycleDeltaTCorrection,
   bondCycleLodCorrection, hallstattCycleLodCorrection, jose5CycleLodCorrection, jose4CycleLodCorrection,
   dtCycleLodCorrectionSum, resonatorSwingDeltaTCorrection, resonatorSwingLodCorrection, resonatorSwingLodRate,
@@ -151,8 +151,6 @@ const { NAVIGABLE_PAST_YEARS: _NAV_PAST, NAVIGABLE_FUTURE_YEARS: _NAV_FUTURE } =
 const _CUMUL_INTEGRAL_YEAR_MIN = -_NAV_PAST;
 const _CUMUL_INTEGRAL_YEAR_MAX = _NAV_FUTURE;
 const _CUMUL_INTEGRAL_STEP = 10000;
-function _cumulIntegralJ2000IdxGet() { return Math.round((C.startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP); }
-function _cumulIntegralLength() { return Math.ceil((_CUMUL_INTEGRAL_YEAR_MAX - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP) + 1; }
 
 // Year↔JD under deep time: ONE implementation, @essrt/physics/phase/deep-calendar;
 // each engine builds it from its own grid, days-per-year source and α pin.
@@ -162,7 +160,10 @@ function _deepCal() {
   if (_deepCalM !== null) return _deepCalM;
   _deepCalM = createDeepCalendar({
     meanYearInDaysAtAgeMa: meanYearInDaysAtAge,
+    meanTropicalYearDaysAtAgeMa: meanTropicalYearDaysAtAge,
     withLatticeAlpha: _withLatticeAlpha,
+    withShippedAlpha: _withShippedAlpha,
+    deltaTSecondsAtAges: meanDeltaTSecondsAtAges,
     startModelJD: C.startmodelJD,
     startModelYear: C.startmodelYear,
     startModelYearWithCorrection: C.startmodelYear,
@@ -181,116 +182,41 @@ function siYearToJD(ySI) { return _deepCal().siYearToJD(ySI); }
  *  (constants.js exports a SNAPSHOT `yearToJD`, linear in meanSolarYearDays — the two disagree by −465 d at −100 kyr.) */
 function yearToJDDeepTime(year) { return _deepCal().yearToJD(year); }
 
-// Scene time coordinate ↔ JD (R4): `pos` counts tropical years since startmodelJD;
-// under deep time the conversion is the INTEGRAL of the drifting rate (the
-// rectangle form doubles the accumulated drift). Operation-for-operation the
-// browser twin's (Gate C). Real α(t), not the pinned reference — a physical
-// time conversion, not a count. Out of domain → null, the caller falls back.
-let _cumulPosTable = null;
-const _posDpy = (year) => meanTropicalYearDaysAtAge((C.startmodelYear - year) / 1e6);
-let _posAnchorLo = null, _posAnchorDy0 = null;
-function _posAnchorLoIdx() {
-  if (_posAnchorLo === null) {
-    _posAnchorLo = Math.floor((C.startmodelYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
-    _posAnchorDy0 = C.startmodelYear - (_CUMUL_INTEGRAL_YEAR_MIN + _posAnchorLo * _CUMUL_INTEGRAL_STEP);
-  }
-  return _posAnchorLo;
-}
-function _posAnchorDy() { _posAnchorLoIdx(); return _posAnchorDy0; }
+// Scene time coordinate ↔ JD (R4, plan 27 — doc 111 §1.36): `pos` counts TROPICAL YEARS OF DATE
+// since startmodelJD; the Julian Day it maps to is the UT one — a count of SOLAR days of date,
+// the day the UT clock counts — on the package calendar's position table (ONE home, shared with
+// the browser twin and the model's own UT→TT bridge; the former local table integrated SI days
+// per year, so beyond the era its label parted from the age the physics drew by ΔT itself:
+// 123 yr at −1 Myr, 341 Myr at −2 Gyr). Out of domain → null, the caller falls back.
 
-function _ensureCumulPosTable() {
-  if (_cumulPosTable !== null) return;
-  const N = _cumulIntegralLength();
-  const j2000Idx = _cumulIntegralJ2000IdxGet();
-  _cumulPosTable = new Float64Array(N);
-  const dpy = _posDpy;
-  const gridYearAtJ2000Idx = _CUMUL_INTEGRAL_YEAR_MIN + j2000Idx * _CUMUL_INTEGRAL_STEP;
-  _cumulPosTable[j2000Idx] = -(C.startmodelYear - gridYearAtJ2000Idx) * dpy(C.startmodelYear);
-  let prev = dpy(gridYearAtJ2000Idx);
-  for (let i = j2000Idx + 1; i < N; i++) {
-    const curr = dpy(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
-    _cumulPosTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulPosTable[i - 1]))
-      ? _cumulPosTable[i - 1] + 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP : NaN;
-    prev = curr;
-  }
-  prev = dpy(gridYearAtJ2000Idx);
-  for (let i = j2000Idx - 1; i >= 0; i--) {
-    const curr = dpy(_CUMUL_INTEGRAL_YEAR_MIN + i * _CUMUL_INTEGRAL_STEP);
-    _cumulPosTable[i] = (prev !== null && curr !== null && !Number.isNaN(_cumulPosTable[i + 1]))
-      ? _cumulPosTable[i + 1] - 0.5 * (prev + curr) * _CUMUL_INTEGRAL_STEP : NaN;
-    prev = curr;
-  }
-  // Normalise so jdFromPos(0) === startmodelJD exactly, with the SAME analytic
-  // sub-cell integration the reader uses (the anchor cell otherwise carries a 37-s artifact).
-  const lo0n = _posAnchorLoIdx(), dy0n = _posAnchorDy();
-  const yLo0n = _CUMUL_INTEGRAL_YEAR_MIN + lo0n * _CUMUL_INTEGRAL_STEP;
-  const v0 = _cumulPosTable[lo0n] + 0.5 * (_posDpy(yLo0n) + _posDpy(C.startmodelYear)) * dy0n;
-  if (Number.isFinite(v0)) for (let i = 0; i < N; i++) _cumulPosTable[i] -= v0;
-}
-
-/** Scene time coordinate → Julian Date; pos = 0 returns startmodelJD exactly; null out of domain. */
+/** Scene time coordinate → the UT Julian Date (solar days of date); pos = 0 returns startmodelJD exactly; null out of domain. */
 function jdFromPos(pos) {
   if (!Number.isFinite(pos)) return null;
-  _ensureCumulPosTable();
-  // Years from the anchor cell's lower edge — never via the absolute index fraction (4e-5 d of loss).
-  const lo0 = _posAnchorLoIdx();
-  const total = _posAnchorDy() + pos;
-  const k = Math.floor(total / _CUMUL_INTEGRAL_STEP);
-  const dyCell = total - k * _CUMUL_INTEGRAL_STEP;
-  const lo = lo0 + k;
-  if (lo < 0 || lo >= _cumulPosTable.length - 1) return null;
-  const a = _cumulPosTable[lo];
-  if (Number.isNaN(a)) return null;
-  // Integrate analytically across the partial cell (linear interpolation returns the cell's chord slope).
-  const yLo = _CUMUL_INTEGRAL_YEAR_MIN + lo * _CUMUL_INTEGRAL_STEP;
-  const f0 = _posDpy(yLo), f1 = _posDpy(yLo + dyCell);
-  if (f0 === null || f1 === null) return null;
-  return C.startmodelJD + a + 0.5 * (f0 + f1) * dyCell;
+  return _deepCal().yearToJDUT(C.startmodelYear + pos);
 }
 
-/** Julian Date → scene time coordinate; the exact inverse of jdFromPos; null out of domain. */
+/** UT Julian Date → scene time coordinate; the exact inverse of jdFromPos; null out of domain. */
 function posFromJD(jd) {
   if (!Number.isFinite(jd)) return null;
-  _ensureCumulPosTable();
-  const N = _cumulPosTable.length;
-  const target = jd - C.startmodelJD;
-  let lo = 0, hi = N - 1;
-  while (lo < N && Number.isNaN(_cumulPosTable[lo])) lo++;
-  while (hi >= 0 && Number.isNaN(_cumulPosTable[hi])) hi--;
-  if (lo >= hi) return null;
-  if (target < _cumulPosTable[lo] || target > _cumulPosTable[hi]) return null;
-  const guessYear = C.startmodelYear + target / SI_TROPICAL_YEAR_DAYS;
-  let g = Math.floor((guessYear - _CUMUL_INTEGRAL_YEAR_MIN) / _CUMUL_INTEGRAL_STEP);
-  if (g < lo) g = lo; if (g > hi - 1) g = hi - 1;
-  if (_cumulPosTable[g] <= target && _cumulPosTable[g + 1] >= target) {
-    lo = g; hi = g + 1;
-  } else {
-    let span = 1, a = g, b = g;
-    while (span < N) {
-      a = Math.max(lo, g - span); b = Math.min(hi, g + span);
-      if (_cumulPosTable[a] <= target && _cumulPosTable[b] >= target) break;
-      span <<= 1;
-    }
-    lo = a; hi = b;
-    while (lo < hi - 1) {
-      const mid = (lo + hi) >> 1;
-      if (_cumulPosTable[mid] <= target) lo = mid; else hi = mid;
-    }
-  }
-  // Solve within the cell against the SAME analytic sub-integration jdFromPos uses.
-  const a2 = _cumulPosTable[lo];
-  const yLo = _CUMUL_INTEGRAL_YEAR_MIN + lo * _CUMUL_INTEGRAL_STEP;
-  const f0 = _posDpy(yLo);
-  let dy = (_cumulPosTable[hi] === a2) ? 0
-    : (target - a2) / (_cumulPosTable[hi] - a2) * _CUMUL_INTEGRAL_STEP * (hi - lo);
-  for (let it = 0; it < 4; it++) {
-    const f1 = _posDpy(yLo + dy);
-    if (f1 === null) break;
-    const g = a2 + 0.5 * (f0 + f1) * dy - target;
-    if (Math.abs(g) < 1e-11) break;
-    dy -= g / f1;
-  }
-  return (lo - _posAnchorLoIdx()) * _CUMUL_INTEGRAL_STEP - _posAnchorDy() + dy;
+  const year = _deepCal().jdUTToYear(jd);
+  return year === null ? null : year - C.startmodelYear;
+}
+
+/** The TT instant of a scene time coordinate (SI days of the same position); null out of domain. */
+function jdTTFromPos(pos) {
+  if (!Number.isFinite(pos)) return null;
+  return _deepCal().yearToJDTT(C.startmodelYear + pos);
+}
+
+/** THE BRIDGE: ΔT (seconds, the curve without the J2000 anchor) at a UT Julian Date through the
+ *  package calendar's implicit solve — the raw integral at the TT age the UT count has reached,
+ *  the era corrections at the civil year; null out of the table's domain. */
+function deltaTSecondsAtJdUT(jdUT) { return _deepCal().deltaTSecondsAtJdUT(jdUT); }
+
+/** The navigable position range {posMin, posMax} — the calendar's position table's finite extent. */
+function navigablePosRange() {
+  const r = _deepCal().navigableYearRange();
+  return { posMin: r.yearMin - C.startmodelYear, posMax: r.yearMax - C.startmodelYear };
 }
 
 // ─── Exports (every pre-B2 name kept) ──────────────────────────────────────
@@ -298,7 +224,7 @@ module.exports = {
   _deepEcc,
   EPOCH_PARAMS,
   _jdToSIyear, siYearToJD, yearToJDDeepTime, SI_TROPICAL_YEAR_DAYS,
-  posFromJD, jdFromPos,
+  posFromJD, jdFromPos, jdTTFromPos, navigablePosRange, deltaTSecondsAtJdUT,
   MEAN_SIDEREAL_YEAR_J2000_S, MEAN_TROPICAL_YEAR_J2000_S, LOD_NOW_H13_S, A_MOON_NOW_M, A_LOCK_M,
   MOON_APSIDAL_J2000_S, MOON_NODAL_J2000_S, MOON_SIDEREAL_MONTH_J2000_S, SOLAR_MASS_LOSS_FRAC_PER_YR,
   earthMoiFactorAtAge, iEarthAtAge,

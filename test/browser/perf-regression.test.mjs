@@ -28,8 +28,9 @@
  *   C-VIS frame   0.03 ms   ·  trace sample ratio ~3
  * (Between 2026-09-23 and 2026-09-26 the rows read ~106/125/167 ms: the
  * cold-jump row's −5.34 Myr scene state, restored by every probe, added a
- * ~53-ms perihelion-calendar hint walk per update — see the reset below
- * the cold-jump row. Those readings were the artefact, not the update.)
+ * ~53-ms year-by-year calendar walk per update — the former perihelion
+ * calendar's converter, retired with plan 27 — see the reset below the
+ * cold-jump row. Those readings were the artefact, not the update.)
  *
  * THE COLD-JUMP ROW (a class the steady-state rows
  * cannot see): the FIRST evaluation at a deep epoch on a fresh page builds
@@ -162,9 +163,9 @@ try {
   gate('full jump: first scene jump to −400 Myr on both banks', deepCold, 15000, 'ms');
   // Bring the scene back to a modern epoch (measured 2026-09-26): the cold
   // jump leaves o.julianDay at −5.34 Myr, and every hybridSpinProbe below
-  // restores that JD after its own jump — so each update paid the
-  // perihelion-calendar converter's year-by-year hint walk TWICE across
-  // 5.4 Myr (~10 ms per Myr): the in-table full update read 106 ms per pair
+  // restores that JD after its own jump — so each update paid the former
+  // perihelion calendar's year-by-year hint walk TWICE across 5.4 Myr (~10 ms
+  // per Myr; the converter is retired, the reset stays): the in-table full update read 106 ms per pair
   // where the true cost is 3–6 ms, and the constant ~53 ms in numerator and
   // denominator compressed every ratio below toward 1 (a 28× class would
   // have read ~4.5 against the limit 6). Rows 1–5 now measure the update.

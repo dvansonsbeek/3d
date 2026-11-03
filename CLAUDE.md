@@ -225,6 +225,25 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   checkpoint and walked unseated (63 s at −2.9 Gyr, 0.06 s at −2.8); gate the
   DEEP end of every seat. A finder's step is the month OF DATE where the month
   is not the era's (0.9 d at the genesis). (§1.35)
+- **The UT clock counts SOLAR days, and a bridge is solved on the instant it
+  lands on** — the deep ΔT integrand divided by 86,400 (SI days per year) where
+  the UT clock counts yearS/LOD solar days: 7 % low at 400 Ma, 73 % at the
+  genesis; the bridge took ΔT at the UT count's label, 341 Myr from the TT age
+  at −2 Gyr. ONE position table (`phase/deep-calendar`, SI days per tropical
+  year of date, the shipped α — the α-reference pin moves the J2000 day 3.7 ms), the
+  UT Julian Day its TT instant minus the FULL ΔT, the inverse a Newton solve
+  (slope 86,400/LOD; the fixed point diverges beyond ~1 Gyr). A quantity with
+  two fitted axes names both: `meanDeltaTSecondsAtAges(tMaRaw, tMaCorrections)`
+  — the raw integral at the TT age, the era cycles at the civil year. A table
+  of MEAN solar days per year is not the civil UT axis (24 s in 24 yr). A
+  sampler asked for an age OUTSIDE the domain answers at the edge, never by
+  walking there — unclamped, the spin walk ran unseated beyond the bank's
+  deepest checkpoint (3.4–15 s per read, a 22-min post-landing stall from one
+  windowed display row); the perihelion calendar's year-by-year walk
+  (13 ms/Myr) is retired. A gate converts the axis it samples with the SAME
+  bridge the tier under test reads — `scene-year-lengths` kept a civil-label
+  ΔT of its own: 8.8 days and −2.9 s per year at ±1 Myr, invisible at the era
+  rows. (§1.36)
 
 ---
 
@@ -301,7 +320,8 @@ REFUSES if the lab's mean parts from the series') and the spin-axis
 checkpoint bank (`spin-axis-bank.js --write`, ~25 min — REFUSES if a
 checkpoint does not resume bit-exactly or the step schedule parts from a
 10-yr walk at 100 Ma / 500 Ma / 2.46 Ga) and the lunar cumulative bank
-(`lunar-cumulative-bank.js --write`, ~7 min — REFUSES if a segment prefix
+(`lunar-cumulative-bank.js --write`, ~2.1 h since it spans the navigable
+domain, its recorded `generatedAtWalkSeconds` — REFUSES if a segment prefix
 does not resume bit-exactly or the deep lunar longitude parts between the
 seated and the unseeded tables). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run

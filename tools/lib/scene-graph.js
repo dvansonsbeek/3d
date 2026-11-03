@@ -246,20 +246,14 @@ function _moonApparentM() {
 // TT — one clock for the ring and the Moon at every epoch.
 function _jdTTToolsFromUT(jd) {
   if (!DEEP_TIME_ENABLED) return jd;
-  // Browser convention (script.js Moon-series UT→TT, Phase 9.16): t_Ma from
-  // the CALENDAR decimal year vs J2000_CALENDAR_YEAR (= startmodelYear).
-  // This mirror carried a linear 365.2425 approximation — ~5-6 s of ΔT and
-  // ~1e-3° of Moon longitude adrift at the Babylonian epochs (measured
-  // against the browser via the -135 decomposition probe; modern was fine).
-  // THE SCENE CLOCK IS TRUE TT: the model's absolute ΔT
-  // is deltaTStart + curve (the published ΔT surface; the besselian and the
-  // registry instruments add the same bridge). The curve alone is the
-  // eclipse FINDERS' certified axis, which had leaked into the scene: at true
-  // UT the scene Moon sat 30″ west (0.549″/s × 54.55 s), the Sun 2.2″, and
-  // the retired moonMeeusLpCorrection (+32.75″) had compensated it here.
-  const t_Ma = (C.startmodelYear - jdToDecimalYear(jd)) / 1e6;
-  const dT = DT.meanDeltaTSecondsAtAge(t_Ma);
-  return Number.isFinite(dT) ? jd + _TT_BRIDGE_SECONDS / 86400 + dT / 86400 : jd;
+  // THE SCENE CLOCK IS TRUE TT: the model's absolute ΔT is deltaTStart + curve (the published
+  // ΔT surface; the besselian and the registry instruments add the same bridge). The curve
+  // alone is the eclipse FINDERS' certified axis, which had leaked into the scene: at true UT
+  // the scene Moon sat 30″ west (0.549″/s × 54.55 s), the Sun 2.2″.
+  // PLAN 27 (doc 111 §1.36): the curve is read through the ONE bridge — the package calendar's
+  // implicit solve (the raw integral at the TT age the UT count has reached, the era corrections
+  // at the civil year) — the same function the model's finders and besselian tier read.
+  return jd + (_TT_BRIDGE_SECONDS + _finderCurveDeltaTTools(jd)) / 86400;
 }
 /** deltaTStart — the ΔT trend anchor at J2000 (astro-reference earthOrbital),
  *  read from the package constants (the one home every runtime shares). */
@@ -271,6 +265,11 @@ function _finderAxisJdTools(jdUT) { return jdUT + _TT_BRIDGE_SECONDS / 86400; }
  *  convention (mirror of the browser's _eclDeltaT); no bridge. */
 function _finderCurveDeltaTTools(jd) {
   if (!DEEP_TIME_ENABLED) return 0;
+  // PLAN 27 (doc 111 §1.36): the ONE bridge — the package calendar's implicit solve (the raw
+  // integral at the TT age the UT count has reached, the era corrections at the civil year),
+  // the function the model's own finders read; the civil reading outside the table.
+  const bridged = DT.deltaTSecondsAtJdUT(jd);
+  if (bridged !== null && Number.isFinite(bridged)) return bridged;
   const dT = DT.meanDeltaTSecondsAtAge((C.startmodelYear - jdToDecimalYear(jd)) / 1e6);
   return Number.isFinite(dT) ? dT : 0;
 }

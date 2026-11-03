@@ -26,7 +26,7 @@ export function assembleOneSourceMovement(ctx: import("./year-day-lengths.js").C
             planetaryRelAtYear: (year: number) => number;
         }>;
         /** The one-source sample at a decimal year (the engine year) — ε, e, ϖ of date, the Earth-orbit normal (the fields the frame of date and the invariable-plane elements read). @param {number} year */
-        sampleAt: (year: number) => any;
+        sampleAt: (yearIn: number) => any;
         /** EXPERIMENT accessors: the series' e and equinox-referenced ϖ of date. @param {number} year @returns {number} */
         eAt: (year: number) => number;
         /** @param {number} year @returns {number} */

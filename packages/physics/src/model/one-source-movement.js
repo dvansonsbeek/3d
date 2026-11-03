@@ -7,6 +7,7 @@ import { createDeepOrbitalHistory } from '../earth/deep-orbital-history.cjs';
 import { ONE_FAMILY_WINDOW_YEARS, createYearLengths } from '../earth/year-lengths.cjs';
 import { DEEP_MODES_ARTIFACT } from '../moon/deep-modes-artifact.cjs';
 import { CHAIN_ARTIFACT } from '../planets/chain-artifact.js';
+import { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } from '../time/navigable-domain.cjs';
 
 /** @param {import('./year-day-lengths.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleOneSourceMovement(ctx) {
@@ -104,7 +105,13 @@ export function assembleOneSourceMovement(ctx) {
     const samplers = /** @type {Map<number, any>} */ (new Map());
     const gridStep = (/** @type {number} */ n) => (n <= 50000 ? 100 : n <= 2000000 ? 1000 : 5000);
     const tierSpan = (/** @type {number} */ n) => (n <= 50000 ? 50000 : 2000000);
-    const sampleAt = (/** @type {number} */ year) => {
+    const sampleAt = (/** @type {number} */ yearIn) => {
+      // PLAN 27 (doc 111 §1.36): a read is CLAMPED to the navigable domain — the spin bank's two
+      // edges. Beyond the deepest checkpoint the walk continued unseated into physics the inputs
+      // no longer define (the Moon history ends there): 3.4 s at −4,425.5 Myr, 15 s at −4,431 Myr,
+      // ε reading 0.8°; a windowed display row sampling ±10 Myr around the edge held the browser's
+      // main thread for 22 minutes after every landing there. The edge's own sample stands in.
+      const year = Math.max(2000 - NAVIGABLE_PAST_YEARS, Math.min(2000 + NAVIGABLE_FUTURE_YEARS, yearIn));
       const t = year - 2000, need = Math.max(20000, Math.abs(t) * 1.25);
       if (need > 2000000) {
         // The deep tier (5000-yr grid): walked in the queried DIRECTION only,

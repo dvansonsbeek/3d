@@ -1,5 +1,6 @@
 /** @param {import('./time-axis.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
+    deepCalendar: import("../phase/deep-calendar.cjs").DeepCalendar;
     frameworkDeltaTSecondsAtJD: (jd: number) => number;
     j2000JD: number;
     jdTTFromUT: (jd: number) => number;

@@ -11,7 +11,7 @@ export function assembleSurface(ctx) {
     C, F, EPOCH_PARAMS, GM_EARTH_ALONE, GM_EARTH_MOON_SYSTEM, GM_MOON_ALONE, GM_SUN, GM_SUN_PLUS_EARTH, G_CONSTANT,
     MASS_RATIO_EARTH_MOON, M_SUN, PLANET_KEYS, PUBLISHED_PLANET_RECORDS, anomalisticYearDays, ascendingNodeDeg,
     besselian, cardinalCrossingJdUT, cardinalCrossingNearJdUT, cardinalTargetDeg, certifiedAxialPrecessionJ2000Years,
-    chain, dayLengthSeconds, deepLod, deltaTSeconds, earthMoiFactorAtAge, earthPerihelionDeg, eccentricityAt,
+    chain, dayLengthSeconds, deepCalendar, deepLod, deltaTSeconds, earthMoiFactorAtAge, earthPerihelionDeg, eccentricityAt,
     eclipseFinders, evalClimateL1, frameworkDeltaTSecondsAtJD, inclinationDeg, j2000JD, jdFromYear, jdTTFromUT,
     julianCenturyDays, lodRealSeconds, meanLengthOfDay, meanSiderealYearDays, moonDistanceCorrected, moonDistanceKm,
     moonDistanceKmAtYearOrNaN, moonOrbitalShift, moonSeries, moonSiderealMonth, moonSiderealMonthDaysAt,
@@ -26,6 +26,15 @@ export function assembleSurface(ctx) {
       yearFromJD,
       jdFromYear,
       siTropicalYearDays,
+      // PLAN 27 (doc 111 §1.36) — the ONE deep clock: a position (tropical years of date from
+      // the scene epoch, year = startmodelYear + pos) ↔ its UT Julian Day (solar days of date,
+      // the day the UT clock counts) and ↔ its TT instant (SI days); the navigable range is the
+      // solar-day table's finite extent. The two scene twins' position tables read THESE.
+      yearToJDUT: deepCalendar.yearToJDUT,
+      jdUTToYear: deepCalendar.jdUTToYear,
+      yearToJDTT: deepCalendar.yearToJDTT,
+      jdTTToYear: deepCalendar.jdTTToYear,
+      navigableYearRange: deepCalendar.navigableYearRange,
     }),
     // The Moon-Kepler mass chain — the J2000 derivation docs 24 / the website's
     // "mass from the Moon" page narrate, published from the one place that

@@ -28,6 +28,46 @@ export type DeepCalendar = {
      * table length once built, null before.
      */
     cumulDaysTableLength: () => (number | null);
+    /**
+     * the TT instant (SI
+     * days) of a year of date — the position table, normalised, analytic partial
+     * cell; null out of domain or without a `meanTropicalYearDaysAtAgeMa` source
+     * (plan 27, doc 111 §1.36).
+     */
+    yearToJDTT: (year: number) => (number | null);
+    /**
+     * the exact inverse of yearToJDTT.
+     */
+    jdTTToYear: (jd: number) => (number | null);
+    /**
+     * the UT Julian Day (the
+     * solar-day count the UT clock keeps) of a year of date: its TT instant minus the
+     * full ΔT there; null out of domain.
+     */
+    yearToJDUT: (year: number) => (number | null);
+    /**
+     * the year of date a UT
+     * Julian Day has reached — the inverse of yearToJDUT through the implicit bridge.
+     */
+    jdUTToYear: (jdUT: number) => (number | null);
+    /**
+     * THE BRIDGE: ΔT at a
+     * UT Julian Day — the raw integral at the TT age the count has reached, the era
+     * corrections at the civil year; null without a `deltaTSecondsAtAges` source.
+     */
+    deltaTSecondsAtJdUT: (jdUT: number) => (number | null);
+    /**
+     * ΔT at a TT instant.
+     */
+    deltaTSecondsAtJdTT: (jdTT: number) => (number | null);
+    /**
+     * the first
+     * and last years the position table defines — the ONE navigable edge.
+     */
+    navigableYearRange: () => {
+        yearMin: number;
+        yearMax: number;
+    };
 };
 /**
  * @typedef {Object} DeepCalendar
@@ -45,11 +85,30 @@ export type DeepCalendar = {
  *   year = startModelYear.
  * @property {() => (number | null)} cumulDaysTableLength diagnostic — the
  *   table length once built, null before.
+ * @property {(year: number) => (number | null)} yearToJDTT the TT instant (SI
+ *   days) of a year of date — the position table, normalised, analytic partial
+ *   cell; null out of domain or without a `meanTropicalYearDaysAtAgeMa` source
+ *   (plan 27, doc 111 §1.36).
+ * @property {(jd: number) => (number | null)} jdTTToYear the exact inverse of yearToJDTT.
+ * @property {(year: number) => (number | null)} yearToJDUT the UT Julian Day (the
+ *   solar-day count the UT clock keeps) of a year of date: its TT instant minus the
+ *   full ΔT there; null out of domain.
+ * @property {(jdUT: number) => (number | null)} jdUTToYear the year of date a UT
+ *   Julian Day has reached — the inverse of yearToJDUT through the implicit bridge.
+ * @property {(jdUT: number) => (number | null)} deltaTSecondsAtJdUT THE BRIDGE: ΔT at a
+ *   UT Julian Day — the raw integral at the TT age the count has reached, the era
+ *   corrections at the civil year; null without a `deltaTSecondsAtAges` source.
+ * @property {(jdTT: number) => (number | null)} deltaTSecondsAtJdTT ΔT at a TT instant.
+ * @property {() => {yearMin: number, yearMax: number}} navigableYearRange the first
+ *   and last years the position table defines — the ONE navigable edge.
  */
 /**
  * @param {{
  *   meanYearInDaysAtAgeMa: (tMa: number) => (number | null),
+ *   meanTropicalYearDaysAtAgeMa?: ((tMa: number) => (number | null)) | null,
  *   withLatticeAlpha: (build: () => void) => void,
+ *   withShippedAlpha?: ((build: () => void) => void) | null,
+ *   deltaTSecondsAtAges?: ((tMaRaw: number, tMaCorrections: number) => number) | null,
  *   startModelJD: number,
  *   startModelYear: number,
  *   startModelYearWithCorrection: number,
@@ -66,9 +125,12 @@ export type DeepCalendar = {
  *   nearest `startModelYear`.
  * @returns {DeepCalendar}
  */
-export function createDeepCalendar({ meanYearInDaysAtAgeMa, withLatticeAlpha, startModelJD, startModelYear, startModelYearWithCorrection, siTropicalYearDays, yearMin, yearMax, stepYears, }: {
+export function createDeepCalendar({ meanYearInDaysAtAgeMa, meanTropicalYearDaysAtAgeMa, withLatticeAlpha, withShippedAlpha, deltaTSecondsAtAges, startModelJD, startModelYear, startModelYearWithCorrection, siTropicalYearDays, yearMin, yearMax, stepYears, }: {
     meanYearInDaysAtAgeMa: (tMa: number) => (number | null);
+    meanTropicalYearDaysAtAgeMa?: ((tMa: number) => (number | null)) | null;
     withLatticeAlpha: (build: () => void) => void;
+    withShippedAlpha?: ((build: () => void) => void) | null;
+    deltaTSecondsAtAges?: ((tMaRaw: number, tMaCorrections: number) => number) | null;
     startModelJD: number;
     startModelYear: number;
     startModelYearWithCorrection: number;
