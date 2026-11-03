@@ -243,7 +243,12 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   (13 ms/Myr) is retired. A gate converts the axis it samples with the SAME
   bridge the tier under test reads — `scene-year-lengths` kept a civil-label
   ΔT of its own: 8.8 days and −2.9 s per year at ±1 Myr, invisible at the era
-  rows. (§1.36)
+  rows. **A year COUNT is not an age** — the position's tropical-year count
+  parts from the civil TT year by 0.055 % (2.4 Myr at the genesis, where the
+  Moon's history moves 20 %: the ring 27 % from the placed Moon); every label
+  that feeds a physics read is the ENGINE's year, the navigable domain is the
+  engine's, the position table carries its own margin, and the scene lands on
+  the edge from every entry. (§1.36)
 
 ---
 

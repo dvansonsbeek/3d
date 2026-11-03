@@ -42,6 +42,7 @@ import { openSimulator } from './harness.mjs';
 import { meanYearInDaysAtAge, meanMoonDistanceAtAge, meanAuAtAge, posFromJD, jdFromPos, navigablePosRange } from '../../tools/lib/deep-time.js';
 import { createModel } from '@essrt/physics';
 const require = createRequire(import.meta.url);
+const { jdToDecimalYear } = require('@essrt/physics/time/calendar');
 
 // The edge JDs are the twin's OWN UT axis (doc 111 §1.36): a linear 365.25-day count overshoots
 // the future UT edge by the future ΔT (121 Myr of years at +1 Gyr — the former literal) and
@@ -62,6 +63,11 @@ const SPIN_MODERN_JD = 2460409.262, TOL_SPIN_DEG = 1e-9;   // 2024-04-08 18:17 U
 const CLOCK_POS = [-1e6, -400e6, -2000e6, navigablePosRange().posMin + 1e4];
 const CLOCK_JDS = CLOCK_POS.map((p) => jdFromPos(p));
 const TOL_CLOCK_YEAR = 1e-6, TOL_CLOCK_TT_DAYS = 1e-3, TOL_RING_REL = 1e-9, TOL_RANGE_YEARS = 1e-6;
+// The placed Moon against its ring: the lunar eccentricity of date bounds the ratio (0.055 at
+// J2000, the deep channel below 0.08) — at the genesis the ring once sat 27 % from the Moon,
+// sized on the position's tropical-year COUNT while the Moon read the TT age (the owner's
+// screenshot at −4.42 Gyr; doc 111 §1.36).
+const TOL_MOON_RING_REL = 0.08;
 
 const EPOCHS_MA = [-5, -1, 1, 5];
 const TOL_DAYS = 0.002;
@@ -138,6 +144,15 @@ for (const jd of CLOCK_JDS) {
     return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm };
   }, jd));
 }
+// THE HONEST EDGE (plan 27 step B): a jump past either edge lands ON the edge, never beyond —
+// beyond it the readers fell back to a linear count (630 solar days per year one day before the
+// genesis, the owner's measurement).
+domainRows.edge = await s.page.evaluate(({ beforeJD, afterJD }) => {
+  const T = window.__test__;
+  T.jumpJD(beforeJD); const past = T.scenePos();
+  T.jumpJD(afterJD); const future = T.scenePos();
+  return { past, future };
+}, { beforeJD: jdFromPos(navigablePosRange().posMin) - 1e6, afterJD: jdFromPos(navigablePosRange().posMax) + 1e6 });
 
 const pageErrors = s.errors.length;
 await s.dispose();
@@ -183,7 +198,10 @@ for (const r of rows) {
 for (const jd of DOMAIN_EDGE_JDS) {
   const pos = posFromJD(jd), back = pos === null ? NaN : jdFromPos(pos);
   const d = back - jd;
-  const ok = Number.isFinite(d) && Math.abs(d) <= TOL_ROUNDTRIP_DAYS;
+  // the double's resolution: one ULP of a 4.4e9-year position is 30 s of TT and up to 1,500 UT
+  // solar days per year of date at the genesis — 1.9e-3 UT days per ULP (measured at the edge)
+  const tol = Math.max(TOL_ROUNDTRIP_DAYS, 2 * Math.abs(pos) * Number.EPSILON * 1500);
+  const ok = Number.isFinite(d) && Math.abs(d) <= tol;
   if (!ok) fail++;
   console.log(`${ok ? '  ok ' : 'FAIL '} JD ${jd.toFixed(0).padStart(14)}  pos round trip      `
     + ` Δ ${Number(d).toExponential(2)} d`);
@@ -223,13 +241,15 @@ for (const jd of DOMAIN_EDGE_JDS) {
     console.log(`${ok ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Earth spin scene/tier GMST`
       + ` ${scene.toFixed(6)} / ${tier.toFixed(6)}°  Δ ${Number(d).toExponential(2)}°`);
   }
-  // THE ONE DEEP CLOCK (doc 111 §1.36): (1) the scene's labelled year of date ≡ the model's
-  // year of the UT count (the package calendar, two runtimes); (2) the TT instant of the
+  // THE ONE DEEP CLOCK (doc 111 §1.36): (1) the scene's labelled year of date ≡ the civil year
+  // of the TT instant the model's bridge gives (the engine's year axis, two runtimes — NOT the
+  // position's tropical-year count, 2.4 Myr from it at the genesis); (2) the TT instant of the
   // position ≡ the UT JD plus the model's bridge; (3) the Moon's ring ≡ the cited distance at
   // the labelled age (the ring used to read the UT count's SI-day label: 95,882 km against a
-  // Moon at 321,601 at the edge); (4) the browser's navigable range ≡ the twin's.
+  // Moon at 321,601 at the edge), and the placed Moon within the eccentricity of its ring;
+  // (4) the browser's navigable range ≡ the twin's, and a jump past an edge lands on it.
   for (const r of domainRows.clock) {
-    const modelYear = m.time.jdUTToYear(r.jd);
+    const modelYear = jdToDecimalYear(r.jd + m.eclipse.deltaTSecondsAtJD(r.jd) / 86400);
     const dYear = r.year - modelYear;
     const okYear = Number.isFinite(dYear) && Math.abs(dYear) <= TOL_CLOCK_YEAR;
     if (!okYear) fail++;
@@ -244,7 +264,11 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const relRing = (ringKm - citedKm) / citedKm;
     const okRing = Number.isFinite(relRing) && Math.abs(relRing) <= TOL_RING_REL;
     if (!okRing) fail++;
-    console.log(`${okRing ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Moon ring/cited a(t) at the label  ${ringKm.toFixed(1)} / ${citedKm.toFixed(1)} km  rel ${Number(relRing).toExponential(2)}  (placed Moon ${r.moonDistKm.toFixed(0)} km)`);
+    console.log(`${okRing ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Moon ring/cited a(t) at the label  ${ringKm.toFixed(1)} / ${citedKm.toFixed(1)} km  rel ${Number(relRing).toExponential(2)}`);
+    const relMoon = r.moonDistKm / ringKm - 1;
+    const okMoon = Number.isFinite(relMoon) && Math.abs(relMoon) <= TOL_MOON_RING_REL;
+    if (!okMoon) fail++;
+    console.log(`${okMoon ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  placed Moon / its ring  ${r.moonDistKm.toFixed(0)} / ${ringKm.toFixed(0)} km  rel ${Number(relMoon).toExponential(2)}  (bound ${TOL_MOON_RING_REL}, the eccentricity of date)`);
   }
   {
     const twin = navigablePosRange();
@@ -252,6 +276,10 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const ok = Number.isFinite(d) && d <= TOL_RANGE_YEARS;
     if (!ok) fail++;
     console.log(`${ok ? '  ok ' : 'FAIL '} navigable range browser/twin  [${domainRows.range.posMin}, ${domainRows.range.posMax}] / [${twin.posMin}, ${twin.posMax}]`);
+    const dPast = domainRows.edge.past - twin.posMin, dFuture = domainRows.edge.future - twin.posMax;
+    const okEdge = Number.isFinite(dPast) && Number.isFinite(dFuture) && Math.abs(dPast) <= TOL_RANGE_YEARS && Math.abs(dFuture) <= TOL_RANGE_YEARS;
+    if (!okEdge) fail++;
+    console.log(`${okEdge ? '  ok ' : 'FAIL '} honest edge: a jump 1e6 d past either edge lands on it  Δ ${Number(dPast).toExponential(2)} / ${Number(dFuture).toExponential(2)} yr`);
   }
 }
 

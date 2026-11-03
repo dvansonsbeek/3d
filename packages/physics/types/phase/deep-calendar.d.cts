@@ -116,7 +116,9 @@ export type DeepCalendar = {
  *   yearMin?: number,
  *   yearMax?: number,
  *   stepYears?: number,
- * }} deps — `meanYearInDaysAtAgeMa` is the engine's days-per-year source
+ * }} deps — `yearMin`/`yearMax` are the navigable domain as the callers count it (years since
+ *   the scene epoch, default the engine's ±navigable years); the table adds its own margin.
+ *   `meanYearInDaysAtAgeMa` is the engine's days-per-year source
  *   (the LOD channel's `yearInDaysAtAge`); `withLatticeAlpha` the engine's
  *   R2 pin; `startModelYear` is the table zero (2000.5) and
  *   `startModelYearWithCorrection` the SI-axis anchor (≈ 2000.4977) — two
@@ -125,7 +127,7 @@ export type DeepCalendar = {
  *   nearest `startModelYear`.
  * @returns {DeepCalendar}
  */
-export function createDeepCalendar({ meanYearInDaysAtAgeMa, meanTropicalYearDaysAtAgeMa, withLatticeAlpha, withShippedAlpha, deltaTSecondsAtAges, startModelJD, startModelYear, startModelYearWithCorrection, siTropicalYearDays, yearMin, yearMax, stepYears, }: {
+export function createDeepCalendar({ meanYearInDaysAtAgeMa, meanTropicalYearDaysAtAgeMa, withLatticeAlpha, withShippedAlpha, deltaTSecondsAtAges, startModelJD, startModelYear, startModelYearWithCorrection, siTropicalYearDays, yearMin: domainYearMin, yearMax: domainYearMax, stepYears, }: {
     meanYearInDaysAtAgeMa: (tMa: number) => (number | null);
     meanTropicalYearDaysAtAgeMa?: ((tMa: number) => (number | null)) | null;
     withLatticeAlpha: (build: () => void) => void;

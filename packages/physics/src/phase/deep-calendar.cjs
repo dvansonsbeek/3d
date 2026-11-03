@@ -32,7 +32,17 @@
 'use strict';
 
 const { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } = require('../time/navigable-domain.cjs');
-const { jdToDecimalYear } = require('../time/calendar.cjs');
+const { jdToDecimalYear, calendarToJD } = require('../time/calendar.cjs');
+
+/** THE TWO YEAR AXES (plan 27, doc 111 §1.36). The position axis counts tropical years OF DATE
+ *  since the scene epoch; the engine axis is the civil year of the TT instant (the chain's age,
+ *  the spin bank's edges, every physics read). They part by the year-length history: 0.055 %
+ *  at −4.425 Gyr, 2.4 Myr — over which the cited Moon history moves 20 % at the genesis, so a
+ *  ring sized on the position's count sat 27 % from a Moon placed at the TT age (measured). The
+ *  navigable domain is the ENGINE's; the position table carries this margin beyond it (whole
+ *  cells, so the grid inside the domain is the former grid, bit-identical — the build runs
+ *  outward from J2000) and the navigable range is the engine edges' image on the position axis. */
+const POSITION_TABLE_MARGIN = 0.002;
 
 /**
  * @typedef {Object} DeepCalendar
@@ -82,7 +92,9 @@ const { jdToDecimalYear } = require('../time/calendar.cjs');
  *   yearMin?: number,
  *   yearMax?: number,
  *   stepYears?: number,
- * }} deps — `meanYearInDaysAtAgeMa` is the engine's days-per-year source
+ * }} deps — `yearMin`/`yearMax` are the navigable domain as the callers count it (years since
+ *   the scene epoch, default the engine's ±navigable years); the table adds its own margin.
+ *   `meanYearInDaysAtAgeMa` is the engine's days-per-year source
  *   (the LOD channel's `yearInDaysAtAge`); `withLatticeAlpha` the engine's
  *   R2 pin; `startModelYear` is the table zero (2000.5) and
  *   `startModelYearWithCorrection` the SI-axis anchor (≈ 2000.4977) — two
@@ -101,10 +113,15 @@ function createDeepCalendar({
   startModelYear,
   startModelYearWithCorrection,
   siTropicalYearDays,
-  yearMin = -NAVIGABLE_PAST_YEARS,
-  yearMax = NAVIGABLE_FUTURE_YEARS,
+  yearMin: domainYearMin = -NAVIGABLE_PAST_YEARS,
+  yearMax: domainYearMax = NAVIGABLE_FUTURE_YEARS,
   stepYears = 10000,
 }) {
+  // The engine's edge years (the civil year of the TT instant: the one-source sampler's clamp,
+  // the spin bank's ends) and the table's own span — the domain plus the margin in whole cells.
+  const engineYearMin = 2000 + domainYearMin, engineYearMax = 2000 + domainYearMax;
+  const yearMin = domainYearMin - Math.ceil(Math.abs(domainYearMin) * POSITION_TABLE_MARGIN / stepYears) * stepYears;
+  const yearMax = domainYearMax + Math.ceil(Math.abs(domainYearMax) * POSITION_TABLE_MARGIN / stepYears) * stepYears;
   const j2000Idx = Math.round((startModelYear - yearMin) / stepYears);
   const N = Math.ceil((yearMax - yearMin) / stepYears) + 1;
   /** @type {(jd: number) => number} */
@@ -335,10 +352,9 @@ function createDeepCalendar({
       jdTT = jdUT + civilDT / 86400;
     } else {
       if (!ttTable) return null;
-      const r = ttTable.range();
-      const edge = jdUT < startModelJD ? ttTable.jdAtYear(r.yearMin) : ttTable.jdAtYear(r.yearMax);
-      if (edge === null) return null;
-      jdTT = edge;
+      // the ENGINE's edge instant, where the chain is defined — the table's own edge lies the
+      // margin beyond it, past the cited Moon history's end (the LOD is null there)
+      jdTT = calendarToJD(jdUT < startModelJD ? engineYearMin : engineYearMax, 1, 1, 0);
     }
     let dT = NaN;
     for (let it = 0; it < 40; it++) {
@@ -390,10 +406,23 @@ function createDeepCalendar({
     },
     deltaTSecondsAtJdUT,
     deltaTSecondsAtJdTT,
-    /** The navigable year range: the first and last cells the position table defines. */
+    /** The navigable range on the POSITION axis (years of date since the scene epoch, as the
+     *  callers count): the positions whose TT instant is the engine's edge year (January 1 of
+     *  2000 ∓ the navigable years, the civil axis the physics reads) — never the table's own
+     *  edge, which lies the margin beyond. */
     navigableYearRange: /** @returns {{yearMin: number, yearMax: number}} */ () => {
       if (!ttTable) return { yearMin: NaN, yearMax: NaN };
-      const r = ttTable.range(); return { yearMin: r.yearMin, yearMax: r.yearMax };
+      const r = ttTable.range();
+      const jdLo = calendarToJD(engineYearMin, 1, 1, 0), jdHi = calendarToJD(engineYearMax, 1, 1, 0);
+      let lo = ttTable.yearAtJD(jdLo), hi = ttTable.yearAtJD(jdHi);
+      // The position's resolution at 4.4e9 years is 30 s: round INTO the domain, so the edge's
+      // TT instant is on or after January 1 (the label reads the edge year, not December 31).
+      for (let k = 0; lo !== null && k < 4 && /** @type {number} */ (ttTable.jdAtYear(lo)) < jdLo; k++) lo += Math.abs(lo) * Number.EPSILON;
+      for (let k = 0; hi !== null && k < 4 && /** @type {number} */ (ttTable.jdAtYear(hi)) > jdHi; k++) hi -= Math.abs(hi) * Number.EPSILON;
+      return {
+        yearMin: lo === null ? r.yearMin : Math.max(lo, r.yearMin),
+        yearMax: hi === null ? r.yearMax : Math.min(hi, r.yearMax),
+      };
     },
   });
 }

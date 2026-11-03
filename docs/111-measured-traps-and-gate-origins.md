@@ -1035,17 +1035,45 @@ bit-identically.
 mean the age the physics draws: the −2 Gyr label renders the 2.0-Ga system,
 the edge the 4.42-Ga one; round trips close to the double's resolution at
 every depth; the scene's Earth makes the year's own number of turns per year
-of date. The Date beyond ±3,000 yr of J2000 is the position's year written as
-a season date (the year's fraction on a 365.2422-day proleptic year's months;
-the Time field the solar day's clock as always); at the seam the two labels
-differ by ΔT(3 kyr) = 7 h, below the day resolution. The epoch-consistency
-gate reads, at −1 Myr, −400 Myr, −2 Gyr and the edge: the scene's year of date
-≡ the model's (two runtimes, 1e-6 yr), the TT instant of the position ≡ the UT
-JD plus the model's bridge, the Moon's ring ≡ the cited distance at the
-labelled age, and the browser's navigable range ≡ the twin's. **The rule:** a
-clock's bridge is solved on the instant it lands on, never on the label it
-starts from; the integrand's day is the day the clock counts; and a quantity
-with two fitted axes names both (`…AtAges(tMaRaw, tMaCorrections)`).
+of date. The Date and Time beyond ±3,000 yr of J2000 are the civil date and
+time of the position's TT instant (the engine's year axis; the Julian Day
+field stays the UT count, the solar day's clock); at the seam the two labels
+differ by ΔT(3 kyr) = 7 h. The epoch-consistency gate reads, at −1 Myr,
+−400 Myr, −2 Gyr and the edge: the scene's year of date ≡ the civil year of
+the model's bridged TT instant (two runtimes, 1e-6 yr), the TT instant of the
+position ≡ the UT JD plus the model's bridge, the Moon's ring ≡ the cited
+distance at the labelled age and the placed Moon within the eccentricity of
+its ring, the browser's navigable range ≡ the twin's, and a jump past either
+edge lands on it. **The rule:** a clock's bridge is solved on the instant it
+lands on, never on the label it starts from; the integrand's day is the day
+the clock counts; and a quantity with two fitted axes names both
+(`…AtAges(tMaRaw, tMaCorrections)`).
+
+**A year COUNT is not an age.** The first deep label wrote the position's
+tropical-year count of date as a season date, and the epoch anchors read
+that count as the age: the owner's screenshot at the −4.42 Gyr label showed
+the Moon well outside its ring. The two axes — the count of tropical years of
+date and the civil year of the TT instant (the chain's age, the spin bank's
+edges) — part by the year-length history: 0.055 % at the genesis, 2.4 Myr,
+over which the cited Moon history moves 20 % (111,384 km at the TT age of
+that label against 95,833 km at its count; the gate's edge row had printed a
+placed Moon of 98,315 km against a ring of 77,318 and passed, reading only
+the ring). The same split put the scene's edge at a TT age of 4,422.57 Ma
+while the engine's domain ends at 4,425.0 Ma, so the "first day" read 1,268
+solar days per sidereal year where the chain's edge gives 1,360 (the genesis
+chart's 1,591 is the cited history's last point at 4,429 Ma, 4 Myr past the
+spin bank). The navigable domain is the ENGINE's: the position table
+carries a 0.2 % margin in whole cells (the grid inside the former domain is
+bit-identical — the build runs outward from J2000), `navigableYearRange` is
+the engine edges' image on the position axis, the bridge's deep start is the
+engine's edge instant (the table's own edge lies past the history's end,
+where the LOD is null), and every label beyond the seam is the TT instant's
+civil date and time. One day before the genesis the readers had fallen back
+to a linear count (630 solar days per year): the scene now lands on the edge
+from every entry (the Julian Day field, the Date/Time fields, a jump, Play —
+which stops there), the first bullet of plan 27 step B. The rule: a label
+that feeds a physics read is the engine's own year; a count of years of date
+is a coordinate, never an age.
 
 **Two costs found by the gate at the edge.** (a) The spin sampler's reads were
 unclamped: a windowed display row sampling ±10 Myr around the navigable edge

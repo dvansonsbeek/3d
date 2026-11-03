@@ -2717,12 +2717,10 @@ function recomputeDerivedAnchorsForEpoch(t_Ma) {
 // arguments to the Meeus polynomial skeleton past +1 Myr, whose fitted T⁴ tail
 // cancels the lunar mean motion at year ~1,989,000 and REVERSES it beyond
 // (user-visible: Moon stationary at +2.0 Myr, retrograde at +2.1 Myr).
-// The grid spans THE NAVIGABLE DOMAIN (ONE home, @essrt/physics time/navigable-domain): beyond the
-// former ±500 Myr edge posFromJD extrapolated by one trapezoid from the edge cell and jdFromPos by a
-// linear count, so a jump to −700 Myr sat 44 kyr off, to −2 Gyr 817 kyr off (doc 111 §1.33). The
-// Node twin (tools/lib/deep-time.js) reads the same two numbers.
-const _CUMUL_INTEGRAL_YEAR_MIN = -NAVIGABLE_PAST_YEARS;
-const _CUMUL_INTEGRAL_YEAR_MAX = NAVIGABLE_FUTURE_YEARS;
+// The grid's span is the package calendar's own (ONE home, phase/deep-calendar: the navigable
+// domain on the ENGINE axis plus the position table's margin — plan 27, doc 111 §1.36). Beyond the
+// former ±500 Myr edge posFromJD once extrapolated by one trapezoid from the edge cell and jdFromPos
+// by a linear count, so a jump to −700 Myr sat 44 kyr off, to −2 Gyr 817 kyr off (doc 111 §1.33).
 const _CUMUL_INTEGRAL_STEP     = 10000;
 // Grid geometry for the pos table below (the deep calendar computes the same
 // two numbers for its own table).
@@ -2753,8 +2751,6 @@ function _deepCal() {
     startModelYear: startmodelYear,
     startModelYearWithCorrection: startmodelYear,   // the SI-year label anchors on the epoch itself
     siTropicalYearDays: SI_TROPICAL_YEAR_DAYS,
-    yearMin: _CUMUL_INTEGRAL_YEAR_MIN,
-    yearMax: _CUMUL_INTEGRAL_YEAR_MAX,
     stepYears: _CUMUL_INTEGRAL_STEP,
   });
   return _deepCalM;
@@ -2815,60 +2811,83 @@ function posFromJD(jd) {
 }
 
 /** The navigable position range {posMin, posMax} — the calendar's position table's finite extent. */
+let _navigablePosRangeCache = null;
 function navigablePosRange() {
-  const r = _deepCal().navigableYearRange();
-  return { posMin: r.yearMin - startmodelYear, posMax: r.yearMax - startmodelYear };
+  if (_navigablePosRangeCache === null) {
+    const r = _deepCal().navigableYearRange();
+    _navigablePosRangeCache = { posMin: r.yearMin - startmodelYear, posMax: r.yearMax - startmodelYear };
+  }
+  return _navigablePosRangeCache;
+}
+/** THE HONEST EDGE (plan 27 step B, doc 111 §1.36): a position is clamped to the navigable
+ *  domain — beyond it the readers fall back to a linear count (630 solar days per year one day
+ *  before the genesis, measured by the owner) and nothing is drawn. Play stops at an edge. */
+function clampPosToNavigable(pos) {
+  if (!DEEP_TIME_MODE_ENABLED || !Number.isFinite(pos)) return pos;
+  const r = navigablePosRange();
+  return pos < r.posMin ? r.posMin : pos > r.posMax ? r.posMax : pos;
+}
+/** The clamped position of a UT Julian Day: the nearest edge where the table has no answer. */
+function posFromJDClamped(jd) {
+  const p = posFromJD(jd);
+  if (Number.isFinite(p)) return clampPosToNavigable(p);
+  if (!DEEP_TIME_MODE_ENABLED) return p;
+  const r = navigablePosRange();
+  return jd < startmodelJD ? r.posMin : r.posMax;
 }
 
 // ── THE LABEL SEAM (plan 27, doc 111 §1.36) ──────────────────────────────────────────────
-// Inside ±DEEP_LABEL_SEAM_YEARS of J2000 the Date is the CIVIL calendar date of the UT Julian
-// Day (the records' axis, unchanged). Beyond it the civil count of a UT day count means
-// nothing — it is ΔT from the age the physics is drawn at — so the Date is the POSITION's
-// year (the tropical-year count of date, the age the scene renders) written as a date: the
-// year's fraction mapped onto a 365.2422-day proleptic year's months (a season date), the
-// Time (UTC) field the solar day's own clock as always. At the seam the two labels differ
-// by ΔT(3,000 yr) = 7 h, below the deep label's day resolution.
+// Inside ±DEEP_LABEL_SEAM_YEARS of J2000 the Date and Time are the CIVIL calendar date and
+// time of the UT Julian Day (the records' axis, unchanged). Beyond it the civil count of a
+// UT day count means nothing — it is ΔT from the age the physics is drawn at — so the Date
+// and Time are the civil date and time of the position's TT INSTANT: the engine's own year
+// axis, the age every epoch anchor, the Moon's ring and every panel row read. (A first form
+// wrote the position's tropical-year COUNT as a season date: that count is not the age — it
+// parts from the TT civil year by the year-length history, 2.4 Myr at the genesis, where the
+// ring sat 27 % from the placed Moon.) At the seam the two labels differ by ΔT(3,000 yr) =
+// 7 h. The Julian Day field stays the UT count, the solar day's clock.
 const DEEP_LABEL_SEAM_YEARS = 3000;
-const _SEASON_MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+/** The Julian Day the label is written on: the UT JD inside the seam, the TT instant beyond. */
+function _labelJdOfPos(pos) {
+  if (!DEEP_TIME_MODE_ENABLED || Math.abs(pos) <= DEEP_LABEL_SEAM_YEARS) return jdFromPos(pos);
+  const jdTT = jdTTFromPos(pos);
+  return jdTT === null ? jdFromPos(pos) : jdTT;
+}
+/** The label's Julian Day for a UT Julian Day: the position's TT instant beyond the seam (the
+ *  position table's own, the curve-only axis the model's finders and bridge read — NOT the
+ *  Moon block's absolute clock, which adds the 56-s deltaTStart: one label, one instant). */
+function _labelJdOfUT(jdUT) {
+  const pos = posFromJD(jdUT);
+  return (pos === null || !Number.isFinite(pos)) ? jdUT : _labelJdOfPos(pos);
+}
 /** The scene's year of date for a UT Julian Day: the civil decimal year inside the seam, the
- *  position's year beyond (the age every epoch anchor and the Moon's ring then read). */
+ *  civil decimal year of the position's TT instant beyond — the engine year every physics
+ *  read takes. */
 function sceneYearOfDate(jdUT) {
   const civil = julianDateToDecimalYear(jdUT);
   if (!DEEP_TIME_MODE_ENABLED || Math.abs(civil - J2000_CALENDAR_YEAR) <= DEEP_LABEL_SEAM_YEARS) return civil;
-  const pos = posFromJD(jdUT);
-  return pos === null ? civil : startmodelYear + pos;
+  return julianDateToDecimalYear(_labelJdOfUT(jdUT));
 }
-/** The Date string for a position: civil inside the seam, the season date of the position's year beyond. */
+/** The Date string for a position: the civil date of the label's Julian Day (UT inside the
+ *  seam, the TT instant beyond). */
 function sceneDateLabel(pos) {
-  if (!DEEP_TIME_MODE_ENABLED || Math.abs(pos) <= DEEP_LABEL_SEAM_YEARS) return daysToDate(posToDays(pos));
-  const year = startmodelYear + pos;
-  const y = Math.floor(year);
-  let doy = Math.floor((year - y) * 365.2422);   // 0-based day of a 365.2422-day year
-  let m = 0;
-  while (m < 11 && doy >= _SEASON_MONTH_DAYS[m]) { doy -= _SEASON_MONTH_DAYS[m]; m++; }
-  const d = Math.min(doy + 1, _SEASON_MONTH_DAYS[m]);
-  return `${y}-${pad2(m + 1)}-${pad2(d)}`;
+  return daysToDate(_labelJdOfPos(pos) - startmodelJD);
 }
-/** The inverse of the deep label: a season date's year fraction. */
-function _yearFractionFromSeasonDate(month, day) {
-  let doy = 0;
-  for (let i = 0; i < month - 1 && i < 12; i++) doy += _SEASON_MONTH_DAYS[i];
-  return (doy + (day - 1) + 0.5) / 365.2422;
-}
-/** Date+time → scene time coordinate. Inside the seam the civil route (dateToDays, NOT
- *  dateTimeToJulianDay, to keep its pre-reform convention; the day fraction from timeToPos).
- *  Beyond it the label is the position's year: the season date's fraction plus the time as a
- *  fraction of the solar day of date. */
+/** Date+time → scene time coordinate. The civil route (dateToDays, NOT dateTimeToJulianDay,
+ *  to keep its pre-reform convention; the day fraction from timeToPos) gives the label's
+ *  Julian Day: the UT count inside the seam, the TT instant beyond — the position table's
+ *  own inverse there. */
 function posFromDateTime(dateStr, timeStr) {
-  const dm = /^(-?\d+)-(\d{1,2})-(\d{1,2})$/.exec(dateStr);
-  const y = dm ? parseInt(dm[1], 10) : NaN;
-  if (DEEP_TIME_MODE_ENABLED && Number.isFinite(y) && Math.abs(y - J2000_CALENDAR_YEAR) > DEEP_LABEL_SEAM_YEARS) {
-    const year = y + _yearFractionFromSeasonDate(parseInt(dm[2], 10), parseInt(dm[3], 10));
-    const dayFraction = timeToPos(timeStr) / sDay;                       // the time as a fraction of a day
-    const daysPerYear = meanYearInDaysAtAge((startmodelYear - year) / 1e6);   // solar days in this year of date
-    return year - startmodelYear + (daysPerYear ? dayFraction / daysPerYear : 0);
+  const jdLabel = startmodelJD + dateToDays(dateStr) + timeToPos(timeStr) / sDay;
+  const civil = julianDateToDecimalYear(jdLabel);
+  if (DEEP_TIME_MODE_ENABLED && Number.isFinite(civil) && Math.abs(civil - J2000_CALENDAR_YEAR) > DEEP_LABEL_SEAM_YEARS) {
+    const year = _deepCal().jdTTToYear(jdLabel);
+    if (year !== null && Number.isFinite(year)) return clampPosToNavigable(year - startmodelYear);
+    // beyond the position table: the edge it lies past
+    const r = navigablePosRange();
+    return civil < J2000_CALENDAR_YEAR ? r.posMin : r.posMax;
   }
-  return posFromJD(startmodelJD + dateToDays(dateStr) + timeToPos(timeStr) / sDay);
+  return clampPosToNavigable(posFromJD(jdLabel));
 }
 
 // ───── PHASE 6.7 — Simulation time units (sDay/sYear/sMonth/sWeek/sHour/sMinute/sSecond) ─────
@@ -20711,7 +20730,7 @@ function setupGUI() {
       // sDay·Δday rectangle lands the scene off by the accumulated deep-time
       // drift (measured: entering the VE JD at −9.12 Myr moved the scene
       // −2,972 d and showed the sun 17° from the equinox).
-      o.pos = posFromJD(newJD);
+      o.pos = posFromJDClamped(newJD);   // the honest edge (plan 27 step B)
       o.Day = posToDays(o.pos);
       positionChanged = true;
       dateCtrl.refresh();
@@ -22434,6 +22453,9 @@ function render(now) {
   smoothedDeltaMs = smoothedDeltaMs * 0.9 + Math.min(Math.max(deltaMs, 4), 100) * 0.1;
   if (o.Run) {
     o.pos += Number(o.speedFact) * o.speed * (smoothedDeltaMs * 0.001);
+    // THE HONEST EDGE (plan 27 step B): Play stops AT the navigable edge, never runs past it.
+    const _clampedPos = clampPosToNavigable(o.pos);
+    if (_clampedPos !== o.pos) { o.pos = _clampedPos; o.Run = false; }
     // Throttle CSS2D label updates to 30 Hz during playback
     labelElapsed += delta;
     if (labelElapsed >= 0.033) {
@@ -25295,12 +25317,14 @@ function buildJdArray () {
 /*  Helper – do exactly what the “Julian day” GUI field does */
 /* ────────────────────────────────────────────────────────── */
 function jumpToJulianDay (jd) {
-  o.julianDay = jd;
-
   // Calculate position from JD alone - Day already contains the time fraction
   // (Fixed: removed "+ timeToPos(o.Time)" which caused double-counting of time)
+  // THE HONEST EDGE (plan 27 step B): the scene lands on the navigable edge, never past it;
+  // the JD field follows the landing.
+  const raw = posFromJD(jd);
+  o.pos = posFromJDClamped(jd);
+  o.julianDay = (o.pos === raw) ? jd : jdFromPos(o.pos);   // the input JD stands unless the landing moved (a round trip is 1e-9 d)
   o.Day = o.julianDay - startmodelJD;
-  o.pos = posFromJD(o.julianDay);
 
   positionChanged = true; // Signal animation loop to update scene
 }
@@ -33723,7 +33747,7 @@ function posToDays(pos) {
 }
 
 function posToTime(pos) {
-  const _d = jdFromPos(pos) - startmodelJD;
+  const _d = _labelJdOfPos(pos) - startmodelJD;   // the label's JD: UT inside the seam, the TT instant beyond
   let days = _d - Math.floor(_d);
   let hours = Math.floor(days * 24);
   let minutes = Math.floor((days * 24 - hours) * 60);
@@ -36249,8 +36273,12 @@ function dayToDate(jd) {
     throw new TypeError('dayToDate: julian day must be a finite number');
   }
 
+  // PLAN 27 (doc 111 §1.36): beyond the label seam the strings are the TT instant's — the
+  // engine's year axis, the same label sceneDateLabel and posToTime write from the position.
+  const civilUT = julianDateToDecimalYear(jd);
+  const jdLabel = (DEEP_TIME_MODE_ENABLED && Math.abs(civilUT - J2000_CALENDAR_YEAR) > DEEP_LABEL_SEAM_YEARS) ? _labelJdOfUT(jd) : jd;
   // the one-home converter: Julian before the reform, Gregorian from it
-  const cal = jdToCalendar(jd);
+  const cal = jdToCalendar(jdLabel);
   const isGregorian = cal.calendar === 'Gregorian';
   let day = cal.day;
   const fracDay = cal.dayFrac;
