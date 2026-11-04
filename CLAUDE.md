@@ -272,7 +272,11 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   measured from J2000, never from its own fine edge (one segment past the
   domain: a 2.9-h walk ending in a null), and a segment keeps the cells
   before its first undefined one — a sticky "side undefined" flag is a
-  visit-order dependence. (§1.36)
+  visit-order dependence. An integral called per read is re-integrated per
+  read: the channel-rate integral walked 4.4 Gyr of Simpson on EVERY Moon
+  read at the edge (11.5 s per repeat landing with both banks seated) — a
+  cumulative integral rides a segmented table, the era form verbatim inside
+  its window, and a perf row measures the REPEAT landing. (§1.36)
 
 ---
 

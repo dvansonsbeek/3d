@@ -878,7 +878,7 @@
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
       "packages/physics/src/moon/arguments.cjs": "sha256:9647bf57d21be1fd45016f95357980169acdab05b5fd318feec4c8bce7b71f15",
-      "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:0990e5c8a72791a6141c147bf9c8742e440503d34a891e881692bee14308967a",
+      "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:2a315254c143b3e43557dad26871f7afa12339c45ffe7f26a8f7650ef0eedcd2",
       "packages/physics/src/moon/deep-modes-artifact.cjs": "sha256:d2a53b3976fae922c6c838913d758062fc4db80009e6ef20d4e6e57d638ee1a5",
       "tools/explore/fetch-jpl-sun-longitude-tt.mjs": "sha256:e067a851ecb54bc3cf70afa9b1c8d48ea27219a8b6de4a05aedcd02e2447488c",
       "tools/verify/sun-vs-horizons.js": "sha256:4958fdfbd29a5a128731b4994b7c9c9b2b1db73894b53187b42f20605b243307"

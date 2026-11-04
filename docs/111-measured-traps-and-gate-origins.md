@@ -1203,6 +1203,26 @@ prefixes (17,715 past, 4,000 future), the Moon's longitude at the edge is the
 same read first or after a −3 Myr read, and a read 20 kyr past the history
 leaves the −3 Myr value unchanged.
 
+**An integral called per read is re-integrated per read.** With both banks
+written and seated — the first spin read at the edge 1 ms, every lunar seat
+taken — a landing on the genesis edge still read 21 s on a fresh page and
+11.5 s on a repeat, with 23–26 s of display frames after each; the gate mirror
+and the perf rows (the spin read, the −400 Myr jump) had not measured a full
+edge landing. A CPU profile put 34.7 of 35 s in one function: the deep
+eccentricity channel's rate integral `channelIntegral(T, s)`
+(`moon/deep-ecc-channel.cjs`), a composite Simpson from J2000 to T at a 4-kyr
+step, recomputed on every call — 1.1 M evaluations of the 18-mode series per
+call at the edge, two calls (perigee, node) per Moon read, ~1 s per read, and
+a landing is 30–40 reads. The era form is certified and stays verbatim inside
+|T| ≤ 2,500 cy (the carriers' fine range); beyond it the same 4-kyr Simpson
+cells ride the segmented cumulative association the lunar tables use (64
+cells per segment, grown on demand per s, pure in T — `test:sampler-purity`
+Twin 5 pins the edge first-vs-last and the visit order), a one-time walk of
+~2.2 M evaluations and three per read after. The perf gate's row 0d measures
+a REPEAT landing on the edge, absolute; the values beyond the window move at
+the association's rounding level (the deep goldens re-recorded with this
+reason), the in-era values not at all.
+
 ---
 
 ## 2. The browser tier's gates and their origins

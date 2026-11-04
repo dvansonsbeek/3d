@@ -31,7 +31,9 @@
  *
  * LOAD-BEARING conventions (the certified numerics):
  *  - channelIntegral uses composite Simpson with step ≤ ~4,000 yr
- *    (N ≥ 2, even);
+ *    (N ≥ 2, even) inside |T| ≤ 2,500 cy — the certified era form, verbatim —
+ *    and the same 4-kyr Simpson cells on a SEGMENTED cumulative table beyond
+ *    (plan 27, doc 111 §1.36: pure in T, O(1) per read after a one-time walk);
  *  - modulation(tMa, s) takes age in Myr, positive = past, ≡ 1 at J2000;
  *  - eFactorAt(tYr) = eccAt(tYr) / e0, ≡ 1 at J2000.
  */
@@ -144,22 +146,78 @@ function createDeepEccChannel({ earthZ, anchorE, anchorPeriEclipticDeg, anchorZD
     return Math.pow(Math.pow(1 - e * e, -1.5) / g0, s);
   }
 
+  /** The channel-rate integrand at t (Julian centuries from J2000) for the exponent s.
+   *  @param {number} t @param {number} s */
+  const integrand = (t, s) => {
+    const e = eccAt(t * 100);   // t in cy → years
+    return Math.pow(Math.pow(1 - e * e, -1.5) / g0, s) - 1;
+  };
+  /** The era form: composite Simpson from 0 to T, step ≤ ~4 kyr (the era channel's certified
+   *  discretization, verbatim). @param {number} T @param {number} s */
+  function simpsonFromZero(T, s) {
+    const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
+    const h = T / N;
+    let sum = integrand(0, s) + integrand(T, s);
+    for (let i = 1; i < N; i++) sum += integrand(i * h, s) * (i % 2 ? 4 : 2);
+    return sum * h / 3;
+  }
+  // ── Beyond the window: the SEGMENTED cumulative table (plan 27, doc 111 §1.36) ──
+  // The per-call Simpson re-integrated from J2000 on every call: at the genesis edge 1.1 M
+  // evaluations of the 18-mode series per call, two calls (perigee, node) per Moon read,
+  // ~1 s per read — a landing on the edge read 11–21 s and its display rows 23–26 s with
+  // both banks seated, all in this one function. Inside |T| ≤ CHANNEL_WINDOW_CY (the
+  // carriers' fine range, the window the certified Moon rides) the era form stays
+  // VERBATIM. Beyond, the same integrand on 40-cy (4-kyr) Simpson cells, 64 per 2,560-cy
+  // segment, the segmented association the lunar tables use: a value is the window edge's
+  // verbatim integral + P[k] + S_k[j] + the partial cell — the same doubles whichever T was
+  // asked first (test:sampler-purity Twin 5), grown outward on demand and cached per s
+  // (the one-time walk to the genesis is ~2.2 M evaluations, ~1 s; every read after is
+  // three). Not seated in the lunar bank (an option later; the walk is cheap).
+  const CHANNEL_WINDOW_CY = 2500, CELL_CY = 40, SEGMENT_CELLS = 64;
+  /** @typedef {{ edge: number, P: number[], segs: Map<number, number[]> }} ChannelSide */
+  /** @type {Map<number, { fwd: ChannelSide | null, bwd: ChannelSide | null }>} */
+  const channelSides = new Map();
+  /** @param {number} s @param {1|-1} dir @returns {ChannelSide} */
+  function channelSide(s, dir) {
+    let pair = channelSides.get(s);
+    if (!pair) { pair = { fwd: null, bwd: null }; channelSides.set(s, pair); }
+    const key = dir === 1 ? 'fwd' : 'bwd';
+    let side = pair[key];
+    if (!side) { side = { edge: simpsonFromZero(dir * CHANNEL_WINDOW_CY, s), P: [0], segs: new Map() }; pair[key] = side; }
+    return side;
+  }
+  /** Segment k's within-segment prefix sums S_k[0..SEGMENT_CELLS] (built once).
+   *  @param {ChannelSide} side @param {number} s @param {1|-1} dir @param {number} k */
+  function channelSegment(side, s, dir, k) {
+    let S = side.segs.get(k);
+    if (S) return S;
+    S = [0];
+    const base = dir * (CHANNEL_WINDOW_CY + k * SEGMENT_CELLS * CELL_CY);
+    let f0 = integrand(base, s);
+    for (let j = 1; j <= SEGMENT_CELLS; j++) {
+      const t0 = base + dir * (j - 1) * CELL_CY, t1 = t0 + dir * CELL_CY;
+      const fm = integrand((t0 + t1) / 2, s), f1 = integrand(t1, s);
+      S.push(S[j - 1] + (f0 + 4 * fm + f1) * (dir * CELL_CY / 6));
+      f0 = f1;
+    }
+    side.segs.set(k, S);
+    return S;
+  }
   /** ∫₀ᵀ [(g(e(t′))/g₀)^s − 1] dt′ in Julian centuries — the phase-aware
-   *  channel-rate integral. Composite Simpson, step ≤ ~4 kyr (the era
-   *  channel's certified discretization, verbatim).
+   *  channel-rate integral: the era form inside the window, the table beyond.
    *  @param {number} T @param {number} s @returns {number} */
   function channelIntegral(T, s) {
     if (T === 0) return 0;
-    /** @param {number} t */
-    const f = (t) => {
-      const e = eccAt(t * 100);   // t in cy → years
-      return Math.pow(Math.pow(1 - e * e, -1.5) / g0, s) - 1;
-    };
-    const N = Math.max(2, 2 * Math.ceil(Math.abs(T) * 100 / 8000));
-    const h = T / N;
-    let sum = f(0) + f(T);
-    for (let i = 1; i < N; i++) sum += f(i * h) * (i % 2 ? 4 : 2);
-    return sum * h / 3;
+    if (Math.abs(T) <= CHANNEL_WINDOW_CY) return simpsonFromZero(T, s);
+    const dir = T > 0 ? 1 : -1;
+    const side = channelSide(s, dir);
+    const dist = Math.abs(T) - CHANNEL_WINDOW_CY;
+    const i = Math.floor(dist / CELL_CY), k = Math.floor(i / SEGMENT_CELLS), j = i - k * SEGMENT_CELLS;
+    for (let m = side.P.length - 1; m < k; m++) side.P.push(side.P[m] + channelSegment(side, s, dir, m)[SEGMENT_CELLS]);
+    const S = channelSegment(side, s, dir, k);
+    const t0 = dir * (CHANNEL_WINDOW_CY + i * CELL_CY);
+    const partial = T === t0 ? 0 : (integrand(t0, s) + 4 * integrand((t0 + T) / 2, s) + integrand(T, s)) * ((T - t0) / 6);
+    return side.edge + side.P[k] + S[j] + partial;
   }
 
   /** Bounded Meeus E-factor: E ≡ e(t)/e(J2000), ≡ 1 at J2000.

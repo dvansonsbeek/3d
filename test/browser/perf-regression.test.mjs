@@ -161,6 +161,20 @@ try {
   }, jdOf(-400000000));
   console.log(`      full scene jump ms to −400 Myr (both banks seated, after the spin read): ${deepCold.toFixed(0)}`);
   gate('full jump: first scene jump to −400 Myr on both banks', deepCold, 15000, 'ms');
+  // ── 0d. A REPEAT LANDING ON THE GENESIS EDGE (plan 27, doc 111 §1.36): the Moon's
+  // channel-rate integral was re-integrated from J2000 on every call — 1.1 M series
+  // evaluations per call at the edge, two per Moon read — so a REPEAT landing read 11.5 s
+  // and its display rows 23 s with both banks seated and every spin read at 1 ms. On the
+  // segmented table the first landing pays the one-time walk (~2 s) and a repeat landing
+  // is the Moon reads' three evaluations each. Absolute, like 0b: a slow second landing
+  // must not hide behind the first. The Julian Day entry clamps to the edge (the honest edge).
+  const edgeLanding = await sim.page.evaluate(() => {
+    const T = window.__test__;
+    T.enterJulianDay(-1e13); T.jumpJD(2451545);
+    const t0 = performance.now(); T.enterJulianDay(-1e13); return performance.now() - t0;
+  });
+  console.log(`      repeat landing ms on the genesis edge (both banks seated): ${edgeLanding.toFixed(0)}`);
+  gate('repeat landing on the genesis edge', edgeLanding, 3000, 'ms');
   // Bring the scene back to a modern epoch (measured 2026-09-26): the cold
   // jump leaves o.julianDay at −5.34 Myr, and every hybridSpinProbe below
   // restores that JD after its own jump — so each update paid the former

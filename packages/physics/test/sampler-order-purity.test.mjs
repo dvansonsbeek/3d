@@ -128,6 +128,22 @@ const check = (label, year, fresh, dirty) => {
     for (const jd of LUNAR_JDS) {
       check('model moon.lonDegAtJD lunar bank vs unseeded tables', 2000 + (jd - 2451545) / 365.25, ml0.moon.lonDegAtJD(jd), seatedLon[jd]);
     }
+    // ── Twin 5 (plan 27, doc 111 §1.36): the deep eccentricity channel's rate integral is
+    // a TABLE beyond |T| ≤ 2,500 cy — a segmented cumulative grown on demand per s. Its value
+    // at the genesis edge must be the same doubles whether the edge is the first T asked for
+    // or the last, and every probe the same in either visit order (the segmented association);
+    // inside the window the verbatim era Simpson (the −2600-cy probe sits just outside it).
+    const { createDeepEccChannel } = require(join(ROOT, 'packages', 'physics', 'src', 'moon', 'deep-ecc-channel.cjs'));
+    const { DEEP_MODES_ARTIFACT } = require(join(ROOT, 'packages', 'physics', 'src', 'moon', 'deep-modes-artifact.cjs'));
+    const { NAVIGABLE_PAST_YEARS } = require(join(ROOT, 'packages', 'physics', 'src', 'time', 'navigable-domain.cjs'));
+    const T_EDGE = -NAVIGABLE_PAST_YEARS / 100, T_PROBES = [-2600, -1e5, -1e7, -3e7, T_EDGE, 2600, 1e6];
+    for (const s of [1.5, -1]) {
+      const first = createDeepEccChannel(DEEP_MODES_ARTIFACT), last = createDeepEccChannel(DEEP_MODES_ARTIFACT);
+      const edgeFirst = first.channelIntegral(T_EDGE, s);
+      for (const t of T_PROBES) last.channelIntegral(t, s);
+      check(`deepEcc.channelIntegral(s=${s}) edge first vs edge last`, 2000 + T_EDGE * 100, edgeFirst, last.channelIntegral(T_EDGE, s));
+      for (const t of T_PROBES) check(`deepEcc.channelIntegral(s=${s}) visit order`, 2000 + t * 100, first.channelIntegral(t, s), last.channelIntegral(t, s));
+    }
   }
 }
 
