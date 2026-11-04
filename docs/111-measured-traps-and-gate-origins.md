@@ -1075,6 +1075,67 @@ which stops there), the first bullet of plan 27 step B. The rule: a label
 that feeds a physics read is the engine's own year; a count of years of date
 is a coordinate, never an age.
 
+**The edge is the history's end, less the integrators' margin.** The spin
+bank had stopped at 4,425 Myr (the lunar-age constraint Farhat et al. fit
+to), 4 Myr short of the cited history's last sample at 4,429 Ma: the scene's
+"first day" read 1,360 solar days per sidereal year where the Genesis chart's
+last point read 1,591. Measured first, and the first measurement was blind:
+a convergence test started from the walk's own state at −4,428.75 Myr found
+every step from 1 yr to 1/64 yr agreeing to 0.0000″ — because that state
+had already collapsed onto the orbit normal, a fixed point for any step.
+Started from the −4,425 Myr checkpoint instead (ε 23.157° against the orbit
+normal of date) and read at −4,426/−4,427/−4,428 Myr and the edge, the 1-yr
+floor collapsed ε to 23.04°, 21.39°, 0.98°, 0.0001°; 0.5 yr to 0.05° at the
+edge; 0.25 yr to 20.56°; 1/8 yr read 23.074°, 1/16 23.152°, 1/32 23.154°
+(converged, 5.4 µs per step). RK4 damps the component perpendicular to n̂ by
+~θ⁶/72 per step — 1e-3 at 9 steps per cycle — and the cone angle the
+equation conserves adiabatically is lost to the integrator: the bank's "ε at
+the edge" was that collapse, not a band. And from the −4,420 Myr checkpoint
+the 100-step integer tier itself (1–2-yr steps at T_p 82–280 yr) still
+damped ε by 30″ against a 1/64-yr walk to the edge — the band's own size, an
+integrator's artefact. The schedule's rule is now 300 steps per torque
+period wherever T_p is under 1,000 yr (the last ~50 Myr before the history's
+end), on candidates continuing in binary fractions to 1/32 yr; at T_p ≥
+1,000 yr the 100-step rule on the integer candidates is unchanged
+(bit-identical checkpoints there); the fallback is the smallest step, never
+1 yr; the generator's edge row gates the schedule against a 1/64-yr walk. **A convergence test
+starts from a state the integrator has not already destroyed.** The first
+form of that edge row then REFUSED: Δε 234″ and Δlon 4,256″ between the
+1/32-yr schedule and the 1/64-yr walk over the last 235 kyr. Both are the
+precession PHASE: the row measured ε against the J2000 pole, which mixes the
+phase in, and the stretch holds 24,700 precession cycles (T_p 9.5 yr) — the
+rate is α·cos ε, so a 0.17″ difference in the damped cone angle moves the
+rate by 1.6e-7 and that is 1.4° of phase after the stretch. The phase after
+25,000 cycles is not a certifiable quantity at any affordable step; the cone
+angle against the orbit normal of date (the quantity the equation conserves)
+and the mean rate are. The rows now read Δε as that cone angle (the factory
+exposes `orbitNormalAt`) and the edge row gates the mean rate (5e-7
+relative) while recording the phase; the three era rows keep their 60″ on
+the phase (400 cycles at 2.46 Ga). Measured on the physical form: Δε(cone)
+−0.17″, the rate 1.6e-7, ε at the edge 23.154°. **A sub-year step needs a
+denser seat.** Between 250-kyr checkpoints at 1/32-yr steps one segment is
+8 million RK4 steps (~45 s), and a panel row that scans ±10 Myr around the
+epoch would have walked 320 million — the owner's "filling in the date
+takes a long time" at the genesis, and with the old 1-yr floor already 40
+segments of 1.3 s. Where the schedule steps at 2 yr or less (the last
+~50 Myr) the bank now also records the state at every 5-kyr grid node of the
+deep tier (about 10,000 checkpoints, +1 MB) and at the edge itself, and the
+seat is the nearest recorded state by binary search: a node there is a seat
+with no walk. The
+domain's past edge is now the last sample minus 15 kyr — the sampler's deep
+tier walks two 5-kyr nodes past a query, each node's rate is a ±2.5-yr
+central difference, and the engine year 2000 − N sits 0.5 yr before the
+chain's age N — on the 5-kyr grid (`time/navigable-domain`, one home). The
+bank records the edge itself off the 250-kyr grid and the seat is the nearest
+checkpoint on the near side by binary search (the former search tried only
+spacing multiples: a landing at the edge would have walked 235 kyr unseated,
+~25 s), and the generator's convergence gate has an edge row. The Genesis
+chart's deep end is the same edge, so the scene's first day and the chart's
+last point are one age and one number: a = 6.2 R⊕, a 5.51-h day, 1,590 solar
+days per sidereal year. Farhat's own day at the last sample is 5.79 h (1,513
+days; their interval 5.25–5.95 h), the conservation day 0.28 h shorter, inside
+their band; their best-fit impact is 2 Myr earlier still (4.431 Ga).
+
 **Two costs found by the gate at the edge.** (a) The spin sampler's reads were
 unclamped: a windowed display row sampling ±10 Myr around the navigable edge
 asked the spin walk for ages beyond the bank's deepest checkpoint, where it
@@ -1113,6 +1174,34 @@ the constants embed came out byte-identical, so the stamp cost only the four
 campaigns' re-stamp (12 minutes), not a second bank run. A comment in a
 bank- or fit-hashed file is edited together with a physics change, never
 alone (plan 22's header-edit lesson, now measured on the banks).
+
+**A bank's limit is measured from the anchor, and a segment keeps the cells
+before the first undefined one.** The three banked tables — the five chain
+counts (`chain-cycles/index.cjs`), the two carriers (`moon/arguments.cjs`) and
+the Sun's mean longitude (`model/sun-and-eclipses.js`) — recorded "K = the
+whole segments inside the limit from the fine edge", so with the domain's
+past edge passed as the limit each asked for one segment past the domain. At
+the genesis edge, 15 kyr before the cited history's last sample, that
+segment's last cell ends 500 yr past the history (the chain integrator's age
+anchor is 2000.5), the four lunar chains' integrand is null there, and the
+generator's 2.9-hour unseated walk ended in `REFUSING: chain draconic is
+undefined inside the limit` with nothing written; the former 4,425-Myr limit
+had 4 Myr of slack and never saw it. Reproduced in 2.7 s on a model seated on
+the previous bank (the record then walks only the last 15 segments) — the
+cheap reproduction of a generator's refusal is the seated model, never a
+second unseated walk. The one rule now in all three tables: K = the segments
+whose END lies inside the limit measured from J2000. The second finding sat
+in the chain tier's segment builder: one undefined cell set a sticky "side
+undefined" flag and returned the whole segment null, so a read at the domain
+edge — inside the segment the history ends in — would have fallen to the
+adaptive Simpson path AND taken every later coarse read of that side with
+it, a visit-order dependence `test:sampler-purity` sees only if it visits the
+edge. A segment now keeps the cells before its first undefined one, chains no
+P[k+1], and a read lands null only beyond its last defined cell. Measured
+after the fix on the seated model: every table reaches the domain with finite
+prefixes (17,715 past, 4,000 future), the Moon's longitude at the edge is the
+same read first or after a −3 Myr read, and a read 20 kyr past the history
+leaves the −3 Myr value unchanged.
 
 ---
 

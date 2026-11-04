@@ -112,11 +112,14 @@ export function assembleSunAndEclipses(ctx) {
       const v1 = j + 1 <= COARSE_SEGMENT_CELLS ? P[k] + S[j + 1] : (prefixesTo(side, s, k + 1), P[k + 1] + segment(side, s, k + 1)[0]);
       return v0 + cf * (v1 - v0);
     };
-    /** THE GENERATOR'S HOOK (plan 26 pickup): the coarse segment prefixes in both directions over ±limitYears from the fine edge. @param {number} limitYears */
+    /** THE GENERATOR'S HOOK (plan 26 pickup): the coarse segment prefixes in both directions — the
+     *  segments whose END lies within ±limitYears of J2000 (the one rule of the three banked tables,
+     *  chain-cycles/index.cjs recordSegmentPrefixes). @param {number | {past: number, future: number}} limitYears */
     const recordSunCumulativeBank = (limitYears) => {
       // the limit per direction (a number means both): the bank is ASYMMETRIC like the domain it covers
       const lim = typeof limitYears === 'number' ? { past: limitYears, future: limitYears } : limitYears;
-      const Kf = Math.floor(lim.future / (COARSE_SEGMENT_CELLS * COARSE_STEP)), Kb = Math.floor(lim.past / (COARSE_SEGMENT_CELLS * COARSE_STEP));
+      const segmentsInside = (/** @type {number} */ limit) => Math.max(0, Math.floor((limit - FINE_SPAN) / (COARSE_SEGMENT_CELLS * COARSE_STEP)));
+      const Kf = segmentsInside(lim.future), Kb = segmentsInside(lim.past);
       coarseInit(fwd, 1); coarseInit(bwd, -1); prefixesTo(fwd, 1, Kf); prefixesTo(bwd, -1, Kb);
       return { fwd: /** @type {number[]} */ (fwd.P).slice(0, Kf + 1), bwd: /** @type {number[]} */ (bwd.P).slice(0, Kb + 1) };
     };

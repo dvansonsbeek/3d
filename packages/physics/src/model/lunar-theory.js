@@ -155,7 +155,8 @@ export function assembleLunarTheory(ctx) {
    *  edges — the payload of data/lunar-cumulative-checkpoints.json, computed by the tables' own
    *  recursion on THIS context (never seated on a bank: the generator builds without one).
    *  A number records ±limitYears; {past, future} records each direction to its own edge
-   *  (the navigable domain is asymmetric: −4,425 / +1,000 Myr).
+   *  (the navigable domain is asymmetric: the cited Moon history's last sample minus the
+   *  integrators' margin / +1,000 Myr — time/navigable-domain, one home).
    *  @param {number | {past: number, future: number}} limitYears */
   const recordLunarCumulativeBank = (limitYears) => ({
     chains: {

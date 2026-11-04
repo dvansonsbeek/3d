@@ -35,7 +35,10 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
     sun: Readonly<{
         /** Mean longitude of date, degrees, unwrapped — L0 + 360·∫dt/T_trop (the one-family tropical year). @param {number} year @returns {number} */
         meanLongitudeDegAt: ((year: number) => number) & {
-            recordSunCumulativeBank: (limitYears: number) => {
+            recordSunCumulativeBank: (limitYears: number | {
+                past: number;
+                future: number;
+            }) => {
                 fwd: number[];
                 bwd: number[];
             };
@@ -352,7 +355,10 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
             eccentricityAt: (year: number) => number;
             perihelionLongitudeDegAt: (year: number) => number;
             meanLongitudeDegAt: ((year: number) => number) & {
-                recordSunCumulativeBank: (limitYears: number) => {
+                recordSunCumulativeBank: (limitYears: number | {
+                    past: number;
+                    future: number;
+                }) => {
                     fwd: number[];
                     bwd: number[];
                 };

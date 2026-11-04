@@ -93,7 +93,7 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
             generalPrecessionLonRateDegPerYr: number;
         };
     };
-    recordStates: (tEndYr: number, spacingYr: number) => Array<{
+    recordStates: (tEndYr: number, spacingYr: number, fineSpacingYr?: number, fineStepYrAtMost?: number) => Array<{
         t: number;
         s: number[];
     }>;
@@ -102,6 +102,11 @@ export function createDeepOrbitalHistory({ zModes, zetaModes, zetaSeries, zSerie
         t: number;
     };
     stepYearsAt: (t: number) => number;
+    /** The orbit normal of date n̂(t) in the J2000 ecliptic frame (the ζ series; no spin
+     *  dependence) — the bank generator reads the walk's obliquity as the cone angle against
+     *  it, the quantity the equation conserves, never against the J2000 pole, which mixes in
+     *  the precession phase (plan 27: 25,000 cycles at the genesis). @param {number} t */
+    orbitNormalAt: (t: number) => number[];
     stateJ2000: number[];
     bankLoaded: boolean;
     alphaArcsecPerYr: number;

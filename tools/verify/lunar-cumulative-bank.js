@@ -14,7 +14,7 @@
  * coarse tiers are SEGMENTS of 250 cells with separate segment prefixes P[k] (the value at
  * the start of segment k), a value being the two-term sum P[k] + S_k[j]; this bank stores
  * the P[k] of every named table in both directions over the NAVIGABLE DOMAIN (time/navigable-domain.cjs:
- * −4,425 / +1,000 Myr, the spin bank's two edges — the former ±600 Myr left a jump to −2 Gyr
+ * the cited Moon history's last sample minus the integrators' margin / +1,000 Myr, the spin bank's two edges — the former ±600 Myr left a jump to −2 Gyr
  * integrating ε for 8 min, doc 111 §1.33), computed by the tables' own recursion on the shipped context. A runtime seated on it
  * computes only the segment it reads — the SAME doubles in the SAME order as the unseeded
  * path, so the bank is a seat, never a value (test:sampler-purity's lunar rows).
@@ -42,6 +42,7 @@ const { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } = require('../../packages
 const LIMIT_YEARS = { past: NAVIGABLE_PAST_YEARS, future: NAVIGABLE_FUTURE_YEARS };
 const INPUT_FILES = [
   'tools/verify/lunar-cumulative-bank.js',
+  'packages/physics/src/time/navigable-domain.cjs',
   'packages/physics/src/chain-cycles/index.cjs',
   'packages/physics/src/moon/arguments.cjs',
   'packages/physics/src/moon/ecc-sensitivities.cjs',
@@ -92,6 +93,7 @@ async function main() {
         chainLimitYears: rec.chainLimitYears,
         chainEdgeYears: 250000,     // the dense tier's edge, |year − 2000|
         carrierEdgeCenturies: 2500, // the fine tier's edge, |T| in Julian centuries
+        sunEdgeYears: 20000,        // the Sun's fine tier's edge, |year − 2000|; each table holds the segments whose end lies inside limitYears of J2000
         chains: Object.keys(rec.chains),
         carriers: Object.keys(rec.carriers),
         gates: null,
@@ -113,9 +115,11 @@ async function main() {
       sun: { meanLongitude: { fwd: rec.sun.meanLongitude.fwd.slice(0, k + 1), bwd: rec.sun.meanLongitude.bwd.slice(0, k + 1) } },
     });
     // the longer side (the past) sets the loop; each side is checked only where it has a P[k+1],
-    // and the seeded side is asked for no more than the bank holds per direction
+    // and the seeded side is asked for no more than the bank holds per direction. A table's K counts
+    // the segments whose end lies inside the limit from J2000, so a limit reaching the end of
+    // segment k+1 (the fine edge plus k+2 segments at most) is what forces P[k+1].
     const nSeg = Math.max(rec.chains.draconic.fwd.length, rec.chains.draconic.bwd.length);
-    const limitTo = (/** @type {number} */ k) => ({ past: Math.min(rec.segmentYears * (k + 1), LIMIT_YEARS.past), future: Math.min(rec.segmentYears * (k + 1), LIMIT_YEARS.future) });
+    const limitTo = (/** @type {number} */ k) => ({ past: Math.min(rec.segmentYears * (k + 2), LIMIT_YEARS.past), future: Math.min(rec.segmentYears * (k + 2), LIMIT_YEARS.future) });
     for (let k = 0; k + 1 < nSeg; k += 20) {
       const seeded = createModel(undefined, { secularSeriesArtifact: series, spinCheckpointsArtifact: spin, lunarCheckpointsArtifact: truncated(k) });
       const r = seeded.moon.recordCumulativeBank(limitTo(k));   // forces P[0..k+1] on the seeded side

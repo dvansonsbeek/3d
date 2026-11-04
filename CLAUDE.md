@@ -1,8 +1,11 @@
 # Expanding Solar System Resonance Theory (ESSRT) — simulator
 
 Geocentric solar-system model and 3D simulator implementing the Expanding Solar
-System Resonance Theory (ESSRT). The model is analytic and parametric, valid
-across ±500 Myr. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
+System Resonance Theory (ESSRT). The model is analytic and parametric,
+certified across ±500 Myr (every gate, the API); the simulator navigates from
+the Earth–Moon genesis (the cited history's end, 4.43 Ga) to +1 Gyr, where
+beyond ±500 Myr the deep quantities are reproducible, not converged, and the
+obliquity is a band. [Preprint](https://doi.org/10.21203/rs.3.rs-8758810/v4) ·
 [Live demo](https://3d.holisticuniverse.com)
 
 **Scale:** `src/script.js` ~37,000 lines (the console-test folder, 13,000 lines, retired in plan 18 — its checks are gates; plan 20 took ~2,600 lines of dead code out) · `tools/` ~185 tracked scripts
@@ -248,7 +251,28 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   Moon's history moves 20 %: the ring 27 % from the placed Moon); every label
   that feeds a physics read is the ENGINE's year, the navigable domain is the
   engine's, the position table carries its own margin, and the scene lands on
-  the edge from every entry. (§1.36)
+  the edge from every entry. The domain's past edge is the cited history's
+  last sample minus the integrators' margin (15 kyr: two 5-kyr walk nodes, a
+  ±2.5-yr rate difference, the 0.5-yr epoch offset); the walk's 1-yr floor
+  COLLAPSED ε there (23.16° → 0.0001° over the last 4 Myr: RK4 damps the
+  perpendicular component ~θ⁶/72 per step at 9 steps per cycle; the
+  100-step integer tier still lost 30″ over the last 5 Myr) — 300 steps
+  per cycle wherever T_p < 1,000 yr, on binary fractions to 1/32 yr, the
+  fallback the smallest step; a convergence test starts from a state the
+  integrator has not
+  already destroyed (the first test, from a collapsed state, read 0.0000″
+  at every step); a convergence row reads ε as the CONE ANGLE against the
+  orbit normal of date, never against the J2000 pole (which mixes in the
+  phase), and at the genesis gates the mean rate — the phase after 25,000
+  cycles moves 1.4° per 0.17″ of ε and is not certifiable; a sub-year step
+  needs a denser seat — where the walk steps ≤ 2 yr the bank records every
+  5-kyr grid node (one 250-kyr segment at 1/32 yr is 8 M steps, a ±10-Myr
+  panel scan 320 M), plus the edge itself, and the seat is the nearest
+  recorded state by binary search, not a spacing multiple. A bank's limit is
+  measured from J2000, never from its own fine edge (one segment past the
+  domain: a 2.9-h walk ending in a null), and a segment keeps the cells
+  before its first undefined one — a sticky "side undefined" flag is a
+  visit-order dependence. (§1.36)
 
 ---
 

@@ -55,7 +55,10 @@ export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
     };
     sunL0Deg: any;
     sunMeanLongitudeDegAt: ((year: number) => number) & {
-        recordSunCumulativeBank: (limitYears: number) => {
+        recordSunCumulativeBank: (limitYears: number | {
+            past: number;
+            future: number;
+        }) => {
             fwd: number[];
             bwd: number[];
         };
@@ -74,7 +77,10 @@ export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
     };
     sunPlanetaryCompletionDeg: (T: number) => number;
     sunTropicalRateDegPerCy: number;
-    recordSunCumulativeBank: (limitYears: number) => {
+    recordSunCumulativeBank: (limitYears: number | {
+        past: number;
+        future: number;
+    }) => {
         fwd: number[];
         bwd: number[];
     };

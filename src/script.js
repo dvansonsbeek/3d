@@ -4082,6 +4082,11 @@ if (typeof window !== 'undefined') {
     navigablePosRange: () => navigablePosRange(),
     sceneYearOfDate: (jdUT) => sceneYearOfDate(jdUT),
     sceneDateLabel: (pos) => sceneDateLabel(pos),
+    // THE HONEST EDGE's two field paths, driven as a user does (plan 27 step B): the entry
+    // functions the root controls' change handlers call, then the scene pose of the landing.
+    enterDateTime: (dateStr, timeStr) => { o.Date = dateStr; o.Time = timeStr; o._rootEntry.enterDateTime(); forceSceneUpdate(); },
+    enterJulianDay: (jd) => { o.julianDay = jd; o._rootEntry.enterJulianDay(jd); forceSceneUpdate(); },
+    clockFields: () => ({ date: o.Date, time: o.Time, julianDay: o.julianDay, pos: o.pos }),
     // The perihelion-date rows' solve against the certified Sun it rides
     // (plan 20 §1b.11): the instant's JD, the Sun's longitude there and the target.
     perihelionDateProbe: () => {
@@ -12608,7 +12613,11 @@ const ESSRT_QTY_TABS = [
 
 // Time ranges (x in calendar Ma; negative = past). Convention: t_Ma_geo = -x.
 const ESSRT_RANGE_TABS = [
-  { key: 'full',    t_lo: -4429, t_hi: 1000, label: 'Full (−4.43 to +1 Gyr)' },
+  // the deep end is the NAVIGABLE edge (one home, time/navigable-domain): the cited history's last
+  // sample minus the integrators' margin — the scene's "first day" and this chart's last point are
+  // then one age and one number (1,590 solar days per sidereal year), where the chart once ran to
+  // the raw last sample 15 kyr deeper (1,591) that the scene could not reach (owner, 2026-11-03)
+  { key: 'full',    t_lo: -NAVIGABLE_PAST_YEARS / 1e6, t_hi: 1000, label: 'Full (−4.43 to +1 Gyr)' },
   { key: 'phanero', t_lo:  -650, t_hi:    0, label: 'Phanerozoic (650 Ma)' },
 ];
 
@@ -12723,7 +12732,7 @@ const ESSRT_QTY_SPECS = {
 
 // Geological-era markers (calendar Ma, negative = past)
 const ESSRT_ERA_MARKERS = [
-  { t_cal: -4429, label: 'Earth-Moon genesis', color: '#a66' },
+  { t_cal: -NAVIGABLE_PAST_YEARS / 1e6, label: 'Earth-Moon genesis', color: '#a66' },
   { t_cal: -541,  label: 'Cambrian',           color: '#699' },
   { t_cal: -380,  label: 'Devonian',           color: '#6a9' },
   { t_cal: -250,  label: 'Pangea (mid)',       color: '#c95' },
@@ -20694,13 +20703,44 @@ function setupGUI() {
 
   // Guard against re-entrant / rapid-fire confirmed changes
   let _rootUpdating = false;
+  // THE HONEST EDGE (plan 27 step B, doc 111 §1.36): every entry lands on the navigable domain,
+  // and all three fields show the landing at once — a date or Julian Day before the Earth–Moon
+  // genesis (or past the future edge) reads back as the edge itself, never a value beyond it.
+  // The two entry paths are named so the gate can drive them the way a user does.
+  /** The Date/Time fields' path: o.Date / o.Time hold the entry; the position is clamped, the
+   *  Julian Day follows it, and the strings are re-derived from the landing. */
+  const enterDateTime = () => {
+    updatePosition();                                   // o.pos clamped, o.julianDay from it
+    o.Date = sceneDateLabel(o.pos);
+    o.Time = posToTime(o.pos);
+    dateCtrl.refresh();
+    timeCtrl.refresh();
+    jdCtrl.refresh();
+  };
+  /** The Julian Day field's path: the position is clamped; when the landing moved, the Julian Day
+   *  follows it; the strings are re-derived from the landing.
+   *  R4: pos comes from the INTEGRATED pos↔JD map — the linear sDay·Δday rectangle landed the
+   *  scene off by the accumulated deep-time drift (measured: entering the VE JD at −9.12 Myr
+   *  moved the scene −2,972 d and showed the sun 17° from the equinox). */
+  const enterJulianDay = (/** @type {number} */ newJD) => {
+    const raw = posFromJD(newJD);
+    o.pos = posFromJDClamped(newJD);
+    if (o.pos !== raw) o.julianDay = jdFromPos(o.pos);
+    o.Date = sceneDateLabel(o.pos);
+    o.Time = posToTime(o.pos);
+    o.Day = posToDays(o.pos);
+    positionChanged = true;
+    dateCtrl.refresh();
+    timeCtrl.refresh();
+    jdCtrl.refresh();
+  };
+  o._rootEntry = { enterDateTime, enterJulianDay };
   // When Date or Time changes → recompute position, then refresh JD + perihelion display
   const dateCtrl = gui.addBinding(o, 'Date', { label: 'Date (Y-M-D)' })
     .on('change', ({ value, last }) => {
       if (!last || !isValidDate(value) || _rootUpdating || o._renderLoopRefreshing) return;
       _rootUpdating = true;
-      updatePosition();
-      jdCtrl.refresh();
+      enterDateTime();
       blurActiveInput();
       _rootUpdating = false;
     });
@@ -20709,8 +20749,7 @@ function setupGUI() {
     .on('change', ({ value, last }) => {
       if (!last || !isValidTime(value) || _rootUpdating || o._renderLoopRefreshing) return;
       _rootUpdating = true;
-      updatePosition();
-      jdCtrl.refresh();
+      enterDateTime();
       blurActiveInput();
       _rootUpdating = false;
     });
@@ -20723,18 +20762,7 @@ function setupGUI() {
       const newJD = Number(value);
       const currentJD = dateTimeToJulianDay(o.Date, o.Time);
       if (Math.abs(newJD - currentJD) < 0.0000001) { _rootUpdating = false; return; }
-      const converted = dayToDate(newJD);
-      o.Date = converted.date;
-      o.Time = converted.time;
-      // R4: pos must come from the INTEGRATED pos↔JD map — the linear
-      // sDay·Δday rectangle lands the scene off by the accumulated deep-time
-      // drift (measured: entering the VE JD at −9.12 Myr moved the scene
-      // −2,972 d and showed the sun 17° from the equinox).
-      o.pos = posFromJDClamped(newJD);   // the honest edge (plan 27 step B)
-      o.Day = posToDays(o.pos);
-      positionChanged = true;
-      dateCtrl.refresh();
-      timeCtrl.refresh();
+      enterJulianDay(newJD);
       blurActiveInput();
       _rootUpdating = false;
     });
@@ -25354,7 +25382,7 @@ function forceSceneUpdate (mode) {
   }
 
   o.Day           = posToDays(o.pos);
-  o.Date          = daysToDate(o.Day);
+  o.Date          = sceneDateLabel(o.pos);   // ONE label (plan 27): the UT count's civil date beyond the seam read −6.76 Gyr at the genesis edge
   o.Time          = posToTime(o.pos);
   o.currentYear   = sceneYearOfDate(o.julianDay); // Required for updatePredictions & updateAscendingNodes
 

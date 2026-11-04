@@ -202,6 +202,8 @@ Two things worth knowing before you read a red result as breakage:
 
 ## Deep-Time Implementation — from the Moon's genesis to the tidal-lock asymptote
 
+**Two spans, named.** The simulator navigates from the Earth–Moon genesis — the end of the cited Earth–Moon distance history, 4.43 Gyr ago — to +1 Gyr. The model is **certified** over ±500 Myr: every gate below runs there and the API serves that span; beyond it the deep lunar phase is reproducible, not converged, and the deep obliquity is served as a band, not a value.
+
 The model's parameters apply at **all epochs from the end of the cited Earth–Moon history (4.43 Gyr ago — the lunar age of Farhat et al. 2022's solution, the model's distance input) through J2000 and into the future tidal-lock asymptote at ~<!--v:tidalLockRE-->87.1<!--/v--> R_⊕**. [Doc 99](docs/99-expanding-solar-system-resonance-theory.md) documents the canonical chain from the epoch through the length of day, the mean lunisolar precession period, the AU, solar mass loss, the Kepler year, the Moon's distance and synodic month, the anomalistic year, the stellar and sidereal days and the planets' orbital and synodic periods. The chain is anchored to modern Lunar Laser Ranging and the [Farhat 2022](https://www.aanda.org/articles/aa/full_html/2022/09/aa44329-22/aa44329-22.html) lunar-distance evolution; the deep-time outputs are then validated against external anchors the model was **not** fit against:
 
 - **Wells 1963** (Devonian coral growth bands at 380 Ma): <!--v:anchorWellsFlagship380Pred-->402.83<!--/v--> days per year predicted against Wells's paleontological count of 400 (<!--v:anchorWellsFlagship380DeltaPct-->+0.71<!--/v--> %)

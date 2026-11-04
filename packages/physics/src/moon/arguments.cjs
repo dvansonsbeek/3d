@@ -248,9 +248,12 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
     };
     if (name) {
       const bankSide = (/** @type {1|-1} */ dir) => { const bc = checkpoints && checkpoints.carriers ? checkpoints.carriers[name] : undefined; const arr = bc ? bc[dir === 1 ? 'fwd' : 'bwd'] : undefined; return Array.isArray(arr) ? arr[0] : null; };
+      // K = the whole segments whose END lies within the limit OF J2000 (not of the fine edge) — the
+      // one rule of the three banked tables (chain-cycles/index.cjs recordSegmentPrefixes).
+      const segmentsInside = (/** @type {number} */ limitCy) => Math.max(0, Math.floor((Math.min(limitCy, CARRIER_LIMIT_CY) - CARRIER_FINE_RANGE_CY) / (CARRIER_SEGMENT_CELLS * CARRIER_CELL_CY)));
       carrierRecorders.set(name, {
-        fwd: (limitCy) => { const s = sideOf(1); coarseInit(s, 1); const K = Math.floor(Math.min(limitCy, CARRIER_LIMIT_CY) / (CARRIER_SEGMENT_CELLS * CARRIER_CELL_CY)); prefixesTo(s, 1, K); return /** @type {number[]} */ (s.P).slice(0, K + 1); },
-        bwd: (limitCy) => { const s = sideOf(-1); coarseInit(s, -1); const K = Math.floor(Math.min(limitCy, CARRIER_LIMIT_CY) / (CARRIER_SEGMENT_CELLS * CARRIER_CELL_CY)); prefixesTo(s, -1, K); return /** @type {number[]} */ (s.P).slice(0, K + 1); },
+        fwd: (limitCy) => { const s = sideOf(1); coarseInit(s, 1); const K = segmentsInside(limitCy); prefixesTo(s, 1, K); return /** @type {number[]} */ (s.P).slice(0, K + 1); },
+        bwd: (limitCy) => { const s = sideOf(-1); coarseInit(s, -1); const K = segmentsInside(limitCy); prefixesTo(s, -1, K); return /** @type {number[]} */ (s.P).slice(0, K + 1); },
         status: () => { const f = sideOf(1), b = sideOf(-1); coarseInit(f, 1); coarseInit(b, -1); return { fwd: { banked: f.banked, edge: /** @type {number[]} */ (f.P)[0], bankEdge: bankSide(1) }, bwd: { banked: b.banked, edge: /** @type {number[]} */ (b.P)[0], bankEdge: bankSide(-1) } }; },
       });
     }

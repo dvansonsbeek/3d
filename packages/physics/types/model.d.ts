@@ -48,7 +48,10 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
     }>;
     sun: Readonly<{
         meanLongitudeDegAt: ((year: number) => number) & {
-            recordSunCumulativeBank: (limitYears: number) => {
+            recordSunCumulativeBank: (limitYears: number | {
+                past: number;
+                future: number;
+            }) => {
                 fwd: number[];
                 bwd: number[];
             };
@@ -302,7 +305,10 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
             eccentricityAt: (year: number) => number;
             perihelionLongitudeDegAt: (year: number) => number;
             meanLongitudeDegAt: ((year: number) => number) & {
-                recordSunCumulativeBank: (limitYears: number) => {
+                recordSunCumulativeBank: (limitYears: number | {
+                    past: number;
+                    future: number;
+                }) => {
                     fwd: number[];
                     bwd: number[];
                 };

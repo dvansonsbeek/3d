@@ -573,7 +573,21 @@ function createDeepOrbitalHistory({
   // phase by 9° at 100 Ma. The 50-yr walk IS converged: 0.10″ / 10″ at 100 Ma
   // against a 10-yr walk (ratios 3,000–30,000 where fourth order predicts 625).
   // STRICT < so the walk switches AT the ±50,000 boundary (a grid node).
-  const STEP_CANDIDATES = [50, 25, 20, 10, 5, 4, 2, 1];
+  // PLAN 27 (doc 111 §1.36) — the fast-precession regime before the cited history's end: where
+  // the torque period is under 1,000 yr (the last ~50 Myr; T_p falls from 1 kyr to 9.4 yr) the
+  // rule is 300 steps per period and the candidates continue in binary fractions to 1/32 yr; at
+  // T_p ≥ 1,000 yr the 100-step rule on the integer candidates is the certified regime, unchanged
+  // (bit-identical checkpoints there). MEASURED 2026-11-03, walking from the −4,425 Myr checkpoint
+  // (ε 23.157° against the orbit normal of date) to the edge at fixed steps: 1 yr collapsed ε to
+  // 0.0001° (RK4 damps the component perpendicular to n̂ by ~θ⁶/72 per step, 1e-3 at 9 steps per
+  // cycle), 0.5 yr to 0.05°, 0.25 yr to 20.56°; 0.125 yr read 23.074°, 1/16 yr 23.152°, 1/32 yr
+  // 23.154° (converged); and from −4,420 Myr the 100-step integer tier (1–2 yr at T_p 82–280)
+  // still damped ε by 30″ against a 1/64-yr walk — the band's size, an integrator's artefact. The
+  // former 1-yr floor's "ε at the edge" was that collapse, not a band. Every candidate divides 100
+  // evenly and t stays exact (binary fractions), so the walk still lands on every grid node; the
+  // fallback is the SMALLEST step, never 1 yr.
+  const STEP_CANDIDATES = [50, 25, 20, 10, 5, 4, 2, 1, 0.5, 0.25, 0.125, 0.0625, 0.03125];
+  const stepsPerCycle = (/** @type {number} */ Tp) => (Tp < 1000 ? 300 : 100);
   let stepCellKey = NaN, stepCellH = 5;
   const hStepAt = (/** @type {number} */ t) => {
     const a = Math.abs(t);
@@ -581,8 +595,9 @@ function createDeepOrbitalHistory({
     const cellKey = (t < 0 ? -1 : 1) * Math.floor(a / 1000) * 1000;
     if (cellKey === stepCellKey) return stepCellH;
     const Tp = axialPrecessionYearsAtYearFn ? axialPrecessionYearsAtYearFn(2000 + cellKey) : axialPrecessionYearsJ2000;
-    let h = 1;
-    for (const c of STEP_CANDIDATES) if (c * 100 <= Tp) { h = c; break; }
+    let h = STEP_CANDIDATES[STEP_CANDIDATES.length - 1];
+    const perCycle = stepsPerCycle(Tp);
+    for (const c of STEP_CANDIDATES) if (c * perCycle <= Tp) { h = c; break; }
     stepCellKey = cellKey; stepCellH = h;
     return h;
   };
@@ -600,9 +615,15 @@ function createDeepOrbitalHistory({
     return { s, t };
   }
   /** The continuous walk's states at every multiple of spacingYr from J2000 to tEndYr (one
-   *  direction) — the bank generator's instrument; no grid is built.
-   *  @param {number} tEndYr @param {number} spacingYr @returns {Array<{t: number, s: number[]}>} */
-  function recordStates(tEndYr, spacingYr) {
+   *  direction) — the bank generator's instrument; no grid is built. Where the schedule steps at
+   *  `fineStepYrAtMost` or less (the fast-precession regime before the cited history's end), the
+   *  states are ALSO recorded at every multiple of `fineSpacingYr` — the deep tier's own grid —
+   *  so a node there is a seat with no walk: between 250-kyr checkpoints at 1/32-yr steps a
+   *  single segment is 8 million RK4 steps (~45 s), and a panel row scanning ±10 Myr would have
+   *  walked 320 million (plan 27, measured as the owner's "a long time" at the genesis).
+   *  @param {number} tEndYr @param {number} spacingYr @param {number} [fineSpacingYr]
+   *  @param {number} [fineStepYrAtMost] @returns {Array<{t: number, s: number[]}>} */
+  function recordStates(tEndYr, spacingYr, fineSpacingYr = 0, fineStepYrAtMost = 0) {
     const dir = tEndYr < 0 ? -1 : 1;
     /** @type {Array<{t: number, s: number[]}>} */ const out = [];
     let s = S0A, t = 0;
@@ -610,14 +631,24 @@ function createDeepOrbitalHistory({
       const h = hStepAt(t);
       s = rk4(s, t, dir * h);
       t += dir * h;
-      if (t % spacingYr === 0) out.push({ t, s: s.slice() });
+      if (t % spacingYr === 0 || (fineSpacingYr > 0 && t % fineSpacingYr === 0 && hStepAt(t) <= fineStepYrAtMost)) out.push({ t, s: s.slice() });
     }
+    // the domain's edge itself, off the spacing grid: recorded so a landing there seats exactly
+    // (plan 27: the edge is the cited history's last sample minus the integrators' margin,
+    // 235 kyr past the deepest grid checkpoint — unseated, that stretch cost ~25 s per session)
+    if (t === tEndYr && t % spacingYr !== 0) out.push({ t, s: s.slice() });
     return out;
   }
   // The bank, indexed by t (years from J2000; both directions).
   /** @type {Map<number, number[]> | null} */
   const bank = spinCheckpoints && spinCheckpoints.checkpoints ? new Map(spinCheckpoints.checkpoints.map((/** @type {{t: number, s: number[]}} */ c) => [c.t, c.s])) : null;
-  const bankSpacing = spinCheckpoints && bank ? spinCheckpoints.spacingYr : 0;
+  /** The checkpoints' |t| per direction, ascending — the seat search's index (the record's own
+   *  set: the spacing multiples and the domain's edge, which the generator records off-grid). */
+  const bankAbsT = { [-1]: /** @type {number[]} */ ([]), [1]: /** @type {number[]} */ ([]) };
+  if (bank) {
+    for (const t of bank.keys()) { if (t < 0) bankAbsT[-1].push(-t); else if (t > 0) bankAbsT[1].push(t); }
+    bankAbsT[-1].sort((x, y) => x - y); bankAbsT[1].sort((x, y) => x - y);
+  }
 
   /** The factory's walks, one per grid step: the shared node grid and, per direction, the
    *  COVERED SEGMENTS — contiguous node ranges [from, to] (|t|) each with the live frontier
@@ -700,10 +731,13 @@ function createDeepOrbitalHistory({
       let start = { a: 0, s: S0, t: 0, seg: null };
       for (const sg of segs) if (sg.to <= need && sg.to > start.a) start = { a: sg.to, s: sg.s, t: sg.t, seg: sg };
       if (bank) {
-        for (let a = Math.floor(need / bankSpacing) * bankSpacing; a > start.a; a -= bankSpacing) {
-          const cs = bank.get(dir * a);
-          if (cs) { start = { a, s: cs, t: dir * a, seg: null }; break; }
-        }
+        // the nearest checkpoint on the near side of the query, by binary search on the sorted
+        // |t| — the spacing multiples and the recorded edge alike
+        const arr = bankAbsT[dir];
+        let lo = 0, hi = arr.length;
+        while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m] <= need) lo = m + 1; else hi = m; }
+        const a = lo > 0 ? arr[lo - 1] : 0;
+        if (a > start.a) { const cs = bank.get(dir * a); if (cs) start = { a, s: cs, t: dir * a, seg: null }; }
       }
       let s = start.s, t = start.t;
       const end = dir * need;
@@ -799,6 +833,11 @@ function createDeepOrbitalHistory({
     recordStates,
     walkFrom,
     stepYearsAt: hStepAt,
+    /** The orbit normal of date n̂(t) in the J2000 ecliptic frame (the ζ series; no spin
+     *  dependence) — the bank generator reads the walk's obliquity as the cone angle against
+     *  it, the quantity the equation conserves, never against the J2000 pole, which mixes in
+     *  the precession phase (plan 27: 25,000 cycles at the genesis). @param {number} t */
+    orbitNormalAt: (t) => orbitNormal(t),
     stateJ2000: S0A,
     bankLoaded: bank !== null,
     alphaArcsecPerYr: ALPHA * R2D * 3600,   // the injected GENERAL-anchor form (input echo, unchanged semantics)

@@ -151,7 +151,13 @@ domainRows.edge = await s.page.evaluate(({ beforeJD, afterJD }) => {
   const T = window.__test__;
   T.jumpJD(beforeJD); const past = T.scenePos();
   T.jumpJD(afterJD); const future = T.scenePos();
-  return { past, future };
+  // the two FIELD paths, as a user drives them: a date before the genesis and a Julian Day before
+  // it both land on the edge, and all three fields read the edge (owner, 2026-11-03)
+  const edgePos = T.navigablePosRange().posMin;
+  const edgeLabel = T.sceneDateLabel(edgePos);
+  T.enterDateTime('-5000000000-01-01', '00:00:00'); const viaDate = T.clockFields();
+  T.jumpJD(2451545); T.enterJulianDay(beforeJD); const viaJD = T.clockFields();
+  return { past, future, edgeLabel, viaDate, viaJD };
 }, { beforeJD: jdFromPos(navigablePosRange().posMin) - 1e6, afterJD: jdFromPos(navigablePosRange().posMax) + 1e6 });
 
 const pageErrors = s.errors.length;
@@ -280,6 +286,13 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const okEdge = Number.isFinite(dPast) && Number.isFinite(dFuture) && Math.abs(dPast) <= TOL_RANGE_YEARS && Math.abs(dFuture) <= TOL_RANGE_YEARS;
     if (!okEdge) fail++;
     console.log(`${okEdge ? '  ok ' : 'FAIL '} honest edge: a jump 1e6 d past either edge lands on it  Δ ${Number(dPast).toExponential(2)} / ${Number(dFuture).toExponential(2)} yr`);
+    const edgeJD = jdFromPos(twin.posMin);
+    for (const [label, f] of [['the Date field', domainRows.edge.viaDate], ['the Julian Day field', domainRows.edge.viaJD]]) {
+      const dPos = f.pos - twin.posMin, dJD = f.julianDay - edgeJD;
+      const okF = Number.isFinite(dPos) && Math.abs(dPos) <= TOL_RANGE_YEARS && Number.isFinite(dJD) && Math.abs(dJD) <= 2 * Math.abs(twin.posMin) * Number.EPSILON * 1500 && f.date === domainRows.edge.edgeLabel;
+      if (!okF) fail++;
+      console.log(`${okF ? '  ok ' : 'FAIL '} honest edge via ${label}: lands on the edge and shows it  pos Δ ${Number(dPos).toExponential(2)} yr · JD Δ ${Number(dJD).toExponential(2)} d · Date ${f.date} (edge ${domainRows.edge.edgeLabel}) ${f.time}`);
+    }
   }
 }
 

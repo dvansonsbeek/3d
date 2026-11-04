@@ -547,7 +547,10 @@ shrinks below 5 kyr — so the walk lands exactly on the samplers' 1,000- and
 genesis is 88 million steps (~15 min in Node), which is why it ships with
 its bank: `data/spin-axis-checkpoints.json` (generator
 `tools/verify/spin-axis-bank.js --write`) holds the continuous walk's exact
-unit vector every 250 kyr from −4,425 Myr to +1,000 Myr. The walk is pure
+unit vector every 250 kyr over the navigable domain (`time/navigable-domain`:
+the cited Moon history's last sample minus the integrators' margin, 4,428.985
+Myr, and +1,000 Myr; the edge itself is recorded off-grid so a landing there
+seats exactly). The walk is pure
 in (ŝ, t) — a node is computed from the state alone, nothing accumulates —
 so a runtime seated on the nearest checkpoint on its near side walks at most
 one spacing (~5,000 steps, ~50 ms) for a POINT read of ε, the equinox or e —
@@ -577,7 +580,7 @@ are now 250-kyr SEGMENTS with separate segment prefixes P[k] — a value is the
 two-term sum P[k] + the within-segment sum — and
 `data/lunar-cumulative-checkpoints.json` (`tools/verify/lunar-cumulative-bank.js
 --write`, ~25 min) stores every table's P[k] in both directions over the
-navigable domain (−4,425 / +1,000 Myr, `time/navigable-domain` — the spin
+navigable domain (−4,428.985 / +1,000 Myr, `time/navigable-domain` — the spin
 bank's two edges), computed by the tables' own recursion on the shipped
 context. A runtime seated on it sums one segment at most and reads the SAME
 doubles in the SAME order as without it: a seat, never a value — the
