@@ -4,7 +4,7 @@
  * One slice of `assembleModel` (../model.js): receives the context the earlier slices built, returns the bindings the later ones read.
  */
 import { createChainCycleIntegrator } from '../chain-cycles/index.cjs';
-import { J2000_JD, JULIAN_CENTURY_DAYS } from '../constants/units.cjs';
+import { DAYS_PER_JULIAN_YEAR, J2000_JD, JULIAN_CENTURY_DAYS } from '../constants/units.cjs';
 import { createMoonArguments, jdToDecimalYear } from '../moon/arguments.cjs';
 import { createDeepCalendar } from '../phase/deep-calendar.cjs';
 import { createMoonSeries } from '../moon/series.cjs';
@@ -248,16 +248,22 @@ export function assembleLunarTheory(ctx) {
       eFactorAtJdTT: /** @param {number} jdTT */ (jdTT) => fwEFactor(jdTT - j2000JD),
       // 20.3d(i): the Driver-1 ratio at the EVALUATED epoch (per-jd pure
       // evaluator). MATCHED TRIPLE with the tools-lib and browser getters:
-      // identical age arithmetic — the SI-linear year (yearFromJD, never
-      // the calendar year: the recorded linear-vs-calendar mirror trap)
-      // against the MODEL-START anchor (startmodelYear, the browser's
-      // J2000_CALENDAR_YEAR — NOT this model's 2000.0 yearToTMa convention:
-      // the 0.5-yr difference is 4.95e-11 of distance and failed the
-      // bit-exact parity gate). Falls back to the J2000 constant
-      // without a jd (legacy call shape) or past the domain.
+      // identical age arithmetic — the ENGINE age, Julian years from J2000.0
+      // on the TT instant ((j2000JD − jdTT) / 365.25 / 1e6, the chain's
+      // yearToTMa convention; doc 111 §1.31). The former SI-linear count
+      // (365.2422-d years from the model start) runs 2.14e-5 of the span
+      // ahead of the engine age — 95 kyr at the genesis — and crossed the
+      // cited history's end INSIDE the navigable domain (which ends 15 kyr
+      // before it on the engine axis): the history refused, this fallback
+      // answered with the J2000 constant, and the eclipse tier's Moon sat at
+      // 366,681 km where the rendered one sat at 37,834 (the umbra ring 49°
+      // from the Moon's shadow at the owner's genesis eclipse; the browser's
+      // same fallback read an epoch-mutable global and was right by accident).
+      // Falls back to the J2000 constant without a jd (legacy call shape) or
+      // past the history (beyond the navigable domain only, now).
       getMoonDistanceKm: /** @param {number} [jdTT] */ (jdTT) => {
         if (jdTT === undefined) return moonDistanceKm;
-        const d = moonDistanceMetresAtAge((startmodelYear - yearFromJD(jdTT)) / 1e6);
+        const d = moonDistanceMetresAtAge((j2000JD - jdTT) / DAYS_PER_JULIAN_YEAR / 1e6);
         return d === null ? moonDistanceKm : d / 1000;
       },
       getEccentricityBase: () => C.moonReference.moonOrbitalEccentricityBase,

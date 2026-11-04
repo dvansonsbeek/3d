@@ -9,6 +9,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 const C = require('./constants');
+const { DAYS_PER_JULIAN_YEAR } = require('@essrt/physics/constants/units');   // the engine age of a TT JD (the Moon series' distance getter)
 const DT = require('./deep-time');
 // perf: cached lazy requirer. A bare `require()` inside a per-call function
 // re-runs module RESOLUTION every call (~30 µs: internalModuleStat +
@@ -338,7 +339,10 @@ function _moonSeriesM() {
         // (SG_DEEP_TIME=0) keeps the J2000 constant — prior bit-parity.
         getMoonDistanceKm: (jdTT) => {
           if (!DEEP_TIME_ENABLED || jdTT === undefined) return C.moonDistance;
-          const d = DTmod.meanMoonDistanceMetresAtAge((C.startmodelYear - _jdToSIyearTools(jdTT)) / 1e6);
+          // the ENGINE age (Julian years from J2000.0 on the TT instant) — matched with the
+          // browser and package getters; the former SI-linear count crossed the cited
+          // history's end inside the navigable domain (doc 111 §1.31)
+          const d = DTmod.meanMoonDistanceMetresAtAge((C.j2000JD - jdTT) / DAYS_PER_JULIAN_YEAR / 1e6);
           return d === null ? C.moonDistance : d / 1000;
         },
         getEccentricityBase: () => C.moonOrbitalEccentricity,

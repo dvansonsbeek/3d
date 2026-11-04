@@ -2371,11 +2371,15 @@ const _moonSeries = (() => {
           // parity). Bit-equal to the global at year 2000.
           getMoonDistanceKm: (jdTT) => {
             if (!DEEP_TIME_MODE_ENABLED || jdTT === undefined) return moonDistance;
-            // SI-linear year + corrected start anchor — MATCHED TRIPLE with
-            // tools-lib and the package (bit-identical age arithmetic; the
-            // calendar year here would trip the recorded linear-vs-calendar
-            // mirror trap).
-            const dKm = meanMoonDistanceAtAge((startmodelYear - _jdToSIyear(jdTT)) / 1e6);
+            // The ENGINE age (Julian years from J2000.0 on the TT instant) —
+            // MATCHED TRIPLE with tools-lib and the package (bit-identical age
+            // arithmetic). The former SI-linear count ran 95 kyr past the
+            // engine age at the genesis and crossed the cited history's end
+            // inside the navigable domain; the fallback below then answered
+            // with the epoch-mutable global — right by accident here, the
+            // J2000 constant in the package (the umbra ring 49° from the
+            // Moon's shadow at the genesis eclipse; doc 111 §1.31).
+            const dKm = meanMoonDistanceAtAge((j2000JD - jdTT) / DAYS_PER_JULIAN_YEAR / 1e6);
             return dKm === null ? moonDistance : dKm;
           },
           getEccentricityBase: () => moonOrbitalEccentricityBase,
@@ -3259,7 +3263,13 @@ function _engineYearTT(jdUT) {
 function _engineYearOfSceneYear(sceneYear) {
   const y = Math.floor(sceneYear);
   const jd0 = dateToJulianDay(y, 1, 1), jd1 = dateToJulianDay(y + 1, 1, 1);
-  return _engineYearTT(jd0 + (sceneYear - y) * (jd1 - jd0));
+  const jdCal = jd0 + (sceneYear - y) * (jd1 - jd0);
+  // Beyond the label seam the scene year IS the TT instant's civil year (plan 27, doc 111
+  // §1.36), so its calendar JD is the TT instant itself: bridging it as a UT label again reads
+  // the epoch that label's UT count reaches — 3.35 Ga at the genesis (measured through the
+  // cardinal rows, plan 27 step F). Inside the seam the label is the civil UT date, bridged.
+  if (DEEP_TIME_MODE_ENABLED && Math.abs(sceneYear - J2000_CALENDAR_YEAR) > DEEP_LABEL_SEAM_YEARS) return 2000 + (jdCal - j2000JD) / DAYS_PER_JULIAN_YEAR;
+  return _engineYearTT(jdCal);
 }
 
 // ───── Meeus arguments vs integrator-derived (verification) ─────
@@ -3472,6 +3482,9 @@ if (typeof window !== 'undefined') {
     // manifest — null until the table has loaded
     earthTierAtAge: (ageMa) => (earth && earth._earthTierAtAge) ? earth._earthTierAtAge(ageMa) : null,
     earthDayMapState: () => (earth && earth._earthDayMapState) ? earth._earthDayMapState() : null,
+    // plan 27 step F: the scene year → engine year map and the Orbit Analysis paper's cardinal dates (seam-aware)
+    engineYearOfSceneYear: (y) => _engineYearOfSceneYear(y),
+    hiCardinalDates: (y) => _hiCardinalDates(y),
     // plan 27 step F: a body's tier for an age ('moon' | 'mercury' | 'saturn'; null until its
     // table has loaded) and its live state (the active tier, whether its map has decoded)
     bodyTierAtAge: (name, ageMa) => { const pd = _surfaceTierBodies.find((b) => b.name.toLowerCase() === name); return pd ? pd._surfaceTiers.tierAtAge(ageMa) : null; },
@@ -3984,6 +3997,33 @@ if (typeof window !== 'undefined') {
         eyePresent: !!document.querySelector('.pl-handle-eye') };
     },
     restoreFocus: (name) => { switchToPlanet(name); forceSceneUpdate(); return o.Target; },
+    // A close-up for the headless screenshots (plan 27 step F: the umbra cap at the genesis):
+    // the camera `distUnits` from the body, looking at it from the Sun's side (`side` 'sun'),
+    // from 90° off the Sun line ('limb' — the shadow near the limb), or along the current direction.
+    zoomToBody: (name, distUnits, side) => {
+      const pd = planetObjects.find((p) => p.name === name);
+      if (!pd || !pd.planetObj) return null;
+      switchToPlanet(name); forceSceneUpdate();
+      const ctr = pd.planetObj.getWorldPosition(new THREE.Vector3());
+      const sunW = sun.planetObj.getWorldPosition(new THREE.Vector3());
+      let dir = camera.position.clone().sub(ctr).normalize();
+      if (side === 'sun') dir = sunW.clone().sub(ctr).normalize();
+      if (side === 'limb') { const toSun = sunW.clone().sub(ctr).normalize(); dir = new THREE.Vector3(0, 1, 0).cross(toSun).normalize(); if (dir.lengthSq() < 0.5) dir.set(1, 0, 0); }
+      if (side === 'umbra' && moon.planetObj) {
+        // look at where the Moon's shadow axis meets (or grazes) the globe, from a little toward the Sun
+        const moonW = moon.planetObj.getWorldPosition(new THREE.Vector3());
+        const axis = moonW.clone().sub(sunW).normalize(), mRel = moonW.clone().sub(ctr);
+        const foot = mRel.clone().addScaledVector(axis, -mRel.dot(axis));
+        const R = pd.planetObj.geometry.parameters.radius, d = foot.length();
+        let aim;
+        if (d < R) { const t = -mRel.dot(axis) - Math.sqrt(R * R - d * d); aim = mRel.clone().addScaledVector(axis, t); } else aim = foot;
+        dir = aim.normalize().add(sunW.clone().sub(ctr).normalize().multiplyScalar(0.5)).normalize();
+      }
+      camera.position.copy(ctr).add(dir.multiplyScalar(distUnits));
+      controls.target.copy(ctr); controls.update();
+      positionChanged = true; needsLabelUpdate = true;
+      return { distUnits, side: side || 'current' };
+    },
     // Orbit-plane gate hook: focusing a chain planet shows its orbit-plane grid
     // (switchToPlanet → pd.orbitPlaneHelper.visible). The grid must pass
     // through the rendered Sun with its normal along the chain's orbit normal
@@ -10027,19 +10067,28 @@ function _hiConstellationAt(lonJ2000) {
   return best ? best[0] : _HI_ECLIPTIC_CONSTELLATIONS[0][0];
 }
 
-/** "YYYY-MM-DD HH:MM UT" for a JD (UT). */
+/** "YYYY-MM-DD HH:MM UT" for a JD (UT) — the instant's label as the Date/Time fields write it:
+ *  the civil UT date inside the label seam, the TT instant's civil date beyond (marked TT). */
 function _hiDateTimeFromJD(jd) {
-  const d = _hiCalendarFromJD(jd);
-  const frac = jd + 0.5 - Math.floor(jd + 0.5);
-  const mins = Math.round(frac * 1440), hh = Math.floor(mins / 60) % 24, mm = mins % 60;
-  return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} UT`;
+  const p = posFromJD(jd);
+  if (!Number.isFinite(p)) {
+    const d = _hiCalendarFromJD(jd);
+    const frac = jd + 0.5 - Math.floor(jd + 0.5);
+    const mins = Math.round(frac * 1440), hh = Math.floor(mins / 60) % 24, mm = mins % 60;
+    return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} UT`;
+  }
+  const beyondSeam = DEEP_TIME_MODE_ENABLED && Math.abs(sceneYearOfDate(jd) - J2000_CALENDAR_YEAR) > DEEP_LABEL_SEAM_YEARS;
+  return `${sceneDateLabel(p)} ${posToTime(p).slice(0, 5)} ${beyondSeam ? 'TT' : 'UT'}`;
 }
 
-/** The model's four cardinal instants of the scene year (the Earth-predictions panel's call: the crossing nearest the calendar year's midpoint). */
+/** The model's four cardinal instants of the scene year (the Earth-predictions panel's call: the
+ *  crossing nearest the calendar year's midpoint, seeded ON THE SCENE'S UT AXIS through the one
+ *  mapping — plan 27 step F: a calendar JD handed to the finder as a UT instant read another
+ *  epoch's crossings beyond the seam). */
 function _hiCardinalDates(year) {
   const out = {};
   try {
-    const seed = dateToJulianDay(year, 7, 2) + 0.5, cpM = _tierModelB().cardinal;
+    const seed = jdFromPos(posFromDateTime(`${year}-07-02`, '12:00:00')), cpM = _tierModelB().cardinal;
     for (const [cp] of _HI_CARDINALS) out[cp] = _hiDateTimeFromJD(cpM.jdNearUT(seed, cp));
   } catch { for (const [cp] of _HI_CARDINALS) out[cp] = '—'; }
   return out;
@@ -10051,10 +10100,12 @@ function _hiCalendarFromJD(jd) {
   return { year, month, day };
 }
 
-/** The Sun's ecliptic longitude of date on the first of each month of `year` (the model's own certified Sun; 30° steps if a date is out of the calendar helper's range). */
+/** The Sun's ecliptic longitude of date on the first of each month of `year` (the model's own
+ *  certified Sun at the month's first day ON THE SCENE'S UT AXIS; 30° steps if a date is out of
+ *  the calendar helper's range). */
 function _hiMonthSunLongitudes(year) {
   return _HI_MONTHS.map((_, i) => {
-    try { return _hiWrap360(_tierModelB().eclipse.sunLonDegAtJD(dateToJulianDay(year, i + 1, 1))); }
+    try { return _hiWrap360(_tierModelB().eclipse.sunLonDegAtJD(jdFromPos(posFromDateTime(`${year}-${String(i + 1).padStart(2, '0')}-01`, '00:00:00')))); }
     catch { return _hiWrap360(360 * (i - 2) / 12); }
   });
 }
@@ -19992,7 +20043,7 @@ function createFrameworkImagesContext(epochYear) {
     /** Earth's longitude of perihelion of date (the published Sun tier), degrees. */
     perihelionLongitudeOfDateDeg: (y) => earthPerihelionEclipticOfDateDeg(jdOfYear(y), y),
     /** The model's cardinal instant `cp` ('VE' | 'SS' | 'AE' | 'WS') of calendar year `y`, JD (UT) — the Planet Orbit Analysis call (the crossing nearest the year's midpoint). */
-    cardinalJD: (y, cp) => _tierModelB().cardinal.jdNearUT(dateToJulianDay(y, 7, 2) + 0.5, cp),
+    cardinalJD: (y, cp) => _tierModelB().cardinal.jdNearUT(dateToJulianDay(y, 7, 2) + 0.5, cp),   // the chart-export gate's ERA context (year 2000): the calendar JD is the UT JD there
     /** "YYYY-MM-DD HH:MM UT" for a JD (UT). */
     formatUT: (jd) => _hiDateTimeFromJD(jd),
     /** The seven planets' keys, inner to outer. */
@@ -26216,6 +26267,13 @@ function decToDMSFromRadians(rad) {
  * Convert Julian Day to calendar date string
  */
 function jdToDateString(jd) {
+  // Beyond the label seam a UT Julian Day's label is the TT instant's civil date and time —
+  // the Date/Time fields' convention (plan 27, doc 111 §1.36); the civil date of the UT count
+  // means nothing there (the reports and the analemma chart print this).
+  if (DEEP_TIME_MODE_ENABLED && Number.isFinite(jd) && Math.abs(sceneYearOfDate(jd) - J2000_CALENDAR_YEAR) > DEEP_LABEL_SEAM_YEARS) {
+    const p = posFromJD(jd);
+    if (Number.isFinite(p)) return { date: sceneDateLabel(p), time: posToTime(p) };
+  }
   // Julian Day to calendar date conversion — the one-home converter
   const { year, month, day, dayFrac } = jdToCalendar(jd);
   const { hour: hours, minute: mins, second: secs } = dayFractionToHMS(dayFrac);
@@ -35091,9 +35149,19 @@ function updatePredictions() {
   // the panel showed the events of −5341772 for a date in −5341886 (owner).
   // The rows are therefore seeded by a JD — the calendar year's midpoint —
   // and each is the crossing nearest it (unique within ±½ tropical year), so
-  // the displayed year's own events show at every epoch. (2) Against USNO 2000
-  // the package reads +0.04/+0.65/+0.07/−0.13 min (VE/SS/AE/WS). Cached per
-  // calendar year (8 Newton solves).
+  // the displayed year's own events show at every epoch. The seed is that
+  // midpoint ON THE SCENE'S UT AXIS, through the one mapping the Date field
+  // uses (posFromDateTime → jdFromPos: the civil UT date inside the seam, the
+  // TT instant's UT Julian Day beyond — plan 27 step F, doc 111 §1.31): the
+  // former calendar JD handed to the finder AS a UT instant was 2.3 Gyr of
+  // days from the scene's at the genesis, where the bridge maps that label to
+  // 3.35 Ga and the rows showed THAT epoch's crossings (157 UT days apart, a
+  // 633-day "year" — the owner's reading). The next year's seed is the next
+  // civil midpoint through the same mapping (not +365.2422 days: a UT day is
+  // a solar day of date, 1,430 of them in the genesis year), and the Date
+  // rows are the instant's label as the Date/Time fields write it. (2) Against
+  // USNO 2000 the package reads +0.04/+0.65/+0.07/−0.13 min (VE/SS/AE/WS).
+  // Cached per calendar year (8 Newton solves).
   // Adaptive hold (measured: without it the perf gate's far/in-table
   // full-update ratio read 16.9× against the 15× limit — eight Newton solves
   // on the deep-tier Sun per year change): a year change
@@ -35105,12 +35173,13 @@ function updatePredictions() {
     const nowMs = performance.now();
     if (!_cpPanelCache.vals || nowMs - _cpPanelCache.lastMs >= _cpPanelCache.holdMs) {
       _cpPanelCache.lastMs = nowMs;
-      const cpMidJD = dateToJulianDay(cpYear, 7, 2) + 0.5;
+      const cpMidJD = jdFromPos(posFromDateTime(`${cpYear}-07-02`, '12:00:00'));
+      const cpNextMidJD = jdFromPos(posFromDateTime(`${cpYear + 1}-07-02`, '12:00:00'));
       const cpM = _tierModelB().cardinal;
       const vals = {};
       for (const cp of ['SS', 'WS', 'VE', 'AE']) {
         const jd = cpM.jdNearUT(cpMidJD, cp);
-        vals[cp] = { jd, raDeg: cpM.raDeg(cpYear, cp), yearLenDays: cpM.jdNearUT(cpMidJD + SI_TROPICAL_YEAR_DAYS, cp) - jd };
+        vals[cp] = { jd, raDeg: cpM.raDeg(cpYear, cp), yearLenDays: cpM.jdNearUT(cpNextMidJD, cp) - jd };
       }
       _cpPanelCache.year = cpYear;
       _cpPanelCache.vals = vals;
@@ -35122,8 +35191,8 @@ function updatePredictions() {
   }
   for (const cp of ['SS', 'WS', 'VE', 'AE']) {
     const cv = _cpPanelCache.vals[cp];
-    const dt = jdToDateString(cv.jd);
-    predictions['cp' + cp + 'Date'] = dt.date + ' ' + dt.time;
+    const cvPos = posFromJD(cv.jd);   // the instant's label as the Date/Time fields write it (civil UT inside the seam, the TT civil date beyond)
+    predictions['cp' + cp + 'Date'] = sceneDateLabel(cvPos) + ' ' + posToTime(cvPos);
     predictions['cp' + cp + 'JD'] = cv.jd;
     predictions['cp' + cp + 'RA'] = cv.raDeg;
     predictions['cp' + cp + 'YearLen'] = cv.yearLenDays;
@@ -35448,21 +35517,73 @@ function makeRealisticEarth(pd){
      * automatically every frame from Sun-Moon-Earth scene positions; hidden
      * when the Moon's shadow misses Earth. Sized to the actual umbra width
      * at Earth's surface (umbra-cone apex geometry), NOT the parallel-ray
-     * approximation that Three.js's DirectionalLight shadow renders. Placed
-     * at radius × 1.04 (above the shadow shell at 1.025) and rendered with
-     * renderOrder:20 so it draws on top — making the totality zone clearly
-     * visible regardless of cloud cover or terminator. Parented to `core`
-     * so it inherits Earth's daily spin (the umbra moves across geographic
-     * locations as Earth rotates). */
+     * approximation that Three.js's DirectionalLight shadow renders. A
+     * spherical CAP conforming to the globe (plan 27 step F: a flat disc
+     * lifted 4 % and set tangent to the sphere never showed its flatness at
+     * today's 100-km umbra and stood off the limb once the genesis umbra grew
+     * to a quarter of the radius), drawn at the cloud-top radius — the shadow
+     * falls on the cloud tops, so the cap darkens the clouds and the ground
+     * under it alike — and rendered with renderOrder:20 so it draws on top,
+     * making the totality zone clearly visible regardless of cloud cover or
+     * terminator. Parented to `core` so it inherits Earth's daily spin (the
+     * umbra moves across geographic locations as Earth rotates). */
+    const UMBRA_CAP_RADIUS = 1.0205;         // × mesh radius: just above the clouds (1.02), under the shadow shell (1.025)
+    const UMBRA_HALO_GAP = 1.05;             // the rim starts 5 % outside the umbra's angular radius …
+    const UMBRA_HALO_WIDTH_KM = 25;          // … and is 25 km wide on the globe at every umbra size (a rim, not a scaled band:
+                                             //     the genesis umbra is a quarter of the Earth's radius, today's a hundred km;
+                                             //     100 km swamped the −135 eclipse's umbra — the owner's reading)
+    /** A unit-sphere cap about +Y: polar angles 0 … thetaLength. @param {number} thetaLength */
+    const _sphereCapGeometry = (thetaLength) => new THREE.SphereGeometry(1, 64, 24, 0, Math.PI * 2, 0, thetaLength);
+    /* THE FOOTPRINT SHADER (plan 27 step F). The cap is a CANVAS on the unit sphere; the
+     * fragment shader keeps only the points within the umbra's radius of the shadow AXIS —
+     * the totality cylinder, exact where a round cap is not: the footprint stretches toward
+     * the limb and slides on and off it over the minutes the axis takes to cross (the former
+     * disc popped in and out at γ = 1 with its whole 1,563-km cap at the genesis; measured:
+     * the axis crosses the limb at 0.18 km/s there, a 150-minute slide-off) — and paints the
+     * rim as the 25-km band just outside (the pale corona tint, opacity 0.75: at today's
+     * 50–250-km umbra the black cap is a couple of pixels and the rim gives the totality
+     * location its outline, as the NASA maps draw the path). The night side is discarded —
+     * the shadow falls on the lit face. Everything is in the cap's own unit-sphere frame;
+     * updateUmbraDisc hands the axis, the radii and the Sun direction in that frame. */
+    const UMBRA_CAP_VERT = `
+      varying vec3 vPos;
+      void main() { vPos = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+    const UMBRA_CAP_FRAG = `
+      precision highp float;
+      uniform vec3  u_axisPoint;   /* a point of the shadow axis (unit-sphere frame) */
+      uniform vec3  u_axisDir;     /* its direction (unit) */
+      uniform vec3  u_sunDir;      /* toward the Sun (unit) */
+      uniform float u_umbraR;      /* the umbra's radius (unit-sphere units) */
+      uniform float u_rimIn;       /* the rim's inner and outer radii */
+      uniform float u_rimOut;
+      uniform float u_groundRatio; /* the ground sphere's radius in the cap's units (the cap sits at the cloud tops) */
+      varying vec3 vPos;
+      void main() {
+        if (dot(vPos, u_sunDir) < 0.0) discard;
+        /* the footprint is the umbra ON THE GROUND, projected radially onto this canvas: test the
+         * point's projection onto the ground sphere, not the cap's own — at a grazing incidence the
+         * cap's 2 % lift would move the cylinder's intersection thousands of kilometres along the
+         * axis (measured: the 2026-08-12 sliver over Portugal instead of the Balearics) */
+        vec3 pg = normalize(vPos) * u_groundRatio;
+        float dist = length(cross(pg - u_axisPoint, u_axisDir));
+        if (dist < u_umbraR) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+        if (dist > u_rimIn && dist < u_rimOut) { gl_FragColor = vec4(1.0, 0.973, 0.753, 0.75); return; }
+        discard;
+      }`;
+    const umbraCapUniforms = {
+      u_axisPoint: { value: new THREE.Vector3() }, u_axisDir: { value: new THREE.Vector3(0, 1, 0) }, u_sunDir: { value: new THREE.Vector3(0, 1, 0) },
+      u_umbraR: { value: 0 }, u_rimIn: { value: 0 }, u_rimOut: { value: 0 }, u_groundRatio: { value: 1 / UMBRA_CAP_RADIUS },
+    };
     const umbraDisc = new THREE.Mesh(
-      new THREE.CircleGeometry(1, 64),       // unit radius; scaled per-frame
-      new THREE.MeshBasicMaterial({
-        color       : 0x000000,              // pure black — totality (Sun fully blocked)
-        transparent : true,                  // must be transparent so renderOrder works across
+      _sphereCapGeometry(0.01),              // rebuilt per footprint extent (updateUmbraDisc); scaled to the cloud-top radius
+      new THREE.ShaderMaterial({
+        uniforms      : umbraCapUniforms,
+        vertexShader  : UMBRA_CAP_VERT,
+        fragmentShader: UMBRA_CAP_FRAG,
+        transparent   : true,                // must be transparent so renderOrder works across
                                              // the transparent-pass shells (shadow shell, atm)
-        opacity     : 1.0,
-        side        : THREE.DoubleSide,
-        depthWrite  : false
+        side          : THREE.DoubleSide,
+        depthWrite    : false
       })
     );
     umbraDisc.visible       = false;
@@ -35470,37 +35591,10 @@ function makeRealisticEarth(pd){
     umbraDisc.castShadow    = false;
     umbraDisc.receiveShadow = false;
 
-    /* White halo ring around the umbra disc. At typical total-eclipse umbra
-     * widths (~50–250 km on a 6,371 km Earth) the black disc is only a
-     * couple of pixels across at normal zoom — easy to miss. The halo
-     * (a thin annulus from 1.1× to 1.5× the disc radius, with a small
-     * gap between disc and halo so the umbra reads as a distinct shape)
-     * gives the totality location a clearly visible outline, similar to
-     * how NASA eclipse maps draw the path of totality. Opacity 0.75 keeps
-     * the halo a subtle visual aid rather than a dominant element.
-     * Sized + positioned in sync with the disc; rendered just under it
-     * (renderOrder 19 vs disc's 20) so the disc sits on top in the center
-     * while the halo extends outward. */
-    const umbraHalo = new THREE.Mesh(
-      new THREE.RingGeometry(1.1, 1.5, 64),
-      new THREE.MeshBasicMaterial({
-        color       : 0xfff8c0,            // pale corona-tint yellow
-        transparent : true,
-        opacity     : 0.75,
-        side        : THREE.DoubleSide,
-        depthWrite  : false
-      })
-    );
-    umbraHalo.visible       = false;
-    umbraHalo.renderOrder   = 19;
-    umbraHalo.castShadow    = false;
-    umbraHalo.receiveShadow = false;
-
     /* ------------------------------------------------ container ------- */
     const container = new THREE.Object3D();
     core.add(clouds);                        // clouds follow core spin 1-to-1
-    core.add(umbraDisc);                     // umbra disc also follows core spin
-    core.add(umbraHalo);                     // and its halo
+    core.add(umbraDisc);                     // the umbra cap (with its rim) also follows core spin
     container.add(core, atm, shadowShell);   // atmosphere can stay a sibling
 
     /* ------------------------------------------------ helpers --------- */
@@ -35537,13 +35631,18 @@ function makeRealisticEarth(pd){
     const _udcLocal     = new THREE.Vector3();
     const _udcNormal    = new THREE.Vector3();
     const _udcQuat      = new THREE.Quaternion();
+    const _udcQuatInv   = new THREE.Quaternion();
     const _udcAxisQuat  = new THREE.Quaternion();
-    const _udcZAxis     = new THREE.Vector3(0, 0, 1);
+    const _udcMeshQInv  = new THREE.Quaternion();
+    const _udcAxisDir   = new THREE.Vector3();          // the shadow axis (world frame, geocentric): Sun → Moon, on to the Earth
+    const _udcAxisFoot  = new THREE.Vector3();          // the axis's closest point to the Earth's centre
+    const _udcTmp       = new THREE.Vector3();
+    const _udcYAxis     = new THREE.Vector3(0, 1, 0);   // the cap's pole
+    let   _udcCapTheta  = -1;                            // the angular radius the cap was last built for
 
     function updateUmbraDisc() {
         if (!sun.planetObj || !moon.planetObj) {
             umbraDisc.visible = false;
-            umbraHalo.visible = false;
             return;
         }
         sun .planetObj.getWorldPosition(_udcSun);
@@ -35580,32 +35679,49 @@ function makeRealisticEarth(pd){
         }
 
         const R_E   = radius;                        // mesh radius (= captured pd.size)
-        /* U2 (the umbra strangler): the disc POSITION comes from the tier
-         * umbra — the single implementation the audit and the gates certify
-         * — so the visible disc IS the certified prediction (delegated
-         * umbraFromSceneAtJd; one-JD memo makes the per-frame call cheap).
-         * The scene vectors above stay only for the cone-RADIUS geometry
-         * (visual km-class). Chart: core-local, -X = Greenwich, +Z = 90°E,
-         * +Y = north (public/Earth.jpg); the tier's geodetic latitude is
-         * converted back to geocentric for the spherical mesh. */
+        const km_per_unit = currentAUDistance / 100;
+        /* The shadow AXIS from the rendered geometry: through the Moon along Sun → Moon. Its
+         * closest point to the Earth's centre lies at distance dAxis (γ · R_E on the
+         * fundamental plane). */
+        _udcAxisDir.copy(_udcMoonGeo).sub(_udcSunGeo).normalize();
+        _udcAxisFoot.copy(_udcMoonGeo).addScaledVector(_udcAxisDir, -_udcMoonGeo.dot(_udcAxisDir));
+        const dAxis = _udcAxisFoot.length();
+
+        /* U2 (the umbra strangler): while the axis pierces the Earth the
+         * footprint is centred on the TIER's ground point — the single
+         * implementation the audit and the gates certify — so the visible
+         * umbra IS the certified prediction (delegated umbraFromSceneAtJd;
+         * one-JD memo makes the per-frame call cheap). Once the axis misses
+         * (γ > 1) the tier refuses and the cap is centred on the limb point
+         * nearest the axis, so the umbra slides off the globe instead of
+         * vanishing. Chart: core-local, -X = Greenwich, +Z = 90°E, +Y = north
+         * (public/Earth.jpg); the tier's geodetic latitude is converted back
+         * to geocentric for the spherical mesh. */
         const _jdDisc = o.julianDay;
         const _tp = Number.isFinite(_jdDisc) ? umbraFromSceneAtJd(_jdDisc) : null;
-        if (_tp === null) {                          // umbra misses Earth — no eclipse
-            umbraDisc.visible = false;
-            umbraHalo.visible = false;
-            return;
-        }
-        const _D2Ru = Math.PI / 180;
-        const _fEl = 1 / K.physicalConstants.earthFlatteningInverseWGS84;
-        const _latGc = Math.atan(Math.tan(_tp.lat * _D2Ru) * (1 - _fEl) * (1 - _fEl));
-        const _lamU = _tp.lon * _D2Ru;
-        _udcLocal.set(
-            -Math.cos(_latGc) * Math.cos(_lamU),
-            Math.sin(_latGc),
-            Math.cos(_latGc) * Math.sin(_lamU),
-        ).multiplyScalar(R_E);
         core.getWorldQuaternion(_udcQuat);
-        _udcHit.copy(_udcLocal).applyQuaternion(_udcQuat);   // world-frame hit for the radius geometry
+        _udcQuatInv.copy(_udcQuat).invert();
+        if (_tp !== null) {
+            const _D2Ru = Math.PI / 180;
+            const _fEl = 1 / K.physicalConstants.earthFlatteningInverseWGS84;
+            const _latGc = Math.atan(Math.tan(_tp.lat * _D2Ru) * (1 - _fEl) * (1 - _fEl));
+            const _lamU = _tp.lon * _D2Ru;
+            _udcLocal.set(
+                -Math.cos(_latGc) * Math.cos(_lamU),
+                Math.sin(_latGc),
+                Math.cos(_latGc) * Math.sin(_lamU),
+            ).multiplyScalar(R_E);
+            _udcHit.copy(_udcLocal).applyQuaternion(_udcQuat);   // world-frame (geocentric) hit
+        } else if (dAxis <= R_E) {
+            // the tier refused (γ at 1 to its rounding) while the rendered axis still pierces: the
+            // near intersection along the axis (the Moon at parameter 0, the Earth's centre beyond)
+            const t = -_udcMoonGeo.dot(_udcAxisDir) - Math.sqrt(R_E * R_E - dAxis * dAxis);
+            _udcHit.copy(_udcMoonGeo).addScaledVector(_udcAxisDir, t);
+            _udcLocal.copy(_udcHit).applyQuaternion(_udcQuatInv);     // → core-local
+        } else {
+            _udcHit.copy(_udcAxisFoot).multiplyScalar(R_E / dAxis);   // the limb point nearest the axis (world, geocentric)
+            _udcLocal.copy(_udcHit).applyQuaternion(_udcQuatInv);     // → core-local
+        }
 
         /* True umbra width via umbra-cone apex geometry (NOT the parallel-
          * ray approximation that Three.js renders). For a Moon-cone apex
@@ -35623,7 +35739,6 @@ function makeRealisticEarth(pd){
          * eclipses (e.g. 2017 Aug 21 at gamma 0.44: 100 km vs 46 km).
          *
          * Negative values are antumbra (annular eclipse) — use abs. */
-        const km_per_unit = currentAUDistance / 100;
         _udcMoonToHit.copy(_udcHit).sub(_udcMoonGeo);
         const D_M_at_hit_km = _udcMoonToHit.length() * km_per_unit;
         const D_S_km    = _udcSunGeo .length() * km_per_unit;
@@ -35633,22 +35748,47 @@ function makeRealisticEarth(pd){
         const D_apex    = R_Moon_km * (D_S_km - D_M_km) / R_Sun_km;
         const umbraR_km    = Math.abs(R_Moon_km * (1 - D_M_at_hit_km / D_apex));
         const umbraR_scene = umbraR_km / km_per_unit;
+        const rimOut_scene = UMBRA_HALO_GAP * umbraR_scene + UMBRA_HALO_WIDTH_KM / km_per_unit;
+        if (dAxis > R_E + rimOut_scene) { umbraDisc.visible = false; return; }   // the umbra and its rim no longer touch the globe
 
-        /* Position disc + halo just above shadow shell (× 1.04, below
-         * atmosphere at 1.05) and orient tangent to the sphere — +Z axis
-         * (the mesh normal) aligns with the outward radial direction. */
+        /* The cap is a canvas about the hit's outward normal (a unit-sphere
+         * cap, rebuilt when its angular radius moves by more than 2 %, scaled
+         * to the cloud-top radius, centred on the core). Its extent must hold
+         * the footprint, which stretches along the axis's projection as the
+         * axis grazes the limb — a point at angle φ from the tangent point
+         * along the axis lies R(1 − cos φ) ≈ Rφ²/2 from the line, so the
+         * reach there is √(2r/R) against asin(r/R) across (40° against 14°
+         * at the genesis, 10° against 1° today). The shader paints the
+         * footprint; what the cap covers beyond it is discarded. */
         _udcNormal.copy(_udcLocal).normalize();
-        _udcLocal .copy(_udcNormal).multiplyScalar(R_E * 1.04);
-
-        umbraDisc.position.copy(_udcLocal);
-        umbraDisc.quaternion.setFromUnitVectors(_udcZAxis, _udcNormal);
-        umbraDisc.scale.setScalar(umbraR_scene);
+        const ratio = Math.min(1, rimOut_scene / R_E);
+        const theta = Math.min(Math.PI / 2, 1.05 * Math.max(Math.asin(ratio), Math.sqrt(2 * ratio)));
+        if (!(Math.abs(theta - _udcCapTheta) <= 0.02 * theta)) {
+          _udcCapTheta = theta;
+          umbraDisc.geometry.dispose();
+          umbraDisc.geometry = _sphereCapGeometry(theta);
+        }
+        umbraDisc.position.set(0, 0, 0);
+        umbraDisc.quaternion.setFromUnitVectors(_udcYAxis, _udcNormal);
+        const capR = R_E * UMBRA_CAP_RADIUS;
+        umbraDisc.scale.setScalar(capR);
         umbraDisc.visible = true;
 
-        umbraHalo.position.copy(_udcLocal);
-        umbraHalo.quaternion.copy(umbraDisc.quaternion);
-        umbraHalo.scale.setScalar(umbraR_scene);
-        umbraHalo.visible = true;
+        /* The shader's frame is the cap's unit sphere: world → core-local
+         * (the core's inverse rotation) → cap-local (the cap's inverse
+         * rotation), lengths / capR. The axis is shifted to pass through the
+         * certified hit while the tier answers (the rendered axis and the
+         * tier agree to kilometres; the epoch-consistency gate pins them),
+         * so the painted footprint is the certified one. */
+        _udcMeshQInv.copy(umbraDisc.quaternion).invert();
+        const UC = umbraCapUniforms;   // (not U — the Earth shader's uniforms)
+        UC.u_axisDir.value.copy(_udcAxisDir).applyQuaternion(_udcQuatInv).applyQuaternion(_udcMeshQInv).normalize();
+        _udcTmp.copy(_tp !== null ? _udcHit : _udcAxisFoot).applyQuaternion(_udcQuatInv).applyQuaternion(_udcMeshQInv).multiplyScalar(1 / capR);
+        UC.u_axisPoint.value.copy(_udcTmp);
+        UC.u_sunDir.value.copy(_udcSunGeo).applyQuaternion(_udcQuatInv).applyQuaternion(_udcMeshQInv).normalize();
+        UC.u_umbraR.value = umbraR_scene / capR;
+        UC.u_rimIn.value  = UMBRA_HALO_GAP * umbraR_scene / capR;
+        UC.u_rimOut.value = rimOut_scene / capR;
     }
   
     // ------------------------------------------------ era / map switcher -- 

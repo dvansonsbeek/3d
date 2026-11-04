@@ -198,7 +198,11 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   browser's eclipse tier kept a civil-label ΔT of its own until plan 27 step F
   — the Earth-focused light read the Sun's longitude through it: the Moon
   beside a focused Earth lit from a random direction at deep time (168° at
-  −10 Myr), exact in the era. (§1.31)
+  −10 Myr), exact in the era. And the lunar series read the cited distance
+  history at the SI-linear age, 95 kyr past the engine age at the genesis —
+  across the history's end inside the navigable domain, where the getter's
+  fallback hid the refusal behind a constant (the eclipse tier's Moon at
+  366,681 km, the rendered one at 37,834; the umbra ring 49° off). (§1.31)
 - **An artifact that reads the coefficients it feeds is a LOOP** — the T1
   pole rate read the climate coefficients through α(t) in the torque rate's
   LOD and fed the lines those coefficients are fitted on: three recorded

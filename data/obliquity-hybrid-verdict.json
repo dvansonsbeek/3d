@@ -135,7 +135,7 @@
    "packages/physics/src/model/derived-constants.js": "sha256:c401d5dcd0879cea6b6ca010e2e9abc7ec9d9288d2ea88aabc29dc162f7fc99a",
    "packages/physics/src/model/earth-scalars.js": "sha256:292024c388ae42ad31976fd7b0cbc98b9736de06b3bc81b7a63667a6f2a959c5",
    "packages/physics/src/model/inv-plane-elements.js": "sha256:97fc18474b126f589d4e29fc69f9e2d59611577afffed1b2a884360fe37f3117",
-   "packages/physics/src/model/lunar-theory.js": "sha256:348cdda26a9c9f230ad2ff9021851aab1add1aa75fb97e33eaa5cd4a13c8cec4",
+   "packages/physics/src/model/lunar-theory.js": "sha256:cdec4244f56329038cc9f9bfd36962792cd2cd698e28db6586a88bcc0d400b94",
    "packages/physics/src/model/moon-epoch.js": "sha256:6ab1a890b71d8459333d4f8c99a386a030ae199855b308fbd3b926fb77c0daad",
    "packages/physics/src/model/one-source-movement.js": "sha256:fe3ac281654b630076ead30e870161361d26ebaf14512efcd5ed6ff877dcd3ee",
    "packages/physics/src/model/planet-elements-of-date.js": "sha256:1069316fec3656c8dc8465314659d5ecf45238c4dce15992b5fdab4985a18731",

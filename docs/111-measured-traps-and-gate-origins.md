@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.7
+modelVersion: v27.8
 coefficients: sha256:3afe3e8645567bc8
 status: current
 ---
@@ -763,6 +763,47 @@ every epoch; in the era the two clocks part by milliseconds, so 74 browser
 golden rows moved at ≤ 4e-7 relative (the `dtFw@` rows by −4.7 ms, the
 ancient eclipse magnitudes by 4e-7, the umbra ground points by 4e-6°) and
 were re-recorded with this reason.
+
+A fifth, from the next screenshot (the first eclipse after the genesis): the
+certified umbra ring 49° (5,485 km) from the Moon's rendered shadow, labelled
+partial where the rendered geometry is central. The lunar series' distance of
+date (`moon/series.cjs fullDistanceKm` — the finders, the shadow radii, the
+besselian ground point, the API's `distanceKmAtJD`) read the cited Earth–Moon
+history at an age on the SI-LINEAR axis, 365.2422-d years from the model
+start, while the navigable domain, the bridge and every other physics read run
+on the ENGINE age (Julian years from J2000.0 on the TT instant). The two part
+by 2.14e-5 of the span — 95 kyr at the genesis — so the series' age crossed
+the history's end inside the navigable domain (which stops 15 kyr before it on
+the engine axis): the history refused, and the getter's fallback answered with
+the J2000 constant in the package (the eclipse tier's Moon at 366,681 km
+where the rendered one sat at 37,834) and with the epoch-mutable global in the
+browser — right by accident, which is why the browser's own finder read the
+right distance and only the package-placed ring was off. The three getters
+(package, browser, tools-lib — the matched triple) now read the history at the
+engine age with bit-identical arithmetic; measured after: the tier's Moon
+37,834 km, the umbra 1,560 km, the penumbra 1,916 km, γ 0.08. In the era the
+age moves by 0.47 yr at J2000 (the chain's 2000.0 anchor against the former
+2000.5 model start) and 2.14e-5 of the span beyond: 1.8 cm of Moon distance at
+J2000, 2.4 mm at −3000 — the certified instants at their microsecond floor,
+re-baselined with this reason. The rule holds its shape: a fallback that
+answers a refused age with a CONSTANT hides the refusal; inside the domain a
+refusal must not be reachable, and beyond it the answer must say so.
+
+A sixth, the same day, from the Predictions panel's cardinal rows at the
+genesis: the panel seeded the finder with the displayed year's calendar
+midpoint handed over as a UT instant. Beyond the label seam that calendar JD
+is the TT instant, 2.3 Gyr of days from the scene's UT axis, and the bridge
+maps it as a UT label to 3.35 Ga — so the rows showed that epoch's crossings
+(157 UT days apart, a 633-day "year"), the next-year seed was +365.2422 days
+where a UT day is a solar day of date (1,430 in the genesis year), and the
+Date rows printed the civil date of the UT count. The scene-year → engine-year
+map, the Orbit Analysis paper's cardinal dates and month longitudes and the
+report/analemma date strings carried the same pattern. The rule in its third
+form: a CALENDAR JD is a UT instant only inside the seam; every seed and every
+label goes through the one mapping the Date field uses. Still open in the
+finder itself: its Newton step is the J2000 rate per UT day, 3.7× too large at
+the genesis (0.2° of residual after 20 steps) — the slope of date, with the
+next model-slice edit.
 
 ### 1.32 An artifact that reads the coefficients it feeds is a loop — cut it at the source, never declare it
 
