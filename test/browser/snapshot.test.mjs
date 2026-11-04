@@ -67,6 +67,9 @@ const EPOCHS_MA = [-5, -1, -0.3, 0, 0.3, 1, 5];
 const write = process.argv.includes('--write');
 const s = await openSimulator();
 
+// plan 27 step E: the Earth surface tier table loads asynchronously (public/textures/earth/manifest.json)
+await s.page.waitForFunction(() => window.__test__ && window.__test__.earthTierAtAge && window.__test__.earthTierAtAge(0) !== null, { timeout: 30000 });
+
 const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_JDS, MOON_TMAS, MOON_CHAIN_PAIRS }) => {
   const T = window.__test__;
 
@@ -110,6 +113,15 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
     v[`periFrames.${p}.earthFrame@2000`] = b.earthFrame;
   }
   v['periFrames.mercury.grAdvance'] = T.relativisticPerihelionAdvanceArcsecCy('mercury');
+
+  // plan 27 step E: the Earth's surface tier by age — the tier id, its kind and the cross-fade
+  // mix at ages on both sides of every boundary class (the LGM end, an atlas step, the atlas's
+  // deep end, each Snowball episode, the generated tiers, the genesis edge). A map swap, a
+  // moved boundary or a changed fade shows here; the maps themselves are the gate's.
+  for (const ageMa of [-1, 0, 0.02, 0.0225, 0.03, 1, 2.49, 2.51, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4420, 4428.985]) {
+    const r = T.earthTierAtAge(ageMa);
+    v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)}` : null;
+  }
 
   // The planets' ECLIPTIC ascending node of date — the chain's element
   // (the value updateAscendingNodes writes is the chain's).

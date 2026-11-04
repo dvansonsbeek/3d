@@ -3421,6 +3421,10 @@ if (typeof window !== 'undefined') {
     setEpochByAge, setEpoch, resetEpochToJ2000, currentEpochTMa, isDeepTimeMode,
     // the render loop's idle-check counters (the perf gate's paused-idle row)
     wakeStats: (reset) => { const s = { frames: _wake.frames, active: _wake.active, paneEvents: _wake.paneEvents, monitors: _wake.monitors }; if (reset) { _wake.frames = 0; _wake.active = 0; _wake.paneEvents = 0; } return s; },
+    // plan 27 step E: the Earth's surface tier for an age (Myr before J2000) from the loaded
+    // manifest — null until the table has loaded
+    earthTierAtAge: (ageMa) => (earth && earth._earthTierAtAge) ? earth._earthTierAtAge(ageMa) : null,
+    earthDayMapState: () => (earth && earth._earthDayMapState) ? earth._earthDayMapState() : null,
     // Cycles-tab perihelion breakdown (doc 13 §1.8): the two coordinates and the
     // relativistic advance from the model constants — probed by the browser golden
     // so the panel can never drift from the registry / closure gate silently.
@@ -5585,6 +5589,7 @@ let o = {
 
   Day: "",
   julianDay: "",
+  earthSurface: 'Present-day Earth (satellite imagery) — cited',   // the Earth's surface tier (plan 27 step E; updateEra writes it)
   pos : 0,
   displayFormat : 'sexagesimal',
   distanceUnit : 'AU',
@@ -20767,14 +20772,19 @@ function setupGUI() {
       _rootUpdating = false;
     });
 
+  // plan 27 step E: the Earth's surface tier by age — read-only; updateEra writes o.earthSurface
+  // from the tier table (public/textures/earth/manifest.json) and names what the map IS
+  // (cited paleogeography or generated illustration)
+  const surfaceCtrl = gui.addBinding(o, 'earthSurface', { label: 'Earth surface', readonly: true, interval: 500 });
+
   // Store root controls for selective render-loop refresh
   o._rootCtrls = { dateCtrl, timeCtrl, jdCtrl };
 
   // Make root controls visually prominent
-  [dateCtrl, timeCtrl, jdCtrl].forEach(c => {
+  [dateCtrl, timeCtrl, jdCtrl, surfaceCtrl].forEach(c => {
     c.element.classList.add('root-control');
   });
-  jdCtrl.element.classList.add('root-control-last');
+  surfaceCtrl.element.classList.add('root-control-last');
 
   // ── Simulation Controls ──
   const ctrlFolder = gui.addFolder({ title: 'Simulation Controls' });
@@ -35268,8 +35278,7 @@ function makeRealisticEarth(pd){
     /* ------------------------------------------------ textures -------- */
     const TL = new THREE.TextureLoader().setCrossOrigin('anonymous');
     const tex = {
-        dayPostLGM  : TL.load("public/Earth.jpg"),
-        dayLGM      : TL.load("public/EarthLGM.png"),
+        dayPostLGM  : TL.load("public/Earth.jpg"),      // the present-day map — the tier table's youngest entry (plan 27 step E)
         niteModern  : TL.load("public/EarthNight.png"),
         niteClassic : TL.load("public/EarthNightClassic.png"),
         norm        : TL.load("public/EarthNormal.png"),
@@ -35279,7 +35288,6 @@ function makeRealisticEarth(pd){
   
     // ----- colour-space assignment  ----------------------------------
     tex.dayPostLGM.colorSpace  = THREE.NoColorSpace;
-    tex.dayLGM.colorSpace      = THREE.NoColorSpace;
     tex.niteModern.colorSpace  = THREE.SRGBColorSpace;
     tex.cloud.colorSpace       = THREE.SRGBColorSpace;
     tex.niteClassic.colorSpace = THREE.SRGBColorSpace;
@@ -35289,8 +35297,8 @@ function makeRealisticEarth(pd){
     /* ------------------------------------------------ shared uniforms - */
     const U = {
         /* DAY -------- */
-        u_dayTexA : { value: tex.dayLGM      },   // before the change-over
-        u_dayTexB : { value: tex.dayPostLGM  },   // after   the change-over
+        u_dayTexA : { value: tex.dayPostLGM  },   // the active tier's map (plan 27 step E — updateEra below)
+        u_dayTexB : { value: tex.dayPostLGM  },   // the next younger tier's map, faded in near the tier's younger edge
         u_dayMix  : { value: 0.0 },               // 0 → A, 1 → B
 
         /* NIGHT ------ */
@@ -35587,19 +35595,86 @@ function makeRealisticEarth(pd){
   
     // ------------------------------------------------ era / map switcher -- 
     const JD_NIGHT_BOUNDARY = 2305620;   // first lit cities
-    const JD_DAY_BOUNDARY   = -5756193;  // End of LGM with max inclination of 2.05831717
-    const TRANSITION_DAYS   = 109572;    // length of the fade
+    const TRANSITION_DAYS   = 109572;    // length of the night-map fade (300 yr)
+
+    // PLAN 27 STEP E — the day map by AGE. ONE home: public/textures/earth/manifest.json
+    // (written by tools/pipeline/build-earth-tiers.js; gate tools/verify/earth-tiers.js): the
+    // tier table in Myr before J2000 — Scotese's cited paleogeography at the atlas's own
+    // 5-Myr steps from the 21-ka map to 750 Ma, generated illustration beyond (the model does
+    // not model continents), the satellite map from the end of the LGM on. Each tier's map
+    // cross-fades to the next younger tier's over fadeMyr at its younger edge; the former
+    // LGM/post-LGM pair's JD boundary and 300-yr fade are the table's first boundary. Maps
+    // load on demand (2048 × 1024, 8 MB of GPU memory each): a tier's map is shown once
+    // decoded — until then the last shown map stays — and only the active tier's map and its
+    // two neighbours stay resident. The age is the epoch's TT civil year (o.currentYear, set
+    // by the render loop before this runs).
+    const dayTiers = { table: null, entries: new Map(), active: -1, lastA: tex.dayPostLGM, lastB: tex.dayPostLGM };
+    fetchRepoJson('public/textures/earth/manifest.json').then((m) => {
+      if (m && Array.isArray(m.tiers) && m.tiers.length) { dayTiers.table = m.tiers; dayTiers.active = -1; }
+    });
+    /** The decoded texture of a tier's map, or null while it loads. @param {string} file */
+    function tierTexture(file) {
+      let e = dayTiers.entries.get(file);
+      if (!e) {
+        e = { tex: null, ready: false };
+        dayTiers.entries.set(file, e);
+        if (file === 'public/Earth.jpg') { e.tex = tex.dayPostLGM; e.ready = true; }
+        else { e.tex = loadTexture(file, () => { e.ready = true; }); e.tex.colorSpace = THREE.NoColorSpace; }
+      }
+      return e.ready ? e.tex : null;
+    }
+    /** Release every tier map but the active tier's, its neighbours' and the present-day map. @param {number} k */
+    function releaseTierMaps(k) {
+      const keep = new Set();
+      for (let i = k - 1; i <= k + 1; i++) if (dayTiers.table[i]) keep.add(dayTiers.table[i].file);
+      for (const [file, e] of dayTiers.entries) {
+        if (keep.has(file) || file === 'public/Earth.jpg') continue;
+        if (e.tex) { e.tex.dispose(); textureCache.delete(file); }
+        dayTiers.entries.delete(file);
+      }
+    }
+    /** The tier holding an age (Myr before J2000) and its mix toward the next younger tier's
+     *  map — pure in the table (the browser golden's rows read it). @param {number} ageMa */
+    function tierAtAge(ageMa) {
+      const T = dayTiers.table;
+      if (!T) return null;
+      let lo = 0, hi = T.length - 1;
+      while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (T[mid].fromMa <= ageMa) lo = mid; else hi = mid - 1; }
+      const tier = T[lo];
+      const mix = (lo > 0 && tier.fadeMyr > 0) ? THREE.MathUtils.clamp(1 - (ageMa - tier.fromMa) / tier.fadeMyr, 0, 1) : 0;
+      return { index: lo, id: tier.id, label: tier.label, kind: tier.kind, source: tier.source, file: tier.file, youngerFile: lo > 0 ? T[lo - 1].file : tier.file, mix };
+    }
+    const surfaceLabel = (/** @type {{label: string, kind: string}} */ t) => t.kind === 'cited' ? `${t.label} — cited` : `${t.label} — illustration; continents not modelled`;
 
     function updateEra(julianDay = o.julianDay) {
-
-    // night side (Classic ➜ Modern)
-      let t = (julianDay - JD_NIGHT_BOUNDARY) / TRANSITION_DAYS;
+      // night side (Classic ➜ Modern)
+      const t = (julianDay - JD_NIGHT_BOUNDARY) / TRANSITION_DAYS;
       U.u_niteMix.value = THREE.MathUtils.clamp(t, 0, 1);
-      // or:  U.u_niteMix.value = THREE.MathUtils.smoothstep(0, 1, t);
 
-      // day side (LGM ➜ Post-LGM)
-      t = (julianDay - JD_DAY_BOUNDARY) / TRANSITION_DAYS;
-      U.u_dayMix.value = THREE.MathUtils.clamp(t, 0, 1);
+      // day side: the tier table on the TT age of the epoch
+      const at = tierAtAge((J2000_CALENDAR_YEAR - o.currentYear) / 1e6);
+      if (!at) return;   // the table has not loaded yet: the present-day map stays
+      if (at.index !== dayTiers.active) {
+        dayTiers.active = at.index;
+        releaseTierMaps(at.index);
+        for (const i of [at.index - 1, at.index + 1]) if (dayTiers.table[i]) tierTexture(dayTiers.table[i].file);   // warm the neighbours
+        o.earthSurface = surfaceLabel(at);
+      }
+      const a = tierTexture(at.file);
+      if (a) dayTiers.lastA = a;
+      const b = at.mix > 0 ? tierTexture(at.youngerFile) : dayTiers.lastA;
+      if (b) dayTiers.lastB = b;
+      U.u_dayTexA.value = dayTiers.lastA;
+      U.u_dayTexB.value = dayTiers.lastB;
+      U.u_dayMix.value = (a && b) ? at.mix : 0;
+    }
+    /** The day-map state for the headless probes: the active tier, the mix, whether the
+     *  active tier's map has decoded, and the surface label. */
+    function dayMapState() {
+      const T = dayTiers.table;
+      const tier = T && dayTiers.active >= 0 ? T[dayTiers.active] : null;
+      const e = tier ? dayTiers.entries.get(tier.file) : null;
+      return { loaded: !!T, active: dayTiers.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mix: U.u_dayMix.value, surface: o.earthSurface, resident: dayTiers.entries.size };
     }
 
     U.u_position.value.copy(core.position);
@@ -35610,6 +35685,8 @@ function makeRealisticEarth(pd){
         updateSunDir,
         updateClouds,
         updateEra,
+        tierAtAge,
+        dayMapState,
         updateUmbraDisc
     };
 }
@@ -35665,6 +35742,8 @@ function createPlanet(pd) {           // pd = Planet Data
   pd._updateSunDirFunc    = earthPack.updateSunDir;
   pd._updateCloudsFunc    = earthPack.updateClouds;
   pd._updateEraFunc       = earthPack.updateEra;
+  pd._earthTierAtAge      = earthPack.tierAtAge;      // plan 27 step E: the surface tier by age (gate rows)
+  pd._earthDayMapState    = earthPack.dayMapState;    //   … and the day-map state (the headless probes)
   pd._updateUmbraDiscFunc = earthPack.updateUmbraDisc;
     
   } else {

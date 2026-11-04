@@ -303,7 +303,9 @@ in [NOTICE](NOTICE) — that is the authoritative list; this is the short versio
 
 **Data** — [Yale Bright Star Catalog](https://github.com/brettonw/YaleBrightStarCatalog)
 (stars) · [Solar System Scope](https://www.solarsystemscope.com/textures/)
-(textures) · IMCCE and Chapront & Francou (ELP lunar series) · paleoclimate and
+(textures) · [PALEOMAP PaleoAtlas](https://doi.org/10.5281/zenodo.5460860)
+(Scotese 2016, CC BY 4.0 — the Earth's paleogeography by age, 21 ka to 750 Ma;
+older tiers are generated illustration) · IMCCE and Chapront & Francou (ELP lunar series) · paleoclimate and
 historical eclipse records — per-dataset sources, citations and licences in
 [data/PROVENANCE.md](data/PROVENANCE.md)
 

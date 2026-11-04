@@ -294,7 +294,9 @@ retired-vocabulary RATCHET — the docs and READMEs, and since plan 16 the
 code's comments and label strings; counts may only fall), `test:docs-fresh`, `check:artifacts` (generated
 artifacts vs their recorded input hashes — fails naming the exact regeneration
 command), `check:data` (every tracked dataset manifest-covered in
-PROVENANCE.md), `docs:values` / `docs:tables` (the script-written numbers in
+PROVENANCE.md), `check:earth-tiers` (the Earth surface tier table ≡ its
+rasters' recorded hashes, contiguous over the navigable domain, no orphan
+raster), `docs:values` / `docs:tables` (the script-written numbers in
 docs), `values:package` (the published @essrt/model-values ≡ the live
 registry, plus PLAUSIBILITY rows), `test:verify` (the model gates),
 `test:py-physics` (no Python defines model physics outside the ledger),
@@ -417,6 +419,7 @@ what actually made corrections stick here.
 | `tools/explore/` | frozen research one-offs (and the print-only scripts that left `tools/verify/`) — findings live in `docs/`; a script stays only while something names it (its README states the rule) |
 | `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last holds the GIA τ only since plan 12) — embedded by `generate.mjs`. The ΔT pair is GOVERNED (plan 12 §1b close-out): the joint `--write` stamps an `inputs` block, `check:artifacts` fails when the physics it was fitted on moves, and `regen:cascade` lists the stale fit as a by-hand step — a re-close is a decision, never an automatic regeneration. The anchor `deltaTStart` ships INSIDE the fit artifact (`FIT.DT_ANCHOR`), never in astro-reference — a re-close no longer re-stamps the N-body node |
 | `data/astrogeo22-earth-moon.json` | the CITED Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; `npm run import:astrogeo22`) — embedded as `deltat/moon-distance-artifact.cjs`, read by `deltat/moon-distance-history.cjs` (plan 12 option A) |
+| `public/textures/earth/` | the Earth's day maps by age (plan 27 step E): Scotese's PaleoAtlas v3 (CC BY 4.0; 21 ka–750 Ma at its own steps; `npm run import:paleoatlas` fetches, prepares and hashes) and generated illustration beyond — ONE table `manifest.json` read by the scene's `updateEra` and the "Earth surface" control, gated by `check:earth-tiers` (`tools/pipeline/build-earth-tiers.js`) |
 | `docs/` | the numbered docs (`00-readme` is the index); `40-architecture`, `99-essrt`, `110-calculation-map`, `111-measured-traps-and-gate-origins` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main
