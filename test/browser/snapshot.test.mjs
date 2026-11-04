@@ -69,6 +69,8 @@ const s = await openSimulator();
 
 // plan 27 step E: the Earth surface tier table loads asynchronously (public/textures/earth/manifest.json)
 await s.page.waitForFunction(() => window.__test__ && window.__test__.earthTierAtAge && window.__test__.earthTierAtAge(0) !== null, { timeout: 30000 });
+// plan 27 step F: the Moon's, Mercury's and Saturn's tables likewise (public/textures/<body>/manifest.json)
+await s.page.waitForFunction(() => ['moon', 'mercury', 'saturn'].every((b) => window.__test__.bodyTierAtAge(b, 0) !== null), { timeout: 30000 });
 
 const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_JDS, MOON_TMAS, MOON_CHAIN_PAIRS }) => {
   const T = window.__test__;
@@ -120,7 +122,16 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   // moved boundary or a changed fade shows here; the maps themselves are the gate's.
   for (const ageMa of [-1, 0, 0.02, 0.0225, 0.03, 1, 2.49, 2.51, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4420, 4428.985]) {
     const r = T.earthTierAtAge(ageMa);
-    v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)}` : null;
+    v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)} clouds=${r.clouds.toFixed(4)} atm=${r.atmosphere.toFixed(4)} modern=${r.modern.toFixed(4)}` : null;
+  }
+  // plan 27 step F: the Moon's, Mercury's and Saturn's tiers on both sides of every boundary
+  // (the mare flooding steps, the lunar magma ocean, Mercury's oldest surfaces, the rings' age
+  // band) and at the edges — the tier id, its kind and whether the rings are shown.
+  for (const [body, ages] of [['moon', [0, 3299, 3301, 3549, 3551, 3799, 3801, 4349, 4351, 4428.985]], ['mercury', [0, 4099, 4101, 4428.985]], ['saturn', [-1, 0, 399, 401, 4428.985]]]) {
+    for (const ageMa of ages) {
+      const r = T.bodyTierAtAge(body, ageMa);
+      v[`${body}Tier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} rings=${r.rings}` : null;
+    }
   }
 
   // The planets' ECLIPTIC ascending node of date — the chain's element
@@ -371,6 +382,28 @@ Object.assign(measured, await s.page.evaluate(() => {
     v[`oscWobble.pomOfDateDeg@${y}`] = o ? o.pomOfDateDeg : null;
   }
   return v;
+}));
+
+// ── plan 27 step B: THE HONEST EDGE — a backward step at the past edge (1,000,000 years, the
+// longest period) leaves the scene ON the edge and raises the edge notice; the render loop
+// clamps every writer of the position, so the check waits for a frame. Pinned AFTER the main
+// pass: the landing moves the epoch. Then the notice side and text, and the edge position
+// against the navigable range.
+await s.page.evaluate(() => { const T = window.__test__; T.enterJulianDay(-1e13); T.setStepYears(1e6); });
+Object.assign(measured, await s.page.evaluate(() => {
+  const T = window.__test__, v = {};
+  v['edge.landedOnPastEdge'] = T.clockFields().pos === T.navigablePosRange().posMin;
+  const before = T.edgeNoticeState().count;
+  T.stepBy(-1);
+  v['edge.stepBackwardRaisedNotice'] = T.edgeNoticeState().count > before;
+  v['edge.noticeSide'] = T.edgeNoticeState().side;
+  v['edge.noticeText'] = T.edgeNoticeState().text;
+  return v;
+}));
+await s.page.waitForFunction(() => window.__test__.clockFields().pos === window.__test__.navigablePosRange().posMin, null, { timeout: 30000 });
+Object.assign(measured, await s.page.evaluate(() => {
+  const T = window.__test__;
+  return { 'edge.posAfterStepBackward': T.clockFields().pos === T.navigablePosRange().posMin ? 'on the edge' : 'PAST THE EDGE', 'edge.noticeVisible': T.edgeNoticeState().visible };
 }));
 
 const pageErrors = s.errors.length;

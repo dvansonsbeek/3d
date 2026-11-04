@@ -379,6 +379,19 @@ to every engine-placed frame — removing it moved 73 browser goldens at
 would have turned 90° with no gate noticing. The browser golden now pins that
 group's local → world azimuth map (`inclPathWorldAzimuthDeg@local0/90`).
 
+The converse trap (plan 27 step F, found by the perihelion-at-sun rows): a
+WORLD rotation set against an ancestor's pose is valid only until that
+ancestor moves. The planets' rotation axes were placed as world rotations in
+the planet pass against their orbit container, and the container itself was
+re-posed from the same elements of date AFTER that, in the loop's 10-Hz
+block — in steady state the two agreed; on the frame the series landed the
+container moved 6e-9 after the axis was placed, and with no frame following
+(the step-F wake frames reordered the load) Saturn's pole read 1.3e-8 from
+the channel's, and 7e-7 on the frame after every jump, until the next frame.
+Pose ancestors first, in ONE pass, in dependency order
+(`_chainPoseOrbitContainer` before `_chainPlacePlanetPole`); a 10-Hz updater
+that moves a parent of an engine-placed child is the same bug waiting.
+
 ### 1.26 A precession constant is not a precession rate — and a seam kicks the pole through n̂, not through its mean plane
 
 (plan 12 §8, measured) The composed lunisolar law scales the precession
@@ -1071,9 +1084,16 @@ where the LOD is null), and every label beyond the seam is the TT instant's
 civil date and time. One day before the genesis the readers had fallen back
 to a linear count (630 solar days per year): the scene now lands on the edge
 from every entry (the Julian Day field, the Date/Time fields, a jump, Play —
-which stops there), the first bullet of plan 27 step B. The rule: a label
-that feeds a physics read is the engine's own year; a count of years of date
-is a coordinate, never an age.
+which stops there), the first bullet of plan 27 step B. The owner's review
+then found the step buttons walking past an edge a jump had landed on: the
+clamp has ONE home — the render loop clamps every writer of the position once
+per frame — and the one clamp function raises a non-modal notice naming the
+edge, shown by the loop AFTER the landing: a timer started inside a first
+landing (seconds of blocking work) expired before the first paint, so the
+first notice never showed (the golden steps 1 Myr back at the edge and pins
+the position and the notice). The rule: a label that feeds a physics read is
+the engine's own year; a count of years of date is a coordinate, never an
+age.
 
 **The edge is the history's end, less the integrators' margin.** The spin
 bank had stopped at 4,425 Myr (the lunar-age constraint Farhat et al. fit

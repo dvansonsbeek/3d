@@ -2825,7 +2825,39 @@ function navigablePosRange() {
 function clampPosToNavigable(pos) {
   if (!DEEP_TIME_MODE_ENABLED || !Number.isFinite(pos)) return pos;
   const r = navigablePosRange();
-  return pos < r.posMin ? r.posMin : pos > r.posMax ? r.posMax : pos;
+  if (pos < r.posMin) { noteNavigableEdge('past'); return r.posMin; }
+  if (pos > r.posMax) { noteNavigableEdge('future'); return r.posMax; }
+  return pos;
+}
+// The edge NOTICE: whenever the clamp above actually clamps — a jump, an entered date, Play,
+// a step button — ONE small non-modal line tells the user why the scene stays where it is.
+// Debounced: a notice already showing only has its timer extended.
+const _edgeNotice = { el: /** @type {HTMLElement|null} */ (null), timer: 0, side: '', count: 0, pending: false };
+const EDGE_NOTICE_TEXT = {
+  past: 'The navigable domain ends here, at the Earth–Moon genesis 4,429 Myr ago — the end of the cited Earth–Moon history (Farhat et al. 2022). Nothing is drawn before the Moon exists.',
+  future: 'The navigable domain ends here, 1,000 Myr in the future.',
+};
+/** Mark that a clamp happened; the render loop shows the notice (showPendingEdgeNotice) AFTER
+ *  the landing — a first landing on the edge blocks the thread for seconds, and a timer
+ *  started here would expire before the first paint. @param {'past'|'future'} side */
+function noteNavigableEdge(side) {
+  _edgeNotice.side = side; _edgeNotice.count++; _edgeNotice.pending = true;
+}
+/** Show the pending notice (the render loop, once per frame) and start its 6-s timer. */
+function showPendingEdgeNotice() {
+  if (!_edgeNotice.pending || typeof document === 'undefined') return;
+  _edgeNotice.pending = false;
+  const side = _edgeNotice.side;
+  if (!_edgeNotice.el) {
+    const el = document.createElement('div');
+    el.id = 'edge-notice'; el.className = 'edge-notice'; el.setAttribute('role', 'status');
+    document.body.appendChild(el);
+    _edgeNotice.el = el;
+  }
+  _edgeNotice.el.textContent = EDGE_NOTICE_TEXT[side];
+  _edgeNotice.el.classList.add('visible');
+  clearTimeout(_edgeNotice.timer);
+  _edgeNotice.timer = setTimeout(() => { if (_edgeNotice.el) _edgeNotice.el.classList.remove('visible'); }, 6000);
 }
 /** The clamped position of a UT Julian Day: the nearest edge where the table has no answer. */
 function posFromJDClamped(jd) {
@@ -2833,6 +2865,7 @@ function posFromJDClamped(jd) {
   if (Number.isFinite(p)) return clampPosToNavigable(p);
   if (!DEEP_TIME_MODE_ENABLED) return p;
   const r = navigablePosRange();
+  noteNavigableEdge(jd < startmodelJD ? 'past' : 'future');
   return jd < startmodelJD ? r.posMin : r.posMax;
 }
 
@@ -2883,8 +2916,9 @@ function posFromDateTime(dateStr, timeStr) {
   if (DEEP_TIME_MODE_ENABLED && Number.isFinite(civil) && Math.abs(civil - J2000_CALENDAR_YEAR) > DEEP_LABEL_SEAM_YEARS) {
     const year = _deepCal().jdTTToYear(jdLabel);
     if (year !== null && Number.isFinite(year)) return clampPosToNavigable(year - startmodelYear);
-    // beyond the position table: the edge it lies past
+    // beyond the position table: the edge it lies past (and the edge notice)
     const r = navigablePosRange();
+    noteNavigableEdge(civil < J2000_CALENDAR_YEAR ? 'past' : 'future');
     return civil < J2000_CALENDAR_YEAR ? r.posMin : r.posMax;
   }
   return clampPosToNavigable(posFromJD(jdLabel));
@@ -3416,6 +3450,10 @@ function currentEpochTMa() { return currentEpoch_t_Ma; }
 // ESM module scope is unreachable from `window`, so the golden-master harness
 // (plan §5c) cannot otherwise call in. The transparency gate must evaluate
 // f(Y), mutate the epoch, and evaluate f(Y) again — impossible from outside.
+/** @type {any[]} the bodies carrying a surface tier table (plan 27 step F; createPlanet
+ *  registers them, makeSurfaceTiers below) — declared here, above the test hooks that read it
+ *  while the page still loads */
+const _surfaceTierBodies = [];
 if (typeof window !== 'undefined') {
   window.__test__ = {
     setEpochByAge, setEpoch, resetEpochToJ2000, currentEpochTMa, isDeepTimeMode,
@@ -3425,6 +3463,14 @@ if (typeof window !== 'undefined') {
     // manifest — null until the table has loaded
     earthTierAtAge: (ageMa) => (earth && earth._earthTierAtAge) ? earth._earthTierAtAge(ageMa) : null,
     earthDayMapState: () => (earth && earth._earthDayMapState) ? earth._earthDayMapState() : null,
+    // plan 27 step F: a body's tier for an age ('moon' | 'mercury' | 'saturn'; null until its
+    // table has loaded) and its live state (the active tier, whether its map has decoded)
+    bodyTierAtAge: (name, ageMa) => { const pd = _surfaceTierBodies.find((b) => b.name.toLowerCase() === name); return pd ? pd._surfaceTiers.tierAtAge(ageMa) : null; },
+    // the honest edge (plan 27 step B): the step buttons and the edge notice's state
+    stepBy: (dir) => o['Step by'](dir),
+    setStepYears: (years) => { const v = SYEAR_J2000 * years; o['1 second equals'] = v; o.speedFact = v; },
+    edgeNoticeState: () => ({ side: _edgeNotice.side, count: _edgeNotice.count, visible: !!(_edgeNotice.el && _edgeNotice.el.classList.contains('visible')), text: _edgeNotice.el ? _edgeNotice.el.textContent : '' }),
+    bodySurfaceState: (name) => { const pd = _surfaceTierBodies.find((b) => b.name.toLowerCase() === name); return pd ? pd._surfaceTiers.state() : null; },
     // Cycles-tab perihelion breakdown (doc 13 §1.8): the two coordinates and the
     // relativistic advance from the model constants — probed by the browser golden
     // so the panel can never drift from the registry / closure gate silently.
@@ -4780,6 +4826,7 @@ const moon = {
   size: (diameters.moonDiameter/2/ currentAUDistance)*100,
   color: 0x8b8b8b,
   textureUrl: 'public/Moon.jpg',
+  tiersUrl: 'public/textures/moon/manifest.json',   // plan 27 step F: the Moon's map by age (makeSurfaceTiers)
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -4864,6 +4911,7 @@ const mercury = {
   size: (diameters.mercuryDiameter/2/ currentAUDistance)*100,
   color: 0x868485,
   textureUrl: 'public/Mercury.jpg',
+  tiersUrl: 'public/textures/mercury/manifest.json',   // plan 27 step F: Mercury's map by age (makeSurfaceTiers)
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5085,6 +5133,7 @@ const saturn = {
   size: (diameters.saturnDiameter/2/ currentAUDistance)*100,
   color: 0xA79662,
   textureUrl: 'public/Saturn.jpg',
+  tiersUrl: 'public/textures/saturn/manifest.json',   // plan 27 step F: the rings shown by age (makeSurfaceTiers)
   ringUrl: 'public/saturn-rings.png',
   ringSize   : 2*(diameters.saturnDiameter/2/ currentAUDistance)*100,
   ringInnerMult: 1.23,
@@ -5357,6 +5406,7 @@ uniform sampler2D u_specTexture;
 
 uniform vec3  u_sunRelPosition;   /* vector Earth → Sun (world) */
 uniform float u_normalPower;      /* 0-1 mix of normal-map shading */
+uniform float u_modernMix;        /* 1 on the present-day tier, 0 on any other (plan 27 step E): the modern relief and ocean-glint maps belong to today's continents only */
 uniform vec3  u_position;         /* planet centre (world) */
 uniform float u_dayGain;
 uniform float u_termWidth;        /* terminator width */
@@ -5383,7 +5433,7 @@ void main(){
     /* normal-map shading */
     vec3 texN = texture2D(u_normalTexture, vUv).xyz*2.0 - 1.0;
     mat3 tbn  = cotangent_frame(vNormal, vPos, vUv);
-    vec3 nMap = normalize( mix( vNormal, normalize( tbn * texN ), u_normalPower ) );
+    vec3 nMap = normalize( mix( vNormal, normalize( tbn * texN ), u_normalPower * u_modernMix ) );
 
     /* day-night mix */
     float hemi = dot(vNormal, sunDir)*0.5 + 0.5;  /* geometry only */
@@ -5426,7 +5476,7 @@ void main(){
     float spec    = pow(max(dot(reflDir, viewDir), 0.0), 1.0 / rough);
 
     float fresnel = pow(1.0 - max(dot(viewDir, nMap), 0.0), 5.0);
-    float ocean   = specMask * hemi;                          // day-side water only
+    float ocean   = specMask * hemi * u_modernMix;            // day-side water only, today's oceans only
 
     color += spec * fresnel * ocean * 0.6;
 
@@ -5447,6 +5497,7 @@ const ATM_FRAG = `
 precision mediump float;
 
 uniform vec3 u_sunRelPosition;     /* Earth → Sun (world) */
+uniform float u_atmEra;            /* the surface tier's atmosphere factor (plan 27 step E: 0 over the magma ocean) */
 varying vec3 vN;
 varying vec3 vPos;
 
@@ -5461,7 +5512,7 @@ void main(){
     /* forward-scattering haze on the day side */
     float dayGlow = pow(max(dot(sunDir, vN), 0.0), 3.0);
 
-    float alpha  = clamp(rim * 0.45 + dayGlow * 0.25, 0.0, 1.0) * 0.7; // mix factors
+    float alpha  = clamp(rim * 0.45 + dayGlow * 0.25, 0.0, 1.0) * 0.7 * u_atmEra; // mix factors, scaled by the tier
     vec3  col   = vec3(0.35, 0.55, 1.0);                      // soft blue-sky tint
 
     gl_FragColor = vec4(col * alpha, alpha * 0.8);
@@ -5473,6 +5524,7 @@ precision mediump float;
 uniform sampler2D u_cloudTexture;
 uniform vec3      u_sunRelPosition;
 uniform float     u_alpha;        /* global cloud thickness */
+uniform float     u_cloudEra;     /* the surface tier's cloud factor (plan 27 step E: 0 at the magma ocean) */
 uniform float     u_nightCloudFactor;
 
 varying vec2 vUv;
@@ -5494,7 +5546,7 @@ void main(){
     vec4 cloudTex = texture2D(u_cloudTexture, vUv);
 
     vec3  colour = cloudTex.rgb * visibility;
-    float alpha  = cloudTex.a  * u_alpha * visibility;
+    float alpha  = cloudTex.a  * u_alpha * u_cloudEra * visibility;
 
     gl_FragColor = vec4(colour, alpha);
 }`;
@@ -5512,34 +5564,25 @@ let o = {
   reverse: false,
 
   'Step forward': function () {
-    // Compare against SYEAR_J2000 (the dropdown's captured value), not live
-    // sYear: the dropdown options are frozen at tweakpane construction, so the
-    // J2000-anchored comparison preserves the "1 year/sec" semantic across epochs.
-    if (this.speedFact === SYEAR_J2000) {
-      this.pos = posFromDateTime(addYears(this.Date, 1), this.Time);
-    } else if (this.speedFact === SYEAR_J2000 * 10) {
-      this.pos = posFromDateTime(addYears(this.Date, 10), this.Time);
-    } else if (this.speedFact === SYEAR_J2000 * 100) {
-      this.pos = posFromDateTime(addYears(this.Date, 100), this.Time);
-    } else if (this.speedFact === SYEAR_J2000 * 1000) {
-      this.pos = posFromDateTime(addYears(this.Date, 1000), this.Time);
-    } else {
-      this.pos += this.speedFact;
-    }
-    positionChanged = true;
+    this['Step by'](1);
   },
 
   'Step backward': function () {
-    if (this.speedFact === SYEAR_J2000) {
-      this.pos = posFromDateTime(addYears(this.Date, -1), this.Time);
-    } else if (this.speedFact === SYEAR_J2000 * 10) {
-      this.pos = posFromDateTime(addYears(this.Date, -10), this.Time);
-    } else if (this.speedFact === SYEAR_J2000 * 100) {
-      this.pos = posFromDateTime(addYears(this.Date, -100), this.Time);
-    } else if (this.speedFact === SYEAR_J2000 * 1000) {
-      this.pos = posFromDateTime(addYears(this.Date, -1000), this.Time);
+    this['Step by'](-1);
+  },
+
+  /** One step of the chosen period, forward (+1) or backward (−1): a whole-year period steps
+   *  the civil date (1 … 1,000,000 years), any other adds the period to the position. The
+   *  render loop clamps the result to the navigable domain (the honest edge). The period is
+   *  compared against SYEAR_J2000 (the dropdown's captured value), not the live sYear: the
+   *  options are frozen at tweakpane construction, so the J2000-anchored comparison preserves
+   *  the "1 year/sec" semantic across epochs. */
+  'Step by': function (dir) {
+    const years = Math.round(this.speedFact / SYEAR_J2000);
+    if (years >= 1 && Math.abs(this.speedFact - years * SYEAR_J2000) < 1e-6 * SYEAR_J2000) {
+      this.pos = posFromDateTime(addYears(this.Date, dir * years), this.Time);
     } else {
-      this.pos -= this.speedFact;
+      this.pos += dir * this.speedFact;
     }
     positionChanged = true;
   },
@@ -5590,6 +5633,7 @@ let o = {
   Day: "",
   julianDay: "",
   earthSurface: 'Present-day Earth (satellite imagery) — cited',   // the Earth's surface tier (plan 27 step E; updateEra writes it)
+  bodySurfaces: 'present-day maps — cited',   // the Moon's, Mercury's and Saturn's tiers (plan 27 step F; updateSurfaceTiers writes it)
   pos : 0,
   displayFormat : 'sexagesimal',
   distanceUnit : 'AU',
@@ -20776,15 +20820,18 @@ function setupGUI() {
   // from the tier table (public/textures/earth/manifest.json) and names what the map IS
   // (cited paleogeography or generated illustration)
   const surfaceCtrl = gui.addBinding(o, 'earthSurface', { label: 'Earth surface', readonly: true, interval: 500 });
+  // plan 27 step F: the Moon's, Mercury's and Saturn's tiers — the bodies whose active tier is
+  // not the present-day one, with what each map IS; updateSurfaceTiers writes o.bodySurfaces
+  const bodiesCtrl = gui.addBinding(o, 'bodySurfaces', { label: 'Moon & planets', readonly: true, interval: 500 });
 
   // Store root controls for selective render-loop refresh
   o._rootCtrls = { dateCtrl, timeCtrl, jdCtrl };
 
   // Make root controls visually prominent
-  [dateCtrl, timeCtrl, jdCtrl, surfaceCtrl].forEach(c => {
+  [dateCtrl, timeCtrl, jdCtrl, surfaceCtrl, bodiesCtrl].forEach(c => {
     c.element.classList.add('root-control');
   });
-  surfaceCtrl.element.classList.add('root-control-last');
+  bodiesCtrl.element.classList.add('root-control-last');
 
   // ── Simulation Controls ──
   const ctrlFolder = gui.addFolder({ title: 'Simulation Controls' });
@@ -20814,6 +20861,9 @@ function setupGUI() {
       '10 years': sYear * 10,
       '100 years': sYear * 100,
       '1000 years': sYear * 1000,
+      '10,000 years': sYear * 10000,
+      '100,000 years': sYear * 100000,
+      '1,000,000 years': sYear * 1000000,
     }
   }).on('change', () => { o.speedFact = Number(o['1 second equals']); });
   ctrlFolder.addBinding(o, 'speed', { label: 'Speed \u00D7', min: -5, max: 5, step: 0.5 });
@@ -22491,9 +22541,6 @@ function render(now) {
   smoothedDeltaMs = smoothedDeltaMs * 0.9 + Math.min(Math.max(deltaMs, 4), 100) * 0.1;
   if (o.Run) {
     o.pos += Number(o.speedFact) * o.speed * (smoothedDeltaMs * 0.001);
-    // THE HONEST EDGE (plan 27 step B): Play stops AT the navigable edge, never runs past it.
-    const _clampedPos = clampPosToNavigable(o.pos);
-    if (_clampedPos !== o.pos) { o.pos = _clampedPos; o.Run = false; }
     // Throttle CSS2D label updates to 30 Hz during playback
     labelElapsed += delta;
     if (labelElapsed >= 0.033) {
@@ -22501,6 +22548,12 @@ function render(now) {
       needsLabelUpdate = true;
     }
   }
+  // THE HONEST EDGE (plan 27 step B): EVERY writer of o.pos — Play, the step buttons, a reset —
+  // is clamped here, once per frame, to the navigable domain; Play stops AT the edge, never
+  // runs past it, and the clamp raises the edge notice when it clamps.
+  const _clampedPos = clampPosToNavigable(o.pos);
+  if (_clampedPos !== o.pos) { o.pos = _clampedPos; o.Run = false; positionChanged = true; }
+  showPendingEdgeNotice();
 
   // 7) Throttle the human-readable GUI (20 Hz)
   let uiUpdateThisFrame = false;
@@ -22584,6 +22637,7 @@ function render(now) {
   }
   if (earth._updateSunDirFunc)    earth._updateSunDirFunc(sun.planetObj);
   if (earth._updateEraFunc)       earth._updateEraFunc(o.julianDay);
+  updateSurfaceTiers();
   if (earth._updateUmbraDiscFunc) earth._updateUmbraDiscFunc();
   updateSunGlow();
 
@@ -32552,6 +32606,33 @@ function _chainPeriSunMarker(planetObj) {
 // are this axis's children. Beyond the channel's ±10 Myr the axis keeps its
 // last pose. Mirror: tools/lib/scene-graph.js _applyEngineEarthFrame.
 const _CHAIN_PS = new THREE.Vector3(), _CHAIN_PN = new THREE.Vector3(), _CHAIN_PG = new THREE.Vector3(), _CHAIN_PX = new THREE.Vector3();
+/** A planet's inclination of date to the EARTH's orbit plane of date — the mutual inclination
+ *  of the two planes, both in the J2000 ecliptic frame (at J2000 the Earth normal is the J2000
+ *  pole and this is the chain's inclEclipticDeg). ONE home for the panels' rows
+ *  (updateDynamicInclinations) and the orbit containers' tilt (_chainPoseOrbitContainer).
+ *  @param {string} nm @param {number} jdUT @param {number[]} nE the Earth's orbit normal (J2000 ecliptic) */
+function _chainPlanetMutualInclinationDeg(nm, jdUT, nE) {
+  const el = _chainElementsOfDate(nm, jdUT);
+  const i = el.inclEclipticDeg * DEG2RAD, Om = el.ascNodeEclipticDeg * DEG2RAD;
+  // the orbit normal in the J2000 ecliptic frame, the engine's convention
+  // (the same form as the Earth normal: [sin i sin Ω, −sin i cos Ω, cos i])
+  const nP = [Math.sin(i) * Math.sin(Om), -Math.sin(i) * Math.cos(Om), Math.cos(i)];
+  const d = nP[0] * nE[0] + nP[1] * nE[1] + nP[2] * nE[2];
+  return Math.acos(Math.max(-1, Math.min(1, d))) * RAD2DEG;
+}
+/** The planet's orbit container takes the plain node tilt of date — Ω the chain's ecliptic
+ *  node, i the mutual inclination above (the scaffold hangs under the Earth's orbit frame of
+ *  date): rotation.x = cos(−90° − Ω)·(−i), rotation.z = sin(−90° − Ω)·(−i), the scaffold's own
+ *  convention. Posed in the same pass as the axis, before it (see updatePositions).
+ *  @param {number[]} nE the Earth's orbit normal of date (J2000 ecliptic), once per pass */
+function _chainPoseOrbitContainer(obj, nm, jdUT, nE) {
+  if (!obj.containerObj) return;
+  const el = _chainElementsOfDate(nm, jdUT);
+  const angle = (-90 - el.ascNodeEclipticDeg) * DEG2RAD;
+  const inclination = _chainPlanetMutualInclinationDeg(nm, jdUT, nE);
+  obj.containerObj.rotation.x = Math.cos(angle) * -inclination * DEG2RAD;
+  obj.containerObj.rotation.z = Math.sin(angle) * -inclination * DEG2RAD;
+}
 function _chainPlacePlanetPole(obj, nm, jdUT) {
   if (!obj.rotationAxis || !_chainR) return;
   const ch = _tierModelB().planets.spin(nm), year = _engineYearTT(jdUT);
@@ -33074,6 +33155,9 @@ function updatePositions() {
   o.obliquityEarth = _sceneEpsTargetDeg(_yearForObliquity);
 
   // ───────────────────────── each planet ───────────────────────────
+  // the Earth's orbit normal of date, once per pass: the planets' orbit containers tilt by
+  // their mutual inclination with it (_chainPoseOrbitContainer)
+  const _earthNormalOfDate = _chainEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(o.currentYear));
   for (let i = 0, L = tracePlanets.length; i < L; i++) {
     const obj = tracePlanets[i];
     obj.planetObj.getWorldPosition(PLANET_POS);
@@ -33100,7 +33184,14 @@ function updatePositions() {
       // the mesh parent's local; parent matrices are current from step 0).
       // The orbit ring and the trace are chain-sampled too
       // (_chainUpdateOrbitLine below / _chainChainWorldPos in the trace sampler).
-      _chainPlacePlanetPole(obj, _nm, o.julianDay);   // the axis first: the mesh and the rings hang under it
+      // The planet's orbit container (the node tilt the scaffold carries) is posed from the
+      // SAME elements of date BEFORE the axis: the axis is set as a WORLD rotation against the
+      // container's pose, so a container re-posed after it — the former 10-Hz
+      // updateOrbitalPlaneRotations in the loop's 8b block — dragged the axis by the move
+      // until the next frame (measured: Saturn's pole 1.3e-8 off on the frame the series
+      // landed when no frame followed, 7e-7 on the frame a jump lands on).
+      _chainPoseOrbitContainer(obj, _nm, o.julianDay, _earthNormalOfDate);
+      _chainPlacePlanetPole(obj, _nm, o.julianDay);   // the axis next: the mesh and the rings hang under it
       _CHAIN_V.set(_wp[0], _wp[1], _wp[2]);
       obj.planetObj.parent.worldToLocal(_CHAIN_V);
       obj.planetObj.position.copy(_CHAIN_V);
@@ -33889,9 +33980,10 @@ function updatePerihelion() {
 function updateAscendingNodes() {
   // P5/K5b — the SEVEN PLANETS' nodes ride the chain's elements-of-date:
   // Ω(t) from the ζ-vector secular skeleton + derived terms, ω = ϖ − Ω
-  // from the SAME element set (proper ecliptic arguments). Placed BEFORE
-  // updateOrbitalPlaneRotations so the VISUAL orbital planes follow the
-  // same Ω.
+  // from the SAME element set (proper ecliptic arguments). The VISUAL orbital
+  // planes (the planets' orbit containers) follow the same Ω and i in
+  // updatePositions' planet pass — _chainPoseOrbitContainer, posed before the
+  // axis — so nothing here moves the scene.
   {
     for (const _p of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
       const _el = _chainElementsOfDate(_p, o.julianDay);
@@ -33900,47 +33992,6 @@ function updateAscendingNodes() {
       o[_p + 'ArgumentOfPeriapsis'] = ((_el.lonPeriEclipticDeg - _el.ascNodeEclipticDeg) % 360 + 360) % 360;
     }
   }
-
-  // Update the visual orbital plane markers to reflect the dynamic ascending nodes
-  updateOrbitalPlaneRotations();
-}
-
-/**
- * Update the orbital plane container rotations based on dynamic ascending node values.
- * This ensures the visual markers (orbital plane, node markers) reflect the current
- * ascending node rather than the static epoch 2000 values.
- *
- * The formula to convert ascending node Ω and inclination i to tilt values:
- *   orbitTilta = cos((-90-Ω) * π/180) * -inclination
- *   orbitTiltb = sin((-90-Ω) * π/180) * -inclination
- *
- * The containerObj.rotation uses:
- *   rotation.x = orbitTilta * π/180
- *   rotation.z = orbitTiltb * π/180
- */
-function updateOrbitalPlaneRotations() {
-
-  // The planet's own container — the plain node tilt (the chain places the
-  // mesh and _chainPlacePlanetPole its axis; the orbit-plane grid is a scene
-  // child placed from the engine).
-  const updatePlaneRotation = (planetData, ascendingNode, inclination) => {
-    const angle = (-90 - ascendingNode) * DEG2RAD;
-    const newTilta = Math.cos(angle) * -inclination;
-    const newTiltb = Math.sin(angle) * -inclination;
-    if (planetData && planetData.containerObj) {
-      planetData.containerObj.rotation.x = newTilta * DEG2RAD;
-      planetData.containerObj.rotation.z = newTiltb * DEG2RAD;
-    }
-  };
-
-  // Update each planet's orbital plane using dynamic ecliptic inclination
-  updatePlaneRotation(mercury, o.mercuryAscendingNode, o.mercuryEclipticInclinationDynamic);
-  updatePlaneRotation(venus, o.venusAscendingNode, o.venusEclipticInclinationDynamic);
-  updatePlaneRotation(mars, o.marsAscendingNode, o.marsEclipticInclinationDynamic);
-  updatePlaneRotation(jupiter, o.jupiterAscendingNode, o.jupiterEclipticInclinationDynamic);
-  updatePlaneRotation(saturn, o.saturnAscendingNode, o.saturnEclipticInclinationDynamic);
-  updatePlaneRotation(uranus, o.uranusAscendingNode, o.uranusEclipticInclinationDynamic);
-  updatePlaneRotation(neptune, o.neptuneAscendingNode, o.neptuneEclipticInclinationDynamic);
 }
 
 /**
@@ -34525,17 +34576,12 @@ function updateDynamicInclinations() {
   // panel's i_inv reads), both in the J2000 ecliptic frame. At J2000 the
   // Earth normal is the J2000 pole and the value is the chain's
   // inclEclipticDeg; away from it this is the mutual inclination of the two
-  // planes of date. The visual orbital-plane tilt groups
-  // (updateOrbitalPlaneRotations) read the same value.
+  // planes of date. The visual orbital-plane tilts (_chainPoseOrbitContainer,
+  // in updatePositions' planet pass) take the same value from the same home,
+  // _chainPlanetMutualInclinationDeg.
   const nE = _chainEarthEngineOrbitNormalJ2000(_engineYearOfSceneYear(o.currentYear));
   for (const key of ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']) {
-    const el = _chainElementsOfDate(key, o.julianDay);
-    const i = el.inclEclipticDeg * DEG2RAD, Om = el.ascNodeEclipticDeg * DEG2RAD;
-    // the orbit normal in the J2000 ecliptic frame, the engine's convention
-    // (the same form as the Earth normal: [sin i sin Ω, −sin i cos Ω, cos i])
-    const nP = [Math.sin(i) * Math.sin(Om), -Math.sin(i) * Math.cos(Om), Math.cos(i)];
-    const d = nP[0] * nE[0] + nP[1] * nE[1] + nP[2] * nE[2];
-    o[key + 'EclipticInclinationDynamic'] = Math.acos(Math.max(-1, Math.min(1, d))) * RAD2DEG;
+    o[key + 'EclipticInclinationDynamic'] = _chainPlanetMutualInclinationDeg(key, o.julianDay, nE);
   }
 }
 
@@ -35313,6 +35359,9 @@ function makeRealisticEarth(pd){
         u_normalPower    : { value: 1.0 },          // 1 = original, >1 exaggerates bumps
         u_dayGain        : { value: 1.5 },          // Day brighter
         u_alpha          : { value: 0.7 },          // <-- NEW  (0-1 cloud opacity)
+        u_cloudEra       : { value: 1.0 },          // plan 27 step E: the tier's cloud factor (updateEra)
+        u_modernMix      : { value: 1.0 },          // plan 27 step E: 1 on the present-day tier (updateEra)
+        u_atmEra         : { value: 1.0 },          // plan 27 step E: the tier's atmosphere factor (updateEra; the atmosphere shell shares it)
         u_termWidth      : { value: 0.08 },          // width in hemi-space (0 < w ≤ 1)
         u_iceGlowStrength : { value: 0.05 },
         u_nightCloudFactor : { value: 0.3 },
@@ -35376,7 +35425,7 @@ function makeRealisticEarth(pd){
     const atm = new THREE.Mesh(
         new THREE.SphereGeometry(radius * 1.05, segments, segments),
         new THREE.ShaderMaterial({
-            uniforms      : { u_sunRelPosition: U.u_sunRelPosition },
+            uniforms      : { u_sunRelPosition: U.u_sunRelPosition, u_atmEra: U.u_atmEra },
             vertexShader  : ATM_VERT,
             fragmentShader: ATM_FRAG,
             transparent   : true,
@@ -35619,7 +35668,7 @@ function makeRealisticEarth(pd){
         e = { tex: null, ready: false };
         dayTiers.entries.set(file, e);
         if (file === 'public/Earth.jpg') { e.tex = tex.dayPostLGM; e.ready = true; }
-        else { e.tex = loadTexture(file, () => { e.ready = true; }); e.tex.colorSpace = THREE.NoColorSpace; }
+        else { e.tex = loadTexture(file, () => { e.ready = true; positionChanged = true; }); e.tex.colorSpace = THREE.NoColorSpace; }   // a decode wakes the idle loop
       }
       return e.ready ? e.tex : null;
     }
@@ -35638,11 +35687,14 @@ function makeRealisticEarth(pd){
     function tierAtAge(ageMa) {
       const T = dayTiers.table;
       if (!T) return null;
-      let lo = 0, hi = T.length - 1;
-      while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (T[mid].fromMa <= ageMa) lo = mid; else hi = mid - 1; }
+      const lo = tierIndexAtAge(T, ageMa);
       const tier = T[lo];
       const mix = (lo > 0 && tier.fadeMyr > 0) ? THREE.MathUtils.clamp(1 - (ageMa - tier.fromMa) / tier.fadeMyr, 0, 1) : 0;
-      return { index: lo, id: tier.id, label: tier.label, kind: tier.kind, source: tier.source, file: tier.file, youngerFile: lo > 0 ? T[lo - 1].file : tier.file, mix };
+      const clouds = tier.clouds ?? 1, youngerClouds = lo > 0 ? (T[lo - 1].clouds ?? 1) : clouds;
+      const atm = tier.atmosphere ?? 1, youngerAtm = lo > 0 ? (T[lo - 1].atmosphere ?? 1) : atm;
+      return { index: lo, id: tier.id, label: tier.label, kind: tier.kind, source: tier.source, file: tier.file, youngerFile: lo > 0 ? T[lo - 1].file : tier.file, mix,
+        // the tier's cloud and atmosphere factors and the modern weight, all following the cross-fade (no map needed)
+        clouds: clouds * (1 - mix) + youngerClouds * mix, atmosphere: atm * (1 - mix) + youngerAtm * mix, modern: (lo === 0 ? 1 - mix : 0) + (lo === 1 ? mix : 0) };
     }
     const surfaceLabel = (/** @type {{label: string, kind: string}} */ t) => t.kind === 'cited' ? `${t.label} — cited` : `${t.label} — illustration; continents not modelled`;
 
@@ -35667,6 +35719,9 @@ function makeRealisticEarth(pd){
       U.u_dayTexA.value = dayTiers.lastA;
       U.u_dayTexB.value = dayTiers.lastB;
       U.u_dayMix.value = (a && b) ? at.mix : 0;
+      U.u_cloudEra.value = at.clouds;     // no clouds over the magma ocean
+      U.u_atmEra.value = at.atmosphere;   // no blue sky over the magma ocean either
+      U.u_modernMix.value = at.modern;    // the modern relief and ocean glint only on the present-day tier
     }
     /** The day-map state for the headless probes: the active tier, the mix, whether the
      *  active tier's map has decoded, and the surface label. */
@@ -35674,7 +35729,7 @@ function makeRealisticEarth(pd){
       const T = dayTiers.table;
       const tier = T && dayTiers.active >= 0 ? T[dayTiers.active] : null;
       const e = tier ? dayTiers.entries.get(tier.file) : null;
-      return { loaded: !!T, active: dayTiers.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mix: U.u_dayMix.value, surface: o.earthSurface, resident: dayTiers.entries.size };
+      return { loaded: !!T, active: dayTiers.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapApplied: !!(e && e.ready && U.u_dayTexA.value === e.tex), mix: U.u_dayMix.value, clouds: U.u_cloudEra.value, atmosphere: U.u_atmEra.value, modern: U.u_modernMix.value, surface: o.earthSurface, resident: dayTiers.entries.size };
     }
 
     U.u_position.value.copy(core.position);
@@ -35689,6 +35744,94 @@ function makeRealisticEarth(pd){
         dayMapState,
         updateUmbraDisc
     };
+}
+
+/** The index of the tier holding an age in a sorted, contiguous tier table (ages in Myr before
+ *  J2000; the last tier whose fromMa ≤ ageMa, the first tier below its start) — ONE home for
+ *  the Earth's day map and the other bodies' maps. @param {{fromMa: number}[]} T @param {number} ageMa */
+function tierIndexAtAge(T, ageMa) {
+  let lo = 0, hi = T.length - 1;
+  while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (T[mid].fromMa <= ageMa) lo = mid; else hi = mid - 1; }
+  return lo;
+}
+
+// PLAN 27 STEP F — the Moon's, Mercury's and Saturn's look by age. ONE home per body:
+// public/textures/<body>/manifest.json (written by tools/pipeline/build-body-tiers.js; gate
+// tools/verify/surface-tiers.js), the same table form as the Earth's. A body's map is SWAPPED
+// at a tier boundary (no cross-fade — these maps do not fill the screen the way the Earth's
+// does) and Saturn's ring mesh shown or hidden by the tier's `rings`. Maps load on demand and
+// are shown once decoded (until then the last map stays); the active tier's map, its two
+// neighbours' and the present-day map stay resident. The age is the epoch's TT civil year.
+/** @param {any} pd the planet data carrying `tiersUrl`, `textureUrl` and `planetMaterial` */
+function makeSurfaceTiers(pd) {
+  const S = { table: /** @type {any[]|null} */ (null), active: -1, entries: new Map(), label: '' };
+  fetchRepoJson(pd.tiersUrl).then((m) => {
+    if (m && Array.isArray(m.tiers) && m.tiers.length) { S.table = m.tiers; S.active = -1; }
+  });
+  /** The decoded texture of a tier's map, or null while it loads. @param {string} file */
+  function texture(file) {
+    let e = S.entries.get(file);
+    if (!e) {
+      e = { tex: null, ready: file === pd.textureUrl };   // the present-day map is the material's own
+      S.entries.set(file, e);
+      e.tex = loadTexture(file, () => { e.ready = true; positionChanged = true; });   // a decode wakes the idle loop
+    }
+    return e.ready ? e.tex : null;
+  }
+  /** Release every tier map but the active tier's, its neighbours' and the present-day map. @param {number} k */
+  function release(k) {
+    const keep = new Set();
+    for (let i = k - 1; i <= k + 1; i++) if (S.table[i]) keep.add(S.table[i].file);
+    for (const [file, e] of S.entries) {
+      if (keep.has(file) || file === pd.textureUrl) continue;
+      if (e.tex) { e.tex.dispose(); textureCache.delete(file); }
+      S.entries.delete(file);
+    }
+  }
+  /** The tier holding an age (Myr before J2000) — pure in the table (the browser golden's rows read it). @param {number} ageMa */
+  function tierAtAge(ageMa) {
+    const T = S.table;
+    if (!T) return null;
+    const k = tierIndexAtAge(T, ageMa);
+    const t = T[k];
+    return { index: k, id: t.id, label: t.label, kind: t.kind, source: t.source, file: t.file, rings: t.rings !== false };
+  }
+  /** Apply the tier for an age: the map once decoded, the rings, the label. @param {number} ageMa */
+  function update(ageMa) {
+    const at = tierAtAge(ageMa);
+    if (!at) return;
+    if (at.index !== S.active) {
+      S.active = at.index;
+      release(at.index);
+      for (const i of [at.index - 1, at.index + 1]) if (S.table[i]) texture(S.table[i].file);   // warm the neighbours
+      pd._ringsShown = at.rings;
+      if (pd.ringObj) pd.ringObj.visible = pd.visible && at.rings;
+      S.label = at.index === 0 ? '' : `${pd.name}: ${at.label} — ${at.kind}`;
+    }
+    const tex = texture(at.file);
+    if (tex && pd.planetMaterial.map !== tex) { pd.planetMaterial.map = tex; pd.planetMaterial.needsUpdate = true; }
+  }
+  /** The live state for the headless probes. */
+  function state() {
+    const T = S.table;
+    const tier = T && S.active >= 0 ? T[S.active] : null;
+    const e = tier ? S.entries.get(tier.file) : null;
+    return { loaded: !!T, active: S.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapIsTier: !!(e && pd.planetMaterial.map === e.tex), rings: pd._ringsShown !== false, ringVisible: pd.ringObj ? pd.ringObj.visible : null, label: S.label, resident: S.entries.size };
+  }
+  return { tierAtAge, update, state, get label() { return S.label; } };
+}
+
+/** Every tiered body's map and rings for the epoch's TT age, and the root read-out. */
+function updateSurfaceTiers() {
+  if (_surfaceTierBodies.length === 0) return;
+  const ageMa = (J2000_CALENDAR_YEAR - o.currentYear) / 1e6;
+  let label = '';
+  for (const pd of _surfaceTierBodies) {
+    pd._surfaceTiers.update(ageMa);
+    if (pd._surfaceTiers.label) label += (label ? ' · ' : '') + pd._surfaceTiers.label;
+  }
+  const next = label || 'present-day maps — cited';
+  if (o.bodySurfaces !== next) o.bodySurfaces = next;
 }
 
 function createPlanet(pd) {           // pd = Planet Data
@@ -35829,10 +35972,12 @@ function createPlanet(pd) {           // pd = Planet Data
         opacity    : pd.ringOpacity ?? 0.6
       });
 
+      ring.visible = pd.visible !== false && pd._ringsShown !== false;   // plan 27 step F: the tier may have hidden them before the texture arrived
       rotationAxis.add(ring);
       pd.ringObj = ring;
     });
   }
+  if (pd.tiersUrl) { pd._surfaceTiers = makeSurfaceTiers(pd); _surfaceTierBodies.push(pd); }   // plan 27 step F
 
   orbit.add(rotationAxis);
   orbitContainer.add(orbit);
@@ -35934,7 +36079,7 @@ function showHideObject(obj) {
       }
     }
     if (obj.ringObj) {
-    obj.ringObj.visible = obj.visible;
+    obj.ringObj.visible = obj.visible && obj._ringsShown !== false;   // plan 27 step F: the tier's rings flag
   }
     if (obj.labelObj) {
       obj.labelObj.visible = obj.visible;

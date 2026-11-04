@@ -533,11 +533,36 @@ early ocean world and the Hadean magma ocean at the genesis — with the three
 Snowball episodes cut in (Makganyene, Sturtian, Marinoan). Each tier
 cross-fades to the next younger tier's map over `fadeMyr` at its younger edge
 (`updateEra` in `makeRealisticEarth`; the night maps keep their JD boundary).
-Maps load on demand; a tier's map is shown once decoded and only the active
-tier's and its two neighbours' stay resident. The root control "Earth surface"
+Each tier also carries `clouds` and `atmosphere` factors (both 0 over the
+magma ocean, 1 elsewhere) that scale the cloud shell and the blue atmosphere
+shell, and the shader's modern weight (1 on
+the present-day tier, 0 on any other, both following the cross-fade) fades the
+modern relief normal map and the modern ocean-glint mask out: they belong to
+today's continents only. Maps load on demand; a tier's map is shown once
+decoded — the decode wakes the idle render loop — and only the active tier's
+and its two neighbours' stay resident. The root control "Earth surface"
 names the active tier and what it IS — cited or illustration; the model does
 not model continents. The browser golden pins the tier and the mix at ages on
 both sides of every boundary class.
+
+**The Moon, Mercury and Saturn (step F).** The same table form, one
+`public/textures/<body>/manifest.json` per body (written by
+`tools/pipeline/build-body-tiers.js`, checked by the same gate,
+`tools/verify/surface-tiers.js`), read by `makeSurfaceTiers` — a planet's
+`tiersUrl` registers it in `createPlanet`, and `updateSurfaceTiers` runs every
+frame beside `updateEra`. A body's map is swapped at a boundary (no cross-fade:
+these maps do not fill the screen) by replacing `material.map`; Saturn's tier
+carries `rings`, which shows or hides the ring mesh (and `showHideObject`
+honours it). The Moon has five tiers — the lunar magma ocean (generated) to
+4,350 Ma, the highland crust derived from the present-day map with the maria
+raised, then the maria at one third and two thirds of their present darkness
+(3,800–3,550–3,300 Ma, the mare flooding), then the present-day map; Mercury
+two — a generated early crust before its oldest preserved surfaces (4,100 Ma),
+then the present-day map; Saturn two — its rings hidden before 400 Ma, the
+rings' age being a cited band, not a value. The root control "Moon & planets"
+lists the bodies whose active tier is not the present-day one with what each
+map IS; the browser golden pins each body's tier on both sides of every
+boundary.
 
 ---
 

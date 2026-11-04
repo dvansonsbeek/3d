@@ -396,6 +396,31 @@ canvas {
   padding-bottom: 1px;
 }
 
+/* ── The edge notice (plan 27 step B: the honest edge — shown by the scene's clamp) ── */
+.edge-notice {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(8px);
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border: 1px solid hsla(220, 30%, 28%, 0.6);
+  border-radius: 8px;
+  background: hsla(215, 40%, 16%, 0.92);
+  color: hsla(0, 0%, 96%, 1);
+  font-size: 12.5px;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 50;
+}
+.edge-notice.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* ── Navigation toolbar (step/reset/now) ── */
 .tp-nav-toolbar {
   display: flex;

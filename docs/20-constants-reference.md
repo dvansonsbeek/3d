@@ -278,7 +278,8 @@ Input constants used in the formulas above:
 The planets carry no frame corrections: the engine-D chain places every
 rendered planet quantity, each planet's rotation axis is placed from the spin
 channel's pole of date (`_chainPlacePlanetPole`), and the planet containers take
-the plain node tilt.
+the plain node tilt (`_chainPoseOrbitContainer`, posed in the same pass before
+the axis: the axis is a world rotation set against the container's pose).
 
 ## Mass Computation & Universal Constants
 

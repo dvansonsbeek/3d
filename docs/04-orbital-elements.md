@@ -197,7 +197,7 @@ Two rules keep element comparisons honest across both tiers:
 | `_chainElementsOfDate()` / `_chainHelioAU()` | [script.js](../src/script.js) | Scene bindings of the chain |
 | `updatePlanetInvariablePlaneHeights()` | [script.js](../src/script.js) | Chain projections (heights, nodes) |
 | `updateDynamicInclinations()` | [script.js](../src/script.js) | The panels' inclination rows of date |
-| `updateAscendingNodes()` / `updateOrbitalPlaneRotations()` | [script.js](../src/script.js) | Ecliptic nodes and 3D plane orientation |
+| `updateAscendingNodes()` / `_chainPoseOrbitContainer()` | [script.js](../src/script.js) | Ecliptic nodes (the panel fields) and the 3D plane orientation (posed in the planet pass, before the axis) |
 | `updateMoonOrbitalElements()` | [script.js](../src/script.js) | Moon Ω, ϖ, anomalies, phase (Earth as focus) |
 
 ## References
