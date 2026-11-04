@@ -746,6 +746,24 @@ year axes of plan 06 — calendar, engine, SI-tropical count — are three
 CLOCKS when a ΔT reads them), and gate a tier's clock against another tier's
 events, never against its own.
 
+A fourth clock surfaced in plan 27 step F, from a screenshot: the Moon beside
+a focused Earth lit from a direction unrelated to the Sun at the genesis,
+while the Earth's own shader (the rendered Sun's direction every frame) was
+right and a focused Moon was right. The directional light's Earth-focused
+rebuild (the shadow map's in-era precision: `updateSunlightForPlanet`) reads
+the Sun's longitude through the browser's eclipse finders, whose `_eclDeltaT`
+still read `meanDeltaTSecondsAtAge` at the age of the UT day's CIVIL label —
+the clock every other browser read had left for the bridge. Measured, the
+light against the true Sun → Earth direction: ≤ 0.003° to year 1000, 0.017°
+at −100 kyr, 167.6° at −10 Myr, 25.3° at −100 Myr, 107.9° at −1 Gyr, 80.5° at
+the genesis — a sub-year error in the longitude's argument is a random
+direction. `_eclDeltaT` now reads the scene's one bridge
+(`_sceneDeltaTSeconds`, the function `_sceneJdTT` is built on): ≤ 0.006° at
+every epoch; in the era the two clocks part by milliseconds, so 74 browser
+golden rows moved at ≤ 4e-7 relative (the `dtFw@` rows by −4.7 ms, the
+ancient eclipse magnitudes by 4e-7, the umbra ground points by 4e-6°) and
+were re-recorded with this reason.
+
 ### 1.32 An artifact that reads the coefficients it feeds is a loop — cut it at the source, never declare it
 
 **Measured** (the vocabulary cascade, 2026-11-01, first read as a run-to-run

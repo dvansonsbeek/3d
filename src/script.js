@@ -2062,12 +2062,16 @@ function pureDeltaTAtAge(t_Ma) {
 // retired, these are the only copies).
 // ═════════════════════════════════════════════════════════════════════════════
 
-/** Pure-tidal ΔT at given JD, in seconds. Wraps meanDeltaTSecondsAtAge for
- *  callers that have a JD instead of a t_Ma. Returns 0 if formula undefined. */
+/** The eclipse tier's ΔT at a UT JD, in seconds (the mean law without the J2000 anchor, the
+ *  convention the certified eclipse numbers carry) — read from the scene's ONE bridge,
+ *  _sceneDeltaTSeconds. It used to read meanDeltaTSecondsAtAge at the age of the UT day's
+ *  CIVIL label, the clock plan 27 retired everywhere else: the two agree to milliseconds in
+ *  the era and part by months beyond ~1 Myr, and the directional light's Earth-focused
+ *  rebuild (updateSunlightForPlanet) read the Sun's longitude through it — the Moon beside
+ *  a focused Earth lit from a random direction at deep time (measured 168° at −10 Myr, 80°
+ *  at the genesis; ≤ 0.02° to −100 kyr). Returns 0 where the law is undefined. */
 function _eclDeltaT(jd) {
-  const decYear = julianDateToDecimalYear(jd);
-  const t_Ma    = (J2000_CALENDAR_YEAR - decYear) / 1e6;
-  const dT      = meanDeltaTSecondsAtAge(t_Ma);
+  const dT = _sceneDeltaTSeconds(jd);
   return Number.isFinite(dT) ? dT : 0;
 }
 
@@ -3222,16 +3226,21 @@ const STARTMODEL_YEAR_SI = _jdToSIyear(startmodelJD);
  *  model's ΔT curve in deep-time mode (the Moon block's convention) — the ONE
  *  UT→TT step every argument read of the frame takes (the engine year below,
  *  the Moon ring's and markers' lunar arguments). */
+/** The scene's ΔT (seconds, the mean law without the J2000 anchor deltaTStart) at a UT Julian
+ *  Day — the ONE bridge (plan 27, doc 111 §1.36): the package calendar's implicit solve (the raw
+ *  integral at the TT age the UT count has reached, the era corrections at the civil year), the
+ *  function the model's finders, the besselian tier and the Node twin read; the civil reading
+ *  outside the table, as before. Every ΔT read in the browser goes through here — the eclipse
+ *  tier's _eclDeltaT included (doc 111 §1.31: a clock has ONE age axis). NaN where undefined. */
+function _sceneDeltaTSeconds(jdUT) {
+  const bridged = _deepCal().deltaTSecondsAtJdUT(jdUT);
+  return (bridged !== null && Number.isFinite(bridged)) ? bridged
+    : meanDeltaTSecondsAtAge((J2000_CALENDAR_YEAR - julianDateToDecimalYear(jdUT)) / 1e6);
+}
 function _sceneJdTT(jdUT) {
   let jdTT = jdUT;
   if (DEEP_TIME_MODE_ENABLED) {
-    // PLAN 27 (doc 111 §1.36): the ONE bridge — the package calendar's implicit solve (the raw
-    // integral at the TT age the UT count has reached, the era corrections at the civil year),
-    // the function the model's finders, the besselian tier and the Node twin read; the civil
-    // reading outside the table, as before.
-    const bridged = _deepCal().deltaTSecondsAtJdUT(jdUT);
-    const dT = (bridged !== null && Number.isFinite(bridged)) ? bridged
-      : meanDeltaTSecondsAtAge((J2000_CALENDAR_YEAR - julianDateToDecimalYear(jdUT)) / 1e6);
+    const dT = _sceneDeltaTSeconds(jdUT);
     if (Number.isFinite(dT)) jdTT = jdUT + (deltaTStart + dT) / SECONDS_PER_DAY;
   }
   return jdTT;
