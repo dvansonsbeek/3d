@@ -521,6 +521,24 @@ In short: **the full corrected curve (Layer 4) governs all validated rotation ph
 - [Doc 99 — Expanding Solar System Resonance Theory (ESSRT)](99-expanding-solar-system-resonance-theory.md) — canonical chain from `t_Ma` through LOD, T_p, AU, M_Sun, Kepler year, Moon distance, planet orbital + synodic periods
 - [Doc 20 § "ESSRT epoch dependence"](20-constants-reference.md#essrt-epoch-dependence--most-tabulated-values-are-j2000-anchored) — J2000-constant → `mean*AtAge(t_Ma)` helper map
 
+### 15.6 The Earth's surface by age (plan 27 step E)
+
+The Earth's day map is chosen by the TT age of the scene epoch from ONE table,
+`public/textures/earth/manifest.json` (written by
+`tools/pipeline/build-earth-tiers.js`, gated by `tools/verify/earth-tiers.js`):
+the satellite map from the end of the LGM on, Scotese's cited paleogeography
+(PaleoAtlas v3, CC BY 4.0) at the atlas's own 5-Myr steps from 21 ka to 750 Ma,
+and generated illustration beyond — the Proterozoic, the Archean cratons, the
+early ocean world and the Hadean magma ocean at the genesis — with the three
+Snowball episodes cut in (Makganyene, Sturtian, Marinoan). Each tier
+cross-fades to the next younger tier's map over `fadeMyr` at its younger edge
+(`updateEra` in `makeRealisticEarth`; the night maps keep their JD boundary).
+Maps load on demand; a tier's map is shown once decoded and only the active
+tier's and its two neighbours' stay resident. The root control "Earth surface"
+names the active tier and what it IS — cited or illustration; the model does
+not model continents. The browser golden pins the tier and the mix at ages on
+both sides of every boundary class.
+
 ---
 
 **Previous**: [40 - Architecture](40-architecture.md)
