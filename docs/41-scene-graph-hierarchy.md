@@ -602,8 +602,10 @@ one on what the model or the source says, the rows — the day, the sidereal
 year in solar days (the tropical year is ill-defined where the clock
 collapses to years), the Moon's distance and apparent diameter, the
 precession clock, the obliquity (a value inside the hybrid's ±10-Myr domain,
-the band beyond) and, inside the ice history, the ice cover — each with its
-provenance tag (measured / cited / derived / forecast / band / uncalibrated;
+the range it swings over beyond, the beat in the hover) and, inside the ice
+history, the ice cover — each with its
+provenance tag (measured / cited / derived / forecast — the certification
+status is the card's footer, never a row's tag;
 ahead of today the Moon's recession is held at the LLR rate, so its rows are
 forecasts), and the gated rock anchor where one exists (Lantink 2.46 Ga,
 Xiamaling 1.4 Ga, Wells 380 and 65 Ma, the LR04 stack at the LGM — named,
