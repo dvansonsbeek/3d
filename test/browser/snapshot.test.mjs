@@ -121,17 +121,21 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   // deep end, each Snowball episode, the generated tiers, the genesis edge). A map swap, a
   // moved boundary or a changed fade shows here; the maps themselves are the gate's.
   // (4,402 / 4,412 / 4,418 / 4,427.5: the rain-out, the steam atmosphere and the genesis fades;
-  // 163.5: inside an atlas step's 2.5-Myr fade — plan 27 step I)
-  for (const ageMa of [-1, 0, 0.02, 0.0225, 0.03, 1, 2.49, 2.51, 163.5, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
+  // 163.5: inside an atlas step's 2.5-Myr fade — plan 27 step I; the Pleistocene rows carry the
+  // ice fraction from the model's own ice history — 0.021 the LGM, 0.125 the Eemian, −0.05 and
+  // −0.9 the forecast ahead, step G1/H4 — and every row the sky tint, step G3)
+  // (the future: −950 the moist greenhouse, −875 its fade, −650 the biosphere's end, −550 the
+  // present tier's fade, −0.9 beyond the ice forecast, −0.1 inside it — plan 27 step H1/H4)
+  for (const ageMa of [-950, -875, -650, -550, -1, -0.9, -0.1, -0.05, 0, 0.02, 0.021, 0.0225, 0.03, 0.125, 1, 2.49, 2.51, 163.5, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
     const r = T.earthTierAtAge(ageMa);
-    v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)} clouds=${r.clouds.toFixed(4)} atm=${r.atmosphere.toFixed(4)} modern=${r.modern.toFixed(4)}` : null;
+    v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)} clouds=${r.clouds.toFixed(4)} atm=${r.atmosphere.toFixed(4)} modern=${r.modern.toFixed(4)} ice=${r.ice === null ? '-' : r.ice.toFixed(4)} sky=${r.skyTint.map((c) => c.toFixed(2)).join('/')}` : null;
   }
   // plan 27 step F: the Moon's, Mercury's and Saturn's tiers on both sides of every boundary
   // (the mare flooding steps, the lunar magma ocean, Mercury's oldest surfaces, the rings' age
   // band) and at the edges — the tier id, its kind, whether the rings are shown, and (plan 27
   // step I) the cross-fade mix and the rings' opacity factor at ages inside each fade (3,310 /
   // 3,560 / 3,810 / 4,360 the Moon's, 4,110 Mercury's, 410 the rings').
-  for (const [body, ages] of [['moon', [0, 3299, 3301, 3310, 3549, 3551, 3560, 3799, 3801, 3810, 4349, 4351, 4360, 4428.985]], ['mercury', [0, 4099, 4101, 4110, 4428.985]], ['saturn', [-1, 0, 399, 401, 410, 4428.985]]]) {
+  for (const [body, ages] of [['moon', [0, 107, 109, 113, 449, 451, 799, 801, 805, 3299, 3301, 3310, 3549, 3551, 3560, 3799, 3801, 3810, 4349, 4351, 4360, 4428.985]], ['mercury', [0, 4099, 4101, 4110, 4428.985]], ['saturn', [-250, -150, -50, -1, 0, 399, 401, 410, 4428.985]]]) {
     for (const ageMa of ages) {
       const r = T.bodyTierAtAge(body, ageMa);
       v[`${body}Tier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} rings=${r.rings} mix=${r.mix.toFixed(4)} ringFactor=${r.ringFactor.toFixed(4)}` : null;

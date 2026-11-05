@@ -28,7 +28,8 @@
    "fadeMyr": 0,
    "file": "public/Mercury.jpg",
    "source": "modern",
-   "kind": "cited"
+   "kind": "cited",
+   "present": true
   },
   {
    "id": "early-crust",

@@ -37,6 +37,23 @@
    "file": "public/Earth.jpg",
    "source": "Solar System Scope textures (https://www.solarsystemscope.com/textures/)",
    "licence": "CC BY 4.0"
+  },
+  "derived": {
+   "note": "the present-day map with its vegetation desaturated to an ochre desert (the biosphere's end), and that under a seeded vapour deck with the seas darkened (the moist greenhouse) — derivatives of the CC BY 4.0 map, labelled \"illustration\"; the spans a reading of the literature below",
+   "derivedFrom": "public/Earth.jpg",
+   "licence": "CC BY 4.0 (derivative, attributed)"
+  },
+  "literature": {
+   "caldeiraKasting1992": "Caldeira, K. & Kasting, J.F., 1992. The life span of the biosphere revisited. Nature 360, 721–723 — C₃ photosynthesis ends at ~+0.5–0.9 Gyr as CO₂ is drawn down under the brightening Sun.",
+   "franck2006": "Franck, S., Bounama, C. & von Bloh, W., 2006. Causes and timing of future biosphere extinctions. Biogeosciences 3, 85–92 — the land biosphere ends ~+0.8–1.2 Gyr.",
+   "leconte2013": "Leconte, J., Forget, F., Charnay, B., Wordsworth, R. & Pottier, A., 2013. Increased insolation threshold for runaway greenhouse processes on Earth-like planets. Nature 504, 268–271 — the runaway at ~+1 Gyr.",
+   "wolfToon2015": "Wolf, E.T. & Toon, O.B., 2015. The evolution of habitable climates under the brightening Sun. JGR Atmospheres 120, 5775–5794 — the moist greenhouse sets in at ~+1 Gyr.",
+   "zahnle2007": "Zahnle, K., Arndt, N., Cockell, C., Halliday, A., Nisbet, E., Selsis, F. & Sleep, N.H., 2007. Emergence of a habitable planet. Space Science Reviews 129, 35–78 — the rock-vapour and steam atmospheres after the impact, the rain-out.",
+   "hamano2013": "Hamano, K., Abe, Y. & Genda, H., 2013. Emergence of two types of terrestrial planet on solidification of magma ocean. Nature 497, 607–610 — the magma ocean crystallises in 1–4 Myr at 1 AU.",
+   "sleep2001": "Sleep, N.H., Zahnle, K. & Neuhoff, P.S., 2001. Initiation of clement surface conditions on the earliest Earth. PNAS 98, 3666–3672 — clement conditions within ~10 Myr of the impact.",
+   "wilde2001": "Wilde, S.A., Valley, J.W., Peck, W.H. & Graham, C.M., 2001. Evidence from detrital zircons for the existence of continental crust and oceans on the Earth 4.4 Gyr ago. Nature 409, 175–178 — liquid water by 4,400 Ma.",
+   "zahnle2006": "Zahnle, K., Claire, M. & Catling, D., 2006. The loss of mass-independent fractionation in sulfur due to a Palaeoproterozoic collapse of atmospheric methane. Geobiology 4, 271–283 — the Archean methane haze.",
+   "arney2016": "Arney, G. et al., 2016. The pale orange dot: the spectrum and habitability of hazy Archean Earth. Astrobiology 16, 873–899 — the orange organic haze."
   }
  },
  "size": {
@@ -45,16 +62,46 @@
  },
  "tiers": [
   {
+   "id": "moist-greenhouse",
+   "label": "The moist greenhouse — the oceans evaporating under a brightening Sun, a reading of Leconte 2013 and Wolf & Toon 2015 (derived)",
+   "fromMa": -1000000000,
+   "toMa": -900,
+   "fadeMyr": 0,
+   "file": "public/textures/earth/generated/future-moist-greenhouse.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 0.8,
+   "skyTint": [
+    0.8,
+    0.78,
+    0.74
+   ]
+  },
+  {
+   "id": "biosphere-end",
+   "label": "The end of the land biosphere — CO₂ starvation of the plants under a brightening Sun, a reading of Caldeira & Kasting 1992 and Franck 2006 (derived)",
+   "fromMa": -900,
+   "toMa": -600,
+   "fadeMyr": 50,
+   "file": "public/textures/earth/generated/future-biosphere-end.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
    "id": "modern",
    "label": "Present-day Earth (satellite imagery)",
-   "fromMa": -1000000000,
+   "fromMa": -600,
    "toMa": 0.022471561943874056,
-   "fadeMyr": 0,
+   "fadeMyr": 100,
    "file": "public/Earth.jpg",
    "source": "modern",
    "kind": "cited",
    "clouds": 1,
-   "atmosphere": 1
+   "atmosphere": 1,
+   "present": true
   },
   {
    "id": "scotese-001",
@@ -1288,7 +1335,7 @@
   },
   {
    "id": "archean",
-   "label": "Archean cratons (generated)",
+   "label": "Archean cratons under an anoxic, hazy sky over an iron-green sea (generated)",
    "fromMa": 2500,
    "toMa": 3500,
    "fadeMyr": 40,
@@ -1296,11 +1343,16 @@
    "source": "generated",
    "kind": "illustration",
    "clouds": 1,
-   "atmosphere": 1
+   "atmosphere": 1,
+   "skyTint": [
+    0.85,
+    0.58,
+    0.28
+   ]
   },
   {
    "id": "ocean-world",
-   "label": "Early ocean world (generated)",
+   "label": "Early ocean world — an iron-green sea under an anoxic sky (generated)",
    "fromMa": 3500,
    "toMa": 4400,
    "fadeMyr": 60,
@@ -1308,7 +1360,12 @@
    "source": "generated",
    "kind": "illustration",
    "clouds": 1,
-   "atmosphere": 1
+   "atmosphere": 1,
+   "skyTint": [
+    0.82,
+    0.62,
+    0.35
+   ]
   },
   {
    "id": "rain-out",
@@ -1320,7 +1377,12 @@
    "source": "generated",
    "kind": "illustration",
    "clouds": 1,
-   "atmosphere": 0.8
+   "atmosphere": 0.8,
+   "skyTint": [
+    0.78,
+    0.74,
+    0.66
+   ]
   },
   {
    "id": "steam",
@@ -1332,7 +1394,12 @@
    "source": "generated",
    "kind": "illustration",
    "clouds": 1,
-   "atmosphere": 0.5
+   "atmosphere": 0.5,
+   "skyTint": [
+    0.8,
+    0.78,
+    0.74
+   ]
   },
   {
    "id": "genesis",
@@ -1348,6 +1415,18 @@
   }
  ],
  "files": {
+  "public/textures/earth/generated/future-moist-greenhouse.webp": {
+   "sha256": "3344f8ca359b0e38225c13962a0692a506ce8fcb73576d736174d986d5f98b32",
+   "bytes": 51068,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-biosphere-end.webp": {
+   "sha256": "884bdf641eb82cc41173b4a9fb81ef3082fdc8a95ee199caa732bb44d6b9a89c",
+   "bytes": 111180,
+   "width": 2048,
+   "height": 1024
+  },
   "public/Earth.jpg": {
    "sha256": "4f69bb75e7336327d0b4cffc7bf1624857799882272e6ed5a3dff5f6c8189a79",
    "bytes": 1057739,
@@ -1901,14 +1980,14 @@
    "height": 1024
   },
   "public/textures/earth/generated/archean.webp": {
-   "sha256": "927367f949113e4ffec7c55c608ab585e149aad420bc0c4ef7dec1335a9fe28a",
-   "bytes": 27168,
+   "sha256": "ec3310ed8431b11235c40ec16a39bfe57d340cbd8e8b63c8fae641499efd88b7",
+   "bytes": 24708,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/generated/ocean-world.webp": {
-   "sha256": "143795347fdae75ee5727d1e66c216443d6effa311ffd4c66372339602985b40",
-   "bytes": 22278,
+   "sha256": "825e6c8915ee33317a9eb0205a461b86e9f57019b2029dcfbeba6727d5d7464d",
+   "bytes": 22074,
    "width": 2048,
    "height": 1024
   },

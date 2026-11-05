@@ -9,7 +9,7 @@
    "licence": "CC BY 4.0"
   },
   "derived": {
-   "note": "the present-day map with the maria raised toward the highlands' albedo under a blurred low-albedo mask (the method and its measured thresholds are in the script) — a derivative of the CC BY 4.0 map, labelled \"illustration\"",
+   "note": "the present-day map with its young ray systems suppressed (the positive band-pass inside a weight around each crater: Tycho, Aristarchus, Copernicus, Kepler) and, from that, the maria raised toward the highlands' albedo under a blurred low-albedo mask (the methods and their measured thresholds are in the script) — derivatives of the CC BY 4.0 map, labelled \"illustration\"",
    "derivedFrom": "public/Moon.jpg",
    "licence": "CC BY 4.0 (derivative, attributed)"
   },
@@ -18,7 +18,8 @@
   },
   "literature": {
    "elkins-tanton2011": "Elkins-Tanton, L.T., Burgess, S. & Yin, Q.-Z., 2011. The lunar magma ocean: Reconciling the solidification process with lunar petrology and geochronology. EPSL 304, 326–336 — the flotation crust within ~10–200 Myr of formation.",
-   "hiesinger2011": "Hiesinger, H., Head, J.W., Wolf, U., Jaumann, R. & Neukum, G., 2011. Ages and stratigraphy of lunar mare basalts: A synthesis. GSA Special Paper 477, 1–51 — most mare basalts 3.9–3.1 Ga, the youngest ~1.2 Ga."
+   "hiesinger2011": "Hiesinger, H., Head, J.W., Wolf, U., Jaumann, R. & Neukum, G., 2011. Ages and stratigraphy of lunar mare basalts: A synthesis. GSA Special Paper 477, 1–51 — most mare basalts 3.9–3.1 Ga, the youngest ~1.2 Ga.",
+   "stofflerRyder2001": "Stöffler, D. & Ryder, G., 2001. Stratigraphy and isotope ages of lunar geologic units: chronological standard for the inner solar system. Space Science Reviews 96, 9–54 — Tycho 109 ± 4 Ma, Copernicus ~800 Ma (the Copernican system), Aristarchus ~450 Ma."
   }
  },
  "size": {
@@ -30,11 +31,42 @@
    "id": "modern",
    "label": "Present-day Moon",
    "fromMa": -1000000000,
-   "toMa": 3300,
+   "toMa": 108,
    "fadeMyr": 0,
    "file": "public/Moon.jpg",
    "source": "modern",
-   "kind": "cited"
+   "kind": "cited",
+   "present": true
+  },
+  {
+   "id": "pre-tycho",
+   "label": "Before Tycho — the Moon without its brightest ray system, 109 ± 4 Ma (derived)",
+   "fromMa": 108,
+   "toMa": 450,
+   "fadeMyr": 10,
+   "file": "public/textures/moon/derived/moon-pre-tycho.webp",
+   "source": "derived",
+   "kind": "illustration"
+  },
+  {
+   "id": "pre-aristarchus",
+   "label": "Before Aristarchus — without the Tycho and Aristarchus rays, ~450 Ma (derived)",
+   "fromMa": 450,
+   "toMa": 800,
+   "fadeMyr": 10,
+   "file": "public/textures/moon/derived/moon-pre-aristarchus.webp",
+   "source": "derived",
+   "kind": "illustration"
+  },
+  {
+   "id": "no-rays",
+   "label": "Before Copernicus and Kepler — the Moon without its young ray systems, ~800 Ma (derived)",
+   "fromMa": 800,
+   "toMa": 3300,
+   "fadeMyr": 10,
+   "file": "public/textures/moon/derived/moon-no-rays.webp",
+   "source": "derived",
+   "kind": "illustration"
   },
   {
    "id": "maria-two-thirds",
@@ -84,21 +116,39 @@
    "width": 2048,
    "height": 1024
   },
+  "public/textures/moon/derived/moon-pre-tycho.webp": {
+   "sha256": "d7423c7a930e61307c0dd56466f9bab267bc78a74d39985a8b47c65687586c65",
+   "bytes": 342954,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/moon/derived/moon-pre-aristarchus.webp": {
+   "sha256": "3304e19695f05178d56e3e63b27d97c8cd1d0d734b2c73bb45f446573b83ea59",
+   "bytes": 342962,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/moon/derived/moon-no-rays.webp": {
+   "sha256": "1404c1556c229f1239755367a9a7fc7350576bf87ee004b38cbfdd2d05d915ac",
+   "bytes": 343012,
+   "width": 2048,
+   "height": 1024
+  },
   "public/textures/moon/derived/moon-maria-2of3.webp": {
-   "sha256": "0dedc051395b622b0096432532680b67ded3c1596703736d1448e68f74c89bc8",
-   "bytes": 340404,
+   "sha256": "f3c08071f23c2a5351c6733d4a2cc8cfbc39e3abee734badd87f9eb23404c277",
+   "bytes": 334522,
    "width": 2048,
    "height": 1024
   },
   "public/textures/moon/derived/moon-maria-1of3.webp": {
-   "sha256": "9beeaeba869f9991744707edcf7ab34ab6282087887c95a7d71f2ddd97d8571c",
-   "bytes": 341062,
+   "sha256": "2fa663e46e52fb0fb017161639c55a1c94bc3688fbf03a97ced70d8a63f8941d",
+   "bytes": 334372,
    "width": 2048,
    "height": 1024
   },
   "public/textures/moon/derived/moon-pre-maria.webp": {
-   "sha256": "b9e64ec2899f5b92aea1523b46df204dc4e9a5e7a0d2340e75e0f780ae616449",
-   "bytes": 343142,
+   "sha256": "7b3d9a3016708899f6ba8e1e7e61ab57a5db33be12bf51954111c03142907873",
+   "bytes": 335886,
    "width": 2048,
    "height": 1024
   },

@@ -69,9 +69,14 @@ const GENERATED_TIERS = [
   // atmosphere factors (the scene's cloud shell and its blue atmosphere shell scaled by them,
   // following the cross-fade; 1 unless stated — the magma ocean has neither water clouds nor
   // a blue sky)
+  // plan 27 step G3: `skyTint` is the atmosphere shell's colour — today's blue where absent; before
+  // the Great Oxidation Event (2.4 Ga; the Archean tier's younger fade at 2,500 is where it
+  // turns) the sky was anoxic, at times under an orange organic haze (Zahnle et al. 2006; Arney
+  // et al. 2016), and the ocean held dissolved ferrous iron (the banded iron formations) — the
+  // Archean and ocean-world recipes paint a greener sea; the steam tiers a grey sky
   { id: 'proterozoic', label: 'Proterozoic (generated)', fromMa: 780, toMa: 2500, fadeMyr: 20, recipe: 'proterozoic', clouds: 1, atmosphere: 1 },
-  { id: 'archean', label: 'Archean cratons (generated)', fromMa: 2500, toMa: 3500, fadeMyr: 40, recipe: 'archean', clouds: 1, atmosphere: 1 },
-  { id: 'ocean-world', label: 'Early ocean world (generated)', fromMa: 3500, toMa: 4400, fadeMyr: 60, recipe: 'ocean-world', clouds: 1, atmosphere: 1 },
+  { id: 'archean', label: 'Archean cratons under an anoxic, hazy sky over an iron-green sea (generated)', fromMa: 2500, toMa: 3500, fadeMyr: 40, recipe: 'archean', clouds: 1, atmosphere: 1, skyTint: [0.85, 0.58, 0.28] },
+  { id: 'ocean-world', label: 'Early ocean world — an iron-green sea under an anoxic sky (generated)', fromMa: 3500, toMa: 4400, fadeMyr: 60, recipe: 'ocean-world', clouds: 1, atmosphere: 1, skyTint: [0.82, 0.62, 0.35] },
   // The water was in the planet all along (chondritic building blocks: Alexander et al. 2012,
   // Piani et al. 2020) and condensed, it did not arrive — the two tiers between the magma ocean
   // and the ocean world show where it is meanwhile (owner 2026-11-05: "where did all the water
@@ -82,8 +87,8 @@ const GENERATED_TIERS = [
   // Neuhoff 2001); the Jack Hills zircons show liquid water by 4,400 Ma (Wilde et al. 2001;
   // Valley et al. 2014). The spans below are a READING of those papers on the model's
   // genesis (4,429 Ma), illustrative like every generated tier, and say so in their labels.
-  { id: 'rain-out', label: 'The first oceans raining out of the steam atmosphere onto the new crust — a reading of Zahnle 2007 and Wilde 2001 (generated)', fromMa: 4400, toMa: 4415, fadeMyr: 5, recipe: 'rain-out', clouds: 1, atmosphere: 0.8 },
-  { id: 'steam', label: 'Steam atmosphere over the solidifying crust — a reading of Hamano 2013 and Zahnle 2007 (generated)', fromMa: 4415, toMa: 4427, fadeMyr: 3, recipe: 'steam', clouds: 1, atmosphere: 0.5 },
+  { id: 'rain-out', label: 'The first oceans raining out of the steam atmosphere onto the new crust — a reading of Zahnle 2007 and Wilde 2001 (generated)', fromMa: 4400, toMa: 4415, fadeMyr: 5, recipe: 'rain-out', clouds: 1, atmosphere: 0.8, skyTint: [0.78, 0.74, 0.66] },
+  { id: 'steam', label: 'Steam atmosphere over the solidifying crust — a reading of Hamano 2013 and Zahnle 2007 (generated)', fromMa: 4415, toMa: 4427, fadeMyr: 3, recipe: 'steam', clouds: 1, atmosphere: 0.5, skyTint: [0.8, 0.78, 0.74] },
   { id: 'genesis', label: 'Hadean magma ocean after the Moon-forming impact (generated)', fromMa: 4427, toMa: 5000, fadeMyr: 1, recipe: 'genesis', clouds: 0, atmosphere: 0 },
 ];
 // Snowball Earth episodes (global glaciations; one generated white map for all three):
@@ -115,7 +120,7 @@ const sha256 = (/** @type {string} */ file) => crypto.createHash('sha256').updat
 const rel = (/** @type {string} */ p) => path.relative(ROOT, p).split(path.sep).join('/');
 // the generated maps' machinery (noise, colour helpers, the sphere renderer) has ONE home,
 // shared with build-body-tiers.js
-const { run, makeNoise, mix3, smooth, renderSphereMap } = require('./lib/procedural-sphere');
+const { run, makeNoise, mix3, clamp01, smooth, renderSphereMap, readImageRgb, writeWebp } = require('./lib/procedural-sphere');
 /** @typedef {import('./lib/procedural-sphere').Recipe} Recipe */
 
 // ── 1. The atlas ────────────────────────────────────────────────────────────────────────────
@@ -215,10 +220,11 @@ const RECIPES = {
     const vapour = mix3([200, 200, 206], [236, 236, 240], band);
     return mix3(ground, vapour, 0.25 + 0.45 * smooth(0.4, 0.75, deck));                 // 25–70 % cover
   },
-  // a global ocean with scattered volcanic islands (a few per cent of land)
-  'ocean-world': (u, v, p, N) => rockyWorld(p, N, { freq: 4.5, sea: 0.76, shelf: 0.05, land: [96, 84, 72], landHigh: [150, 132, 110], ocean: [26, 62, 118], deep: [12, 34, 80], shelfColor: [66, 120, 160] }),
-  // small cratons in a global ocean, no vegetation, no ice
-  archean: (u, v, p, N) => rockyWorld(p, N, { freq: 2.6, sea: 0.68, shelf: 0.06, land: [122, 100, 74], landHigh: [170, 150, 118], ocean: [22, 56, 108], deep: [9, 28, 68], shelfColor: [66, 120, 160] }),
+  // a global ocean with scattered volcanic islands (a few per cent of land); the sea iron-green
+  // (ferrous iron in solution before the oxygenation: plan 27 step G3)
+  'ocean-world': (u, v, p, N) => rockyWorld(p, N, { freq: 4.5, sea: 0.76, shelf: 0.05, land: [96, 84, 72], landHigh: [150, 132, 110], ocean: [28, 84, 92], deep: [12, 48, 58], shelfColor: [64, 128, 122] }),
+  // small cratons in a global ocean, no vegetation, no ice; the sea iron-green before the GOE
+  archean: (u, v, p, N) => rockyWorld(p, N, { freq: 2.6, sea: 0.68, shelf: 0.06, land: [122, 100, 74], landHigh: [170, 150, 118], ocean: [24, 78, 86], deep: [10, 44, 54], shelfColor: [62, 126, 118] }),
   // supercontinent-scale red-bed land, wide shallow seas, no vegetation
   proterozoic: (u, v, p, N) => rockyWorld(p, N, { freq: 1.8, sea: 0.58, shelf: 0.07, land: [152, 92, 60], landHigh: [190, 150, 104], ocean: [24, 60, 112], deep: [10, 30, 70], shelfColor: [74, 128, 168] }),
   // the same world under global ice: sea ice with faint fracture lines, land ice greyer
@@ -233,6 +239,45 @@ const RECIPES = {
     return mix3(base, [base[0] * 0.93, base[1] * 0.95, base[2]], 1 - lat);   // a slightly bluer equatorial sea-ice band
   },
 };
+
+// ── 2b. The derived future maps (plan 27 step H1): today's map with its vegetation gone, and that
+// under the vapour deck with the seas darkened ──────────────────────────────────────────────
+const FUTURE_BROWN = 'future-biosphere-end', FUTURE_GREENHOUSE = 'future-moist-greenhouse';
+/** @param {string} modern the present-day map @param {string} outBrown @param {string} outGreenhouse */
+function deriveFutureMaps(modern, outBrown, outGreenhouse) {
+  const rgb = readImageRgb(modern, OUT_W, OUT_H);
+  const n = OUT_W * OUT_H;
+  const brown = Buffer.alloc(n * 3), green = Buffer.alloc(n * 3);
+  const N = makeNoise(SEED + 11);
+  for (let j = 0; j < OUT_H; j++) {
+    const v = (j + 0.5) / OUT_H, lat = (0.5 - v) * Math.PI, cl = Math.cos(lat), sl = Math.sin(lat);
+    for (let i = 0; i < OUT_W; i++) {
+      const k = j * OUT_W + i;
+      const r = rgb[k * 3], g = rgb[k * 3 + 1], b = rgb[k * 3 + 2];
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      // vegetation: green at or above red and blue (the satellite map's forests are dark olive:
+      // g − max(r, b) of only 10–25 levels), not bright (ice), not blue (sea); water: blue above red
+      const veg = smooth(-0.01, 0.05, (g - Math.max(r, b)) / 255) * (1 - smooth(0.6, 0.8, lum)) * (1 - smooth(0.0, 0.1, (b - r) / 255));
+      const water = smooth(0.0, 0.15, (b - r) / 255) * (1 - smooth(0.5, 0.7, lum));
+      // the biosphere's end: the greens to a bright ochre desert (a desert reflects more than a
+      // forest: the luminance rises toward the Sahara's), the seas and the ice kept
+      const ochre = [0.78, 0.66, 0.46];
+      const l2 = Math.max(0.62, Math.min(1, lum * 1.9));
+      const bro = [mix3([r, g, b], [ochre[0] * 255 * l2, ochre[1] * 255 * l2, ochre[2] * 255 * l2], veg)];
+      brown[k * 3] = clamp01(bro[0][0] / 255) * 255; brown[k * 3 + 1] = clamp01(bro[0][1] / 255) * 255; brown[k * 3 + 2] = clamp01(bro[0][2] / 255) * 255;
+      // the moist greenhouse: the brown Earth, its seas darkened (shrinking) under the vapour deck
+      const px = cl * Math.cos(((i + 0.5) / OUT_W - 0.5) * 2 * Math.PI), py = sl, pz = cl * Math.sin(((i + 0.5) / OUT_W - 0.5) * 2 * Math.PI);
+      const deck = N.fbm(px * 3.5 + 17, py * 3.5 + 17, pz * 3.5 + 17, 6);
+      const band = N.fbm(px * 9 + 31, py * 9 + 31, pz * 9 + 31, 4);
+      const vapour = mix3([196, 196, 202], [236, 236, 240], band);
+      const sea = mix3(bro[0], [bro[0][0] * 0.55, bro[0][1] * 0.6, bro[0][2] * 0.7], water);
+      const gh = mix3(sea, vapour, 0.5 + 0.5 * smooth(0.3, 0.7, deck));
+      green[k * 3] = clamp01(gh[0] / 255) * 255; green[k * 3 + 1] = clamp01(gh[1] / 255) * 255; green[k * 3 + 2] = clamp01(gh[2] / 255) * 255;
+    }
+  }
+  writeWebp(brown, OUT_W, OUT_H, outBrown, WEBP_QUALITY);
+  writeWebp(green, OUT_W, OUT_H, outGreenhouse, WEBP_QUALITY);
+}
 
 /** Render one generated map to a WebP file. @param {string} recipe @param {string} out */
 function renderGenerated(recipe, out) {
@@ -261,7 +306,17 @@ function cutIn(tiers, span) {
 /** @param {{ name: string, ageMa: number, label: string, file: string }[]} atlas */
 function buildTierTable(atlas) {
   /** @type {Tier[]} */
-  let tiers = [{ id: 'modern', label: 'Present-day Earth (satellite imagery)', fromMa: -1e9, toMa: LGM_END_MA, fadeMyr: 0, file: 'public/Earth.jpg', source: 'modern', kind: 'cited', clouds: 1, atmosphere: 1 }];
+  // plan 27 step H1 — the future to the domain's edge: the Sun brightens ~10 % per Gyr; CO₂
+  // drawdown starves C₃ plants at ~+0.6 to +0.9 Gyr (Caldeira & Kasting 1992; Franck et al. 2006)
+  // and the moist greenhouse sets in near +1 Gyr (Leconte et al. 2013; Wolf & Toon 2015), the
+  // domain's future edge. Two DERIVED tiers (from today's map: the greens desaturated to ochre;
+  // then the same under a thickening vapour deck with the seas darkened), the mirror of the
+  // genesis sequence, their spans a reading of those papers and said so; ages ahead are negative.
+  let tiers = [
+    { id: 'moist-greenhouse', label: 'The moist greenhouse — the oceans evaporating under a brightening Sun, a reading of Leconte 2013 and Wolf & Toon 2015 (derived)', fromMa: -1e9, toMa: -900, fadeMyr: 0, file: `public/textures/earth/generated/${FUTURE_GREENHOUSE}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 0.8, skyTint: [0.8, 0.78, 0.74] },
+    { id: 'biosphere-end', label: 'The end of the land biosphere — CO₂ starvation of the plants under a brightening Sun, a reading of Caldeira & Kasting 1992 and Franck 2006 (derived)', fromMa: -900, toMa: -600, fadeMyr: 50, file: `public/textures/earth/generated/${FUTURE_BROWN}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 1 },
+    { id: 'modern', label: 'Present-day Earth (satellite imagery)', fromMa: -600, toMa: LGM_END_MA, fadeMyr: 100, file: 'public/Earth.jpg', source: 'modern', kind: 'cited', clouds: 1, atmosphere: 1, present: true },
+  ];
   // the atlas slices from the 21-ka map up: midpoints between neighbours; the 0 Ma map is unused
   const slices = atlas.filter((a) => a.ageMa > 0);
   for (let i = 0; i < slices.length; i++) {
@@ -270,7 +325,7 @@ function buildTierTable(atlas) {
     const toMa = i === slices.length - 1 ? GENERATED_TIERS[0].fromMa : (a.ageMa + slices[i + 1].ageMa) / 2;
     tiers.push({ id: `scotese-${String(a.ageMa).padStart(3, '0')}`, label: `${a.label}, ${a.ageMa === 1 ? '21 ka' : a.ageMa + ' Ma'} (Scotese 2016 PaleoAtlas)`, fromMa, toMa, fadeMyr: i === 0 ? LGM_FADE_MYR : ATLAS_FADE_MYR, file: a.file, source: 'scotese2016', kind: 'cited', clouds: 1, atmosphere: 1, ageMa: a.ageMa });
   }
-  for (const g of GENERATED_TIERS) tiers.push({ id: g.id, label: g.label, fromMa: g.fromMa, toMa: g.toMa, fadeMyr: g.fadeMyr, file: `public/textures/earth/generated/${g.recipe}.webp`, source: 'generated', kind: 'illustration', clouds: g.clouds, atmosphere: g.atmosphere });
+  for (const g of GENERATED_TIERS) tiers.push({ id: g.id, label: g.label, fromMa: g.fromMa, toMa: g.toMa, fadeMyr: g.fadeMyr, file: `public/textures/earth/generated/${g.recipe}.webp`, source: 'generated', kind: 'illustration', clouds: g.clouds, atmosphere: g.atmosphere, ...(g.skyTint ? { skyTint: g.skyTint } : {}) });
   tiers.sort((a, b) => a.fromMa - b.fromMa);
   for (const s of SNOWBALL_SPANS) tiers = cutIn(tiers, { ...s, fadeMyr: SNOWBALL_FADE_MYR, file: 'public/textures/earth/generated/snowball.webp', source: 'generated', kind: 'illustration', clouds: 1, atmosphere: 1 });
   for (let i = 0; i + 1 < tiers.length; i++) if (tiers[i].toMa !== tiers[i + 1].fromMa) throw new Error(`tier table not contiguous at ${tiers[i].id} → ${tiers[i + 1].id}`);
@@ -295,6 +350,10 @@ async function main() {
   for (const recipe of Object.keys(RECIPES)) {
     const out = path.join(DEEP_DIR, `${recipe}.webp`);
     if (REBUILD || !fs.existsSync(out)) { const t1 = Date.now(); renderGenerated(recipe, out); console.log(`rendered ${recipe} (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
+  }
+  {
+    const outBrown = path.join(DEEP_DIR, `${FUTURE_BROWN}.webp`), outGreenhouse = path.join(DEEP_DIR, `${FUTURE_GREENHOUSE}.webp`);
+    if (REBUILD || !fs.existsSync(outBrown) || !fs.existsSync(outGreenhouse)) { const t1 = Date.now(); deriveFutureMaps(path.join(ROOT, 'public/Earth.jpg'), outBrown, outGreenhouse); console.log(`derived the future maps (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
   }
   const tiers = buildTierTable(atlas);
   /** @type {Record<string, { sha256: string, bytes: number, width: number, height: number }>} */
@@ -322,6 +381,19 @@ async function main() {
         snowballEpisodes: SNOWBALL_SPANS.map((s) => ({ id: s.id, fromMa: s.fromMa, toMa: s.toMa })),
       },
       modern: { file: 'public/Earth.jpg', source: 'Solar System Scope textures (https://www.solarsystemscope.com/textures/)', licence: 'CC BY 4.0' },
+      derived: { note: 'the present-day map with its vegetation desaturated to an ochre desert (the biosphere\'s end), and that under a seeded vapour deck with the seas darkened (the moist greenhouse) — derivatives of the CC BY 4.0 map, labelled "illustration"; the spans a reading of the literature below', derivedFrom: 'public/Earth.jpg', licence: 'CC BY 4.0 (derivative, attributed)' },
+      literature: {
+        caldeiraKasting1992: 'Caldeira, K. & Kasting, J.F., 1992. The life span of the biosphere revisited. Nature 360, 721–723 — C₃ photosynthesis ends at ~+0.5–0.9 Gyr as CO₂ is drawn down under the brightening Sun.',
+        franck2006: 'Franck, S., Bounama, C. & von Bloh, W., 2006. Causes and timing of future biosphere extinctions. Biogeosciences 3, 85–92 — the land biosphere ends ~+0.8–1.2 Gyr.',
+        leconte2013: 'Leconte, J., Forget, F., Charnay, B., Wordsworth, R. & Pottier, A., 2013. Increased insolation threshold for runaway greenhouse processes on Earth-like planets. Nature 504, 268–271 — the runaway at ~+1 Gyr.',
+        wolfToon2015: 'Wolf, E.T. & Toon, O.B., 2015. The evolution of habitable climates under the brightening Sun. JGR Atmospheres 120, 5775–5794 — the moist greenhouse sets in at ~+1 Gyr.',
+        zahnle2007: 'Zahnle, K., Arndt, N., Cockell, C., Halliday, A., Nisbet, E., Selsis, F. & Sleep, N.H., 2007. Emergence of a habitable planet. Space Science Reviews 129, 35–78 — the rock-vapour and steam atmospheres after the impact, the rain-out.',
+        hamano2013: 'Hamano, K., Abe, Y. & Genda, H., 2013. Emergence of two types of terrestrial planet on solidification of magma ocean. Nature 497, 607–610 — the magma ocean crystallises in 1–4 Myr at 1 AU.',
+        sleep2001: 'Sleep, N.H., Zahnle, K. & Neuhoff, P.S., 2001. Initiation of clement surface conditions on the earliest Earth. PNAS 98, 3666–3672 — clement conditions within ~10 Myr of the impact.',
+        wilde2001: 'Wilde, S.A., Valley, J.W., Peck, W.H. & Graham, C.M., 2001. Evidence from detrital zircons for the existence of continental crust and oceans on the Earth 4.4 Gyr ago. Nature 409, 175–178 — liquid water by 4,400 Ma.',
+        zahnle2006: 'Zahnle, K., Claire, M. & Catling, D., 2006. The loss of mass-independent fractionation in sulfur due to a Palaeoproterozoic collapse of atmospheric methane. Geobiology 4, 271–283 — the Archean methane haze.',
+        arney2016: 'Arney, G. et al., 2016. The pale orange dot: the spectrum and habitability of hazy Archean Earth. Astrobiology 16, 873–899 — the orange organic haze.',
+      },
     },
     size: { width: OUT_W, height: OUT_H },
     tiers,

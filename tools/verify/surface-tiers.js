@@ -72,8 +72,14 @@ for (const body of bodies) {
     if (!(t.fadeMyr >= 0) || t.fadeMyr > t.toMa - t.fromMa) fail(tag(`${t.id}: fadeMyr ${t.fadeMyr} is negative or wider than the tier`));
     if ('rings' in t && typeof t.rings !== 'boolean') fail(tag(`${t.id}: rings "${t.rings}" is not a boolean`));
     for (const k of ['clouds', 'atmosphere']) if (k in t && !(typeof t[k] === 'number' && t[k] >= 0 && t[k] <= 1)) fail(tag(`${t.id}: ${k} "${t[k]}" is not a number in [0, 1]`));
+    if ('skyTint' in t && !(Array.isArray(t.skyTint) && t.skyTint.length === 3 && t.skyTint.every((c) => typeof c === 'number' && c >= 0 && c <= 1))) fail(tag(`${t.id}: skyTint "${JSON.stringify(t.skyTint)}" is not three numbers in [0, 1]`));
+    if ('present' in t && t.present !== true) fail(tag(`${t.id}: present "${t.present}" is not true (omit it on every other tier)`));
   }
   if (tiers[0].fromMa > -1e9) fail(tag(`the youngest tier starts at ${tiers[0].fromMa} Ma — the future edge (−1,000 Myr) is uncovered`));
+  // plan 27 step H: exactly ONE present-day tier per body (the rows read it as "today's map"; a future tier may sit before it)
+  const present = tiers.filter((t) => t.present === true);
+  if (present.length !== 1) fail(tag(`${present.length} tiers carry present: true — exactly one must (the present-day map)`));
+  else if (!(present[0].fromMa <= 0 && present[0].toMa > 0)) fail(tag(`the present tier ${present[0].id} (${present[0].fromMa}–${present[0].toMa} Ma) does not contain today`));
   const pastEdgeMa = NAVIGABLE_PAST_YEARS / 1e6;
   if (tiers[tiers.length - 1].toMa < pastEdgeMa) fail(tag(`the oldest tier ends at ${tiers[tiers.length - 1].toMa} Ma — the navigable edge ${pastEdgeMa} Ma is uncovered`));
 

@@ -550,6 +550,30 @@ published reconstruction or a generated map; the model does
 not model continents. The browser golden pins the tier and the mix at ages on
 both sides of every boundary class.
 
+**The ice ages, the sky and the future (steps G and H).** For the last
+2.5 Myr the Earth's ice cover is a MODEL result: the ice fraction of date is
+the climate formula's orbital L1 layer on the LR04 regimes (the climate
+chart's own stitched curve, `cfmEvalStitched` — one home with the chart),
+read as 0 at today's value and 1 at its 21-ka value (the Last Glacial
+Maximum), and the day map blends today's satellite map and Scotese's 21-ka
+reconstruction by that fraction (`iceFractionAtAgeMa`, `updateEra`); ahead
+of today the same formula is carried forward as a labelled FORECAST to
++150 kyr (beyond that the fitted line sum is unconstrained — measured 2.7× the
+LGM swing at +500 kyr), the hover naming Berger & Loutre 2002 and the
+Ganopolski 2016 CO₂ caveat. Each tier may carry a `skyTint`: the atmosphere
+shell's colour follows it across the cross-fades (today's blue; the Archean's
+and the ocean world's orange organic haze before the Great Oxidation Event,
+Zahnle 2006 / Arney 2016, over an iron-green sea; the steam tiers' grey). The
+future to the domain's edge: two DERIVED tiers from today's map — the end of
+the land biosphere (+600 to +900 Myr: the vegetation desaturated to an ochre
+desert; Caldeira & Kasting 1992, Franck 2006) and the moist greenhouse (+900
+Myr to the edge: the seas darkened under a vapour deck; Leconte 2013, Wolf &
+Toon 2015) — the mirror of the genesis sequence, their spans a reading of
+those papers and said so; the present-day tier is the one the manifest marks
+`present: true` (the gate requires exactly one per body), never index 0.
+The hover of the present tier ahead of today names the next supercontinent
+(~+250 Myr, Pangaea Proxima / Amasia) as not drawn.
+
 **The Moon, Mercury and Saturn (step F).** The same table form, one
 `public/textures/<body>/manifest.json` per body (written by
 `tools/pipeline/build-body-tiers.js`, checked by the same gate,
@@ -561,13 +585,19 @@ second sphere a hair larger, the same material class, at opacity = mix, a
 child of the mesh so it follows the spin; Saturn's tier carries `rings`, and
 the ring mesh's opacity ramps under the same fade (the rings grow in over
 420 → 400 Ma instead of switching on; `showHideObject` honours the factor).
-The Moon has five tiers — the lunar magma ocean (generated) to
+The Moon has eight tiers — its young ray systems suppressed before their
+impacts (Tycho 109 Ma, Aristarchus ~450 Ma, Copernicus and Kepler ~800 Ma:
+Stöffler & Ryder 2001; each system the positive 8-to-60-px band-pass inside a
+weight around its crater, the maria tiers deriving from the no-rays map;
+step G2), then the lunar magma ocean (generated) to
 4,350 Ma, the highland crust derived from the present-day map with the maria
 raised, then the maria at one third and two thirds of their present darkness
 (3,800–3,550–3,300 Ma, the mare flooding), then the present-day map; Mercury
 two — a generated early crust before its oldest preserved surfaces (4,100 Ma),
-then the present-day map; Saturn two — its rings hidden before 400 Ma, the
-rings' age being a cited band, not a value. The About folder's "Moon & planet
+then the present-day map; Saturn three — its rings hidden before 400 Ma and
+gone again after ~+200 Myr ahead (Cassini's ring rain, O'Donoghue 2019; the
+opacity ramps out over +100 → +200 Myr; step H2), the rings' ages being cited
+bands, not values. The About folder's "Moon & planet
 maps" row lists the bodies whose active tier is not the present-day one, its
 hover what each map IS and the cited ages; the browser golden pins each body's
 tier on both sides of every

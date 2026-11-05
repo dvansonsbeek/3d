@@ -11,6 +11,7 @@
   },
   "literature": {
    "kempf2023": "Kempf, S., Altobelli, N., Schmidt, J., Cuzzi, J.N., Estrada, P.R. & Srama, R., 2023. Micrometeoroid infall onto Saturn's rings constrains their age to no more than a few hundred million years. Science Advances 9, eadf8537 — ≤ ~400 Myr.",
+   "odonoghue2019": "O'Donoghue, J., Moore, L., Connerney, J., Melin, H., Stallard, T.S., Miller, S. & Baines, K.H., 2019. Observations of the chemical and thermal response of 'ring rain' on Saturn's ionosphere. Icarus 322, 251–260 — the rings drain into the planet within ~100–300 Myr (the forward band of the `rings-gone` tier).",
    "iess2019": "Iess, L. et al., 2019. Measurement and implications of Saturn's gravity field and ring mass. Science 364, eaat2965 — 10–100 Myr from the ring mass.",
    "hyodo2024": "Hyodo, R., Genda, H. & Madeira, G., 2024. Saturn's rings may be older than they look (the pollution clock allows old rings). Nature Geoscience — the dissent; the age stays a band."
   }
@@ -21,15 +22,27 @@
  },
  "tiers": [
   {
-   "id": "rings",
-   "label": "Present-day Saturn with its rings",
+   "id": "rings-gone",
+   "label": "after its rings — Cassini's ring rain gives them 100–300 Myr more (O'Donoghue 2019), a band",
    "fromMa": -1000000000,
-   "toMa": 400,
+   "toMa": -200,
    "fadeMyr": 0,
    "file": "public/Saturn.jpg",
    "source": "modern",
    "kind": "cited",
-   "rings": true
+   "rings": false
+  },
+  {
+   "id": "rings",
+   "label": "Present-day Saturn with its rings",
+   "fromMa": -200,
+   "toMa": 400,
+   "fadeMyr": 100,
+   "file": "public/Saturn.jpg",
+   "source": "modern",
+   "kind": "cited",
+   "rings": true,
+   "present": true
   },
   {
    "id": "no-rings",

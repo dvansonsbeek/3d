@@ -3510,6 +3510,14 @@ function currentEpochTMa() { return currentEpoch_t_Ma; }
  *  registers them, makeSurfaceTiers below) — declared here, above the test hooks that read it
  *  while the page still loads */
 const _surfaceTierBodies = [];
+// (declared here, above the planets' creation — read while the Earth is built: a const below it
+// is in its temporal dead zone at that moment, the trap of plan 27 step F)
+/** Today's sky tint (the atmosphere shell's soft blue), the default where a tier names none. */
+const SKY_TINT_TODAY = [0.35, 0.55, 1.0];
+/** The Pleistocene ice history's span (the LGM tier's, Myr before J2000) and the forecast's end
+ *  ahead of today (negative = future), plan 27 steps G1 and H4; the LGM tier's id in the table. */
+const ICE_HISTORY_END_MA = 2.5, ICE_FORECAST_END_MA = -0.15, ICE_LGM_TIER_ID = 'scotese-001';   // the forecast: the 28-line sum is plausible to ~150 kyr ahead (an interglacial continuing, a glacial peaking at +60–100 kyr) and unconstrained beyond (measured: 2.7× the LGM swing at +500 kyr)
+let _iceRefs = null;
 if (typeof window !== 'undefined') {
   window.__test__ = {
     setEpochByAge, setEpoch, resetEpochToJ2000, currentEpochTMa, isDeepTimeMode,
@@ -5595,6 +5603,7 @@ precision mediump float;
 
 uniform vec3 u_sunRelPosition;     /* Earth → Sun (world) */
 uniform float u_atmEra;            /* the surface tier's atmosphere factor (plan 27 step E: 0 over the magma ocean) */
+uniform vec3  u_atmColor;          /* the sky's colour by tier (plan 27 step G3: today's blue; the Archean's orange haze; the steam's grey) */
 varying vec3 vN;
 varying vec3 vPos;
 
@@ -5610,7 +5619,7 @@ void main(){
     float dayGlow = pow(max(dot(sunDir, vN), 0.0), 3.0);
 
     float alpha  = clamp(rim * 0.45 + dayGlow * 0.25, 0.0, 1.0) * 0.7 * u_atmEra; // mix factors, scaled by the tier
-    vec3  col   = vec3(0.35, 0.55, 1.0);                      // soft blue-sky tint
+    vec3  col   = u_atmColor;                                  // the sky tint of the tier
 
     gl_FragColor = vec4(col * alpha, alpha * 0.8);
 }`;
@@ -35600,6 +35609,7 @@ function makeRealisticEarth(pd){
         u_cloudEra       : { value: 1.0 },          // plan 27 step E: the tier's cloud factor (updateEra)
         u_modernMix      : { value: 1.0 },          // plan 27 step E: 1 on the present-day tier (updateEra)
         u_atmEra         : { value: 1.0 },          // plan 27 step E: the tier's atmosphere factor (updateEra; the atmosphere shell shares it)
+        u_atmColor       : { value: new THREE.Color(SKY_TINT_TODAY[0], SKY_TINT_TODAY[1], SKY_TINT_TODAY[2]) },   // plan 27 step G3: the sky's colour by tier (the atmosphere shell shares it)
         u_termWidth      : { value: 0.08 },          // width in hemi-space (0 < w ≤ 1)
         u_iceGlowStrength : { value: 0.05 },
         u_nightCloudFactor : { value: 0.3 },
@@ -35663,7 +35673,7 @@ function makeRealisticEarth(pd){
     const atm = new THREE.Mesh(
         new THREE.SphereGeometry(radius * 1.05, segments, segments),
         new THREE.ShaderMaterial({
-            uniforms      : { u_sunRelPosition: U.u_sunRelPosition, u_atmEra: U.u_atmEra },
+            uniforms      : { u_sunRelPosition: U.u_sunRelPosition, u_atmEra: U.u_atmEra, u_atmColor: U.u_atmColor },
             vertexShader  : ATM_VERT,
             fragmentShader: ATM_FRAG,
             transparent   : true,
@@ -35974,7 +35984,7 @@ function makeRealisticEarth(pd){
     // decoded — until then the last shown map stays — and only the active tier's map and its
     // two neighbours stay resident. The age is the epoch's TT civil year (o.currentYear, set
     // by the render loop before this runs).
-    const dayTiers = { table: null, entries: new Map(), active: -1, lastA: tex.dayPostLGM, lastB: tex.dayPostLGM };
+    const dayTiers = { table: null, entries: new Map(), active: -1, lastA: tex.dayPostLGM, lastB: tex.dayPostLGM, icePct: -1, lgmIdx: -1, modernIdx: -1 };
     fetchRepoJson('public/textures/earth/manifest.json').then((m) => {
       if (m && Array.isArray(m.tiers) && m.tiers.length) { dayTiers.table = m.tiers; dayTiers.active = -1; }
     });
@@ -36009,9 +36019,22 @@ function makeRealisticEarth(pd){
       const mix = (lo > 0 && tier.fadeMyr > 0) ? THREE.MathUtils.clamp(1 - (ageMa - tier.fromMa) / tier.fadeMyr, 0, 1) : 0;
       const clouds = tier.clouds ?? 1, youngerClouds = lo > 0 ? (T[lo - 1].clouds ?? 1) : clouds;
       const atm = tier.atmosphere ?? 1, youngerAtm = lo > 0 ? (T[lo - 1].atmosphere ?? 1) : atm;
-      return { index: lo, id: tier.id, label: tier.label, kind: tier.kind, source: tier.source, fromMa: tier.fromMa, toMa: tier.toMa, file: tier.file, youngerFile: lo > 0 ? T[lo - 1].file : tier.file, mix,
+      // plan 27 step G3: the sky's colour per tier, following the cross-fade (today's blue by default)
+      const tintOf = (/** @type {{skyTint?: number[]}} */ q) => (Array.isArray(q.skyTint) && q.skyTint.length === 3 ? q.skyTint : SKY_TINT_TODAY);
+      const tint = tintOf(tier), youngerTint = lo > 0 ? tintOf(T[lo - 1]) : tint;
+      const skyTint = [0, 1, 2].map((i) => tint[i] * (1 - mix) + youngerTint[i] * mix);
+      // plan 27 step G1 / H4: the Pleistocene ice fraction from the model's own ice history
+      // inside the LGM tier's span (and the forecast ahead of today); null elsewhere
+      const lgmIdx = dayTiers.lgmIdx >= 0 ? dayTiers.lgmIdx : (dayTiers.lgmIdx = T.findIndex((q) => q.id === ICE_LGM_TIER_ID));
+      // the present-day tier by its manifest flag — a future tier may sit before it (plan 27 step H1)
+      const modernIdx = dayTiers.modernIdx >= 0 ? dayTiers.modernIdx : (dayTiers.modernIdx = Math.max(0, T.findIndex((q) => q.present === true)));
+      const ice = (lgmIdx > 0 && ageMa < ICE_HISTORY_END_MA && ageMa > ICE_FORECAST_END_MA) ? iceFractionAtAgeMa(ageMa) : null;
+      return { index: lo, id: tier.id, label: tier.label, kind: tier.kind, source: tier.source, present: tier.present === true, fromMa: tier.fromMa, toMa: tier.toMa, file: tier.file, youngerFile: lo > 0 ? T[lo - 1].file : tier.file, mix,
         // the tier's cloud and atmosphere factors and the modern weight, all following the cross-fade (no map needed)
-        clouds: clouds * (1 - mix) + youngerClouds * mix, atmosphere: atm * (1 - mix) + youngerAtm * mix, modern: (lo === 0 ? 1 - mix : 0) + (lo === 1 ? mix : 0) };
+        clouds: clouds * (1 - mix) + youngerClouds * mix, atmosphere: atm * (1 - mix) + youngerAtm * mix,
+        // the modern relief and glint: on the present-day map only, receding under the ice and across its fades
+        modern: ice !== null ? 1 - ice : (lo === modernIdx ? 1 - mix : 0) + (lo === modernIdx + 1 ? mix : 0),
+        skyTint, ice, iceFile: lgmIdx > 0 ? T[lgmIdx].file : tier.file, modernFile: T[modernIdx].file };
     }
     /** The About folder's "Earth map" row: the value column's short name and the hover's full
      *  sentence — what the row means, the tier and its age span, the sources (owner 2026-11-05).
@@ -36019,9 +36042,21 @@ function makeRealisticEarth(pd){
     const surfaceLabel = (t) => {
       o.earthSurface = surfaceShortName(t.label);
       const far = t.toMa > 4429 ? 'the past edge (4,429 Ma)' : `${surfaceAgeText(t.toMa)} ago`;
-      const span = t.index === 0 ? `today's map, used back to ${far}` : `used from ${surfaceAgeText(t.fromMa)} to ${far}`;
-      const what = t.index === 0 ? '' : t.kind === 'cited' ? ' — a published reconstruction, Scotese 2016 PaleoAtlas (CC BY 4.0), shown at its nearest age step' : ' — a generated map standing in where no reconstruction exists';
-      o.earthSurfaceHover = `The map drawn on the Earth at this date and where it comes from. Now showing: ${t.label}, ${span}${what}. The model does not model continents.`;
+      const ahead = t.fromMa < 0;   // a future tier, or the present one's forward span (ages ahead of today are negative)
+      const span = t.present ? `today's map, used back to ${far}` : t.toMa <= 0 ? `used from +${surfaceAgeText(-t.toMa)} to ${t.fromMa <= -1e9 ? 'the future edge (+1,000 Myr)' : '+' + surfaceAgeText(-t.fromMa)} ahead` : `used from ${surfaceAgeText(t.fromMa)} to ${far}`;
+      const what = t.present ? '' : t.kind === 'cited' ? ' — a published reconstruction, Scotese 2016 PaleoAtlas (CC BY 4.0), shown at its nearest age step' : t.source === 'derived' ? ' — derived from today\'s map, a reading of the cited papers in its label' : ' — a generated map standing in where no reconstruction exists';
+      o.earthSurfaceHover = `The map drawn on the Earth at this date and where it comes from. Now showing: ${t.label}, ${span}${what}. The model does not model continents`
+        + (ahead && ageMaNow() < 0 ? '; the next supercontinent is expected around +250 Myr (Pangaea Proxima, Amasia) and is not drawn.' : '.');
+    };
+    const ageMaNow = () => (J2000_CALENDAR_YEAR - o.currentYear) / 1e6;
+
+    /** The Pleistocene row (plan 27 step G1 / H4): the ice fraction of date from the model's own
+     *  ice history — the value column and the hover. @param {number} pct @param {number} ageMa */
+    const iceLabel = (pct, ageMa) => {
+      const ahead = ageMa < 0;
+      o.earthSurface = `${ahead ? 'Forecast: ' : ''}ice at ${pct} % of the Last Glacial Maximum`;
+      o.earthSurfaceHover = `The map drawn on the Earth at this date and where it comes from. For the last ${ICE_HISTORY_END_MA} Myr the ice cover follows the model's OWN ice history: the orbital (L1) layer of the climate formula fitted on the LR04 δ¹⁸O stack (Lisiecki & Raymo 2005; the three regimes stitched), read as 0 at today's value and 1 at the Last Glacial Maximum (21 ka), here ${pct} %. The map blends today's satellite map and Scotese's 21-ka reconstruction (CC BY 4.0) by that fraction; the model does not model continents.`
+        + (ahead ? ` Ahead of today the same formula is carried forward as a FORECAST on the model's orbital elements of date, to +${Math.round(-ICE_FORECAST_END_MA * 1000)} kyr (beyond that the fitted line sum is unconstrained): Berger & Loutre 2002 expect the present interglacial to last ~50 kyr more, and anthropogenic CO₂ may skip the next glaciation (Ganopolski et al. 2016) — the formula knows neither.` : '');
     };
 
     function updateEra(julianDay = o.julianDay) {
@@ -36030,24 +36065,36 @@ function makeRealisticEarth(pd){
       U.u_niteMix.value = THREE.MathUtils.clamp(t, 0, 1);
 
       // day side: the tier table on the TT age of the epoch
-      const at = tierAtAge((J2000_CALENDAR_YEAR - o.currentYear) / 1e6);
+      const ageMa = (J2000_CALENDAR_YEAR - o.currentYear) / 1e6;
+      const at = tierAtAge(ageMa);
       if (!at) return;   // the table has not loaded yet: the present-day map stays
-      if (at.index !== dayTiers.active) {
+      // plan 27 step G1: inside the Pleistocene the two maps (today's, the LGM's) blend by the
+      // ice fraction of date from the model's own ice history, not by a boundary; H4: ahead of
+      // today the same formula is a labelled forecast
+      const ice = at.ice;
+      if (at.index !== dayTiers.active || (ice === null && dayTiers.icePct >= 0)) {
         dayTiers.active = at.index;
+        dayTiers.icePct = -1;
         releaseTierMaps(at.index);
         for (const i of [at.index - 1, at.index + 1]) if (dayTiers.table[i]) tierTexture(dayTiers.table[i].file);   // warm the neighbours
-        surfaceLabel(at);
+        if (ice === null) surfaceLabel(at);
       }
-      const a = tierTexture(at.file);
+      if (ice !== null) {
+        const pct = Math.round(ice * 100);
+        if (pct !== dayTiers.icePct) { dayTiers.icePct = pct; iceLabel(pct, ageMa); }
+      }
+      const fileA = ice !== null ? at.iceFile : at.file, fileB = ice !== null ? at.modernFile : at.youngerFile, mix = ice !== null ? 1 - ice : at.mix;
+      const a = tierTexture(fileA);
       if (a) dayTiers.lastA = a;
-      const b = at.mix > 0 ? tierTexture(at.youngerFile) : dayTiers.lastA;
+      const b = mix > 0 ? tierTexture(fileB) : dayTiers.lastA;
       if (b) dayTiers.lastB = b;
       U.u_dayTexA.value = dayTiers.lastA;
       U.u_dayTexB.value = dayTiers.lastB;
-      U.u_dayMix.value = (a && b) ? at.mix : 0;
+      U.u_dayMix.value = (a && b) ? mix : 0;
       U.u_cloudEra.value = at.clouds;     // no clouds over the magma ocean
       U.u_atmEra.value = at.atmosphere;   // no blue sky over the magma ocean either
-      U.u_modernMix.value = at.modern;    // the modern relief and ocean glint only on the present-day tier
+      U.u_atmColor.value.set(at.skyTint[0], at.skyTint[1], at.skyTint[2]);   // plan 27 step G3: the sky's colour by tier (the Archean haze)
+      U.u_modernMix.value = ice !== null ? 1 - ice : at.modern;    // the modern relief and ocean glint only on the present-day map
     }
     /** The day-map state for the headless probes: the active tier, the mix, whether the
      *  active tier's map has decoded, and the surface label. */
@@ -36055,7 +36102,7 @@ function makeRealisticEarth(pd){
       const T = dayTiers.table;
       const tier = T && dayTiers.active >= 0 ? T[dayTiers.active] : null;
       const e = tier ? dayTiers.entries.get(tier.file) : null;
-      return { loaded: !!T, active: dayTiers.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapApplied: !!(e && e.ready && U.u_dayTexA.value === e.tex), mix: U.u_dayMix.value, clouds: U.u_cloudEra.value, atmosphere: U.u_atmEra.value, modern: U.u_modernMix.value, surface: o.earthSurface, resident: dayTiers.entries.size };
+      return { loaded: !!T, active: dayTiers.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapApplied: !!(e && e.ready && U.u_dayTexA.value === e.tex), mix: U.u_dayMix.value, clouds: U.u_cloudEra.value, atmosphere: U.u_atmEra.value, modern: U.u_modernMix.value, icePct: dayTiers.icePct, skyTint: U.u_atmColor.value.toArray(), surface: o.earthSurface, resident: dayTiers.entries.size };
     }
 
     U.u_position.value.copy(core.position);
@@ -36128,7 +36175,7 @@ function makeSurfaceTiers(pd) {
     const mix = (y && t.fadeMyr > 0) ? THREE.MathUtils.clamp(1 - (ageMa - t.fromMa) / t.fadeMyr, 0, 1) : 0;
     const ringsOf = (/** @type {{rings?: boolean}} */ q) => (q.rings !== false ? 1 : 0);
     const ringFactor = ringsOf(t) * (1 - mix) + ringsOf(y || t) * mix;
-    return { index: k, id: t.id, label: t.label, kind: t.kind, source: t.source, file: t.file, rings: t.rings !== false, mix, youngerFile: y ? y.file : t.file, ringFactor };
+    return { index: k, id: t.id, label: t.label, kind: t.kind, source: t.source, present: t.present === true, file: t.file, rings: t.rings !== false, mix, youngerFile: y ? y.file : t.file, ringFactor };
   }
   /** The cross-fade canvas: a second sphere a hair larger carrying the next younger tier's map at
    *  opacity = mix, the same material class so the lighting matches; a child of the mesh so it
@@ -36154,8 +36201,8 @@ function makeSurfaceTiers(pd) {
       release(at.index);
       for (const i of [at.index - 1, at.index + 1]) if (S.table[i]) texture(S.table[i].file);   // warm the neighbours
       // the value column's short name and the hover's full sentence (owner 2026-11-05)
-      S.label = at.index === 0 ? '' : `${pd.name}: ${surfaceShortName(at.label)}`;
-      S.hover = at.index === 0 ? '' : `${pd.name} — ${at.label.replace(/\s+\((generated|derived)\)$/, '')} (${at.kind === 'cited' ? 'a cited age' : at.source === 'derived' ? 'derived from today\'s map' : 'a generated map'})`;
+      S.label = at.present ? '' : `${pd.name}: ${surfaceShortName(at.label)}`;
+      S.hover = at.present ? '' : `${pd.name} — ${at.label.replace(/\s+\((generated|derived)\)$/, '')} (${at.kind === 'cited' ? 'a cited age' : at.source === 'derived' ? 'derived from today\'s map' : 'a generated map'})`;
     }
     const tex = texture(at.file);
     if (tex && pd.planetMaterial.map !== tex) { pd.planetMaterial.map = tex; pd.planetMaterial.needsUpdate = true; }
@@ -36203,14 +36250,25 @@ function updateSurfaceTiers() {
     if (pd._surfaceTiers.hover) hover += (hover ? '. ' : '') + pd._surfaceTiers.hover;
   }
   const next = label || 'present-day maps';
-  if (o.bodySurfaces !== next) {
+  if (o.bodySurfaces !== next || !o._bodySurfacesHoverSet) {   // the first pass writes the full hover even at today's maps
     o.bodySurfaces = next;
     o.bodySurfacesHover = BODY_MAPS_HOVER_HEAD + (hover ? `Now showing: ${hover}. ` : 'All three show their present-day maps. ') + BODY_MAPS_HOVER_TAIL;
+    o._bodySurfacesHoverSet = true;
   }
 }
 /** The About folder's "Moon & planet maps" hover (owner 2026-11-05): what the row means, the state, the sources. */
 const BODY_MAPS_HOVER_HEAD = 'The maps drawn on the Moon, Mercury and Saturn at this date. A body not listed shows its present-day map. ';
-const BODY_MAPS_HOVER_TAIL = 'The Moon\'s maria flooded 3.9–3.1 Ga (Hiesinger 2011); Mercury\'s oldest preserved surfaces are 4.0–4.1 Ga (Marchi 2013); Saturn\'s rings are a measured band, ≤ 400 Myr (Kempf 2023) and disputed. These maps illustrate the look at that age; nothing on them is modelled.';
+const BODY_MAPS_HOVER_TAIL = 'The Moon\'s maria flooded 3.9–3.1 Ga (Hiesinger 2011); Mercury\'s oldest preserved surfaces are 4.0–4.1 Ga (Marchi 2013); Saturn\'s rings are a measured band, ≤ 400 Myr (Kempf 2023) and disputed. These maps illustrate the look at that age; nothing on them is modelled. Not tiered: Venus resurfaced ~300–700 Myr ago (Strom et al. 1994) and anything earlier is speculation; the giant planets\' maps show today\'s weather (Jupiter\'s Great Red Spot, the bands) at every age; Mars is a separate item.';
+/** The ice fraction of date from the model's OWN ice history (plan 27 step G1): the climate
+ *  formula's orbital L1 layer on the LR04 regimes (the climate chart's stitched curve,
+ *  cfmEvalStitched — one home with the chart), read as 0 at today's value and 1 at its 21-ka
+ *  value (the Last Glacial Maximum), clamped. Ahead of today the post-MPT regime is carried
+ *  forward (step H4: a labelled forecast). Pure in the age. @param {number} ageMa @returns {number} */
+function iceFractionAtAgeMa(ageMa) {
+  if (_iceRefs === null) _iceRefs = { today: cfmEvalStitched(0, 'l1'), lgm: cfmEvalStitched(21, 'l1') };
+  const v = cfmEvalStitched(ageMa * 1000, 'l1');
+  return THREE.MathUtils.clamp((v - _iceRefs.today) / (_iceRefs.lgm - _iceRefs.today), 0, 1);
+}
 /** A tier label's short name for a value column — the label up to its source tag or its dash clause. @param {string} label */
 function surfaceShortName(label) { return label.replace(/\s+\(.*$|\s+—.*$/, ''); }
 /** An age in Myr before J2000 for the hovers. @param {number} ma */
