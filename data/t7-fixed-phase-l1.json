@@ -1515,7 +1515,7 @@
   "script": "scripts/t7_fixed_phase_l1.py",
   "plan": "holisticuniverse plan 06 \u00a74 T7",
   "doc": "docs/92-climate-formula.md",
-  "runtime_sec": 26.006298065185547,
+  "runtime_sec": 24.988388776779175,
   "environment": {
    "python": "3.12.3",
    "numpy": "2.4.1",

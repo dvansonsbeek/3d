@@ -120,7 +120,8 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   // mix at ages on both sides of every boundary class (the LGM end, an atlas step, the atlas's
   // deep end, each Snowball episode, the generated tiers, the genesis edge). A map swap, a
   // moved boundary or a changed fade shows here; the maps themselves are the gate's.
-  for (const ageMa of [-1, 0, 0.02, 0.0225, 0.03, 1, 2.49, 2.51, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4420, 4428.985]) {
+  // (4,402 / 4,412 / 4,418 / 4,427.5: the rain-out, the steam atmosphere and the genesis fades)
+  for (const ageMa of [-1, 0, 0.02, 0.0225, 0.03, 1, 2.49, 2.51, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
     const r = T.earthTierAtAge(ageMa);
     v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)} clouds=${r.clouds.toFixed(4)} atm=${r.atmosphere.toFixed(4)} modern=${r.modern.toFixed(4)}` : null;
   }
@@ -405,6 +406,39 @@ Object.assign(measured, await s.page.evaluate(() => {
   const T = window.__test__;
   return { 'edge.posAfterStepBackward': T.clockFields().pos === T.navigablePosRange().posMin ? 'on the edge' : 'PAST THE EDGE', 'edge.noticeVisible': T.edgeNoticeState().visible };
 }));
+
+// ── plan 27 step B/C: the 'Domain' row at five positions (the era, −400 Myr, −2 Gyr, the two
+// edges — pure in the position, no jump) and the genesis button from the edge the block above
+// landed on: the browser's own finder on the seated tier model (the registry's
+// genesisFirstSolarEclipseJD is pinned against it by the epoch-consistency gate), the landing,
+// the five Solar Eclipses fields, and the 2024-04-08 preset's fundamental-plane radii.
+Object.assign(measured, await s.page.evaluate(() => {
+  const T = window.__test__, v = {};
+  const r = T.navigablePosRange();
+  for (const [label, pos] of [['era', 0], ['-400Myr', -400e6], ['-2Gyr', -2000e6], ['edge', r.posMin], ['futureEdge', r.posMax]]) { const d = T.domainStatus(pos); v[`domain@${label}`] = d.text; v[`domainHover@${label}`] = d.hover; }   // strings: the comparator reads scalars
+  v['genesis.radii@2024-04-08'] = T.solarEclipseRadiiText(2460409.262050);
+  const ev = T.jumpToGenesisEclipse();
+  v['genesis.found'] = ev !== null;
+  const f = T.solarEclipseFields();
+  v['genesis.label'] = f.label; v['genesis.loc'] = f.loc; v['genesis.gamma'] = f.gamma; v['genesis.jd'] = f.jd; v['genesis.radii'] = f.radii;
+  v['genesis.landedJD'] = T.clockFields().julianDay;
+  return v;
+}));
+
+// ── doc 111 §1.33 (the scene's own re-learning, 2026-11-05): the umbra cap is drawn only while
+// the Earth lies DOWNSTREAM of the Moon on the shadow axis — never at a full Moon, where the
+// Sun → Moon line pierces the globe from behind and the near-intersection fallback painted a
+// solar umbra on the sunlit face (the owner's genesis JD, 1.3 days after a total lunar eclipse).
+// Each row: a jump, a rendered frame, the cap's state. Two full Moons (false), two solar
+// eclipses (true).
+{
+  const genesisJD = await s.page.evaluate(() => window.__test__.genesisEclipse().jd);
+  for (const [label, jd] of [['fullMoon@genesis', -2469702431722.9775], ['lunar@2025-09-07', 2460926.2582], ['solar@2024-04-08', 2460409.262050], ['solar@genesis', genesisJD]]) {
+    await s.page.evaluate((j) => window.__test__.jumpJD(j), jd);
+    await s.page.waitForTimeout(1000);
+    measured[`umbraCap.visible@${label}`] = await s.page.evaluate(() => { const u = window.__test__.umbraDiscState(); return u ? u.visible : null; });
+  }
+}
 
 const pageErrors = s.errors.length;
 await s.dispose();

@@ -16,8 +16,9 @@
  *                  re-encoded at 2048 × 1024 WebP. The present-day map of the set is NOT used
  *                  (the satellite map stays); its 21-ka map replaces the simulator's former
  *                  LGM map, whose source was unrecorded.
- *   illustration — the tiers older than the atlas (the Hadean genesis, the ocean world, the
- *                  Archean, the Proterozoic) and the three Snowball episodes, GENERATED here
+ *   illustration — the tiers older than the atlas (the Hadean genesis, the steam atmosphere,
+ *                  the rain-out, the ocean world, the Archean, the Proterozoic) and the three
+ *                  Snowball episodes, GENERATED here
  *                  from seeded 3-D value noise on the sphere with the parameters below —
  *                  reproducible, no third-party rights, and labelled as illustration on every
  *                  surface: the model does not model continents (plan 27 §1).
@@ -71,7 +72,19 @@ const GENERATED_TIERS = [
   { id: 'proterozoic', label: 'Proterozoic (generated)', fromMa: 780, toMa: 2500, fadeMyr: 20, recipe: 'proterozoic', clouds: 1, atmosphere: 1 },
   { id: 'archean', label: 'Archean cratons (generated)', fromMa: 2500, toMa: 3500, fadeMyr: 40, recipe: 'archean', clouds: 1, atmosphere: 1 },
   { id: 'ocean-world', label: 'Early ocean world (generated)', fromMa: 3500, toMa: 4400, fadeMyr: 60, recipe: 'ocean-world', clouds: 1, atmosphere: 1 },
-  { id: 'genesis', label: 'Hadean magma ocean after the Moon-forming impact (generated)', fromMa: 4400, toMa: 5000, fadeMyr: 30, recipe: 'genesis', clouds: 0, atmosphere: 0 },
+  // The water was in the planet all along (chondritic building blocks: Alexander et al. 2012,
+  // Piani et al. 2020) and condensed, it did not arrive — the two tiers between the magma ocean
+  // and the ocean world show where it is meanwhile (owner 2026-11-05: "where did all the water
+  // come from all of a sudden?"). The magma ocean crystallises in 1–4 Myr (Hamano et al. 2013;
+  // Elkins-Tanton 2012), outgassing a steam atmosphere of a few hundred bar that blankets the
+  // cooling crust; once the surface drops below ~500 K the steam rains out in millennia and
+  // the surface is clement within ~10 Myr of the impact (Zahnle et al. 2007; Sleep, Zahnle &
+  // Neuhoff 2001); the Jack Hills zircons show liquid water by 4,400 Ma (Wilde et al. 2001;
+  // Valley et al. 2014). The spans below are a READING of those papers on the model's
+  // genesis (4,429 Ma), illustrative like every generated tier, and say so in their labels.
+  { id: 'rain-out', label: 'The first oceans raining out of the steam atmosphere onto the new crust — a reading of Zahnle 2007 and Wilde 2001 (generated)', fromMa: 4400, toMa: 4415, fadeMyr: 5, recipe: 'rain-out', clouds: 1, atmosphere: 0.8 },
+  { id: 'steam', label: 'Steam atmosphere over the solidifying crust — a reading of Hamano 2013 and Zahnle 2007 (generated)', fromMa: 4415, toMa: 4427, fadeMyr: 3, recipe: 'steam', clouds: 1, atmosphere: 0.5 },
+  { id: 'genesis', label: 'Hadean magma ocean after the Moon-forming impact (generated)', fromMa: 4427, toMa: 5000, fadeMyr: 1, recipe: 'genesis', clouds: 0, atmosphere: 0 },
 ];
 // Snowball Earth episodes (global glaciations; one generated white map for all three):
 // Makganyene 2,300–2,220 Ma (Kopp et al. 2005), Sturtian 717–659 Ma and Marinoan 645–635 Ma
@@ -176,6 +189,28 @@ const RECIPES = {
     const warm = mix3(hot, [150, 40, 14], ember);
     const haze = N.fbm(p[0] * 20, p[1] * 20, p[2] * 20, 3);
     return mix3(warm, [warm[0] * 0.8, warm[1] * 0.8, warm[2] * 0.8], (haze - 0.5) * 0.5 + 0.25);
+  },
+  // the solidifying crust under its steam blanket: the genesis crust, cooled and dimmed, seen
+  // through a nearly opaque grey-white vapour deck (a hot Venus) — the water is in the air
+  steam: (u, v, p, N) => {
+    const crust = N.fbm(p[0] * 2.5, p[1] * 2.5, p[2] * 2.5, 6);
+    const region = N.fbm(p[0] * 1.3 + 9, p[1] * 1.3 + 9, p[2] * 1.3 + 9, 3);
+    const r = 1 - Math.abs(2 * N.fbm(p[0] * 4.5 + 3, p[1] * 4.5 + 3, p[2] * 4.5 + 3, 5) - 1);
+    const glow = smooth(0.95, 1.0, r) * smooth(0.5, 0.8, region) * 0.3;                // the last glowing fractures
+    const base = mix3(mix3([30, 27, 27], [62, 56, 52], crust), [150, 50, 20], glow);
+    const deck = N.fbm(p[0] * 3.5 + 17, p[1] * 3.5 + 17, p[2] * 3.5 + 17, 6);            // the vapour deck's density
+    const band = N.fbm(p[0] * 9 + 31, p[1] * 9 + 31, p[2] * 9 + 31, 4);                   // its finer structure
+    const vapour = mix3([196, 196, 202], [236, 236, 240], band);
+    return mix3(base, vapour, 0.55 + 0.45 * smooth(0.3, 0.7, deck));                    // 55–100 % cover: the dark crust shows in the thin patches
+  },
+  // the rain-out: the same terrain field the ocean world rises over (freq 4.5), water filling
+  // the lows under a thinning vapour veil — the cross-fade into the ocean world raises the sea
+  'rain-out': (u, v, p, N) => {
+    const ground = rockyWorld(p, N, { freq: 4.5, sea: 0.5, shelf: 0.04, land: [56, 52, 50], landHigh: [98, 92, 86], ocean: [30, 48, 74], deep: [16, 30, 52], shelfColor: [48, 66, 92] });
+    const deck = N.fbm(p[0] * 3.5 + 17, p[1] * 3.5 + 17, p[2] * 3.5 + 17, 6);
+    const band = N.fbm(p[0] * 9 + 31, p[1] * 9 + 31, p[2] * 9 + 31, 4);
+    const vapour = mix3([200, 200, 206], [236, 236, 240], band);
+    return mix3(ground, vapour, 0.25 + 0.45 * smooth(0.4, 0.75, deck));                 // 25–70 % cover
   },
   // a global ocean with scattered volcanic islands (a few per cent of land)
   'ocean-world': (u, v, p, N) => rockyWorld(p, N, { freq: 4.5, sea: 0.76, shelf: 0.05, land: [96, 84, 72], landHigh: [150, 132, 110], ocean: [26, 62, 118], deep: [12, 34, 80], shelfColor: [66, 120, 160] }),

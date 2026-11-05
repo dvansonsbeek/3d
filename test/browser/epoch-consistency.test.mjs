@@ -63,6 +63,7 @@ const SPIN_MODERN_JD = 2460409.262, TOL_SPIN_DEG = 1e-9;   // 2024-04-08 18:17 U
 const CLOCK_POS = [-1e6, -400e6, -2000e6, navigablePosRange().posMin + 1e4];
 const CLOCK_JDS = CLOCK_POS.map((p) => jdFromPos(p));
 const TOL_CLOCK_YEAR = 1e-6, TOL_CLOCK_TT_DAYS = 1e-3, TOL_RING_REL = 1e-9, TOL_RANGE_YEARS = 1e-6;
+const TOL_GENESIS_JD_DAYS = 1e-5, TOL_GENESIS_GAMMA = 1e-4, TOL_GENESIS_UMBRA_KM = 1;   // the registry's rendered precision
 // The placed Moon against its ring: the lunar eccentricity of date bounds the ratio (0.055 at
 // J2000, the deep channel below 0.08) — at the genesis the ring once sat 27 % from the Moon,
 // sized on the position's tropical-year COUNT while the Moon read the TT age (the owner's
@@ -144,6 +145,10 @@ for (const jd of CLOCK_JDS) {
     return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm };
   }, jd));
 }
+// plan 27 step C: the genesis eclipse — the browser's own finder on the seated tier model (one
+// finder, two runtimes), read here and compared below with the registry's run of it on the Node
+// twin (`genesisFirstSolarEclipse*`, written by values:package:write).
+domainRows.genesis = await s.page.evaluate(() => window.__test__.genesisEclipse());
 // THE HONEST EDGE (plan 27 step B): a jump past either edge lands ON the edge, never beyond —
 // beyond it the readers fell back to a linear count (630 solar days per year one day before the
 // genesis, the owner's measurement).
@@ -286,6 +291,17 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const okEdge = Number.isFinite(dPast) && Number.isFinite(dFuture) && Math.abs(dPast) <= TOL_RANGE_YEARS && Math.abs(dFuture) <= TOL_RANGE_YEARS;
     if (!okEdge) fail++;
     console.log(`${okEdge ? '  ok ' : 'FAIL '} honest edge: a jump 1e6 d past either edge lands on it  Δ ${Number(dPast).toExponential(2)} / ${Number(dFuture).toExponential(2)} yr`);
+    // plan 27 step C: the genesis eclipse, browser finder vs the registry (the Node twin's run of
+    // the same finder on the same seated model): the JD to 1e-5 d (the registry's 5 decimals), γ
+    // to 1e-4, the umbra radius to 1 km — one finder, two runtimes, the carriers' last bit.
+    const reg = require(`${root}packages/model-values/src/model-values.generated.json`).values;
+    const g = domainRows.genesis;
+    const regJD = Number(reg.genesisFirstSolarEclipseJD), regGamma = Number(reg.genesisFirstSolarEclipseGamma);
+    const regUmbraKm = Number(String(reg.genesisFirstSolarEclipseUmbraRadiusKm).replace(/,/g, ''));
+    const dJD = g ? g.jd - regJD : NaN, dGamma = g ? g.gamma - regGamma : NaN, dUmbra = g ? Math.abs(g.umbraKm) - regUmbraKm : NaN;
+    const okG = Number.isFinite(dJD) && Math.abs(dJD) <= TOL_GENESIS_JD_DAYS && Number.isFinite(dGamma) && Math.abs(dGamma) <= TOL_GENESIS_GAMMA && Number.isFinite(dUmbra) && Math.abs(dUmbra) <= TOL_GENESIS_UMBRA_KM;
+    if (!okG) fail++;
+    console.log(`${okG ? '  ok ' : 'FAIL '} genesis eclipse browser/registry  JD ${g ? g.jd.toFixed(5) : 'null'} / ${regJD.toFixed(5)}  Δ ${Number(dJD).toExponential(2)} d · γ Δ ${Number(dGamma).toExponential(2)} · umbra Δ ${Number(dUmbra).toExponential(2)} km`);
     const edgeJD = jdFromPos(twin.posMin);
     for (const [label, f] of [['the Date field', domainRows.edge.viaDate], ['the Julian Day field', domainRows.edge.viaJD]]) {
       const dPos = f.pos - twin.posMin, dJD = f.julianDay - edgeJD;

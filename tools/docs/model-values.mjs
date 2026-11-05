@@ -196,7 +196,9 @@ const phys = await import('@essrt/physics');
 const physModel = (() => {
   /** @type {any} */ let m;
   return () => {
-    if (!m) m = phys.createModel(undefined, { secularSeriesArtifact: rd('data/nbody-secular-series.json') });
+    // seated on both banks (plan 27 step C): the genesis keys read the model at the navigable
+    // domain's past edge, where an unseated walk is hours
+    if (!m) m = phys.createModel(undefined, { secularSeriesArtifact: rd('data/nbody-secular-series.json'), spinCheckpointsArtifact: rd('data/spin-axis-checkpoints.json'), lunarCheckpointsArtifact: rd('data/lunar-cumulative-checkpoints.json') });
     return m;
   };
 })();
@@ -2863,9 +2865,38 @@ export const VALUES = {
       return 2 * Math.PI * Math.sqrt(p.moonLockDistanceM ** 3 / p.gmEarthMoonM3S2);
     };
     const epochs = { Devonian: () => 380, Hadean: genesisMa, '200MyrFuture': () => -200 };
+    /** The first solar eclipse after the navigable domain's past edge, memoised (one ~30-s scan
+     *  on the seated model). @returns {any} */
+    const genesisEclipse = (() => {
+      /** @type {any} */ let ev;
+      return () => {
+        if (ev) return ev;
+        const m = physModel();
+        const jdEdge = m.time.yearToJDUT(m.time.navigableYearRange().yearMin);
+        const found = m.eclipse.firstSolarEclipseAfterJD(jdEdge, { maxDays: 2000 });
+        if (!found) throw new Error('genesisFirstSolarEclipse: no solar eclipse within 2,000 days of the navigable edge');
+        ev = { ...found, jdEdge, kind: found.ground ? (found.umbraKm < 0 ? 'total' : 'annular') : 'partial' };
+        return ev;
+      };
+    })();
     const out = {
       daysPerYearAtDevonian: { get: () => dtl().meanYearInDaysAtAge(380), render: (v) => Number(v).toFixed(2), unit: 'd/yr', note: 'matches Wells 1963 ~400 to 0.01%' },
       moonDistanceAtHadeanRE: { get: () => rawMoonKm(genesisMa()) / astro.physicalConstants.earthParallaxRadiusKm, render: (v) => Number(v).toFixed(2), unit: 'R_E' },
+      // plan 27 step C — the first solar eclipse of the cited history: the model's finder from the
+      // navigable domain's past edge (time/navigable-domain through the one bridge — the scene's
+      // edge instant), on the Node model seated on both banks. Reproducible, not converged: the
+      // lunar inclination is the J2000 constant and the early Laplace-plane transition is not
+      // modelled. The scene's "Jump to Earth–Moon genesis" computes the same live (one home: the
+      // package finder); an epoch-consistency row pins the two instants.
+      genesisFirstSolarEclipseJD: { get: () => genesisEclipse().jd, render: (v) => Number(v).toFixed(5), unit: 'JD (UT)', note: 'the scene\'s UT axis — the Julian Day field lands on it' },
+      genesisFirstSolarEclipseAgeMa: { get: () => genesisEclipse().ageMa, render: (v) => Number(v).toFixed(4), unit: 'Ma' },
+      genesisFirstSolarEclipseDaysAfterEdge: { get: () => genesisEclipse().jd - genesisEclipse().jdEdge, render: (v) => Number(v).toFixed(2), unit: 'UT days (solar days of date)' },
+      genesisFirstSolarEclipseType: { get: () => genesisEclipse().kind, render: (v) => String(v), unit: '' },
+      genesisFirstSolarEclipseGamma: { get: () => genesisEclipse().gamma, render: (v) => Number(v).toFixed(4), unit: '' },
+      genesisFirstSolarEclipseUmbraRadiusKm: { get: () => Math.abs(genesisEclipse().umbraKm), render: (v) => thousands(Math.round(v)), unit: 'km', note: 'on the fundamental plane; total where the finder\'s umbra radius is negative' },
+      genesisFirstSolarEclipsePenumbraRadiusKm: { get: () => genesisEclipse().penumbraKm, render: (v) => thousands(Math.round(v)), unit: 'km' },
+      genesisFirstSolarEclipseMoonDistanceKm: { get: () => genesisEclipse().moonDistanceKm, render: (v) => thousands(Math.round(v)), unit: 'km' },
+      genesisFirstSolarEclipseSynodicMonthDays: { get: () => genesisEclipse().synodicMonthDays, render: (v) => Number(v).toFixed(4), unit: 'd', note: 'the month OF DATE the finder stepped with' },
       tidalLockDaysPerYear: { get: () => C.meanSolarYearDays / Math.round(lockLodSeconds() / 86400), render: (v) => Number(v).toFixed(1), unit: 'd/yr', note: 'over the rounded 47-day lock LOD (site convention)' },
       tidalLockLodDays: { get: () => lockLodSeconds() / 86400, render: (v) => Number(v).toFixed(0), unit: 'd' },
       tidalLockApproachGyr: { get: () => astro.knownValues.tidalLockApproachGyr, render: (v) => String(v), unit: 'Gyr', note: 'prose estimate — beyond the red-giant phase' },

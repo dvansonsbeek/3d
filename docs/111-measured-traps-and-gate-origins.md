@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.8
+modelVersion: v27.9
 coefficients: sha256:3afe3e8645567bc8
 status: current
 ---
@@ -857,6 +857,13 @@ headlessly). One screenshot, four defects:
    event: 42°N 126°W) — the "penumbra" ring in the picture. The scene's
    closest-approach twin (`umbraNASAConventionAtJd`) had the same blind spot.
    Fix: a negative root is no hit (`s < 0` → null; `t_closest < 0` → null).
+   The scene re-learned it once: the footprint shader's fallback (the near
+   intersection while the tier refuses, meant for γ at 1) took the root
+   without its sign and painted a solar umbra on the sunlit face 1.3 days
+   after a total lunar eclipse at the genesis (the owner, JD
+   −2469702431722.98); `updateUmbraDisc` now hides the cap unless the axis's
+   foot lies ahead of the Moon, and the browser golden pins the cap's state
+   at two full Moons and two solar eclipses (`umbraCap.visible@*`).
    No solar event moves; the audit re-stamps.
 2. **Two clocks beyond ±500 Myr.** The engines' cumulative position tables
    (JD ↔ scene position, 10-kyr cells) spanned ±500 Myr. Beyond the edge

@@ -118,7 +118,7 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
         /** THE REALIZED POLE RATE OVER A WINDOW, ″/yr — see the one home above (the mean of the inertial rate of
          *  date with its three of-date factors); the rate the obliquity lines of a record spanning the window carry. */
         spinAxisInertialRateMeanArcsecPerYr: (yearFrom: number, yearTo: number, stepYears?: number, opts?: {
-            ellipticity? /** Mean longitude of date, degrees, unwrapped — L0 + 360·∫dt/T_trop (the one-family tropical year). @param {number} year @returns {number} */: boolean;
+            ellipticity?: boolean;
         }) => number;
         /** THE REALIZED OBLIQUITY PERIOD OVER A WINDOW, years — 1,296,000/(⟨ψ̇ᵢₙ⟩_window − |s₃|): the period a record
          *  spanning [yearFrom, yearTo] sees (40,930 over the LR04 record 0–5.32 Ma, 41,018 over the last Myr); the

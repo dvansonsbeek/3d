@@ -4,6 +4,7 @@
  * The last slice of `assembleModel` (../model.js): reads the bindings every earlier slice built and returns the published surface.
  */
 import { ONE_FAMILY_WINDOW_YEARS } from '../earth/year-lengths.cjs';
+import { DAYS_PER_JULIAN_YEAR } from '../constants/units.cjs';
 
 /** @param {import('./cardinal-instants.js').Ctx} ctx @returns the published surface (frozen) */
 export function assembleSurface(ctx) {
@@ -362,9 +363,15 @@ export function assembleSurface(ctx) {
        *  @param {number} jdStart @param {{maxDays?: number}} [opts] */
       firstSolarEclipseAfterJD: (jdStart, opts) => {
         const maxDays = (opts && Number.isFinite(opts.maxDays)) ? /** @type {number} */ (opts.maxDays) : 400;
-        const yearStart = yearFromJD(jdStart);
-        if (yearStart === null || !chain) return null;
-        const synodicMonthSeconds = chain.meanSynodicMonthAtAge(yearToTMa(yearStart));
+        // The age is the ENGINE age — Julian years from J2000.0 on the TT instant — never the
+        // SI-linear year count (yearFromJD: 365.2422-d years from the model start), which runs
+        // 95 kyr past the engine age at the genesis and so past the month chain's domain while the
+        // instant lies inside the navigable one: the finder refused at the edge it was built for
+        // (plan 27 step C; doc 111 §1.31).
+        const ageMaOfUT = /** @param {number} jdUT */ (jdUT) => (j2000JD - jdTTFromUT(jdUT)) / DAYS_PER_JULIAN_YEAR / 1e6;
+        const tMaStart = ageMaOfUT(jdStart);
+        if (!Number.isFinite(tMaStart) || !chain) return null;
+        const synodicMonthSeconds = chain.meanSynodicMonthAtAge(tMaStart);
         if (typeof synodicMonthSeconds !== 'number' || !Number.isFinite(synodicMonthSeconds)) return null;   // beyond the month chain's domain
         const synodicMonthDays = synodicMonthSeconds / 86400;
         const stepDays = synodicMonthDays / 60;
@@ -373,7 +380,7 @@ export function assembleSurface(ctx) {
           const events = eclipseFinders.findSolarEclipsesInRange(jd0, Math.min(jd0 + windowDays, jdStart + maxDays), { stepDays });
           const ev = events.find((e) => e.jd >= jdStart);
           if (ev) {
-            return { ...ev, ...besselian.shadowRadiiAt(ev.jd), ground: besselian.umbraGroundAt(ev.jd), ageMa: yearToTMa(yearFromJD(ev.jd)), synodicMonthDays };
+            return { ...ev, ...besselian.shadowRadiiAt(ev.jd), ground: besselian.umbraGroundAt(ev.jd), ageMa: ageMaOfUT(ev.jd), synodicMonthDays };
           }
         }
         return null;

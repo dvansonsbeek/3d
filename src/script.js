@@ -2827,6 +2827,43 @@ function navigablePosRange() {
   }
   return _navigablePosRangeCache;
 }
+/** The scene's standing against the model's domains (plan 27 step B) — the root 'Domain' row:
+ *  the two edges, the certified ±500 Myr, and the deep band beyond it with what each quantity IS
+ *  there (cited / derived / a band / uncalibrated) and what the Earth's map is (cited
+ *  paleogeography or a generated illustration). `text` is the row, `hover` the full sentence.
+ *  Pure in the position (the Earth tier table is a loaded input; '—' until it has loaded).
+ *  @param {number} pos @returns {{text: string, hover: string}} */
+const DOMAIN_CERTIFIED_MYR = 500;
+function domainStatusAt(pos) {
+  // the row's wording (owner 2026-11-05): the value is the state in a few words, the hover says
+  // what the row means, the state in full and what the words mean
+  const certified = {
+    text: `certified (±${DOMAIN_CERTIFIED_MYR} Myr)`,
+    hover: `How far the model is validated at this date. Within ${DOMAIN_CERTIFIED_MYR} million years of today every quantity is certified: the gates cover the historical eclipses, the ΔT and length-of-day record, the cardinal points and 45 paleoclimate anchors, and the published API serves this range.`,
+  };
+  if (!DEEP_TIME_MODE_ENABLED || !Number.isFinite(pos)) return certified;
+  const r = navigablePosRange();
+  if (pos <= r.posMin) {
+    return {
+      text: 'past edge (4,429 Ma)',
+      hover: 'The simulator cannot go further back: the published Earth–Moon distance history (Farhat et al. 2022) ends at 4,429 million years ago and the model does not extrapolate it. The Sun is about 140 million years older (4,567 Ma), but nothing is drawn before the Moon exists. Everything shown at this date is reproducible, not converged.',
+    };
+  }
+  if (pos >= r.posMax) {
+    return {
+      text: 'future edge (+1,000 Myr)',
+      hover: 'The simulator cannot go further forward: its precomputed tables end 1,000 million years after today, the range of the charts. The Moon\'s recession is held at today\'s measured rate. Beyond ±500 Myr the results are reproducible, not converged.',
+    };
+  }
+  const tMa = (2000 - _engineYearTT(jdFromPos(pos))) / 1e6;
+  if (Math.abs(tMa) <= DOMAIN_CERTIFIED_MYR) return certified;
+  const tier = (earth && earth._earthTierAtAge) ? earth._earthTierAtAge(tMa) : null;
+  const surface = tier ? (tier.kind === 'cited' ? 'a published reconstruction (Scotese 2016)' : 'a generated illustration, continents not modelled') : 'not yet loaded';
+  return {
+    text: 'beyond certification',
+    hover: `This date lies outside the ±${DOMAIN_CERTIFIED_MYR} Myr certified range. What you see is the model's own extrapolation on cited inputs. Moon distance: the published Earth–Moon history (Farhat et al. 2022). Length of day: derived from it by angular-momentum conservation. Obliquity: a band of possible values, not one value. Precession clock: the composed lunisolar law, not calibrated against any rock record here. Earth map: ${surface}. Results are reproducible, not converged.`,
+  };
+}
 /** THE HONEST EDGE (plan 27 step B, doc 111 §1.36): a position is clamped to the navigable
  *  domain — beyond it the readers fall back to a linear count (630 solar days per year one day
  *  before the genesis, measured by the owner) and nothing is drawn. Play stops at an edge. */
@@ -3482,6 +3519,8 @@ if (typeof window !== 'undefined') {
     // manifest — null until the table has loaded
     earthTierAtAge: (ageMa) => (earth && earth._earthTierAtAge) ? earth._earthTierAtAge(ageMa) : null,
     earthDayMapState: () => (earth && earth._earthDayMapState) ? earth._earthDayMapState() : null,
+    // the umbra cap's state after a frame (doc 111 §1.33: no solar umbra at a full Moon)
+    umbraDiscState: () => (earth && earth._umbraState) ? earth._umbraState() : null,
     // plan 27 step F: the scene year → engine year map and the Orbit Analysis paper's cardinal dates (seam-aware)
     engineYearOfSceneYear: (y) => _engineYearOfSceneYear(y),
     hiCardinalDates: (y) => _hiCardinalDates(y),
@@ -3493,6 +3532,15 @@ if (typeof window !== 'undefined') {
     setStepYears: (years) => { const v = SYEAR_J2000 * years; o['1 second equals'] = v; o.speedFact = v; },
     edgeNoticeState: () => ({ side: _edgeNotice.side, count: _edgeNotice.count, visible: !!(_edgeNotice.el && _edgeNotice.el.classList.contains('visible')), text: _edgeNotice.el ? _edgeNotice.el.textContent : '' }),
     bodySurfaceState: (name) => { const pd = _surfaceTierBodies.find((b) => b.name.toLowerCase() === name); return pd ? pd._surfaceTiers.state() : null; },
+    // plan 27 step B/C: the 'Domain' row's text for a position (and a JD → position read for the
+    // gate's rows); the genesis eclipse from the browser's own finder on the seated tier model,
+    // the genesis jump, the Solar Eclipses fields and the fundamental-plane radii text
+    domainStatus: (pos) => domainStatusAt(pos),
+    posOfJD: (jd) => posFromJD(jd),
+    genesisEclipse: () => genesisEclipseEvent(),
+    jumpToGenesisEclipse: () => jumpToGenesisEclipse(),
+    solarEclipseFields: () => ({ label: o.eclipseSolarLabel, loc: o.eclipseSolarLoc, gamma: o.eclipseSolarGamma, jd: o.eclipseSolarJD, radii: o.eclipseSolarRadii }),
+    solarEclipseRadiiText: (jd) => solarEclipseRadiiText(jd),
     // Cycles-tab perihelion breakdown (doc 13 §1.8): the two coordinates and the
     // relativistic advance from the model constants — probed by the browser golden
     // so the panel can never drift from the registry / closure gate silently.
@@ -5681,8 +5729,10 @@ let o = {
 
   Day: "",
   julianDay: "",
-  earthSurface: 'Present-day Earth (satellite imagery) — cited',   // the Earth's surface tier (plan 27 step E; updateEra writes it)
-  bodySurfaces: 'present-day maps — cited',   // the Moon's, Mercury's and Saturn's tiers (plan 27 step F; updateSurfaceTiers writes it)
+  earthSurface: 'Present-day Earth',   // the Earth's surface tier (plan 27 step E; updateEra writes it and the hover)
+  earthSurfaceHover: 'The map drawn on the Earth at this date and where it comes from. Now showing: Present-day Earth (satellite imagery). The model does not model continents.',
+  bodySurfaces: 'present-day maps',   // the Moon's, Mercury's and Saturn's tiers (plan 27 step F; updateSurfaceTiers writes it and the hover)
+  bodySurfacesHover: 'The maps drawn on the Moon, Mercury and Saturn at this date. A body not listed shows its present-day map. All three show their present-day maps.',
   pos : 0,
   displayFormat : 'sexagesimal',
   distanceUnit : 'AU',
@@ -20876,22 +20926,34 @@ function setupGUI() {
       _rootUpdating = false;
     });
 
-  // plan 27 step E: the Earth's surface tier by age — read-only; updateEra writes o.earthSurface
-  // from the tier table (public/textures/earth/manifest.json) and names what the map IS
-  // (cited paleogeography or generated illustration)
-  const surfaceCtrl = gui.addBinding(o, 'earthSurface', { label: 'Earth surface', readonly: true, interval: 500 });
+  // The three "what the scene stands on" rows live at the TOP of the About folder (owner
+  // 2026-11-05: not in the root group, which is the time navigation), read-only, in this order:
+  // plan 27 step B: where the scene stands against the model's domains (the certified ±500 Myr,
+  // the deep band with what each quantity IS, the two edges); the full sentence is the hover.
+  // The render loop's 20-Hz block rewrites it only when the text changes (domainStatusAt).
+  o.domainStatus = '';
+  const domainCtrl = aboutFolder.addBinding(o, 'domainStatus', { label: 'Model validity', readonly: true, interval: 500, index: 0 });
+  o._domainCtrl = domainCtrl;
+  // plan 27 step E: the Earth's surface tier by age — updateEra writes o.earthSurface from the
+  // tier table (public/textures/earth/manifest.json) and names what the map IS (cited
+  // paleogeography or generated illustration)
+  const surfaceCtrl = aboutFolder.addBinding(o, 'earthSurface', { label: 'Earth map', readonly: true, interval: 500, index: 1 });
   // plan 27 step F: the Moon's, Mercury's and Saturn's tiers — the bodies whose active tier is
   // not the present-day one, with what each map IS; updateSurfaceTiers writes o.bodySurfaces
-  const bodiesCtrl = gui.addBinding(o, 'bodySurfaces', { label: 'Moon & planets', readonly: true, interval: 500 });
+  const bodiesCtrl = aboutFolder.addBinding(o, 'bodySurfaces', { label: 'Moon & planet maps', readonly: true, interval: 500, index: 2 });
+  [domainCtrl, surfaceCtrl, bodiesCtrl].forEach(c => c.element.classList.add('root-control-readonly'));
+  // the two surface rows carry their full text as the hover (the value column truncates it) —
+  // kept in step by the render loop's 20-Hz block, like the Domain row's hover
+  o._surfaceCtrls = { surface: surfaceCtrl, bodies: bodiesCtrl };
 
   // Store root controls for selective render-loop refresh
   o._rootCtrls = { dateCtrl, timeCtrl, jdCtrl };
 
   // Make root controls visually prominent
-  [dateCtrl, timeCtrl, jdCtrl, surfaceCtrl, bodiesCtrl].forEach(c => {
+  [dateCtrl, timeCtrl, jdCtrl].forEach(c => {
     c.element.classList.add('root-control');
   });
-  bodiesCtrl.element.classList.add('root-control-last');
+  jdCtrl.element.classList.add('root-control-last');
 
   // ── Simulation Controls ──
   const ctrlFolder = gui.addFolder({ title: 'Simulation Controls' });
@@ -21267,9 +21329,11 @@ function setupGUI() {
   const _solarEclTitleEl = solarEclFolder.element.querySelector('.tp-fldv_t');
   const _updateSolarEclTitle = () => {
     if (!_solarEclTitleEl) return;
-    _solarEclTitleEl.textContent = _eclipseNavigated
-      ? `Solar Eclipses · ${_eclipseState.idx + 1} of ${ECLIPSE_PRESETS.length}`
-      : `Solar Eclipses (${ECLIPSE_PRESETS.length} entries)`;
+    _solarEclTitleEl.textContent = _eclipseAtGenesis
+      ? 'Solar Eclipses · Earth–Moon genesis'
+      : _eclipseNavigated
+        ? `Solar Eclipses · ${_eclipseState.idx + 1} of ${ECLIPSE_PRESETS.length}`
+        : `Solar Eclipses (${ECLIPSE_PRESETS.length} entries)`;
   };
 
   // Storage for the 4 read-only display fields. Initialized with placeholder
@@ -21282,41 +21346,59 @@ function setupGUI() {
   o.eclipseSolarLoc   = '—';
   o.eclipseSolarGamma = '—';
   o.eclipseSolarJD    = '—';
+  o.eclipseSolarRadii = '—';   // plan 27 step C: the umbra and penumbra radii on the fundamental plane, from the tier
 
   const solarEclBindings = [
     solarEclFolder.addBinding(o, 'eclipseSolarLabel', { label: 'Eclipse Details', readonly: true }),
     solarEclFolder.addBinding(o, 'eclipseSolarLoc',   { label: 'Location',        readonly: true }),
     solarEclFolder.addBinding(o, 'eclipseSolarGamma', { label: 'γ',               readonly: true }),
     solarEclFolder.addBinding(o, 'eclipseSolarJD',    { label: 'JD (UT)',         readonly: true }),
+    solarEclFolder.addBinding(o, 'eclipseSolarRadii', { label: 'Umbra / penumbra', readonly: true }),
   ];
 
   // Indices in solarEclBindings of the fields whose values can exceed the
   // visible value-column width even after Improvement B (Eclipse Details and
   // Location). These get a hover tooltip with the full text — see
   // _solarEclRefresh below.
-  const _eclLongFieldIdx = [0, 1];
+  const _eclLongFieldIdx = [0, 1, 4];
 
   // Track whether the user has navigated at least once. Until they have, the
   // panel shows the placeholder strings above (avoiding the confusing state
   // where the display says "2024 Apr 8 Total" but the sim is at a different
   // date). First Prev → wraps to oldest entry; first Next → goes to most recent.
   let _eclipseNavigated = false;
+  // plan 27 step C: the panel stands at the genesis eclipse (the folder title says so) until
+  // the next Prev/Next
+  let _eclipseAtGenesis = false;
 
+  const _solarEclTooltips = () => {
+    _eclLongFieldIdx.forEach(i => {
+      solarEclBindings[i].element.title =
+        (i === 0) ? o.eclipseSolarLabel : (i === 1) ? o.eclipseSolarLoc : o.eclipseSolarRadii;
+    });
+  };
   const _solarEclRefresh = () => {
     const cur = ECLIPSE_PRESETS[_eclipseState.idx];
+    _eclipseAtGenesis = false;
     o.eclipseSolarLabel = cur.label;  // Improvement A: counter moved to folder title; just show eclipse name here.
     o.eclipseSolarLoc   = cur.loc;
     o.eclipseSolarGamma = cur.gamma.toFixed(3);
     o.eclipseSolarJD    = cur.jd.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+    o.eclipseSolarRadii = solarEclipseRadiiText(cur.jd);
     solarEclBindings.forEach(b => b.refresh());
     // After refresh, update hover tooltips for the long-text fields so the user
     // can read the full Eclipse Details / Location even when they get visually
     // truncated by the value column's fixed width.
-    _eclLongFieldIdx.forEach(i => {
-      solarEclBindings[i].element.title =
-        (i === 0) ? o.eclipseSolarLabel : o.eclipseSolarLoc;
-    });
+    _solarEclTooltips();
     // Improvement A: update folder title with current position counter.
+    _updateSolarEclTitle();
+  };
+  // plan 27 step C: after jumpToGenesisEclipse has written the five fields — refresh them and
+  // title the folder with the genesis
+  o._solarEclShowGenesis = () => {
+    _eclipseAtGenesis = true;
+    solarEclBindings.forEach(b => b.refresh());
+    _solarEclTooltips();
     _updateSolarEclTitle();
   };
 
@@ -21362,6 +21444,24 @@ function setupGUI() {
   _eclBtnRow.appendChild(_mkEclBtn('Jump to Next ›',
     'Jump to the next (more recent) historical solar eclipse and navigate the simulation to that date.',
     () => _navigateSolarEcl(-1)));
+  // plan 27 step C: the Earth–Moon genesis — the first solar eclipse of the cited history, found
+  // live by the scene's eclipse tier on the seated model (one finder; the registry's
+  // genesisFirstSolarEclipse* keys are the Node twin's run of it). The first click walks the
+  // finder from the past edge (tens of seconds): the label says so before the walk starts.
+  _eclBtnRow.appendChild(_mkEclBtn('Genesis',
+    'Jump to the Earth–Moon genesis: the first solar eclipse of the cited Earth–Moon history (Farhat et al. 2022), found live by the eclipse tier from the past edge of the navigable domain — reproducible, not converged. The first click takes a while (the finder walks the months of date).',
+    () => {
+      if (_genesisEclipseMemo === null) {
+        o.eclipseSolarLabel = 'finding the first solar eclipse of the cited history — the tier walks the months of date from the past edge (a first click takes a while) …';
+        solarEclBindings[0].refresh();
+      }
+      setTimeout(() => {
+        if (jumpToGenesisEclipse() === null) {
+          o.eclipseSolarLabel = 'no solar eclipse found within 2,000 solar days of the past edge';
+          solarEclBindings[0].refresh();
+        }
+      }, 30);
+    }));
   _eclLastBladeEl.after(_eclBtnRow);
 
   // ── Lunar Eclipses subfolder (collapsed by default; mirrors Solar layout) ──
@@ -22628,6 +22728,11 @@ function render(now) {
     // display (beyond the label seam the Date is a season date a civil parser would misread).
     o.julianDay     = jdFromPos(o.pos);
     o.currentYear = sceneYearOfDate(o.julianDay)
+    // plan 27 step B: the 'Domain' row — rewritten only when its text changes
+    if (o._domainCtrl) {
+      const d = domainStatusAt(o.pos);
+      if (d.text !== o.domainStatus) { o.domainStatus = d.text; o._domainCtrl.element.title = d.hover; o._domainCtrl.refresh(); }
+    }
 
     // ───── deep-time auto-sync (gated on DEEP_TIME_MODE_ENABLED) ─────
     // When ON, mutate every deep-time global to the epoch implied by o.currentYear.
@@ -22698,6 +22803,14 @@ function render(now) {
   if (earth._updateSunDirFunc)    earth._updateSunDirFunc(sun.planetObj);
   if (earth._updateEraFunc)       earth._updateEraFunc(o.julianDay);
   updateSurfaceTiers();
+  // the About folder's two map rows: text and hover (the full sentence) refreshed in the SAME
+  // frame the tier moved — a refresh left to the 20-Hz block ran before the tier pass and the
+  // idle loop could stop before the next frame (one jump behind, measured headless, 2026-11-05)
+  if (o._surfaceCtrls) {
+    const sc = o._surfaceCtrls.surface, bc = o._surfaceCtrls.bodies;
+    if (sc.element.title !== o.earthSurfaceHover || o._earthSurfaceShown !== o.earthSurface) { sc.element.title = o.earthSurfaceHover; o._earthSurfaceShown = o.earthSurface; sc.refresh(); }
+    if (bc.element.title !== o.bodySurfacesHover || o._bodySurfacesShown !== o.bodySurfaces) { bc.element.title = o.bodySurfacesHover; o._bodySurfacesShown = o.bodySurfaces; bc.refresh(); }
+  }
   if (earth._updateUmbraDiscFunc) earth._updateUmbraDiscFunc();
   updateSunGlow();
 
@@ -27020,6 +27133,53 @@ function jumpToEclipsePreset(idx) {
     o._rootCtrls.timeCtrl?.refresh();
     o._rootCtrls.jdCtrl?.refresh();
   }
+}
+
+/** The umbra and penumbra radii on the fundamental plane at a solar eclipse's UT JD, from the
+ *  tier (plan 27 step C): 'umbra 65 km · penumbra 3,418 km'. The besselian umbra radius is
+ *  NEGATIVE where the umbral cone reaches the plane (a total eclipse) and positive beyond its
+ *  vertex (the antumbra — an annular eclipse). The registry's `genesisFirstSolarEclipse*RadiusKm`
+ *  keys read the same `shadowRadiiAtJD`. @param {number} jdUT @returns {string} */
+function solarEclipseRadiiText(jdUT) {
+  const r = _tierModelB().eclipse.shadowRadiiAtJD(jdUT);
+  if (!r || !Number.isFinite(r.umbraKm) || !Number.isFinite(r.penumbraKm)) return '—';
+  const km = (v) => Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  return `${r.umbraKm < 0 ? 'umbra' : 'antumbra'} ${km(r.umbraKm)} km · penumbra ${km(r.penumbraKm)} km`;
+}
+// plan 27 step C: the Earth–Moon genesis — the first solar eclipse of the cited history, found by
+// the browser's own finder on the seated tier model from the past edge (the registry's
+// genesisFirstSolarEclipse* keys are the Node twin's run of the same finder; the epoch-consistency
+// gate pins the two JDs to 1e-5 d). Memoised per tier-model instance (a bank landing resets it).
+let _genesisEclipseMemo = null;
+function genesisEclipseEvent() {
+  const model = _tierModelB();
+  if (_genesisEclipseMemo === null || _genesisEclipseMemo.model !== model) {
+    const ev = model.eclipse.firstSolarEclipseAfterJD(jdFromPos(navigablePosRange().posMin), { maxDays: 2000 });
+    _genesisEclipseMemo = { model, ev: ev || null };
+  }
+  return _genesisEclipseMemo.ev;
+}
+/** The genesis button's action: jump to the first solar eclipse of the cited history and write
+ *  the Solar Eclipses fields from the event — the kind and the honesty tag, the umbra's ground
+ *  point and the days after the edge, γ, the UT JD, the radii. @returns {object|null} the event */
+function jumpToGenesisEclipse() {
+  const ev = genesisEclipseEvent();
+  if (!ev) return null;
+  jumpToJulianDay(ev.jd);
+  o.Date = sceneDateLabel(o.pos);
+  o.Time = posToTime(o.pos);
+  if (o._rootCtrls) { o._rootCtrls.dateCtrl?.refresh(); o._rootCtrls.timeCtrl?.refresh(); o._rootCtrls.jdCtrl?.refresh(); }
+  const kind = ev.ground ? (ev.umbraKm < 0 ? 'total' : 'annular') : 'partial';   // the besselian sign (solarEclipseRadiiText)
+  const daysAfterEdge = Math.round(ev.jd - jdFromPos(navigablePosRange().posMin));
+  const deg = (v, pos, neg) => `${Math.abs(v).toFixed(2)}° ${v >= 0 ? pos : neg}`;
+  o.eclipseSolarLabel = `Earth–Moon genesis — the first solar eclipse of the cited history (${kind}; ${Number(ev.ageMa).toFixed(3)} Ma; reproducible, not converged)`;
+  o.eclipseSolarLoc   = (ev.ground ? `umbra ground point ${deg(ev.ground.latDeg, 'N', 'S')}, ${deg(ev.ground.lonDeg, 'E', 'W')}` : 'no central line')
+    + ` — ${daysAfterEdge.toLocaleString('en-US')} solar days after the past edge`;
+  o.eclipseSolarGamma = ev.gamma.toFixed(3);
+  o.eclipseSolarJD    = ev.jd.toLocaleString('en-US', { minimumFractionDigits: 6, maximumFractionDigits: 6 });
+  o.eclipseSolarRadii = solarEclipseRadiiText(ev.jd);
+  if (o._solarEclShowGenesis) o._solarEclShowGenesis();
+  return ev;
 }
 
 /** Parallel to jumpToEclipsePreset but for LUNAR_ECLIPSE_PRESETS. Updates
@@ -35686,6 +35846,14 @@ function makeRealisticEarth(pd){
         _udcAxisDir.copy(_udcMoonGeo).sub(_udcSunGeo).normalize();
         _udcAxisFoot.copy(_udcMoonGeo).addScaledVector(_udcAxisDir, -_udcMoonGeo.dot(_udcAxisDir));
         const dAxis = _udcAxisFoot.length();
+        /* The Earth must lie DOWNSTREAM of the Moon on the shadow axis — the axis's foot ahead of
+         * the Moon (the Moon between the Sun and the Earth). Behind the Earth (a full Moon, the
+         * lunar-eclipse geometry) the Sun → Moon line pierces the globe too, the tier refuses, and
+         * the near-intersection fallback below painted a solar umbra on the sunlit face (the owner,
+         * JD −2469702431722.98 at the genesis; doc 111 §1.33's class — a line–sphere root taken
+         * without its sign). */
+        const tFoot = -_udcMoonGeo.dot(_udcAxisDir);
+        if (!(tFoot > 0)) { umbraDisc.visible = false; return; }
 
         /* U2 (the umbra strangler): while the axis pierces the Earth the
          * footprint is centred on the TIER's ground point — the single
@@ -35841,11 +36009,20 @@ function makeRealisticEarth(pd){
       const mix = (lo > 0 && tier.fadeMyr > 0) ? THREE.MathUtils.clamp(1 - (ageMa - tier.fromMa) / tier.fadeMyr, 0, 1) : 0;
       const clouds = tier.clouds ?? 1, youngerClouds = lo > 0 ? (T[lo - 1].clouds ?? 1) : clouds;
       const atm = tier.atmosphere ?? 1, youngerAtm = lo > 0 ? (T[lo - 1].atmosphere ?? 1) : atm;
-      return { index: lo, id: tier.id, label: tier.label, kind: tier.kind, source: tier.source, file: tier.file, youngerFile: lo > 0 ? T[lo - 1].file : tier.file, mix,
+      return { index: lo, id: tier.id, label: tier.label, kind: tier.kind, source: tier.source, fromMa: tier.fromMa, toMa: tier.toMa, file: tier.file, youngerFile: lo > 0 ? T[lo - 1].file : tier.file, mix,
         // the tier's cloud and atmosphere factors and the modern weight, all following the cross-fade (no map needed)
         clouds: clouds * (1 - mix) + youngerClouds * mix, atmosphere: atm * (1 - mix) + youngerAtm * mix, modern: (lo === 0 ? 1 - mix : 0) + (lo === 1 ? mix : 0) };
     }
-    const surfaceLabel = (/** @type {{label: string, kind: string}} */ t) => t.kind === 'cited' ? `${t.label} — cited` : `${t.label} — illustration; continents not modelled`;
+    /** The About folder's "Earth map" row: the value column's short name and the hover's full
+     *  sentence — what the row means, the tier and its age span, the sources (owner 2026-11-05).
+     *  @param {{label: string, kind: string, source: string, fromMa: number, toMa: number, index: number}} t */
+    const surfaceLabel = (t) => {
+      o.earthSurface = surfaceShortName(t.label);
+      const far = t.toMa > 4429 ? 'the past edge (4,429 Ma)' : `${surfaceAgeText(t.toMa)} ago`;
+      const span = t.index === 0 ? `today's map, used back to ${far}` : `used from ${surfaceAgeText(t.fromMa)} to ${far}`;
+      const what = t.index === 0 ? '' : t.kind === 'cited' ? ' — a published reconstruction, Scotese 2016 PaleoAtlas (CC BY 4.0), shown at its nearest age step' : ' — a generated map standing in where no reconstruction exists';
+      o.earthSurfaceHover = `The map drawn on the Earth at this date and where it comes from. Now showing: ${t.label}, ${span}${what}. The model does not model continents.`;
+    };
 
     function updateEra(julianDay = o.julianDay) {
       // night side (Classic ➜ Modern)
@@ -35859,7 +36036,7 @@ function makeRealisticEarth(pd){
         dayTiers.active = at.index;
         releaseTierMaps(at.index);
         for (const i of [at.index - 1, at.index + 1]) if (dayTiers.table[i]) tierTexture(dayTiers.table[i].file);   // warm the neighbours
-        o.earthSurface = surfaceLabel(at);
+        surfaceLabel(at);
       }
       const a = tierTexture(at.file);
       if (a) dayTiers.lastA = a;
@@ -35891,7 +36068,8 @@ function makeRealisticEarth(pd){
         updateEra,
         tierAtAge,
         dayMapState,
-        updateUmbraDisc
+        updateUmbraDisc,
+        umbraState        : () => ({ visible: umbraDisc.visible }),   // the cap's state (the golden's full-Moon rows)
     };
 }
 
@@ -35913,7 +36091,7 @@ function tierIndexAtAge(T, ageMa) {
 // neighbours' and the present-day map stay resident. The age is the epoch's TT civil year.
 /** @param {any} pd the planet data carrying `tiersUrl`, `textureUrl` and `planetMaterial` */
 function makeSurfaceTiers(pd) {
-  const S = { table: /** @type {any[]|null} */ (null), active: -1, entries: new Map(), label: '' };
+  const S = { table: /** @type {any[]|null} */ (null), active: -1, entries: new Map(), label: '', hover: '' };
   fetchRepoJson(pd.tiersUrl).then((m) => {
     if (m && Array.isArray(m.tiers) && m.tiers.length) { S.table = m.tiers; S.active = -1; }
   });
@@ -35955,7 +36133,9 @@ function makeSurfaceTiers(pd) {
       for (const i of [at.index - 1, at.index + 1]) if (S.table[i]) texture(S.table[i].file);   // warm the neighbours
       pd._ringsShown = at.rings;
       if (pd.ringObj) pd.ringObj.visible = pd.visible && at.rings;
-      S.label = at.index === 0 ? '' : `${pd.name}: ${at.label} — ${at.kind}`;
+      // the value column's short name and the hover's full sentence (owner 2026-11-05)
+      S.label = at.index === 0 ? '' : `${pd.name}: ${surfaceShortName(at.label)}`;
+      S.hover = at.index === 0 ? '' : `${pd.name} — ${at.label.replace(/\s+\((generated|derived)\)$/, '')} (${at.kind === 'cited' ? 'a cited age' : at.source === 'derived' ? 'derived from today\'s map' : 'a generated map'})`;
     }
     const tex = texture(at.file);
     if (tex && pd.planetMaterial.map !== tex) { pd.planetMaterial.map = tex; pd.planetMaterial.needsUpdate = true; }
@@ -35967,21 +36147,32 @@ function makeSurfaceTiers(pd) {
     const e = tier ? S.entries.get(tier.file) : null;
     return { loaded: !!T, active: S.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapIsTier: !!(e && pd.planetMaterial.map === e.tex), rings: pd._ringsShown !== false, ringVisible: pd.ringObj ? pd.ringObj.visible : null, label: S.label, resident: S.entries.size };
   }
-  return { tierAtAge, update, state, get label() { return S.label; } };
+  return { tierAtAge, update, state, get label() { return S.label; }, get hover() { return S.hover; } };
 }
 
 /** Every tiered body's map and rings for the epoch's TT age, and the root read-out. */
 function updateSurfaceTiers() {
   if (_surfaceTierBodies.length === 0) return;
   const ageMa = (J2000_CALENDAR_YEAR - o.currentYear) / 1e6;
-  let label = '';
+  let label = '', hover = '';
   for (const pd of _surfaceTierBodies) {
     pd._surfaceTiers.update(ageMa);
     if (pd._surfaceTiers.label) label += (label ? ' · ' : '') + pd._surfaceTiers.label;
+    if (pd._surfaceTiers.hover) hover += (hover ? '. ' : '') + pd._surfaceTiers.hover;
   }
-  const next = label || 'present-day maps — cited';
-  if (o.bodySurfaces !== next) o.bodySurfaces = next;
+  const next = label || 'present-day maps';
+  if (o.bodySurfaces !== next) {
+    o.bodySurfaces = next;
+    o.bodySurfacesHover = BODY_MAPS_HOVER_HEAD + (hover ? `Now showing: ${hover}. ` : 'All three show their present-day maps. ') + BODY_MAPS_HOVER_TAIL;
+  }
 }
+/** The About folder's "Moon & planet maps" hover (owner 2026-11-05): what the row means, the state, the sources. */
+const BODY_MAPS_HOVER_HEAD = 'The maps drawn on the Moon, Mercury and Saturn at this date. A body not listed shows its present-day map. ';
+const BODY_MAPS_HOVER_TAIL = 'The Moon\'s maria flooded 3.9–3.1 Ga (Hiesinger 2011); Mercury\'s oldest preserved surfaces are 4.0–4.1 Ga (Marchi 2013); Saturn\'s rings are a measured band, ≤ 400 Myr (Kempf 2023) and disputed. These maps illustrate the look at that age; nothing on them is modelled.';
+/** A tier label's short name for a value column — the label up to its source tag or its dash clause. @param {string} label */
+function surfaceShortName(label) { return label.replace(/\s+\(.*$|\s+—.*$/, ''); }
+/** An age in Myr before J2000 for the hovers. @param {number} ma */
+function surfaceAgeText(ma) { return ma <= 0 ? 'today' : ma < 1 ? `${Math.round(ma * 1000)} ka` : ma < 10 ? `${ma.toFixed(1)} Ma` : `${Math.round(ma).toLocaleString('en-US')} Ma`; }
 
 function createPlanet(pd) {           // pd = Planet Data
 
@@ -36037,7 +36228,8 @@ function createPlanet(pd) {           // pd = Planet Data
   pd._earthTierAtAge      = earthPack.tierAtAge;      // plan 27 step E: the surface tier by age (gate rows)
   pd._earthDayMapState    = earthPack.dayMapState;    //   … and the day-map state (the headless probes)
   pd._updateUmbraDiscFunc = earthPack.updateUmbraDisc;
-    
+  pd._umbraState          = earthPack.umbraState;     //   … and the umbra cap's state (the golden's full-Moon rows)
+
   } else {
     /*  ---------- all other planets  ---------- */
     let materialOpts = {};

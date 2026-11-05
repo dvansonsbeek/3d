@@ -134,6 +134,12 @@ function blockGenesis() {
   }
   rows.push('');
   rows.push(`Near genesis the Moon's torque dominates by orders of magnitude ((a₀/a_M)³ ≈ ${th(Math.pow(384399 / moonKm(4429), 3))} at the input's end, 4.429 Ga), so the precession period collapses to years — a statement of the composition law at the edge of the input's domain, not a calibrated prediction (the distance there is Farhat et al. 2022's solution, read as the ratio a(t)/a(0) on the J2000 distance; the model refuses beyond 4,429 Ma).`);
+  // plan 27 step C: the first solar eclipse of the cited history — the registry's record of the
+  // eclipse tier's finder on the seated model (the packaged registry is gated ≡ the live one)
+  const reg = JSON.parse(readFileSync(join(ROOT, 'packages/model-values/src/model-values.generated.json'), 'utf8')).values;
+  const gk = (k) => reg[`genesisFirstSolarEclipse${k}`] ?? '—';
+  rows.push('');
+  rows.push(`The first solar eclipse of the cited history (the registry's \`genesisFirstSolarEclipse*\` keys: the eclipse tier's finder on the seated model, walking the months of date from the navigable past edge): JD (UT) ${gk('JD')}, ${gk('DaysAfterEdge')} solar days of date after the edge (${gk('AgeMa')} Ma), ${gk('Type')}, γ ${gk('Gamma')}, umbra ${gk('UmbraRadiusKm')} km and penumbra ${gk('PenumbraRadiusKm')} km on the fundamental plane, the Moon at ${gk('MoonDistanceKm')} km, the synodic month of date ${gk('SynodicMonthDays')} d — reproducible, not converged (the lunar inclination is the J2000 constant; the early Laplace-plane transition is not modelled). The simulator's Solar Eclipses folder lands on it ("Genesis").`);
   return rows.join('\n');
 }
 

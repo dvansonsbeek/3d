@@ -67,14 +67,26 @@ export function assembleCardinalInstants(ctx) {
    *  year's own events at every epoch. @param {number} jdSeedUT @param {string} type @returns {number} */
   const cardinalCrossingNearJdUT = (jdSeedUT, type) => {
     const target = cardinalTargetDeg(type);
-    const RATE = 360 / CARDINAL_SI_YEAR_D;
-    let jd = jdSeedUT;
-    for (let i = 0; i < 20; i++) {
-      const d = ((((sunApparentLonDegAtJdUT(jd) - target) + 540) % 360 + 360) % 360) - 180;
-      jd -= d / RATE;
-      if (Math.abs(d) < 1e-10) break;
+    const wrapDeg = /** @param {number} x */ (x) => ((((x) + 540) % 360 + 360) % 360) - 180;
+    // A secant iteration on the Sun's rate per UT day OF DATE — the slope read from the last two
+    // iterates, seeded by two evaluations one UT day apart. A UT day is a solar day of date: the
+    // J2000 mean rate (360°/365.2422 per day) the former fixed-slope Newton stepped by is 3.7×
+    // too large at the genesis, where its 20 steps stopped unconverged (0.16–0.23° of residual, a
+    // day of instant; plan 27 step C, doc 111 §1.31), and even the slope at the seed leaves 1e-3°
+    // there (the rate moves through the year). In the era the root is the same to the 1e-10°
+    // criterion. The mean rate stays the fallback where a slope cannot be read.
+    const MEAN_RATE = 360 / CARDINAL_SI_YEAR_D;
+    let jdA = jdSeedUT, dA = wrapDeg(sunApparentLonDegAtJdUT(jdA) - target);
+    let jdB = jdSeedUT + 1, dB = wrapDeg(sunApparentLonDegAtJdUT(jdB) - target);
+    for (let i = 0; i < 40; i++) {
+      if (Math.abs(dB) < 1e-10) break;
+      const slope = (jdB !== jdA) ? (dB - dA) / (jdB - jdA) : NaN;
+      const rate = (Number.isFinite(slope) && slope > 0.01) ? slope : MEAN_RATE;
+      const jdN = jdB - dB / rate;
+      jdA = jdB; dA = dB;
+      jdB = jdN; dB = wrapDeg(sunApparentLonDegAtJdUT(jdB) - target);
     }
-    return jd - F.DT_ANCHOR.deltaTStartSeconds / 86400;
+    return jdB - F.DT_ANCHOR.deltaTStartSeconds / 86400;
   };
   /** The TRUE-UT JD at which the APPARENT Sun's longitude of date equals
    *  the cardinal target in the given year — Newton on the crossing (the

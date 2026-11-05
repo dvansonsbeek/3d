@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.8
+modelVersion: v27.9
 coefficients: sha256:3afe3e8645567bc8
 status: current
 ---
@@ -529,7 +529,11 @@ The Earth's day map is chosen by the TT age of the scene epoch from ONE table,
 the satellite map from the end of the LGM on, Scotese's cited paleogeography
 (PaleoAtlas v3, CC BY 4.0) at the atlas's own 5-Myr steps from 21 ka to 750 Ma,
 and generated illustration beyond — the Proterozoic, the Archean cratons, the
-early ocean world and the Hadean magma ocean at the genesis — with the three
+early ocean world, and at the genesis the Hadean magma ocean, the steam
+atmosphere over the solidifying crust and the rain-out into the first oceans
+(the water was in the planet all along and condensed; the three spans are a
+reading of Hamano 2013, Zahnle 2007, Sleep 2001 and the 4,400-Ma Jack Hills
+zircons, said so in their labels) — with the three
 Snowball episodes cut in (Makganyene, Sturtian, Marinoan). Each tier
 cross-fades to the next younger tier's map over `fadeMyr` at its younger edge
 (`updateEra` in `makeRealisticEarth`; the night maps keep their JD boundary).
@@ -540,8 +544,9 @@ the present-day tier, 0 on any other, both following the cross-fade) fades the
 modern relief normal map and the modern ocean-glint mask out: they belong to
 today's continents only. Maps load on demand; a tier's map is shown once
 decoded — the decode wakes the idle render loop — and only the active tier's
-and its two neighbours' stay resident. The root control "Earth surface"
-names the active tier and what it IS — cited or illustration; the model does
+and its two neighbours' stay resident. The About folder's "Earth map" row
+names the active tier, its hover the tier's age span and what it IS — a
+published reconstruction or a generated map; the model does
 not model continents. The browser golden pins the tier and the mix at ages on
 both sides of every boundary class.
 
@@ -559,9 +564,10 @@ raised, then the maria at one third and two thirds of their present darkness
 (3,800–3,550–3,300 Ma, the mare flooding), then the present-day map; Mercury
 two — a generated early crust before its oldest preserved surfaces (4,100 Ma),
 then the present-day map; Saturn two — its rings hidden before 400 Ma, the
-rings' age being a cited band, not a value. The root control "Moon & planets"
-lists the bodies whose active tier is not the present-day one with what each
-map IS; the browser golden pins each body's tier on both sides of every
+rings' age being a cited band, not a value. The About folder's "Moon & planet
+maps" row lists the bodies whose active tier is not the present-day one, its
+hover what each map IS and the cited ages; the browser golden pins each body's
+tier on both sides of every
 boundary.
 
 ---

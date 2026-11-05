@@ -1311,11 +1311,35 @@
    "atmosphere": 1
   },
   {
+   "id": "rain-out",
+   "label": "The first oceans raining out of the steam atmosphere onto the new crust — a reading of Zahnle 2007 and Wilde 2001 (generated)",
+   "fromMa": 4400,
+   "toMa": 4415,
+   "fadeMyr": 5,
+   "file": "public/textures/earth/generated/rain-out.webp",
+   "source": "generated",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 0.8
+  },
+  {
+   "id": "steam",
+   "label": "Steam atmosphere over the solidifying crust — a reading of Hamano 2013 and Zahnle 2007 (generated)",
+   "fromMa": 4415,
+   "toMa": 4427,
+   "fadeMyr": 3,
+   "file": "public/textures/earth/generated/steam.webp",
+   "source": "generated",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 0.5
+  },
+  {
    "id": "genesis",
    "label": "Hadean magma ocean after the Moon-forming impact (generated)",
-   "fromMa": 4400,
+   "fromMa": 4427,
    "toMa": 5000,
-   "fadeMyr": 30,
+   "fadeMyr": 1,
    "file": "public/textures/earth/generated/genesis.webp",
    "source": "generated",
    "kind": "illustration",
@@ -1885,6 +1909,18 @@
   "public/textures/earth/generated/ocean-world.webp": {
    "sha256": "143795347fdae75ee5727d1e66c216443d6effa311ffd4c66372339602985b40",
    "bytes": 22278,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/rain-out.webp": {
+   "sha256": "2fad89bbe3b6b048ad54fd4ae971cd7e22eed5a98097859ea60fd3e7cdacc093",
+   "bytes": 49704,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/steam.webp": {
+   "sha256": "14c4cf97434a366461ac7caab8a1cd4675337e649a517c0dfa8a717a8a5d5665",
+   "bytes": 31276,
    "width": 2048,
    "height": 1024
   },
