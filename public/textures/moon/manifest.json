@@ -41,7 +41,7 @@
    "label": "Mare flooding under way — the maria at two thirds of their present darkness (derived)",
    "fromMa": 3300,
    "toMa": 3550,
-   "fadeMyr": 0,
+   "fadeMyr": 50,
    "file": "public/textures/moon/derived/moon-maria-2of3.webp",
    "source": "derived",
    "kind": "illustration"
@@ -51,7 +51,7 @@
    "label": "Mare flooding beginning — the maria at one third of their present darkness (derived)",
    "fromMa": 3550,
    "toMa": 3800,
-   "fadeMyr": 0,
+   "fadeMyr": 50,
    "file": "public/textures/moon/derived/moon-maria-1of3.webp",
    "source": "derived",
    "kind": "illustration"
@@ -61,7 +61,7 @@
    "label": "Highland crust before the mare flooding (derived)",
    "fromMa": 3800,
    "toMa": 4350,
-   "fadeMyr": 0,
+   "fadeMyr": 50,
    "file": "public/textures/moon/derived/moon-pre-maria.webp",
    "source": "derived",
    "kind": "illustration"
@@ -71,7 +71,7 @@
    "label": "Lunar magma ocean under its forming crust (generated)",
    "fromMa": 4350,
    "toMa": 5000,
-   "fadeMyr": 0,
+   "fadeMyr": 20,
    "file": "public/textures/moon/generated/moon-magma.webp",
    "source": "generated",
    "kind": "illustration"

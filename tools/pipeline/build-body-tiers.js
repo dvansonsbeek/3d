@@ -161,10 +161,14 @@ const BODIES = {
     },
     tiers: /** @type {Tier[]} */ ([
       { id: 'modern', label: 'Present-day Moon', fromMa: FUTURE_EDGE_MA, toMa: 3300, fadeMyr: 0, file: MOON_MODERN, source: 'modern', kind: 'cited' },
-      { id: 'maria-two-thirds', label: 'Mare flooding under way — the maria at two thirds of their present darkness (derived)', fromMa: 3300, toMa: 3550, fadeMyr: 0, file: 'public/textures/moon/derived/moon-maria-2of3.webp', source: 'derived', kind: 'illustration' },
-      { id: 'maria-one-third', label: 'Mare flooding beginning — the maria at one third of their present darkness (derived)', fromMa: 3550, toMa: 3800, fadeMyr: 0, file: 'public/textures/moon/derived/moon-maria-1of3.webp', source: 'derived', kind: 'illustration' },
-      { id: 'pre-maria', label: 'Highland crust before the mare flooding (derived)', fromMa: 3800, toMa: 4350, fadeMyr: 0, file: 'public/textures/moon/derived/moon-pre-maria.webp', source: 'derived', kind: 'illustration' },
-      { id: 'magma-ocean', label: 'Lunar magma ocean under its forming crust (generated)', fromMa: 4350, toMa: DEEP_END_MA, fadeMyr: 0, file: 'public/textures/moon/generated/moon-magma.webp', source: 'generated', kind: 'illustration' },
+      // plan 27 step I: `fadeMyr` is the cross-fade at a tier's YOUNGER edge toward the next
+      // younger tier's map (the Earth's rule) — the mare flooding was gradual (Hiesinger 2011:
+      // the basalts mainly 3.9–3.1 Ga), 50 Myr per step; the crust formed over the magma ocean
+      // within ~10–200 Myr (Elkins-Tanton 2011), 20 Myr here
+      { id: 'maria-two-thirds', label: 'Mare flooding under way — the maria at two thirds of their present darkness (derived)', fromMa: 3300, toMa: 3550, fadeMyr: 50, file: 'public/textures/moon/derived/moon-maria-2of3.webp', source: 'derived', kind: 'illustration' },
+      { id: 'maria-one-third', label: 'Mare flooding beginning — the maria at one third of their present darkness (derived)', fromMa: 3550, toMa: 3800, fadeMyr: 50, file: 'public/textures/moon/derived/moon-maria-1of3.webp', source: 'derived', kind: 'illustration' },
+      { id: 'pre-maria', label: 'Highland crust before the mare flooding (derived)', fromMa: 3800, toMa: 4350, fadeMyr: 50, file: 'public/textures/moon/derived/moon-pre-maria.webp', source: 'derived', kind: 'illustration' },
+      { id: 'magma-ocean', label: 'Lunar magma ocean under its forming crust (generated)', fromMa: 4350, toMa: DEEP_END_MA, fadeMyr: 20, file: 'public/textures/moon/generated/moon-magma.webp', source: 'generated', kind: 'illustration' },
     ]),
   },
   mercury: {
@@ -176,7 +180,7 @@ const BODIES = {
     },
     tiers: /** @type {Tier[]} */ ([
       { id: 'modern', label: 'Present-day Mercury', fromMa: FUTURE_EDGE_MA, toMa: 4100, fadeMyr: 0, file: MERCURY_MODERN, source: 'modern', kind: 'cited' },
-      { id: 'early-crust', label: 'Early crust before the oldest preserved surfaces (generated)', fromMa: 4100, toMa: DEEP_END_MA, fadeMyr: 0, file: 'public/textures/mercury/generated/mercury-crust.webp', source: 'generated', kind: 'illustration' },
+      { id: 'early-crust', label: 'Early crust before the oldest preserved surfaces (generated)', fromMa: 4100, toMa: DEEP_END_MA, fadeMyr: 50, file: 'public/textures/mercury/generated/mercury-crust.webp', source: 'generated', kind: 'illustration' },   // plan 27 step I: the fade into the present-day map
     ]),
   },
   saturn: {
@@ -191,7 +195,7 @@ const BODIES = {
     },
     tiers: /** @type {Tier[]} */ ([
       { id: 'rings', label: 'Present-day Saturn with its rings', fromMa: FUTURE_EDGE_MA, toMa: 400, fadeMyr: 0, file: SATURN_MODERN, source: 'modern', kind: 'cited', rings: true },
-      { id: 'no-rings', label: 'before its rings — their age is a band, ≤ 400 Myr (Kempf 2023) and disputed', fromMa: 400, toMa: DEEP_END_MA, fadeMyr: 0, file: SATURN_MODERN, source: 'modern', kind: 'cited', rings: false },
+      { id: 'no-rings', label: 'before its rings — their age is a band, ≤ 400 Myr (Kempf 2023) and disputed', fromMa: 400, toMa: DEEP_END_MA, fadeMyr: 20, file: SATURN_MODERN, source: 'modern', kind: 'cited', rings: false },   // plan 27 step I: the rings' opacity ramps in over the fade (420 → 400 Ma) instead of switching on
     ]),
   },
 };

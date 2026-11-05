@@ -555,10 +555,13 @@ both sides of every boundary class.
 `tools/pipeline/build-body-tiers.js`, checked by the same gate,
 `tools/verify/surface-tiers.js`), read by `makeSurfaceTiers` — a planet's
 `tiersUrl` registers it in `createPlanet`, and `updateSurfaceTiers` runs every
-frame beside `updateEra`. A body's map is swapped at a boundary (no cross-fade:
-these maps do not fill the screen) by replacing `material.map`; Saturn's tier
-carries `rings`, which shows or hides the ring mesh (and `showHideObject`
-honours it). The Moon has five tiers — the lunar magma ocean (generated) to
+frame beside `updateEra`. A body's map cross-fades at a boundary over the
+tier's `fadeMyr` (the Earth's rule): the next younger tier's map rides a
+second sphere a hair larger, the same material class, at opacity = mix, a
+child of the mesh so it follows the spin; Saturn's tier carries `rings`, and
+the ring mesh's opacity ramps under the same fade (the rings grow in over
+420 → 400 Ma instead of switching on; `showHideObject` honours the factor).
+The Moon has five tiers — the lunar magma ocean (generated) to
 4,350 Ma, the highland crust derived from the present-day map with the maria
 raised, then the maria at one third and two thirds of their present darkness
 (3,800–3,550–3,300 Ma, the mare flooding), then the present-day map; Mercury

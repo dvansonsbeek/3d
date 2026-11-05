@@ -36091,7 +36091,7 @@ function tierIndexAtAge(T, ageMa) {
 // neighbours' and the present-day map stay resident. The age is the epoch's TT civil year.
 /** @param {any} pd the planet data carrying `tiersUrl`, `textureUrl` and `planetMaterial` */
 function makeSurfaceTiers(pd) {
-  const S = { table: /** @type {any[]|null} */ (null), active: -1, entries: new Map(), label: '', hover: '' };
+  const S = { table: /** @type {any[]|null} */ (null), active: -1, entries: new Map(), label: '', hover: '', overlay: /** @type {THREE.Mesh|null} */ (null), mix: 0, ringFactor: 1 };
   fetchRepoJson(pd.tiersUrl).then((m) => {
     if (m && Array.isArray(m.tiers) && m.tiers.length) { S.table = m.tiers; S.active = -1; }
   });
@@ -36115,15 +36115,37 @@ function makeSurfaceTiers(pd) {
       S.entries.delete(file);
     }
   }
-  /** The tier holding an age (Myr before J2000) — pure in the table (the browser golden's rows read it). @param {number} ageMa */
+  /** The tier holding an age (Myr before J2000) and its cross-fade (plan 27 step I): `mix` is
+   *  the weight of the next YOUNGER tier's map inside this tier's `fadeMyr` at its younger edge
+   *  (the Earth's rule, one form: 1 at the edge, 0 a fade in), `ringFactor` the rings' opacity
+   *  factor under the same fade (Saturn's rings grow in over 420 → 400 Ma instead of switching
+   *  on). Pure in the table (the browser golden's rows read it). @param {number} ageMa */
   function tierAtAge(ageMa) {
     const T = S.table;
     if (!T) return null;
     const k = tierIndexAtAge(T, ageMa);
-    const t = T[k];
-    return { index: k, id: t.id, label: t.label, kind: t.kind, source: t.source, file: t.file, rings: t.rings !== false };
+    const t = T[k], y = k > 0 ? T[k - 1] : null;
+    const mix = (y && t.fadeMyr > 0) ? THREE.MathUtils.clamp(1 - (ageMa - t.fromMa) / t.fadeMyr, 0, 1) : 0;
+    const ringsOf = (/** @type {{rings?: boolean}} */ q) => (q.rings !== false ? 1 : 0);
+    const ringFactor = ringsOf(t) * (1 - mix) + ringsOf(y || t) * mix;
+    return { index: k, id: t.id, label: t.label, kind: t.kind, source: t.source, file: t.file, rings: t.rings !== false, mix, youngerFile: y ? y.file : t.file, ringFactor };
   }
-  /** Apply the tier for an age: the map once decoded, the rings, the label. @param {number} ageMa */
+  /** The cross-fade canvas: a second sphere a hair larger carrying the next younger tier's map at
+   *  opacity = mix, the same material class so the lighting matches; a child of the mesh so it
+   *  follows the spin. Built on the first fade. */
+  function overlayMesh() {
+    if (S.overlay || !pd.planetObj || !pd.planetMaterial) return S.overlay;
+    const m = pd.planetMaterial.clone();
+    m.map = null; m.transparent = true; m.opacity = 0; m.depthWrite = false;
+    const ov = new THREE.Mesh(pd.planetObj.geometry, m);
+    ov.scale.setScalar(1.002);
+    ov.visible = false; ov.castShadow = false; ov.receiveShadow = pd.planetObj.receiveShadow;
+    ov.renderOrder = pd.planetObj.renderOrder + 1;
+    pd.planetObj.add(ov);
+    S.overlay = ov;
+    return ov;
+  }
+  /** Apply the tier for an age: the map once decoded, the cross-fade, the rings, the label. @param {number} ageMa */
   function update(ageMa) {
     const at = tierAtAge(ageMa);
     if (!at) return;
@@ -36131,21 +36153,41 @@ function makeSurfaceTiers(pd) {
       S.active = at.index;
       release(at.index);
       for (const i of [at.index - 1, at.index + 1]) if (S.table[i]) texture(S.table[i].file);   // warm the neighbours
-      pd._ringsShown = at.rings;
-      if (pd.ringObj) pd.ringObj.visible = pd.visible && at.rings;
       // the value column's short name and the hover's full sentence (owner 2026-11-05)
       S.label = at.index === 0 ? '' : `${pd.name}: ${surfaceShortName(at.label)}`;
       S.hover = at.index === 0 ? '' : `${pd.name} — ${at.label.replace(/\s+\((generated|derived)\)$/, '')} (${at.kind === 'cited' ? 'a cited age' : at.source === 'derived' ? 'derived from today\'s map' : 'a generated map'})`;
     }
     const tex = texture(at.file);
     if (tex && pd.planetMaterial.map !== tex) { pd.planetMaterial.map = tex; pd.planetMaterial.needsUpdate = true; }
+    // the cross-fade (plan 27 step I): the next younger tier's map over this one at the mix
+    S.mix = at.mix;
+    const fading = at.mix > 0 && at.youngerFile !== at.file;   // two tiers on one map (Saturn) have nothing to blend
+    const ov = fading ? overlayMesh() : S.overlay;
+    if (ov) {
+      const ytex = fading ? texture(at.youngerFile) : null;
+      if (ytex) {
+        if (ov.material.map !== ytex) { ov.material.map = ytex; ov.material.needsUpdate = true; }
+        ov.material.opacity = at.mix;
+        ov.visible = pd.visible !== false;
+      } else {
+        ov.visible = false;
+      }
+    }
+    // the rings' opacity under the fade (Saturn): the body's base opacity × the factor, hidden at 0
+    S.ringFactor = at.ringFactor;
+    pd._ringFactor = at.ringFactor;
+    pd._ringsShown = at.ringFactor > 0;
+    if (pd.ringObj) {
+      pd.ringObj.material.opacity = (pd.ringOpacity ?? 0.6) * at.ringFactor;
+      pd.ringObj.visible = pd.visible !== false && at.ringFactor > 0;
+    }
   }
   /** The live state for the headless probes. */
   function state() {
     const T = S.table;
     const tier = T && S.active >= 0 ? T[S.active] : null;
     const e = tier ? S.entries.get(tier.file) : null;
-    return { loaded: !!T, active: S.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapIsTier: !!(e && pd.planetMaterial.map === e.tex), rings: pd._ringsShown !== false, ringVisible: pd.ringObj ? pd.ringObj.visible : null, label: S.label, resident: S.entries.size };
+    return { loaded: !!T, active: S.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapIsTier: !!(e && pd.planetMaterial.map === e.tex), rings: pd._ringsShown !== false, ringVisible: pd.ringObj ? pd.ringObj.visible : null, ringOpacity: pd.ringObj ? pd.ringObj.material.opacity : null, mix: S.mix, overlayVisible: !!(S.overlay && S.overlay.visible), overlayOpacity: S.overlay ? S.overlay.material.opacity : 0, label: S.label, resident: S.entries.size };
   }
   return { tierAtAge, update, state, get label() { return S.label; }, get hover() { return S.hover; } };
 }
@@ -36314,6 +36356,7 @@ function createPlanet(pd) {           // pd = Planet Data
       });
 
       ring.visible = pd.visible !== false && pd._ringsShown !== false;   // plan 27 step F: the tier may have hidden them before the texture arrived
+      if (pd._ringFactor !== undefined) ring.material.opacity = (pd.ringOpacity ?? 0.6) * pd._ringFactor;   // plan 27 step I: the fade's opacity, if the tier moved first
       rotationAxis.add(ring);
       pd.ringObj = ring;
     });

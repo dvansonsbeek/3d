@@ -95,7 +95,10 @@ const SNOWBALL_SPANS = [
   { id: 'snowball-makganyene', label: 'Makganyene Snowball Earth (generated)', fromMa: 2220, toMa: 2300 },
 ];
 const SNOWBALL_FADE_MYR = 2;
-const ATLAS_FADE_MYR = 0.5;
+// plan 27 step I: half the atlas's own 5-Myr spacing — the Earth is always a blend of the two
+// nearest reconstructions and the continents move continuously instead of stepping (0.5 Myr
+// was shorter than a 1-Myr time step: picture x one step, picture y the next — the owner)
+const ATLAS_FADE_MYR = 2.5;
 const SEED = 20261103;
 
 const argv = process.argv.slice(2);

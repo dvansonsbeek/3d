@@ -35,7 +35,7 @@
    "label": "Early crust before the oldest preserved surfaces (generated)",
    "fromMa": 4100,
    "toMa": 5000,
-   "fadeMyr": 0,
+   "fadeMyr": 50,
    "file": "public/textures/mercury/generated/mercury-crust.webp",
    "source": "generated",
    "kind": "illustration"

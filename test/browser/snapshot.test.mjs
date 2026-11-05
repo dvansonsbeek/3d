@@ -120,18 +120,21 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   // mix at ages on both sides of every boundary class (the LGM end, an atlas step, the atlas's
   // deep end, each Snowball episode, the generated tiers, the genesis edge). A map swap, a
   // moved boundary or a changed fade shows here; the maps themselves are the gate's.
-  // (4,402 / 4,412 / 4,418 / 4,427.5: the rain-out, the steam atmosphere and the genesis fades)
-  for (const ageMa of [-1, 0, 0.02, 0.0225, 0.03, 1, 2.49, 2.51, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
+  // (4,402 / 4,412 / 4,418 / 4,427.5: the rain-out, the steam atmosphere and the genesis fades;
+  // 163.5: inside an atlas step's 2.5-Myr fade — plan 27 step I)
+  for (const ageMa of [-1, 0, 0.02, 0.0225, 0.03, 1, 2.49, 2.51, 163.5, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
     const r = T.earthTierAtAge(ageMa);
     v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)} clouds=${r.clouds.toFixed(4)} atm=${r.atmosphere.toFixed(4)} modern=${r.modern.toFixed(4)}` : null;
   }
   // plan 27 step F: the Moon's, Mercury's and Saturn's tiers on both sides of every boundary
   // (the mare flooding steps, the lunar magma ocean, Mercury's oldest surfaces, the rings' age
-  // band) and at the edges — the tier id, its kind and whether the rings are shown.
-  for (const [body, ages] of [['moon', [0, 3299, 3301, 3549, 3551, 3799, 3801, 4349, 4351, 4428.985]], ['mercury', [0, 4099, 4101, 4428.985]], ['saturn', [-1, 0, 399, 401, 4428.985]]]) {
+  // band) and at the edges — the tier id, its kind, whether the rings are shown, and (plan 27
+  // step I) the cross-fade mix and the rings' opacity factor at ages inside each fade (3,310 /
+  // 3,560 / 3,810 / 4,360 the Moon's, 4,110 Mercury's, 410 the rings').
+  for (const [body, ages] of [['moon', [0, 3299, 3301, 3310, 3549, 3551, 3560, 3799, 3801, 3810, 4349, 4351, 4360, 4428.985]], ['mercury', [0, 4099, 4101, 4110, 4428.985]], ['saturn', [-1, 0, 399, 401, 410, 4428.985]]]) {
     for (const ageMa of ages) {
       const r = T.bodyTierAtAge(body, ageMa);
-      v[`${body}Tier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} rings=${r.rings}` : null;
+      v[`${body}Tier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} rings=${r.rings} mix=${r.mix.toFixed(4)} ringFactor=${r.ringFactor.toFixed(4)}` : null;
     }
   }
 

@@ -36,7 +36,7 @@
    "label": "before its rings — their age is a band, ≤ 400 Myr (Kempf 2023) and disputed",
    "fromMa": 400,
    "toMa": 5000,
-   "fadeMyr": 0,
+   "fadeMyr": 20,
    "file": "public/Saturn.jpg",
    "source": "modern",
    "kind": "cited",
