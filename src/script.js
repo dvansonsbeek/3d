@@ -2904,6 +2904,216 @@ function showPendingEdgeNotice() {
   clearTimeout(_edgeNotice.timer);
   _edgeNotice.timer = setTimeout(() => { if (_edgeNotice.el) _edgeNotice.el.classList.remove('visible'); }, 6000);
 }
+// ── THE ORIGIN TOUR (plan 27 step D) ─────────────────────────────────────────────────────────
+// A scripted sequence from the Earth–Moon genesis to today, nine stations at a logarithmic
+// pace: each a seated jump by the Date field, the camera on the Earth, a caption card with the
+// day, the year in solar days, the Moon's distance and apparent diameter, the precession clock
+// and the obliquity (a value inside the hybrid's domain, a band beyond), each with its
+// provenance tag, and the gated rock anchor where one exists. Every number is read LIVE from the
+// package model the registry runs on (`_tierModelB()`, seated on the banks) — never a hand number;
+// the epoch-consistency gate pins the stations against the Node model at the same engine year.
+const TOUR_HOLD_MS = 12000;
+// Every card has the same shape: the title, the age, ONE sentence on what the scene shows, ONE
+// on what the model or the source says (the owner's review, 2026-11-05), the value rows, and the
+// rock anchor where one exists. Ages ahead of today are negative.
+/** @type {{ ageMa: number, title: string, scene: string, says: string, anchor?: string, anchorAction?: 'genesis' }[]} */
+const TOUR_STATIONS = [
+  { ageMa: 4428.985, title: 'The Earth–Moon genesis', scene: 'A magma ocean under a forming steam atmosphere; the Moon at six Earth radii, five degrees across.', says: 'The oldest point the Moon\'s measured distance history reaches (Farhat et al. 2022); the simulator goes no further back.', anchor: 'The first solar eclipse the Moon ever cast lands 84 days later.', anchorAction: 'genesis' },
+  { ageMa: 4415, title: 'The first oceans', scene: 'The steam rains out onto the new crust under a thinning vapour deck.', says: 'An illustration following Zahnle 2007 and Sleep 2001; the Jack Hills zircons, the oldest crystals on Earth, record liquid water by 4,400 Ma (Wilde 2001).' },
+  { ageMa: 4200, title: 'The Hadean ocean world', scene: 'A global ocean with volcanic islands under an oxygen-free sky.', says: 'The short day and the close Moon follow from conservation of angular momentum on the Moon\'s measured distance history.' },
+  { ageMa: 3800, title: 'The Moon gets its dark seas', scene: 'Lava floods the Moon\'s great impact basins: the dark maria that make its face appear; on Earth the first continental cores grow.', says: 'The dark basalts date 3.9–3.1 Ga (Hiesinger 2011); the Moon\'s look is derived from today\'s map, an illustration.' },
+  { ageMa: 3200, title: 'The Archean', scene: 'The first continental cores (cratons) in an iron-green ocean under an orange organic haze.', says: 'No free oxygen in the air yet; the orange haze and the iron-green sea follow Zahnle 2006 and Arney 2016.' },
+  { ageMa: 2460, title: 'A rock clock at 2.46 Ga', scene: 'Layered iron-rich rocks form in a still oxygen-free sea in what is now South Africa.', says: 'Their layers record the Earth\'s precession and day length at this age; the model is checked against them.', anchor: 'Rock anchor: Lantink et al. 2022 at 2.46 Ga — the model\'s precession period and day length are checked against it (the Framework Verification panel).' },
+  { ageMa: 2400, title: 'The Great Oxidation Event', scene: 'Free oxygen appears, the haze clears and the sky turns blue; the first red rocks form on land.', says: 'The oxygenation of the atmosphere 2.45–2.2 Ga (Holland 2006); the sky\'s colour changes with the map here.' },
+  { ageMa: 1400, title: 'A rock clock at 1.4 Ga', scene: 'The Proterozoic world: red land, wide shallow seas, nothing alive on land.', says: 'Rock layers of this age in northern China (the Xiamaling Formation) record the precession of the Earth\'s axis.', anchor: 'Rock anchor: Meyers & Malinverno 2018 at 1.4 Ga — the model is checked against it; its gap to Zhou 2024\'s values is an open question we state.' },
+  { ageMa: 700, title: 'Snowball Earth', scene: 'Ice to the equator: the Sturtian glaciation.', says: 'A global glaciation dated 717–659 Ma (Rooney et al. 2015); the model does not model the climate of this age.' },
+  { ageMa: 540, title: 'The Cambrian', scene: 'The published reconstructions begin: the continents in their mapped positions, animal life in the seas.', says: 'From here on the model is within its validated ±500 million years; the Earth\'s map is Scotese 2016\'s reconstruction.' },
+  { ageMa: 380, title: 'The Devonian', scene: 'Forests cover the land; corals in the shallow seas count the days of the year.', says: 'The fossil corals\' growth bands count the days in a year of this age; the rows below are the model\'s.', anchor: 'Rock anchor: Wells 1963\'s coral growth bands (~400 days per year) — the model\'s count at 380 Ma is checked against the fossil record.' },
+  { ageMa: 250, title: 'Pangaea', scene: 'One supercontinent from pole to pole; the end-Permian extinction lies just ahead.', says: 'The reconstruction is Scotese 2016\'s; the day and the Moon are the model\'s.' },
+  { ageMa: 66, title: 'The end of the Cretaceous', scene: 'The continents nearly in their present places; the Chicxulub impact ends the dinosaurs.', says: 'The rows below show how much shorter the day was than today.', anchor: 'Rock anchor: the Cretaceous tidal rhythmites and bivalve shells (Wells, 65 Ma) — the model\'s day length is checked against them.' },
+  { ageMa: 0.021, title: 'The Last Glacial Maximum', scene: 'Ice sheets over North America and Scandinavia; the sea 120 m lower.', says: 'The ice cover is the model\'s own: its climate formula on the deep-sea sediment record (the LR04 stack), at 100 % of its maximum here.', anchor: 'Rock anchor: the LR04 benthic δ¹⁸O stack (Lisiecki & Raymo 2005) — the climate formula is fitted on it.' },
+  { ageMa: 0, title: 'Today', scene: 'The present Earth, Moon and sky.', says: 'The validated present: every quantity below is a measured or published value the model reproduces.' },
+  { ageMa: -0.08, title: 'The next glaciation', scene: 'The ice sheets return, as the model\'s climate formula carried forward predicts.', says: 'A FORECAST, labelled as such: Berger & Loutre 2002 expect the present warm period to last ~50 kyr more; CO₂ may skip the next glaciation (Ganopolski 2016).' },
+  { ageMa: -50, title: 'The continents on their way', scene: 'Australia has reached Southeast Asia and Africa has closed the Mediterranean; the Atlantic is wider.', says: 'Today\'s measured plate motions carried 50 Myr ahead (DeMets et al. 2010) — the robust part of any forecast.' },
+  { ageMa: -250, title: 'Pangaea Proxima', scene: 'One supercontinent again: the Atlantic closed, the Americas against Africa and Europe, Australia on Asia.', says: 'Scotese\'s scenario, one reading of several (Amasia, Novopangaea, Aurica: Davies et al. 2018); Saturn has lost its rings by now (O\'Donoghue 2019).' },
+  { ageMa: -600, title: 'The end of the land biosphere', scene: 'The greens become desert under a brightening Sun.', says: 'The brightening Sun draws CO₂ out of the air until most plants can no longer grow, around +0.6–0.9 Gyr (Caldeira & Kasting 1992; Franck 2006) — an illustration of those papers.' },
+  { ageMa: -950, title: 'The moist greenhouse', scene: 'The oceans evaporate into a thickening vapour deck.', says: 'The oceans boil away into a runaway greenhouse near +1 Gyr (Leconte 2013; Wolf & Toon 2015) — an illustration of those papers.' },
+  { ageMa: -1000, title: 'The edge of the domain', scene: 'The simulator\'s tables end here, 1,000 Myr ahead.', says: 'The day near 32 hours and the Moon\'s recession held at today\'s rate: reproducible, not converged.' },
+];
+const _tour = { active: false, paused: false, index: -1, timer: 0, pendingArm: false, el: /** @type {HTMLElement|null} */ (null), started: 0 };
+/** Today's values for the rows' references (the package model at J2000), filled on first use. */
+let _tourToday = null;
+/** The caption values of a station — PURE in the station (the package model at the engine year
+ *  2000 − age; no jump). The strings the card shows and the golden pins; the numbers the gate
+ *  compares with the Node model. @param {number} i */
+function tourStationValues(i) {
+  const st = TOUR_STATIONS[i];
+  if (!st) return null;
+  const m = _tierModelB();
+  const year = 2000 - st.ageMa * 1e6;
+  // the SIDEREAL year of date over the day of date (the site's chart): the tropical year's definition
+  // fails near the formation edge, where the precession clock collapses to years
+  const lodS = m.epoch.lodRealSecondsAtYear(year), tropS = m.epoch.siderealYearSecondsAtYear(year);
+  const moonKm = m.epoch.moonDistanceKmAtYear(year);
+  const moonDiamDeg = 2 * Math.asin(1737.4 / moonKm) * 180 / Math.PI;
+  const precYears = m.epoch.axialPrecessionYearsAtYear(year);
+  const dom = m.earth.obliquityHybridDomainYears;
+  const inHybrid = Array.isArray(dom) && year >= dom[0] && year <= dom[1];
+  const band = inHybrid ? null : m.earth.obliquityBandAt(year);
+  const obliquityDeg = inHybrid ? m.earth.obliquityDeg(year) : null;
+  const ahead = st.ageMa < 0, today = st.ageMa === 0, certified = Math.abs(st.ageMa) <= 500;
+  const derived = today ? 'measured' : ahead ? 'forecast' : 'derived';   // ahead of today the Moon's recession is held at today's rate: a forecast
+  const ice = (st.ageMa < ICE_HISTORY_END_MA && st.ageMa > ICE_FORECAST_END_MA) ? iceFractionAtAgeMa(st.ageMa) : null;
+  // today's values beside each row (the owner's review: a number means little without its reference)
+  if (_tourToday === null) {
+    const l0 = m.epoch.lodRealSecondsAtYear(2000), m0 = m.epoch.moonDistanceKmAtYear(2000);
+    _tourToday = { dayHours: l0 / 3600, yearSolarDays: m.epoch.siderealYearSecondsAtYear(2000) / l0, moonKm: m0, moonDiamDeg: 2 * Math.asin(1737.4 / m0) * 180 / Math.PI, precYears: m.epoch.axialPrecessionYearsAtYear(2000), obliquityDeg: m.earth.obliquityDeg(2000) };
+  }
+  const T0 = _tourToday;
+  const hm = (/** @type {number} */ h) => `${Math.floor(h)} h ${String(Math.round((h - Math.floor(h)) * 60)).padStart(2, '0')} min`;
+  const n1 = (/** @type {number} */ x) => x.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 });   // the sidereal year to three decimals: 365.256 is the number people know (the owner)
+  const beat = band ? (band.periodYears < 1000 ? `${Math.round(band.periodYears)} yr` : `${Math.round(band.periodYears / 1000)} kyr`) : '';
+  const bandText = band ? (band.maxDeg - band.minDeg < 0.05
+    ? `${((band.minDeg + band.maxDeg) / 2).toFixed(1)}° · band ±${((band.maxDeg - band.minDeg) / 2).toFixed(1)}°, beat ${beat}`
+    : `${band.minDeg.toFixed(1)}–${band.maxDeg.toFixed(1)}° · beat ${beat}`) : '';
+  const rows = [
+    { label: 'Solar Day', value: `${(lodS / 3600).toFixed(2)} h (${hm(lodS / 3600)})`, today: today ? '' : `today ${T0.dayHours.toFixed(2)} h`, tag: derived, hint: 'the length of the solar day: angular-momentum conservation on the cited Moon history' },
+    { label: 'Sidereal Year', value: `${n1(tropS / lodS)} solar days`, today: today ? '' : `today ${n1(T0.yearSolarDays)}`, tag: derived, hint: 'the sidereal year of date in solar days of date (the tropical year is ill-defined where the precession clock collapses to years)' },
+    { label: 'Moon Distance', value: `${Math.round(moonKm).toLocaleString('en-US')} km`, today: today ? '' : `today ${Math.round(T0.moonKm).toLocaleString('en-US')} km`, tag: today ? 'measured' : ahead ? 'forecast' : 'cited', hint: ahead ? 'the LLR recession rate held constant ahead of today' : 'the distance history of Farhat et al. 2022' },
+    { label: 'Moon in the sky', value: `${moonDiamDeg.toFixed(2)}° across`, today: today ? '' : `today ${T0.moonDiamDeg.toFixed(2)}° (${(moonDiamDeg / T0.moonDiamDeg).toFixed(1)}× today's)`, tag: today ? 'measured' : ahead ? 'forecast' : 'derived', hint: 'the Moon\'s apparent diameter seen from the Earth — half a degree today, a thumb at arm\'s length is about two; from the distance above' },
+    { label: 'Precession period', value: `${Math.round(precYears).toLocaleString('en-US')} yr per turn`, today: today ? '' : `today ${Math.round(T0.precYears).toLocaleString('en-US')} yr`, tag: today ? 'measured' : certified ? derived : 'uncalibrated', hint: 'the composed lunisolar law on the day and the Moon of date' },
+    obliquityDeg !== null
+      ? { label: 'Obliquity', value: `${obliquityDeg.toFixed(2)}°`, today: today ? '' : `today ${T0.obliquityDeg.toFixed(2)}°`, tag: derived, hint: 'the hybrid integration inside its ±10-Myr domain' }
+      : { label: 'Obliquity', value: bandText, today: `today ${T0.obliquityDeg.toFixed(2)}°`, tag: 'band', hint: 'beyond the hybrid domain the value is not certifiable; the band (its width and beat) is the claim' },
+  ];
+  if (ice !== null) rows.push({ label: 'Ice cover', value: `${Math.round(ice * 100)} % of the Last Glacial Maximum`, today: '', tag: today ? 'measured' : ahead ? 'forecast' : 'derived', hint: 'the climate formula\'s orbital layer on the LR04 stack, the model\'s own ice history' });
+  return {
+    ageMa: st.ageMa, title: st.title, scene: st.scene, says: st.says, anchor: st.anchor || null, anchorAction: st.anchorAction || null, year,
+    dayHours: lodS / 3600, yearSolarDays: tropS / lodS, moonKm, moonDiamDeg, precYears,
+    obliquityDeg, band, ice, rows,
+  };
+}
+/** The age line of a station. @param {number} ageMa */
+function _tourAgeText(ageMa) {
+  if (ageMa === 0) return 'today';
+  const a = Math.abs(ageMa), s = a >= 1000 ? `${(a / 1000).toFixed(2)} billion years` : a >= 1 ? `${a} million years` : `${Math.round(a * 1000)} thousand years`;
+  return ageMa > 0 ? `${s} ago` : `in ${s}`;
+}
+/** The card: the head, the two sentences, the rows, the anchor, the controls. `landing` draws the
+ *  head and a waiting line before the jump (a first deep landing blocks for up to half a minute).
+ *  @param {number} i @param {ReturnType<typeof tourStationValues> | null} v @param {boolean} [landing] */
+function _tourRenderCard(i, v, landing = false) {
+  if (typeof document === 'undefined') return;
+  if (!_tour.el) {
+    const el = document.createElement('div');
+    el.id = 'origin-tour'; el.className = 'origin-tour'; el.setAttribute('role', 'dialog');
+    document.body.appendChild(el);
+    _tour.el = el;
+  }
+  const st = TOUR_STATIONS[i];
+  const esc = (/** @type {string} */ s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const head = `<button type="button" class="origin-tour-close" data-tour="close" title="Close the tour">×</button><div class="origin-tour-head"><span class="origin-tour-step">${i + 1} / ${TOUR_STATIONS.length}</span><span class="origin-tour-title">${esc(st.title)}</span><span class="origin-tour-age">${_tourAgeText(st.ageMa)}</span></div>`;
+  const body = landing || !v
+    ? `<div class="origin-tour-landing">Landing${i === 0 || _tour.started === 1 ? ' — the first deep jump builds the deep tables and can take up to half a minute' : ''} …</div>`
+    : `<div class="origin-tour-note">${esc(v.scene)}</div><div class="origin-tour-says">${esc(v.says)}</div>`
+      + `<div class="origin-tour-rows">${v.rows.map((r) => `<div class="origin-tour-row" title="${esc(r.hint)}${r.today ? ` — ${esc(r.today)}` : ''}"><span class="origin-tour-label">${esc(r.label)}</span><span class="origin-tour-value">${esc(r.value)}</span><span class="origin-tour-tag origin-tour-tag-${r.tag}">${r.tag}</span></div>`).join('')}</div>`
+      + (v.anchor ? `<div class="origin-tour-anchor">${esc(v.anchor)}${v.anchorAction === 'genesis' ? ' <button type="button" class="origin-tour-btn origin-tour-btn-small" data-tour="genesis" title="Jump to the first solar eclipse of the cited history — the finder walks the months of date from the edge (about 45 s the first time); the tour pauses">Jump to it</button>' : ''}</div>` : '')
+      + `<div class="origin-tour-legend">measured · cited input · derived by the model · forecast (the recession held) · band, not a value · uncalibrated here — hover a row for its source and today's value</div>`;
+  const foot = `<div class="origin-tour-foot"><button type="button" class="origin-tour-btn" data-tour="prev"${i === 0 ? ' disabled' : ''}>‹ Back</button><button type="button" class="origin-tour-btn" data-tour="next"${i + 1 >= TOUR_STATIONS.length ? ' disabled' : ''}>Next ›</button><button type="button" class="origin-tour-btn" data-tour="pause">${_tour.paused ? 'Resume' : 'Pause'}</button><span class="origin-tour-hint">${Math.abs(st.ageMa) > 500 ? 'beyond ±500 Myr: reproducible, not converged' : st.ageMa < 0 ? 'ahead of today: a forecast' : 'inside the certified ±500 Myr'}</span></div>`
+    + `<div class="origin-tour-progress"><div class="origin-tour-progress-fill"></div></div>`;
+  _tour.el.innerHTML = head + body + foot;
+  _tour.el.querySelectorAll('button[data-tour]').forEach((b) => b.addEventListener('click', () => {
+    const a = /** @type {HTMLElement} */ (b).dataset.tour;
+    if (a === 'next') tourNext(); else if (a === 'prev') tourGoto(_tour.index - 1); else if (a === 'pause') tourPauseToggle();
+    else if (a === 'genesis') { if (!_tour.paused) tourPauseToggle(); /** @type {HTMLElement} */ (b).textContent = 'finding …'; setTimeout(() => { jumpToGenesisEclipse(); /** @type {HTMLElement} */ (b).textContent = 'Jump to it'; }, 30); }
+    else tourStop();
+  }));
+  _tour.el.classList.add('visible');
+}
+/** The hold's progress bar: run over the hold, or freeze. @param {'run'|'freeze'|'reset'} mode */
+function _tourProgress(mode) {
+  const bar = _tour.el && /** @type {HTMLElement|null} */ (_tour.el.querySelector('.origin-tour-progress-fill'));
+  if (!bar) return;
+  if (mode === 'run') { bar.style.transition = 'none'; bar.style.width = '0%'; void bar.offsetWidth; bar.style.transition = `width ${TOUR_HOLD_MS}ms linear`; bar.style.width = '100%'; }
+  else if (mode === 'freeze') { const w = getComputedStyle(bar).width; bar.style.transition = 'none'; bar.style.width = w; }
+  else { bar.style.transition = 'none'; bar.style.width = '0%'; }
+}
+/** Land on station i: the card first (the landing line), then the seated jump by the Date field
+ *  on the next tick so the card paints before a long first landing, the camera on the Earth, the
+ *  full card, the hold armed by the render loop. @param {number} i */
+function tourGoto(i) {
+  if (i < 0 || i >= TOUR_STATIONS.length) return;
+  clearTimeout(_tour.timer);
+  _tour.active = true; _tour.index = i; _tour.pendingArm = false;
+  o.Run = false;
+  _tourRenderCard(i, null, true);
+  setTimeout(() => {
+    if (!_tour.active || _tour.index !== i) return;
+    const st = TOUR_STATIONS[i];
+    const year = Math.round(2000 - st.ageMa * 1e6);
+    o.Date = st.ageMa === 0 ? '2000-06-21' : `${year}-01-01`; o.Time = '00:00:00';
+    if (o._rootEntry) o._rootEntry.enterDateTime();
+    switchToPlanet('Earth');   // always: the default focus IS the Earth, from the far start view — the tour frames it
+    tourFrameEarth();
+    const v = tourStationValues(i);
+    _tourRenderCard(i, v);
+    positionChanged = true;
+    // the hold is armed by the render loop on the station's first RESPONSIVE frame (tourArmPending)
+    _tour.pendingArm = !_tour.paused && i + 1 < TOUR_STATIONS.length;
+  }, 30);
+}
+/** Pause / resume the auto-advance; the card stays. */
+function tourPauseToggle() {
+  _tour.paused = !_tour.paused;
+  clearTimeout(_tour.timer); _tour.timer = 0;
+  _tourProgress(_tour.paused ? 'freeze' : 'reset');
+  if (!_tour.paused) _tour.pendingArm = _tour.index + 1 < TOUR_STATIONS.length;
+  const b = _tour.el && _tour.el.querySelector('button[data-tour="pause"]');
+  if (b) b.textContent = _tour.paused ? 'Resume' : 'Pause';
+}
+/** Frame the Earth for a station: the camera 3.5 radii out on the sunlit side, a little above the
+ *  ecliptic (focusPlanet only re-targets the controls and keeps the camera's distance — from the
+ *  far start view the Earth stayed a dot, measured). The scene is moved to the landing first. */
+function tourFrameEarth() {
+  if (!earth?.planetObj || !sun?.planetObj) return;
+  forceSceneUpdate('minimal');
+  const ctr = earth.planetObj.getWorldPosition(new THREE.Vector3());
+  const sunW = sun.planetObj.getWorldPosition(new THREE.Vector3());
+  const R = earth.planetObj.geometry.parameters.radius * earth.planetObj.getWorldScale(new THREE.Vector3()).x;
+  const dir = sunW.clone().sub(ctr).normalize().multiplyScalar(0.92).add(new THREE.Vector3(0, 0.39, 0)).normalize();
+  camera.position.copy(ctr).add(dir.multiplyScalar(R * 3.5));
+  controls.target.copy(ctr); controls.update();
+  positionChanged = true; needsLabelUpdate = true;
+}
+/** The render loop, at the end of every frame: start the station's hold on the first RESPONSIVE
+ *  frame (a deep landing's first frames block the thread for seconds — the seats, the tables —
+ *  and a hold armed before them counted the block as viewing time: measured, the 12-s hold
+ *  expired behind a 10-s first frame). @param {number} frameMs this frame's wall time */
+function tourArmPending(frameMs) {
+  if (!_tour.pendingArm || _tour.paused || frameMs > 250) return;
+  _tour.pendingArm = false;
+  const i = _tour.index;
+  clearTimeout(_tour.timer);
+  _tour.timer = setTimeout(() => { if (_tour.active && _tour.index === i) tourNext(); }, TOUR_HOLD_MS);
+  _tourProgress('run');
+}
+function tourNext() { if (_tour.index + 1 < TOUR_STATIONS.length) tourGoto(_tour.index + 1); else tourPauseAtEnd(); }
+/** The last station: the auto-advance ends, the card stays. */
+function tourPauseAtEnd() { clearTimeout(_tour.timer); _tour.timer = 0; _tour.pendingArm = false; }
+/** Close the tour: the card hidden, the auto-advance off. */
+function tourStop() {
+  clearTimeout(_tour.timer); _tour.timer = 0;
+  _tour.active = false; _tour.index = -1; _tour.pendingArm = false; _tour.paused = false;
+  if (_tour.el) _tour.el.classList.remove('visible');
+}
+/** The "Origin" button: from the genesis to the edge of the domain. */
+function startOriginTour() {
+  _tour.started++;
+  _tour.paused = false;
+  tourGoto(0);
+}
+if (typeof document !== 'undefined') document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && _tour.active) tourStop(); });
+
 /** The clamped position of a UT Julian Day: the nearest edge where the table has no answer. */
 function posFromJDClamped(jd) {
   const p = posFromJD(jd);
@@ -3549,6 +3759,15 @@ if (typeof window !== 'undefined') {
     jumpToGenesisEclipse: () => jumpToGenesisEclipse(),
     solarEclipseFields: () => ({ label: o.eclipseSolarLabel, loc: o.eclipseSolarLoc, gamma: o.eclipseSolarGamma, jd: o.eclipseSolarJD, radii: o.eclipseSolarRadii }),
     solarEclipseRadiiText: (jd) => solarEclipseRadiiText(jd),
+    // plan 27 step D: the Origin tour — the stations' values (pure: no jump) and the tour's state
+    tourStations: () => TOUR_STATIONS.map((s) => s.ageMa),
+    tourStationValues: (i) => tourStationValues(i),
+    tourStart: () => startOriginTour(),
+    tourNext: () => tourNext(),
+    tourPause: () => tourPauseToggle(),
+    tourGoto: (i) => tourGoto(i),
+    tourStop: () => tourStop(),
+    tourState: () => ({ active: _tour.active, paused: _tour.paused, index: _tour.index, started: _tour.started, armed: !_tour.pendingArm && _tour.timer !== 0, visible: !!(_tour.el && _tour.el.classList.contains('visible')), landing: !!(_tour.el && _tour.el.querySelector('.origin-tour-landing')), title: _tour.el ? (_tour.el.querySelector('.origin-tour-title') || {}).textContent : null }),
     // Cycles-tab perihelion breakdown (doc 13 §1.8): the two coordinates and the
     // relativistic advance from the model constants — probed by the browser golden
     // so the panel can never drift from the registry / closure gate silently.
@@ -5125,6 +5344,7 @@ const mars = {
   size: (diameters.marsDiameter/2/ currentAUDistance)*100,
   color: 0xFF0000,
   textureUrl: 'public/Mars.jpg',
+  tiersUrl: 'public/textures/mars/manifest.json',   // plan 27, the Mars item: the Noachian and Hesperian seas, the pre-Noachian crust (makeSurfaceTiers)
   visible: true,
   containerObj:"",
   orbitObj:"",
@@ -5741,7 +5961,7 @@ let o = {
   earthSurface: 'Present-day Earth',   // the Earth's surface tier (plan 27 step E; updateEra writes it and the hover)
   earthSurfaceHover: 'The map drawn on the Earth at this date and where it comes from. Now showing: Present-day Earth (satellite imagery). The model does not model continents.',
   bodySurfaces: 'present-day maps',   // the Moon's, Mercury's and Saturn's tiers (plan 27 step F; updateSurfaceTiers writes it and the hover)
-  bodySurfacesHover: 'The maps drawn on the Moon, Mercury and Saturn at this date. A body not listed shows its present-day map. All three show their present-day maps.',
+  bodySurfacesHover: 'The maps drawn on the Moon, Mercury, Mars and Saturn at this date. A body not listed shows its present-day map. All four show their present-day maps.',
   pos : 0,
   displayFormat : 'sexagesimal',
   distanceUnit : 'AU',
@@ -22437,6 +22657,10 @@ function setupGUI() {
     'The model against JPL WebGeoCalc observations: the observed perihelion precession of the seven planets over 1900\u20132026 (longitude of perihelion, with the ascending node and the argument of periapsis on request) next to the model\u2019s own rate.');
   addTooltip(analysisFolder.addButton({ title: 'Planet Orbit Analysis' }).on('click', () => openHierarchyInspector()),
     'Inspect the orbit of date of one planet from the N-body chain: its elements, the orbit geometry drawn in the 3D scene (plane, nodes, extremes, perihelion, anomalies), the orbit picture export, and the position report against the NASA/JPL test dates.');
+  // plan 27 step D: the Origin tour \u2014 the stations from the Earth\u2013Moon genesis to the edge of the
+  // domain (the owner: under Tools \u203a Analysis, beside the genesis analysis)
+  addTooltip(analysisFolder.addButton({ title: 'Origin Tour' }).on('click', () => startOriginTour()),
+    `A scripted tour in ${TOUR_STATIONS.length} stations from the Earth\u2013Moon genesis (4,429 Ma) through today to the edge of the domain (+1,000 Myr): each a jump with the camera on the Earth and a card with the day, the year, the Moon, the precession clock and the obliquity of date, every number read live from the model with its provenance tag. The FIRST jump builds the deep tables and can take up to half a minute. Next / Back / Pause on the card, \u00d7 closes it; Escape closes.`);
   addTooltip(analysisFolder.addButton({ title: 'Earth\u2013Moon Genesis Analysis' }).on('click', () => openEssrtPanel()),
     'The model\u2019s own evolution from Earth\u2013Moon genesis (\u22124.43 Gyr, the end of the cited Earth\u2013Moon distance history) to +1 Gyr: the day length, the lunisolar precession period, the obliquity beat, the AU, the Moon\u2019s distance and the planets\u2019 orbital parameters, with the Wu et al. 2024 cyclostratigraphy anchors on the Phanerozoic 650 Ma window.');
   addTooltip(analysisFolder.addButton({ title: 'Earth Climate Analysis' }).on('click', () => openClimateFormulaPanel()),
@@ -22597,6 +22821,7 @@ function _refreshVisibleMonitors() {
 function render(now) {
   requestAnimationFrame(render);
   const _perfT0 = PERF_HUD ? performance.now() : 0;
+  const _frameT0 = performance.now();   // plan 27 step D: the Origin tour arms its hold on a responsive frame
 
   // (no frame cap: requestAnimationFrame paces at the display's rate and the
   // simulation step is the clamped smoothed delta below, so motion is
@@ -22912,6 +23137,7 @@ function render(now) {
     labelRenderer.render(scene, camera);
     needsLabelUpdate = false;
   }
+  tourArmPending(performance.now() - _frameT0);   // plan 27 step D: the hold counts from the first responsive frame of the station
 
   // 11) First-frame: recalculate after renderer establishes correct scene state
   if (_needsInitialSceneUpdate) {
@@ -36046,7 +36272,7 @@ function makeRealisticEarth(pd){
       const span = t.present ? `today's map, used back to ${far}` : t.toMa <= 0 ? `used from +${surfaceAgeText(-t.toMa)} to ${t.fromMa <= -1e9 ? 'the future edge (+1,000 Myr)' : '+' + surfaceAgeText(-t.fromMa)} ahead` : `used from ${surfaceAgeText(t.fromMa)} to ${far}`;
       const what = t.present ? '' : t.kind === 'cited' ? ' — a published reconstruction, Scotese 2016 PaleoAtlas (CC BY 4.0), shown at its nearest age step' : t.source === 'derived' ? ' — derived from today\'s map, a reading of the cited papers in its label' : ' — a generated map standing in where no reconstruction exists';
       o.earthSurfaceHover = `The map drawn on the Earth at this date and where it comes from. Now showing: ${t.label}, ${span}${what}. The model does not model continents`
-        + (ahead && ageMaNow() < 0 ? '; the next supercontinent is expected around +250 Myr (Pangaea Proxima, Amasia) and is not drawn.' : '.');
+        + (ahead && ageMaNow() < 0 ? '; ahead of today the continents follow today\'s measured plate motions (DeMets et al. 2010) for 100 Myr and Scotese\'s Pangaea Proxima scenario beyond — one reading of several (Amasia, Novopangaea and Aurica are the others).' : '.');
     };
     const ageMaNow = () => (J2000_CALENDAR_YEAR - o.currentYear) / 1e6;
 
@@ -36252,13 +36478,13 @@ function updateSurfaceTiers() {
   const next = label || 'present-day maps';
   if (o.bodySurfaces !== next || !o._bodySurfacesHoverSet) {   // the first pass writes the full hover even at today's maps
     o.bodySurfaces = next;
-    o.bodySurfacesHover = BODY_MAPS_HOVER_HEAD + (hover ? `Now showing: ${hover}. ` : 'All three show their present-day maps. ') + BODY_MAPS_HOVER_TAIL;
+    o.bodySurfacesHover = BODY_MAPS_HOVER_HEAD + (hover ? `Now showing: ${hover}. ` : 'All four show their present-day maps. ') + BODY_MAPS_HOVER_TAIL;
     o._bodySurfacesHoverSet = true;
   }
 }
 /** The About folder's "Moon & planet maps" hover (owner 2026-11-05): what the row means, the state, the sources. */
-const BODY_MAPS_HOVER_HEAD = 'The maps drawn on the Moon, Mercury and Saturn at this date. A body not listed shows its present-day map. ';
-const BODY_MAPS_HOVER_TAIL = 'The Moon\'s maria flooded 3.9–3.1 Ga (Hiesinger 2011); Mercury\'s oldest preserved surfaces are 4.0–4.1 Ga (Marchi 2013); Saturn\'s rings are a measured band, ≤ 400 Myr (Kempf 2023) and disputed. These maps illustrate the look at that age; nothing on them is modelled. Not tiered: Venus resurfaced ~300–700 Myr ago (Strom et al. 1994) and anything earlier is speculation; the giant planets\' maps show today\'s weather (Jupiter\'s Great Red Spot, the bands) at every age; Mars is a separate item.';
+const BODY_MAPS_HOVER_HEAD = 'The maps drawn on the Moon, Mercury, Mars and Saturn at this date. A body not listed shows its present-day map. ';
+const BODY_MAPS_HOVER_TAIL = 'The Moon\'s maria flooded 3.9–3.1 Ga (Hiesinger 2011); Mercury\'s oldest preserved surfaces are 4.0–4.1 Ga (Marchi 2013); Saturn\'s rings are a measured band, ≤ 400 Myr (Kempf 2023) and disputed. These maps illustrate the look at that age; nothing on them is modelled. Not tiered: Venus resurfaced ~300–700 Myr ago (Strom et al. 1994) and anything earlier is speculation; the giant planets\' maps show today\'s weather (Jupiter\'s Great Red Spot, the bands) at every age. Mars\'s Noachian and Hesperian seas are a contested reading (Carr & Head 2003; Di Achille & Hynek 2010) drawn below the MOLA shoreline contours.';
 /** The ice fraction of date from the model's OWN ice history (plan 27 step G1): the climate
  *  formula's orbital L1 layer on the LR04 regimes (the climate chart's stitched curve,
  *  cfmEvalStitched — one home with the chart), read as 0 at today's value and 1 at its 21-ka

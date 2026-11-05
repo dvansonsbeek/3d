@@ -70,7 +70,7 @@ const s = await openSimulator();
 // plan 27 step E: the Earth surface tier table loads asynchronously (public/textures/earth/manifest.json)
 await s.page.waitForFunction(() => window.__test__ && window.__test__.earthTierAtAge && window.__test__.earthTierAtAge(0) !== null, { timeout: 30000 });
 // plan 27 step F: the Moon's, Mercury's and Saturn's tables likewise (public/textures/<body>/manifest.json)
-await s.page.waitForFunction(() => ['moon', 'mercury', 'saturn'].every((b) => window.__test__.bodyTierAtAge(b, 0) !== null), { timeout: 30000 });
+await s.page.waitForFunction(() => ['moon', 'mercury', 'mars', 'saturn'].every((b) => window.__test__.bodyTierAtAge(b, 0) !== null), { timeout: 30000 });
 
 const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_JDS, MOON_TMAS, MOON_CHAIN_PAIRS }) => {
   const T = window.__test__;
@@ -126,7 +126,9 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   // −0.9 the forecast ahead, step G1/H4 — and every row the sky tint, step G3)
   // (the future: −950 the moist greenhouse, −875 its fade, −650 the biosphere's end, −550 the
   // present tier's fade, −0.9 beyond the ice forecast, −0.1 inside it — plan 27 step H1/H4)
-  for (const ageMa of [-950, -875, -650, -550, -1, -0.9, -0.1, -0.05, 0, 0.02, 0.021, 0.0225, 0.03, 0.125, 1, 2.49, 2.51, 163.5, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
+  // (the continents ahead: −12.5 inside the present tier's fade into the +50 snapshot, −50, −100,
+  // −175 inside a snapshot's fade, −250, −400 the supercontinent held — plan 27 step H3)
+  for (const ageMa of [-950, -875, -650, -550, -400, -250, -175, -100, -50, -12.5, -1, -0.9, -0.1, -0.05, 0, 0.02, 0.021, 0.0225, 0.03, 0.125, 1, 2.49, 2.51, 163.5, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
     const r = T.earthTierAtAge(ageMa);
     v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)} clouds=${r.clouds.toFixed(4)} atm=${r.atmosphere.toFixed(4)} modern=${r.modern.toFixed(4)} ice=${r.ice === null ? '-' : r.ice.toFixed(4)} sky=${r.skyTint.map((c) => c.toFixed(2)).join('/')}` : null;
   }
@@ -135,7 +137,7 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   // band) and at the edges — the tier id, its kind, whether the rings are shown, and (plan 27
   // step I) the cross-fade mix and the rings' opacity factor at ages inside each fade (3,310 /
   // 3,560 / 3,810 / 4,360 the Moon's, 4,110 Mercury's, 410 the rings').
-  for (const [body, ages] of [['moon', [0, 107, 109, 113, 449, 451, 799, 801, 805, 3299, 3301, 3310, 3549, 3551, 3560, 3799, 3801, 3810, 4349, 4351, 4360, 4428.985]], ['mercury', [0, 4099, 4101, 4110, 4428.985]], ['saturn', [-250, -150, -50, -1, 0, 399, 401, 410, 4428.985]]]) {
+  for (const [body, ages] of [['moon', [0, 107, 109, 113, 449, 451, 799, 801, 805, 3299, 3301, 3310, 3549, 3551, 3560, 3799, 3801, 3810, 4349, 4351, 4360, 4428.985]], ['mercury', [0, 4099, 4101, 4110, 4428.985]], ['mars', [0, 2999, 3001, 3075, 3699, 3701, 3775, 4099, 4101, 4150, 4428.985]], ['saturn', [-250, -150, -50, -1, 0, 399, 401, 410, 4428.985]]]) {
     for (const ageMa of ages) {
       const r = T.bodyTierAtAge(body, ageMa);
       v[`${body}Tier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} rings=${r.rings} mix=${r.mix.toFixed(4)} ringFactor=${r.ringFactor.toFixed(4)}` : null;
@@ -431,6 +433,30 @@ Object.assign(measured, await s.page.evaluate(() => {
   v['genesis.landedJD'] = T.clockFields().julianDay;
   return v;
 }));
+
+// ── plan 27 step D: the Origin tour — every station's caption values (pure in the station: the
+// package model at the engine year, no jump), then the tour itself started on the edge it stands
+// on (station 1 is the genesis) and stepped once (the 4.2-Ga station), then stopped.
+Object.assign(measured, await s.page.evaluate(() => {
+  const T = window.__test__, v = {};
+  const ages = T.tourStations();
+  for (let i = 0; i < ages.length; i++) { const r = T.tourStationValues(i); v[`tour.station@${ages[i]}Ma`] = r ? `${r.title} | ${r.rows.map((x) => `${x.label}: ${x.value} [${x.tag}]`).join(' | ')}` : null; }
+  return v;
+}));
+// the jump follows the card on the next tick (the landing line paints first); the start lands on
+// the genesis, one next moves exactly one station (the 4,415-Ma one), Pause keeps the card, × closes
+await s.page.evaluate(() => window.__test__.tourStart());
+await s.page.waitForFunction(() => { const st = window.__test__.tourState(); return st.visible && !st.landing; }, null, { timeout: 60000 });
+await s.page.waitForTimeout(500);
+Object.assign(measured, await s.page.evaluate(() => { const T = window.__test__; const st = T.tourState(); return { 'tour.start.index': st.index, 'tour.start.visible': st.visible, 'tour.start.title': st.title, 'tour.start.date': T.clockFields().date, 'tour.start.onEdge': T.clockFields().pos === T.navigablePosRange().posMin }; }));
+await s.page.evaluate(() => window.__test__.tourNext());
+await s.page.waitForFunction(() => { const st = window.__test__.tourState(); return st.index === 1 && st.visible && !st.landing; }, null, { timeout: 60000 });
+await s.page.waitForTimeout(500);
+Object.assign(measured, await s.page.evaluate(() => { const T = window.__test__; const st = T.tourState(); return { 'tour.next.index': st.index, 'tour.next.title': st.title, 'tour.next.date': T.clockFields().date }; }));
+await s.page.evaluate(() => window.__test__.tourPause());
+Object.assign(measured, await s.page.evaluate(() => { const st = window.__test__.tourState(); return { 'tour.pause.paused': st.paused, 'tour.pause.visible': st.visible, 'tour.pause.armed': st.armed }; }));
+await s.page.evaluate(() => window.__test__.tourStop());
+Object.assign(measured, await s.page.evaluate(() => { const st = window.__test__.tourState(); return { 'tour.close.active': st.active, 'tour.close.visible': st.visible }; }));
 
 // ── doc 111 §1.33 (the scene's own re-learning, 2026-11-05): the umbra cap is drawn only while
 // the Earth lies DOWNSTREAM of the Moon on the shadow axis — never at a full Moon, where the

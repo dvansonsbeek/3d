@@ -240,8 +240,142 @@ const RECIPES = {
   },
 };
 
-// ── 2b. The derived future maps (plan 27 step H1): today's map with its vegetation gone, and that
-// under the vapour deck with the seas darkened ──────────────────────────────────────────────
+// ── 2a. The future continents (plan 27 step H3, the owner's request 2026-11-05): today's
+// continents moved by their MEASURED present-day plate rotations, then one published scenario ──
+// The plates' Euler poles and rates are NNR-MORVEL56 (DeMets, Gordon & Argus 2010, Geophys. J.
+// Int. 181, 1–80; the no-net-rotation frame), rounded. A linear extrapolation of today's motions
+// is robust for the first ~50 Myr (Australia reaches Southeast Asia at ~7 cm/yr, Africa closes
+// the Mediterranean at ~2.5 cm/yr, the Atlantic still widens); beyond that the scenarios diverge
+// (Davies, Green & Duarte 2018, Global and Planetary Change 169: Pangaea Proxima, Novopangaea,
+// Aurica, Amasia). The tiers follow Scotese's Pangaea Proxima (the PALEOMAP Project's future
+// maps, Scotese 2000s): after ~+100 Myr the Atlantic begins to subduct and the Americas return
+// east to Africa and Europe; Africa and Australia, docked, ride with Eurasia; Antarctica stays
+// polar. The merge is one reading of one scenario, said so in the labels; the continent outlines
+// are hand-drawn polygons (the plates' interiors, not their precise boundaries).
+const PLATES = {
+  // NNR-MORVEL56 rounded: the pole (lat, lon °E) and the rate (°/Myr)
+  eurasia:      { pole: [48.9, -106.5], rate: 0.223, poly: [[-10, 36], [-10, 44], [-5, 48], [-5, 58], [5, 62], [15, 70], [30, 72], [60, 78], [100, 80], [140, 78], [170, 72], [190, 68], [190, 60], [160, 58], [146, 44], [142, 38], [140, 33], [131, 31], [122, 24], [110, 18], [109, 10], [104, 1], [106, -7], [115, -9], [105, -6], [95, 5], [80, 6], [78, 8], [72, 20], [66, 25], [60, 22], [57, 26], [50, 30], [44, 37], [36, 37], [28, 36], [26, 36], [12, 37], [0, 38], [-6, 36]] },
+  africa:       { pole: [47.7, -68.4], rate: 0.292, poly: [[-18, 32], [-10, 36], [10, 38], [12, 33], [20, 33], [32, 32], [35, 31], [36, 36], [44, 37], [50, 30], [57, 25], [60, 22], [55, 17], [45, 12], [51, 12], [50, 2], [40, -5], [40, -12], [50, -14], [50, -26], [35, -30], [28, -35], [18, -35], [12, -28], [12, -18], [8, -5], [10, 4], [-8, 5], [-17, 13], [-18, 22]] },
+  northAmerica: { pole: [-4.9, -80.6], rate: 0.209, poly: [[-168, 66], [-141, 70], [-125, 72], [-100, 72], [-85, 83], [-60, 83], [-20, 83], [-15, 78], [-18, 70], [-40, 60], [-52, 52], [-55, 47], [-65, 43], [-70, 40], [-75, 35], [-80, 30], [-80, 25], [-85, 21], [-77, 8], [-83, 8], [-90, 13], [-96, 15], [-105, 19], [-110, 22], [-118, 28], [-125, 38], [-130, 50], [-140, 58], [-152, 57], [-160, 55], [-168, 60]] },
+  southAmerica: { pole: [-22.6, -112.8], rate: 0.109, poly: [[-82, 10], [-72, 12], [-60, 10], [-50, 2], [-35, -5], [-35, -12], [-40, -22], [-48, -28], [-53, -35], [-58, -40], [-65, -48], [-68, -55], [-75, -54], [-76, -45], [-72, -35], [-71, -25], [-78, -10], [-82, -3], [-80, 2]] },
+  australia:    { pole: [33.9, 37.9], rate: 0.632, poly: [[113, -22], [114, -35], [118, -35], [130, -32], [138, -36], [147, -44], [150, -37], [154, -28], [153, -25], [146, -18], [142, -10], [131, -3], [141, -2], [150, -5], [151, -11], [143, -13], [137, -12], [130, -11], [125, -14], [114, -20]] },
+  antarctica:   { pole: [65.4, -118.1], rate: 0.250, poly: null },   // everything south of −63°
+};
+// the Pangaea Proxima scenario's events (Myr ahead): Australia docks on Southeast Asia and Africa
+// on Europe (then both ride with Eurasia); the Atlantic starts to close and the Americas move
+// east about the pole at 0.3°/Myr (3 cm/yr at the equator) until they meet Africa and Europe
+// `linearUntilMyr`: today's measured rotations are carried this far and then held — a 0.22°/Myr
+// rotation of Eurasia carried 250 Myr swung it 45° and dragged the docked continents with it
+// (measured: the Atlantic ended 4,267 km wide); beyond it only the scenario's closure moves
+const SCENARIO = { linearUntilMyr: 100, australiaDocksMyr: 45, africaDocksMyr: 50, atlanticClosesFromMyr: 100, atlanticCloseRateDegPerMyr: 0.34 };
+const FUTURE_PLATE_STEPS = [50, 100, 150, 200, 250];
+const d2r = Math.PI / 180;
+/** Rotation matrix about a unit axis by an angle (right-handed, degrees). @param {number[]} ax @param {number} deg */
+function rotAxis(ax, deg) {
+  const c = Math.cos(deg * d2r), s = Math.sin(deg * d2r), t = 1 - c, [x, y, z] = ax;
+  return [[t * x * x + c, t * x * y - s * z, t * x * z + s * y], [t * x * y + s * z, t * y * y + c, t * y * z - s * x], [t * x * z - s * y, t * y * z + s * x, t * z * z + c]];
+}
+const matMul = (/** @type {number[][]} */ A, /** @type {number[][]} */ B) => A.map((r, i) => [0, 1, 2].map((j) => r[0] * B[0][j] + r[1] * B[1][j] + r[2] * B[2][j]));
+const matT = (/** @type {number[][]} */ A) => [0, 1, 2].map((i) => [A[0][i], A[1][i], A[2][i]]);
+const matVec = (/** @type {number[][]} */ A, /** @type {number[]} */ v) => A.map((r) => r[0] * v[0] + r[1] * v[1] + r[2] * v[2]);
+const unit = (/** @type {number} */ lat, /** @type {number} */ lon) => [Math.cos(lat * d2r) * Math.cos(lon * d2r), Math.cos(lat * d2r) * Math.sin(lon * d2r), Math.sin(lat * d2r)];
+const latLonOf = (/** @type {number[]} */ v) => [Math.asin(Math.max(-1, Math.min(1, v[2]))) / d2r, Math.atan2(v[1], v[0]) / d2r];
+const poleAxis = (/** @type {number[]} */ p) => unit(p[0], p[1]);
+/** The cumulative rotation of a plate at t Myr ahead under the scenario. @param {string} k @param {number} t */
+function plateRotation(k, t) {
+  const P = PLATES[k];
+  const linear = (/** @type {number} */ until) => rotAxis(poleAxis(P.pole), P.rate * Math.min(t, until, SCENARIO.linearUntilMyr));
+  if (k === 'eurasia' || k === 'antarctica') return linear(Infinity);
+  if (k === 'africa' || k === 'australia') {
+    const dock = k === 'africa' ? SCENARIO.africaDocksMyr : SCENARIO.australiaDocksMyr;
+    if (t <= dock) return linear(dock);
+    // docked: ride with Eurasia from the docking instant on — R(t) = R_Eu(t)·R_Eu(dock)⁻¹·R_own(dock)
+    const Eu = (/** @type {number} */ tt) => rotAxis(poleAxis(PLATES.eurasia.pole), PLATES.eurasia.rate * Math.min(tt, SCENARIO.linearUntilMyr));
+    return matMul(matMul(Eu(t), matT(Eu(dock))), linear(dock));
+  }
+  // the Americas: linear until the Atlantic starts to close, then east about the pole
+  const t0 = SCENARIO.atlanticClosesFromMyr;
+  if (t <= t0) return linear(t0);
+  return matMul(rotAxis([0, 0, 1], SCENARIO.atlanticCloseRateDegPerMyr * (t - t0)), linear(t0));
+}
+/** Point in a lon/lat polygon (even–odd), the longitude unwrapped against the polygon's span. @param {number} lon @param {number} lat @param {number[][]} poly */
+function inPoly(lon, lat, poly) {
+  let inside = false;
+  for (const L of [lon, lon + 360, lon - 360]) {
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i], [xj, yj] = poly[j];
+      if ((yi > lat) !== (yj > lat) && L < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    if (inside) return true;
+  }
+  return false;
+}
+/** Which plate holds a present-day point. @param {number} lat @param {number} lon */
+function plateAt(lat, lon) {
+  if (lat < -63) return 'antarctica';
+  for (const k of ['eurasia', 'africa', 'northAmerica', 'southAmerica', 'australia']) if (inPoly(lon, lat, PLATES[k].poly)) return k;
+  return null;
+}
+/** Render the continents at t Myr ahead from today's map. @param {Buffer} rgb today's map (OUT_W × OUT_H) @param {number} t @param {string} out */
+function renderFuturePlates(rgb, t, out) {
+  const n = OUT_W * OUT_H;
+  // public/Earth.jpg is PACIFIC-CENTRED: its left edge is Greenwich and longitude runs 0 → 360°
+  // east across the map (the atlas maps are rolled by 180° to match it) — measured: with the
+  // (lon + 180)/360 reading the Congo sampled as sea and the "deep sea" fill came out
+  // continent-grey. The sampler and the output grid both use u = lon_east / 360.
+  const uOf = (/** @type {number} */ lon) => (((lon % 360) + 360) % 360) / 360;
+  const px = (/** @type {number} */ lat, /** @type {number} */ lon) => { const i = ((Math.round(uOf(lon) * OUT_W - 0.5) % OUT_W) + OUT_W) % OUT_W, j = Math.min(OUT_H - 1, Math.max(0, Math.round(((90 - lat) / 180) * OUT_H - 0.5))); const k = (j * OUT_W + i) * 3; return [rgb[k], rgb[k + 1], rgb[k + 2]]; };
+  const isOcean = (/** @type {number[]} */ c) => c[2] > c[0] + 20 && c[2] > c[1];
+  const deepSea = px(0, -150);   // the mid-Pacific blue fills the sea floor a continent has left
+  const inv = {};
+  for (const k of Object.keys(PLATES)) inv[k] = matT(plateRotation(k, t));
+  const out3 = Buffer.alloc(n * 3);
+  let land = 0;
+  for (let j = 0; j < OUT_H; j++) {
+    const lat = 90 - ((j + 0.5) / OUT_H) * 180;
+    for (let i = 0; i < OUT_W; i++) {
+      const lonE = ((i + 0.5) / OUT_W) * 360, lon = lonE > 180 ? lonE - 360 : lonE;
+      const v = unit(lat, lon);
+      let col = null;
+      for (const k of ['eurasia', 'africa', 'northAmerica', 'southAmerica', 'australia', 'antarctica']) {
+        const [slat, slon] = latLonOf(matVec(inv[k], v));
+        if (plateAt(slat, slon) !== k) continue;
+        const c = px(slat, slon);
+        if (isOcean(c) && k !== 'antarctica') continue;   // the polygon's own sea stays sea
+        col = c; break;
+      }
+      if (col === null) { const here = px(lat, lon); col = (isOcean(here) || lat > 72) ? here : deepSea; }   // today's sea (and the Arctic ice) where nothing moved in
+      else land++;
+      const k = (j * OUT_W + i) * 3; out3[k] = col[0]; out3[k + 1] = col[1]; out3[k + 2] = col[2];
+    }
+  }
+  writeWebp(out3, OUT_W, OUT_H, out, WEBP_QUALITY);
+  return land / n;
+}
+/** The plausibility report: the plates' velocities at known places from the poles (against the
+ *  textbook values), the Atlantic's equatorial width per step, the land fraction per map. */
+function reportFuturePlates(landFracByStep) {
+  const R = 6371;
+  const vel = (/** @type {string} */ k, /** @type {number} */ lat, /** @type {number} */ lon) => {
+    const P = PLATES[k], w = poleAxis(P.pole).map((c) => c * P.rate * d2r), p = unit(lat, lon);
+    const v = [w[1] * p[2] - w[2] * p[1], w[2] * p[0] - w[0] * p[2], w[0] * p[1] - w[1] * p[0]];   // ω × r, per Myr (unit sphere)
+    const cmPerYr = Math.hypot(...v) * R * 1e5 / 1e6;
+    const east = [-Math.sin(lon * d2r), Math.cos(lon * d2r), 0], north = [-Math.sin(lat * d2r) * Math.cos(lon * d2r), -Math.sin(lat * d2r) * Math.sin(lon * d2r), Math.cos(lat * d2r)];
+    const az = Math.atan2(v[0] * east[0] + v[1] * east[1] + v[2] * east[2], v[0] * north[0] + v[1] * north[1] + v[2] * north[2]) / d2r;
+    return `${cmPerYr.toFixed(1)} cm/yr toward ${((az + 360) % 360).toFixed(0)}°`;
+  };
+  console.log(`  plate velocities (NNR-MORVEL56, rounded): Sydney ${vel('australia', -33.9, 151.2)} (textbook ~7 NNE) · Cairo ${vel('africa', 30, 31)} (~2.5 N) · New York ${vel('northAmerica', 40.7, -74)} (~2 W) · Rio ${vel('southAmerica', -23, -43)} (~1.5 W) · Paris ${vel('eurasia', 48.9, 2.3)} (~2 E)`);
+  for (const t of [0, ...FUTURE_PLATE_STEPS]) {
+    // the Atlantic's width at the equator: Brazil's east tip (−5, −35) under South America's rotation against Liberia (5, −9) under Africa's
+    const [, lonB] = latLonOf(matVec(plateRotation('southAmerica', t), unit(-5, -35))), [, lonL] = latLonOf(matVec(plateRotation('africa', t), unit(5, -9)));
+    const gapKm = Math.max(0, ((lonL - lonB + 540) % 360 - 180)) * 111;
+    const [latS, lonS] = latLonOf(matVec(plateRotation('australia', t), unit(-12, 131)));   // Darwin
+    console.log(`  +${String(t).padStart(3)} Myr: Atlantic at the equator ${gapKm.toFixed(0)} km · Darwin at ${latS.toFixed(1)}°, ${lonS.toFixed(1)}°${landFracByStep[t] !== undefined ? ` · land ${(landFracByStep[t] * 100).toFixed(1)} %` : ''}`);
+  }
+}
+
+// ── 2b. The derived future maps (plan 27 step H1): the future continents with their vegetation
+// gone, and that under the vapour deck with the seas darkened ──────────────────────────────────
 const FUTURE_BROWN = 'future-biosphere-end', FUTURE_GREENHOUSE = 'future-moist-greenhouse';
 /** @param {string} modern the present-day map @param {string} outBrown @param {string} outGreenhouse */
 function deriveFutureMaps(modern, outBrown, outGreenhouse) {
@@ -312,10 +446,18 @@ function buildTierTable(atlas) {
   // domain's future edge. Two DERIVED tiers (from today's map: the greens desaturated to ochre;
   // then the same under a thickening vapour deck with the seas darkened), the mirror of the
   // genesis sequence, their spans a reading of those papers and said so; ages ahead are negative.
+  // H3 (the owner, 2026-11-05): the continents move — snapshots every 50 Myr to +250, each tier
+  // cross-fading into the next at its younger edge, the supercontinent held beyond
+  const plateTier = (/** @type {number} */ t, /** @type {string} */ what) => ({ id: `future-plates-${t}`, label: `+${t} Myr — ${what} (derived)`, fromMa: -(t + 25), toMa: -(t - 25), fadeMyr: 50, file: `public/textures/earth/generated/future-plates-${String(t).padStart(3, '0')}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 1 });
   let tiers = [
     { id: 'moist-greenhouse', label: 'The moist greenhouse — the oceans evaporating under a brightening Sun, a reading of Leconte 2013 and Wolf & Toon 2015 (derived)', fromMa: -1e9, toMa: -900, fadeMyr: 0, file: `public/textures/earth/generated/${FUTURE_GREENHOUSE}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 0.8, skyTint: [0.8, 0.78, 0.74] },
     { id: 'biosphere-end', label: 'The end of the land biosphere — CO₂ starvation of the plants under a brightening Sun, a reading of Caldeira & Kasting 1992 and Franck 2006 (derived)', fromMa: -900, toMa: -600, fadeMyr: 50, file: `public/textures/earth/generated/${FUTURE_BROWN}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 1 },
-    { id: 'modern', label: 'Present-day Earth (satellite imagery)', fromMa: -600, toMa: LGM_END_MA, fadeMyr: 100, file: 'public/Earth.jpg', source: 'modern', kind: 'cited', clouds: 1, atmosphere: 1, present: true },
+    { ...plateTier(250, 'Pangaea Proxima: the Atlantic closed, the Americas against Africa and Europe, Australia on Asia — Scotese\'s scenario on today\'s plate motions (DeMets 2010), one reading of several'), fromMa: -600, toMa: -225, fadeMyr: 100 },
+    plateTier(200, 'the Atlantic closing: the Americas on their way back east, the scenario of Scotese'),
+    plateTier(150, 'the Atlantic begins to close (the scenario\'s first speculative step); Africa and Australia ride with Eurasia'),
+    plateTier(100, 'Australia docked on Southeast Asia, the Mediterranean closed; the Atlantic at its widest — today\'s plate motions, DeMets 2010'),
+    plateTier(50, 'today\'s plate motions carried 50 Myr ahead (DeMets 2010): Australia at Indonesia, Africa into Europe, the Atlantic wider'),
+    { id: 'modern', label: 'Present-day Earth (satellite imagery)', fromMa: -25, toMa: LGM_END_MA, fadeMyr: 25, file: 'public/Earth.jpg', source: 'modern', kind: 'cited', clouds: 1, atmosphere: 1, present: true },
   ];
   // the atlas slices from the 21-ka map up: midpoints between neighbours; the 0 Ma map is unused
   const slices = atlas.filter((a) => a.ageMa > 0);
@@ -352,8 +494,20 @@ async function main() {
     if (REBUILD || !fs.existsSync(out)) { const t1 = Date.now(); renderGenerated(recipe, out); console.log(`rendered ${recipe} (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
   }
   {
+    // the future continents (every step rendered when any is missing: one reading, one set), then
+    // the biosphere's end and the greenhouse ON the supercontinent of the last step
+    const plateOut = (/** @type {number} */ t) => path.join(DEEP_DIR, `future-plates-${String(t).padStart(3, '0')}.webp`);
     const outBrown = path.join(DEEP_DIR, `${FUTURE_BROWN}.webp`), outGreenhouse = path.join(DEEP_DIR, `${FUTURE_GREENHOUSE}.webp`);
-    if (REBUILD || !fs.existsSync(outBrown) || !fs.existsSync(outGreenhouse)) { const t1 = Date.now(); deriveFutureMaps(path.join(ROOT, 'public/Earth.jpg'), outBrown, outGreenhouse); console.log(`derived the future maps (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
+    const platesStale = REBUILD || FUTURE_PLATE_STEPS.some((t) => !fs.existsSync(plateOut(t)));
+    if (platesStale) {
+      const t1 = Date.now();
+      const rgb = readImageRgb(path.join(ROOT, 'public/Earth.jpg'), OUT_W, OUT_H);
+      /** @type {Record<number, number>} */ const landFrac = {};
+      for (const t of FUTURE_PLATE_STEPS) landFrac[t] = renderFuturePlates(rgb, t, plateOut(t));
+      console.log(`rendered the future continents at ${FUTURE_PLATE_STEPS.join('/')} Myr (${((Date.now() - t1) / 1000).toFixed(1)} s)`);
+      reportFuturePlates(landFrac);
+    }
+    if (platesStale || !fs.existsSync(outBrown) || !fs.existsSync(outGreenhouse)) { const t1 = Date.now(); deriveFutureMaps(plateOut(FUTURE_PLATE_STEPS[FUTURE_PLATE_STEPS.length - 1]), outBrown, outGreenhouse); console.log(`derived the future maps on the +${FUTURE_PLATE_STEPS[FUTURE_PLATE_STEPS.length - 1]}-Myr continents (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
   }
   const tiers = buildTierTable(atlas);
   /** @type {Record<string, { sha256: string, bytes: number, width: number, height: number }>} */

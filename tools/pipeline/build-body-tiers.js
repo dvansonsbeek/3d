@@ -87,9 +87,11 @@ const RECIPES = {
   'moon-magma': coolingCrust({ crustDark: [52, 48, 46], crustLight: [118, 112, 104], lavaDark: [170, 44, 14], lavaBright: [255, 196, 86], ember: [150, 42, 16], glow: 1, scale: 1 }),
   // Mercury's early crust: darker, smaller plates, the melt mostly under the surface — a faint glow only
   'mercury-crust': coolingCrust({ crustDark: [36, 34, 34], crustLight: [84, 80, 78], lavaDark: [140, 36, 12], lavaBright: [230, 150, 60], ember: [120, 34, 14], glow: 0.45, scale: 1.7 }),
+  // Mars's pre-Noachian crust: the basaltic crust in Mars's own rust, the melt mostly under it
+  'mars-crust': coolingCrust({ crustDark: [78, 46, 34], crustLight: [150, 96, 66], lavaDark: [150, 40, 12], lavaBright: [240, 160, 70], ember: [130, 38, 16], glow: 0.35, scale: 1.4 }),
 };
 /** Each generated map's seed: the body's own. @type {Record<string, number>} */
-const SEEDS = { 'moon-magma': SEED, 'mercury-crust': SEED + 1 };
+const SEEDS = { 'moon-magma': SEED, 'mercury-crust': SEED + 1, 'mars-crust': SEED + 2 };
 
 // ── 2. The derived Moon maps: the maria raised toward the highlands' albedo ─────────────────
 // The present-day map's blurred luminance is bimodal (measured at 1024 × 512, box blur 6 px):
@@ -194,6 +196,73 @@ function deriveRaySuppressedMaps(modern, steps) {
   }
 }
 
+// ── 2c. Mars (plan 27, the Mars item): the seas of the Noachian and the Hesperian from the MOLA
+// topography ─────────────────────────────────────────────────────────────────────────────────
+// The northern lowlands lie 4–5 km below the southern highlands. Carr & Head (2003) assess the
+// two candidate shorelines: the Arabia level (~−2,090 m, the larger Noachian ocean, contested)
+// and the Deuteronilus level (~−3,792 m, the smaller Hesperian body, the Vastitas Borealis
+// Formation); Di Achille & Hynek (2010) place the deltas and valley networks at the Arabia level.
+// The tiers fill today's map below each contour with a depth-shaded sea (the polar caps kept);
+// the epochs' boundaries are Hartmann & Neukum (2001): Noachian/Hesperian 3.7 Ga, Hesperian/
+// Amazonian 3.0 Ga, the Noachian's start ~4.1 Ga. The DEM is the MOLA MEGDR at 4 pixel/degree
+// (NASA PDS, public domain; 1440 × 720 big-endian 16-bit metres above the areoid, the first
+// column at 0°E — measured: Hellas −6,044 m, Olympus Mons 19,340 m), fetched into data/.cache
+// and sha256-pinned; the map is east-positive centred on 0° (Syrtis Major dark, Arabia bright).
+const MARS_MODERN = 'public/Mars.jpg';
+const MOLA = {
+  url: 'https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg004/megt90n000cb.img',
+  file: path.join(ROOT, 'data', '.cache', 'mola', 'megt90n000cb.img'),
+  sha256: '25f16fb7aaf857898dcf98bc4f841341a24f8b9f7e98453ca083bc45d897ca2c',
+  width: 1440, height: 720,
+};
+const MARS_SHORELINES = { arabia: -2090, deuteronilus: -3792 };   // metres, Carr & Head 2003
+/** Fetch the MOLA grid when absent and check its hash. @returns {Int16Array} the elevations, row-major from 90°N, 0°E */
+function loadMola() {
+  fs.mkdirSync(path.dirname(MOLA.file), { recursive: true });
+  if (!fs.existsSync(MOLA.file)) { console.log(`fetching ${MOLA.url}`); run('curl', ['-sS', '-L', '--max-time', '300', '-o', MOLA.file, MOLA.url]); }
+  const h = sha256(MOLA.file);
+  if (h !== MOLA.sha256) throw new Error(`${MOLA.file}: sha256 ${h} ≠ pinned ${MOLA.sha256}`);
+  const buf = fs.readFileSync(MOLA.file);
+  const z = new Int16Array(MOLA.width * MOLA.height);
+  for (let k = 0; k < z.length; k++) z[k] = buf.readInt16BE(k * 2);
+  return z;
+}
+/** Derive the sea maps from today's map and the DEM. @param {string} modern @param {Int16Array} dem @param {{ contourM: number, out: string }[]} steps */
+function deriveMarsSeaMaps(modern, dem, steps) {
+  const rgb = readImageRgb(modern, OUT_W, OUT_H);
+  const n = OUT_W * OUT_H;
+  /** the DEM at a map pixel (the map's u = (lon + 180)/360 east-positive; the DEM's u = lon/360): bilinear */
+  const zAt = (/** @type {number} */ i, /** @type {number} */ j) => {
+    const lon = ((i + 0.5) / OUT_W) * 360 - 180, lat = 90 - ((j + 0.5) / OUT_H) * 180;
+    const x = (((lon % 360) + 360) % 360) / 360 * MOLA.width - 0.5, y = (90 - lat) / 180 * MOLA.height - 0.5;
+    const x0 = Math.floor(x), y0 = Math.min(MOLA.height - 2, Math.max(0, Math.floor(y))), fx = x - x0, fy = Math.min(1, Math.max(0, y - y0));
+    const c = (/** @type {number} */ xx, /** @type {number} */ yy) => dem[yy * MOLA.width + ((xx % MOLA.width) + MOLA.width) % MOLA.width];
+    return (c(x0, y0) * (1 - fx) + c(x0 + 1, y0) * fx) * (1 - fy) + (c(x0, y0 + 1) * (1 - fx) + c(x0 + 1, y0 + 1) * fx) * fy;
+  };
+  for (const s of steps) {
+    const out = Buffer.alloc(n * 3);
+    let seaW = 0, totW = 0;
+    for (let j = 0; j < OUT_H; j++) {
+      const lat = 90 - ((j + 0.5) / OUT_H) * 180, cw = Math.cos(lat * Math.PI / 180);
+      for (let i = 0; i < OUT_W; i++) {
+        const k = j * OUT_W + i;
+        const r = rgb[k * 3], g = rgb[k * 3 + 1], b = rgb[k * 3 + 2];
+        const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        const z = zAt(i, j);
+        const depth = s.contourM - z;
+        const cap = smooth(0.7, 0.85, lum) * smooth(70, 80, Math.abs(lat));   // today's polar caps stay
+        const w = (1 - smooth(-120, 120, -depth)) * (1 - cap);              // sea below the contour, the shore antialiased over ±120 m
+        const sea = mix3([64, 92, 112], [30, 44, 70], smooth(0, 1200, depth)); // the shelf lighter, the deep darker
+        const px = mix3([r, g, b], sea, w);
+        out[k * 3] = clamp01(px[0] / 255) * 255; out[k * 3 + 1] = clamp01(px[1] / 255) * 255; out[k * 3 + 2] = clamp01(px[2] / 255) * 255;
+        seaW += w * cw; totW += cw;
+      }
+    }
+    console.log(`${path.basename(s.out)}: sea below ${s.contourM} m covers ${(seaW / totW * 100).toFixed(1)} % of the surface`);
+    writeWebp(out, OUT_W, OUT_H, s.out, WEBP_QUALITY);
+  }
+}
+
 // ── 3. The bodies ───────────────────────────────────────────────────────────────────────────
 /** @typedef {{ id: string, label: string, fromMa: number, toMa: number, fadeMyr: number, file: string, source: string, kind: 'cited'|'illustration', rings?: boolean }} Tier */
 
@@ -242,6 +311,27 @@ const BODIES = {
       { id: 'early-crust', label: 'Early crust before the oldest preserved surfaces (generated)', fromMa: 4100, toMa: DEEP_END_MA, fadeMyr: 50, file: 'public/textures/mercury/generated/mercury-crust.webp', source: 'generated', kind: 'illustration' },   // plan 27 step I: the fade into the present-day map
     ]),
   },
+  mars: {
+    description: 'Mars\'s tier table — GENERATED by tools/pipeline/build-body-tiers.js --write (plan 27, the Mars item). The scene cross-fades Mars\'s map by the TT age of its epoch from `tiers` (ages in Myr before J2000). `kind` names what a map IS: the cited present-day map, or illustration — derived from the present-day map and the MOLA topography (the seas below a cited shoreline contour), or generated. The gate tools/verify/surface-tiers.js checks the files against `files`.',
+    sources: {
+      modern: { file: MARS_MODERN, ...SSS },
+      mola: { title: 'MOLA Mission Experiment Gridded Data Record (MEGDR), 4 pixel/degree topography, megt90n000cb', url: MOLA.url, sha256: MOLA.sha256, bytes: 2073600, format: `${MOLA.width} x ${MOLA.height} big-endian 16-bit metres above the areoid, the first column at 0°E, the first row at 90°N`, citation: 'Smith, D.E. et al., 2001. Mars Orbiter Laser Altimeter: Experiment summary after the first year of global mapping of Mars. JGR 106, 23689–23722.', licence: 'NASA PDS Geosciences Node — public domain (a US Government work)', cached: 'data/.cache/mola/ (gitignored; fetched and hash-checked by the script)' },
+      derived: { note: 'the present-day map with a depth-shaded sea filled below a shoreline contour of the MOLA topography (the polar caps kept; the method is in the script) — a derivative of the CC BY 4.0 map, labelled "illustration"; the shorelines are a CONTESTED reading of the literature below', derivedFrom: MARS_MODERN, licence: 'CC BY 4.0 (derivative, attributed)' },
+      generated: { note: `procedural illustration rendered by this script from seeded 3-D value noise on the sphere (seed ${SEED + 2}) — no third-party rights; labelled "illustration"` },
+      literature: {
+        carrHead2003: 'Carr, M.H. & Head, J.W., 2003. Oceans on Mars: An assessment of the observational evidence and possible fate. JGR 108, 5042 — the Arabia (~−2,090 m) and Deuteronilus (~−3,792 m) shoreline levels; the evidence assessed as suggestive, not conclusive.',
+        diAchilleHynek2010: 'Di Achille, G. & Hynek, B.M., 2010. Ancient ocean on Mars supported by global distribution of deltas and valleys. Nature Geoscience 3, 459–463 — the deltas and valley networks at the Arabia level in the Noachian/early Hesperian.',
+        hartmannNeukum2001: 'Hartmann, W.K. & Neukum, G., 2001. Cratering chronology and the evolution of Mars. Space Science Reviews 96, 165–194 — the Noachian/Hesperian boundary ~3.7 Ga, the Hesperian/Amazonian ~3.0 Ga, the Noachian from ~4.1 Ga.',
+        tanaka2014: 'Tanaka, K.L. et al., 2014. Geologic map of Mars. USGS Scientific Investigations Map 3292 — the epochs\' surfaces.',
+      },
+    },
+    tiers: /** @type {Tier[]} */ ([
+      { id: 'modern', label: 'Present-day Mars — the Amazonian', fromMa: FUTURE_EDGE_MA, toMa: 3000, fadeMyr: 0, file: MARS_MODERN, source: 'modern', kind: 'cited', present: true },
+      { id: 'hesperian-sea', label: 'The Hesperian — a northern sea below the Deuteronilus shoreline (−3,792 m, Carr & Head 2003), a contested reading (derived)', fromMa: 3000, toMa: 3700, fadeMyr: 150, file: 'public/textures/mars/derived/mars-hesperian-sea.webp', source: 'derived', kind: 'illustration' },
+      { id: 'noachian-sea', label: 'The Noachian — a northern ocean below the Arabia shoreline (−2,090 m, Carr & Head 2003; Di Achille & Hynek 2010), a contested reading (derived)', fromMa: 3700, toMa: 4100, fadeMyr: 150, file: 'public/textures/mars/derived/mars-noachian-sea.webp', source: 'derived', kind: 'illustration' },
+      { id: 'pre-noachian', label: 'The pre-Noachian — the early crust before the Noachian\'s recorded surfaces (generated)', fromMa: 4100, toMa: DEEP_END_MA, fadeMyr: 100, file: 'public/textures/mars/generated/mars-crust.webp', source: 'generated', kind: 'illustration' },
+    ]),
+  },
   saturn: {
     description: 'Saturn\'s tier table — GENERATED by tools/pipeline/build-body-tiers.js --write (plan 27 step F). The map is the same throughout; `rings` says whether the ring mesh is shown at the TT age of the epoch (ages in Myr before J2000). The rings\' age is a measured BAND (see sources.literature); the boundary is the pollution bound\'s upper edge. The gate tools/verify/surface-tiers.js checks the files against `files`.',
     sources: {
@@ -267,7 +357,7 @@ const BODIES = {
 function main() {
   const t0 = Date.now();
   // generated maps
-  for (const [name, dir] of [['moon-magma', 'moon'], ['mercury-crust', 'mercury']]) {
+  for (const [name, dir] of [['moon-magma', 'moon'], ['mercury-crust', 'mercury'], ['mars-crust', 'mars']]) {
     const out = path.join(TEX, dir, 'generated', `${name}.webp`);
     fs.mkdirSync(path.dirname(out), { recursive: true });
     if (REBUILD || !fs.existsSync(out)) { const t1 = Date.now(); renderSphereMap(RECIPES[name], SEEDS[name], OUT_W, OUT_H, out, WEBP_QUALITY); console.log(`rendered ${name} (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
@@ -286,6 +376,11 @@ function main() {
   const raysStale = REBUILD || raySteps.some((s) => !fs.existsSync(s.out));
   if (raysStale) { const t1 = Date.now(); deriveRaySuppressedMaps(path.join(ROOT, MOON_MODERN), raySteps); console.log(`derived the three ray-suppressed Moon maps (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
   if (raysStale || steps.some((s) => !fs.existsSync(s.out))) { const t1 = Date.now(); deriveMariaMaps(noRays, steps); console.log(`derived the three maria Moon maps from the no-rays map (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
+  // the Mars seas (plan 27, the Mars item): the MOLA grid fetched and hash-checked on demand
+  const marsDerived = path.join(TEX, 'mars', 'derived');
+  fs.mkdirSync(marsDerived, { recursive: true });
+  const marsSteps = [{ contourM: MARS_SHORELINES.deuteronilus, out: path.join(marsDerived, 'mars-hesperian-sea.webp') }, { contourM: MARS_SHORELINES.arabia, out: path.join(marsDerived, 'mars-noachian-sea.webp') }];
+  if (REBUILD || marsSteps.some((s) => !fs.existsSync(s.out))) { const t1 = Date.now(); deriveMarsSeaMaps(path.join(ROOT, MARS_MODERN), loadMola(), marsSteps); console.log(`derived the two Mars sea maps (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
   // the tables
   for (const [body, b] of Object.entries(BODIES)) {
     const tiers = b.tiers;

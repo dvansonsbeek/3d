@@ -571,8 +571,50 @@ Myr to the edge: the seas darkened under a vapour deck; Leconte 2013, Wolf &
 Toon 2015) — the mirror of the genesis sequence, their spans a reading of
 those papers and said so; the present-day tier is the one the manifest marks
 `present: true` (the gate requires exactly one per body), never index 0.
-The hover of the present tier ahead of today names the next supercontinent
-(~+250 Myr, Pangaea Proxima / Amasia) as not drawn.
+The continents ahead MOVE (the owner, 2026-11-05): five snapshots at +50 to
++250 Myr, cross-fading every 50 Myr from the present tier's 25-Myr fade —
+today's continents as hand-drawn plate polygons rotated by their measured
+present-day Euler poles and rates (NNR-MORVEL56, DeMets et al. 2010), robust
+for ~100 Myr (Australia reaches New Guinea, Africa closes the Mediterranean,
+the Atlantic widens to 5,500 km at the equator) and held beyond, then
+Scotese's Pangaea Proxima scenario (the Atlantic closes from +100 Myr at
+3 cm/yr until the Americas meet Africa and Europe at +250; one reading of
+several — Davies et al. 2018 name Amasia, Novopangaea and Aurica); the
+pipeline prints the velocities at known places (Sydney 5.7 cm/yr NNE, New
+York 1.7 W, Paris 2.2 NE), the equatorial Atlantic's width per step (2,886 km
+today, 0 at +250) and the land fraction. The biosphere's end and the
+greenhouse are drawn on the +250-Myr continents. `public/Earth.jpg` is
+Pacific-centred (its left edge Greenwich, longitude 0–360° east) — the first
+render read it as (lon + 180)/360 and painted the continents 180° off.
+
+**The Origin tour (step D).** The "Origin Tour" button on the Tools folder's
+Analysis page (beside the genesis analysis; the owner's placement)
+runs its stations from the Earth–Moon genesis through today to the edge of
+the domain (4,429 → 4,415 → 4,200 → 3,800 → 3,200 → 2,460 → 2,400 → 1,400 →
+700 → 540 → 380 → 250 → 66 → 0.021 → 0 Ma, then +80 kyr, +50, +250, +600,
++950 and +1,000 Myr — twenty-one; 12 s per station, Next / Back / Pause on the
+card, × closes, Escape closes). Each station: the card first with a landing line (the first
+deep jump builds the tables, up to half a minute — the owner's first remark),
+then on the next tick a seated jump by the Date field with the camera framed
+on the Earth 3.5 radii out from the sunlit side, then the full card
+(`#origin-tour`): the title, the age, one sentence on what the scene shows,
+one on what the model or the source says, the rows — the day, the sidereal
+year in solar days (the tropical year is ill-defined where the clock
+collapses to years), the Moon's distance and apparent diameter, the
+precession clock, the obliquity (a value inside the hybrid's ±10-Myr domain,
+the band beyond) and, inside the ice history, the ice cover — each with its
+provenance tag (measured / cited / derived / forecast / band / uncalibrated;
+ahead of today the Moon's recession is held at the LLR rate, so its rows are
+forecasts), and the gated rock anchor where one exists (Lantink 2.46 Ga,
+Xiamaling 1.4 Ga, Wells 380 and 65 Ma, the LR04 stack at the LGM — named,
+their numbers in the Framework Verification panel). The hold is armed on the
+station's first RESPONSIVE frame (a hold armed at the jump expired behind a
+10-s first frame, measured). Every number is read live from the package model
+the registry runs on (`tourStationValues`, pure in the station — no hand
+number); the browser golden pins every station's card text and the start /
+next / pause / close states, and the epoch-consistency gate compares each
+station's day, Moon and clock with the Node model at the same engine year
+(1e-9) and the Devonian station with the registry's own keys (5e-3).
 
 **The Moon, Mercury and Saturn (step F).** The same table form, one
 `public/textures/<body>/manifest.json` per body (written by
@@ -594,7 +636,14 @@ step G2), then the lunar magma ocean (generated) to
 raised, then the maria at one third and two thirds of their present darkness
 (3,800–3,550–3,300 Ma, the mare flooding), then the present-day map; Mercury
 two — a generated early crust before its oldest preserved surfaces (4,100 Ma),
-then the present-day map; Saturn three — its rings hidden before 400 Ma and
+then the present-day map; Mars four — the Amazonian present-day map, the
+Hesperian with a northern sea below the Deuteronilus shoreline (−3,792 m) and
+the Noachian with an ocean below the Arabia shoreline (−2,090 m), both
+derived from today's map and the MOLA 4-pixel/degree topography (NASA PDS,
+fetched and hash-pinned by the script) at Carr & Head 2003's contested levels
+(Di Achille & Hynek 2010 for the deltas), the epochs' boundaries Hartmann &
+Neukum 2001 (3.0 and 3.7 Ga, the Noachian from ~4.1), then a generated
+pre-Noachian crust; Saturn three — its rings hidden before 400 Ma and
 gone again after ~+200 Myr ahead (Cassini's ring rain, O'Donoghue 2019; the
 opacity ramps out over +100 → +200 Myr; step H2), the rings' ages being cited
 bands, not values. The About folder's "Moon & planet

@@ -91,11 +91,71 @@
    "atmosphere": 1
   },
   {
+   "id": "future-plates-250",
+   "label": "+250 Myr — Pangaea Proxima: the Atlantic closed, the Americas against Africa and Europe, Australia on Asia — Scotese's scenario on today's plate motions (DeMets 2010), one reading of several (derived)",
+   "fromMa": -600,
+   "toMa": -225,
+   "fadeMyr": 100,
+   "file": "public/textures/earth/generated/future-plates-250.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-200",
+   "label": "+200 Myr — the Atlantic closing: the Americas on their way back east, the scenario of Scotese (derived)",
+   "fromMa": -225,
+   "toMa": -175,
+   "fadeMyr": 50,
+   "file": "public/textures/earth/generated/future-plates-200.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-150",
+   "label": "+150 Myr — the Atlantic begins to close (the scenario's first speculative step); Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -175,
+   "toMa": -125,
+   "fadeMyr": 50,
+   "file": "public/textures/earth/generated/future-plates-150.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-100",
+   "label": "+100 Myr — Australia docked on Southeast Asia, the Mediterranean closed; the Atlantic at its widest — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -125,
+   "toMa": -75,
+   "fadeMyr": 50,
+   "file": "public/textures/earth/generated/future-plates-100.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-50",
+   "label": "+50 Myr — today's plate motions carried 50 Myr ahead (DeMets 2010): Australia at Indonesia, Africa into Europe, the Atlantic wider (derived)",
+   "fromMa": -75,
+   "toMa": -25,
+   "fadeMyr": 50,
+   "file": "public/textures/earth/generated/future-plates-050.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
    "id": "modern",
    "label": "Present-day Earth (satellite imagery)",
-   "fromMa": -600,
+   "fromMa": -25,
    "toMa": 0.022471561943874056,
-   "fadeMyr": 100,
+   "fadeMyr": 25,
    "file": "public/Earth.jpg",
    "source": "modern",
    "kind": "cited",
@@ -1416,14 +1476,44 @@
  ],
  "files": {
   "public/textures/earth/generated/future-moist-greenhouse.webp": {
-   "sha256": "3344f8ca359b0e38225c13962a0692a506ce8fcb73576d736174d986d5f98b32",
-   "bytes": 51068,
+   "sha256": "5a51a2cc22c6769e40240ee940195816bec892a7f777936557bea4067e3b6ab9",
+   "bytes": 49634,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/generated/future-biosphere-end.webp": {
-   "sha256": "884bdf641eb82cc41173b4a9fb81ef3082fdc8a95ee199caa732bb44d6b9a89c",
-   "bytes": 111180,
+   "sha256": "80ef25c4fca5d62b8a2a3c0658416550bcf576abe769e4fdbe5d9d09f17e4f60",
+   "bytes": 103074,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-250.webp": {
+   "sha256": "b4e6c3ae35389ffb3996ec5b3ee17710e497799fadb54bebb90ada65cf238b52",
+   "bytes": 113320,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-200.webp": {
+   "sha256": "20534ec7d5229ace9265a55a68be072dc6bf31058cd5a9e9134c50ba6bf0cc00",
+   "bytes": 112264,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-150.webp": {
+   "sha256": "141d789cde4c0cee92fdf1361e2bacabb4f858e8f3bfb46b3a4d7b34f4e224a3",
+   "bytes": 112360,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-100.webp": {
+   "sha256": "5422e06d893ea0e8d9c3ab797659f0480d30adee1c6e870a82950773cf051ec6",
+   "bytes": 113366,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-050.webp": {
+   "sha256": "1f165299575238c52f54a140070bd1179a5729d4c48c5f86f9696823c6bbc01e",
+   "bytes": 112512,
    "width": 2048,
    "height": 1024
   },

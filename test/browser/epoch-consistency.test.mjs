@@ -64,6 +64,7 @@ const CLOCK_POS = [-1e6, -400e6, -2000e6, navigablePosRange().posMin + 1e4];
 const CLOCK_JDS = CLOCK_POS.map((p) => jdFromPos(p));
 const TOL_CLOCK_YEAR = 1e-6, TOL_CLOCK_TT_DAYS = 1e-3, TOL_RING_REL = 1e-9, TOL_RANGE_YEARS = 1e-6;
 const TOL_GENESIS_JD_DAYS = 1e-5, TOL_GENESIS_GAMMA = 1e-4, TOL_GENESIS_UMBRA_KM = 1;   // the registry's rendered precision
+const TOL_TOUR_REL = 1e-9, TOL_TOUR_REGISTRY_REL = 5e-3;   // one model, two runtimes; the registry's rounded keys (and their own year definition)
 // The placed Moon against its ring: the lunar eccentricity of date bounds the ratio (0.055 at
 // J2000, the deep channel below 0.08) — at the genesis the ring once sat 27 % from the Moon,
 // sized on the position's tropical-year COUNT while the Moon read the TT age (the owner's
@@ -149,6 +150,10 @@ for (const jd of CLOCK_JDS) {
 // finder, two runtimes), read here and compared below with the registry's run of it on the Node
 // twin (`genesisFirstSolarEclipse*`, written by values:package:write).
 domainRows.genesis = await s.page.evaluate(() => window.__test__.genesisEclipse());
+// plan 27 step D: the Origin tour's station values — the browser's package model at each station's
+// engine year (pure, no jump), compared below with the Node model at the same year (one model,
+// two runtimes) and, at the Devonian, with the registry's own keys.
+domainRows.tour = await s.page.evaluate(() => { const T = window.__test__; return T.tourStations().map((ageMa, i) => ({ ageMa, ...T.tourStationValues(i) })); });
 // THE HONEST EDGE (plan 27 step B): a jump past either edge lands ON the edge, never beyond —
 // beyond it the readers fell back to a linear count (630 solar days per year one day before the
 // genesis, the owner's measurement).
@@ -302,6 +307,25 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const okG = Number.isFinite(dJD) && Math.abs(dJD) <= TOL_GENESIS_JD_DAYS && Number.isFinite(dGamma) && Math.abs(dGamma) <= TOL_GENESIS_GAMMA && Number.isFinite(dUmbra) && Math.abs(dUmbra) <= TOL_GENESIS_UMBRA_KM;
     if (!okG) fail++;
     console.log(`${okG ? '  ok ' : 'FAIL '} genesis eclipse browser/registry  JD ${g ? g.jd.toFixed(5) : 'null'} / ${regJD.toFixed(5)}  Δ ${Number(dJD).toExponential(2)} d · γ Δ ${Number(dGamma).toExponential(2)} · umbra Δ ${Number(dUmbra).toExponential(2)} km`);
+    // plan 27 step D: the tour's stations against the Node model at the same engine year
+    for (const st of domainRows.tour) {
+      const y = st.year;
+      const lodH = m.epoch.lodRealSecondsAtYear(y) / 3600, moonKm = m.epoch.moonDistanceKmAtYear(y), prec = m.epoch.axialPrecessionYearsAtYear(y);
+      const rel = (/** @type {number} */ a, /** @type {number} */ b) => Math.abs(a - b) / Math.abs(b);
+      const dLod = rel(st.dayHours, lodH), dMoon = rel(st.moonKm, moonKm), dPrec = rel(st.precYears, prec);
+      const okT = [dLod, dMoon, dPrec].every((d) => Number.isFinite(d) && d <= TOL_TOUR_REL);
+      if (!okT) fail++;
+      console.log(`${okT ? '  ok ' : 'FAIL '} tour station ${String(st.ageMa).padStart(9)} Ma  day ${st.dayHours.toFixed(4)} h · Moon ${st.moonKm.toFixed(1)} km · clock ${st.precYears.toFixed(1)} yr  vs the Node model  rel ${Number(dLod).toExponential(1)} / ${Number(dMoon).toExponential(1)} / ${Number(dPrec).toExponential(1)}`);
+    }
+    {
+      // the Devonian station against the registry's own keys (the published numbers)
+      const dev = domainRows.tour.find((st) => st.ageMa === 380);
+      const regLod = Number(reg.lodAtDevonianHr), regDays = Number(String(reg.daysPerYearAtDevonian).replace(/,/g, ''));
+      const dL = dev ? Math.abs(dev.dayHours - regLod) / regLod : NaN, dD = dev ? Math.abs(dev.yearSolarDays - regDays) / regDays : NaN;
+      const okD = Number.isFinite(dL) && dL <= TOL_TOUR_REGISTRY_REL && Number.isFinite(dD) && dD <= TOL_TOUR_REGISTRY_REL;
+      if (!okD) fail++;
+      console.log(`${okD ? '  ok ' : 'FAIL '} tour Devonian station vs the registry  day ${dev ? dev.dayHours.toFixed(2) : '-'} / ${regLod} h · year ${dev ? dev.yearSolarDays.toFixed(2) : '-'} / ${regDays} solar days  rel ${Number(dL).toExponential(1)} / ${Number(dD).toExponential(1)}`);
+    }
     const edgeJD = jdFromPos(twin.posMin);
     for (const [label, f] of [['the Date field', domainRows.edge.viaDate], ['the Julian Day field', domainRows.edge.viaJD]]) {
       const dPos = f.pos - twin.posMin, dJD = f.julianDay - edgeJD;

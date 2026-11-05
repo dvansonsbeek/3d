@@ -421,6 +421,59 @@ canvas {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ── The Origin tour card (plan 27 step D) ── */
+.origin-tour {
+  position: fixed;
+  left: 96px;      /* clear of the Planet Info rail and the eye button (the owner's screenshot) */
+  bottom: 40px;
+  width: min(440px, calc(100vw - 120px));
+  padding: 12px 14px 0;
+  font-family: "Inter", system-ui, sans-serif;   /* the panel's face — the card inherited the page's serif */
+  overflow: hidden;
+  border: 1px solid hsla(220, 30%, 32%, 0.7);
+  border-radius: 10px;
+  background: hsla(215, 40%, 13%, 0.94);
+  color: hsla(0, 0%, 96%, 1);
+  font-size: 12.5px;
+  line-height: 1.45;
+  box-shadow: 0 8px 28px hsla(0, 0%, 0%, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 240ms ease, transform 240ms ease;
+  z-index: 9999;
+}
+.origin-tour.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.origin-tour-close { position: absolute; top: 6px; right: 8px; width: 22px; height: 22px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: hsla(210, 10%, 62%, 1); font: inherit; font-size: 16px; line-height: 22px; cursor: pointer; }
+.origin-tour-close:hover { background: hsla(220, 30%, 28%, 0.9); color: hsla(0, 0%, 96%, 1); }
+.origin-tour-head { display: flex; align-items: baseline; gap: 8px; margin: 0 26px 6px 0; }
+.origin-tour-landing { color: hsla(45, 70%, 78%, 1); padding: 6px 0 2px; }
+.origin-tour-says { color: hsla(210, 10%, 62%, 1); font-size: 12px; margin-bottom: 8px; }
+.origin-tour-step { font-size: 10.5px; color: hsla(210, 10%, 60%, 1); font-variant-numeric: tabular-nums; }
+.origin-tour-title { font-size: 15px; font-weight: 600; }
+.origin-tour-age { margin-left: auto; font-size: 11px; color: hsla(45, 80%, 78%, 1); white-space: nowrap; }
+.origin-tour-note { color: hsla(210, 10%, 86%, 1); margin-bottom: 3px; }
+.origin-tour-tag-forecast { border-color: hsla(280, 50%, 60%, 0.7); color: hsla(280, 60%, 78%, 1); }
+.origin-tour-btn:disabled { opacity: 0.4; cursor: default; }
+.origin-tour-rows { display: flex; flex-direction: column; gap: 3px; }
+.origin-tour-row { display: grid; grid-template-columns: 112px 1fr auto; gap: 10px; align-items: baseline; }
+.origin-tour-label { color: hsla(210, 10%, 62%, 1); }
+.origin-tour-value { font-family: "IBM Plex Mono", Menlo, Consolas, monospace; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.origin-tour-legend { margin-top: 8px; font-size: 10px; line-height: 1.35; color: hsla(210, 10%, 50%, 1); }
+.origin-tour-btn-small { font-size: 10.5px; padding: 1px 8px; margin-left: 6px; vertical-align: baseline; }
+.origin-tour-progress { height: 3px; margin: 8px -14px 0; background: hsla(220, 25%, 24%, 0.6); }
+.origin-tour-progress-fill { height: 100%; width: 0%; background: hsla(45, 80%, 68%, 0.9); }
+.origin-tour-tag { font-size: 9.5px; letter-spacing: 0.04em; text-transform: uppercase; padding: 1px 6px; border-radius: 8px; border: 1px solid hsla(220, 25%, 40%, 0.6); color: hsla(210, 10%, 72%, 1); }
+.origin-tour-tag-measured { border-color: hsla(140, 50%, 45%, 0.7); color: hsla(140, 50%, 70%, 1); }
+.origin-tour-tag-cited { border-color: hsla(200, 60%, 50%, 0.7); color: hsla(200, 60%, 72%, 1); }
+.origin-tour-tag-derived { border-color: hsla(45, 60%, 50%, 0.7); color: hsla(45, 70%, 72%, 1); }
+.origin-tour-tag-band, .origin-tour-tag-uncalibrated { border-color: hsla(20, 70%, 50%, 0.7); color: hsla(20, 80%, 72%, 1); }
+.origin-tour-anchor { margin-top: 8px; padding-top: 6px; border-top: 1px solid hsla(220, 25%, 30%, 0.5); color: hsla(45, 70%, 78%, 1); font-size: 11.5px; }
+.origin-tour-foot { display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-bottom: 2px; }
+.origin-tour-btn { font: inherit; font-size: 11.5px; padding: 3px 10px; border-radius: 6px; border: 1px solid hsla(220, 30%, 40%, 0.7); background: hsla(220, 30%, 20%, 0.9); color: inherit; cursor: pointer; }
+.origin-tour-btn:hover { background: hsla(220, 30%, 28%, 0.95); }
+.origin-tour-hint { margin-left: auto; font-size: 10.5px; color: hsla(210, 10%, 58%, 1); text-align: right; }
+
 /* ── Navigation toolbar (step/reset/now) ── */
 .tp-nav-toolbar {
   display: flex;
