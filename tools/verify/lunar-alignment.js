@@ -64,6 +64,9 @@ const INPUT_FILES = [
   // Stage A′ of the engine-switch record):
   'packages/physics/src/moon/apparent.cjs',
   'packages/api/src/app.js',
+  // the clock every instant here crosses (plan 27 §8 J; doc 111 §1.16): the raw ΔT integrand and the UT↔TT bridge
+  'packages/physics/src/deltat/deep-time.cjs',
+  'packages/physics/src/phase/deep-calendar.cjs',
   // the banked fitted deep-time record (τ_GIA) the ΔT stack's GIA channel rides
   'data/deep-time-fitted.json',
   // THE REST OF WHAT THIS CAMPAIGN ACTUALLY RUNS ON (measured, 2026-09-30):

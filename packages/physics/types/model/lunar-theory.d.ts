@@ -129,6 +129,19 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
             fwd: number[];
             bwd: number[];
         }>;
+        channel: {
+            windowCenturies: number;
+            segmentCenturies: number;
+            exponents: {
+                s: number;
+                edge: {
+                    fwd: number;
+                    bwd: number;
+                };
+                fwd: number[];
+                bwd: number[];
+            }[];
+        };
         segmentYears: number;
         chainLimitYears: number;
     };
@@ -157,6 +170,19 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
                 bankEdge: number | null;
             };
         }>;
+        channel: {
+            s: number;
+            fwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+            bwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+        }[];
     };
 };
 export type Ctx = import("./time-axis.js").Ctx & ReturnType<typeof assembleLunarTheory>;

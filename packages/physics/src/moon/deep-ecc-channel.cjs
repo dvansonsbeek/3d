@@ -171,20 +171,76 @@ function createDeepEccChannel({ earthZ, anchorE, anchorPeriEclipticDeg, anchorZD
   // segment, the segmented association the lunar tables use: a value is the window edge's
   // verbatim integral + P[k] + S_k[j] + the partial cell — the same doubles whichever T was
   // asked first (test:sampler-purity Twin 5), grown outward on demand and cached per s
-  // (the one-time walk to the genesis is ~2.2 M evaluations, ~1 s; every read after is
-  // three). Not seated in the lunar bank (an option later; the walk is cheap).
+  // (the one-time walk to the genesis is 2.2 M evaluations per exponent and direction; every
+  // read after is three).
+  //
+  // SEATED IN THE LUNAR BANK (plan 27 §8 K): that one-time walk was the first landing on the
+  // genesis edge — two exponents (perigee, node), 6.4 s of an 8.1-s first landing in Node on
+  // ONE model, and the browser builds two (measured by table, scratchpad first-landing-steps).
+  // The segment prefixes P[k] are the bank's `channel` section; a seated side sums only the
+  // segment it reads — the same doubles in the same order as the walk (a seat, never a
+  // value). The seat check is the carriers': the bank's window-edge integral against this
+  // runtime's own to a RELATIVE 1e-7 (a bit-exact check refuses every seat in the browser,
+  // whose V8 differs from Node's at the last bit — doc 111 §1.29).
   const CHANNEL_WINDOW_CY = 2500, CELL_CY = 40, SEGMENT_CELLS = 64;
-  /** @typedef {{ edge: number, P: number[], segs: Map<number, number[]> }} ChannelSide */
+  const SEGMENT_CY = SEGMENT_CELLS * CELL_CY;
+  /** @typedef {{ edge: number, P: number[], segs: Map<number, number[]>, banked: number, bankEdge: number | null }} ChannelSide */
+  /** @typedef {{ s: number, edge: { fwd: number, bwd: number }, fwd: number[], bwd: number[] }} ChannelBankEntry */
   /** @type {Map<number, { fwd: ChannelSide | null, bwd: ChannelSide | null }>} */
   const channelSides = new Map();
+  /** @type {ChannelBankEntry[] | null} */
+  let channelBank = null;
+  /** The bank's entry for an exponent — matched to a relative 1e-9 (the sensitivities are
+   *  derived doubles; the two runtimes may part at the last bit). @param {number} s */
+  const bankEntryFor = (s) => (channelBank ? channelBank.find((e) => Math.abs(e.s - s) <= 1e-9 * Math.max(1, Math.abs(s))) : undefined);
   /** @param {number} s @param {1|-1} dir @returns {ChannelSide} */
   function channelSide(s, dir) {
     let pair = channelSides.get(s);
     if (!pair) { pair = { fwd: null, bwd: null }; channelSides.set(s, pair); }
     const key = dir === 1 ? 'fwd' : 'bwd';
     let side = pair[key];
-    if (!side) { side = { edge: simpsonFromZero(dir * CHANNEL_WINDOW_CY, s), P: [0], segs: new Map() }; pair[key] = side; }
+    if (!side) {
+      side = { edge: simpsonFromZero(dir * CHANNEL_WINDOW_CY, s), P: [0], segs: new Map(), banked: 0, bankEdge: null };
+      const entry = bankEntryFor(s);
+      const arr = entry ? entry[key] : undefined;
+      if (entry && entry.edge && typeof entry.edge[key] === 'number') side.bankEdge = entry.edge[key];
+      if (Array.isArray(arr) && arr.length > 1 && arr[0] === 0 && side.bankEdge !== null && Math.abs(side.bankEdge - side.edge) <= 1e-7 * Math.max(1, Math.abs(side.edge))) { side.P = arr.slice(); side.banked = arr.length; }
+      pair[key] = side;
+    }
     return side;
+  }
+  /** SEAT the segment prefixes on the lunar bank's `channel` section (null unseats). The sides
+   *  built so far are dropped — their values are pure in T, the next read rebuilds its own.
+   *  @param {{ exponents?: ChannelBankEntry[] } | null | undefined} bank */
+  function seatPrefixes(bank) {
+    channelBank = bank && Array.isArray(bank.exponents) ? bank.exponents : null;
+    channelSides.clear();
+  }
+  /** THE GENERATOR'S HOOK (tools/verify/lunar-cumulative-bank.js): the segment prefixes of the
+   *  given exponents in both directions, by the table's own recursion — K = the whole segments
+   *  whose END lies within the limit OF J2000, the one rule of the banked tables.
+   *  @param {number | {past: number, future: number}} limitCy Julian centuries
+   *  @param {number[]} exponents
+   *  @returns {{ windowCenturies: number, segmentCenturies: number, exponents: ChannelBankEntry[] }} */
+  function recordPrefixes(limitCy, exponents) {
+    const lim = typeof limitCy === 'number' ? { past: limitCy, future: limitCy } : limitCy;
+    const upTo = (/** @type {number} */ s, /** @type {1|-1} */ dir, /** @type {number} */ limit) => {
+      const side = channelSide(s, dir);
+      const K = Math.max(0, Math.floor((limit - CHANNEL_WINDOW_CY) / SEGMENT_CY));
+      for (let m = side.P.length - 1; m < K; m++) side.P.push(side.P[m] + channelSegment(side, s, dir, m)[SEGMENT_CELLS]);
+      return side.P.slice(0, K + 1);
+    };
+    return {
+      windowCenturies: CHANNEL_WINDOW_CY, segmentCenturies: SEGMENT_CY,
+      exponents: exponents.map((s) => ({ s, edge: { fwd: channelSide(s, 1).edge, bwd: channelSide(s, -1).edge }, fwd: upTo(s, 1, lim.future), bwd: upTo(s, -1, lim.past) })),
+    };
+  }
+  /** THE SEAT DIAGNOSTIC: per exponent and direction, how many prefixes the bank seated and the
+   *  two window-edge integrals compared. Forces each side's window-edge integral.
+   *  @param {number[]} exponents */
+  function seatStatus(exponents) {
+    const one = (/** @type {number} */ s, /** @type {1|-1} */ dir) => { const side = channelSide(s, dir); return { banked: side.banked, edge: side.edge, bankEdge: side.bankEdge }; };
+    return exponents.map((s) => ({ s, fwd: one(s, 1), bwd: one(s, -1) }));
   }
   /** Segment k's within-segment prefix sums S_k[0..SEGMENT_CELLS] (built once).
    *  @param {ChannelSide} side @param {number} s @param {1|-1} dir @param {number} k */
@@ -226,7 +282,7 @@ function createDeepEccChannel({ earthZ, anchorE, anchorPeriEclipticDeg, anchorZD
     return eccAt(tYr) / e0;
   }
 
-  return { eccAt, eccRateAt, modulation, channelIntegral, eFactorAt, e0, g0 };
+  return { eccAt, eccRateAt, modulation, channelIntegral, eFactorAt, e0, g0, seatPrefixes, recordPrefixes, seatStatus };
 }
 
 module.exports = { createDeepEccChannel };

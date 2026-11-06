@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.9
-coefficients: sha256:3afe3e8645567bc8
+modelVersion: v27.10
+coefficients: sha256:7c135a128a54451c
 status: current
 ---
 
@@ -580,7 +580,7 @@ The model exposes four LOD values in the tweakpane **Day Lengths → Solar Day**
 |:---|:---|:---|---:|
 | **Layer 1 (Tidal Mean)** | pure-tidal chain (Farhat 2022, LLR α₁) + the ecliptic kinematic term, with α held at long-term L1-climate MEAN value | Isolates Moon-recession tidal drift from the glacial-cycle α oscillation. Sits ABOVE Layer 2 at J2000 because J2000 is near a Holocene interglacial (L1 minimum → α at J2000 < α at climate mean) | **86400.110143 s** |
 | **Layer 2 (+ GIA)** | Layer 1 with α(t) applied at the current epoch (at J2000 this is EARTH_MOI_FACTOR exactly) | Adds the GIA channel via the L1-orbital-coupled α(t) curve — the physics baseline used by year-length derivations | **<!--v:solarDayLayer2J2000-->86,400.003432<!--/v--> s** |
-| **Layer 3 (+ Cycles)** | Layer 2 + Σ Bond/Hallstatt/Jose5/Jose4 cyclic δLOD stack (flags only) | Cyclic sub-Milankovitch modulation WITHOUT the Core-mantle swing | **<!--v:solarDayLayer3J2000-->86,400.000704<!--/v--> s** |
+| **Layer 3 (+ Cycles)** | Layer 2 + Σ Bond/Hallstatt/Jose5/Jose4 cyclic δLOD stack (flags only) | Cyclic sub-Milankovitch modulation WITHOUT the Core-mantle swing | **<!--v:solarDayLayer3J2000-->86,400.000703<!--/v--> s** |
 | **Layer 4 (REAL LOD)** | Layer 3 + Core-mantle swing (Resonator episode) | Physical length of one solar day — the shipped observable. Closes on the USNO target <!--v:usnoLodJ2000-->86,400.0012<!--/v--> s by construction of the joint fit (one J2000 day basis since plan 09 — see "The J2000 day basis") | **<!--v:lodRealPhysical-->86,400.001200<!--/v--> s** |
 
 **Layer 1 − Layer 2 gap (~107 ms at J2000)** — the effect of using α at climate-mean vs α at J2000:
@@ -1135,7 +1135,7 @@ The shipped chain, written by the engine on the cited history — LOD by conserv
 
 Near genesis the Moon's torque dominates by orders of magnitude ((a₀/a_M)³ ≈ 921 at the input's end, 4.429 Ga), so the precession period collapses to years — a statement of the composition law at the edge of the input's domain, not a calibrated prediction (the distance there is Farhat et al. 2022's solution, read as the ratio a(t)/a(0) on the J2000 distance; the model refuses beyond 4,429 Ma).
 
-The first solar eclipse of the cited history (the registry's `genesisFirstSolarEclipse*` keys: the eclipse tier's finder on the seated model, walking the months of date from the navigable past edge): JD (UT) -2469702431781.82178, 83.90 solar days of date after the edge (4428.9850 Ma), total, γ 0.0655, umbra 1,560 km and penumbra 1,916 km on the fundamental plane, the Moon at 37,822 km, the synodic month of date 0.9068 d — reproducible, not converged (the lunar inclination is the J2000 constant; the early Laplace-plane transition is not modelled). The simulator's Solar Eclipses folder lands on it ("Genesis").
+The first solar eclipse of the cited history (the registry's `genesisFirstSolarEclipse*` keys: the eclipse tier's finder on the seated model, walking the months of date from the navigable past edge): JD (UT) -2470620550205.87451, 91.01 solar days of date after the edge (4428.9850 Ma), total, γ 0.0654, umbra 1,560 km and penumbra 1,916 km on the fundamental plane, the Moon at 37,822 km, the synodic month of date 0.9068 d — reproducible, not converged (the lunar inclination is the J2000 constant; the early Laplace-plane transition is not modelled). The simulator's Solar Eclipses folder lands on it ("Genesis").
 <!-- /generated:doc99-genesis-table -->
 
 The distance column IS Farhat's (the input, on the model's J2000 anchor); the day-length column is conservation on it, and agrees with his own to 0.01 h at 100 Ma and 0.24 h at 4.4 Ga. Forward of J2000 the input has no future: the chain holds the LLR rate constant there, a labelled extrapolation (Farhat's model accounts for the future recession-rate slowdown; the two part by a few per cent at +0.2 Gyr).

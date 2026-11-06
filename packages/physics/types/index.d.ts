@@ -67,7 +67,7 @@ export { DEG2RAD, RAD2DEG, ARCSEC_PER_TURN, ARCSEC_PER_RAD, wrap360, wrap180, wr
 export { MOON_ECC_SENSITIVITY_PERIGEE, MOON_ECC_SENSITIVITY_NODE, deriveMoonEccSensitivities, MEEUS_ARGUMENT_RATES_DEG_PER_CY } from "./moon/ecc-sensitivities.cjs";
 export { computeMassChainJ2000, computeMoonPeriodsJ2000 } from "./earth/mass-chain.cjs";
 export { SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR, JULIAN_CENTURY_DAYS, SECONDS_PER_JULIAN_YEAR } from "./constants/units.cjs";
-export { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } from "./time/navigable-domain.cjs";
+export { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS, deepTierWalkSpanYears } from "./time/navigable-domain.cjs";
 export { computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG } from "./earth/frame-of-date.cjs";
 export { derivePlanetGeometry, scaffoldOrbitInputs } from "./planets/geometry.cjs";
 export { buildPlanetChainsFromArtifactData, computePlanetElementsAtYear, computeHeliocentricEclipticFromElements, computePoissonArgRad, computeOsculatingElements, solveKeplerRad, computeApsidalTangentDegPerYr, ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD } from "./planets/keplerian-chain.cjs";

@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.9
-coefficients: sha256:3afe3e8645567bc8
+modelVersion: v27.10
+coefficients: sha256:7c135a128a54451c
 status: current
 ---
 
@@ -67,7 +67,7 @@ Full −720…2017 window, `--joint`, anchors free to move:
 | bond + hallstatt | 33.49 s | 72.70 s |
 | bond + hallstatt + jose5 | 34.89 s | 45.00 s |
 | bond + hallstatt + jose4 (jose5 removed) | 26.07 s | 74.81 s |
-| **all four (shipped)** | **<!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s** | **<!--v:stephensonFullWindowRmsSeconds-->28.75<!--/v--> s** |
+| **all four (shipped)** | **<!--v:deltaTEspenakRmsSeconds-->12.5<!--/v--> s** | **<!--v:stephensonFullWindowRmsSeconds-->21.41<!--/v--> s** |
 
 ## 4. Configuration sweep — out-of-sample
 

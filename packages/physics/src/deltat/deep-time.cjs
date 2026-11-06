@@ -31,6 +31,7 @@
 'use strict';
 
 const { createComposedPrecession } = require('../earth/precession-composed.cjs');
+const { SECONDS_PER_JULIAN_YEAR } = require('../constants/units.cjs');
 
 /**
  * @typedef {Object} DeepTimeLodConstants
@@ -250,9 +251,15 @@ function createDeepTimeLod(deps) {
 
   /**
    * The raw ΔT integrand at an age: seconds of ΔT per Myr of TT. ΔT grows by (86,400 − LOD)
-   * per SOLAR day, and a year of date holds yearS/LOD solar days — the UT clock counts solar
-   * days, never SI days (a former /86,400 read 0.02 % low at 1 Ma, 7 % at 400 Ma, 26 % at
-   * 2 Ga, 42 % at the genesis: doc 111 §1.36). The day is the solar day of date: the
+   * per SOLAR day, and a Myr of the AGE AXIS holds 1e6 · (seconds per year of that axis)/LOD
+   * solar days — the UT clock counts solar days, never SI days (a former /86,400 read 0.02 %
+   * low at 1 Ma, 7 % at 400 Ma, 26 % at 2 Ga, 42 % at the genesis: doc 111 §1.36). The age
+   * axis is the ENGINE's: Julian years of TT from J2000 (`year = 2000 − t_Ma·1e6`, the bridge's
+   * own `(jdTT − J2000)/365.25`), so its year is the JULIAN year. The tropical year of date in
+   * that place counted solar days per tropical year on an axis of Julian years — low by
+   * T_trop(date)/365.25: 2.14e-5 in the era (0.6 s of raw ΔT at −1000, 1.7 s at −3000), 4.4e-5
+   * of the UT day at 1 Ga, 8.3 % of it at the genesis, where the UT clock's day read 5.98 h
+   * against the history's 5.51 h (measured, plan 27 §8 J1). The day is the solar day of date: the
    * kinematic mean LOD plus the ecliptic "missing motion" — the solar day is measured against
    * the Sun on the ECLIPTIC, whose plane turns on the invariable plane at the nodal rate s₃
    * (period ≈ 68,751 yr, an orbital quantity), not in the inclination frame; ~3.4 ms at
@@ -263,9 +270,9 @@ function createDeepTimeLod(deps) {
   function deltaTRawIntegrandAtAge(tau) {
     const lodMean = lodSecondsAtAge(tau);
     if (lodMean === null) return NaN;
-    const yearS = tropicalYearSecondsFromLod(tau, lodMean);
+    const yearS = tropicalYearSecondsFromLod(tau, lodMean);   // the missing-motion term's year of date
     const lodH5Raw = lodMean + lodMean / (deps.nodalPeriodYearsFn() * (yearS / 86400));
-    return (86400 - lodH5Raw) * yearS * 1e6 / lodH5Raw;
+    return (86400 - lodH5Raw) * SECONDS_PER_JULIAN_YEAR * 1e6 / lodH5Raw;
   }
 
   /** Simpson over [a, b] on the integrand with a midpoint (exact for a quadratic). @param {number} a @param {number} b @returns {number} */
@@ -289,10 +296,16 @@ function createDeepTimeLod(deps) {
   /** @param {number[]} P @param {number} dir @param {number} originMa @param {number} cellMa @param {number} cells */
   const growDeltaTPrefix = (P, dir, originMa, cellMa, cells) => {
     const target = Math.ceil((cells + 1) / DELTAT_SEGMENT_CELLS) * DELTAT_SEGMENT_CELLS;
+    // a cell's far edge is the next cell's near edge — the SAME double (the same expression in
+    // k), so its integrand is evaluated once: two evaluations per cell where simpsonCell takes
+    // three, the same sum to the bit (a third of the table's build, on the first deep landing)
+    let fEdge = P.length <= target ? deltaTRawIntegrandAtAge(dir * (originMa + (P.length - 1) * cellMa)) : NaN;
     for (let k = P.length; k <= target; k++) {
       const a = dir * (originMa + (k - 1) * cellMa), b = dir * (originMa + k * cellMa);
       const prev = P[k - 1];
-      P.push(Number.isNaN(prev) ? NaN : prev + simpsonCell(a, b));
+      const fm = deltaTRawIntegrandAtAge((a + b) / 2), f1 = deltaTRawIntegrandAtAge(b);
+      P.push(Number.isNaN(prev) ? NaN : prev + (fEdge + 4 * fm + f1) * (b - a) / 6);
+      fEdge = f1;
     }
   };
   /**

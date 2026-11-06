@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.9
-coefficients: sha256:3afe3e8645567bc8
+modelVersion: v27.10
+coefficients: sha256:7c135a128a54451c
 status: current
 ---
 
@@ -568,7 +568,7 @@ The balance calculation lives inside `updateInvariablePlaneBalance()`, summing `
 1. **GPU-bound frame rate** — on a large high-ratio display the draw, not the loop's JavaScript, sets the frame rate; the adaptive pixel ratio drops to 1 under 30 fps, and `index.html?perf=1` measures it ([doc 52](52-analysis-export-tools.md) Part 4b)
 2. **Memory** — the textures are the bulk of the page's memory
 3. **No persistence** — state is lost on page refresh
-4. **Single thread** — a jump to a deep epoch integrates Earth's spin axis on the main thread. Since plan 24 the spin walk seats on the shipped checkpoint bank (`data/spin-axis-checkpoints.json`, the walk's exact state every 250 kyr) and a point read of ε or the equinox covers at most one spacing (the first ε at −400 Myr ≤ 2 s, gated); since plan 25 the lunar cumulative tables (the chain-cycle counts and the Lp carriers, which integrate from J2000 and read ε/e at every 1-kyr cell) seat on the lunar cumulative bank (`data/lunar-cumulative-checkpoints.json`, their segment prefixes every 250 kyr) and sum one segment at most, so the Node package's lunar longitude at −400 Myr went from 84 s to ~3 s; the browser seats both banks once its fetch lands — until then, or without the files, the same tables integrate from J2000 and the same walk runs — the numbers never depend on a bank, only the wait ([doc 109 §18](109-model-nbody-engine.md), [doc 111 §1.29](111-measured-traps-and-gate-origins.md))
+4. **Single thread** — a jump to a deep epoch integrates Earth's spin axis on the main thread. Since plan 24 the spin walk seats on the shipped checkpoint bank (`data/spin-axis-checkpoints.json`, the walk's exact state every 250 kyr) and a point read of ε or the equinox covers at most one spacing (the first ε at −400 Myr ≤ 2 s, gated); since plan 25 the lunar cumulative tables (the chain-cycle counts and the Lp carriers, which integrate from J2000 and read ε/e at every 1-kyr cell) seat on the lunar cumulative bank (`data/lunar-cumulative-checkpoints.json`, their segment prefixes every 250 kyr) and sum one segment at most, so the Node package's lunar longitude at −400 Myr went from 84 s to ~3 s; since plan 27 the same bank carries the eccentricity channel's segment prefixes for the perigee and node exponents (its `channel` section — their one-time walk to the genesis was most of a first landing there) and the one-source sampler's deep tier never walks past the domain's edge ([doc 111 §1.37](111-measured-traps-and-gate-origins.md)); the browser seats both banks once its fetch lands — until then, or without the files, the same tables integrate from J2000 and the same walk runs — the numbers never depend on a bank, only the wait ([doc 109 §18](109-model-nbody-engine.md), [doc 111 §1.29](111-measured-traps-and-gate-origins.md))
 
 ---
 

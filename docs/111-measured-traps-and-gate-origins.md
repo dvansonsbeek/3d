@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.9
-coefficients: sha256:3afe3e8645567bc8
+modelVersion: v27.10
+coefficients: sha256:7c135a128a54451c
 status: current
 ---
 
@@ -1308,6 +1308,122 @@ Twin 5 pins the edge first-vs-last and the visit order), a one-time walk of
 a REPEAT landing on the edge, absolute; the values beyond the window move at
 the association's rounding level (the deep goldens re-recorded with this
 reason), the in-era values not at all.
+
+### 1.37 An integrand's year is its axis's year — three more axes inside the one deep clock, and a tolerance per cell that added up
+
+§1.36 put the scene on one deep clock. Checking the year length at the genesis
+on that clock (the Predictions panel's cardinal year read 1,317 UT days where
+the chain says 1,430 solar days per tropical year of date) showed that the
+clock's three functions of one position — the TT instant, the UT instant, the
+count — each still read "the age" off an axis that was not the age. All three
+were invisible to every gate that read the clock against itself; they show
+the moment the clock is read against the CHAIN (the baseline, at eighteen
+positions, differences over ±50 count years):
+
+| finding | what read the wrong axis | size |
+|---|---|---|
+| J1 | the raw ΔT integrand multiplied (86,400 − LOD)/LOD by the TROPICAL year of date, on an age axis of JULIAN years (`year = 2000 − t_Ma·1e6`, the bridge's own `(jdTT − J2000)/365.25`) | low by T_trop(date)/365.25: 2.14e-5 of the raw ΔT in the era — 0.04 s at AD 1000, 0.53 s at −1000, 1.6 s at −3000, 6.8 s at −8000; the UT day (the bridge's dTT/dUT) against the chain's LOD: 1.0e-6 at 100 Ma, 9.8e-6 at 400 Ma, 4.4e-5 at 1 Ga, 5.8e-4 at 4 Ga, 5.1e-3 at 4,425 Ma, 8.3 % at the genesis edge (21,510 s where the history's day is 19,854 s: 5.98 h against 5.51 h) |
+| J2 | the position table read its integrand, the tropical year of date, at the COUNT as if the count were the age | the count runs 0.055 % ahead of the TT age (2.59 Myr at the genesis), so the integrand was read 2.4 Myr too deep inside the cited history and on its fallback past the history's end for the last 4.6 Myr of count: 364.94 SI days per count year at the edge where the tropical year of date is 328.74 (11 %), 360.28 against 362.66 at 4,425 Ma, 8.5e-5 at 4.4 Ga; under 2 ms on any instant of the historical window |
+| J3 | the UT↔TT bridge read the raw integral's age off the CIVIL decimal year | proleptic Julian before 1582 — the engine's axis to a constant 12.5 days, the fitted convention, unchanged; GREGORIAN ahead of today — 2.05e-5 of the span ahead of the engine year: 20.5 yr at +1 Myr, 2,053 yr at +100 Myr, 20,329 yr at +990 Myr; the UT day 1.2e-6 off at +100 Myr, 1.5e-5 at +990 Myr |
+
+**The fixes.** J1: the integrand counts on its axis's own year
+(`SECONDS_PER_JULIAN_YEAR`; the ecliptic missing-motion term keeps its year
+of date). J2: the table solves dJD/dcount = D(age(JD)) — each cell the
+implicit trapezoid T₁ = T₀ + ½·(D(age(T₀)) + D(age(T₁)))·Δcount by fixed
+point, the partial-cell read the same equation from the cell's lower node, and
+the inverse in CLOSED FORM (the age of the target instant is known). J3: ahead
+of the scene epoch the raw integral's age is Julian years of TT; the past
+keeps the civil year the fitted convention reads. After them the UT day equals
+the chain's LOD to 2.9e-8 at 1 Ga, 4.0e-7 at 4 Ga and 1.2e-5 at the edge, and
+to 7e-10 at +990 Myr; the count year equals the tropical year of date to 1e-8
+inside 4,425 Ma and 3.3e-7 at the edge (1,430.50 UT days per count year
+against the chain's 1,430.52). J3 was found by the GATE's design, not by the
+plan: the residual left after J1 grew with depth on the future side, and a
+tolerance wide enough to pass it would have hidden it (§1.20).
+
+**The governed ΔT pair re-closed by hand** on the new raw integral: the trend
+anchor `deltaTStart` 56.076420 → 56.076924 s, the Bond amplitude 368.780 →
+368.792 s, the phases by ≤ 0.009°, the Espenak-window RMS 12.4532 → 12.4528 s,
+the USNO closure unchanged; the caps and the resonator's shape as before. The
+climate chain upstream of the fit came out value-identical. The three eclipse
+campaigns refused and were re-baselined as conscious re-measurements, every
+move explained by the ΔT: the eclipse audit's mean absolute residuals 1213.7955
+→ 1213.7963 s (lunar) and 664.00005 → 664.00026 s (solar), 39 rows reproduced;
+the lunar alignment's canon mean 8.517816 → 8.517801 min and RMS 9.823798 →
+9.823778 min; the canon recall's oldest era (−2000…−1501, outside the fit's
+window, where nothing absorbs J1) signed median −6.42 → −6.40 min, two of
+12,064 eclipses across the 15-minute tight limit (81.81 → 81.79 %), the
+overall recall unchanged.
+
+**The gate** `tools/verify/deep-clock-axes.js` (in the suite): at ten positions
+from +990 Myr to 20 kyr inside the genesis edge, |UT day / LOD_real − 1| and
+|SI days per count year / tropical year of date − 1| against tolerances that
+are the measured residuals with a margin, by depth (the day 2e-7 to 1 Ga,
+2e-6 to 4 Ga, 5e-5 beyond; the year 5e-8, 1e-7 at 4,425 Ma, 2e-6 at the edge)
+— the residual is the ΔT table's partial-cell quadrature on the cited
+history's interpolation, and the table's own 10-kyr trapezoid where the year
+changes fast. Fail-proven: `ESSRT_DEEP_CLOCK_PLANT=1` puts J1's year unit back
+into the measured day (9 of 10 rows fail), `=2` stretches the count year by
+1e-6 (9 of 10).
+
+**Three traps on the way.**
+
+*A difference of Julian Days needs room.* The first baseline differenced the
+table over ±0.5 count years: Julian Days of 10¹⁰ carry 10⁻⁵ d of granularity,
+and the day ratio read ±1e-5 of noise at 10–100 Ma — larger than J1 there and
+of alternating sign, which looked like a fourth finding. Over ±50 years the
+ratio equals J1's prediction at every age.
+
+*A tolerance per cell adds up.* The J2 march first accepted a cell when its
+trapezoid image lay within a few units in the last place of the iterate
+(`4e-16·|T|`, meant as the double's own floor). With a predictor from the
+previous cell's slope — one evaluation per cell — the accepted residual is
+SYSTEMATIC, and over the table's 443,000 cells it added up to 0.9 days at the
+genesis against the converged form. The test is now below ONE unit in the last
+place at depth (1e-9 d in the era), i.e. an exact fixed point: the predictor
+form reproduces the converged form bit for bit at all eighteen positions, at
+500 ms where the converged form took 765 ms (347 ms before J2).
+
+*A gate's check must exercise what it names.* The lunar bank's
+seat-and-resume loop seeded the new channel section with as many prefixes as
+the tables (k + 1). The channel's segments are 256 kyr against the tables' 250,
+so those prefixes already covered the limit and the seeded side resumed
+nothing — the check compared the bank with itself. A trial of the generator on
+a ±6-Myr span (a patched copy in the scratchpad, minutes) refused on its own
+counter ("no side resumed"); found there, not at the end of the 2-hour run.
+The channel is seeded one prefix short of what the limit requires.
+
+**The first landing on the genesis edge (K).** By table, in Node on one model
+(`scratchpad/first-landing-steps.mjs`): 8.1 s, of which 6.4 s the Moon's first
+read — the eccentricity channel's one-time walk of its two exponents (perigee,
+node; 2.2 M evaluations each per direction) —, 0.35 s the position table and
+0.5 s the raw ΔT table; the browser builds two models. Two levers taken, one
+trimmed: (1) the channel's segment prefixes ride the lunar bank (its `channel`
+section: 17,300 past + 3,906 future prefixes per exponent, 0.8 MB; the
+carriers' relative seat check) — on the channel alone twelve reads at six ages
+take 3.7 ms seated against 5.0 s walking, bit-identical, a truncated seat
+resumes every recorded prefix exactly, a bank with another window-edge
+integral seats nothing; (2) the one-source sampler's deep tier walked two grid
+nodes past the query, and at the clamped edge that was 10 kyr at the 1/32-yr
+step — 320,000 RK4 steps beyond a state the spin bank holds; the span has ONE
+home (`deepTierWalkSpanYears`, time/navigable-domain) for the package's
+sampler and the scene's twin and never passes the edge; (3) the raw ΔT table
+evaluated each cell edge twice — once per cell now, the same sum to the bit
+(513 → 416 ms). Measured after the bank was regenerated: 2.0 s in Node on one
+model (the position table 0.46 s, the ΔT table 0.40 s, the Moon's first read
+0.78 s), and headless on a fresh page 7.3 s for the entry where it read ~23 s
+(the Origin tour's first card 7.5 s for 24.6 s), 135 ms for the three frames
+after it, 32 ms for a repeat landing; every channel side seated (17,300 +
+3,906 prefixes, the scene's chain and the tier model alike). The perf gate's
+row 0e times the first landing in its sequence, absolute, and its seat row
+names an unseated channel. What is left is the two models' position and ΔT
+tables, built once each.
+
+**A hole in the freshness gate (§1.16's class).** No generator hashed
+`phase/deep-calendar.cjs`, the UT↔TT bridge, and the three eclipse campaigns
+did not hash `deltat/deep-time.cjs` either: an edit to the bridge alone would
+have moved their recorded numbers with `check:artifacts` green. The three
+campaigns and the lunar bank list both files now.
 
 ---
 

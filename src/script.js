@@ -16,7 +16,7 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   DEG2RAD, RAD2DEG, wrap360, wrap180,
   computeMassChainJ2000, computeMoonPeriodsJ2000, SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR,
   // the navigable domain (time/navigable-domain): the pos table's and the deep calendar's grid edges
-  NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS,
+  NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS, deepTierWalkSpanYears,
   // THE deep-time chain (the six browser factories it replaces: the GIA α channel,
   // the Layer-0 primitives, the recession history, the ΔT cycles, the deep e, the month chain)
   createDeepTimeChain } from '@essrt/physics';
@@ -2918,7 +2918,7 @@ const TOUR_HOLD_MS = 12000;
 // rock anchor where one exists. Ages ahead of today are negative.
 /** @type {{ ageMa: number, title: string, scene: string, says: string, anchor?: string, anchorAction?: 'genesis' }[]} */
 const TOUR_STATIONS = [
-  { ageMa: 4428.985, title: 'The Earth–Moon genesis', scene: 'A magma ocean under a forming steam atmosphere; the Moon at six Earth radii, five degrees across.', says: 'The oldest point the Moon\'s measured distance history reaches (Farhat et al. 2022); the simulator goes no further back.', anchor: 'The first solar eclipse the Moon ever cast lands 84 days later.', anchorAction: 'genesis' },
+  { ageMa: 4428.985, title: 'The Earth–Moon genesis', scene: 'A magma ocean under a forming steam atmosphere; the Moon at six Earth radii, five degrees across.', says: 'The oldest point the Moon\'s measured distance history reaches (Farhat et al. 2022); the simulator goes no further back.', anchor: 'The first solar eclipse the Moon ever cast follows about ninety of those short days later — three weeks of ours.', anchorAction: 'genesis' },
   { ageMa: 4415, title: 'The first oceans', scene: 'The steam rains out onto the new crust under a thinning cloud of steam.', says: 'An illustration following Zahnle 2007 and Sleep 2001; the Jack Hills zircons, the oldest crystals on Earth, record liquid water by 4,400 million years ago (Wilde 2001).' },
   { ageMa: 4200, title: 'The Hadean ocean world', scene: 'A global ocean with volcanic islands under an oxygen-free sky.', says: 'The short day and the close Moon go together: as the Moon moves away, the Earth\'s spin slows to pay for it — computed on the Moon\'s measured distance history.' },
   { ageMa: 3800, title: 'The Moon gets its dark seas', scene: 'Lava floods the Moon\'s great impact basins: the dark maria that make its face appear; on Earth the first continental cores grow.', says: 'The dark basalts date 3,900–3,100 million years ago (Hiesinger 2011); the Moon\'s look is derived from today\'s map, an illustration.' },
@@ -3018,7 +3018,7 @@ function _tourRenderCard(i, v, landing = false) {
     ? `<div class="origin-tour-landing">Landing${i === 0 || _tour.started === 1 ? ' — the first deep jump prepares the deep-time tables and can take up to half a minute' : ''} …</div>`
     : `<div class="origin-tour-note">${esc(v.scene)}</div><div class="origin-tour-says">${esc(v.says)}</div>`
       + `<div class="origin-tour-rows">${v.rows.map((r) => `<div class="origin-tour-row" title="${esc(r.hint)}${r.today ? ` — ${esc(r.today)}` : ''}"><span class="origin-tour-label">${esc(r.label)}</span><span class="origin-tour-value">${esc(r.value)}</span><span class="origin-tour-tag origin-tour-tag-${r.tag}">${r.tag}</span></div>`).join('')}</div>`
-      + (v.anchor ? `<div class="origin-tour-anchor">${esc(v.anchor)}${v.anchorAction === 'genesis' ? ' <button type="button" class="origin-tour-btn origin-tour-btn-small" data-tour="genesis" title="Jump to the first solar eclipse of the cited history — the finder walks the months of date from the edge (about 45 s the first time); the tour pauses">Jump to it</button>' : ''}</div>` : '')
+      + (v.anchor ? `<div class="origin-tour-anchor">${esc(v.anchor)}${v.anchorAction === 'genesis' ? ' <button type="button" class="origin-tour-btn origin-tour-btn-small" data-tour="genesis" title="Jump to the first solar eclipse of the cited history — the finder walks the months of date from the edge (about 40 s the first time); the tour pauses">Jump to it</button>' : ''}</div>` : '')
       + `<div class="origin-tour-legend">measured today · cited: a published input · derived: computed by the model · forecast: carried ahead of today — hover a row for its source and today's value</div>`;
   const foot = `<div class="origin-tour-foot"><button type="button" class="origin-tour-btn" data-tour="prev"${i === 0 ? ' disabled' : ''}>‹ Back</button><button type="button" class="origin-tour-btn" data-tour="next"${i + 1 >= TOUR_STATIONS.length ? ' disabled' : ''}>Next ›</button><button type="button" class="origin-tour-btn" data-tour="pause">${_tour.paused ? 'Resume' : 'Pause'}</button></div>`
     + `<div class="origin-tour-progress"><div class="origin-tour-progress-fill"></div></div>`;
@@ -4085,7 +4085,9 @@ if (typeof window !== 'undefined') {
     // runtime and the two edge values compared (the perf gate asserts every seat took).
     lunarBankLoaded: () => _lunarBankData !== null,
     lunarSeatStatus: () => ({ chains: _chainCycles().seatStatus(), carriers: _moonArgsM().carrierSeatStatus(),
-      // the package tier model's own tables (its chains, carriers and the Sun's mean-longitude table — plan 26 pickup)
+      // the scene chain's eccentricity channel: the perigee and node exponents' segment prefixes (plan 27 §8 K)
+      channel: _deepEcc().seatStatus([_dtc().moonEccSensitivities.perigeePhysical, _dtc().moonEccSensitivities.nodePhysical]),
+      // the package tier model's own tables (its chains, carriers, channel and the Sun's mean-longitude table — plan 26 pickup)
       package: _tierModelB().moon.bankSeatStatus() }),
     // Perf-gate surface (the R9 class): force ONE resample of every chain
     // planet's orbit ring at jd — the 10-yr JD condition and the 250-ms
@@ -15564,7 +15566,7 @@ let _spinBankData = null;   // {spacingYr, checkpoints:[{t, s:[x,y,z]}]}
 // tables sum one segment at most and read the SAME doubles in the SAME order
 // as without the bank (a seat, never a value; the purity gate's lunar rows).
 // Loaded like the series; until it lands the tables integrate from J2000.
-let _lunarBankData = null;   // {chains:{name:{fwd,bwd}}, carriers:{name:{fwd,bwd}}, meta}
+let _lunarBankData = null;   // {chains:{name:{fwd,bwd}}, carriers:{name:{fwd,bwd}}, sun, channel:{exponents:[{s,edge,fwd,bwd}]}, meta}
 {
   (async () => {
     const candidates = ['data/lunar-cumulative-checkpoints.json', REPO_RAW_URL + 'data/lunar-cumulative-checkpoints.json'];
@@ -15574,13 +15576,16 @@ let _lunarBankData = null;   // {chains:{name:{fwd,bwd}}, carriers:{name:{fwd,bw
         if (!res.ok) continue;
         const a = await res.json();
         if (!a.chains || !a.carriers || !a.chains.draconic || !Array.isArray(a.chains.draconic.bwd)) continue;
-        _lunarBankData = { chains: a.chains, carriers: a.carriers, sun: a.sun, meta: a.meta };   // sun: the Sun's mean-longitude table (plan 26)
+        _lunarBankData = { chains: a.chains, carriers: a.carriers, sun: a.sun, channel: a.channel, meta: a.meta };   // sun: the Sun's mean-longitude table (plan 26); channel: the eccentricity channel's prefixes (plan 27 §8 K)
         // Rebuild every holder of a lunar table so the next evaluation seats:
         // the arguments factory (its carriers), the chain-cycle integrator (its
-        // counts), the package tier model (its own instances of both), and the
+        // counts), the scene chain's eccentricity channel (its two exponents'
+        // prefixes — the first landing on the genesis edge walked them: ~13 s),
+        // the package tier model (its own instances of all three), and the
         // umbra tier's one-JD memo with it (a paused frame re-reads the same JD).
         _moonArgsM.reset();
         _chainCycles.reset();
+        _deepEcc().seatPrefixes(a.channel ?? null);
         _tierUmbraModel = null;
         _eclipseM = null;   // the finders hold the instance's Sun deps (plan 26 pickup)
         _umbraTierMemo.jd = NaN;
@@ -15750,12 +15755,13 @@ function _hybridSeriesSampleAt(yearIn) {
     // owner's 80-s deep jump were that forward walk (measured headless:
     // 86 → 65 s).
     const dir = t < 0 ? -1 : 1;
-    // Walk to two grid nodes past the QUERY — the package's own rule — never to the
+    // Walk to two grid nodes past the QUERY, never past the domain's edge — the package's
+    // own rule, ONE home (time/navigable-domain) — never to the
     // tier's span: that span (1.25 × a need already 1.25 × |t|) passed the bank's
     // deepest checkpoint (−4,425 Myr) for every query beyond |t| = 2.83 Gyr and the walk
     // ran unseated from there: 0.06 s at −2.8 Gyr, 63 s at −2.9 Gyr, 130 s at the
     // position table's edge (doc 111 §1.35).
-    const walkSpan = Math.ceil((Math.abs(t) + 2 * 5000) / 5000) * 5000;
+    const walkSpan = deepTierWalkSpanYears(t);
     if (walkSpan > _epsSeriesDeepRangeYr[dir]) {
       _epsSeriesDeepRangeYr[dir] = walkSpan;
       _epsSeriesSamplers.set(key, _deepHistSeries().build(dir * walkSpan, 0, 5000));

@@ -63,6 +63,9 @@ const INPUT_FILES = [
   'packages/physics/src/moon/month-chain.cjs',
   'packages/physics/src/moon/series-extension.cjs',
   'packages/physics/src/deltat/cycles.cjs',
+  // the clock every instant here crosses (plan 27 §8 J; doc 111 §1.16): the raw ΔT integrand and the UT↔TT bridge
+  'packages/physics/src/deltat/deep-time.cjs',
+  'packages/physics/src/phase/deep-calendar.cjs',
   'data/deep-time-fitted.json',
   'data/deltaT-4flag-fit.json',
   'data/core-mantle-resonator-stage1.json',

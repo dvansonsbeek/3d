@@ -288,6 +288,25 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   read at the edge (11.5 s per repeat landing with both banks seated) — a
   cumulative integral rides a segmented table, the era form verbatim inside
   its window, and a perf row measures the REPEAT landing. (§1.36)
+- **An integrand's year is its AXIS's year, an integrand's age is the age of
+  the INSTANT, and a calendar label is not an age** — three more axes inside
+  the one deep clock, each invisible to every gate that read the clock against
+  itself: the raw ΔT integrand counted solar days per TROPICAL year on an age
+  axis of JULIAN years (0.53 s at −1000, 8.3 % of the UT day at the genesis:
+  5.98 h for 5.51); the position table read its integrand at the COUNT as if
+  it were the age (364.94 SI days per count year at the edge where the
+  tropical year is 328.74); the bridge read the raw integral's age off the
+  civil year, which is GREGORIAN ahead of today (20 kyr of age at +990 Myr).
+  Gate a clock's DERIVATIVES against the chain (`deep-clock-axes.js`: the UT
+  day ≡ LOD, the count year ≡ the tropical year of date), and take a
+  difference of Julian Days over a span with room — 10¹⁰ days carry 10⁻⁵ d of
+  granularity, a one-year span read as a fourth finding. **A tolerance per
+  cell adds up**: an accepted residual of a few units in the last place per
+  cell is systematic — 0.9 days over 443,000 cells; accept an exact fixed
+  point at depth. **A gate's check must exercise what it names**: the bank's
+  seat-and-resume loop seeded the new section with enough prefixes that
+  nothing resumed — try a generator's write path on a SHORT span before its
+  2-hour run. (§1.37)
 
 ---
 
@@ -371,7 +390,8 @@ domain, its recorded `generatedAtWalkSeconds` — REFUSES if a segment prefix
 does not resume bit-exactly or the deep lunar longitude parts between the
 seated and the unseeded tables). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (15 generators, 6 gates).
+test:verify:list` the full classification (15 generators, 8 gates — the
+newest, `deep-clock-axes.js`, reads the deep clock against the chain, §1.37).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

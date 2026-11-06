@@ -232,6 +232,19 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
                 fwd: number[];
                 bwd: number[];
             }>;
+            channel: {
+                windowCenturies: number;
+                segmentCenturies: number;
+                exponents: {
+                    s: number;
+                    edge: {
+                        fwd: number;
+                        bwd: number;
+                    };
+                    fwd: number[];
+                    bwd: number[];
+                }[];
+            };
             segmentYears: number;
             chainLimitYears: number;
         };
@@ -274,6 +287,19 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
                     bankEdge: number | null;
                 };
             }>;
+            channel: {
+                s: number;
+                fwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+                bwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+            }[];
         };
     }>;
     eclipse: Readonly<{

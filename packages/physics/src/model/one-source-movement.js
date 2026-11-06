@@ -7,7 +7,7 @@ import { createDeepOrbitalHistory } from '../earth/deep-orbital-history.cjs';
 import { ONE_FAMILY_WINDOW_YEARS, createYearLengths } from '../earth/year-lengths.cjs';
 import { DEEP_MODES_ARTIFACT } from '../moon/deep-modes-artifact.cjs';
 import { CHAIN_ARTIFACT } from '../planets/chain-artifact.js';
-import { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } from '../time/navigable-domain.cjs';
+import { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS, DEEP_TIER_GRID_YEARS, deepTierWalkSpanYears } from '../time/navigable-domain.cjs';
 
 /** @param {import('./year-day-lengths.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleOneSourceMovement(ctx) {
@@ -115,12 +115,13 @@ export function assembleOneSourceMovement(ctx) {
       const t = year - 2000, need = Math.max(20000, Math.abs(t) * 1.25);
       if (need > 2000000) {
         // The deep tier (5000-yr grid): walked in the queried DIRECTION only,
-        // to two nodes past the query, and EXTENDED by the factory's shared
+        // to two nodes past the query — never past the domain's edge (ONE home,
+        // time/navigable-domain) — and EXTENDED by the factory's shared
         // walk when a deeper epoch arrives. It was built to
         // ±1.25·|t| in both directions and rebuilt from J2000 on every deeper
         // probe — bit-identical values, 4× the RK4 steps of one walk.
-        const span = Math.ceil((Math.abs(t) + 2 * 5000) / 5000) * 5000;
-        return hist.build(t < 0 ? -span : span, 0, 5000).at(t);
+        const span = deepTierWalkSpanYears(t);
+        return hist.build(t < 0 ? -span : span, 0, DEEP_TIER_GRID_YEARS).at(t);
       }
       const span = tierSpan(need);
       if (!samplers.has(span)) samplers.set(span, hist.build(span, -span, gridStep(span)));

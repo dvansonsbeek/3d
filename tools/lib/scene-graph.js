@@ -176,10 +176,13 @@ const { createChainCycleIntegrator } = _req('@essrt/physics/chain-cycles');
 // PLAN 25 — the lunar cumulative bank (data/lunar-cumulative-checkpoints.json): the five chain
 // counts' and the two carriers' coarse segment prefixes every 250 kyr; a deep lunar read then
 // integrates one segment at most, bit-identical to the unseeded tables. Absent → computed.
+// Its `channel` section seats the chain's eccentricity channel (the perigee and node exponents'
+// segment prefixes — plan 27 §8 K) the moment the bank is read.
 let _lunarBankM;
 function _lunarBank() {
   if (_lunarBankM === undefined) {
     try { _lunarBankM = require('../../data/lunar-cumulative-checkpoints.json'); } catch { _lunarBankM = null; }
+    DT._deepEcc().seatPrefixes(_lunarBankM ? _lunarBankM.channel : null);
   }
   return _lunarBankM;
 }

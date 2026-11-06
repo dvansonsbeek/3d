@@ -146,9 +146,11 @@ order.forEach((id, i) => {
 });
 console.log(`\nthen (by hand — each is a judgement, not a regeneration):
   npm run test:fixtures          re-record ONLY if the change was intended, and say so in the commit
+  npm run values:package:write   FIRST of the writers: doc 99's genesis block reads the PACKAGED registry (written
+                                 after it, the block is stale — measured 2026-11-06); then the version note and the publish (owner)
   npm run docs:values:write && npm run docs:tables:write && npm run docs:calcmap:write && npm run docs:doc99:write && npm run docs:doc92:write && node tools/docs/stamp-frontmatter.mjs --write
                                  (docs:tables:write is the Python doc 92 table writer; docs 110/99 and doc 92's Node blocks have their own — the docs:tables CHECK covers all of them)
-  npm run values:package:write   then the version note and the package publish (owner)
+  node tools/types/emit-physics-types.mjs --write   after a fit re-close: the coefficients' declaration embeds them
   npm run fit:6a2 && npm run check:csv-smoke   if the engine's frame of date moved`);
 
 if (!RUN) process.exit(0);

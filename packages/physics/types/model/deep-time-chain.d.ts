@@ -142,6 +142,46 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
             eFactorAt: (tYr: number) => number;
             e0: number;
             g0: number;
+            seatPrefixes: (bank: {
+                exponents?: {
+                    s: number;
+                    edge: {
+                        fwd: number;
+                        bwd: number;
+                    };
+                    fwd: number[];
+                    bwd: number[];
+                }[];
+            } | null | undefined) => void;
+            recordPrefixes: (limitCy: number | {
+                past: number;
+                future: number;
+            }, exponents: number[]) => {
+                windowCenturies: number;
+                segmentCenturies: number;
+                exponents: {
+                    s: number;
+                    edge: {
+                        fwd: number;
+                        bwd: number;
+                    };
+                    fwd: number[];
+                    bwd: number[];
+                }[];
+            };
+            seatStatus: (exponents: number[]) => {
+                s: number;
+                fwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+                bwd: {
+                    banked: number;
+                    edge: number;
+                    bankEdge: number | null;
+                };
+            }[];
         };
         eCompModulation: (tMa: number, s: number) => number;
         moonChain: {
@@ -241,6 +281,46 @@ export function assembleDeepTimeChain(ctx: import("./derived-constants.js").Ctx)
         eFactorAt: (tYr: number) => number;
         e0: number;
         g0: number;
+        seatPrefixes: (bank: {
+            exponents?: {
+                s: number;
+                edge: {
+                    fwd: number;
+                    bwd: number;
+                };
+                fwd: number[];
+                bwd: number[];
+            }[];
+        } | null | undefined) => void;
+        recordPrefixes: (limitCy: number | {
+            past: number;
+            future: number;
+        }, exponents: number[]) => {
+            windowCenturies: number;
+            segmentCenturies: number;
+            exponents: {
+                s: number;
+                edge: {
+                    fwd: number;
+                    bwd: number;
+                };
+                fwd: number[];
+                bwd: number[];
+            }[];
+        };
+        seatStatus: (exponents: number[]) => {
+            s: number;
+            fwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+            bwd: {
+                banked: number;
+                edge: number;
+                bankEdge: number | null;
+            };
+        }[];
     };
     deepLod: {
         lodSecondsAtAge: (t_Ma: number) => number | null;

@@ -129,6 +129,11 @@ const INPUT_FILES = [
   'data/deltaT-4flag-fit.json',
   'data/core-mantle-resonator-stage1.json',
   'packages/physics/src/deltat/cycles.cjs',
+  // the clock every instant here crosses (plan 27 §8 J): the raw ΔT integrand and the UT↔TT
+  // bridge — neither was hashed by any campaign, so an edit to the bridge alone moved the
+  // recorded numbers unseen by check:artifacts (doc 111 §1.16)
+  'packages/physics/src/deltat/deep-time.cjs',
+  'packages/physics/src/phase/deep-calendar.cjs',
   // the audit-26 / Babylon / centerlines umbra chain — U1: the package
   // besselian tier (single implementation; the scene twin is retired here);
   // the model assembly is the composer plus its slices (plan 15):

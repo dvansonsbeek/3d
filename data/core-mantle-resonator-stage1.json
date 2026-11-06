@@ -186,11 +186,11 @@
       "kick_coefficients_s": [
         {
           "cos": 0,
-          "sin": 621.757494731443
+          "sin": 621.3749524125255
         },
         {
           "cos": 0,
-          "sin": 1.2281738938730244
+          "sin": 1.4096850217052999
         }
       ],
       "T0_lattice_n": 685,
@@ -207,9 +207,9 @@
           "retired": "RETIRED (2026-09): shipped at amplitude 0 — measured to buy nothing once the GIA channel became the lagged response (kicks-only 11.89 / 21.04 s vs all three 12.04 / 21.34 s); dn/phase kept as the convention for the diagnostic column (DT_RESONATOR_COMPONENTS)."
         }
       ],
-      "rms_s": 21.415476037405096,
-      "raw_at_j2000_s": -83.16490839960045,
-      "lod_raw_at_j2000_s_per_day": 0.0004964259979456313,
+      "rms_s": 21.412140943033975,
+      "raw_at_j2000_s": -83.02556174669932,
+      "lod_raw_at_j2000_s_per_day": 0.000496538049917233,
       "deep_time_checks_s": {
         "900": -245.8439379884609,
         "2000": -82.32559425279462,
@@ -314,12 +314,12 @@
       "packages/physics/src/climate/l1-orbital.cjs": "sha256:f15c92118c12c0e4d7904fe1e793703749594a4668f3f7ad8611632c82710e22",
       "packages/physics/src/deltat/cycles.cjs": "sha256:d1a2571146ccf675c22a8d685900b84d5bee6764b32731dc4e43b32a1a81d2f3",
       "packages/physics/src/deltat/deep-time-chain.js": "sha256:e92e712523ee60b85be25b9d1bf5e05ff015e95ae10f036b5cb5f555d11f3a51",
-      "packages/physics/src/deltat/deep-time.cjs": "sha256:246d981862bdd3fa8e9bb73d7db1560fbbbfe25b80612cb81fd52612d6eae414",
+      "packages/physics/src/deltat/deep-time.cjs": "sha256:646d3c7c61c5617365f42364cf7c32f23621acddacb1f0ee783e24fc82dacf9c",
       "packages/physics/src/deltat/moon-distance-history.cjs": "sha256:0a8918d69ca6b1e229517efc0a5b0322b0842acb54df270aa9636c67452542ce",
       "packages/physics/src/earth/mean-obliquity-history.cjs": "sha256:78dac2b3854c55a6ce63b8cfd409e5c9a06b0924d9e1b9f5bf88202ea5461555",
       "packages/physics/src/earth/precession-composed.cjs": "sha256:448b2327fc6f3a6994bfc5cc514fec3dc7ceae2037312ae8343b57b7f948252a",
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
-      "public/input/climate-formula-coefficients.json": "sha256:0f3333d0362e50e6d1b7027f48f7958512b5c95b3a09fcf24c86c3a72d101d4e",
+      "public/input/climate-formula-coefficients.json": "sha256:bd72d29fe65cb38b5064be7409430407547433089b0689c048d231fb620e6892",
       "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
       "tools/fit/dt-corrections-fit.js": "sha256:37249d88eb5f4450c644170a5a49c21867e2e8f4196661325c72c2ead9a7373b",
       "tools/lib/constants.js": "sha256:fc23b637b6642d4e173d513b023d608278a6889c667bf56bae0ae5a23e9e18b0",

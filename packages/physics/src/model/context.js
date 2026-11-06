@@ -28,9 +28,10 @@
  * every 250 kyr; a deep read then walks at most one spacing, bit-identical to the full walk. Null =
  * the full walk from J2000.
  * `lunarCheckpointsArtifact` (plan 25): the parsed lunar cumulative bank — the five chain counts' and
- * the two carriers' coarse segment prefixes every 250 kyr; a deep lunar read then integrates one
- * segment at most, bit-identical to the unseeded tables. Null = compute the prefixes.
- * @typedef {{ giaEllipticityOfDate?: boolean, spinCheckpointsArtifact?: { spacingYr: number, checkpoints: ReadonlyArray<{t: number, s: number[]}> } | null, lunarCheckpointsArtifact?: { chains?: Record<string, { fwd: number[], bwd: number[] }>, carriers?: Record<string, { fwd: number[], bwd: number[] }>, sun?: { meanLongitude?: { fwd: number[], bwd: number[] } } } | null }} Options
+ * the two carriers' coarse segment prefixes every 250 kyr, the Sun's mean-longitude table and
+ * (plan 27 §8 K) the eccentricity channel's two exponents (`channel`); a deep lunar read then
+ * integrates one segment at most, bit-identical to the unseeded tables. Null = compute the prefixes.
+ * @typedef {{ giaEllipticityOfDate?: boolean, spinCheckpointsArtifact?: { spacingYr: number, checkpoints: ReadonlyArray<{t: number, s: number[]}> } | null, lunarCheckpointsArtifact?: { chains?: Record<string, { fwd: number[], bwd: number[] }>, carriers?: Record<string, { fwd: number[], bwd: number[] }>, sun?: { meanLongitude?: { fwd: number[], bwd: number[] } }, channel?: { exponents?: Array<{ s: number, edge: { fwd: number, bwd: number }, fwd: number[], bwd: number[] }> } } | null }} Options
  */
 
 /**

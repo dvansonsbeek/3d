@@ -22,6 +22,11 @@ export function assembleLunarTheory(ctx) {
   // chain counts' and the carriers' coarse segment prefixes every 250 kyr. A seat, never a value — the
   // tables' association is the same with and without it (the purity gate's lunar rows).
   const lunarCheckpoints = options.lunarCheckpointsArtifact ?? null;
+  // PLAN 27 §8 K — the eccentricity channel's segment prefixes ride the same bank (its `channel`
+  // section): the perigee and node exponents' one-time walk to the genesis was the first landing
+  // there. Seated here, before any read; a bank without the section leaves the channel walking.
+  const channelExponents = [chain.moonEccSensitivities.perigeePhysical, chain.moonEccSensitivities.nodePhysical];
+  deepEcc.seatPrefixes(lunarCheckpoints ? lunarCheckpoints.channel : null);
   // Wiring mirrors the engine call sites exactly — tools/lib/deep-time.js
   // (ecc channel, month chain, J2000 precession anchors),
   // tools/lib/scene-graph.js (chain-cycles, arguments, series) and
@@ -168,6 +173,8 @@ export function assembleLunarTheory(ctx) {
     },
     // the carriers count centuries; a per-direction limit ({past, future}) passes through per side
     carriers: moonArgs.recordCarrierPrefixes(typeof limitYears === 'number' ? limitYears / 100 : { past: limitYears.past / 100, future: limitYears.future / 100 }),
+    // the eccentricity channel's two exponents (perigee, node), centuries like the carriers
+    channel: deepEcc.recordPrefixes(typeof limitYears === 'number' ? limitYears / 100 : { past: limitYears.past / 100, future: limitYears.future / 100 }, channelExponents),
     segmentYears: chainCycles.coarseSegmentYears,
     chainLimitYears: chainCycles.coarseLimitYears,
   });
@@ -279,7 +286,7 @@ export function assembleLunarTheory(ctx) {
   });
 
   /** THE SEAT DIAGNOSTIC (plan 25/26): every named lunar table's seat in this runtime. */
-  const lunarSeatStatus = () => ({ chains: chainCycles.seatStatus(), carriers: moonArgs.carrierSeatStatus() });
+  const lunarSeatStatus = () => ({ chains: chainCycles.seatStatus(), carriers: moonArgs.carrierSeatStatus(), channel: deepEcc.seatStatus(channelExponents) });
   return { deepCalendar, frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays, recordLunarCumulativeBank, lunarSeatStatus };
 }
 /** @typedef {import('./time-axis.js').Ctx & ReturnType<typeof assembleLunarTheory>} Ctx */

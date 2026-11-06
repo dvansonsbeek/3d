@@ -159,7 +159,7 @@ npm run check             # the full gate chain (~4.4 min): lint, typecheck, bou
 npm run check:docs        # scoped tier (~30 s) for docs/registry/marker edits;
                           # tools/lib and packages/physics edits take the full chain
 npm run test:browser      # golden masters in headless Chromium (~2.5 min, builds first)
-npm run test:verify:list  # how the tools/verify scripts classify (6 gates, 15 generators)
+npm run test:verify:list  # how the tools/verify scripts classify (8 gates, 15 generators)
 npm run values:package    # packaged @essrt/model-values vs the live registry
 npm run check:artifacts   # campaign artifacts vs their recorded input hashes
 ```
@@ -178,7 +178,7 @@ Two things worth knowing before you read a red result as breakage:
   and required in CI** — a year's computed values do not depend on which epoch
   the scene happens to be set to, bit-exact on the round trip. Red there is a
   regression of a closed acceptance criterion, not a tracked state.
-- Every script in `tools/verify/` either FAILS or WRITES: six gates and thirteen
+- Every script in `tools/verify/` either FAILS or WRITES: eight gates and fifteen
   generators. `test:verify` runs the gates and deliberately skips the generators,
   which regenerate tracked data files rather than checking them (`npm run
   regen:cascade` lists the stale ones in order). The suite fails on any

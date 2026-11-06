@@ -124,6 +124,7 @@ function createDeepCalendar({
   const yearMax = domainYearMax + Math.ceil(Math.abs(domainYearMax) * POSITION_TABLE_MARGIN / stepYears) * stepYears;
   const j2000Idx = Math.round((startModelYear - yearMin) / stepYears);
   const N = Math.ceil((yearMax - yearMin) / stepYears) + 1;
+  const J2000_JD = 2451545.0, JULIAN_YEAR_DAYS = 365.25;
   /** @type {(jd: number) => number} */
   const jdToSIyear = (jd) => startModelYearWithCorrection + (jd - startModelJD) / siTropicalYearDays;
   /** The exact inverse: SI-year label → JD (the Moon layers' argument clock
@@ -200,11 +201,53 @@ function createDeepCalendar({
   // parts from the civil one by the era corrections (24 s in 24 years, 1.3 h at −3000).
   // These were the two engines' hand-mirrored position tables (src/script.js,
   // tools/lib/deep-time.js) and their two hand-mirrored bridges; ONE home now.
+  //
+  // THE INTEGRAND IS READ AT THE AGE OF THE INSTANT, NEVER AT THE COUNT (plan 27 §8 J2). The
+  // table solves dJD/dcount = D(age(JD)): the tropical year of date at the TT age the count has
+  // REACHED — Julian years of TT before the scene epoch, the chain's own age axis. The first
+  // form read D at the count itself ((startModelYear − count)/1e6): a count year is not an age
+  // (doc 111 §1.36) — the count runs 0.055 % ahead of the TT age, 2.59 Myr at the genesis, so
+  // the integrand was read 2.4 Myr too deep inside the cited history and on its fallback past
+  // the history's end for the last 4.6 Myr of count (measured: 364.94 SI days per count year
+  // at the edge where the tropical year of date is 328.74; 360.28 against 362.66 at 4,425 Ma).
+  // Each cell is the implicit trapezoid T₁ = T₀ + ½·(D(age(T₀)) + D(age(T₁)))·Δcount, solved by
+  // fixed point (D depends on T at 1e-8 per cell in the era, 2e-4 at the genesis: two to five
+  // evaluations); the partial-cell read solves the same equation from the cell's lower node,
+  // and the inverse is CLOSED FORM — the age of the target instant is known.
   /** @param {(tMa: number) => (number | null)} dpyAtAge days per tropical year of date */
   function makePositionTable(dpyAtAge) {
-    const dpy = (/** @type {number} */ year) => dpyAtAge((startModelYear - year) / 1e6);
+    /** SI days per tropical year of date at the instant `t` days from the scene epoch.
+     *  @param {number} t @returns {number | null} */
+    const dAt = (t) => dpyAtAge(-t / (JULIAN_YEAR_DAYS * 1e6));
+    /** The integrand at the instant the last `stepFrom` returned — exactly `dAt` of that value,
+     *  so a march reuses it as the next cell's f0 (two evaluations per era cell, not four). */
+    let stepF = /** @type {number | null} */ (null);
+    /** The implicit trapezoid from a node: the instant `dy` count years from the node at `t0`
+     *  whose integrand there is `f0` — the iterate whose trapezoid image lies within the
+     *  tolerance of itself (1e-9 d, or the double's own floor at depth). NaN where the
+     *  integrand is undefined.
+     *  @param {number} t0 @param {number} f0 @param {number} dy
+     *  @param {number} [fGuess] the integrand expected at the far end (a march's extrapolation)
+     *  @returns {number} */
+    const stepFrom = (t0, f0, dy, fGuess) => {
+      // the predictor: the node's own integrand, or — in a march — the trapezoid on the
+      // integrand extrapolated from the previous cell (the first evaluation then usually
+      // lands inside the tolerance: one evaluation per cell)
+      let t = t0 + (fGuess === undefined ? f0 : 0.5 * (f0 + fGuess)) * dy;
+      let f = dAt(t);
+      for (let it = 0; it < 8 && f !== null; it++) {
+        const next = t0 + 0.5 * (f0 + f) * dy;
+        // 1e-9 d in the era; at depth LESS than one unit in the last place, i.e. an exact fixed
+        // point — a residual of a few units per cell is systematic and accumulated to 0.9 days
+        // at the genesis over the table's 443,000 cells (measured against the converged form)
+        if (Math.abs(next - t) <= Math.abs(next) * 1e-16 + 1e-9) break;
+        t = next;
+        f = dAt(t);
+      }
+      stepF = f;
+      return f === null ? NaN : t;
+    };
     /** @type {Float64Array | null} */ let T = null;
-    let lo0 = 0, dy0 = 0;
     // The position tables count the solar days the SHIPPED LOD gives (the climate-modulated α —
     // the LOD's own, the ΔT integral's own): under the α-reference pin (withLatticeAlpha) the J2000 day is 3.7 ms off
     // and the era's UT count drifts 32 s in 24 years. The engine's `withShippedAlpha` forces that
@@ -215,27 +258,30 @@ function createDeepCalendar({
       if (T !== null) return;
       underShipped(() => {
         const table = new Float64Array(N);
+        // the scene epoch is the zero (t = 0 at startModelYear); the grid node nearest it is
+        // reached from there, then the march runs outward from that node in both directions
         const gy = yearMin + j2000Idx * stepYears;
-        const d0 = dpy(startModelYear);
-        table[j2000Idx] = -(startModelYear - gy) * /** @type {number} */ (d0);
-        let prev = dpy(gy);
-        for (let i = j2000Idx + 1; i < N; i++) {
-          const curr = dpy(yearMin + i * stepYears);
-          table[i] = (prev !== null && curr !== null && !Number.isNaN(table[i - 1])) ? table[i - 1] + 0.5 * (prev + curr) * stepYears : NaN;
-          prev = curr;
-        }
-        prev = dpy(gy);
-        for (let i = j2000Idx - 1; i >= 0; i--) {
-          const curr = dpy(yearMin + i * stepYears);
-          table[i] = (prev !== null && curr !== null && !Number.isNaN(table[i + 1])) ? table[i + 1] - 0.5 * (prev + curr) * stepYears : NaN;
-          prev = curr;
-        }
-        // normalise: the anchor cell is seeded by extrapolation and read by the analytic
-        // partial-cell integration — without this the zero point carries a constant (37 s)
-        lo0 = Math.floor((startModelYear - yearMin) / stepYears);
-        dy0 = startModelYear - (yearMin + lo0 * stepYears);
-        const f0 = dpy(yearMin + lo0 * stepYears), f1 = dpy(startModelYear);
-        const v0 = (f0 !== null && f1 !== null) ? table[lo0] + 0.5 * (f0 + f1) * dy0 : NaN;
+        const d0 = dAt(0);
+        table[j2000Idx] = d0 === null ? NaN : stepFrom(0, d0, gy - startModelYear);
+        /** @param {number} from @param {number} to @param {number} dir */
+        const march = (from, to, dir) => {
+          let prev = Number.isNaN(table[from]) ? null : dAt(table[from]);
+          /** @type {number | undefined} */ let before;   // the integrand one node further back
+          for (let i = from + dir; dir > 0 ? i <= to : i >= to; i += dir) {
+            const t0 = table[i - dir];
+            table[i] = (prev === null || Number.isNaN(t0)) ? NaN : stepFrom(t0, prev, dir * stepYears, before === undefined ? undefined : 2 * prev - before);
+            before = prev === null ? undefined : prev;
+            prev = Number.isNaN(table[i]) ? null : stepF;   // ≡ dAt(table[i])
+          }
+        };
+        march(j2000Idx, N - 1, 1);
+        march(j2000Idx, 0, -1);
+        // normalise: the epoch is read from its cell's LOWER node, whose trapezoid over the
+        // partial cell is not the one that built the node — without this the zero point carries
+        // a constant (a first form seeded the anchor by extrapolation: 37 s)
+        const lo0 = Math.min(N - 2, Math.max(0, Math.floor((startModelYear - yearMin) / stepYears)));
+        const f0 = Number.isNaN(table[lo0]) ? null : dAt(table[lo0]);
+        const v0 = f0 === null ? NaN : stepFrom(table[lo0], f0, startModelYear - (yearMin + lo0 * stepYears));
         if (Number.isFinite(v0)) for (let i = 0; i < N; i++) table[i] -= v0;
         T = table;
       });
@@ -249,11 +295,11 @@ function createDeepCalendar({
       while (hi >= 0 && Number.isNaN(t[hi])) hi--;
       return { yearMin: yearMin + lo * stepYears, yearMax: yearMin + hi * stepYears, lo, hi };
     }
-    /** The integrand under the SAME α pin the table was built under: the analytic partial cell
-     *  reads it at query time, and an unpinned read (the climate-modulated α) parted from the
-     *  pinned build by 2,743 s at the scene epoch itself (measured, plan 27).
-     *  @param {number} year @returns {number | null} */
-    const dpyPinned = (year) => { /** @type {number | null} */ let v = null; underShipped(() => { v = dpy(year); }); return v; };
+    /** The integrand at an instant under the SAME α pin the table was built under: the partial
+     *  cell reads it at query time, and an unpinned read (the climate-modulated α) parted from
+     *  the pinned build by 2,743 s at the scene epoch itself (measured, plan 27).
+     *  @param {number} t days from the scene epoch @returns {number | null} */
+    const dAtPinned = (t) => { /** @type {number | null} */ let v = null; underShipped(() => { v = dAt(t); }); return v; };
     /** @param {number} year @returns {number | null} the Julian Day of a year of date */
     function jdAtYear(year) {
       if (!Number.isFinite(year)) return null;
@@ -266,10 +312,11 @@ function createDeepCalendar({
       if (lo < 0 || lo >= N - 1) return null;
       const a = t[lo];
       if (Number.isNaN(a)) return null;
-      const yLo = yearMin + lo * stepYears, dy = year - yLo;
-      const f0 = dpyPinned(yLo), f1 = dpyPinned(year);
-      if (f0 === null || f1 === null) return null;
-      return startModelJD + a + 0.5 * (f0 + f1) * dy;   // analytic partial cell
+      const dy = year - (yearMin + lo * stepYears);
+      // the partial cell: the same implicit trapezoid the table was built with, from the lower node
+      /** @type {number} */ let v = NaN;
+      underShipped(() => { const f0 = dAt(a); v = f0 === null ? NaN : stepFrom(a, f0, dy); });
+      return Number.isNaN(v) ? null : startModelJD + v;
     }
     /** @param {number} jd @returns {number | null} the year of date — the exact inverse of jdAtYear */
     function yearAtJD(jd) {
@@ -298,28 +345,30 @@ function createDeepCalendar({
           if (t[mid] <= target) lo = mid; else hi = mid;
         }
       }
+      // CLOSED FORM: the cell's trapezoid target = a + ½·(D(age(a)) + D(age(target)))·dy has its
+      // integrand at the target's OWN age, which is known — no iteration
       const a2 = t[lo], yLo = yearMin + lo * stepYears;
-      const f0 = dpyPinned(yLo);
-      if (f0 === null) return null;
-      let dy = (t[hi] === a2) ? 0 : (target - a2) / (t[hi] - a2) * stepYears * (hi - lo);
-      for (let it = 0; it < 4; it++) {
-        const f1 = dpyPinned(yLo + dy);
-        if (f1 === null) break;
-        const gg = a2 + 0.5 * (f0 + f1) * dy - target;
-        if (Math.abs(gg) < 1e-11) break;
-        dy -= gg / f1;
-      }
-      return yLo + dy;
+      const f0 = dAtPinned(a2), f1 = dAtPinned(target);
+      if (f0 === null || f1 === null) return null;
+      return yLo + (target - a2) / (0.5 * (f0 + f1));
     }
     return { jdAtYear, yearAtJD, range };
   }
   const ttTable = meanTropicalYearDaysAtAgeMa ? makePositionTable(meanTropicalYearDaysAtAgeMa) : null;
-  const J2000_JD = 2451545.0, JULIAN_YEAR_DAYS = 365.25;
-  /** The age (Myr before the scene epoch, the chain's unit) of a TT instant — on the CIVIL
-   *  calendar axis the fitted ΔT convention reads (proleptic Julian before 1582: the engine's
-   *  Julian-year axis to a constant 12.5 days, which is 1 s of raw integral at −3000 and
-   *  nothing at depth). @param {number} jdTT @returns {number} */
-  const tMaOfJdTT = (jdTT) => (startModelYear - jdToDecimalYear(jdTT)) / 1e6;
+  /** The civil decimal year of the scene epoch — where the raw integral's age leaves the civil axis. */
+  const epochCivilYear = jdToDecimalYear(startModelJD);
+  /** The age (Myr before the scene epoch, the chain's unit) of a TT instant, for the RAW
+   *  integral. Up to the scene epoch: the CIVIL calendar year the fitted ΔT convention reads
+   *  (the fitter's own axis — proleptic Julian before 1582: the engine's Julian-year axis to a
+   *  constant 12.5 days, which is 1 s of raw integral at −3000 and nothing at depth), unchanged.
+   *  AHEAD of the scene epoch: Julian years of TT from it, the engine's axis — the civil year
+   *  there is GREGORIAN and runs 2.05e-5 of the span ahead of the engine year (20.5 yr at
+   *  +1 Myr, 2,053 yr at +100 Myr, 20,329 yr at +990 Myr, measured): the raw integral was read
+   *  that far into the future of the instant, and the UT day parted from the chain's day by
+   *  1.2e-6 at +100 Myr and 1.5e-5 at +990 Myr (plan 27 §8 J3 — the third axis finding; no
+   *  record lies ahead of today, so the fitted convention has nothing to say there).
+   *  @param {number} jdTT @returns {number} */
+  const tMaOfJdTT = (jdTT) => (startModelYear - (jdTT <= startModelJD ? jdToDecimalYear(jdTT) : epochCivilYear + (jdTT - startModelJD) / JULIAN_YEAR_DAYS)) / 1e6;
   /** The Newton slope of the bridge f(jdTT) = jdTT − ΔT(jdTT)/86400 − jdUT: f′ = 86,400/LOD =
    *  solar days per SI day of date = (solar days per year)/(SI days per year). The inverse
    *  ratio (0.73 at −2 Gyr) overshoots every step and diverges at depth (measured).

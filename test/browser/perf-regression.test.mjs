@@ -154,7 +154,7 @@ try {
     for (const [k, v] of Object.entries(node)) walk(v, `${path}.${k}`);
   };
   walk(seats, 'seat');
-  gate(`lunar bank: every seat took (${unseated.length ? 'unseated: ' + unseated.join(', ') : seatCount + ' seats — the scene\'s 7 tables and the package model\'s 8, both directions'})`, unseated.length, 0, 'unseated');
+  gate(`lunar bank: every seat took (${unseated.length ? 'unseated: ' + unseated.join(', ') : seatCount + ' seats — the scene\'s 7 tables and its channel\'s 2 exponents, the package model\'s 8 and 2, both directions'})`, unseated.length, 0, 'unseated');
   const deepCold = await sim.page.evaluate((jd) => {
     const T = window.__test__;
     const t0 = performance.now(); T.sceneSunRaDecAt(jd); return performance.now() - t0;
@@ -168,9 +168,23 @@ try {
   // segmented table the first landing pays the one-time walk (~2 s) and a repeat landing
   // is the Moon reads' three evaluations each. Absolute, like 0b: a slow second landing
   // must not hide behind the first. The Julian Day entry clamps to the edge (the honest edge).
+  // ── 0e. THE FIRST LANDING ON THE GENESIS EDGE (plan 27 §8 K, doc 111 §1.37): the first one
+  // in a session paid three one-time walks — the eccentricity channel's two exponents (seated
+  // in the lunar bank's `channel` section since), the spin tier's two grid nodes PAST the edge
+  // at the 1/32-yr step (the span stops at the edge since), the ΔT and position tables.
+  // Measured headless on a FRESH page: ~23 s before the two levers (24.6 s to the Origin tour's
+  // first card), 7.3 s after (7.5 s to the card), the three frames after it 135 ms. This row
+  // sits after the −400 Myr jump above, so some tables are warm; absolute, because an unseated
+  // channel is a 13-s walk and must fail by time here as well as by name above.
+  const edgeFirst = await sim.page.evaluate(() => {
+    const T = window.__test__;
+    const t0 = performance.now(); T.enterJulianDay(-1e13); return performance.now() - t0;
+  });
+  console.log(`      FIRST landing ms on the genesis edge (both banks seated, after the −400 Myr jump): ${edgeFirst.toFixed(0)}`);
+  gate('first landing on the genesis edge', edgeFirst, 8000, 'ms');
   const edgeLanding = await sim.page.evaluate(() => {
     const T = window.__test__;
-    T.enterJulianDay(-1e13); T.jumpJD(2451545);
+    T.jumpJD(2451545);
     const t0 = performance.now(); T.enterJulianDay(-1e13); return performance.now() - t0;
   });
   console.log(`      repeat landing ms on the genesis edge (both banks seated): ${edgeLanding.toFixed(0)}`);
