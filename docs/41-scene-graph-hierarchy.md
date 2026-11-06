@@ -527,7 +527,11 @@ The Earth's day map is chosen by the TT age of the scene epoch from ONE table,
 `public/textures/earth/manifest.json` (written by
 `tools/pipeline/build-earth-tiers.js`, gated by `tools/verify/earth-tiers.js`):
 the satellite map from the end of the LGM on, Scotese's cited paleogeography
-(PaleoAtlas v3, CC BY 4.0) at the atlas's own 5-Myr steps from 21 ka to 750 Ma,
+(PaleoAtlas v3, CC BY 4.0) at the atlas's own 5-Myr steps from 21 ka to 750 Ma
+— prepared with the present-day coastlines and political boundaries the atlas
+draws in ink over every reconstruction removed
+(`tools/pipeline/lib/remove-drawn-lines.js`; the change is stated in the
+manifest and PROVENANCE) —,
 and generated illustration beyond — the Proterozoic, the Archean cratons, the
 early ocean world, and at the genesis the Hadean magma ocean, the steam
 atmosphere over the solidifying crust and the rain-out into the first oceans

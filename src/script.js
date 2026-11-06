@@ -36271,7 +36271,7 @@ function makeRealisticEarth(pd){
       const far = t.toMa > 4429 ? 'the past edge (4,429 Ma)' : `${surfaceAgeText(t.toMa)} ago`;
       const ahead = t.fromMa < 0;   // a future tier, or the present one's forward span (ages ahead of today are negative)
       const span = t.present ? `today's map, used back to ${far}` : t.toMa <= 0 ? `used from +${surfaceAgeText(-t.toMa)} to ${t.fromMa <= -1e9 ? 'the future edge (+1,000 Myr)' : '+' + surfaceAgeText(-t.fromMa)} ahead` : `used from ${surfaceAgeText(t.fromMa)} to ${far}`;
-      const what = t.present ? '' : t.kind === 'cited' ? ' — a published reconstruction, Scotese 2016 PaleoAtlas (CC BY 4.0), shown at its nearest age step' : t.source === 'derived' ? ' — derived from today\'s map, a reading of the cited papers in its label' : ' — a generated map standing in where no reconstruction exists';
+      const what = t.present ? '' : t.kind === 'cited' ? ' — a published reconstruction, Scotese 2016 PaleoAtlas (CC BY 4.0; the present-day coastlines and borders drawn on it removed), shown at its nearest age step' : t.source === 'derived' ? ' — derived from today\'s map, a reading of the cited papers in its label' : ' — a generated map standing in where no reconstruction exists';
       o.earthSurfaceHover = `The map drawn on the Earth at this date and where it comes from. Now showing: ${t.label}, ${span}${what}. The model does not model continents`
         + (ahead && ageMaNow() < 0 ? '; ahead of today the continents follow today\'s measured plate motions (DeMets et al. 2010) for 100 Myr and Scotese\'s Pangaea Proxima scenario beyond — one reading of several (Amasia, Novopangaea and Aurica are the others).' : '.');
     };

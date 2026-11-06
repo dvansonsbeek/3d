@@ -11,7 +11,7 @@
    "url": "https://zenodo.org/records/5460860/files/Scotese_PaleoAtlas_v3.zip?download=1",
    "licence": "CC BY 4.0 (License.txt in the zip)",
    "sourceSize": "3600 x 1800 JPEG",
-   "preparation": "the bottom-left file-name label replaced by the 31x31 median of its 230x34 box; rolled by 180° to the scene's Pacific-centred seam; Lanczos resize to 2048 x 1024; WebP quality 85. The political boundaries drawn on the originals are kept."
+   "preparation": "the bottom-left file-name label replaced by the 31x31 median of its 230x34 box; the present-day coastlines and political boundaries the originals draw in black ink over every reconstruction REMOVED and filled from their surroundings (tools/pipeline/lib/remove-drawn-lines.js: thin features at most 0.45 of their local background's luminance, in connected pieces of at least 24 px, 1–3 % of a map, and the fainter US state grid as long thin pieces at most 0.65 of the background — a change to the licensed work, stated here as CC BY 4.0 requires; a few fragments over the darkest sea and some short island outlines stay in); rolled by 180° to the scene's Pacific-centred seam; Lanczos resize to 2048 x 1024; WebP quality 85."
   },
   "generated": {
    "note": "procedural illustration rendered by this script from seeded 3-D value noise on the sphere (seed 20261103; the recipes' parameters are in the script) — no third-party rights; labelled \"illustration\" on every surface",
@@ -1524,524 +1524,524 @@
    "height": 4096
   },
   "public/textures/earth/paleoatlas/scotese-001Ma.webp": {
-   "sha256": "34281882104e6bff3ee02f4096c8e19e0c1dcc0040ec77940e72dbb35dd709e2",
-   "bytes": 417530,
+   "sha256": "edec4d04366a824024e6061fe57dbf0fe0699c558246738624afa3ca8e71d1ca",
+   "bytes": 352978,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-004Ma.webp": {
-   "sha256": "9f914e099dd640c7a04fd600fe14fe58a06523a59647677c4411a709978b22ac",
-   "bytes": 407792,
+   "sha256": "e6abafbfab00e184ec937446619108e5b6b3fb1e90cbe9cd2b391317520baa3a",
+   "bytes": 338454,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-006Ma.webp": {
-   "sha256": "f4d3bee9961dbb569875c696e4eed35a0a978d3acae57d8102929782773f0385",
-   "bytes": 377820,
+   "sha256": "69c0f67e37d1ac471751d8a157a20c0419e90ec57af4983cd05156aa5d43698a",
+   "bytes": 316340,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-010Ma.webp": {
-   "sha256": "8800848cf1fc80a64f70fc9d8e230d9470ab451628eeb86a0da4de7c6a93e742",
-   "bytes": 419594,
+   "sha256": "71c48cf85b1ad5b33b8de9eac13762c55f102eb5dfacb8f6657dd3771bca2d54",
+   "bytes": 353664,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-015Ma.webp": {
-   "sha256": "ff9781950885c16c82e8775f1df30dd6064f8daa9635e6c79a9d27af80b21265",
-   "bytes": 378136,
+   "sha256": "8af0fd9c3e0f16d939005b6d73d01d02ed11a33156a7d497f8ddcba962649e24",
+   "bytes": 317648,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-020Ma.webp": {
-   "sha256": "2a8a920956a24be62c227b2665cfcb8025aed06222e48cf974586532652fa780",
-   "bytes": 408492,
+   "sha256": "53740cde4e873fc1f88712ca41a7a232cb315e11ce9fb7dbed95afdb769e8b9a",
+   "bytes": 345558,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-025Ma.webp": {
-   "sha256": "19186fa0902b6a5e2e59ee54d5e4c75f85bda1630f4a2a3a4f99db45e2059a80",
-   "bytes": 356314,
+   "sha256": "9937667f978d4a52afc24f988e08524e9806d1b40a2f26496d3a02654c5138a3",
+   "bytes": 299052,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-030Ma.webp": {
-   "sha256": "ed536f7ee62cddec3f77499c9159a4a6f2fe0b9722e4635644d9e4395e629f67",
-   "bytes": 390642,
+   "sha256": "12d834f1c3a1abfbd62dfcec7f7c84517220e8583a94751a600799e602bf7fe3",
+   "bytes": 327940,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-035Ma.webp": {
-   "sha256": "5e941e50ebec2980a48bd292a4f873f3dd2568834223db4cb1d3925376acead1",
-   "bytes": 350340,
+   "sha256": "bf1216b4d19dc25b6b5837ae53ee9317445154f877597893530f0dee5aede341",
+   "bytes": 290666,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-040Ma.webp": {
-   "sha256": "b75c4de868baa2bf9b11fbd8b5d0235bd3558bddbf90664ce340cd4bbcf46bcf",
-   "bytes": 375696,
+   "sha256": "5d96a55e592a22364ee8bdff5e03aac7f4f23eae073e484436904f56f37d02c2",
+   "bytes": 315410,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-045Ma.webp": {
-   "sha256": "93e41cd981c8b6c081515552555c1e013505f63b68e185e7f6ef540bb2b79b6d",
-   "bytes": 370672,
+   "sha256": "c80c7039897e156dbbb9d7315397a12adff5c638ff9244d2aa1bee266667e50f",
+   "bytes": 310136,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-050Ma.webp": {
-   "sha256": "152c29cc889f06997f95d6f60fc555a5745384145bd720c638e14c1d6770dcf0",
-   "bytes": 402692,
+   "sha256": "101111270583fcf69fc589cdb48f30cd3b2b0b8db5a3596f06226b25119af311",
+   "bytes": 337216,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-055Ma.webp": {
-   "sha256": "97626f93d043382cf7b8dfba68df45f6f0790705c392a8413ef5dc9de5dced6d",
-   "bytes": 331136,
+   "sha256": "30d149772bae80b1f4a7a2dc003d1affbd81446ecfe783d59a5b7babe37f0b89",
+   "bytes": 266252,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-060Ma.webp": {
-   "sha256": "5dfc10ca58e60ceffd20b0335e5e0d10a7a13c8f9b11d2fa563f1c57a54a46a5",
-   "bytes": 388142,
+   "sha256": "67b90840d1f9a1c7685fb3002ab86f9831e2812195c15e49348fedb1590135c9",
+   "bytes": 327592,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-066Ma.webp": {
-   "sha256": "20d5784cba4030f2229538f953c8b9e90db4bf59ed4ab2a3a1b359cff0d91eb3",
-   "bytes": 307440,
+   "sha256": "78e9c0b1a6bff8d076a69955130c8c4d9744a6e0837a2809c51107328acaf7ba",
+   "bytes": 242958,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-070Ma.webp": {
-   "sha256": "fce7a781d300be75fc31eac337e2e745f3e74929a12e2436b32884b07d531501",
-   "bytes": 337542,
+   "sha256": "6433d9a04b3a6320b1e25b25506ec05cc261bf6df24bbb3281fba2b43e191470",
+   "bytes": 279942,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-075Ma.webp": {
-   "sha256": "d4c8da10e266dc423cec7c37b321d99c5da31dfce225f99793e6b44d7ae7b1c1",
-   "bytes": 296636,
+   "sha256": "e2f77cdcbf8662a16247ea122666dc89832183def6ca944db4c32cd59b37e640",
+   "bytes": 234106,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-080Ma.webp": {
-   "sha256": "dcfcc3ef0e1b0e9c32ee46fd34d04a45a35d2d8af7093c260407b8ed3894c964",
-   "bytes": 290958,
+   "sha256": "a890c4e13f5017b23494a5e90ecc411a4d614eb3bcddfe9d935023691ff33beb",
+   "bytes": 229526,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-090Ma.webp": {
-   "sha256": "5471db7ed6dd3580692fec0b6fc57104259a11600eb5481f50f6d0fab60fe719",
-   "bytes": 274738,
+   "sha256": "aa1f52da12ebfc4e39bff52d878f05d711126556e0913bc76ce4f5c5f7fa848c",
+   "bytes": 212746,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-095Ma.webp": {
-   "sha256": "02d84f3469c9c43636c7547c3e834d3080b08e847ab8474cade6548cdb3c5434",
-   "bytes": 261758,
+   "sha256": "1d3a7ec30a74e47369f2c439a88550a9a4809551274fc92029fc1820c333c31f",
+   "bytes": 195522,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-100Ma.webp": {
-   "sha256": "902b470d20e99268b7967df1fefe5a7b0a67624961fd56ef380c1403e1597403",
-   "bytes": 313926,
+   "sha256": "f7d30c203dfe1e1a51cc0ddd23de72dd8c514d3d26215ed1f6f81e156070d0d4",
+   "bytes": 251830,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-105Ma.webp": {
-   "sha256": "ebed9fe4629fbc1ab083b4430d9363740b9085c4f217b42a260314d22e11e25d",
-   "bytes": 328916,
+   "sha256": "1e973f69488ef4c8905d98aa2fa05f6a79f6df2ff526d2a02b9cdadccaa8ac0a",
+   "bytes": 256548,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-110Ma.webp": {
-   "sha256": "98bf1e4c4a21c6e3b58ef103d671f89804994ce2823a115b030fcb8dd091764f",
-   "bytes": 322490,
+   "sha256": "36914d9a91a18158560102bca8e845623a5cd7d6aa75bf1097a49b9d3cdd85f4",
+   "bytes": 253306,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-115Ma.webp": {
-   "sha256": "8b50efb05a616c8a585e0caa74306b6d73c616b1ba2437afde8b688af529d5bb",
-   "bytes": 274914,
+   "sha256": "a48fa16e7fa984abf448bb8d7798af9663232241fc74677865868ba2b529cbb0",
+   "bytes": 211190,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-120Ma.webp": {
-   "sha256": "e7a19c0b1c60a1f5c731640aab26a2681fd0bce10ff9076f1d03b00c02a007f2",
-   "bytes": 268152,
+   "sha256": "af3de59bc59900a248f5391c3290d84073c209143478bc95f8406d9675d21a35",
+   "bytes": 201494,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-125Ma.webp": {
-   "sha256": "08778ae628f8a44191b61cdf46f16ab53c4e28eb292b3adaa405bbf7a43950c8",
-   "bytes": 258948,
+   "sha256": "77da50cc9bfdb98dbb2dc116ff8f8a3e4f97a733e3c7eb910196eeada0e017d1",
+   "bytes": 193796,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-130Ma.webp": {
-   "sha256": "0c6de0d96f52b4ce7ae6692154e697cc396c4e36f03c762c1828228b6b44ceef",
-   "bytes": 267332,
+   "sha256": "4994890a0f11ef0eeba083593e9f1f1efe7d8848550d234937dc1e7be51ab801",
+   "bytes": 199956,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-135Ma.webp": {
-   "sha256": "e6afea308d1ef0604a0c1a211d19bf0c27f3fc46c1cdc1cd15b4698f73e0e975",
-   "bytes": 221074,
+   "sha256": "236211b93f8e37ea895fe8f7e826df7c4f8b8c1f7bd9fe34ef1ce25981f987d9",
+   "bytes": 162020,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-140Ma.webp": {
-   "sha256": "ac64d487b50e9b242ad382b433478e32ba840e28b8a5755d0c4db1a28e902029",
-   "bytes": 237236,
+   "sha256": "518de530457f9a799f3e3a83381350f2231e4b041342dbeb265c5033e8150e9f",
+   "bytes": 177812,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-145Ma.webp": {
-   "sha256": "07f4d0f81af431dc7badb0e1f29622ce1e0cb9829d9fc29a248506c126773642",
-   "bytes": 237712,
+   "sha256": "9468bbb0b572c37f1a03e39a933b1f64e4a81768f3f81009089a4aac4bcdad82",
+   "bytes": 176078,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-150Ma.webp": {
-   "sha256": "76af24eb79467b224b9e02a9233a7b3e66d3f9988ad647f5352951795e8eafd4",
-   "bytes": 259184,
+   "sha256": "f32ad954c9938375d7c62f017a432f3413816a9d0ae2f34b83777d44bbc55f75",
+   "bytes": 202302,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-155Ma.webp": {
-   "sha256": "c47db0c5d49b8b702cce8b2dca4620dcfa8896f5d0a520c098ad740d6fe8b5cf",
-   "bytes": 255612,
+   "sha256": "26a33320c58fafaf7e7e7bf8981dd9688cdeda68a7af0aefab0673c8c368a95d",
+   "bytes": 198932,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-160Ma.webp": {
-   "sha256": "33ca47f45c0210ae2915a7b7675a5f287161cebb2db060af133b636b8e731f4a",
-   "bytes": 250652,
+   "sha256": "8813d5b55d27bf05dadc826bc5912ebd1bf7f2a4507c01dce2df487e3a14c8f7",
+   "bytes": 189626,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-165Ma.webp": {
-   "sha256": "2e455b95189196f7d07b8c09d04172c095d29444095833b553e3c4d48de1c309",
-   "bytes": 219708,
+   "sha256": "b4d1c7f243592a62d043d1a390c823aa119453447491cb0565fa43d08a58ee51",
+   "bytes": 163862,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-170Ma.webp": {
-   "sha256": "cf41fc24b45687316f5035e49cb947fdbf353a52859a66e10fafb872ca80252d",
-   "bytes": 222046,
+   "sha256": "5bdb4ec233ec381070722660ad2b8bfeb0da9e07e50fab3837b29c3466be3cea",
+   "bytes": 167078,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-175Ma.webp": {
-   "sha256": "ccc13bb39069521ecc165dfa8e4c3c1fb69cf5cff6dc246d37524a48c9b8d851",
-   "bytes": 205540,
+   "sha256": "49cfad2da74c2d3510b040db3a8bbf0489ccbd8a40e565acb2502dd7447b6b4d",
+   "bytes": 151788,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-180Ma.webp": {
-   "sha256": "e283cf12a738b0318fb6edfa18a0351af0c8a6ab8717804252691e5de85f1650",
-   "bytes": 197838,
+   "sha256": "507f27c126f6399039e0bfcff6a54200c9e5ea5153b848ed4af0e7ff71cfa5b8",
+   "bytes": 146550,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-185Ma.webp": {
-   "sha256": "726dadf58e4b6066064395e6ca0c74ea8c7327f9ca77ff8d06729be2ee1f42d2",
-   "bytes": 198856,
+   "sha256": "4849cbcbf3788455b937af9b414451eecc0aac6bfe1fc0f1e7497cd6e3a37d4c",
+   "bytes": 147884,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-190Ma.webp": {
-   "sha256": "51755bfbce42a37404bd92d2bc531a63e18683f7552f9f2fdfea4dcf9135f311",
-   "bytes": 211692,
+   "sha256": "cd57ef039d71ad5352da26e9bb764ba7ce2090fb91e93bc1d875c1b3a682aff1",
+   "bytes": 158392,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-195Ma.webp": {
-   "sha256": "6ba3ab048759bde734a12bdf5b7cd9f0204f00e9d140be068c819571f7755c06",
-   "bytes": 179738,
+   "sha256": "c6b15edd49bd14212eb02cf3f07622fe270fb9c9792c08fa1285efc6e3fc483a",
+   "bytes": 130176,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-200Ma.webp": {
-   "sha256": "e45c30e6028250c3c67b7a8776a69ac5a1200e45d7eabfae9d4ee732b0a42552",
-   "bytes": 180328,
+   "sha256": "a46ae141a699e6526664e759f3aa7c9a97c3aa76b607534ca1175cae4ffa8cb0",
+   "bytes": 129820,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-210Ma.webp": {
-   "sha256": "e9c3a803cfaaab5700d65a0bdba33e664734a50249f1ca88d657c3228a7ce7fc",
-   "bytes": 206848,
+   "sha256": "a9e413bba6ba1cc5ffa8bdb4c800ce7d490a63c3a4f109ed4caa9c40da43b5bb",
+   "bytes": 153618,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-220Ma.webp": {
-   "sha256": "8882b84feb83377e21e36e3a9ca9e2132c18725487d9fb9d95988d20e6cfb57e",
-   "bytes": 206654,
+   "sha256": "00d6444408d8a2d4343ed7adf84662e72e7317edf593ac459b4809d734d65795",
+   "bytes": 148122,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-230Ma.webp": {
-   "sha256": "3652e79708d52f8bfcd0523d6c0d09b53784a6014da4c24b2fcfbcfed98d262c",
-   "bytes": 185810,
+   "sha256": "6941c10a7f36f79fa4590297ce462695704886c292454d7c7f2e8922414aa7c2",
+   "bytes": 129704,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-240Ma.webp": {
-   "sha256": "6a9f8fea5f86a6669141ec62688bdc7ca048fb9d30202ef9f2c6e862c197e79a",
-   "bytes": 148236,
+   "sha256": "7b565ebfbbf2bb44616d63818b41e87e148fbe7ebdc74fb15890c1c04bdd5aaa",
+   "bytes": 101868,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-245Ma.webp": {
-   "sha256": "82d435a8f68a272c2594a496b2c074bc4678736bc6f721bdaa0dd1f57f398bd2",
-   "bytes": 161072,
+   "sha256": "fb3ecba972787d3801f859590b6952677ed204eb6b376b7e5ef7912d7c67276b",
+   "bytes": 107614,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-250Ma.webp": {
-   "sha256": "2a3ea27970df7e774ceaa235bf3c2f7962c690c50545afc4357c3cec1e1e96b8",
-   "bytes": 154974,
+   "sha256": "86d76fa22b72375c0b5ac7f3132bff5f1614caaf8deb25689994b332ecc5cd30",
+   "bytes": 102832,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-255Ma.webp": {
-   "sha256": "9d1141d80d67ab363010d8d3ef6a05a3c58d77f2a3cc1903b33a495308868368",
-   "bytes": 172938,
+   "sha256": "18e76d80fd24632ffb54fad28dc21f42f23b4801080cb02adf968bae4666400a",
+   "bytes": 116346,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-260Ma.webp": {
-   "sha256": "86cc6f29259891f64161761ec29a156273f74d42dd1f72f07a50c1b7035929d2",
-   "bytes": 150642,
+   "sha256": "9fe749433c98bb9721476e1ee0628cdb1220fdc67c460b16833e16926bf823f7",
+   "bytes": 99606,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-270Ma.webp": {
-   "sha256": "ba049edd82651ed4463df65d0786eafbfc282bb0f540193ce5dcbf7fd17c04e5",
-   "bytes": 139912,
+   "sha256": "ef76ff870a05e030d6cdad997e7ce3f67e040ab56e0b5fdde290627c2324ed3e",
+   "bytes": 82724,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-275Ma.webp": {
-   "sha256": "ead3c42230edf2cdf717a73216409bd461cca32b40a9a5c2875e17fc6ac7e017",
-   "bytes": 173814,
+   "sha256": "f959598c8f65fd6417b045c1ab7ad3bff1ee01695f437fc092bdf7b8c738d7ad",
+   "bytes": 117426,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-280Ma.webp": {
-   "sha256": "c7f872ee829dce9471032d0ca88467439afb45be687b50a0f0e0fc46825e4985",
-   "bytes": 184780,
+   "sha256": "7c5803a3cae1f51c91737de7fe3bbb1e7e35e798c62480e2268b6329852f5c99",
+   "bytes": 127922,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-290Ma.webp": {
-   "sha256": "f4760d1c703b418b464315e4e03e73622e56776f5daf524426b891a0f530a545",
-   "bytes": 167552,
+   "sha256": "551846ee3217e0bc53825b3b6b8b99d7353c73291079ca3195b314291df097a5",
+   "bytes": 106652,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-295Ma.webp": {
-   "sha256": "7a2c6a403f6a35f7203c1851862498d9e2449f2fe171870d38dad8d5bc3f179d",
-   "bytes": 150966,
+   "sha256": "74c3d0bedc499bcd57bd13e58dfbcc6106a450a3b38b4135ea9afe8320744bee",
+   "bytes": 90196,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-300Ma.webp": {
-   "sha256": "12fe61afa9cc78243778e7ac005487e8bfca1a043d02ff72c7398fbd46bd7d2d",
-   "bytes": 139774,
+   "sha256": "0f181c33b041f155d7307baf7482baaf089e9a0fb95824fcc5e1112fccbe8745",
+   "bytes": 78850,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-305Ma.webp": {
-   "sha256": "4acf59078732a3b3232367214e5a2606a5446f9ee65a6728c64b20c0ed5866ab",
-   "bytes": 144420,
+   "sha256": "3830e339697dd729ffd23f18e3c4b792eefc61497e8f99624968c2edee552792",
+   "bytes": 82870,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-310Ma.webp": {
-   "sha256": "7fba6ad185fd956924b91874a7a04f6d60d743da8e17996afa5a724c66f9916d",
-   "bytes": 135776,
+   "sha256": "77f9da81d6339c65d0e2f78f3db5cfd3ff7e8ae309f1760dd9d6de702a04caff",
+   "bytes": 78264,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-315Ma.webp": {
-   "sha256": "83c7b5f786dbdb3b7602f367ff9bc51909b30f4a749c043d145591fd13abb200",
-   "bytes": 145252,
+   "sha256": "6d9832363d4922f71b4b01f90c348f052df20485ed4ecabf8fdacc031705ae3a",
+   "bytes": 85994,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-320Ma.webp": {
-   "sha256": "8f31ef29cd5f96598a41ae2e592242627f521c19672e43b205c87de1ffbb96d3",
-   "bytes": 128366,
+   "sha256": "a03f5ffdfde486906eda2cde0627706a8a5c1a8ee95ceeb14b0488f908ffc6e4",
+   "bytes": 70340,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-330Ma.webp": {
-   "sha256": "f504d4686365d0352965119c29a8e12e305a33250a3a7a183d1b356026125da9",
-   "bytes": 137620,
+   "sha256": "9beafaabc626c593d93a7bb11d161e2e8e0dcebe7a75fb293e5190243dd39ae2",
+   "bytes": 77512,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-340Ma.webp": {
-   "sha256": "b0d87f334c97413e1c641742309fd8f7e7dc5f8ed984e5bbc114690fd563f1da",
-   "bytes": 136470,
+   "sha256": "f240e69de1818b3b82da16dce7d028c4d1617c5ce238f62ec438b2aa8b8ee751",
+   "bytes": 72328,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-350Ma.webp": {
-   "sha256": "b3dc143ccc400fb381b01928382b57cb880e26e26dd95cbaab03769f5751b129",
-   "bytes": 137020,
+   "sha256": "a7a72ed3d9891fec1f394a0d27a7f87146d25617d9f419d8d6af0ba2d4d5d4af",
+   "bytes": 77642,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-360Ma.webp": {
-   "sha256": "92874de2a572d88111e53b42e8ae64c514c7e307bf4f86235e9665aa72b80d0a",
-   "bytes": 124482,
+   "sha256": "af0b8b7453b67972d6ad59f8b154cd7e2a7cad2436366b9346974a7308ced748",
+   "bytes": 60070,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-370Ma.webp": {
-   "sha256": "bf652efd73ff07697a31f8a23785f57ef1feb23d8a720aa40512a326dea451ac",
-   "bytes": 163082,
+   "sha256": "19d351a8768998d196d6662394eed628aa505ef2f32db30974ed8ed725678fd9",
+   "bytes": 95466,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-380Ma.webp": {
-   "sha256": "0483dd950fe20b28f1697e87225fd8d405081c43d205dd5dd8d7723e543c7315",
-   "bytes": 134348,
+   "sha256": "1f3c2fea2f9923277598d3ceed0bd8522967694fe8fa44bcd49eb4d5f7d0895d",
+   "bytes": 68098,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-390Ma.webp": {
-   "sha256": "ea5fd1dde6675a38dc07a774a9558f7ba1ba27574310403bc46292ea1d59a352",
-   "bytes": 160742,
+   "sha256": "2282b759644b5b74f15f5b23a623acd86961eb0ae57a5b8b7be789c216a3cdf8",
+   "bytes": 97702,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-395Ma.webp": {
-   "sha256": "f1fcab34bbfca3b6587fe30acdcfdf57baf88ecfb3d9f5b994bec20ae0c8c944",
-   "bytes": 128664,
+   "sha256": "d0b2449042d8b6dd6b2aa8f8299f974432942cce93c8e6a4f95e30436e79ab1e",
+   "bytes": 67680,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-400Ma.webp": {
-   "sha256": "a8c515654ba621e410e47b415a7a310f7f80c40032e2cd09c819524855ac621e",
-   "bytes": 122306,
+   "sha256": "42b18d8c312f4c11b375cea24eaf37ae0e2248d117f815cfe0ed3cb9cf237e69",
+   "bytes": 59978,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-410Ma.webp": {
-   "sha256": "6b1187653ca44763e498b6afb2f776624f7b0e955e64181a7d9722bfd8f72394",
-   "bytes": 123112,
+   "sha256": "036d9b223861634725a94afa333c1d9bc28930fc6aebb68c95ea65244ef5345f",
+   "bytes": 64922,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-415Ma.webp": {
-   "sha256": "a85a8a57692da703b11f04c58ba015b4dbece0bbfbfeb8e61ff7c372352f5464",
-   "bytes": 126818,
+   "sha256": "4ecd74cc06ee69f4fbd5c03d1b94603c854cc191e87f05467d70de3a4fbce472",
+   "bytes": 65492,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-420Ma.webp": {
-   "sha256": "380529e1e700d140dfbe306197761faf78a871bd64af5f397a902ad64025016f",
-   "bytes": 115738,
+   "sha256": "e0c577cbdb5bb86304623786df59850ccecf5567a681a60291c21c928a303a00",
+   "bytes": 56558,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-425Ma.webp": {
-   "sha256": "b141733df8170ff70f3aab7bbbdfab6aca1a6c214c612d3595897f13c7e5b4a1",
-   "bytes": 122208,
+   "sha256": "5e8b11513576ab15f15cd27cbb3508b513068ab6f0256285e3e1b190a0c1a730",
+   "bytes": 61118,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-430Ma.webp": {
-   "sha256": "382503952bb560193f3c71f890fd2d78816a07d25675da99f8a6eed73b4e53e0",
-   "bytes": 111160,
+   "sha256": "c5d730192a1667eb2d87e977a5dc24e360ccf9d0220d7c8768be9e4962b23582",
+   "bytes": 55708,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-440Ma.webp": {
-   "sha256": "1b61f204ecaffaf86c03dbc7dffb6defc4d7d581d06acfc134ae910421e73c24",
-   "bytes": 108936,
+   "sha256": "a54ecad81586bb8c71177b8340854af6cf29f53e67ac3cfe5a97323d4e53b146",
+   "bytes": 49284,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-445Ma.webp": {
-   "sha256": "65c531cfe3029ac1da0b222e236bb157f149063d032b1c8491059f0e993bb3aa",
-   "bytes": 110372,
+   "sha256": "e7da2a58f1d3b582604667e6b61c821a2139b83346f70fdcac4068bbefe7f931",
+   "bytes": 48584,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-450Ma.webp": {
-   "sha256": "752e8a431cb4ad9c3b622d00c03bce3eb8cb4b044e12e281454dbc5492dade7e",
-   "bytes": 113086,
+   "sha256": "f85cf25862d66459d364182681b5f8c818be523ac3e44f54f3b2cfab6a9b01e4",
+   "bytes": 50932,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-460Ma.webp": {
-   "sha256": "5efc7b41081c94cddbf6f36794d626bd5d1e319fe985bb69185c7ac8031a74b8",
-   "bytes": 131452,
+   "sha256": "f819cbbd2e8eb1f0e9f0cf84dd17030d27afd76fa5215cbcf2d2d95fed323a94",
+   "bytes": 63558,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-461Ma.webp": {
-   "sha256": "8ed2fd2d11bda8363c332bc27bbcc324dc821cc6da83d6f5fbe4b6ebb11dbfdb",
-   "bytes": 118762,
+   "sha256": "e7a05fc0fa123782e6dd90aed1b743fa0bf0f0683ebad64410cb6680ec52f1a4",
+   "bytes": 60552,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-470Ma.webp": {
-   "sha256": "bb5843c100941bcd64e4ef32bd47e86d8ae1685d3255cd16e8ee023997de99e3",
-   "bytes": 122786,
+   "sha256": "219cdb10d25a69b070d7033e31cffede8d929f42dd185843fa50502b4368bdf3",
+   "bytes": 64950,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-480Ma.webp": {
-   "sha256": "fa923706780c650f50a9318c875496a6419e793f1f0c705a4e3b71d42938ed3f",
-   "bytes": 122036,
+   "sha256": "1cc9863fa5e0470721901a3d6e8fe8a573af311cd3efebcc26a2969f6fe306a4",
+   "bytes": 63974,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-490Ma.webp": {
-   "sha256": "82cf37a0ff28362fe00ce2449ea3a3ac99930ba1808f2e8aaf15da819c5342ee",
-   "bytes": 117378,
+   "sha256": "9924f37805c43e0243c32ab97effcee78daa84e55f290cb0cfed61ca90ba5754",
+   "bytes": 60464,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-500Ma.webp": {
-   "sha256": "b64d9fabb196564cd6ee538a3ca92f4eff90e3724ebadbba9f884279882157d4",
-   "bytes": 106782,
+   "sha256": "80e19e933ef3952ee17da7ec3af9c1b6b445cda0f981554096600843ebe1fc46",
+   "bytes": 48734,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-510Ma.webp": {
-   "sha256": "fb19fe0f86d8ae82c24d95e4263078f71ce982ca515cc6223fdf77e1eb8080a8",
-   "bytes": 112940,
+   "sha256": "6d395cfb01f77c8909218083bc9c2b9ea7be25ed4b55e57c4d958909a3a7dac2",
+   "bytes": 55812,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-520Ma.webp": {
-   "sha256": "9f482719bdf808327147014790d80223b163453c3b73ce43e6df60e41cbfd321",
-   "bytes": 108058,
+   "sha256": "d2adf624da6f9fa36800886af5b0e942d0cd97a83013ce8a8cfc0c6c47a53fe1",
+   "bytes": 51022,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-530Ma.webp": {
-   "sha256": "94385fa61a2cfa88704d6b30ac78c9fa829d9522feab6334416b64243c2296e8",
-   "bytes": 112932,
+   "sha256": "cb99218e6b09ff3096459efac44cd071b7695c4cc852a41ce11e3b322b394cf7",
+   "bytes": 56492,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-540Ma.webp": {
-   "sha256": "0b67edc53a4399aa8dde1a907bcadd70cb434ba7a7e84081e292c359709e35c1",
-   "bytes": 112586,
+   "sha256": "a13e3784a5fd47059652487be1279688d1092efd8816da38956eec7ef1d8023c",
+   "bytes": 55570,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-600Ma.webp": {
-   "sha256": "8fa289165446303728619d4bf9f551774878823cc643855463fe0f248d3277bc",
-   "bytes": 104962,
+   "sha256": "d76d2ef5602eebb6fac90b147747702bbc1a640cab1ede52bffb886384de88de",
+   "bytes": 37726,
    "width": 2048,
    "height": 1024
   },
@@ -2052,14 +2052,14 @@
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-690Ma.webp": {
-   "sha256": "a6dc5b0ce849b40c07b4f99cb3caa7a74bbdd0beadf0a210228ff0911595959f",
-   "bytes": 86670,
+   "sha256": "9a3798877ca0bc18ee0706556308f000e6844dc3c3340b8580f2207eb9927d70",
+   "bytes": 35850,
    "width": 2048,
    "height": 1024
   },
   "public/textures/earth/paleoatlas/scotese-750Ma.webp": {
-   "sha256": "da7591a6f936214ca3a2b264646df7d25c508b16e4c959b66c1b968054423ce8",
-   "bytes": 78730,
+   "sha256": "11e0f973cdf7fe83ee9f0fc9ed685d083b0bdf383f83e6f91d2aaed473fc702c",
+   "bytes": 31504,
    "width": 2048,
    "height": 1024
   },

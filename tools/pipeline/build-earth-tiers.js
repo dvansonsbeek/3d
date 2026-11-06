@@ -12,8 +12,10 @@
  *                  (3600 × 1800, 0–750 Ma) in Scotese_PaleoAtlas_v3.zip of the Zenodo record
  *                  10.5281/zenodo.5460860 (Scotese & Wright 2018), whose License.txt states
  *                  CC BY 4.0. Prepared here: the small file-name label painted over (a median
- *                  filter over its box), rolled by 180° to the scene's Pacific-centred seam,
- *                  re-encoded at 2048 × 1024 WebP. The present-day map of the set is NOT used
+ *                  filter over its box), the present-day coastlines and political boundaries
+ *                  drawn in ink over every reconstruction removed (lib/remove-drawn-lines —
+ *                  an anachronism at every age but today's; plan 27 §8 L), rolled by 180° to
+ *                  the scene's Pacific-centred seam, re-encoded at 2048 × 1024 WebP. The present-day map of the set is NOT used
  *                  (the satellite map stays); its 21-ka map replaces the simulator's former
  *                  LGM map, whose source was unrecorded.
  *   illustration — the tiers older than the atlas (the Hadean genesis, the steam atmosphere,
@@ -36,6 +38,8 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { execFileSync } = require('child_process');
+const { removeDrawnLines, REMOVE_DRAWN_LINES_DEFAULTS } = require('./lib/remove-drawn-lines');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const OUT_DIR = path.join(ROOT, 'public', 'textures', 'earth');
@@ -55,6 +59,10 @@ const WEBP_QUALITY = '85';
 // and 750 Ma maps: x 170–350, y 1695–1715 of 3600 × 1800); the box is replaced by its own
 // median (31 × 31) — thin text vanishes, the painted ocean stays.
 const LABEL_BOX = { w: 230, h: 34, x: 150, y: 1688 };
+// The drawn lines' share of a map (the ink mask of lib/remove-drawn-lines): measured 1.2–2.3 %
+// on twelve maps from 1 to 750 Ma. A map outside this band is REFUSED — the mask found another
+// kind of feature, or none (a new atlas version with another line style).
+const INK_LINE_FRACTION = { min: 0.005, max: 0.04 };
 
 // ── The tier table (the one home) ───────────────────────────────────────────────────────────
 // Ages in Myr before J2000 (the engine axis). Each atlas slice covers from the midpoint to the
@@ -155,16 +163,28 @@ function extractRasters(zip) {
   }).sort((a, b) => a.ageMa - b.ageMa);
 }
 
-/** Prepare one atlas raster: label patched, rolled 180°, resized, WebP. @param {string} src @param {string} out */
+/** Prepare one atlas raster: label patched, the drawn lines removed, rolled 180°, resized, WebP.
+ *  Returns the ink mask's statistics; REFUSES a map whose line share is outside the measured band.
+ *  @param {string} src @param {string} out */
 function prepareAtlasRaster(src, out) {
   const dims = run('identify', ['-format', '%w %h', src]).trim();
   if (dims !== `${SOURCE_W} ${SOURCE_H}`) throw new Error(`${src}: ${dims}, expected ${SOURCE_W} ${SOURCE_H}`);
-  run('convert', [src,
+  // pass 1: the label patched, at the source resolution, as raw RGB
+  const patched = execFileSync('convert', [src,
     '(', '+clone', '-crop', `${LABEL_BOX.w}x${LABEL_BOX.h}+${LABEL_BOX.x}+${LABEL_BOX.y}`, '+repage', '-statistic', 'Median', '31x31', ')',
     '-geometry', `+${LABEL_BOX.x}+${LABEL_BOX.y}`, '-composite',
+    '-depth', '8', 'rgb:-'], { maxBuffer: 256 << 20 });
+  // the drawn present-day coastlines and boundaries, at the source resolution (the ink is 1–3 px there)
+  const { rgb, stats } = removeDrawnLines(patched, SOURCE_W, SOURCE_H);
+  if (!(stats.lineFraction >= INK_LINE_FRACTION.min && stats.lineFraction <= INK_LINE_FRACTION.max)) {
+    throw new Error(`${src}: the ink mask took ${(100 * stats.lineFraction).toFixed(2)} % of the map as drawn lines, outside the measured ${100 * INK_LINE_FRACTION.min}–${100 * INK_LINE_FRACTION.max} % — look at the map before importing`);
+  }
+  // pass 2: the roll, the resize and the encoding
+  execFileSync('convert', ['-size', `${SOURCE_W}x${SOURCE_H}`, '-depth', '8', 'rgb:-',
     '-roll', `+${SOURCE_W / 2}+0`,
     '-filter', 'Lanczos', '-resize', `${OUT_W}x${OUT_H}!`,
-    '-quality', WEBP_QUALITY, '-define', 'webp:method=6', out]);
+    '-quality', WEBP_QUALITY, '-define', 'webp:method=6', out], { input: rgb, maxBuffer: 64 << 20 });
+  return stats;
 }
 
 // ── 2. The generated tiers: seeded 3-D value noise on the sphere (lib/procedural-sphere) ────
@@ -482,13 +502,19 @@ async function main() {
   const rasters = extractRasters(zip);
   console.log(`${rasters.length} atlas rasters (${rasters[0].ageMa}–${rasters[rasters.length - 1].ageMa} Ma)`);
   const atlas = [];
+  /** @type {{ ageMa: number, lineFraction: number, filledFraction: number }[]} */ const ink = [];
   for (const r of rasters) {
     if (r.ageMa === 0) continue;   // the present-day map is not used (the satellite map stays)
     const out = path.join(ATLAS_DIR, `scotese-${String(r.ageMa).padStart(3, '0')}Ma.webp`);
-    if (REBUILD || !fs.existsSync(out)) { prepareAtlasRaster(r.src, out); process.stdout.write('.'); }
+    if (REBUILD || !fs.existsSync(out)) { const s = prepareAtlasRaster(r.src, out); ink.push({ ageMa: r.ageMa, lineFraction: s.lineFraction, filledFraction: s.filledFraction }); process.stdout.write('.'); }
     atlas.push({ name: r.name, ageMa: r.ageMa, label: r.label, file: rel(out) });
   }
   console.log(`\natlas prepared (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+  if (ink.length) {
+    const by = (/** @type {'lineFraction'|'filledFraction'} */ f) => ink.slice().sort((a, b) => a[f] - b[f]);
+    const lo = by('lineFraction')[0], hi = by('lineFraction')[ink.length - 1], fhi = by('filledFraction')[ink.length - 1];
+    console.log(`drawn lines removed on ${ink.length} maps: ${(100 * lo.lineFraction).toFixed(2)} % of the map (${lo.ageMa} Ma) to ${(100 * hi.lineFraction).toFixed(2)} % (${hi.ageMa} Ma); the largest filled share ${(100 * fhi.filledFraction).toFixed(2)} % (${fhi.ageMa} Ma)`);
+  }
   for (const recipe of Object.keys(RECIPES)) {
     const out = path.join(DEEP_DIR, `${recipe}.webp`);
     if (REBUILD || !fs.existsSync(out)) { const t1 = Date.now(); renderGenerated(recipe, out); console.log(`rendered ${recipe} (${((Date.now() - t1) / 1000).toFixed(1)} s)`); }
@@ -528,7 +554,7 @@ async function main() {
         zip: ZIP_NAME, zipSha256: ZIP_SHA256, url: ZIP_URL,
         licence: 'CC BY 4.0 (License.txt in the zip)',
         sourceSize: `${SOURCE_W} x ${SOURCE_H} JPEG`,
-        preparation: `the bottom-left file-name label replaced by the 31x31 median of its ${LABEL_BOX.w}x${LABEL_BOX.h} box; rolled by 180° to the scene's Pacific-centred seam; Lanczos resize to ${OUT_W} x ${OUT_H}; WebP quality ${WEBP_QUALITY}. The political boundaries drawn on the originals are kept.`,
+        preparation: `the bottom-left file-name label replaced by the 31x31 median of its ${LABEL_BOX.w}x${LABEL_BOX.h} box; the present-day coastlines and political boundaries the originals draw in black ink over every reconstruction REMOVED and filled from their surroundings (tools/pipeline/lib/remove-drawn-lines.js: thin features at most ${REMOVE_DRAWN_LINES_DEFAULTS.ratio} of their local background's luminance, in connected pieces of at least ${REMOVE_DRAWN_LINES_DEFAULTS.minSpan} px, 1–3 % of a map, and the fainter US state grid as long thin pieces at most ${REMOVE_DRAWN_LINES_DEFAULTS.faintRatio} of the background — a change to the licensed work, stated here as CC BY 4.0 requires; a few fragments over the darkest sea and some short island outlines stay in); rolled by 180° to the scene's Pacific-centred seam; Lanczos resize to ${OUT_W} x ${OUT_H}; WebP quality ${WEBP_QUALITY}.`,
       },
       generated: {
         note: `procedural illustration rendered by this script from seeded 3-D value noise on the sphere (seed ${SEED}; the recipes' parameters are in the script) — no third-party rights; labelled "illustration" on every surface`,
