@@ -126,9 +126,11 @@ const measured = await s.page.evaluate(({ YEARS, EPOCHS_MA, MOON_JDS, MOON_DEEP_
   // −0.9 the forecast ahead, step G1/H4 — and every row the sky tint, step G3)
   // (the future: −950 the moist greenhouse, −875 its fade, −650 the biosphere's end, −550 the
   // present tier's fade, −0.9 beyond the ice forecast, −0.1 inside it — plan 27 step H1/H4)
-  // (the continents ahead: −12.5 inside the present tier's fade into the +50 snapshot, −50, −100,
-  // −175 inside a snapshot's fade, −250, −400 the supercontinent held — plan 27 step H3)
-  for (const ageMa of [-950, -875, -650, -550, -400, -250, -175, -100, -50, -12.5, -1, -0.9, -0.1, -0.05, 0, 0.02, 0.021, 0.0225, 0.03, 0.125, 1, 2.49, 2.51, 163.5, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
+  // (the continents ahead, a snapshot every 5 Myr with 2.5-Myr fades: −1 and −2 inside the
+  // present tier's fade into the +5 snapshot — `modern` there is the weight the city lights,
+  // the relief and the glint ride —, −2.6 and −5 the +5 snapshot, −6.5 inside its fade, −12.5 a
+  // tier boundary, −50, −100, −175, −250, −400 the supercontinent held — plan 27 step H3)
+  for (const ageMa of [-950, -875, -650, -550, -400, -250, -175, -100, -50, -12.5, -6.5, -5, -2.6, -2, -1, -0.9, -0.1, -0.05, 0, 0.02, 0.021, 0.0225, 0.03, 0.125, 1, 2.49, 2.51, 163.5, 165, 540, 634, 636, 644, 646, 658, 660, 716, 718, 779, 781, 2219, 2221, 2299, 2301, 2499, 2510, 3499, 3520, 4399, 4402, 4412, 4418, 4420, 4427.5, 4428.985]) {
     const r = T.earthTierAtAge(ageMa);
     v[`earthTier@${ageMa}Ma`] = r ? `${r.id} ${r.kind} mix=${r.mix.toFixed(4)} clouds=${r.clouds.toFixed(4)} atm=${r.atmosphere.toFixed(4)} modern=${r.modern.toFixed(4)} ice=${r.ice === null ? '-' : r.ice.toFixed(4)} sky=${r.skyTint.map((c) => c.toFixed(2)).join('/')}` : null;
   }

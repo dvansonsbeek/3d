@@ -94,7 +94,7 @@
    "id": "future-plates-250",
    "label": "+250 Myr — Pangaea Proxima: the Atlantic closed, the Americas against Africa and Europe, Australia on Asia — Scotese's scenario on today's plate motions (DeMets 2010), one reading of several (derived)",
    "fromMa": -600,
-   "toMa": -225,
+   "toMa": -247.5,
    "fadeMyr": 100,
    "file": "public/textures/earth/generated/future-plates-250.webp",
    "source": "derived",
@@ -103,11 +103,119 @@
    "atmosphere": 1
   },
   {
+   "id": "future-plates-245",
+   "label": "+245 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -247.5,
+   "toMa": -242.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-245.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-240",
+   "label": "+240 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -242.5,
+   "toMa": -237.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-240.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-235",
+   "label": "+235 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -237.5,
+   "toMa": -232.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-235.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-230",
+   "label": "+230 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -232.5,
+   "toMa": -227.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-230.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-225",
+   "label": "+225 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -227.5,
+   "toMa": -222.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-225.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-220",
+   "label": "+220 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -222.5,
+   "toMa": -217.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-220.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-215",
+   "label": "+215 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -217.5,
+   "toMa": -212.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-215.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-210",
+   "label": "+210 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -212.5,
+   "toMa": -207.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-210.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-205",
+   "label": "+205 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -207.5,
+   "toMa": -202.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-205.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
    "id": "future-plates-200",
-   "label": "+200 Myr — the Atlantic closing: the Americas on their way back east, the scenario of Scotese (derived)",
-   "fromMa": -225,
-   "toMa": -175,
-   "fadeMyr": 50,
+   "label": "+200 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -202.5,
+   "toMa": -197.5,
+   "fadeMyr": 2.5,
    "file": "public/textures/earth/generated/future-plates-200.webp",
    "source": "derived",
    "kind": "illustration",
@@ -115,11 +223,119 @@
    "atmosphere": 1
   },
   {
+   "id": "future-plates-195",
+   "label": "+195 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -197.5,
+   "toMa": -192.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-195.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-190",
+   "label": "+190 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -192.5,
+   "toMa": -187.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-190.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-185",
+   "label": "+185 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -187.5,
+   "toMa": -182.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-185.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-180",
+   "label": "+180 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -182.5,
+   "toMa": -177.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-180.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-175",
+   "label": "+175 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -177.5,
+   "toMa": -172.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-175.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-170",
+   "label": "+170 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -172.5,
+   "toMa": -167.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-170.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-165",
+   "label": "+165 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -167.5,
+   "toMa": -162.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-165.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-160",
+   "label": "+160 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -162.5,
+   "toMa": -157.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-160.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-155",
+   "label": "+155 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -157.5,
+   "toMa": -152.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-155.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
    "id": "future-plates-150",
-   "label": "+150 Myr — the Atlantic begins to close (the scenario's first speculative step); Africa and Australia ride with Eurasia (derived)",
-   "fromMa": -175,
-   "toMa": -125,
-   "fadeMyr": 50,
+   "label": "+150 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -152.5,
+   "toMa": -147.5,
+   "fadeMyr": 2.5,
    "file": "public/textures/earth/generated/future-plates-150.webp",
    "source": "derived",
    "kind": "illustration",
@@ -127,11 +343,119 @@
    "atmosphere": 1
   },
   {
+   "id": "future-plates-145",
+   "label": "+145 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -147.5,
+   "toMa": -142.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-145.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-140",
+   "label": "+140 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -142.5,
+   "toMa": -137.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-140.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-135",
+   "label": "+135 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -137.5,
+   "toMa": -132.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-135.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-130",
+   "label": "+130 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -132.5,
+   "toMa": -127.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-130.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-125",
+   "label": "+125 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -127.5,
+   "toMa": -122.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-125.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-120",
+   "label": "+120 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -122.5,
+   "toMa": -117.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-120.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-115",
+   "label": "+115 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -117.5,
+   "toMa": -112.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-115.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-110",
+   "label": "+110 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -112.5,
+   "toMa": -107.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-110.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-105",
+   "label": "+105 Myr — the Atlantic closing: the Americas on their way back east — Scotese's Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia (derived)",
+   "fromMa": -107.5,
+   "toMa": -102.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-105.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
    "id": "future-plates-100",
-   "label": "+100 Myr — Australia docked on Southeast Asia, the Mediterranean closed; the Atlantic at its widest — today's plate motions, DeMets 2010 (derived)",
-   "fromMa": -125,
-   "toMa": -75,
-   "fadeMyr": 50,
+   "label": "+100 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -102.5,
+   "toMa": -97.5,
+   "fadeMyr": 2.5,
    "file": "public/textures/earth/generated/future-plates-100.webp",
    "source": "derived",
    "kind": "illustration",
@@ -139,12 +463,228 @@
    "atmosphere": 1
   },
   {
+   "id": "future-plates-95",
+   "label": "+95 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -97.5,
+   "toMa": -92.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-095.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-90",
+   "label": "+90 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -92.5,
+   "toMa": -87.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-090.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-85",
+   "label": "+85 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -87.5,
+   "toMa": -82.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-085.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-80",
+   "label": "+80 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -82.5,
+   "toMa": -77.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-080.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-75",
+   "label": "+75 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -77.5,
+   "toMa": -72.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-075.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-70",
+   "label": "+70 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -72.5,
+   "toMa": -67.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-070.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-65",
+   "label": "+65 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -67.5,
+   "toMa": -62.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-065.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-60",
+   "label": "+60 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -62.5,
+   "toMa": -57.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-060.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-55",
+   "label": "+55 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -57.5,
+   "toMa": -52.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-055.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
    "id": "future-plates-50",
-   "label": "+50 Myr — today's plate motions carried 50 Myr ahead (DeMets 2010): Australia at Indonesia, Africa into Europe, the Atlantic wider (derived)",
-   "fromMa": -75,
-   "toMa": -25,
-   "fadeMyr": 50,
+   "label": "+50 Myr — Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -52.5,
+   "toMa": -47.5,
+   "fadeMyr": 2.5,
    "file": "public/textures/earth/generated/future-plates-050.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-45",
+   "label": "+45 Myr — Australia docked on Southeast Asia, Africa closing the Mediterranean, the Atlantic wider — today's plate motions, DeMets 2010 (derived)",
+   "fromMa": -47.5,
+   "toMa": -42.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-045.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-40",
+   "label": "+40 Myr — today's measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening (derived)",
+   "fromMa": -42.5,
+   "toMa": -37.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-040.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-35",
+   "label": "+35 Myr — today's measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening (derived)",
+   "fromMa": -37.5,
+   "toMa": -32.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-035.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-30",
+   "label": "+30 Myr — today's measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening (derived)",
+   "fromMa": -32.5,
+   "toMa": -27.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-030.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-25",
+   "label": "+25 Myr — today's measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening (derived)",
+   "fromMa": -27.5,
+   "toMa": -22.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-025.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-20",
+   "label": "+20 Myr — today's measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening (derived)",
+   "fromMa": -22.5,
+   "toMa": -17.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-020.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-15",
+   "label": "+15 Myr — today's measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening (derived)",
+   "fromMa": -17.5,
+   "toMa": -12.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-015.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-10",
+   "label": "+10 Myr — today's measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening (derived)",
+   "fromMa": -12.5,
+   "toMa": -7.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-010.webp",
+   "source": "derived",
+   "kind": "illustration",
+   "clouds": 1,
+   "atmosphere": 1
+  },
+  {
+   "id": "future-plates-5",
+   "label": "+5 Myr — today's measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening (derived)",
+   "fromMa": -7.5,
+   "toMa": -2.5,
+   "fadeMyr": 2.5,
+   "file": "public/textures/earth/generated/future-plates-005.webp",
    "source": "derived",
    "kind": "illustration",
    "clouds": 1,
@@ -153,9 +693,9 @@
   {
    "id": "modern",
    "label": "Present-day Earth (satellite imagery)",
-   "fromMa": -25,
+   "fromMa": -2.5,
    "toMa": 0.022471561943874056,
-   "fadeMyr": 25,
+   "fadeMyr": 2.5,
    "file": "public/Earth.jpg",
    "source": "modern",
    "kind": "cited",
@@ -1493,9 +2033,117 @@
    "width": 2048,
    "height": 1024
   },
+  "public/textures/earth/generated/future-plates-245.webp": {
+   "sha256": "1622aae151cf743eec1635c719caa4187aecb77970ef1d84a91b0e1631ded92f",
+   "bytes": 112824,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-240.webp": {
+   "sha256": "a37b699f5a22fdff622348c0128541288ccbf69e76253cdec2e22c617fca4ed8",
+   "bytes": 112970,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-235.webp": {
+   "sha256": "67c0c685ee81bbebbabc3480bb09ad89e56b36fe725fed57d9bd60988d309503",
+   "bytes": 112806,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-230.webp": {
+   "sha256": "b510d3153bd33099cce6c123ab9c52f93d7cfb48070962e5ab13a18f8b190cdc",
+   "bytes": 112522,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-225.webp": {
+   "sha256": "29333bb38b8f9831aea8dda74af566cb211a0188399293b7d335ac99f400a2d8",
+   "bytes": 112762,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-220.webp": {
+   "sha256": "341164ec5599024b4abe15c229adc19bd679f119c8d98fe6e961027c5ba022a8",
+   "bytes": 112622,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-215.webp": {
+   "sha256": "5c81aa1d7a45957d1bbf54d9098f9bd79bd102a5ff0ad57319ccd54d84451df0",
+   "bytes": 112256,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-210.webp": {
+   "sha256": "4e5f29807e577becada6b38c608d80d4c4df22e2baa2f45206e18c5846965505",
+   "bytes": 112204,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-205.webp": {
+   "sha256": "60f1281f2d76c310921e7d5942f86d8785a8b4d5805ab49d4be4e51534eb0e83",
+   "bytes": 112126,
+   "width": 2048,
+   "height": 1024
+  },
   "public/textures/earth/generated/future-plates-200.webp": {
    "sha256": "20534ec7d5229ace9265a55a68be072dc6bf31058cd5a9e9134c50ba6bf0cc00",
    "bytes": 112264,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-195.webp": {
+   "sha256": "c28abf81dba95064e223c6196a23f33a5df5b0b87d529e51bdaa864ad5dfe12f",
+   "bytes": 112174,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-190.webp": {
+   "sha256": "aed35b123728697f537d88aa358ffb16c8f7e13fe75980919497a6d2424d81a7",
+   "bytes": 112118,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-185.webp": {
+   "sha256": "c7262e437ab5d8ab4cf3946a9f31af3c83b1bfc01c0b7dc791ef369f888fcaa1",
+   "bytes": 112138,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-180.webp": {
+   "sha256": "e89906d08d9be5bee04fa1c26da26a06c778b0cc8fda9d183534f4446dd1e411",
+   "bytes": 112508,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-175.webp": {
+   "sha256": "887d6b8fc2de8a5f8e757d21c55da228b737317b9fdc95130024c4f60f794d3e",
+   "bytes": 112572,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-170.webp": {
+   "sha256": "42e2efd890f4c9594176a957923ffc2335119dc7c13fa1aea306fd75f4fc606f",
+   "bytes": 112334,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-165.webp": {
+   "sha256": "ee9db21f69165fcc9dfdc0952cd731eda61e96908403d874d0db1fb51ca36c14",
+   "bytes": 112190,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-160.webp": {
+   "sha256": "e8b56451464cfcd1f400ec4df8251ed8e2aa2e9ee2405c804aa6101323eaa2e3",
+   "bytes": 112276,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-155.webp": {
+   "sha256": "4f8e827dfde1c999168280d4c0dd647263e3ce2a501f07b658c1818c015e9fa8",
+   "bytes": 112314,
    "width": 2048,
    "height": 1024
   },
@@ -1505,15 +2153,177 @@
    "width": 2048,
    "height": 1024
   },
+  "public/textures/earth/generated/future-plates-145.webp": {
+   "sha256": "f81b549c2d8d7402926317239fa1e53ed867c82a3a253eb28532b7d745f4248a",
+   "bytes": 112878,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-140.webp": {
+   "sha256": "a60a0ca4e88559ff37d1d1635f9d86f4ca0ae18cf57466eb009a128c7a7aa7da",
+   "bytes": 112312,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-135.webp": {
+   "sha256": "e28d254202e8917e03bf3ad631b9142dae729e6b25f3c981bd1573e24e78d00a",
+   "bytes": 112854,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-130.webp": {
+   "sha256": "944c5022a28d4918fc95917c9ef4a8f7eb960c55574bb072164ae2a34a30249e",
+   "bytes": 112680,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-125.webp": {
+   "sha256": "b7ceca796b59a922d0ac4b9f0fa32cb8152e5eb4c8b3cca14fe726f5f3c39b0f",
+   "bytes": 112882,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-120.webp": {
+   "sha256": "ece209da50817054b8d2651ef9738b21f26733a72b4e058bedf819f70d7ba083",
+   "bytes": 113420,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-115.webp": {
+   "sha256": "fd12907a6fd7fceb1f6fc1bb7f935c88b36aa28355609096eaf3eae5166b3242",
+   "bytes": 113120,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-110.webp": {
+   "sha256": "4370f35e54595cd62e8c560dc11a7d470a54351921631e9a15033fa5cdd84095",
+   "bytes": 113402,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-105.webp": {
+   "sha256": "71e5b62f1f107289360b152ad1bd679ec6809956f3c022d17317d8350a7f15db",
+   "bytes": 113846,
+   "width": 2048,
+   "height": 1024
+  },
   "public/textures/earth/generated/future-plates-100.webp": {
    "sha256": "5422e06d893ea0e8d9c3ab797659f0480d30adee1c6e870a82950773cf051ec6",
    "bytes": 113366,
    "width": 2048,
    "height": 1024
   },
+  "public/textures/earth/generated/future-plates-095.webp": {
+   "sha256": "8c23a879f29188de0e9b48284bc53d61ed339a867ca9c001ee254e48a2c32960",
+   "bytes": 113470,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-090.webp": {
+   "sha256": "fbc1ac8f5930e58d357f5571361aa608b9bfc7db7bcc690dde7f67a963bfaf3a",
+   "bytes": 113262,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-085.webp": {
+   "sha256": "d8ff45f4f28b945f1921c0a1ba0aa1fd821d8b7c338a61fcf03d38126eb35022",
+   "bytes": 113100,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-080.webp": {
+   "sha256": "21be63b8e681a09033143701625562a6de14fc73dbad0e511da5befd651db443",
+   "bytes": 113548,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-075.webp": {
+   "sha256": "10c6b0dbb18aa0569136abcb9a9a5509772af1155d74a4c990e3597f65d0faca",
+   "bytes": 112940,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-070.webp": {
+   "sha256": "32b52aa29b957cec0bae9677c3b0910b0969d8deb45065397268ecba34e4969f",
+   "bytes": 113056,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-065.webp": {
+   "sha256": "efc23d8eb59eeb99ca9da1bc6ae16f5a3bbf480018a34346173145ce79b1bd62",
+   "bytes": 113168,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-060.webp": {
+   "sha256": "fd05cc9c9e95b069682691dd82f89ed1eaed9c28030b92b9696f0b639e5cca6f",
+   "bytes": 113382,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-055.webp": {
+   "sha256": "023b0333e9071078deac8fa702e9e50acc2b60786c1f01760722f31c541b701d",
+   "bytes": 112934,
+   "width": 2048,
+   "height": 1024
+  },
   "public/textures/earth/generated/future-plates-050.webp": {
    "sha256": "1f165299575238c52f54a140070bd1179a5729d4c48c5f86f9696823c6bbc01e",
    "bytes": 112512,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-045.webp": {
+   "sha256": "9d45e7487323a48908499a6999343f7911bfd8e230c645b687e60659a3899815",
+   "bytes": 113110,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-040.webp": {
+   "sha256": "cb49888b47881de8ce2552fc154e8c4f2da4f2c300742069737a14d2255ae63a",
+   "bytes": 113154,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-035.webp": {
+   "sha256": "b747ce28985119913e45a83a2d8d7aff2f28fdcf791edb329d06ff94e596ee90",
+   "bytes": 113092,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-030.webp": {
+   "sha256": "83e0dd1fb1db26ea22ca6d89109f783c360b2213c066cca26bab01329a8c3e52",
+   "bytes": 112404,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-025.webp": {
+   "sha256": "89272cbec5c8ca5956013537ca9d8504e0790469b04f5a6830b28e8eb597477f",
+   "bytes": 113056,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-020.webp": {
+   "sha256": "b502c34247033c7f3743e175785573bb8cd4c6ce53dc9317db3a7cf3cdba2d45",
+   "bytes": 113236,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-015.webp": {
+   "sha256": "efb8a6f0f563def219b63a14b5b346a2cdde98a12ab4e507b9fa7caffe962524",
+   "bytes": 113050,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-010.webp": {
+   "sha256": "7564e8ffca4a4d3a055d3669f689cafefe9c2eed576f4de3c81c6b7a58df5b6b",
+   "bytes": 112298,
+   "width": 2048,
+   "height": 1024
+  },
+  "public/textures/earth/generated/future-plates-005.webp": {
+   "sha256": "12f5ae2e74477865388e17dc2c498bf4ead7fa421e5f08cd1f503f2dba53c3a0",
+   "bytes": 111422,
    "width": 2048,
    "height": 1024
   },

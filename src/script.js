@@ -5732,7 +5732,7 @@ uniform sampler2D u_specTexture;
 
 uniform vec3  u_sunRelPosition;   /* vector Earth → Sun (world) */
 uniform float u_normalPower;      /* 0-1 mix of normal-map shading */
-uniform float u_modernMix;        /* 1 on the present-day tier, 0 on any other (plan 27 step E): the modern relief and ocean-glint maps belong to today's continents only */
+uniform float u_modernMix;        /* 1 on the present-day tier, 0 on any other (plan 27 step E): the modern relief, the ocean glint and the city lights belong to today's continents only */
 uniform vec3  u_position;         /* planet centre (world) */
 uniform float u_dayGain;
 uniform float u_termWidth;        /* terminator width */
@@ -5775,7 +5775,11 @@ void main(){
     /* night map ----------------------------------------------------------- */
     vec3 niteA = texture2D(u_niteTexA, vUv).rgb;
     vec3 niteB = texture2D(u_niteTexB, vUv).rgb;
-    vec3 night = mix(niteA, niteB, u_niteMix);
+    /* the city lights are a record of TODAY's geography: they ride the present-day map's weight,
+       as the modern relief and ocean glint do — dimming under the forecast ice and fading as the
+       continents leave today's positions (they shone on at every future date: the owner's "the
+       lights no longer fit the map", 2026-11-06) */
+    vec3 night = mix(niteA, niteB, u_niteMix * u_modernMix);
     vec3 color = mix(night, day, hemi);
 
     /* --- polar ice glow ----------------------------------------------- */
@@ -36273,7 +36277,7 @@ function makeRealisticEarth(pd){
       const span = t.present ? `today's map, used back to ${far}` : t.toMa <= 0 ? `used from +${surfaceAgeText(-t.toMa)} to ${t.fromMa <= -1e9 ? 'the future edge (+1,000 Myr)' : '+' + surfaceAgeText(-t.fromMa)} ahead` : `used from ${surfaceAgeText(t.fromMa)} to ${far}`;
       const what = t.present ? '' : t.kind === 'cited' ? ' — a published reconstruction, Scotese 2016 PaleoAtlas (CC BY 4.0; the present-day coastlines and borders drawn on it removed), shown at its nearest age step' : t.source === 'derived' ? ' — derived from today\'s map, a reading of the cited papers in its label' : ' — a generated map standing in where no reconstruction exists';
       o.earthSurfaceHover = `The map drawn on the Earth at this date and where it comes from. Now showing: ${t.label}, ${span}${what}. The model does not model continents`
-        + (ahead && ageMaNow() < 0 ? '; ahead of today the continents follow today\'s measured plate motions (DeMets et al. 2010) for 100 Myr and Scotese\'s Pangaea Proxima scenario beyond — one reading of several (Amasia, Novopangaea and Aurica are the others).' : '.');
+        + (ahead && ageMaNow() < 0 ? '; ahead of today the continents follow today\'s measured plate motions (DeMets et al. 2010) for 100 Myr and Scotese\'s Pangaea Proxima scenario beyond — one reading of several (Amasia, Novopangaea and Aurica are the others) — in steps of 5 Myr; today\'s city lights fade out with today\'s map, over the first 2.5 Myr.' : '.');
     };
     const ageMaNow = () => (J2000_CALENDAR_YEAR - o.currentYear) / 1e6;
 
@@ -36321,7 +36325,7 @@ function makeRealisticEarth(pd){
       U.u_cloudEra.value = at.clouds;     // no clouds over the magma ocean
       U.u_atmEra.value = at.atmosphere;   // no blue sky over the magma ocean either
       U.u_atmColor.value.set(at.skyTint[0], at.skyTint[1], at.skyTint[2]);   // plan 27 step G3: the sky's colour by tier (the Archean haze)
-      U.u_modernMix.value = ice !== null ? 1 - ice : at.modern;    // the modern relief and ocean glint only on the present-day map
+      U.u_modernMix.value = ice !== null ? 1 - ice : at.modern;    // the modern relief, the ocean glint and the city lights only on the present-day map
     }
     /** The day-map state for the headless probes: the active tier, the mix, whether the
      *  active tier's map has decoded, and the surface label. */
@@ -36329,7 +36333,7 @@ function makeRealisticEarth(pd){
       const T = dayTiers.table;
       const tier = T && dayTiers.active >= 0 ? T[dayTiers.active] : null;
       const e = tier ? dayTiers.entries.get(tier.file) : null;
-      return { loaded: !!T, active: dayTiers.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapApplied: !!(e && e.ready && U.u_dayTexA.value === e.tex), mix: U.u_dayMix.value, clouds: U.u_cloudEra.value, atmosphere: U.u_atmEra.value, modern: U.u_modernMix.value, icePct: dayTiers.icePct, skyTint: U.u_atmColor.value.toArray(), surface: o.earthSurface, resident: dayTiers.entries.size };
+      return { loaded: !!T, active: dayTiers.active, id: tier ? tier.id : null, mapReady: !!(e && e.ready), mapApplied: !!(e && e.ready && U.u_dayTexA.value === e.tex), mix: U.u_dayMix.value, clouds: U.u_cloudEra.value, atmosphere: U.u_atmEra.value, modern: U.u_modernMix.value, lights: U.u_niteMix.value * U.u_modernMix.value, icePct: dayTiers.icePct, skyTint: U.u_atmColor.value.toArray(), surface: o.earthSurface, resident: dayTiers.entries.size };
     }
 
     U.u_position.value.copy(core.position);

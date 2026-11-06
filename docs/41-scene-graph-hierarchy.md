@@ -575,8 +575,12 @@ Myr to the edge: the seas darkened under a vapour deck; Leconte 2013, Wolf &
 Toon 2015) — the mirror of the genesis sequence, their spans a reading of
 those papers and said so; the present-day tier is the one the manifest marks
 `present: true` (the gate requires exactly one per body), never index 0.
-The continents ahead MOVE (the owner, 2026-11-05): five snapshots at +50 to
-+250 Myr, cross-fading every 50 Myr from the present tier's 25-Myr fade —
+The continents ahead MOVE (the owner, 2026-11-05): a snapshot every 5 Myr to
++250 Myr — the atlas's own step and convention, each tier ± 2.5 Myr around
+its age with a 2.5-Myr cross-fade, the present tier fading into the +5-Myr
+snapshot over its first 2.5 Myr (Australia moves 285 km per step, so a fade
+reads as drift; a 50-Myr step cannot be cross-faded — every continent showed
+twice at +10 Myr) —
 today's continents as hand-drawn plate polygons rotated by their measured
 present-day Euler poles and rates (NNR-MORVEL56, DeMets et al. 2010), robust
 for ~100 Myr (Australia reaches New Guinea, Africa closes the Mediterranean,
@@ -590,6 +594,12 @@ today, 0 at +250) and the land fraction. The biosphere's end and the
 greenhouse are drawn on the +250-Myr continents. `public/Earth.jpg` is
 Pacific-centred (its left edge Greenwich, longitude 0–360° east) — the first
 render read it as (lon + 180)/360 and painted the continents 180° off.
+**The night side** is one picture of today's city lights on black, switched
+on at the first lit cities (`JD_NIGHT_BOUNDARY`, a 300-year fade) — a record
+of TODAY's geography: in the shader the lights ride the present-day map's
+weight (`u_modernMix`, the weight of the modern relief and the ocean glint),
+so they dim under the forecast ice and are out 2.5 Myr ahead, where the map
+is no longer today's. The night texture carries no land.
 
 **The Origin tour (step D).** The "Origin Tour" button on the Tools folder's
 Analysis page (beside the genesis analysis; the owner's placement)

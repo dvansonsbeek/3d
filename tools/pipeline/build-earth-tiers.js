@@ -288,7 +288,12 @@ const PLATES = {
 // rotation of Eurasia carried 250 Myr swung it 45° and dragged the docked continents with it
 // (measured: the Atlantic ended 4,267 km wide); beyond it only the scenario's closure moves
 const SCENARIO = { linearUntilMyr: 100, australiaDocksMyr: 45, africaDocksMyr: 50, atlanticClosesFromMyr: 100, atlanticCloseRateDegPerMyr: 0.34 };
-const FUTURE_PLATE_STEPS = [50, 100, 150, 200, 250];
+// A snapshot every 5 Myr, the atlas's own step, to +250: Australia moves 285 km per step, so a
+// cross-fade between neighbours reads as drift. (The first set stepped by 50 Myr: a 2,850-km
+// displacement cannot be cross-faded — every continent showed twice for the whole fade, measured
+// at +10 Myr; the owner's "the lights no longer fit the map", 2026-11-06.)
+const FUTURE_PLATE_STEP_MYR = 5, FUTURE_PLATE_END_MYR = 250;
+const FUTURE_PLATE_STEPS = Array.from({ length: FUTURE_PLATE_END_MYR / FUTURE_PLATE_STEP_MYR }, (_, i) => (i + 1) * FUTURE_PLATE_STEP_MYR);
 const d2r = Math.PI / 180;
 /** Rotation matrix about a unit axis by an angle (right-handed, degrees). @param {number[]} ax @param {number} deg */
 function rotAxis(ax, deg) {
@@ -385,7 +390,7 @@ function reportFuturePlates(landFracByStep) {
     return `${cmPerYr.toFixed(1)} cm/yr toward ${((az + 360) % 360).toFixed(0)}°`;
   };
   console.log(`  plate velocities (NNR-MORVEL56, rounded): Sydney ${vel('australia', -33.9, 151.2)} (textbook ~7 NNE) · Cairo ${vel('africa', 30, 31)} (~2.5 N) · New York ${vel('northAmerica', 40.7, -74)} (~2 W) · Rio ${vel('southAmerica', -23, -43)} (~1.5 W) · Paris ${vel('eurasia', 48.9, 2.3)} (~2 E)`);
-  for (const t of [0, ...FUTURE_PLATE_STEPS]) {
+  for (const t of [0, ...FUTURE_PLATE_STEPS.filter((q) => q % 50 === 0)]) {
     // the Atlantic's width at the equator: Brazil's east tip (−5, −35) under South America's rotation against Liberia (5, −9) under Africa's
     const [, lonB] = latLonOf(matVec(plateRotation('southAmerica', t), unit(-5, -35))), [, lonL] = latLonOf(matVec(plateRotation('africa', t), unit(5, -9)));
     const gapKm = Math.max(0, ((lonL - lonB + 540) % 360 - 180)) * 111;
@@ -466,18 +471,26 @@ function buildTierTable(atlas) {
   // domain's future edge. Two DERIVED tiers (from today's map: the greens desaturated to ochre;
   // then the same under a thickening vapour deck with the seas darkened), the mirror of the
   // genesis sequence, their spans a reading of those papers and said so; ages ahead are negative.
-  // H3 (the owner, 2026-11-05): the continents move — snapshots every 50 Myr to +250, each tier
-  // cross-fading into the next at its younger edge, the supercontinent held beyond
-  const plateTier = (/** @type {number} */ t, /** @type {string} */ what) => ({ id: `future-plates-${t}`, label: `+${t} Myr — ${what} (derived)`, fromMa: -(t + 25), toMa: -(t - 25), fadeMyr: 50, file: `public/textures/earth/generated/future-plates-${String(t).padStart(3, '0')}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 1 });
+  // H3 (the owner, 2026-11-05): the continents move — a snapshot every 5 Myr to +250 (the atlas's
+  // own step and its convention: a tier covers ± half a step around its age and cross-fades into
+  // the next one over half a step), the supercontinent held beyond. The present-day tier fades
+  // into the +5-Myr snapshot over its first 2.5 Myr ahead — the weight the scene's city lights,
+  // modern relief and ocean glint ride (`modern`).
+  const half = FUTURE_PLATE_STEP_MYR / 2;
+  /** What a snapshot shows, by the scenario's phase. @param {number} t */
+  const plateWhat = (t) => t >= FUTURE_PLATE_END_MYR ? 'Pangaea Proxima: the Atlantic closed, the Americas against Africa and Europe, Australia on Asia — Scotese\'s scenario on today\'s plate motions (DeMets 2010), one reading of several'
+    : t > SCENARIO.atlanticClosesFromMyr ? 'the Atlantic closing: the Americas on their way back east — Scotese\'s Pangaea Proxima scenario, one reading of several; Africa and Australia ride with Eurasia'
+      : t >= SCENARIO.africaDocksMyr ? 'Australia docked on Southeast Asia, the Mediterranean closed, the Atlantic still widening — today\'s plate motions, DeMets 2010'
+        : t >= SCENARIO.australiaDocksMyr ? 'Australia docked on Southeast Asia, Africa closing the Mediterranean, the Atlantic wider — today\'s plate motions, DeMets 2010'
+          : 'today\'s measured plate motions carried ahead (DeMets 2010): Australia toward Indonesia, Africa into Europe, the Atlantic widening';
+  const plateTier = (/** @type {number} */ t) => ({ id: `future-plates-${t}`, label: `+${t} Myr — ${plateWhat(t)} (derived)`, fromMa: -(t + half), toMa: -(t - half), fadeMyr: half, file: `public/textures/earth/generated/future-plates-${String(t).padStart(3, '0')}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 1 });
   let tiers = [
     { id: 'moist-greenhouse', label: 'The moist greenhouse — the oceans evaporating under a brightening Sun, a reading of Leconte 2013 and Wolf & Toon 2015 (derived)', fromMa: -1e9, toMa: -900, fadeMyr: 0, file: `public/textures/earth/generated/${FUTURE_GREENHOUSE}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 0.8, skyTint: [0.8, 0.78, 0.74] },
     { id: 'biosphere-end', label: 'The end of the land biosphere — CO₂ starvation of the plants under a brightening Sun, a reading of Caldeira & Kasting 1992 and Franck 2006 (derived)', fromMa: -900, toMa: -600, fadeMyr: 50, file: `public/textures/earth/generated/${FUTURE_BROWN}.webp`, source: 'derived', kind: 'illustration', clouds: 1, atmosphere: 1 },
-    { ...plateTier(250, 'Pangaea Proxima: the Atlantic closed, the Americas against Africa and Europe, Australia on Asia — Scotese\'s scenario on today\'s plate motions (DeMets 2010), one reading of several'), fromMa: -600, toMa: -225, fadeMyr: 100 },
-    plateTier(200, 'the Atlantic closing: the Americas on their way back east, the scenario of Scotese'),
-    plateTier(150, 'the Atlantic begins to close (the scenario\'s first speculative step); Africa and Australia ride with Eurasia'),
-    plateTier(100, 'Australia docked on Southeast Asia, the Mediterranean closed; the Atlantic at its widest — today\'s plate motions, DeMets 2010'),
-    plateTier(50, 'today\'s plate motions carried 50 Myr ahead (DeMets 2010): Australia at Indonesia, Africa into Europe, the Atlantic wider'),
-    { id: 'modern', label: 'Present-day Earth (satellite imagery)', fromMa: -25, toMa: LGM_END_MA, fadeMyr: 25, file: 'public/Earth.jpg', source: 'modern', kind: 'cited', clouds: 1, atmosphere: 1, present: true },
+    // the supercontinent of the last step, held to +600 Myr and browning over its last 100
+    { ...plateTier(FUTURE_PLATE_END_MYR), fromMa: -600, fadeMyr: 100 },
+    ...FUTURE_PLATE_STEPS.slice(0, -1).reverse().map(plateTier),
+    { id: 'modern', label: 'Present-day Earth (satellite imagery)', fromMa: -half, toMa: LGM_END_MA, fadeMyr: half, file: 'public/Earth.jpg', source: 'modern', kind: 'cited', clouds: 1, atmosphere: 1, present: true },
   ];
   // the atlas slices from the 21-ka map up: midpoints between neighbours; the 0 Ma map is unused
   const slices = atlas.filter((a) => a.ageMa > 0);
