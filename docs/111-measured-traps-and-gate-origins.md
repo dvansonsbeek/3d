@@ -1503,6 +1503,16 @@ folders open and time the rows' arrival (1.7 s at −1 Myr, 4.5 s at the edge;
 limit 15 s). The lesson is §1.25's for a panel: "refreshed by the loop" does
 not cover what the loop only refreshes while someone is looking.
 
+**A finder seeded on the civil year** (plan 30 item E). The cardinal-point
+year-length row took the crossing nearest the NEXT CIVIL MIDPOINT, 365.25 SI
+days on; at the genesis the tropical year is 328 SI days, so for the vernal
+equinox that was the second crossing and the row read 2,854 solar days where
+the three other points read 1,430 (§1.35's class: a step is the period OF
+DATE). The next event is now the crossing nearest one tropical year of date
+after this one, on the UT axis; the gate's row reads every cardinal year
+length against the tropical year of date at the four positions (5e-3; the
+single-year wobble is 8e-6 today and 1.5e-3 at the edge, a skipped year 1.0).
+
 **The lesson**: a surface that quotes a measured quantity carries the window
 it was measured in, and switches to the law at the window's edge exactly
 where the package does — the "A displayed rate must name its window" rule

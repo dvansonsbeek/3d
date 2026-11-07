@@ -75,7 +75,8 @@ const TOL_MOON_RING_REL = 0.08;
 // years, 1.4e-7 from the sampler's own period form today.
 const TOL_WINDOW_REL = 1e-9, TOL_WINDOW_BEAT_REL = 1e-6;
 const TOL_DAY_ROWS_REL = 1e-8;   // the sidereal/stellar day rows against the package (plan 30 item B; a unit slip is 2.6e-4 at 400 Ma)
-const TOL_CP_WAIT_MS = 15000;    // the cardinal rows of a paused landing: solved after its frame (plan 30 item D; the hold left them a minute stale)
+const TOL_CP_WAIT_MS = 15000;
+const TOL_CP_YEAR_REL = 5e-3;    // a cardinal year length against the tropical year of date (plan 30 item E; the wobble ≤ 9e-4 at 4.4 Ga, a skipped year is 1.0)    // the cardinal rows of a paused landing: solved after its frame (plan 30 item D; the hold left them a minute stale)
 
 const EPOCHS_MA = [-5, -1, 1, 5];
 const TOL_DAYS = 0.002;
@@ -171,7 +172,7 @@ for (const jd of CLOCK_JDS) {
     };
     return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm,
       // plan 30 item A: the Predictions panel's live year and precession fields at this landing
-      pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession', 'siderealDayReal', 'stellarDayReal', 'lengthofAU', 'cpSSJD', 'cpSSYearLen']),
+      pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession', 'siderealDayReal', 'stellarDayReal', 'lengthofAU', 'cpSSJD', 'cpSSYearLen', 'cpVEYearLen', 'cpAEYearLen', 'cpWSYearLen']),
       // plan 30 item D: the pane's VIEW of two rows that read a previous landing's value before the fix
       paneAU: paneOf('Orbital Elements', 'Length of AU (km)'), paneSSLen: paneOf('Cardinal Points/S', 'Year Length (LOD d)') };
   }, jd));
@@ -352,6 +353,15 @@ for (const jd of DOMAIN_EDGE_JDS) {
       const okWait = Number.isFinite(r.cpWaitMs) && r.cpWaitMs <= TOL_CP_WAIT_MS;
       if (!(okAU && okSS && okWait)) fail++;
       console.log(`${okAU && okSS && okWait ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  pane shows this landing  AU view ${r.paneAU} / live ${p.lengthofAU} · SS instant ${dSS.toFixed(0)} d from the landing, view ≡ live ${Object.is(r.paneSSLen, p.cpSSYearLen)} · cardinal rows ready ${Number.isFinite(r.cpWaitMs) ? r.cpWaitMs + ' ms' : 'NEVER'} after the landing`);
+      // plan 30 item E: each cardinal year length is ONE tropical year of date in solar days of
+      // date — the next crossing, not the one nearest the next civil midpoint (the VE row read
+      // two years, 2,854 solar days, at the genesis). The single-year wobble is the equation of
+      // centre's: 1e-5 today, 9e-4 at 4.4 Ga (§0a E); a skipped year is 1.0.
+      const tropLod = m.lengths.tropicalYearDays(E);
+      const dCp = ['VE', 'SS', 'AE', 'WS'].map((cp) => Math.abs(p[`cp${cp}YearLen`] - tropLod) / tropLod);
+      const okCp = dCp.every((d) => Number.isFinite(d) && d <= TOL_CP_YEAR_REL);
+      if (!okCp) fail++;
+      console.log(`${okCp ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  cardinal year lengths / the tropical year of date (${tropLod.toFixed(3)} solar days)  VE ${Number(dCp[0]).toExponential(1)} · SS ${Number(dCp[1]).toExponential(1)} · AE ${Number(dCp[2]).toExponential(1)} · WS ${Number(dCp[3]).toExponential(1)}`);
     }
   }
   {

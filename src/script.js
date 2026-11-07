@@ -22242,8 +22242,8 @@ function setupGUI() {
       label: 'RA (\u00B0)', readonly: true, format: v => v.toFixed(6)
     }), 'Right Ascension where the cardinal point occurs. Fully derived (zero fitted constants).');
     addTooltip(sub.addBinding(predictions, 'cp' + cp + 'YearLen', {
-      label: 'Year Length (LOD d)', readonly: true, format: v => v.toFixed(8)
-    }), 'Time between consecutive events of this type, in solar days OF DATE: the difference of the two UT instants, and a day on the UT axis is one mean solar day of date (LOD_real) \u2014 so this row reads ~382 at 200 Ma, the same unit as the Model (LOD days) rows of the year folders, not the SI day of 86,400 s. SS is shortest (~\u221251s), WS is longest (~+47s) today.');
+      label: 'Year Length (LOD d)', readonly: true, format: fmtOrDash(v => v.toFixed(8))
+    }), 'Time between consecutive events of this type, in solar days OF DATE: the difference of the two UT instants, and a day on the UT axis is one mean solar day of date (LOD_real) \u2014 so this row reads ~382 at 200 Ma, the same unit as the Model (LOD days) rows of the year folders, not the SI day of 86,400 s. The next event is the crossing nearest ONE TROPICAL YEAR OF DATE after this one (before plan 30 it was the one nearest the next CIVIL midpoint, 365.25 SI days on \u2014 at the genesis, where the tropical year is 328 SI days, that was the second vernal equinox and the row read 2,854 solar days for 1,430). SS is shortest (~\u221251s), WS is longest (~+47s) today. \u2014 where the next crossing lies past the navigable edge.');
   }
   addTooltip(cpFolder.addBinding(predictions, 'cpSolsticeObliquity', {
     label: 'Observed Obliquity (\u00B0)', readonly: true, format: v => v.toFixed(6)
@@ -35713,12 +35713,19 @@ function updatePredictions() {
     const nowMs = performance.now();
     _cpPanelCache.lastMs = nowMs;
     const cpMidJD = jdFromPos(posFromDateTime(`${year}-07-02`, '12:00:00'));
-    const cpNextMidJD = jdFromPos(posFromDateTime(`${year + 1}-07-02`, '12:00:00'));
     const cpM = _tierModelB().cardinal;
+    // PLAN 30 item E: the NEXT event is the crossing nearest one tropical year OF DATE after
+    // this one, on the UT axis (solar days of date — the panel's Model (LOD days) row). Seeded
+    // on the next CIVIL midpoint (365.25 SI days on) the finder took the second vernal equinox
+    // at the genesis, where the tropical year is 328 SI days: 2,854 solar days for 1,430
+    // (§0a E). The spacing of the crossings IS the tropical year, so the nearest crossing to
+    // jd + Y is the next one with half a year of margin; null past the navigable edge → NaN.
+    const yearSolarDays = predictions.solarYearLodDays;
     const vals = {};
     for (const cp of ['SS', 'WS', 'VE', 'AE']) {
       const jd = cpM.jdNearUT(cpMidJD, cp);
-      vals[cp] = { jd, raDeg: cpM.raDeg(year, cp), yearLenDays: cpM.jdNearUT(cpNextMidJD, cp) - jd };
+      const next = Number.isFinite(yearSolarDays) ? cpM.jdNearUT(jd + yearSolarDays, cp) : null;
+      vals[cp] = { jd, raDeg: cpM.raDeg(year, cp), yearLenDays: next === null || !Number.isFinite(next) ? NaN : next - jd };
     }
     _cpPanelCache.year = year;
     _cpPanelCache.vals = vals;
