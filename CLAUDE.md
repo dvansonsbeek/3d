@@ -307,6 +307,16 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   seat-and-resume loop seeded the new section with enough prefixes that
   nothing resumed — try a generator's write path on a SHORT span before its
   2-hour run. (§1.37)
+- **A measured family is shown only inside its window** — the Predictions
+  panel read the one-source years at every age where the package publishes
+  them inside ±2 Myr only: 384.6 SI days and −19.6 yr of precession at the
+  genesis for the law's 328.2 and 8.92, beside a Planet Info column that
+  carried the law. The scene's year evaluator carries the package's window rule
+  in ONE place; a windowed row outside its window reads "—" with the window in
+  its hover, never a number; the gate reads the panel's live fields against
+  the Node model at the same engine year — which is the TT Julian year of the
+  instant, never the position-count year the UT bridge returns (25 kyr apart
+  at 400 Ma, 2.6 Myr at the genesis). (§1.38)
 
 ---
 

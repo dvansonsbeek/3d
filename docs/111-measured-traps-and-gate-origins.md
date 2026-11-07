@@ -1425,6 +1425,53 @@ did not hash `deltat/deep-time.cjs` either: an edit to the bridge alone would
 have moved their recorded numbers with `check:artifacts` green. The three
 campaigns and the lunar bank list both files now.
 
+### 1.38 A measured family is shown only inside its window — the one-source years beyond ±2 Myr
+
+The one-source year lengths (the tropical, anomalistic and cardinal years and
+every beat made of them) are MEASURED on the sampled movement, and the
+package publishes them only inside ±2 Myr of J2000 (`ONE_FAMILY_WINDOW_YEARS`,
+`model/published-periods.js`: the deep chain's law beyond). The scene's
+Predictions panel never made that switch — `predictions.solarYearSeconds` read
+the one-source sampler at every age — and every row derived from it inherited
+the measured route: the axial precession (the beat of the two years), the
+obliquity beat, the climatic-precession beat, the perihelion timing rows, the
+Moon table's "19 Solar years". Inside the window the two routes agree (the
+beat parts from the sampler's own period form by 1.4e-7 today); beyond it the
+sampler is not resolved, and where the precession period is a few years the
+±2.5-yr rate difference on a wrapped angle aliases outright. Measured by plan
+30's instrument (the panel rows against `createModel()` at the same engine
+year, plan 30 §0a):
+
+| row | 400 Ma | 2.46 Ga | 4.4 Ga | the genesis |
+|---|---|---|---|---|
+| tropical year, scene vs law | −19 s | +43 s | +2,700 s | 384.6 vs 328.2 SI days |
+| axial precession, scene vs law | 20,927 vs 21,196 yr | 12,061 vs 11,863 | 595 vs 566 | −19.57 vs 8.92 yr |
+| obliquity beat, scene vs law | 30,002 vs 30,558 | 14,593 vs 14,304 | 599 vs 570 | −20 vs 8.9 |
+
+Beside it the Planet Info panel's LEFT "mean" columns, which read the deep
+chain, matched the package to 1e-13 at every epoch — the same screen carried
+the law and the aliased measurement side by side under one label.
+
+**The fix** (plan 30 item A): the scene's year evaluator carries the package's
+window rule in ONE place (`_cardinalYearSeconds`: the one-source family inside
+±2 Myr, the deep chain's tropical year beyond, NaN for the anomalistic and
+cardinal years — the apsidal line and the cardinal structure are not resolved
+there); the axial row beyond the window IS the composed lunisolar period (the
+beat of the chain's two years reproduces it only to four digits); a windowed
+row outside its window reads "—" with the window named in its hover, never a
+number (the planets' spin rows beyond ±10 Myr the same). **The gate**: the
+epoch-consistency rows at −400 Myr, −2 Gyr and inside the genesis edge read
+the panel's live fields against the Node model's `epoch.tropicalYearSecondsAtYear`,
+`siderealYearSecondsAtYear` and `axialPrecessionYearsAtYear` at the same engine
+year (1e-9 relative), and assert the anomalistic field is NaN there.
+
+**The lesson**: a surface that quotes a measured quantity carries the window
+it was measured in, and switches to the law at the window's edge exactly
+where the package does — the "A displayed rate must name its window" rule
+(§1.11) applied to the whole family, not to one row. A row that reads a
+correct value through an era convention is a surface defect the model gates
+cannot see; the instrument that finds it is the panel dumped beside the package.
+
 ---
 
 ## 2. The browser tier's gates and their origins

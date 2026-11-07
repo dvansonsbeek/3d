@@ -40,7 +40,7 @@
 import { createRequire } from 'node:module';
 import { openSimulator } from './harness.mjs';
 import { meanYearInDaysAtAge, meanMoonDistanceAtAge, meanAuAtAge, posFromJD, jdFromPos, navigablePosRange } from '../../tools/lib/deep-time.js';
-import { createModel } from '@essrt/physics';
+import { createModel, ONE_FAMILY_WINDOW_YEARS } from '@essrt/physics';
 const require = createRequire(import.meta.url);
 const { jdToDecimalYear } = require('@essrt/physics/time/calendar');
 
@@ -70,6 +70,10 @@ const TOL_TOUR_REL = 1e-9, TOL_TOUR_REGISTRY_REL = 5e-3;   // one model, two run
 // sized on the position's tropical-year COUNT while the Moon read the TT age (the owner's
 // screenshot at −4.42 Gyr; doc 111 §1.36).
 const TOL_MOON_RING_REL = 0.08;
+// The published window (doc 111 §1.38): beyond ±2 Myr the panel's rows are the law itself
+// (one function, two runtimes — 1e-9); inside, the axial row is the beat of the two displayed
+// years, 1.4e-7 from the sampler's own period form today.
+const TOL_WINDOW_REL = 1e-9, TOL_WINDOW_BEAT_REL = 1e-6;
 
 const EPOCHS_MA = [-5, -1, 1, 5];
 const TOL_DAYS = 0.002;
@@ -143,7 +147,9 @@ for (const jd of CLOCK_JDS) {
   domainRows.clock.push(await s.page.evaluate((jd) => {
     const T = window.__test__;
     const pos = T.scenePos(); const ring = T.moonRingProbe();
-    return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm };
+    return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm,
+      // plan 30 item A: the Predictions panel's live year and precession fields at this landing
+      pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession']) };
   }, jd));
 }
 // plan 27 step C: the genesis eclipse — the browser's own finder on the seated tier model (one
@@ -285,6 +291,26 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const okMoon = Number.isFinite(relMoon) && Math.abs(relMoon) <= TOL_MOON_RING_REL;
     if (!okMoon) fail++;
     console.log(`${okMoon ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  placed Moon / its ring  ${r.moonDistKm.toFixed(0)} / ${ringKm.toFixed(0)} km  rel ${Number(relMoon).toExponential(2)}  (bound ${TOL_MOON_RING_REL}, the eccentricity of date)`);
+    // THE PUBLISHED WINDOW (doc 111 §1.38, plan 30 item A): the Predictions panel's year and
+    // precession rows ≡ the Node model's PUBLISHED values at the same engine year — the TT
+    // Julian year of the instant (never the position count). Inside ±2 Myr the panel's axial
+    // row is the beat of its two displayed years and parts from the sampler's own period form
+    // by ~1e-7; beyond, the rows ARE the law (one function, two runtimes) and the anomalistic
+    // row, unresolved there, is NaN (the panel prints "—"). Before the switch the panel read
+    // 384.6 SI days and −19.6 yr of precession at the genesis for the law's 328.2 and 8.92.
+    {
+      const E = 2000 + (r.jdTT - 2451545) / 365.25;
+      const inWindow = Math.abs(E - 2000) <= ONE_FAMILY_WINDOW_YEARS;
+      const p = r.pred;
+      const rel = (/** @type {number} */ a, /** @type {number} */ b) => Math.abs(a - b) / Math.abs(b);
+      const dTrop = rel(p.solarYearSeconds, m.epoch.tropicalYearSecondsAtYear(E));
+      const dSid = rel(p.siderealYearSeconds, m.epoch.siderealYearSecondsAtYear(E));
+      const dPrec = rel(p.axialPrecession, m.epoch.axialPrecessionYearsAtYear(E));
+      const anomOk = inWindow ? Number.isFinite(p.anomalisticYearSeconds) : Number.isNaN(p.anomalisticYearSeconds);
+      const okW = [dTrop, dSid].every((d) => Number.isFinite(d) && d <= TOL_WINDOW_REL) && Number.isFinite(dPrec) && dPrec <= (inWindow ? TOL_WINDOW_BEAT_REL : TOL_WINDOW_REL) && anomOk;
+      if (!okW) fail++;
+      console.log(`${okW ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Predictions rows vs the published family at engine year ${E.toFixed(1)} (${inWindow ? 'inside' : 'beyond'} ±2 Myr)  tropical ${p.solarYearSeconds.toFixed(3)} s Δ ${Number(dTrop).toExponential(2)} · sidereal Δ ${Number(dSid).toExponential(2)} · axial ${p.axialPrecession.toFixed(3)} yr Δ ${Number(dPrec).toExponential(2)} · anomalistic ${inWindow ? 'resolved' : 'NaN'} ${anomOk ? 'ok' : 'WRONG'}`);
+    }
   }
   {
     const twin = navigablePosRange();

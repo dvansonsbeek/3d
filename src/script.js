@@ -17,6 +17,9 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   computeMassChainJ2000, computeMoonPeriodsJ2000, SECONDS_PER_DAY, DAYS_PER_JULIAN_YEAR,
   // the navigable domain (time/navigable-domain): the pos table's and the deep calendar's grid edges
   NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS, deepTierWalkSpanYears,
+  // the one-source family's published window (earth/year-lengths): ±2 Myr of J2000 — inside it
+  // the measured one-source years, beyond it the deep chain's law (plan 30 item A; ONE home)
+  ONE_FAMILY_WINDOW_YEARS,
   // THE deep-time chain (the six browser factories it replaces: the GIA α channel,
   // the Layer-0 primitives, the recession history, the ΔT cycles, the deep e, the month chain)
   createDeepTimeChain } from '@essrt/physics';
@@ -2197,7 +2200,7 @@ const _moonArgsM = (() => {
           // tools-lib. The dynamical rate is the published precession
           // period's (the one-family beat once the series has landed, the
           // composed clock before/beyond; degrees per Julian year).
-          pDynDegPerYearAt: (year) => 360 / (_hybridSpinActive() && Math.abs(year - 2000) <= 2000000
+          pDynDegPerYearAt: (year) => 360 / (_hybridSpinActive() && Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS
             ? _yearLengthsM().axialPrecessionYearsAtYear(year)
             : _axialPrecessionPeriodYearsAtAge((2000 - year) / 1e6)),
           pKinDegPerYearAt: (year) => {
@@ -3849,6 +3852,11 @@ if (typeof window !== 'undefined') {
         anomalistic: _cardinalYearSeconds(year, 'ANOM') / lod,
       };
     },
+    // PLAN 30 item A: the Predictions panel's live fields by name, as the update
+    // left them at the current position (the epoch-consistency gate reads the
+    // year and precession rows beyond the one-source window against the Node
+    // model's published values at the same engine year).
+    predictionsProbe: (keys) => Object.fromEntries(keys.map((k) => [k, predictions[k]])),
     // The four globals recomputeEpochAnchors mutates, read live (the kinematic
     // sidereal year is a J2000 constant — "kinematic" is f(2000), not an epoch state).
     anchors: () => ({
@@ -4736,7 +4744,7 @@ const renderVal = val => {
 
     /* 4. fall back to numeric formatting */
     const num = Number(raw);
-    if (!Number.isFinite(num)) return '';          // guard NaN or ±∞
+    if (!Number.isFinite(num)) return '—';         // NaN or ±∞: the row says it has no value here (plan 30 rule 5 — the reason is in the hover)
 
     /* 5. show infinity symbol if explicitly requested for very large numbers */
     if (val.infinity && Math.abs(num) > val.infinity) return '∞';
@@ -15690,10 +15698,24 @@ function _yearLengthsM() {
 function _siderealYearOneSourceSeconds(year) {
   return _yearLengthsM().siderealYearSecondsAtYear(year);
 }
-// One-source year seconds by type: MEAN (tropical of date), ANOM
-// (anomalistic), or a cardinal VE/SS/AE/WS year. NaN when opted out.
+// THE PUBLISHED year seconds of date by type — the package's window rule
+// (`publishedTropicalYearSecondsAtYear`, model/published-periods.js): inside
+// ±ONE_FAMILY_WINDOW_YEARS of J2000 the one-source family (MEAN the tropical
+// year, ANOM the anomalistic, VE/SS/AE/WS a cardinal year); beyond it the deep
+// chain's tropical year for MEAN and NaN for the rest — the apsidal line and
+// the cardinal structure are not resolved there. Measured before the switch
+// (plan 30 §0a, doc 111 §1.38): the one-source route read 384.6 SI days and a
+// −19.6-yr precession beat at the genesis where the law says 328.2 and 8.92 —
+// the sampler aliases where T_p is a few years. NaN before the series has loaded.
 function _cardinalYearSeconds(year, type) {
   if (!_hybridSpinActive()) return NaN;   // one-source display; NaN only before the series has loaded (D5: no opt-out)
+  if (Math.abs(year - 2000) > ONE_FAMILY_WINDOW_YEARS) {
+    // the age on the package's convention (yearToTMa: Myr before J2000.0), the axis the
+    // lunisolar law beside this row reads — NOT the scene's epoch anchor startmodelYear
+    // 2000.5 (plan 30 item H: the tropical year moves 2.3 s per year of epoch at the
+    // genesis, so the half-year read 1.2 s against the published value in the gate)
+    return type === 'MEAN' ? meanTropicalYearSecondsAtAge((2000 - year) / 1e6) : NaN;
+  }
   const yl = _yearLengthsM();
   return type === 'MEAN' ? yl.tropicalYearSecondsAtYear(year)
     : type === 'ANOM' ? yl.anomalisticYearSecondsAtYear(year)
@@ -22072,6 +22094,8 @@ function setupGUI() {
 
   const daysFolder = astroFolder.addFolder({ title: 'Day Lengths' });
   const fmt6 = v => v.toFixed(6);
+  // A windowed row outside its window reads "—", never NaN (plan 30 rule 5; the hover names the window).
+  const fmtOrDash = (f) => (v) => (Number.isFinite(v) ? f(v) : '—');
 
   // Top-level day-length rows: Solar / Sidereal / Stellar. Solar Day (s)
   // is the framework's full prediction (Tidal + GIA + all cycles) \u2014 a
@@ -22145,7 +22169,7 @@ function setupGUI() {
   const fmt2sec = v => v.toFixed(2);
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearSeconds', {
     label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Mean tropical (solar) year OF DATE in SI seconds — the one-source movement’s analytic mean (equinox rate + λ̇ correction; the Tropical Year chart’s line). ONE FAMILY with the sidereal/anomalistic rows, so the precession beats recompute exactly. The scene-MEASURED cardinal mean lives in the Days & Years report (agrees to sub-0.5 s). Before the series has loaded the row reads the mode-table fallback.');
+  }), 'Mean tropical (solar) year OF DATE in SI seconds — inside ±2 Myr of J2000 the one-source movement’s analytic mean (equinox rate + λ̇ correction; the Tropical Year chart’s line), beyond it the deep-time chain’s tropical year: the package’s published form (epoch.tropicalYearSecondsAtYear), because the one-source sampler is not resolved out there (before plan 30 it read 384.6 SI days at the genesis for the law’s 328.2). ONE FAMILY with the sidereal/anomalistic rows, so the precession beats recompute exactly inside the window. The scene-MEASURED cardinal mean lives in the Days & Years report (agrees to sub-0.5 s). Before the series has loaded the row reads the mode-table fallback.');
   addTooltip(yearsFolder.addBinding(predictions, 'solarYearDays', {
     label: 'Model (SI days)', readonly: true, format: fmt8
   }), 'Mean tropical (solar) year OF DATE in SI days of exactly 86,400 s (seconds / 86,400) — the IAU convention, NOT the day of date (at 200 Ma the day is ~82,500 s). The LOD-days row below counts the days of date. Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
@@ -22166,14 +22190,14 @@ function setupGUI() {
 
   const anomalisticFolder = astroFolder.addFolder({ title: 'Anomalistic Year' });
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearSeconds', {
-    label: 'Model (sec)', readonly: true, format: fmt2sec
-  }), 'Anomalistic year OF DATE in SI seconds (perihelion to perihelion) — the one-source cardinal structure the API serves: the engine’s own apsidal rate ϖ̇ + the λ̇ correction. Before the series has loaded this row is NaN.');
+    label: 'Model (sec)', readonly: true, format: fmtOrDash(fmt2sec)
+  }), 'Anomalistic year OF DATE in SI seconds (perihelion to perihelion) — the one-source cardinal structure the API serves: the engine’s own apsidal rate ϖ̇ + the λ̇ correction. Resolved inside ±2 Myr of J2000 (the banked series); the row reads — beyond, where the movement’s apsidal line is not resolved (the package publishes NaN there). Before the series has loaded this row is — too.');
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearDays', {
-    label: 'Model (SI days)', readonly: true, format: v => v.toFixed(9)
-  }), 'Anomalistic year OF DATE in SI days of exactly 86,400 s (seconds / 86,400) — the IAU convention, not the day of date. Before the series has loaded the row reads the mode-table fallback (the anomalistic rows NaN).');
+    label: 'Model (SI days)', readonly: true, format: fmtOrDash(v => v.toFixed(9))
+  }), 'Anomalistic year OF DATE in SI days of exactly 86,400 s (seconds / 86,400) — the IAU convention, not the day of date. — beyond ±2 Myr of J2000 and before the series has loaded (the row above says why).');
   addTooltip(anomalisticFolder.addBinding(predictions, 'anomalisticYearLodDays', {
-    label: 'Model (LOD days)', readonly: true, format: fmt8
-  }), 'Anomalistic year OF DATE in solar days OF DATE — the seconds row over the Solar Day (s) row (LOD_real). Before the series has loaded the row reads the fallback family.');
+    label: 'Model (LOD days)', readonly: true, format: fmtOrDash(fmt8)
+  }), 'Anomalistic year OF DATE in solar days OF DATE — the seconds row over the Solar Day (s) row (LOD_real). — beyond ±2 Myr of J2000 and before the series has loaded.');
 
   const cpFolder = astroFolder.addFolder({ title: 'Cardinal Points', expanded: false });
   addFolderTooltip(cpFolder, 'Predicted instants of the solstices and equinoxes from the one-source movement — the certified Sun’s apparent crossings on the composed precession clock and the N-body series’ elements of date; the cardinal-point gates read them against JPL Horizons (−3000 … +2000). See doc 11.');
@@ -22199,8 +22223,8 @@ function setupGUI() {
   const precessionFolder = astroFolder.addFolder({ title: 'Precession Periods' });
   const fmt2 = v => v.toFixed(2);
   addTooltip(precessionFolder.addBinding(predictions, 'perihelionPrecession', {
-    label: 'Perihelion (yrs)', readonly: true, format: fmt2
-  }), 'Time for Earth\'s perihelion direction to complete one revolution vs the equinox. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 tropical_sec) \u2014 one-source (dynamical, of date) when the movement is on.');
+    label: 'Perihelion (yrs)', readonly: true, format: fmtOrDash(fmt2)
+  }), 'Time for Earth\'s perihelion direction to complete one revolution vs the equinox. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 tropical_sec) \u2014 one-source (dynamical, of date) when the movement is on. Reads \u2014 beyond \u00b12 Myr of J2000, where the anomalistic year is not resolved.');
   // SIGN CONVENTION (panel-wide, owner-ruled): prograde positive,
   // retrograde negative. The axial/equinox precession is RETROGRADE, so
   // it DISPLAYS negative (format-level negation only \u2014 the internal
@@ -22208,10 +22232,10 @@ function setupGUI() {
   // derived-beat row and the CYCLES axial row consume it).
   addTooltip(precessionFolder.addBinding(predictions, 'axialPrecession', {
     label: 'Axial (yrs)', readonly: true, format: (v) => fmt2(-v)
-  }), 'Time for Earth\'s rotation axis to trace one full cone (precession of the equinoxes). Negative = RETROGRADE (the equinox regresses) \u2014 the panel-wide sign convention: prograde +, retrograde \u2212. Beat of the DISPLAYED year rows: sid_sec / (sid_sec \u2212 tropical_sec) \u2014 one-source (matches the Axial Precession chart, \u2248 25,771.6 at J2000 \u2014 the IAU 2006 p_A period).');
+  }), 'Time for Earth\'s rotation axis to trace one full cone (precession of the equinoxes). Negative = RETROGRADE (the equinox regresses) \u2014 the panel-wide sign convention: prograde +, retrograde \u2212. Inside \u00b12 Myr of J2000 the beat of the DISPLAYED year rows: sid_sec / (sid_sec \u2212 tropical_sec) \u2014 one-source (matches the Axial Precession chart, \u2248 25,771.6 at J2000 \u2014 the IAU 2006 p_A period). Beyond, the composed lunisolar period of date (the Lunisolar Clock\'s T_p row; the package\'s published epoch.axialPrecessionYearsAtYear) \u2014 the one-source beat is not resolved there (before plan 30 it read \u221219.6 yr at the genesis for the law\'s 8.92).');
   addTooltip(precessionFolder.addBinding(predictions, 'inclinationPrecession', {
-    label: 'Apsidal (yrs)', readonly: true, format: fmt2
-  }), 'APSIDAL precession \u2014 time for Earth\'s perihelion to complete one revolution against the fixed stars. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 sid_sec) \u2014 one-source (dynamical, of date; hypersensitive: \u00b11 s of year length moves this \u2248 400 yr). (The historical label "inclination precession" came from the retired assumption tying the inclination cycle to this period \u2014 the orbital PLANE\'s precession is the separate nodal story, the CYCLES-tab chart.)');
+    label: 'Apsidal (yrs)', readonly: true, format: fmtOrDash(fmt2)
+  }), 'APSIDAL precession \u2014 time for Earth\'s perihelion to complete one revolution against the fixed stars. Beat of the DISPLAYED year rows: anom_sec / (anom_sec \u2212 sid_sec) \u2014 one-source (dynamical, of date; hypersensitive: \u00b11 s of year length moves this \u2248 400 yr). Reads \u2014 beyond \u00b12 Myr of J2000, where the anomalistic year is not resolved. (The historical label "inclination precession" came from the retired assumption tying the inclination cycle to this period \u2014 the orbital PLANE\'s precession is the separate nodal story, the CYCLES-tab chart.)');
   addTooltip(precessionFolder.addBinding(predictions, 'eclipticPrecession', {
     label: 'Ecliptic Cycle (yrs)', readonly: true, format: fmt2
   }), 'NODAL precession \u2014 the engine\u2019s of-date tangent of Earth\u2019s orbital-plane node ON the invariable plane (\u00b1150-yr central difference of the chain\u2019s node of date; the same evaluator as the Positions-panel Period cell). Negative = retrograde regression. Stable deep-time base: the dominant nodal mode s\u2083, ' + Math.round(1296000 / CHAIN_ARTIFACT.s.earth.arcsecPerYr).toLocaleString('en-US') + ' yr (nearest-Laskar label, never an input).');
@@ -22222,14 +22246,14 @@ function setupGUI() {
     label: 'T_p (yrs)', readonly: true, format: fmt2
   }), 'The lunisolar precession period of date, T_p(t) — the clock the ratios below are read against. Inside ±2 Myr it is the published of-date period (the Axial (yrs) row: 25,771.4 yr at J2000, IAU 25,771.6); beyond, the composed torque rate’s period [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M)³] on the same J2000 anchor: Earth’s spin from the tidal chain carrying both torques, the lunar torque growing as the Moon was closer — the model’s deep-time spin clock (falsification leg 1; matched by the Precambrian precession constants at 1.4 and 2.46 Ga).');
   addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarApsidalPeriod', {
-    label: 'T_aps, apsidal (yrs)', readonly: true, format: fmt2
-  }), 'The perihelion’s period against the fixed stars from the N-body chain’s secular tangent (the Prec. cell’s rate) — the orbital side of the clock, on the solar-mass tier. Read inside ±2 Myr of J2000 (the banked series); NaN beyond.');
+    label: 'T_aps, apsidal (yrs)', readonly: true, format: fmtOrDash(fmt2)
+  }), 'The perihelion’s period against the fixed stars from the N-body chain’s secular tangent (the Prec. cell’s rate) — the orbital side of the clock, on the solar-mass tier. Read inside ±2 Myr of J2000 (the banked series); — beyond.');
   addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarApsidalPerPrecession', {
-    label: 'T_aps / T_p', readonly: true, format: (v) => v.toFixed(3)
-  }), 'The apsidal period in mean precession periods — how many turns of the spin axis per turn of the perihelion against the stars. Reads 4.33 at J2000 (a fitted reading) and wanders across ±26 kyr; the panel shows the wander live. No unit, no integer: a ratio of two measured periods.');
+    label: 'T_aps / T_p', readonly: true, format: fmtOrDash((v) => v.toFixed(3))
+  }), 'The apsidal period in mean precession periods — how many turns of the spin axis per turn of the perihelion against the stars. Reads 4.33 at J2000 (a fitted reading) and wanders across ±26 kyr; the panel shows the wander live. No unit, no integer: a ratio of two measured periods. — beyond ±2 Myr of J2000 (no T_aps there).');
   addTooltip(lunisolarFolder.addBinding(predictions, 'lunisolarPeriOfDatePerPrecession', {
-    label: 'T_peri / T_p', readonly: true, format: (v) => v.toFixed(4)
-  }), 'The perihelion-of-date period in mean precession periods, with T_peri = 1/(1/T_p + 1/T_aps): equinox precession and inertial perihelion motion add as rates — frame arithmetic at every epoch. Reads 0.812 at J2000, the J2000 reading.');
+    label: 'T_peri / T_p', readonly: true, format: fmtOrDash((v) => v.toFixed(4))
+  }), 'The perihelion-of-date period in mean precession periods, with T_peri = 1/(1/T_p + 1/T_aps): equinox precession and inertial perihelion motion add as rates — frame arithmetic at every epoch. Reads 0.812 at J2000, the J2000 reading. — beyond ±2 Myr of J2000 (no T_aps there).');
 
   const orbitalFolder = astroFolder.addFolder({ title: 'Orbital Elements' });
   addTooltip(orbitalFolder.addBinding(predictions, 'eccentricityEarth', {
@@ -26065,7 +26089,8 @@ function _tierModelB() {
  * planetSpinPhysical, cited) on the chain's orbit, and the spin integrated on
  * the planet's OWN orbit-plane history (the deep ζ table) from the IAU J2000
  * pole. Rows read the scene at the ENGINE year (true TT, R4b). Beyond ±10 Myr
- * the channel is outside its ζ tables' domain and the rows go blank.
+ * the channel is outside its ζ tables' domain and the rows read "—" (the
+ * renderer's form for a row without a value; the hover names the span).
  * @param {string} key @param {string} name
  * @param {{ cassini?: boolean, retrograde?: boolean, note?: string }} [opts]
  */
@@ -26074,7 +26099,7 @@ function _planetSpinRows(key, name, opts = {}) {
   const yr = () => _engineYearTT(o.julianDay);
   let bandMemo = null;
   const band = () => { if (!bandMemo) bandMemo = spin().obliquityEnvelopeDeg(2000, 1000000); return bandMemo; };
-  const home = ` ONE home @essrt/physics/planets/spin-channel; inputs astro-reference planetSpinPhysical (cited per value); the closures and targets are the test:spin-channel gate and doc 109 §19.`;
+  const home = ` Read inside ±10 Myr of J2000 — the span of the planet's own orbit-plane (ζ) tables; the row reads — beyond. ONE home @essrt/physics/planets/spin-channel; inputs astro-reference planetSpinPhysical (cited per value); the closures and targets are the test:spin-channel gate and doc 109 §19.`;
   if (opts.cassini) {
     return [
       {label : () => `Free precession constant α (derived)`,
@@ -28001,8 +28026,8 @@ const planetStats = {
        value : [ { v: () => o.solarYearDays/meansolaryearlengthinDays, dec:6, sep:',' },{ small : 'years' }],
        hover : [`Ratio of current solar year to mean solar year. P = 1.0 when year length equals mean of ~365.2422 days`]},
       {label : () => `Orbital period (solar)`,
-       value : [ { v: () => { const s = _cardinalYearSeconds(o.currentYear, 'MEAN'); return Number.isFinite(s) ? s / SECONDS_PER_DAY : tropicalYearDaysOfDate(o.currentYear); }, dec:8, sep:',' },{ small : 'days' }],
-       hover : () => [`Earth's mean tropical year OF DATE in SI days — the one-source evaluator, the SAME family the Predictions panel rides (so the two surfaces read one value by construction). The equinox-to-equinox interval of a single year wobbles ±minutes about this mean. Scene-measured this year: ${fmtNum(o.solarYearDays,8,',')} d in the scene day basis (the measured mean solar day, doc 11 §Day bases) — the ~0.5-s split is of-date drift + measurement route + day basis, kept visible here.`],
+       value : [ { v: () => predictions.solarYearSeconds / SECONDS_PER_DAY, dec:8, sep:',' },{ small : 'days' }],
+       hover : () => [`Earth's mean tropical year OF DATE in SI days — the ONE displayed family, the Predictions panel's Model (sec) row over 86,400 s (so the two surfaces read one value by construction): the one-source evaluator inside ±2 Myr of J2000, the deep-time chain's tropical year beyond — the package's published form, since the one-source sampler is not resolved there (it read 384.6 SI days at the genesis for the law's 328.2). The equinox-to-equinox interval of a single year wobbles ±minutes about this mean. Scene-measured this year: ${fmtNum(o.solarYearDays,8,',')} d in the scene day basis (the measured mean solar day, doc 11 §Day bases) — the ~0.5-s split is of-date drift + measurement route + day basis, kept visible here.`],
        tpLink: true},
       {label : () => `Orbital period (sidereal)`,
        value : [ { v: () => { const os = _hybridSpinActive() ? _siderealYearOneSourceSeconds(o.currentYear) : null; return os !== null && Number.isFinite(os) ? os / SECONDS_PER_DAY : meanSiderealYearSecondsAtAge((startmodelYear - o.currentYear) / 1e6) / SECONDS_PER_DAY; }, dec:8, sep:',' },{ small : 'days' }],
@@ -28267,14 +28292,14 @@ const planetStats = {
        highlight: true},
       {label : () => `Axial precession period`,
        value : [ { v: () => -predictions.axialPrecession, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`Retrograde (the equinox regresses — hence the minus): the beat of the one-source sidereal and tropical years in Julian years, sid·trop/((sid − trop)·365.25 d) — the same dynamical of-date value the Predictions panel shows (≈25,771.4 at J2000, matching IAU; the same number as 360° over the frame's precession rate per Julian year).`],
+       hover : [`Retrograde (the equinox regresses — hence the minus): inside ±2 Myr of J2000 the beat of the one-source sidereal and tropical years in Julian years, sid·trop/((sid − trop)·365.25 d) — the same dynamical of-date value the Predictions panel shows (≈25,771.4 at J2000, matching IAU; the same number as 360° over the frame's precession rate per Julian year). Beyond ±2 Myr the composed lunisolar period of date — the package's published form — because the one-source beat is not resolved there (before plan 30 this row read 19.57 yr at the genesis, the law 8.92).`],
        tpLink: true},
       {label : () => `Obliquity cycle (derived beat)`,
        value : [ { v: () => 1296000 / ((1296000 / predictions.axialPrecession) * _spinAxisInertialFactor() - _s3ArcsecPerYr()), dec:0, sep:',' },{ small: 'years' }],
        hover : [`The model's DERIVED obliquity period: 2π/(ψ̇ᵢₙ − |s₃|) — the beat of the spin axis's INERTIAL precession rate of date (the one-source axial rate × the hybrid's self-anchor factor: the general precession plus the planetary mean the N-body ecliptic's motion carries, +0.097″/yr at J2000) against the engine's own dominant nodal mode s₃ (the banked deep secular modes, −18.851″/yr — the same partner the published obliqCycleYears and the Framework Verification chart use; the chain's of-date node tangent in the row below is a different, windowed quantity). 41,098 yr at J2000, the instantaneous limit — a dated record sees the beat of the pole rate's mean over its own window (faster spin, lower mean obliquity, higher mean eccentricity in the past): 40,927 yr over the LR04 record, the climate formula's p+s₀ line (registry obliqCycleRealized*Years); the general rate alone read 41,224. Matches the observed Milankovitch obliquity band (~41 kyr) and is gate-pinned in 40–42.5 kyr (the obliquity-hybrid verdict); doc 109 §18 carries the deep-time prediction split (registry obliqBeat*Kyr). At deep time the BAND (this period and the obliquity's amplitude) is the model's claim, never the obliquity VALUE: measured (plan 26), the value is linearly sensitive at 450″ per 1e-6 of the precession constant at 100 Ma (2,000″ at 500 Ma), and the ice-free baseline alone is known to the 1e-4 class — beyond ~20 Myr the obliquity readout is the integration on its inputs.`]},
       {label : () => `Apsidal meets Axial (Perihelion precession)`,
        value : [ { v: () => predictions.perihelionPrecession, dec:2, sep:',' },{ small: 'years' }],
-       hover : [`The two counter-rotations meet: the prograde apsidal motion (the Duration row above) and the retrograde axial precession close on each other, so the rates ADD — 1/T = 1/T_axial + 1/T_apsidal ≈ 20.9 kyr, the climatic-precession beat that paces the Milankovitch precession band. Computed as the beat of the ONE-SOURCE anomalistic and tropical years — the same value the Predictions panel shows.`],
+       hover : [`The two counter-rotations meet: the prograde apsidal motion (the Duration row above) and the retrograde axial precession close on each other, so the rates ADD — 1/T = 1/T_axial + 1/T_apsidal ≈ 20.9 kyr, the climatic-precession beat that paces the Milankovitch precession band. Computed as the beat of the ONE-SOURCE anomalistic and tropical years — the same value the Predictions panel shows. Reads — beyond ±2 Myr of J2000, where the anomalistic year is not resolved.`],
        tpLink: true},
     null,
     {header : '—  Long-Period Cycles —' },
@@ -35437,9 +35462,14 @@ function updatePredictions() {
   // yearLengths.axialPrecessionYearsAtYear (≈25,771.4 at J2000, declining
   // with date). The dimensionless sid/(sid − sol) counts tropical years and
   // reads 0.55 yr more (2026-09: the unit slip the scene check exposed).
-  predictions.axialPrecession = _hybridSpinActive()
-    ? predictions.siderealYearSeconds * predictions.solarYearSeconds / ((predictions.siderealYearSeconds - predictions.solarYearSeconds) * DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY)
-    : o.axialPrecession;
+  // Beyond the one-source window the row IS the law — the composed lunisolar
+  // period of date, the same function the T_p row and the package's published
+  // `epoch.axialPrecessionYearsAtYear` read (plan 30 item A: the beat of the
+  // deep chain's two years reproduces it only to four digits).
+  predictions.axialPrecession = !_hybridSpinActive() ? o.axialPrecession
+    : Math.abs(engineYear - 2000) <= ONE_FAMILY_WINDOW_YEARS
+      ? predictions.siderealYearSeconds * predictions.solarYearSeconds / ((predictions.siderealYearSeconds - predictions.solarYearSeconds) * DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY)
+      : _axialPrecessionPeriodYearsAtAge((2000 - engineYear) / 1e6);
   // The lunisolar clock, in periods and ratios:
   // T_p(t) the PUBLISHED precession period of date — the Axial row's value
   // inside ±2 Myr (the one-family beat), the composed lunisolar period on
@@ -35450,7 +35480,7 @@ function updatePredictions() {
   // package's model.lunisolar; the registry's lunisolar* keys.
   {
     const _tMaLs = (2000 - engineYear) / 1e6;
-    const _Tp = Math.abs(engineYear - 2000) <= 2000000
+    const _Tp = Math.abs(engineYear - 2000) <= ONE_FAMILY_WINDOW_YEARS
       ? predictions.axialPrecession
       : _deepLod().lunisolarPrecessionPeriodYearsAtAge(_tMaLs);
     if (_Tp !== null && Number.isFinite(_Tp)) {
@@ -35461,7 +35491,7 @@ function updatePredictions() {
       // artifact arrives would cache the ζ-mode tail as the movement (the
       // plan-06 R1 trap — measured here as every planet 100–240″ off at
       // −1000 and the deep Moon 1000″ off in the cross-engine gate).
-      if (Math.abs(engineYear - 2000) <= 2000000 && _hybridSpinActive()) {
+      if (Math.abs(engineYear - 2000) <= ONE_FAMILY_WINDOW_YEARS && _hybridSpinActive()) {
         // the ONE movement's own apsidal period (anom/(anom − sid) of the
         // one family — the scene's perihelion; mirrors model.js lunisolar)
         const _Taps = _yearLengthsM().inclinationPrecessionYearsAtYear(engineYear);
@@ -35672,19 +35702,19 @@ function updatePredictions() {
 // has landed; the tidal-chain means before) over the kinematic day of date.
 // Engine twins: tools/lib deep-time.js *YearDaysOfDate.
 function tropicalYearDaysOfDate(year) {
-  const s = _hybridSpinActive() && Math.abs(year - 2000) <= 2000000
+  const s = _hybridSpinActive() && Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS
     ? _yearLengthsM().tropicalYearSecondsAtYear(year)
     : meanTropicalYearSecondsAtAge((J2000_CALENDAR_YEAR - year) / 1e6);
   return s / _lodKinematicSecondsOfDate(year);
 }
 function siderealYearDaysOfDate(year) {
-  const s = _hybridSpinActive() && Math.abs(year - 2000) <= 2000000
+  const s = _hybridSpinActive() && Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS
     ? _yearLengthsM().siderealYearSecondsAtYear(year)
     : _siderealYearSecondsPure(year);
   return s / _lodKinematicSecondsOfDate(year);
 }
 function anomalisticYearDaysOfDate(year) {
-  const s = _hybridSpinActive() && Math.abs(year - 2000) <= 2000000
+  const s = _hybridSpinActive() && Math.abs(year - 2000) <= ONE_FAMILY_WINDOW_YEARS
     ? _yearLengthsM().anomalisticYearSecondsAtYear(year)
     : NaN;
   return s / _lodKinematicSecondsOfDate(year);
