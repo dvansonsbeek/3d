@@ -1513,6 +1513,18 @@ after this one, on the UT axis; the gate's row reads every cardinal year
 length against the tropical year of date at the four positions (5e-3; the
 single-year wobble is 8e-6 today and 1.5e-3 at the edge, a skipped year 1.0).
 
+**A hover that qualifies a moving value with its epoch** (plan 30 item C).
+Forty-two Planet Info rows whose value moves with the epoch carried
+"(at J2000)" as if it qualified the value — "q = a(1−e) ≈ 363,296 km (at
+J2000)" beside a Moon at 39,700 km, the five month rows called "IAU inputs
+(at J2000)" while showing 3.94 solar days of date. Each now says OF DATE,
+names what it rides (the semi-major axis of date, the Moon's distance, the
+day of date, the month chain at the epoch) and keeps today's figure as the
+reference — the tour's pattern; 67 more hovers that name J2000 as the ANCHOR
+beside an of-date statement stay as they are. The literal is a code-surface
+vocabulary-ratchet term since (one hit left, a constant's; the count may only
+fall), so the phrase cannot return unseen.
+
 **The lesson**: a surface that quotes a measured quantity carries the window
 it was measured in, and switches to the law at the window's edge exactly
 where the package does — the "A displayed rate must name its window" rule

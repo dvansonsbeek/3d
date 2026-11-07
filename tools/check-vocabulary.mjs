@@ -56,6 +56,10 @@ const CODE_TERMS = [
   ['comb / lattice', /\b(?:combs?|comb-era|lattice|System-Reset|balanced year)\b/g],
   ['deletion narrative', /\b(?:DELETED|(?:is|are|was|were) deleted|left the JSON|left with the|(?:is|are) gone|went with the|stood here)\b/g],
   ['plan-step label', /\b[Pp]lan (?:0[6-9]|1[0-9]) (?:step|R\d|§|S\d|D\d|T\d|I\d|B\d|A\d|Phase)/g],
+  // plan 30 item C: "(at J2000)" as the qualifier of a value that MOVES with the epoch — 42 Planet
+  // Info hovers carried it (the Moon's months at the genesis among them); the one hit left is a
+  // constant's (the Milky Way orbit period). A row of date names today's value as "today".
+  ['(at J2000) qualifier', /\(at J2000\)/g],
 ];
 
 /** Historical records keep the old vocabulary by design. */

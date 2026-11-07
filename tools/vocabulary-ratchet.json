@@ -16,6 +16,9 @@
     },
     "code:tools/verify/secular-series.js": {
       "comb / lattice": 3
+    },
+    "code:src/script.js": {
+      "(at J2000) qualifier": 1
     }
   }
 }
