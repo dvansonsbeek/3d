@@ -1606,6 +1606,19 @@ The `test:snapshot` chain also carries:
   figure's sidereal day turns its row red). Born with the panel: a figure
   prints what the model computes, so a model move that does not reach a
   figure is a stale reader, not a stale picture.
+- **`surface-rows`** (plan 30 §3 (1), §1.38) — the SURFACE golden: every
+  Planet Info row of every body (776) and 22 live fields of the Predictions
+  panel at seven epochs (today, −3000, −400 Myr, −2.46 Ga, −4.4 Ga, the
+  genesis edge, +990 Myr), pinned as the visitor reads them — the rendered
+  `value | unit` string per epoch and each row's CLASS: whether it moves with
+  the epoch (614 do), whether it is ever "—" (29: the planets' spin rows beyond
+  ±10 Myr, the anomalistic and climatic-precession rows beyond ±2 Myr), whether
+  its hover still says "(at J2000)" on a moving row (0). Born from plan 30's
+  dump, which found the measured year family shown beyond its window, mixed day
+  units in one table, pane rows a landing behind, a finder a year long and 42
+  hovers calling a moving value "(at J2000)" — none visible to a gate that reads
+  the model. A class that changes fails by name; `--write` re-records for a
+  change the commit explains.
 - **`tools-panels`** — every Tools button opens its panel with no page
   error, three clicks within a frame leave ONE panel, and it closes again
   (born from a ReferenceError on open and the double-build race;
@@ -1756,6 +1769,7 @@ points to; each gate's header states its own plant in full):
 | `ESSRT_REPORTS_PLANT=1` | `test/browser/reports-export.test.mjs` | one Infinity cell recorded in every exported sheet |
 | `ESSRT_SCENE_YEARS_PLANT=1` | `tools/verify/scene-year-lengths.js` | the compared sidereal law shifted by 0.1 s (the tolerance is 30 ms) |
 | `ESSRT_TOOLS_PLANT=1` | `test/browser/tools-panels.test.mjs` | one expected panel id renamed |
+| `ESSRT_SURFACE_PLANT=1` | `test/browser/surface-rows.test.mjs` | one row's class (moves) flipped in the measured set |
 | `ESSRT_VALUES_PLANT=1` | `tools/docs/export-model-values-package.mjs` | the 16.0.0 offset (167.048°) re-injected on the first plausibility row |
 | `ESSRT_VOCAB_PLANT=1/2` | `tools/check-vocabulary.mjs` | one phantom docs hit (`=1`) / one phantom code hit (`=2`) |
 | `ESSRT_WOBBLE_PLANT=1` | `test/browser/wobble-center.test.mjs` | the tolerances tightened 10,000× |

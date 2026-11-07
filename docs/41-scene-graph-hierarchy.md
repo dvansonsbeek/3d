@@ -668,6 +668,61 @@ hover what each map IS and the cited ages; the browser golden pins each body's
 tier on both sides of every
 boundary.
 
+### 15.7 What a row shows at deep time (plan 30)
+
+The panels' values are the model's at every epoch (plan 30's dump: every
+Planet Info row on the published family agrees with `createModel()` at the
+same engine year to 1e-7 or better, the genesis included). What a row SAYS
+about its value follows five rules, each born from a measured defect (doc 111
+§1.38):
+
+1. **One unit per row, named.** A period divided by the day OF DATE — the
+   Moon's months and cycles, the eclipse-cycle rows, the Kepler-verification
+   periods, the "solar days of date" year columns — is in solar days of date;
+   a period in days of 86,400 s — the planets' Julian-year periods, the
+   perihelion timing, the "Orbital period (solar/sidereal)" rows — is in SI
+   days. The five unit words have ONE home (`UNIT_SI_DAYS`,
+   `UNIT_SOLAR_DAYS_OF_DATE`, `UNIT_TROPICAL_YEARS_OF_DATE`,
+   `UNIT_DEG_PER_SI_DAY`, `UNIT_DEG_PER_SOLAR_DAY_OF_DATE`); the Moon's month
+   rows show the hours beside the count (3.94 solar days of date · 21.70 h at
+   the genesis). Where a formula takes a year or a month, it takes it in the
+   unit the day it divides by implies — the pane's sidereal day on the year in
+   solar days of date, the Moon's mean speed on the month in seconds.
+2. **One window per quantity, the package's.** The one-source measured years
+   (tropical, anomalistic, the cardinal years) and every beat made of them are
+   shown inside ±2 Myr of J2000 (`ONE_FAMILY_WINDOW_YEARS`); beyond it the
+   tropical year and the axial precession are the deep chain's law — the
+   package's `epoch.*` published form — and the anomalistic year, the cardinal
+   years, the climatic-precession beat and the lunisolar apsidal ratios have no
+   value. The planets' derived spin rows are read inside ±10 Myr, the span of
+   their orbit-plane tables. The scene's switch has ONE home
+   (`_cardinalYearSeconds`); the epoch-consistency gate reads the rows against
+   the Node model's published values at −1 Myr, −400 Myr, −2 Gyr and inside the
+   genesis edge.
+3. **A row without a value reads "—"**, never a number, a blank or NaN — the
+   renderer's form for every non-finite value, the pane's for its windowed
+   rows — and its hover names the window.
+4. **A hover describes the quantity OF DATE** and names what it rides (the
+   semi-major axis of date, the Moon's distance, the day of date, the month
+   chain at the epoch), keeping today's value as the reference ("≈ 363,296 km
+   today"); it never qualifies a moving value with "(at J2000)" — the literal
+   is a vocabulary-ratchet term. A J2000 ANCHOR named beside an of-date
+   statement is a different sentence and stays.
+5. **The pane shows the landing it is on.** The loop-driven monitors are
+   re-read on active frames; opening a folder or selecting a tab wakes one
+   frame for what it reveals, and a paused landing's cardinal-point rows are
+   solved on a timer right after its frame (the hold is Play's). The
+   epoch-consistency gate reads the pane's view against the live field with
+   the folders open.
+
+The **time steps** are days of POSITION fixed at load: one "day" is 1/365.2422
+of the position's tropical-year count — 86,400 s today, 0.90 SI days (3.9
+solar days of date) at the genesis; the "30 days" step (once "1 month") is
+thirty of them. Steps of date are the open decision of plan 30. The whole
+surface — 776 Planet Info rows and 22 Predictions fields at seven epochs to the
+genesis edge, value, unit and class — is the `surface-rows` golden of the
+browser tier (doc 111 §2).
+
 ---
 
 **Previous**: [40 - Architecture](40-architecture.md)

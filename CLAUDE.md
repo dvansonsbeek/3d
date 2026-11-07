@@ -375,7 +375,9 @@ monitor-polling rows) and the `test:snapshot` chain (`chart-export`,
 category —, `reports-export` — the three Reports exporters headless on a
 stubbed SheetJS —, `perihelion-at-sun`, the star-field init alignment, the
 orbit-plane grid at the Sun, the Planet Info eye, the chip-click wake, the
-wobble-centre trace). What each row guards and the owner report it was born
+wobble-centre trace, and `surface-rows` — every Planet Info row of every body
+and the Predictions panel's live fields at seven epochs to the genesis edge,
+value, unit and class, plan 30's dump kept as a gate). What each row guards and the owner report it was born
 from: doc 111 §2. `npm run test:transparency` is the Phase 6 acceptance gate
 (green 84/84 since Phase B, required in CI).
 
