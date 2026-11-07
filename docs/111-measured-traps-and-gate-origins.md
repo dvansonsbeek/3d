@@ -1465,6 +1465,23 @@ the panel's live fields against the Node model's `epoch.tropicalYearSecondsAtYea
 `siderealYearSecondsAtYear` and `axialPrecessionYearsAtYear` at the same engine
 year (1e-9 relative), and assert the anomalistic field is NaN there.
 
+**The unit words on the same screen** (plan 30 item B, the same instrument):
+the panel's sidereal and stellar day divided by the year in SI days where the
+solar-day count of date belongs (20 s short at 400 Ma, 38 s at the genesis,
+96 s long at +990 Myr — the Planet Info "mean" column beside it had the right
+form); the Moon's mean speed multiplied a month in solar days of date by 24
+hours (−9 % at 400 Ma, −77 % at the genesis: 2,635 km/h for 11,479); the
+Metonic and Callippic solar-year rows stood in SI days beside months in solar
+days of date; Earth's "Orbital period (P)" divided the year in SI days by the
+year in solar days of date — the day ratio LOD/86,400 (0.906 at 400 Ma)
+labelled a period; the anomalistic "mean" column multiplied the J2000 day
+count by the day of date (84 SI days at the genesis). Every period cell now
+carries one of five unit words from ONE home (`UNIT_SI_DAYS`,
+`UNIT_SOLAR_DAYS_OF_DATE`, …), the Moon's month rows show the hours beside
+the count (3.94 solar days of date · 21.70 h at the genesis), and the gate's
+day rows read the panel's sidereal and stellar day against the package's at
+the deep positions (1e-8).
+
 **The lesson**: a surface that quotes a measured quantity carries the window
 it was measured in, and switches to the law at the window's edge exactly
 where the package does — the "A displayed rate must name its window" rule

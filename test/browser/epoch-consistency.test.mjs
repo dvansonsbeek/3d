@@ -74,6 +74,7 @@ const TOL_MOON_RING_REL = 0.08;
 // (one function, two runtimes — 1e-9); inside, the axial row is the beat of the two displayed
 // years, 1.4e-7 from the sampler's own period form today.
 const TOL_WINDOW_REL = 1e-9, TOL_WINDOW_BEAT_REL = 1e-6;
+const TOL_DAY_ROWS_REL = 1e-8;   // the sidereal/stellar day rows against the package (plan 30 item B; a unit slip is 2.6e-4 at 400 Ma)
 
 const EPOCHS_MA = [-5, -1, 1, 5];
 const TOL_DAYS = 0.002;
@@ -149,7 +150,7 @@ for (const jd of CLOCK_JDS) {
     const pos = T.scenePos(); const ring = T.moonRingProbe();
     return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm,
       // plan 30 item A: the Predictions panel's live year and precession fields at this landing
-      pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession']) };
+      pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession', 'siderealDayReal', 'stellarDayReal']) };
   }, jd));
 }
 // plan 27 step C: the genesis eclipse — the browser's own finder on the seated tier model (one
@@ -310,6 +311,14 @@ for (const jd of DOMAIN_EDGE_JDS) {
       const okW = [dTrop, dSid].every((d) => Number.isFinite(d) && d <= TOL_WINDOW_REL) && Number.isFinite(dPrec) && dPrec <= (inWindow ? TOL_WINDOW_BEAT_REL : TOL_WINDOW_REL) && anomOk;
       if (!okW) fail++;
       console.log(`${okW ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Predictions rows vs the published family at engine year ${E.toFixed(1)} (${inWindow ? 'inside' : 'beyond'} ±2 Myr)  tropical ${p.solarYearSeconds.toFixed(3)} s Δ ${Number(dTrop).toExponential(2)} · sidereal Δ ${Number(dSid).toExponential(2)} · axial ${p.axialPrecession.toFixed(3)} yr Δ ${Number(dPrec).toExponential(2)} · anomalistic ${inWindow ? 'resolved' : 'NaN'} ${anomOk ? 'ok' : 'WRONG'}`);
+      // plan 30 item B: the panel's sidereal and stellar day ≡ the package's (Y the year in
+      // solar days OF DATE — on the SI-day count the panel read 20 s short at 400 Ma, 38 s at
+      // the genesis). The package's Y is over the kinematic day, the panel's over the real
+      // day: 1e-8 of Y, 3e-11 of the sidereal day.
+      const dSidDay = rel(p.siderealDayReal, m.lengths.siderealDaySeconds(E)), dStelDay = rel(p.stellarDayReal, m.lengths.stellarDaySeconds(E));
+      const okD = [dSidDay, dStelDay].every((d) => Number.isFinite(d) && d <= TOL_DAY_ROWS_REL);
+      if (!okD) fail++;
+      console.log(`${okD ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Predictions day rows vs the package  sidereal ${p.siderealDayReal.toFixed(4)} s Δ ${Number(dSidDay).toExponential(2)} · stellar ${p.stellarDayReal.toFixed(4)} s Δ ${Number(dStelDay).toExponential(2)}`);
     }
   }
   {
