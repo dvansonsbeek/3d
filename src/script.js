@@ -21308,7 +21308,11 @@ function setupGUI() {
   });
   playBtn.element.classList.add('play-btn');
 
-  ctrlFolder.addBinding(o, '1 second equals', {
+  // PLAN 30 (rule 4: a control is named for what it does): "1 month" was 30 days of position —
+  // 30 lunar orbits at the genesis, where the owner read it as a sidereal month. The steps are
+  // DAYS OF POSITION fixed at load (one day = 1/365.2422 of the position's tropical-year count,
+  // 86,400 s today); the hover states what a step is at deep time.
+  addTooltip(ctrlFolder.addBinding(o, '1 second equals', {
     label: 'Time step',
     options: {
       '1 second': sSecond,
@@ -21316,7 +21320,7 @@ function setupGUI() {
       '1 hour': sHour,
       '1 day': sDay,
       '1 week': sWeek,
-      '1 month': sMonth,
+      '30 days': sMonth,
       '1 year': sYear,
       '10 years': sYear * 10,
       '100 years': sYear * 100,
@@ -21325,7 +21329,7 @@ function setupGUI() {
       '100,000 years': sYear * 100000,
       '1,000,000 years': sYear * 1000000,
     }
-  }).on('change', () => { o.speedFact = Number(o['1 second equals']); });
+  }).on('change', () => { o.speedFact = Number(o['1 second equals']); }), 'Scene time per real second under Play, and the Step buttons’ stride. The steps are DAYS OF POSITION, fixed when the page loads: one day is 1/365.2422 of the position’s tropical-year count — 86,400 s today, and at deep time the count year is the tropical year of date, so a "day" is 0.90 SI days (3.9 solar days of date) at the genesis; "1 year" is 365 such days, "30 days" thirty of them (27 SI days at the genesis — seven sidereal months there, not one). The Moon’s months of date are in its Planet Info rows.');
   ctrlFolder.addBinding(o, 'speed', { label: 'Speed \u00D7', min: -5, max: 5, step: 0.5 });
 
   // Navigation toolbar — compact button row
@@ -28025,8 +28029,8 @@ const planetStats = {
        value : [ { v: () => OrbitalFormulas.hillSphereRadius(currentAUDistance, M_EARTH_ALONE, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Region where Earth's gravity dominates: r_Hill = a × (m/3M)^(1/3) ≈ 1.5 million km today — OF DATE on the semi-major axis a(t), so the row moves with it. The Moon orbits at ~384,400 km today (25% of the Hill sphere)`]},
       {label : () => `Hill Sphere`,
-       value : [ { v: () => OrbitalFormulas.hillSphereRadius(currentAUDistance, M_EARTH_ALONE, M_SUN) / currentAUDistance, dec:6, sep:',' },{ small: 'AU' }],
-       hover : [`Hill sphere radius as fraction of semi-major axis ≈ 0.01 AU`]},
+       value : [ { v: () => OrbitalFormulas.hillSphereRadius(currentAUDistance, M_EARTH_ALONE, M_SUN) / AU_J2000_KM, dec:6, sep:',' },{ small: 'AU' }],
+       hover : [`The Hill radius in astronomical units (the J2000 AU, 149,597,870.7 km) — OF DATE on the semi-major axis a(t), like the km row above (0.0100 today, 0.04 % less at the genesis). Its ratio to a is the constant (m/3M)^(1/3) = 0.0100; before plan 30 this row showed that constant under an "AU" label.`]},
       {label : () => `Sphere of Influence (r_SOI)`,
        value : [ { v: () => OrbitalFormulas.sphereOfInfluence(currentAUDistance, M_EARTH_ALONE, M_SUN), dec:0, sep:',' },{ small: 'km' }],
        hover : [`Laplace SOI: r_SOI = a × (m/M)^(2/5) ≈ 925,000 km today — OF DATE on the semi-major axis a(t). Used for spacecraft trajectory calculations`]},
@@ -28352,13 +28356,13 @@ const planetStats = {
     {header : '—  Long-Period Cycles —' },
       {label : () => `Eccentricity Cycle (g-mode beat)`,
        value : [ { v: () => DEEP_MODES_ARTIFACT.verdict.strongestBeatPeriodKyr * 1000, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`Earth's |e| metronome — the beat of the two strongest DEEP secular modes (g2 − g5), from the model's own 20-Myr N-body run (the T5-gated deep-modes verdict): 405.6 kyr, matching the rock-measured 405.6 kyr and La2004's 405.7. The era-window chain beat reads ~425 kyr — the measured era-vs-deep window difference, named, not hidden (doc 109).`]},
+       hover : [`Earth's |e| metronome — the beat of the two strongest DEEP secular modes (g2 − g5), from the model's own 20-Myr N-body run (the T5-gated deep-modes verdict): 405.6 kyr, matching the rock-measured 405.6 kyr and La2004's 405.7. The era-window chain beat reads ~425 kyr — the measured era-vs-deep window difference, named, not hidden (doc 109). A WINDOW value shown at every epoch, by design: the falsification criterion's third leg scales it with the measured solar-mass history as μ^−1.153 (doc 109 §12), and μ(2.48 Ga) = 1.00 ± 0.07 leaves it unchanged within the measurement — the row is the modern class, not a period of date.`]},
       {label : () => `Eccentricity beat (124-kyr companion)`,
        value : [ { v: () => DEEP_MODES_ARTIFACT.verdict.companion124Kyr * 1000, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The second-strongest eccentricity beat from the SAME T5-gated deep verdict — the classical ~124-kyr line of the Milankovitch short-eccentricity band. Together with the 95-kyr companion below it composes the familiar ~100-kyr eccentricity envelope around the 405.6-kyr metronome.`]},
+       hover : [`The second-strongest eccentricity beat from the SAME T5-gated deep verdict — the classical ~124-kyr line of the Milankovitch short-eccentricity band. Together with the 95-kyr companion below it composes the familiar ~100-kyr eccentricity envelope around the 405.6-kyr metronome. A window value shown at every epoch, as the row above.`]},
       {label : () => `Eccentricity beat (95-kyr companion)`,
        value : [ { v: () => DEEP_MODES_ARTIFACT.verdict.companion95Kyr * 1000, dec:0, sep:',' },{ small: 'years' }],
-       hover : [`The third eccentricity beat from the SAME T5-gated deep verdict — the classical ~95-kyr line of the Milankovitch short-eccentricity band. With the 124-kyr companion above it composes the ~100-kyr eccentricity envelope around the 405.6-kyr metronome.`]},
+       hover : [`The third eccentricity beat from the SAME T5-gated deep verdict — the classical ~95-kyr line of the Milankovitch short-eccentricity band. With the 124-kyr companion above it composes the ~100-kyr eccentricity envelope around the 405.6-kyr metronome. A window value shown at every epoch, as the rows above.`]},
       {label : () => `Nodal Precession Period`,
        value : [ { v: () => _chainNodeInvPlanePeriodYears('earth', o.julianDay), dec:2, sep:',', infinity: 1e9 },{ small: 'years' }],
        hover : () => { const _s = CHAIN_ARTIFACT.s.earth; return [`The engine's of-date tangent of Earth's orbital-plane node ON the invariable plane (±150-yr central difference of the chain's node of date — the same evaluator as the Predictions panel's Ecliptic Cycle row and the Positions-panel Period cell). Negative = retrograde regression (the panel-wide sign convention: prograde +, retrograde −). Stable deep-time base: the dominant nodal mode ${_s.nearestLaskar.mode}, ${Math.round(1296000/_s.arcsecPerYr).toLocaleString('en-US')} yr — the cycle the chart below draws.`]; }},    null,
@@ -29034,8 +29038,7 @@ const planetStats = {
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
        value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('mercury').e), dec:4, sep:',' },{ small: '' }],
-       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
-       static: true},
+       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e), on the chain's eccentricity OF DATE. Shows how much faster at perihelion`]},
     null,
       {label : () => `Escape velocity (v_esc)`,
        value : [ { v: () => OrbitalFormulas.escapeVelocity(mercury.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -29341,8 +29344,7 @@ const planetStats = {
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
        value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('venus').e), dec:4, sep:',' },{ small: '' }],
-       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
-       static: true},
+       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e), on the chain's eccentricity OF DATE. Shows how much faster at perihelion`]},
     null,
       {label : () => `Escape velocity (v_esc)`,
        value : [ { v: () => OrbitalFormulas.escapeVelocity(venus.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -29651,8 +29653,7 @@ const planetStats = {
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
        value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('mars').e), dec:4, sep:',' },{ small: '' }],
-       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
-       static: true},
+       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e), on the chain's eccentricity OF DATE. Shows how much faster at perihelion`]},
     null,
       {label : () => `Escape velocity (v_esc)`,
        value : [ { v: () => OrbitalFormulas.escapeVelocity(mars.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -29965,8 +29966,7 @@ const planetStats = {
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
        value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('jupiter').e), dec:4, sep:',' },{ small: '' }],
-       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
-       static: true},
+       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e), on the chain's eccentricity OF DATE. Shows how much faster at perihelion`]},
     null,
       {label : () => `Escape velocity (v_esc)`,
        value : [ { v: () => OrbitalFormulas.escapeVelocity(jupiter.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -30274,8 +30274,7 @@ const planetStats = {
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
        value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('saturn').e), dec:4, sep:',' },{ small: '' }],
-       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
-       static: true},
+       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e), on the chain's eccentricity OF DATE. Shows how much faster at perihelion`]},
     null,
       {label : () => `Escape velocity (v_esc)`,
        value : [ { v: () => OrbitalFormulas.escapeVelocity(saturn.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -30584,8 +30583,7 @@ const planetStats = {
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
        value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('uranus').e), dec:4, sep:',' },{ small: '' }],
-       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
-       static: true},
+       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e), on the chain's eccentricity OF DATE. Shows how much faster at perihelion`]},
     null,
       {label : () => `Escape velocity (v_esc)`,
        value : [ { v: () => OrbitalFormulas.escapeVelocity(uranus.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
@@ -30894,8 +30892,7 @@ const planetStats = {
        hover : [`Minimum orbital velocity at aphelion: vₐ = √(GM/a) × √((1-e)/(1+e))`]},
       {label : () => `Velocity ratio (vₚ/vₐ)`,
        value : [ { v: () => OrbitalFormulas.velocityRatioPeriApo(_chainOrbEl('neptune').e), dec:4, sep:',' },{ small: '' }],
-       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e). Shows how much faster at perihelion`],
-       static: true},
+       hover : [`Perihelion vs aphelion velocity ratio: (1+e)/(1-e), on the chain's eccentricity OF DATE. Shows how much faster at perihelion`]},
     null,
       {label : () => `Escape velocity (v_esc)`,
        value : [ { v: () => OrbitalFormulas.escapeVelocity(neptune.sunDistAU * currentAUDistance) * 3600, dec:2, sep:',' },{ small: 'km/h' }],
