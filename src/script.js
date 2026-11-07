@@ -3769,6 +3769,53 @@ if (typeof window !== 'undefined') {
     tourGoto: (i) => tourGoto(i),
     tourStop: () => tourStop(),
     tourState: () => ({ active: _tour.active, paused: _tour.paused, index: _tour.index, started: _tour.started, armed: !_tour.pendingArm && _tour.timer !== 0, visible: !!(_tour.el && _tour.el.classList.contains('visible')), landing: !!(_tour.el && _tour.el.querySelector('.origin-tour-landing')), title: _tour.el ? (_tour.el.querySelector('.origin-tour-title') || {}).textContent : null }),
+    // PLAN 30 step 0 — THE INSTRUMENT: every published row at the CURRENT position, as the panels
+    // render it. (a) a body's Planet Info rows — label, the rendered value and unit (the renderer's
+    // own `renderVal`, tags stripped), the hover, static or not; (b) every tweakpane binding — its
+    // folder path, label, value and tooltip. The headless dump reads these at six epochs beside
+    // the package's published values and classifies each row (ok / unit / window / hover /
+    // undefined / step). Hooks, not surfaces: nothing here renders.
+    planetInfoBodies: () => Object.keys(planetStats),
+    planetInfoRowsDump: (name) => {
+      const stats = planetStats[name];
+      if (!stats) return null;
+      const strip = (/** @type {unknown} */ s) => String(s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+      const out = [];
+      let header = '';
+      for (const r of stats) {
+        if (!r || r === 'null_row' || r.viz) continue;
+        if (r.header) { header = strip(r.header).replace(/^[—–\-\s]+|[—–\-\s]+$/g, ''); continue; }
+        let label, rawVal, rawHover;
+        if ('label' in r && 'value' in r) { label = typeof r.label === 'function' ? r.label() : r.label; rawVal = r.value; rawHover = r.hover; } else { const pair = Object.entries(r).find(([k]) => k !== 'info'); [label, rawVal] = pair ?? ['?', '']; }
+        let v1 = rawVal, v2 = '';
+        if (Array.isArray(rawVal)) [v1, v2] = rawVal;
+        let value, unit;
+        try { value = strip(renderVal(v1)); unit = strip(renderVal(v2)); } catch (e) { value = 'THROW ' + /** @type {Error} */ (e).message; unit = ''; }
+        let hover = '';
+        try { const hv = typeof rawHover === 'function' ? rawHover() : rawHover; hover = hv === undefined ? '' : strip(Array.isArray(hv) ? hv.filter(Boolean).join(' | ') : hv); } catch (e) { hover = 'THROW ' + /** @type {Error} */ (e).message; }
+        out.push({ header, label: strip(label), value, unit, hover, static: !!(r.static || r.constant), hidden: !!r.hidden });
+      }
+      return out;
+    },
+    paneBindingsDump: () => {
+      const pane = o._guiPane;
+      if (!pane) return null;
+      /** @type {{ path: string, label: string, value: unknown, title: string }[]} */ const out = [];
+      const walk = (/** @type {any} */ api, /** @type {string} */ path) => {
+        const kids = api.pages ? api.pages : (api.children || []);
+        for (const c of kids) {
+          const title = c.title !== undefined ? String(c.title) : '';
+          if (c.children || c.pages) { walk(c, title ? `${path}/${title}` : path); continue; }
+          if (!c.controller || !c.controller.value) continue;   // separators, buttons
+          const el = c.element;
+          const tip = el ? ((el.querySelector('.tp-lblv_l') || {}).title || el.title || '') : '';
+          const raw = c.controller.value.rawValue;
+          out.push({ path, label: String(c.label ?? ''), value: (typeof raw === 'number' || typeof raw === 'string' || typeof raw === 'boolean') ? raw : JSON.stringify(raw), title: String(tip) });
+        }
+      };
+      walk(pane, '');
+      return out;
+    },
     // Cycles-tab perihelion breakdown (doc 13 §1.8): the two coordinates and the
     // relativistic advance from the model constants — probed by the browser golden
     // so the panel can never drift from the registry / closure gate silently.
