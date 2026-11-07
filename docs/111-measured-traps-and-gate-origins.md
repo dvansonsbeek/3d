@@ -1482,6 +1482,27 @@ the count (3.94 solar days of date · 21.70 h at the genesis), and the gate's
 day rows read the panel's sidereal and stellar day against the package's at
 the deep positions (1e-8).
 
+**A pane that shows the previous landing** (plan 30 item D). The same dump
+read the Predictions "Length of AU" one landing behind (today's AU at
+−400 Myr, the −400 Myr AU at the genesis) and the cardinal-point rows of the
+genesis at +990 Myr for more than a minute. Attributed by probe, not by eye
+(§1.33): the live fields were current after every landing — the loop's epoch
+sync precedes the update in the same frame — and two different things lagged.
+The pane's VIEW of a monitor in a collapsed folder: the loop-driven monitors
+(the replacement of 319 poll timers) are re-read only while visible, so a
+collapsed folder kept the whole-pane refresh the entry path makes BEFORE the
+update, and opening the folder did not wake the idle loop. And the cardinal
+rows' LIVE values: a hold added for Play (10× the last solve's cost) blocked
+the one update a paused landing gets, and an idle page never updates again.
+Opening a folder or selecting a tab now wakes one frame (`_wakeOnReveal`,
+one home beside the monitor conversion); the hold is Play's only, and a
+paused landing's rows are solved on a timer right after its frame — never
+inside it, since the perf gate times the landing. The gate's "pane shows
+this landing" rows read the pane's view against the live field with the
+folders open and time the rows' arrival (1.7 s at −1 Myr, 4.5 s at the edge;
+limit 15 s). The lesson is §1.25's for a panel: "refreshed by the loop" does
+not cover what the loop only refreshes while someone is looking.
+
 **The lesson**: a surface that quotes a measured quantity carries the window
 it was measured in, and switches to the law at the window's edge exactly
 where the package does — the "A displayed rate must name its window" rule

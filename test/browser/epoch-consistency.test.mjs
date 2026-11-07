@@ -75,6 +75,7 @@ const TOL_MOON_RING_REL = 0.08;
 // years, 1.4e-7 from the sampler's own period form today.
 const TOL_WINDOW_REL = 1e-9, TOL_WINDOW_BEAT_REL = 1e-6;
 const TOL_DAY_ROWS_REL = 1e-8;   // the sidereal/stellar day rows against the package (plan 30 item B; a unit slip is 2.6e-4 at 400 Ma)
+const TOL_CP_WAIT_MS = 15000;    // the cardinal rows of a paused landing: solved after its frame (plan 30 item D; the hold left them a minute stale)
 
 const EPOCHS_MA = [-5, -1, 1, 5];
 const TOL_DAYS = 0.002;
@@ -142,16 +143,39 @@ const domainRows = await s.page.evaluate(({ POS_JD, MOON_JDS, SPIN_JD }) => {
 // so each jump is followed by a rendered frame before the read (a read in the same tick sees
 // the previous epoch's ring: the one-jump-late artefact measured in plan 27).
 domainRows.clock = [];
+// plan 30 item D: the Predictions folders a visitor would open are open here, so the pane's
+// view of them (what the visitor sees) can be read against the live fields after each landing
+await s.page.evaluate(() => { const T = window.__test__; for (const t of ['Predictions for Earth', 'Orbital Elements', 'Cardinal Points']) T.paneFolderExpand(t, true); });
 for (const jd of CLOCK_JDS) {
+  const tLand = Date.now();
   await s.page.evaluate((jd) => window.__test__.jumpJD(jd), jd);
   await s.page.waitForTimeout(1500);
+  // the cardinal rows of a paused landing are solved right after its frame (item D): wait for
+  // this epoch's rows (the SS instant within two years of the landing), at most 30 s, and record it
+  let cpWaitMs = NaN;
+  for (let i = 0; i < 60; i++) {
+    const near = await s.page.evaluate((jd) => { const p = window.__test__.predictionsProbe(['cpSSJD']); return Math.abs(p.cpSSJD - jd) < 3 * 1600; }, jd);
+    if (near) { cpWaitMs = Date.now() - tLand; break; }
+    await s.page.waitForTimeout(500);
+  }
   domainRows.clock.push(await s.page.evaluate((jd) => {
     const T = window.__test__;
     const pos = T.scenePos(); const ring = T.moonRingProbe();
+    const P = T.paneBindingsDump();
+    // a monitor's view is tweakpane's buffer (the dump stringifies it as a JSON array): its last entry
+    const paneOf = (/** @type {string} */ part, /** @type {string} */ label) => {
+      const b = P.find((x) => x.path.includes(part) && x.label === label);
+      if (!b) return NaN;
+      const v = typeof b.value === 'string' && b.value.startsWith('[') ? JSON.parse(b.value) : b.value;
+      return Number(Array.isArray(v) ? v[v.length - 1] : v);
+    };
     return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm,
       // plan 30 item A: the Predictions panel's live year and precession fields at this landing
-      pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession', 'siderealDayReal', 'stellarDayReal']) };
+      pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession', 'siderealDayReal', 'stellarDayReal', 'lengthofAU', 'cpSSJD', 'cpSSYearLen']),
+      // plan 30 item D: the pane's VIEW of two rows that read a previous landing's value before the fix
+      paneAU: paneOf('Orbital Elements', 'Length of AU (km)'), paneSSLen: paneOf('Cardinal Points/S', 'Year Length (LOD d)') };
   }, jd));
+  domainRows.clock[domainRows.clock.length - 1].cpWaitMs = cpWaitMs;
 }
 // plan 27 step C: the genesis eclipse — the browser's own finder on the seated tier model (one
 // finder, two runtimes), read here and compared below with the registry's run of it on the Node
@@ -319,6 +343,15 @@ for (const jd of DOMAIN_EDGE_JDS) {
       const okD = [dSidDay, dStelDay].every((d) => Number.isFinite(d) && d <= TOL_DAY_ROWS_REL);
       if (!okD) fail++;
       console.log(`${okD ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Predictions day rows vs the package  sidereal ${p.siderealDayReal.toFixed(4)} s Δ ${Number(dSidDay).toExponential(2)} · stellar ${p.stellarDayReal.toFixed(4)} s Δ ${Number(dStelDay).toExponential(2)}`);
+      // plan 30 item D: after a paused landing the pane shows THIS landing — the AU row's view ≡
+      // its live field (it read the previous landing's AU: today's at −400 Myr), and the cardinal
+      // rows are this epoch's (the SS instant within two years of the landing; they kept the
+      // genesis's at +990 Myr for ≥ 60 s), solved after the landing's frame within TOL_CP_WAIT_MS.
+      const okAU = Number.isFinite(r.paneAU) && Object.is(r.paneAU, p.lengthofAU);
+      const dSS = Math.abs(p.cpSSJD - r.jd), okSS = Number.isFinite(dSS) && dSS < 3 * 1600 && Number.isFinite(r.paneSSLen) && Object.is(r.paneSSLen, p.cpSSYearLen);
+      const okWait = Number.isFinite(r.cpWaitMs) && r.cpWaitMs <= TOL_CP_WAIT_MS;
+      if (!(okAU && okSS && okWait)) fail++;
+      console.log(`${okAU && okSS && okWait ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  pane shows this landing  AU view ${r.paneAU} / live ${p.lengthofAU} · SS instant ${dSS.toFixed(0)} d from the landing, view ≡ live ${Object.is(r.paneSSLen, p.cpSSYearLen)} · cardinal rows ready ${Number.isFinite(r.cpWaitMs) ? r.cpWaitMs + ' ms' : 'NEVER'} after the landing`);
     }
   }
   {

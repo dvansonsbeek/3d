@@ -3800,6 +3800,20 @@ if (typeof window !== 'undefined') {
       }
       return out;
     },
+    // PLAN 30 item D: open (or close) every pane folder of that title, as a visitor would —
+    // the loop re-reads a revealed folder's monitors on one wake frame (_wakeOnReveal).
+    paneFolderExpand: (title, expanded = true) => {
+      let n = 0;
+      const walk = (/** @type {any} */ api) => {
+        const kids = api.pages ? api.pages : (api.children || []);
+        for (const c of kids) {
+          if (c.children && String(c.title) === title) { c.expanded = expanded; n++; }
+          if (c.children || c.pages) walk(c);
+        }
+      };
+      if (o._guiPane) walk(o._guiPane);
+      return n;
+    },
     paneBindingsDump: () => {
       const pane = o._guiPane;
       if (!pane) return null;
@@ -20774,6 +20788,7 @@ setupGUI()
 // here and the VISIBLE monitors are re-read on the render loop's 5-Hz DOM tick
 // (only while the loop is active). ONE home — a new readonly row inherits it.
 _convertMonitorsToLoopDriven(o._guiPane);
+_wakeOnReveal(o._guiPane);   // plan 30 item D: opening a folder or a tab re-reads its monitors on one wake frame
 function setupGUI() {
   const gui = new Pane({ title: 'Expanding Solar System Resonance Theory', expanded: true });
   gui.element.id = 'gui';
@@ -22912,6 +22927,24 @@ function _convertMonitorsToLoopDriven(pane) {
 function _refreshVisibleMonitors() {
   if (!o._guiPane) return;
   _forEachBlade(o._guiPane, (api) => { if (_isMonitorApi(api)) api.refresh(); }, true);
+}
+/** A folder opened or a tab page selected reveals monitors the loop has not re-read since
+ *  the last ACTIVE frame — on a paused page that is the state at the last landing, or the one
+ *  before it (the entry path refreshes the whole pane before the update runs: plan 30 §0a D —
+ *  the Predictions "Length of AU" row read the previous landing's value, the live field was
+ *  right). One wake frame re-reads what is now visible. ONE home with the conversion above. */
+function _wakeOnReveal(api) {
+  if (!api) return;
+  const kids = api.pages ? api.pages : (api.children || []);
+  for (const c of kids) {
+    if (c.pages) {
+      if (typeof c.on === 'function') c.on('select', () => { positionChanged = true; });
+      _wakeOnReveal(c);
+    } else if (c.children) {
+      if (typeof c.on === 'function') c.on('fold', () => { positionChanged = true; });
+      _wakeOnReveal(c);
+    }
+  }
 }
 
 function render(now) {
@@ -26204,7 +26237,7 @@ function umbraNASAConventionAtJd(jd) {
 // The rendered Sun IS the certified Sun, so the panel rows read the ONE home
 // (`createModel().cardinal.jdNearUT` seeded at the displayed calendar year's
 // midpoint — updatePredictions) and cache per calendar year here.
-const _cpPanelCache = { year: null, vals: null, lastMs: -Infinity, holdMs: 300 };
+const _cpPanelCache = { year: null, vals: null, lastMs: -Infinity, holdMs: 300, pendingYear: null };
 const _periDateCache = { year: null, key: null, hybrid: null, per: '', ap: '' };   // the perihelion/aphelion date rows (updatePredictions)
 
 /*  Load SheetJS the first time we need it  */
@@ -35669,25 +35702,40 @@ function updatePredictions() {
   // re-solves at most once per 10× the last solve's cost (floor 300 ms); in
   // between the previous year's rows show. Display cadence only — the
   // VALUES are untouched, and a paused epoch serves its exact rows.
+  // PLAN 30 item D (§0a D): the hold is PLAY's. At a paused clock the one update a landing
+  // gets fell inside the hold left by the previous deep solve (10× its cost — a minute after
+  // the genesis), and no further update runs on an idle page, so the rows stayed the previous
+  // epoch's until the camera moved (measured: the genesis rows shown at +990 Myr for ≥ 60 s).
+  // Paused, this year's rows are solved right AFTER the landing's frame (a timer, never inside
+  // it — the perf gate times the landing itself) and the solve wakes one frame to show them.
   const cpYear = Math.floor(o.currentYear);
-  if (_cpPanelCache.year !== cpYear) {
+  const _cpSolve = (year) => {
     const nowMs = performance.now();
-    if (!_cpPanelCache.vals || nowMs - _cpPanelCache.lastMs >= _cpPanelCache.holdMs) {
-      _cpPanelCache.lastMs = nowMs;
-      const cpMidJD = jdFromPos(posFromDateTime(`${cpYear}-07-02`, '12:00:00'));
-      const cpNextMidJD = jdFromPos(posFromDateTime(`${cpYear + 1}-07-02`, '12:00:00'));
-      const cpM = _tierModelB().cardinal;
-      const vals = {};
-      for (const cp of ['SS', 'WS', 'VE', 'AE']) {
-        const jd = cpM.jdNearUT(cpMidJD, cp);
-        vals[cp] = { jd, raDeg: cpM.raDeg(cpYear, cp), yearLenDays: cpM.jdNearUT(cpNextMidJD, cp) - jd };
-      }
-      _cpPanelCache.year = cpYear;
-      _cpPanelCache.vals = vals;
-      // floor 1 s (was 300 ms): at 1,000 yr/s the year changes every frame and the
-      // four cardinal solves re-ran three times a second — 9 % of the frame
-      // budget at deep time for display rows that change in the fourth digit
-      _cpPanelCache.holdMs = Math.max(1000, 10 * (performance.now() - nowMs));
+    _cpPanelCache.lastMs = nowMs;
+    const cpMidJD = jdFromPos(posFromDateTime(`${year}-07-02`, '12:00:00'));
+    const cpNextMidJD = jdFromPos(posFromDateTime(`${year + 1}-07-02`, '12:00:00'));
+    const cpM = _tierModelB().cardinal;
+    const vals = {};
+    for (const cp of ['SS', 'WS', 'VE', 'AE']) {
+      const jd = cpM.jdNearUT(cpMidJD, cp);
+      vals[cp] = { jd, raDeg: cpM.raDeg(year, cp), yearLenDays: cpM.jdNearUT(cpNextMidJD, cp) - jd };
+    }
+    _cpPanelCache.year = year;
+    _cpPanelCache.vals = vals;
+    // floor 1 s (was 300 ms): at 1,000 yr/s the year changes every frame and the
+    // four cardinal solves re-ran three times a second — 9 % of the frame
+    // budget at deep time for display rows that change in the fourth digit
+    _cpPanelCache.holdMs = Math.max(1000, 10 * (performance.now() - nowMs));
+  };
+  if (_cpPanelCache.year !== cpYear) {
+    if (!_cpPanelCache.vals || (o.Run && performance.now() - _cpPanelCache.lastMs >= _cpPanelCache.holdMs)) {
+      _cpSolve(cpYear);
+    } else if (!o.Run && _cpPanelCache.pendingYear !== cpYear) {
+      _cpPanelCache.pendingYear = cpYear;
+      setTimeout(() => {
+        _cpPanelCache.pendingYear = null;
+        if (Math.floor(o.currentYear) === cpYear && _cpPanelCache.year !== cpYear) { _cpSolve(cpYear); positionChanged = true; }
+      }, 0);
     }
   }
   for (const cp of ['SS', 'WS', 'VE', 'AE']) {
