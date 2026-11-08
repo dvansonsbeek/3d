@@ -25,15 +25,18 @@ const OUT = resolve('packages/fixtures/regression/surface-rows.json');
 const write = process.argv.includes('--write');
 const PLANT = process.env.ESSRT_SURFACE_PLANT;
 
-/** The seven epochs, as the Date field takes them (UT civil inside the seam, the TT civil date beyond). */
+/** The seven epochs, as the Date field takes them (plan 29, one clock: the civil UT date inside
+ *  ±3,000 yr of today; beyond, the count form `Y dD` — the year of date and the solar day of date
+ *  in it; a civil Y-M-D typed there is read as that day-of-year). The genesis epoch is typed as a
+ *  year before the edge: the honest edge lands it ON the edge, whose label is recorded. */
 const EPOCHS = [
   { key: 'today', date: '2026-11-07' },
-  { key: 'm3000', date: '-3000-06-21' },
-  { key: 'm400Myr', date: '-399998000-06-21' },
-  { key: 'm2460Myr', date: '-2459998000-06-21' },
-  { key: 'm4400Myr', date: '-4399998000-06-21' },
-  { key: 'genesis', date: '-4428983000-01-01' },
-  { key: 'p990Myr', date: '990002000-06-21' },
+  { key: 'm3000', date: '-3000 d172' },
+  { key: 'm400Myr', date: '-399998000 d172' },
+  { key: 'm2460Myr', date: '-2459998000 d172' },
+  { key: 'm4400Myr', date: '-4399998000 d172' },
+  { key: 'genesis', date: '-5000000000' },
+  { key: 'p990Myr', date: '990002000 d172' },
 ];
 /** The Predictions panel's live numeric fields (the cardinal rows arrive on a timer after a
  *  landing and are gated by epoch-consistency; the fields here are the landing frame's). */
@@ -60,7 +63,7 @@ for (const e of EPOCHS) {
     const info = {}; for (const b of bodies) info[b] = T.planetInfoRowsDump(b);
     return { date: T.clockFields().date, info, pred: T.predictionsProbe(PRED_KEYS) };
   }, { bodies, PRED_KEYS });
-  if (perEpoch[e.key].date !== e.date && e.key !== 'genesis') console.log(`  note: ${e.key} landed on ${perEpoch[e.key].date}`);
+  if (!perEpoch[e.key].date.startsWith(e.date) && e.key !== 'genesis') console.log(`  note: ${e.key} landed on ${perEpoch[e.key].date}`);
 }
 const pageErrors = s.errors.length;
 await s.dispose();

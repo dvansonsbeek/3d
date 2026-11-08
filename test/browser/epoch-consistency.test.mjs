@@ -211,6 +211,45 @@ domainRows.edge = await s.page.evaluate(({ beforeJD, afterJD }) => {
   T.jumpJD(2451545); T.enterJulianDay(beforeJD); const viaJD = T.clockFields();
   return { past, future, edgeLabel, viaDate, viaJD };
 }, { beforeJD: jdFromPos(navigablePosRange().posMin) - 1e6, afterJD: jdFromPos(navigablePosRange().posMax) + 1e6 });
+// plan 29 (one clock, doc 111 §1.40): the LABEL on the UT clock. (1) Typed ≡ displayed on the
+// KEYSTROKE route (the pane's inputs, as a user types) at both seams ±20 d and at the four deep
+// landings: the displayed Date and Time typed back land on the same UT instant and, inside the
+// double's grain, show the same strings (the former TT form landed a −1000 date 7 h off through
+// the hook, and a 24:00:00 a day early). (2) Across each seam in one-UT-day steps: the label's
+// parsed instant is the landing's and advances one solar day per step, both forms seen — a FORMAT
+// change, no clock jump. (3) The count form's day 1 at 00:00 is the midnight of the day that holds
+// the count year's first instant; `Y` alone and a civil `Y-01-01` typed beyond the seam read the
+// same. (4) The 'Engine age (TT)' row at the past edge is the registry's TT age of the edge.
+const SEAM_JDS = [jdFromPos(-3000), jdFromPos(3000)];
+const LABEL_PROBE_JDS = [SEAM_JDS[0] - 20, SEAM_JDS[0] + 20, SEAM_JDS[1] - 20, SEAM_JDS[1] + 20, ...CLOCK_JDS];
+const LABEL_SEAM_WALKS = SEAM_JDS.map((jd) => Array.from({ length: 7 }, (_, k) => jd - 3 + k));
+const COUNT_YEARS = [-1001, 5001, -399998000, -2000000000];
+domainRows.label = await s.page.evaluate(({ probeJDs, walks, countYears }) => {
+  const T = window.__test__;
+  const closure = probeJDs.map((jd) => {
+    T.jumpJD(jd); const f0 = T.clockFields();
+    T.typeDateTime(f0.date, f0.time); const f1 = T.clockFields();
+    return { jd, pos: f0.pos, date: f0.date, time: f0.time, date1: f1.date, time1: f1.time, jd1: f1.julianDay };
+  });
+  const walk = walks.map((jds) => jds.map((jd) => { T.jumpJD(jd); const f = T.clockFields(); return { jd, pos: f.pos, date: f.date, time: f.time, jdParsed: T.jdOfPos(T.posOfDateTime(f.date, f.time)) }; }));
+  const count = countYears.map((Y) => {
+    const p = T.posOfDateTime(`${Y} d1`, '00:00:00');
+    return { Y, day1: T.jdOfPos(p), bare: T.jdOfPos(T.posOfDateTime(`${Y}`, '00:00:00')), civil: T.jdOfPos(T.posOfDateTime(`${Y}-01-01`, '00:00:00')), yearStartJD: T.jdOfPos(Y - 2000.5), label: T.sceneDateLabel(p) };
+  });
+  // (5) the Step buttons cross each seam by whole years (the owner 2026-11-08: stuck at −1000 —
+  // the civil-date step had no civil date to move in the count form): 1-year steps from 5 years
+  // inside each seam, 10 out and 10 back, every step ≈ one year of position
+  const steps = [-2995, 2995].map((start) => {
+    T.enterPos(start); T.setStepYears(1);
+    const out = [T.scenePos()];
+    const dir = start < 0 ? -1 : 1;
+    for (let k = 0; k < 10; k++) { T.stepBy(dir); out.push(T.scenePos()); }
+    for (let k = 0; k < 10; k++) { T.stepBy(-dir); out.push(T.scenePos()); }
+    T.setStepYears(7 / 365);
+    return { start, positions: out, labels: out.length ? [T.sceneDateLabel(out[5]), T.sceneDateLabel(out[10])] : [] };
+  });
+  return { closure, walk, count, steps, edgeAge: T.engineAgeText(T.navigablePosRange().posMin) };
+}, { probeJDs: LABEL_PROBE_JDS, walks: LABEL_SEAM_WALKS, countYears: COUNT_YEARS });
 
 const pageErrors = s.errors.length;
 await s.dispose();
@@ -440,6 +479,55 @@ for (const jd of DOMAIN_EDGE_JDS) {
       const okF = Number.isFinite(dPos) && Math.abs(dPos) <= TOL_RANGE_YEARS && Number.isFinite(dJD) && Math.abs(dJD) <= 2 * Math.abs(twin.posMin) * Number.EPSILON * 1500 && f.date === domainRows.edge.edgeLabel;
       if (!okF) fail++;
       console.log(`${okF ? '  ok ' : 'FAIL '} honest edge via ${label}: lands on the edge and shows it  pos Δ ${Number(dPos).toExponential(2)} yr · JD Δ ${Number(dJD).toExponential(2)} d · Date ${f.date} (edge ${domainRows.edge.edgeLabel}) ${f.time}`);
+    }
+    // plan 29 (one clock): the label rows — the tolerance is the Time field's half second plus the
+    // double's grain of the UT count (2.6 s at −400 Myr, 42 s at the genesis) plus the POSITION's
+    // resolution in UT days (one ulp of a 4.4e9-yr position is up to 1,500 solar days/yr × 9.5e-7 yr
+    // = 1.4e-3 d — the bridge's inverse cannot land closer; measured 3.9e-3 d inside the edge, where
+    // the raw forward image had read 0 only because it was the table's own value)
+    const L = domainRows.label;
+    const labelTol = (/** @type {number} */ jd, /** @type {number} */ pos) => 0.5 / 86400 + 4 * Math.abs(jd) * Number.EPSILON + 2 * Math.abs(pos) * Number.EPSILON * 1500;
+    for (const r of L.closure) {
+      const dJD = r.jd1 - r.jd, tol = labelTol(r.jd, r.pos);
+      const sameStrings = Math.abs(r.jd) < 1e10 ? (r.date1 === r.date && r.time1 === r.time) : true;
+      const okL = Number.isFinite(dJD) && Math.abs(dJD) <= tol && sameStrings;
+      if (!okL) fail++;
+      console.log(`${okL ? '  ok ' : 'FAIL '} label typed back (keystrokes) JD ${r.jd.toFixed(2).padStart(18)}  ${r.date} ${r.time} → ${r.date1} ${r.time1}  Δ ${Number(dJD).toExponential(2)} d (tol ${tol.toExponential(1)})`);
+    }
+    for (const seq of L.walk) {
+      const forms = new Set(seq.map((r) => (/ d\d+\//.test(r.date) ? 'count' : 'civil')));
+      let okW = forms.size === 2;
+      for (let k = 0; k < seq.length; k++) {
+        const r = seq[k], tol = labelTol(r.jd, r.pos);
+        if (!(Number.isFinite(r.jdParsed) && Math.abs(r.jdParsed - r.jd) <= tol)) okW = false;
+        if (k > 0 && Math.abs((r.jdParsed - seq[k - 1].jdParsed) - 1) > 2 * tol) okW = false;
+      }
+      if (!okW) fail++;
+      console.log(`${okW ? '  ok ' : 'FAIL '} label seam walk (${seq[0].jd < 2451545 ? 'past' : 'future'} seam, 1-day steps, both forms ${forms.size === 2 ? 'seen' : 'NOT seen'})  ${seq.map((r) => `${r.date} ${r.time.slice(0, 5)}`).join(' | ')}`);
+    }
+    for (const r of L.count) {
+      const midnight = Math.floor(r.yearStartJD + 0.5) - 0.5, tol = labelTol(r.yearStartJD, r.Y - 2000.5);
+      // a civil Y-01-01 reads as the count year's day 1 only for a year wholly beyond the seam (the
+      // straddling years and a year of margin keep their civil reading — 5001-01-01 is a civil date)
+      const civilReadsAsCount = Math.abs(r.Y - 2000.5) > 3000 + 1;
+      const okC = [r.day1, r.bare, ...(civilReadsAsCount ? [r.civil] : [])].every((v) => Number.isFinite(v) && Math.abs(v - midnight) <= tol) && r.label.startsWith(`${r.Y} d1/`);
+      if (!okC) fail++;
+      console.log(`${okC ? '  ok ' : 'FAIL '} count form day 1 of ${r.Y}: the midnight of the year's first day  Δ ${Number(r.day1 - midnight).toExponential(2)} / ${Number(r.bare - midnight).toExponential(2)} / ${Number(r.civil - midnight).toExponential(2)} d  label ${r.label}`);
+    }
+    for (const st of L.steps) {
+      const p = st.positions;
+      let okS = p.length === 21 && Math.abs(p[20] - p[0]) <= 0.05;   // back where it started (the civil/count year units part by days)
+      for (let k = 1; k < p.length; k++) if (!(Number.isFinite(p[k]) && Math.abs(Math.abs(p[k] - p[k - 1]) - 1) <= 0.05)) okS = false;
+      if (!okS) fail++;
+      console.log(`${okS ? '  ok ' : 'FAIL '} Step buttons across the ${st.start < 0 ? 'past' : 'future'} seam (1-yr steps, 10 out, 10 back)  pos ${p[0].toFixed(3)} → ${p[10].toFixed(3)} (${st.labels[1]}) → ${p[20].toFixed(3)}  max |Δstep − 1| ${Math.max(...p.slice(1).map((v, i) => Math.abs(Math.abs(v - p[i]) - 1))).toExponential(1)} yr`);
+    }
+    {
+      const regGyr = Number(reg.genesisEdgeAgeTTGyr);
+      const mMyr = /([\d,.]+) Myr before J2000/.exec(L.edgeAge);
+      const shownGyr = mMyr ? Number(mMyr[1].replace(/,/g, '')) / 1000 : NaN;
+      const okA = Number.isFinite(shownGyr) && Math.abs(shownGyr - regGyr) <= 5e-4;   // the row's 3 decimals of Myr against the registry's 3 of Gyr
+      if (!okA) fail++;
+      console.log(`${okA ? '  ok ' : 'FAIL '} 'Engine age (TT)' at the past edge: "${L.edgeAge}" vs the registry's ${regGyr} Gyr`);
     }
   }
 }

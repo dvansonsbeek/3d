@@ -79,13 +79,14 @@ Two controls in **Simulation Controls** set how fast time passes: the **Time ste
 ### Date/Time Input
 
 You can jump to any date using:
-- **Calendar date**: Enter a specific date in Y-M-D format (e.g., "2000-01-01")
-- **Time**: Enter time in 24-hour UTC format (e.g., "12:00:00")
-- **Julian Day**: Enter the astronomical Julian day number directly
+- **Calendar date**: Enter a specific date in Y-M-D format (e.g., "2000-01-01"). Beyond ±3,000 years of today the field shows and takes the **count form** `Y dD/N` — the year of date (the Earth's orbit, counted on from today's calendar year), the solar day of date within it and the days that year holds, e.g. `-399998000 d217/403`; `Y` alone is day 1, and a Y-M-D typed that far out is read as that day-of-year of the year Y. The civil calendar is not used there because a year of date holds 403 solar days at 400 million years ago and 1,430 at the Earth–Moon genesis.
+- **Time**: Enter Universal Time in 24-hour format (e.g., "12:00:00") — at every epoch the fraction of the solar day of date, so 12:00 is Greenwich mean noon
+- **Julian Day**: Enter the astronomical Julian day number directly — the count of solar days, one per solar day of date
 
 The display shows:
-- Current UTC date and time
-- Julian Day number (continuous day count since 4713 BC)
+- Current UT date and time, in the civil or the count form (one clock everywhere: the Earth's own rotation count)
+- Julian Day number (continuous solar-day count since 4713 BC)
+- The instant in uniform time (the "Engine age (TT)" row under About — the axis radiometric ages are on; the Date field's orbit count parts from it by 0.06 % at the genesis)
 - Simulation speed
 
 **Date range**: the model is valid across ±500 Myr of J2000, and the scene can be set to any date in that span. A jump of hundreds of millions of years integrates Earth's spin axis from J2000 first, which takes the browser a minute or more before the scene shows the new date (the Earth–Moon Genesis Analysis panel under Tools plots the deep-time evolution over the Moon's whole cited history instead, without moving the scene).

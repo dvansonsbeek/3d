@@ -330,6 +330,26 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   honest. A fallback that keeps a surface plausible hides a refusal better
   than a dash; gate the RATE of a rendered body against its period of date at
   the domain's edges. (§1.39)
+- **A label is written on ONE clock, and its year unit is a unit OF DATE** —
+  the Date/Time fields handed over from the UT day to the TT instant's civil
+  date at ±3,000 yr, silently, mid-year, by two predicates: a one-year typed
+  step at −1000 turned the globe 106° (ΔT 7.08 h × 15°/h), 140° at +5000. A
+  UT label had failed at depth before only because the civil calendar attaches
+  365.25 of TODAY's days to a year — a civil year on the deep day count is a
+  day count in disguise (6.76 "Gyr" at the 4.43-Ga edge, 53 % over the age) —
+  so the deep label counts the year OF DATE (the orbit: the TT age to 6e-5 at
+  400 Ma, 5.9e-4 at the edge) and the solar day of date in it, on the one UT
+  clock, a FORMAT seam at the same instant; the age in uniform time is its own
+  read-only row and the registry's triple (4.429 Gyr TT, 4.432 G orbits,
+  2.471 T solar days). A Date and a Time are read off ONE instant rounded to
+  the second, or to the double's grain where that is coarser (a 24:00:00
+  carried a day early through the field round trip; a typed d172 read back as
+  d171 at −2.46 Gyr); a test hook and a preset jump take the handler's guard
+  (every hook-typed measurement carried a second ΔT; the genesis button
+  re-landed 126 s off its own label); a whole-year step moves the position
+  where the label has no civil date to move (the Step buttons stuck at −1000)
+  and rewrites its strings itself (two clicks in one frame stepped the same
+  Date twice). (§1.40)
 
 ---
 
