@@ -2919,6 +2919,16 @@ export const VALUES = {
       ageFromLinearRate: { get: () => 24 / astro.knownValues.wellsTidalRateHrPerMa / 1000, render: (v) => Number(v).toFixed(2), unit: 'Gyr', note: 'derived: 24 hr ÷ the Wells rate' },
       patternEarthAgeGyr: { get: () => astro.knownValues.patternEarthAgeGyr, render: (v) => String(v), unit: 'Gyr', note: 'Patterson 1956 citation' },
       moonGenesisAgeGa: { get: () => astro.knownValues.moonGenesisAgeGa, render: (v) => String(v), unit: 'Ga', note: 'the end of the cited Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; lunar age 4.425 Ga)' },
+      // ONE age, three counts (plan 29 option H): the navigable domain's past edge — the scene's
+      // Genesis station — measured from the scene epoch through the ONE bridge: in TT Julian years
+      // (the axis the physics reads and radiometric ages are in), in orbits (the position's count of
+      // tropical years of date), and in solar days (the UT clock's turns of the Earth). The fourth key
+      // is what a 365.25-day calendar would print for that day count — a day count in disguise, 53 %
+      // over the TT age, written here once so no surface derives it as an age.
+      genesisEdgeAgeTTGyr: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.yearToJDTT(m.time.navigableYearRange().yearMin)) / 365.25 / 1e9; }, render: (v) => Number(v).toFixed(3), unit: 'Gyr (TT, Julian years)', note: 'the past edge of the navigable domain before the scene epoch, in uniform time' },
+      genesisEdgeOrbitsG: { get: () => (C.startmodelYear - physModel().time.navigableYearRange().yearMin) / 1e9, render: (v) => Number(v).toFixed(3), unit: 'billion orbits (tropical years of date)', note: 'the position count: one per circuit of the Sun — 0.06 % more than the Julian years, the last years before the genesis being 328 SI days long' },
+      genesisEdgeSolarDaysT: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.yearToJDUT(m.time.navigableYearRange().yearMin)) / 1e12; }, render: (v) => Number(v).toFixed(3), unit: 'trillion solar days', note: 'the UT clock: turns of the Earth since the edge (the day was 5.5 h there)' },
+      genesisEdgeUtCalendarYearsG: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.yearToJDUT(m.time.navigableYearRange().yearMin)) / 365.25 / 1e9; }, render: (v) => Number(v).toFixed(2), unit: 'billion "years" of 365.25 days', note: 'the day count divided by today\'s days per year — NOT an age: a civil calendar on the UT count prints this, 53 % over the TT age' },
       solarMassLossFracPerYr: { get: () => P().solarMassLossFracPerYear, render: (v) => fmtSci(v, 1), unit: '/yr' },
       solarSystemShrinkDevonianPpm: { get: () => P().solarMassLossFracPerYear * 380e6 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
       solarSystemShrinkHadeanPpm: { get: () => P().solarMassLossFracPerYear * astro.knownValues.patternEarthAgeGyr * 1e9 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },

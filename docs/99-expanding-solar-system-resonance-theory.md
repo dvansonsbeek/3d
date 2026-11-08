@@ -1221,7 +1221,7 @@ Two layers: a CITED distance history and exact conservation on it (plan 12 optio
 **Properties:**
 - Modern LOD = 86,400 s exactly (anchor preserved)
 - Modern lunar recession = 3.82 cm/yr at J2000 (LLR anchor, Dickey 1994 / Chapront 2002)
-- Past 4.43 Gyr IS Farhat 2022's distance history; the day length is conservation on it (0.01 h from his own at 100 Ma, 0.24 h at 4.4 Ga); the rock record tests the result, the documented deviations are bands with their cause written
+- Past 4.43 Gyr IS Farhat 2022's distance history; the day length is conservation on it (0.01 h from his own at 100 Ma, 0.24 h at 4.4 Ga); the rock record tests the result, the documented deviations are bands with their cause written. The age is ONE number in uniform time (TT, <!--v:genesisEdgeAgeTTGyr-->4.429<!--/v--> Gyr to the navigable edge) with two physical counts beside it — <!--v:genesisEdgeOrbitsG-->4.432<!--/v--> billion orbits and <!--v:genesisEdgeSolarDaysT-->2.471<!--/v--> trillion turns of the Earth; a 365.25-day calendar on that day count would print <!--v:genesisEdgeUtCalendarYearsG-->6.76<!--/v--> billion "years", a day count, not an age (plan 29 H)
 - The history ends at the input's lunar age (4.429 Ga, the Moon at 6.2 R_E); beyond it the chain refuses
 - Future LOD approaches the tidal-lock asymptote (LOD → ∞ at a → <!--v:tidalLockKm-->555,623<!--/v--> km) on the LLR rate held constant, a labelled extrapolation
 - One smooth C1 history (the input's 1-Myr samples on a monotone cubic Hermite), no piecewise regime

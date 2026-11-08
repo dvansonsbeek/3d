@@ -77,7 +77,15 @@ never to the fossil data it is tested against.
   on it (the tropical year of <!--v:tropicalYearAtHadeanSiDays-->327.8<!--/v-->
   SI days, the obliquity band, the first eclipse) are the law's values at
   the edge of its domain — reproducible, not converged (doc 99
-  §Interpretation 2; plan 30 K).
+  §Interpretation 2; plan 30 K). One age, three counts (plan 29 H): the
+  edge lies <!--v:genesisEdgeAgeTTGyr-->4.429<!--/v--> Gyr back in uniform
+  time (TT, the clock radiometric ages are in), which is
+  <!--v:genesisEdgeOrbitsG-->4.432<!--/v--> billion orbits (tropical years of
+  date — 0.06 % more, the last years before the genesis being 328 SI days)
+  and <!--v:genesisEdgeSolarDaysT-->2.471<!--/v--> trillion solar days; a
+  365.25-day calendar laid on that day count prints
+  <!--v:genesisEdgeUtCalendarYearsG-->6.76<!--/v--> billion "years", a day
+  count in disguise, never an age.
 
 ## B. Cyclostratigraphy and climate spectra — artifact-backed
 
