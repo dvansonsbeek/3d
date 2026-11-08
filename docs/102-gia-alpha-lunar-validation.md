@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.10
+modelVersion: v27.11
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -550,7 +550,7 @@ month evolution is chain-integrated on the model's own recession history. The `t
 section of the same gate measures the difference directly, on the TT axis
 (model opposition vs the NASA canon's greatest-eclipse instant, era
 bins ±40 yr, modern definitional baseline subtracted): a smooth secular
-drift reaching <!--v:lunarDrift800Minutes-->−2.7<!--/v--> min at the −750 era
+drift reaching <!--v:lunarDrift800Minutes-->−2.8<!--/v--> min at the −750 era
 and vanishing toward the present — an effective
 Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.22<!--/v--> ″/cy² between the two
 theories. A re-reduction of the tablets with the model's own Moon
@@ -559,7 +559,7 @@ the one-sided residual column above into sign-mixed, noise-class scatter:
 
 | Century | residual today | **pre-registered** residual after model re-reduction |
 |---|---:|---:|
-| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+1.5<!--/v--> min |
+| -800…-701 | <!--v:lunarCentury800ResidualHours-->−0.02<!--/v--> hr | <!--v:lunarPredictedReduced800Minutes-->+1.6<!--/v--> min |
 | -700…-601 | <!--v:lunarCentury700ResidualHours-->−0.09<!--/v--> hr | <!--v:lunarPredictedReduced700Minutes-->−3.4<!--/v--> min |
 | -600…-501 | <!--v:lunarCentury600ResidualHours-->−0.10<!--/v--> hr | <!--v:lunarPredictedReduced600Minutes-->−3.4<!--/v--> min |
 | -500…-401 | <!--v:lunarCentury500ResidualHours-->−0.19<!--/v--> hr | <!--v:lunarPredictedReduced500Minutes-->−9.3<!--/v--> min |
@@ -639,9 +639,9 @@ per-cycle ablation χ² (<!--v:lunarDenseCenturies-->13<!--/v--> centuries with 
 framework-native Sun with the derived torque term, all from the governed
 artifact's `denseTargets.ablationChi2`: full stack <!--v:lunarDenseChi2FullStack-->55.8<!--/v-->
 (the Meeus-basis class, as it must be, since the torque term restores
-Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->121.2<!--/v--> — the
+Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->121.1<!--/v--> — the
 Core-mantle swing is confirmed outright by the eclipse record (removing
-it more than doubles the misfit)**; minus bond <!--v:lunarDenseChi2MinusBond-->61.7<!--/v--> — the
+it more than doubles the misfit)**; minus bond <!--v:lunarDenseChi2MinusBond-->61.8<!--/v--> — the
 Bond cycle is supported, not confirmed (removing it raises the misfit by
 about a tenth over those centuries); no cycles <!--v:lunarDenseChi2NoCycles-->81.1<!--/v-->
 (the stack takes a third off the misfit); minus

@@ -134,6 +134,9 @@ const INPUT_FILES = [
   // recorded numbers unseen by check:artifacts (doc 111 §1.16)
   'packages/physics/src/deltat/deep-time.cjs',
   'packages/physics/src/phase/deep-calendar.cjs',
+  // the lunar arguments' cumulative month counts (plan 30 item J; doc 111 §1.39) — the Moon's
+  // longitude every umbra here is cast from
+  'packages/physics/src/chain-cycles/index.cjs',
   // the audit-26 / Babylon / centerlines umbra chain — U1: the package
   // besselian tier (single implementation; the scene twin is retired here);
   // the model assembly is the composer plus its slices (plan 15):

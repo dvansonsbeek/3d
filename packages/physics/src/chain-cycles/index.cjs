@@ -48,6 +48,7 @@
 
 // THE NAVIGABLE DOMAIN — ONE home: the coarse tiers' cap in both directions.
 const { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } = require('../time/navigable-domain.cjs');
+const { SECONDS_PER_JULIAN_YEAR } = require('../constants/units.cjs');
 
 /**
  * @typedef {(tMa: number) => (number | null)} PeriodSecondsAtAge
@@ -93,6 +94,20 @@ function createChainCycleIntegrator({
   const caches = new WeakMap();
   /** @type {WeakMap<PeriodSecondsAtAge, number>} */
   const j2000Periods = new WeakMap();       // memoized periodFn(0)
+  // THE AGE OF A TICK (plan 30 item J, doc 111 §1.39). The integration variable `y` counts TICKS of
+  // one SI year (tropicalYearJ2000Seconds, 365.2422 d) from the anchor — the right TIME variable for
+  // a count of cycles per tick. The chains' period functions take the AGE in Myr of JULIAN years
+  // (`…AtAge(tMa)`, the engine axis: 365.25 d). Read as if a tick were a Julian year, the age ran
+  // 2.14e-5 ahead of the instant's — 8.6 kyr at 400 Ma, 94.7 kyr at the genesis edge, past the
+  // cited history's last sample (15 kyr beyond the edge): the months' integrand went undefined
+  // within ~80 kyr of the edge, the cumulative counts read null there, and the lunar arguments fell
+  // back to the J2000 polynomial — a Moon at 39,700 km orbiting in 27 SI days where its month of
+  // date is 21.7 h (the owner timed one round at 121 solar days of date; measured ratio to the
+  // month of date 0.035 inside the zone, 1.005 at 100 kyr, 0.98 at 400 Ma). ONE conversion, used by
+  // the dense table, the coarse cells and the Simpson fallback alike.
+  const JULIAN_YEARS_PER_TICK = tropicalYearJ2000Seconds / SECONDS_PER_JULIAN_YEAR;
+  /** The age in Myr (Julian years before the anchor) at tick-year `y`. @param {number} y @returns {number} */
+  const ageMaAtTick = (y) => (ageAnchorYear - y) * JULIAN_YEARS_PER_TICK / 1e6;
   /** @type {Map<PeriodSecondsAtAge, Float64Array | null>} */
   const tables = new Map();
 
@@ -110,8 +125,7 @@ function createChainCycleIntegrator({
     const anchorIdx = Math.round((gridAnchorYear - gridMinYear) / gridStepYears);
     /** @param {number} y @returns {number | null} */
     const f = (y) => {
-      const tMa = (ageAnchorYear - y) / 1e6;
-      const tPeriodS = periodFnSeconds(tMa);
+      const tPeriodS = periodFnSeconds(ageMaAtTick(y));
       if (tPeriodS === null) return null;
       return tropicalYearJ2000Seconds / tPeriodS;   // cycles per tick (one SI year)
     };
@@ -200,7 +214,7 @@ function createChainCycleIntegrator({
   const namedChains = [];
   /** @param {PeriodSecondsAtAge} periodFnSeconds @param {number} y @returns {number | null} cycles per tick */
   const integrandAt = (periodFnSeconds, y) => {
-    const tPeriodS = periodFnSeconds((ageAnchorYear - y) / 1e6);
+    const tPeriodS = periodFnSeconds(ageMaAtTick(y));
     return tPeriodS === null ? null : tropicalYearJ2000Seconds / tPeriodS;
   };
   /** The within-segment prefix sums of segment k (built once; PARTIAL — shorter than
@@ -368,8 +382,7 @@ function createChainCycleIntegrator({
     let sum = 0;
     for (let i = 0; i <= n; i++) {
       const y = yearA + i * h;
-      const tMa = (ageAnchorYear - y) / 1e6;
-      const tPeriodS = periodFnSeconds(tMa);
+      const tPeriodS = periodFnSeconds(ageMaAtTick(y));
       if (tPeriodS === null) return null;
       const integrand = tropicalYearJ2000Seconds / tPeriodS;  // cycles per tick (one SI year)
       const w = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);

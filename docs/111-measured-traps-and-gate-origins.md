@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.10
+modelVersion: v27.11
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -1477,8 +1477,9 @@ year in solar days of date — the day ratio LOD/86,400 (0.906 at 400 Ma)
 labelled a period; the anomalistic "mean" column multiplied the J2000 day
 count by the day of date (84 SI days at the genesis). Every period cell now
 carries one of five unit words from ONE home (`UNIT_SI_DAYS`,
-`UNIT_SOLAR_DAYS_OF_DATE`, …), the Moon's month rows show the hours beside
-the count (3.94 solar days of date · 21.70 h at the genesis), and the gate's
+`UNIT_SOLAR_DAYS_OF_DATE`, …), the Moon's month rows carry the same month in
+hours in their hover (3.94 solar days of date = 21.70 h at the genesis; the
+cell holds the unit word alone — a cell with both did not fit), and the gate's
 day rows read the panel's sidereal and stellar day against the package's at
 the deep positions (1e-8).
 
@@ -1531,6 +1532,54 @@ where the package does — the "A displayed rate must name its window" rule
 (§1.11) applied to the whole family, not to one row. A row that reads a
 correct value through an era convention is a surface defect the model gates
 cannot see; the instrument that finds it is the panel dumped beside the package.
+
+### 1.39 The lunar arguments read the month history at the tick's year — a Moon at 39,700 km orbiting in 27 SI days
+
+Found by the owner's eye after plan 30 had made the Moon's month rows honest:
+at the genesis the sidereal-month row read 3.94 solar days of date (21.7 h,
+Kepler at 39,700 km), and one visible round of the rendered Moon took 121.15
+solar days of date (JD −2470620550205.87 → −2470620550084.72). Measured
+(`probe-moon-rate-genesis.mjs`, `probe-moon-edge-zone2.mjs`): the rendered
+Moon's series longitude and the package's `moon.lonDegAtJD` alike advanced
+2.7–3.4° per solar day of date everywhere within ~80,000 count-years of the
+past edge — the J2000 mean motion, 13.18° per SI day on the TT axis — and 360°
+per month of date everywhere else (ratio 1.005 at 100 kyr inside, 0.98 at
+400 Ma, 0.9–1.1 at the future edge, the orbit's own wobble).
+
+**The mechanism** is §1.31's axis once more, one layer down. The lunar
+arguments build the Moon's mean longitude from the cumulative count of months
+of date (`createMoonArguments`, `tropicalOrbitsBetween(argsY0, y)` with
+`y = jdToSIyear(jdTT)` — the SI-linear year: 365.2422-day ticks from the scene
+start). As the integrator's TIME variable the tick is right — the counts are
+cycles per SI year over SI years. As the AGE at which the chain-cycle
+integrator read the month history (`tMa = (ageAnchorYear − y)/1e6`, three
+sites) it treated a tick as a Julian year: 2.14e-5 of the age ahead — 8.6 kyr
+at 400 Ma, 21 kyr at +1 Gyr, 94.7 kyr at the genesis edge, where the cited
+history's last sample lies only 15 kyr beyond the edge. Within the last
+~80 kyr the integrand was undefined, the counts read null, `fwArgsDeep`
+returned null and `fwArgs` fell back to the certified polynomial skeleton at
+the J2000 rate. §1.31 had found the same offset in the lunar DISTANCE read
+("95 kyr past the engine age at the genesis") and fixed that getter; the
+arguments' integrand kept the axis, and the Genesis button lands exactly in
+the zone. The finder's "first solar eclipse after the genesis" (the registry's
+`genesisFirstSolarEclipse*`, the tour card's "about ninety of those short
+days later") was found on that Moon.
+
+**The fix**: ONE conversion in the integrator (`ageMaAtTick`: the tick count
+× the SI year over the Julian year, used by the dense table, the coarse cells
+and the Simpson fallback alike); the lunar cumulative bank regenerated on it,
+the genesis eclipse re-found, the campaigns run plain (none hashes the
+integrator — §1.16) and re-baselined where they refused. **The gate**: the
+epoch-consistency row "Moon's mean motion / 360° per sidereal month of date"
+reads the rendered Moon's series longitude one solar day of date on, against
+the package's month of date, at −1 Myr, −400 Myr, −2 Gyr and inside the
+genesis edge (15 %: the orbit's wobble is ≤ 10 %, the fallback 0.035).
+
+**The lesson**, §1.31's sharpened: a cumulative integral has TWO axes — the
+time it counts over and the age it reads its integrand at — and a tick that is
+not a Julian year names both. A fallback that keeps a surface plausible (a
+Moon still moving, still eclipsing) hides the refusal better than a dash
+would; the month row beside it, made honest by plan 30, is what exposed it.
 
 ---
 

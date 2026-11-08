@@ -317,6 +317,16 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   the Node model at the same engine year — which is the TT Julian year of the
   instant, never the position-count year the UT bridge returns (25 kyr apart
   at 400 Ma, 2.6 Myr at the genesis). (§1.38)
+- **A cumulative integral has TWO axes — the time it counts over and the age
+  it reads its integrand at** — the lunar arguments counted months in SI-year
+  ticks (right) and read the month history at the tick count as if it were
+  Julian years (94.7 kyr too old at the genesis, past the cited history): the
+  counts went null within 80 kyr of the edge and the arguments fell back to
+  the J2000 polynomial — a Moon at 39,700 km orbiting in 27 SI days, found by
+  the owner timing one round against the month row plan 30 had just made
+  honest. A fallback that keeps a surface plausible hides a refusal better
+  than a dash; gate the RATE of a rendered body against its period of date at
+  the domain's edges. (§1.39)
 
 ---
 

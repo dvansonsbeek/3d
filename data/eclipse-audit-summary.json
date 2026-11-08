@@ -424,6 +424,7 @@
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
       "data/deltaT-4flag-fit.json": "sha256:0e2c7e87aeba3943374a0bf4dff12d7e027e1283a30dc73e004953d751b00bc4",
       "data/nbody-secular-series.json": "sha256:06c90ff051da522bb4a05e069e0565279b213d11f648bdc272a546a582dbc610",
+      "packages/physics/src/chain-cycles/index.cjs": "sha256:14aaac46ac7436508af5f0a8a188d5bfbdf605dcf011c37d16ebec6a3b63fd38",
       "packages/physics/src/deltat/cycles.cjs": "sha256:d1a2571146ccf675c22a8d685900b84d5bee6764b32731dc4e43b32a1a81d2f3",
       "packages/physics/src/deltat/deep-time.cjs": "sha256:646d3c7c61c5617365f42364cf7c32f23621acddacb1f0ee783e24fc82dacf9c",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:bff29c52aad9d30fbc7aec355812a3fbd40cc3eae507c487332cd16cda4ee1fa",
@@ -462,7 +463,7 @@
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
       "tools/lib/scene-graph.js": "sha256:e845777b6ebf54a7e215eac84de0186c9765a5723780864cab374aee9612896c",
-      "tools/verify/eclipse-audit.js": "sha256:c0bbd59fa87924b394144bfcef498bf5736bf25797999b27dc52796b939677b9"
+      "tools/verify/eclipse-audit.js": "sha256:cca98e2df5180af9a4a00adf5d3c28befd4a3a70536ecf9ae169c2b05059128d"
     }
   }
 }

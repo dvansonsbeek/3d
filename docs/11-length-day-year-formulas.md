@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.10
+modelVersion: v27.11
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -49,6 +49,28 @@ siderealYearJ2000 = 365.256363004 d (IAU)      p_A = 50.28796195 ″/yr (IAU 200
   │ siderealDay = T_sid/(T_sid/LOD + 1 + 1/T_p(t))                           │
   └──────────────────────────────────────────────────────────────────────┘
 ```
+
+**The tropical year of date, worked at the far end.** The relation
+1/T_trop = 1/T_sid + 1/T_p(t) is kinematic and holds at every epoch; what
+moves is T_p. Today the clock is 25,772 yr and the tropical year is 20 min
+shorter than the sidereal. At the end of the cited Earth–Moon history (the
+Hadean edge: the Moon at <!--v:moonDistanceAtHadeanRE-->6.19<!--/v--> R⊕, the day
+<!--v:lodAtHadeanHr-->5.51<!--/v--> h) the composed clock is
+<!--v:axialPrecAtHadeanYr-->8.81<!--/v--> yr, so the equinox runs round the orbit
+once every nine years and the tropical year is
+<!--v:tropicalYearAtHadeanSiDays-->327.8<!--/v--> SI days against a sidereal year
+of <!--v:siderealYearAtHadeanSiDays-->364.96<!--/v--> —
+<!--v:tropicalYearAtHadeanSolarDays-->1,429<!--/v--> solar days of date, the count
+a rhythmite would record. The ratio to today's tropical year,
+<!--v:tropicalYearAtHadeanOverJ2000-->0.8975<!--/v-->, is the factor by which any
+unit sized in the position's year count shrinks there (the simulator's time
+steps read 54 minutes for an hour until plan 30 item I; doc 41 §15.7). The
+clock at the edge is the composed law's value at the edge of its domain,
+reproducible, not converged: the law's lunar term carries the J2000 lunar
+inclination to the ecliptic, and inside the Laplace radius (~10–17 R⊕,
+Touma & Wisdom 1994) the Moon's orbit follows Earth's equator, where that
+term is overstated — the edge's T_p is the law's floor, the Earth's was
+longer (doc 99 §Interpretation 2).
 
 ### Key Principle
 

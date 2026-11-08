@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.10
+modelVersion: v27.11
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -69,7 +69,15 @@ never to the fossil data it is tested against.
   (Farhat et al. 2022's lunar-age input, 4.425 Ga) with the Moon at
   <!--v:moonDistanceAtHadeanRE-->6.19<!--/v--> R⊕; the former "Roche
   crossing at 4.498 Ga, an unfitted consistency check" was the deleted
-  spline's pinned endpoint and is withdrawn (plan 12 option A).
+  spline's pinned endpoint and is withdrawn (plan 12 option A). Inside the
+  Laplace radius (~10–17 R⊕, Touma & Wisdom 1994 — the earliest part of the
+  history) the composed law's lunar term is overstated, the Moon's orbit
+  following the equator there rather than the ecliptic the term assumes: the
+  edge's clock of <!--v:axialPrecAtHadeanYr-->8.81<!--/v--> yr and everything
+  on it (the tropical year of <!--v:tropicalYearAtHadeanSiDays-->327.8<!--/v-->
+  SI days, the obliquity band, the first eclipse) are the law's values at
+  the edge of its domain — reproducible, not converged (doc 99
+  §Interpretation 2; plan 30 K).
 
 ## B. Cyclostratigraphy and climate spectra — artifact-backed
 

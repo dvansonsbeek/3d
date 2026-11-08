@@ -76,7 +76,8 @@ const TOL_MOON_RING_REL = 0.08;
 const TOL_WINDOW_REL = 1e-9, TOL_WINDOW_BEAT_REL = 1e-6;
 const TOL_DAY_ROWS_REL = 1e-8;   // the sidereal/stellar day rows against the package (plan 30 item B; a unit slip is 2.6e-4 at 400 Ma)
 const TOL_CP_WAIT_MS = 15000;
-const TOL_CP_YEAR_REL = 5e-3;    // a cardinal year length against the tropical year of date (plan 30 item E; the wobble ≤ 9e-4 at 4.4 Ga, a skipped year is 1.0)    // the cardinal rows of a paused landing: solved after its frame (plan 30 item D; the hold left them a minute stale)
+const TOL_CP_YEAR_REL = 5e-3;
+const TOL_MOON_RATE_REL = 0.15;  // the rendered Moon's one-day rate against 360°/the sidereal month of date (plan 30 item J): the orbit's wobble is ≤ 10 %, the J2000 fallback 0.035    // a cardinal year length against the tropical year of date (plan 30 item E; the wobble ≤ 9e-4 at 4.4 Ga, a skipped year is 1.0)    // the cardinal rows of a paused landing: solved after its frame (plan 30 item D; the hold left them a minute stale)
 
 const EPOCHS_MA = [-5, -1, 1, 5];
 const TOL_DAYS = 0.002;
@@ -162,6 +163,10 @@ for (const jd of CLOCK_JDS) {
   domainRows.clock.push(await s.page.evaluate((jd) => {
     const T = window.__test__;
     const pos = T.scenePos(); const ring = T.moonRingProbe();
+    // plan 30 item J: the rendered Moon's mean motion — its series longitude one UT day (one solar
+    // day of date) on, against 360°/the sidereal month of date below (the J2000 fallback reads 0.035)
+    const lonNow = T.moonSceneState(jd).lonDeg, lonNext = T.moonSceneState(jd + 1).lonDeg;
+    const moonRateDegPerSolarDay = ((((lonNext - lonNow) % 360) + 540) % 360) - 180;
     const P = T.paneBindingsDump();
     // a monitor's view is tweakpane's buffer (the dump stringifies it as a JSON array): its last entry
     const paneOf = (/** @type {string} */ part, /** @type {string} */ label) => {
@@ -174,7 +179,7 @@ for (const jd of CLOCK_JDS) {
       // plan 30 item A: the Predictions panel's live year and precession fields at this landing
       pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession', 'siderealDayReal', 'stellarDayReal', 'lengthofAU', 'cpSSJD', 'cpSSYearLen', 'cpVEYearLen', 'cpAEYearLen', 'cpWSYearLen']),
       // plan 30 item D: the pane's VIEW of two rows that read a previous landing's value before the fix
-      paneAU: paneOf('Orbital Elements', 'Length of AU (km)'), paneSSLen: paneOf('Cardinal Points/S', 'Year Length (LOD d)') };
+      paneAU: paneOf('Orbital Elements', 'Length of AU (km)'), paneSSLen: paneOf('Cardinal Points/S', 'Year Length (LOD d)'), moonRateDegPerSolarDay };
   }, jd));
   domainRows.clock[domainRows.clock.length - 1].cpWaitMs = cpWaitMs;
 }
@@ -362,6 +367,18 @@ for (const jd of DOMAIN_EDGE_JDS) {
       const okCp = dCp.every((d) => Number.isFinite(d) && d <= TOL_CP_YEAR_REL);
       if (!okCp) fail++;
       console.log(`${okCp ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  cardinal year lengths / the tropical year of date (${tropLod.toFixed(3)} solar days)  VE ${Number(dCp[0]).toExponential(1)} · SS ${Number(dCp[1]).toExponential(1)} · AE ${Number(dCp[2]).toExponential(1)} · WS ${Number(dCp[3]).toExponential(1)}`);
+      // THE MOON'S MEAN MOTION (plan 30 item J, doc 111 §1.39): the rendered Moon's longitude advances
+      // 360° per sidereal month OF DATE — within the orbit's own wobble (the eccentricity's ±6 %, the
+      // evection) at every position, the genesis edge included. Before the fix the lunar arguments
+      // read the month history at the SI-linear year (94.7 kyr too old at the edge, past the cited
+      // history's end), the cumulative counts were null within ~80 kyr of the edge and the arguments
+      // fell back to the J2000 polynomial: 3.3° per solar day of date for 91° — the owner timed one
+      // round at 121 solar days where the month row said 3.94.
+      const monthSolarDays = m.moon.siderealMonthDaysAtYear(E);
+      const moonRatio = r.moonRateDegPerSolarDay / (360 / monthSolarDays);
+      const okMoon = Number.isFinite(moonRatio) && Math.abs(moonRatio - 1) <= TOL_MOON_RATE_REL;
+      if (!okMoon) fail++;
+      console.log(`${okMoon ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Moon's mean motion / 360° per sidereal month of date  ${r.moonRateDegPerSolarDay.toFixed(2)} °/solar day vs ${(360 / monthSolarDays).toFixed(2)}  ratio ${moonRatio.toFixed(3)} (month ${monthSolarDays.toFixed(3)} solar days)`);
     }
   }
   {

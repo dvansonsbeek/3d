@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.10
+modelVersion: v27.11
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -684,8 +684,8 @@ about its value follows five rules, each born from a measured defect (doc 111
    days. The five unit words have ONE home (`UNIT_SI_DAYS`,
    `UNIT_SOLAR_DAYS_OF_DATE`, `UNIT_TROPICAL_YEARS_OF_DATE`,
    `UNIT_DEG_PER_SI_DAY`, `UNIT_DEG_PER_SOLAR_DAY_OF_DATE`); the Moon's month
-   rows show the hours beside the count (3.94 solar days of date · 21.70 h at
-   the genesis). Where a formula takes a year or a month, it takes it in the
+   rows carry the same month in hours in their hover (3.94 solar days of date
+   = 21.70 h at the genesis — the cell is for the unit word, the owner's call). Where a formula takes a year or a month, it takes it in the
    unit the day it divides by implies — the pane's sidereal day on the year in
    solar days of date, the Moon's mean speed on the month in seconds.
 2. **One window per quantity, the package's.** The one-source measured years

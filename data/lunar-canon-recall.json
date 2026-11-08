@@ -9,21 +9,21 @@
   "canonEvents": 12064,
   "modelEvents": 12147,
   "matched": 12002,
-  "matchedTight": 9867,
+  "matchedTight": 9868,
   "typeMismatch": 62,
   "modelOnly": 83,
   "nasaOnly": 0,
   "recallPercent": 100,
-  "tightRecallPercent": 81.79,
+  "tightRecallPercent": 81.8,
   "typeAccuracyPercent": 99.49,
   "byEra": {
     "-2000..-1501": {
       "n": 1219,
-      "signedMedianMinutes": -6.4
+      "signedMedianMinutes": -6.39
     },
     "-1500..-1001": {
       "n": 1210,
-      "signedMedianMinutes": 5.98
+      "signedMedianMinutes": 6
     },
     "-1000..-501": {
       "n": 1200,
@@ -69,6 +69,7 @@
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
       "data/deltaT-4flag-fit.json": "sha256:0e2c7e87aeba3943374a0bf4dff12d7e027e1283a30dc73e004953d751b00bc4",
       "data/nbody-secular-series.json": "sha256:06c90ff051da522bb4a05e069e0565279b213d11f648bdc272a546a582dbc610",
+      "packages/physics/src/chain-cycles/index.cjs": "sha256:14aaac46ac7436508af5f0a8a188d5bfbdf605dcf011c37d16ebec6a3b63fd38",
       "packages/physics/src/deltat/cycles.cjs": "sha256:d1a2571146ccf675c22a8d685900b84d5bee6764b32731dc4e43b32a1a81d2f3",
       "packages/physics/src/deltat/deep-time.cjs": "sha256:646d3c7c61c5617365f42364cf7c32f23621acddacb1f0ee783e24fc82dacf9c",
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:bff29c52aad9d30fbc7aec355812a3fbd40cc3eae507c487332cd16cda4ee1fa",
@@ -104,7 +105,7 @@
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
       "public/input/climate-formula-coefficients.json": "sha256:bd72d29fe65cb38b5064be7409430407547433089b0689c048d231fb620e6892",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
-      "tools/verify/lunar-canon-recall.js": "sha256:ef1f82f5300b02227c1b351e7574faaed3af52d1d464a4fbefa2070f8aaa074c"
+      "tools/verify/lunar-canon-recall.js": "sha256:ad0d121ed47b976ae8da5519e62dc7b0fa00bd792193c5d38c87b02e826683ef"
     }
   }
 }

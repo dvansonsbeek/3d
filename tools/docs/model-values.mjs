@@ -2882,6 +2882,19 @@ export const VALUES = {
     const out = {
       daysPerYearAtDevonian: { get: () => dtl().meanYearInDaysAtAge(380), render: (v) => Number(v).toFixed(2), unit: 'd/yr', note: 'matches Wells 1963 ~400 to 0.01%' },
       moonDistanceAtHadeanRE: { get: () => rawMoonKm(genesisMa()) / astro.physicalConstants.earthParallaxRadiusKm, render: (v) => Number(v).toFixed(2), unit: 'R_E' },
+      // plan 30 (the owner's "an hour steps 54 minutes" question): the tropical year OF DATE at the
+      // end of the cited history is the sidereal year beaten with the composed clock,
+      // 1/T_trop = 1/T_sid + 1/T_p(t) — a kinematic relation that holds at every epoch; at the edge
+      // T_p is years, so the tropical year is ~10 % shorter than the sidereal one (1,430 solar days
+      // of 5.5 h). The clock there is the composed law's value at the edge of its domain
+      // (reproducible, not converged): its lunar term carries the J2000 lunar inclination to the
+      // ecliptic, and inside the Laplace radius (~10–17 R⊕, Touma & Wisdom 1994) the Moon's orbit
+      // follows the equator, where that term is overstated — the law's T_p at the edge is a floor.
+      axialPrecAtHadeanYr: { get: () => dtl().meanLunisolarPrecessionPeriodYearsAtAge(genesisMa()), render: (v) => Number(v).toFixed(2), unit: 'yr', note: 'the composed lunisolar precession period at the end of the cited history, to two decimals (axialPrecAtHadean is the rounded form)' },
+      siderealYearAtHadeanSiDays: { get: () => dtl().meanSiderealYearSecondsAtAge(genesisMa()) / 86400, render: (v) => Number(v).toFixed(2), unit: 'SI d', note: 'the sidereal year of date at the end of the cited history (the solar-mass law)' },
+      tropicalYearAtHadeanSiDays: { get: () => dtl().meanTropicalYearSecondsAtAge(genesisMa()) / 86400, render: (v) => Number(v).toFixed(1), unit: 'SI d', note: 'the tropical year of date at the end of the cited history: 1/T_trop = 1/T_sid + 1/T_p(t) with the composed clock of years — ~10 % shorter than the sidereal year' },
+      tropicalYearAtHadeanSolarDays: { get: () => dtl().meanYearInDaysAtAge(genesisMa()), render: (v) => thousands(Math.round(v)), unit: 'solar days of date', note: 'the same tropical year in solar days of date (the day 5.5 h): the count a rhythmite would record at the edge' },
+      tropicalYearAtHadeanOverJ2000: { get: () => dtl().meanTropicalYearSecondsAtAge(genesisMa()) / dtl().meanTropicalYearSecondsAtAge(0.000001), render: (v) => Number(v).toFixed(4), unit: '', note: 'the ratio of the tropical year at the edge to today\'s — the factor by which a time step sized in the position\'s year count shrinks there (an hour read 54 minutes, plan 30 item I)' },
       // plan 27 step C — the first solar eclipse of the cited history: the model's finder from the
       // navigable domain's past edge (time/navigable-domain through the one bridge — the scene's
       // edge instant), on the Node model seated on both banks. Reproducible, not converged: the

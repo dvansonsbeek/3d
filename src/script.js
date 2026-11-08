@@ -2921,7 +2921,7 @@ const TOUR_HOLD_MS = 12000;
 // rock anchor where one exists. Ages ahead of today are negative.
 /** @type {{ ageMa: number, title: string, scene: string, says: string, anchor?: string, anchorAction?: 'genesis' }[]} */
 const TOUR_STATIONS = [
-  { ageMa: 4428.985, title: 'The Earth–Moon genesis', scene: 'A magma ocean under a forming steam atmosphere; the Moon at six Earth radii, five degrees across.', says: 'The oldest point the Moon\'s measured distance history reaches (Farhat et al. 2022); the simulator goes no further back.', anchor: 'The first solar eclipse the Moon ever cast follows about ninety of those short days later — three weeks of ours.', anchorAction: 'genesis' },
+  { ageMa: 4428.985, title: 'The Earth–Moon genesis', scene: 'A magma ocean under a forming steam atmosphere; the Moon at six Earth radii, five degrees across.', says: 'The oldest point the Moon\'s measured distance history reaches (Farhat et al. 2022); the simulator goes no further back.', anchor: 'The first solar eclipse the Moon ever cast follows two and a half of those short days later — about thirteen hours of ours.', anchorAction: 'genesis' },
   { ageMa: 4415, title: 'The first oceans', scene: 'The steam rains out onto the new crust under a thinning cloud of steam.', says: 'An illustration following Zahnle 2007 and Sleep 2001; the Jack Hills zircons, the oldest crystals on Earth, record liquid water by 4,400 million years ago (Wilde 2001).' },
   { ageMa: 4200, title: 'The Hadean ocean world', scene: 'A global ocean with volcanic islands under an oxygen-free sky.', says: 'The short day and the close Moon go together: as the Moon moves away, the Earth\'s spin slows to pay for it — computed on the Moon\'s measured distance history.' },
   { ageMa: 3800, title: 'The Moon gets its dark seas', scene: 'Lava floods the Moon\'s great impact basins: the dark maria that make its face appear; on Earth the first continental cores grow.', says: 'The dark basalts date 3,900–3,100 million years ago (Hiesinger 2011); the Moon\'s look is derived from today\'s map, an illustration.' },
@@ -4724,14 +4724,15 @@ const fmtScientific = (n, dec = 12) => {
 // DATE (the Moon's months and cycles, the Kepler-verification periods, the LOD-day year
 // columns) is in solar days of date; a period in days of 86,400 s (the planets' Julian-year
 // periods, the Earth's SI-day years and perihelion timing) is in SI days. The Moon's month
-// rows show the hours beside the count: at the genesis 3.94 solar days of 5.51 h is 21.7 h.
+// rows carry the same month in hours in their HOVER (the owner: the cell is for the unit word):
+// at the genesis 3.94 solar days of 5.51 h is 21.7 h.
 const UNIT_SI_DAYS = 'SI days';
 const UNIT_SOLAR_DAYS_OF_DATE = 'solar days of date';
 const UNIT_TROPICAL_YEARS_OF_DATE = 'tropical years of date';
 const UNIT_DEG_PER_SI_DAY = '°/SI day';
 const UNIT_DEG_PER_SOLAR_DAY_OF_DATE = '°/solar day of date';
-/** The unit cell of a Moon month row: the solar days of date plus the same month in hours. @param {() => number} monthDaysOfDate */
-const monthUnitCell = (monthDaysOfDate) => () => `${UNIT_SOLAR_DAYS_OF_DATE} · ${fmtNum(monthDaysOfDate() * meanlengthofday / 3600, 2, ',')} h`;
+/** A Moon month of date in hours, for the month rows' hovers. @param {number} monthDaysOfDate */
+const monthHoursText = (monthDaysOfDate) => `${fmtNum(monthDaysOfDate * meanlengthofday / 3600, 2, ',')} h`;
 
 const renderVal = val => {
 
@@ -28455,21 +28456,21 @@ const planetStats = {
 
     {header : '—  Orbital Period & Motion —' },
       {label : () => `Sidereal month`,
-       value : [ { v: () => moonSiderealMonth, dec:10, sep:',' },{ small: monthUnitCell(() => moonSiderealMonth) }],
-       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. The month OF DATE in solar days of date: ${fmtNum(moonSiderealMonth,10,',')} (the hours stand beside the value); today's value, 27.3216615 d, is the IAU input of the month chain`],
+       value : [ { v: () => moonSiderealMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
+       hover : [`Time for the Moon to complete one full orbit relative to the distant stars — the Moon's true orbital period. This is the fundamental reference from which all other lunar months are derived. The month OF DATE: ${fmtNum(moonSiderealMonth,10,',')} solar days of date = ${monthHoursText(moonSiderealMonth)}; today's value, 27.3216615 d (655.7 h), is the IAU input of the month chain`],
        info  : 'https://en.wikipedia.org/wiki/Orbit_of_the_Moon'},
       {label : () => `Synodic month`,
-       value : [ { v: () => moonSynodicMonth, dec:10, sep:',' },{ small: monthUnitCell(() => moonSynodicMonth) }],
-       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month and the sidereal year: 1/synodic = 1/sidereal month − 1/sidereal year (the Sun's own orbit subtracts one alignment per year) = ${fmtNum(moonSynodicMonth,10,',')} solar days of date. OF DATE — derived from the month chain and the year laws at the scene's epoch; today's value is 29.5305889 d`]},
+       value : [ { v: () => moonSynodicMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
+       hover : [`The Moon's phase cycle — new moon to new moon. Longer than the sidereal month because while the Moon orbits Earth, Earth also moves along its orbit around the Sun, so the Moon needs ~2.2 extra days each orbit to catch up to the same Sun-Moon alignment. Derived from the sidereal month and the sidereal year: 1/synodic = 1/sidereal month − 1/sidereal year (the Sun's own orbit subtracts one alignment per year) = ${fmtNum(moonSynodicMonth,10,',')} solar days of date = ${monthHoursText(moonSynodicMonth)}. OF DATE — derived from the month chain and the year laws at the scene's epoch; today's value is 29.5305889 d (708.7 h)`]},
       {label : () => `Anomalistic month`,
-       value : [ { v: () => moonAnomalisticMonth, dec:10, sep:',' },{ small: monthUnitCell(() => moonAnomalisticMonth) }],
-       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. Kinematic identity 1/T_anom = 1/T_sid − 1/T_apsidal,star (the perigee's star-referenced period ${fmtNum(moonApsidalPrecessionindaysEarth,4,',')} d): T_anom = ${fmtNum(moonAnomalisticMonth,10,',')} solar days of date (OF DATE; today 27.5545500 d)`]},
+       value : [ { v: () => moonAnomalisticMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
+       hover : [`Time between successive perigee passages — the closest point in the Moon's elliptical orbit around Earth. Slightly longer than the sidereal month because the perigee point itself slowly advances (apsidal precession, ~8.85 yr cycle), so the Moon needs a little extra time to reach the shifting perigee. Kinematic identity 1/T_anom = 1/T_sid − 1/T_apsidal,star (the perigee's star-referenced period ${fmtNum(moonApsidalPrecessionindaysEarth,4,',')} d): T_anom = ${fmtNum(moonAnomalisticMonth,10,',')} solar days of date = ${monthHoursText(moonAnomalisticMonth)} (OF DATE; today 27.5545500 d, 661.3 h)`]},
       {label : () => `Draconic month (a.k.a. nodal period)`,
-       value : [ { v: () => moonNodalMonth, dec:10, sep:',' },{ small: monthUnitCell(() => moonNodalMonth) }],
-       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. Kinematic identity 1/T_drac = 1/T_sid + 1/T_nodal,star (the node's star-referenced period ${fmtNum(moonNodalPrecessionindaysEarth,4,',')} d): T_drac = ${fmtNum(moonNodalMonth,10,',')} solar days of date (OF DATE; today 27.2122208 d)`]},
+       value : [ { v: () => moonNodalMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
+       hover : [`Time between successive crossings of the ascending node — where the Moon's orbit crosses the ecliptic plane going northward. Shorter than the sidereal month because the nodes slowly regress westward (nodal precession, ~18.6 yr cycle), so the Moon meets the retreating node a little sooner. Critical for predicting eclipses, which can only occur near the nodes. Kinematic identity 1/T_drac = 1/T_sid + 1/T_nodal,star (the node's star-referenced period ${fmtNum(moonNodalPrecessionindaysEarth,4,',')} d): T_drac = ${fmtNum(moonNodalMonth,10,',')} solar days of date = ${monthHoursText(moonNodalMonth)} (OF DATE; today 27.2122208 d, 653.1 h)`]},
       {label : () => `Tropical month`,
-       value : [ { v: () => moonTropicalMonth, dec:10, sep:',' },{ small: monthUnitCell(() => moonTropicalMonth) }],
-       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: the equinox turns account for general precession (one per axial precession period — the chain's calendar convention): the westward drift of the equinox adds one extra return to the same ecliptic longitude per precession period. 1/tropical = 1/sidereal month + 1/T_p (one equinox turn per precession period) = ${fmtNum(moonTropicalMonth,10,',')} solar days of date. OF DATE — the sidereal month of date and the precession period of date (the published lunisolar T_p: 8.9 yr at the genesis, where the tropical month parts from the sidereal by 0.03 % against 0.004 % today)`],
+       value : [ { v: () => moonTropicalMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
+       hover : [`Time for the Moon to return to the same ecliptic longitude, measured relative to the vernal equinox. Slightly shorter than the sidereal month because the vernal equinox slowly drifts westward due to axial precession, so the Moon reaches the same longitude a little sooner. Derived from the sidereal month: the equinox turns account for general precession (one per axial precession period — the chain's calendar convention): the westward drift of the equinox adds one extra return to the same ecliptic longitude per precession period. 1/tropical = 1/sidereal month + 1/T_p (one equinox turn per precession period) = ${fmtNum(moonTropicalMonth,10,',')} solar days of date = ${monthHoursText(moonTropicalMonth)}. OF DATE — the sidereal month of date and the precession period of date (the published lunisolar T_p: 8.9 yr at the genesis, where the tropical month parts from the sidereal by 0.03 % against 0.004 % today)`],
        info  : 'https://eclipse.gsfc.nasa.gov/LEcat5/LEcatalog.html'},
 
     {header : '—  Orbital Shape & Geometry —' },
