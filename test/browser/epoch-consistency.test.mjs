@@ -77,6 +77,7 @@ const TOL_WINDOW_REL = 1e-9, TOL_WINDOW_BEAT_REL = 1e-6;
 const TOL_DAY_ROWS_REL = 1e-8;   // the sidereal/stellar day rows against the package (plan 30 item B; a unit slip is 2.6e-4 at 400 Ma)
 const TOL_CP_WAIT_MS = 15000;
 const TOL_CP_YEAR_REL = 5e-3;
+const TOL_STEP_DAY_REL = 2e-3;   // a "1 day" step in TT days (plan 30 item I): the captured count-year fraction read 0.8975 at the genesis; a JD at 2.5e12 has 5e-4 d of granularity
 const TOL_MOON_RATE_REL = 0.15;  // the rendered Moon's one-day rate against 360°/the sidereal month of date (plan 30 item J): the orbit's wobble is ≤ 10 %, the J2000 fallback 0.035    // a cardinal year length against the tropical year of date (plan 30 item E; the wobble ≤ 9e-4 at 4.4 Ga, a skipped year is 1.0)    // the cardinal rows of a paused landing: solved after its frame (plan 30 item D; the hold left them a minute stale)
 
 const EPOCHS_MA = [-5, -1, 1, 5];
@@ -175,7 +176,11 @@ for (const jd of CLOCK_JDS) {
       const v = typeof b.value === 'string' && b.value.startsWith('[') ? JSON.parse(b.value) : b.value;
       return Number(Array.isArray(v) ? v[v.length - 1] : v);
     };
-    return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm,
+    // plan 30 item I: a "1 day" step is one SI day of TT at every epoch (the captured fraction of
+    // the count year read 0.8975 d at the genesis — "1 hour" stepped 53.9 min); step, read, step back
+    T.setStepYears(1 / 365); const posA = T.scenePos(); T.stepBy(1); const posB = T.scenePos(); T.stepBy(-1); T.setStepYears(7 / 365);
+    const stepDayTTDays = T.jdTTFromPos(posB) - T.jdTTFromPos(posA);
+    return { jd, pos, year: T.sceneYearOfDate(jd), jdTT: T.jdTTFromPos(pos), ringScene: ring ? ring.ringRadiusScene : NaN, moonDistKm: T.moonSceneState(jd).distKm, stepDayTTDays,
       // plan 30 item A: the Predictions panel's live year and precession fields at this landing
       pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession', 'siderealDayReal', 'stellarDayReal', 'lengthofAU', 'cpSSJD', 'cpSSYearLen', 'cpVEYearLen', 'cpAEYearLen', 'cpWSYearLen']),
       // plan 30 item D: the pane's VIEW of two rows that read a previous landing's value before the fix
@@ -379,6 +384,14 @@ for (const jd of DOMAIN_EDGE_JDS) {
       const okMoon = Number.isFinite(moonRatio) && Math.abs(moonRatio - 1) <= TOL_MOON_RATE_REL;
       if (!okMoon) fail++;
       console.log(`${okMoon ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Moon's mean motion / 360° per sidereal month of date  ${r.moonRateDegPerSolarDay.toFixed(2)} °/solar day vs ${(360 / monthSolarDays).toFixed(2)}  ratio ${moonRatio.toFixed(3)} (month ${monthSolarDays.toFixed(3)} solar days)`);
+      // THE TIME STEPS OF DATE (plan 30 item I): the dropdown's "1 day" is one SI day of TT at every
+      // position — the options are captured at load in J2000 position units and converted to the
+      // epoch's units at use (stepPosOfDate); a step applied as the captured fraction of the count
+      // year read 0.8975 d at the genesis, where the owner timed "1 hour" at 53.9 min.
+      const dStep = Math.abs(r.stepDayTTDays - 1);
+      const okStep = Number.isFinite(dStep) && dStep <= TOL_STEP_DAY_REL;
+      if (!okStep) fail++;
+      console.log(`${okStep ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  "1 day" step in TT days  ${r.stepDayTTDays.toFixed(5)}  Δ ${Number(dStep).toExponential(1)}`);
     }
   }
   {

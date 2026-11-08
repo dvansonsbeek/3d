@@ -1526,6 +1526,20 @@ beside an of-date statement stay as they are. The literal is a code-surface
 vocabulary-ratchet term since (one hit left, a constant's; the count may only
 fall), so the phrase cannot return unseen.
 
+**A step sized in the position's year count** (plan 30 item I; the owner:
+"1 hour" moved 54 minutes at the genesis). The time-step dropdown captured its
+options at load as fractions of the position's tropical-year count — 1/8,760
+of a count year per "hour" — and the position counts tropical years OF DATE,
+327.8 SI days at the genesis: the hour was 60 × 327.8/365.2422 = 53.9 min
+there, the "day" 0.90 SI days, every sub-year step short by the ratio of the
+tropical year of date to today's (doc 11's 1/T_trop = 1/T_sid + 1/T_p(t):
+0.8975 at the edge). A step is now converted to the epoch's position units at
+use (`stepPosOfDate`: the captured step × sDay(t)/sDay(J2000)), so every
+option is the SI duration its label names at every epoch and the whole-year
+steps move the civil date as before; the gate's row steps one "day" at the
+four positions and reads one SI day of TT (2e-3; the count-year form read
+0.8975 at the edge).
+
 **The lesson**: a surface that quotes a measured quantity carries the window
 it was measured in, and switches to the law at the window's edge exactly
 where the package does — the "A displayed rate must name its window" rule

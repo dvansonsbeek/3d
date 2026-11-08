@@ -715,10 +715,15 @@ about its value follows five rules, each born from a measured defect (doc 111
    epoch-consistency gate reads the pane's view against the live field with
    the folders open.
 
-The **time steps** are days of POSITION fixed at load: one "day" is 1/365.2422
-of the position's tropical-year count — 86,400 s today, 0.90 SI days (3.9
-solar days of date) at the genesis; the "30 days" step (once "1 month") is
-thirty of them. Steps of date are the open decision of plan 30. The whole
+The **time steps** are SI durations at every epoch: the dropdown captures its
+options at load in J2000 position units and `stepPosOfDate` converts a chosen
+step to the epoch's position units at use (Play's advance and the Step
+buttons), so one "day" is 86,400 s at the genesis as today — 4.4 solar days of
+date there, where the day is 5.5 h — and the "30 days" step (once "1 month")
+is thirty of them; the whole-year steps move the civil date. Before, a step
+was the captured fraction of the position's tropical-year COUNT, and the count
+year is the tropical year of date: "1 hour" advanced 53.9 min at the genesis.
+The whole
 surface — 776 Planet Info rows and 22 Predictions fields at seven epochs to the
 genesis edge, value, unit and class — is the `surface-rows` golden of the
 browser tier (doc 111 §2).

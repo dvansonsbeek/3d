@@ -763,6 +763,14 @@ let   sMinute = sHour/60;                         // Phase 6.7: mutable
 let   sSecond = sMinute/60;                       // Phase 6.7: mutable
 
 const SYEAR_J2000   = sYear;
+const SDAY_J2000    = sDay;
+/** A time step, captured by the dropdown at load in J2000 position units, in the position units
+ *  OF THE CURRENT EPOCH (plan 30 item I): the position counts tropical years of date, so one SI
+ *  day is sDay(t) = 1/(SI days per tropical year of date) of position — 1/365.2422 today,
+ *  1/327.8 at the genesis — and a step of N J2000 days is N SI days at every epoch. Before, the
+ *  captured fraction of the count year was applied as it was: "1 hour" advanced 53.9 min at the
+ *  genesis (the owner, 2026-11-08). The whole-year steps move the civil date instead ('Step by'). */
+function stepPosOfDate(stepJ2000Pos) { return stepJ2000Pos * (sDay / SDAY_J2000); }
 
 const lightYear = speedOfLight*meanlengthofday*meansolaryearlengthinDays;
 const sunOrbitPeriod = (lightYear*milkywayDistance*Math.PI*2)/(sunSpeed/60/60*meanlengthofday*meansolaryearlengthinDays);
@@ -3193,11 +3201,11 @@ function posFromDateTime(dateStr, timeStr) {
 // 79640-s days. The product (absolute seconds) is preserved within Driver
 // 2's 70 ppm tolerance, so simulation time continuity is maintained.
 //
-// IMPORTANT: speed-button comparisons (Step forward/back)
-// still use `SYEAR_J2000` snapshots, because the tweakpane dropdown values
-// are captured at script-load time. This preserves "1 year
-// per click" semantics: the click advances 1 absolute year regardless of
-// epoch.
+// The tweakpane dropdown's values are captured at script-load time (J2000
+// position units); `stepPosOfDate` converts a chosen step to this epoch's
+// position units at use (Play's advance and the Step buttons), so a "1 day"
+// step is one SI day at every epoch, and 'Step by' compares a step against
+// `SYEAR_J2000` to recognise the whole-year steps, which move the civil date.
 function recomputeTimeUnitsForEpoch(t_Ma) {
   // sDay is anchored on the SI tropical year (Kepler-invariant in JD across
   // epochs), not on the epoch-local day count: at deep time the year in JD
@@ -5991,15 +5999,16 @@ let o = {
   /** One step of the chosen period, forward (+1) or backward (−1): a whole-year period steps
    *  the civil date (1 … 1,000,000 years), any other adds the period to the position. The
    *  render loop clamps the result to the navigable domain (the honest edge). The period is
-   *  compared against SYEAR_J2000 (the dropdown's captured value), not the live sYear: the
-   *  options are frozen at tweakpane construction, so the J2000-anchored comparison preserves
-   *  the "1 year/sec" semantic across epochs. */
+   *  compared against SYEAR_J2000 (the dropdown's captured value): the options are frozen at
+   *  tweakpane construction in J2000 position units, and a sub-year step is converted to this
+   *  epoch's position units by `stepPosOfDate` — one SI day per "1 day" at every epoch (plan 30
+   *  item I). */
   'Step by': function (dir) {
     const years = Math.round(this.speedFact / SYEAR_J2000);
     if (years >= 1 && Math.abs(this.speedFact - years * SYEAR_J2000) < 1e-6 * SYEAR_J2000) {
       this.pos = posFromDateTime(addYears(this.Date, dir * years), this.Time);
     } else {
-      this.pos += dir * this.speedFact;
+      this.pos += dir * stepPosOfDate(this.speedFact);
     }
     positionChanged = true;
   },
@@ -21310,9 +21319,9 @@ function setupGUI() {
   playBtn.element.classList.add('play-btn');
 
   // PLAN 30 (rule 4: a control is named for what it does): "1 month" was 30 days of position —
-  // 30 lunar orbits at the genesis, where the owner read it as a sidereal month. The steps are
-  // DAYS OF POSITION fixed at load (one day = 1/365.2422 of the position's tropical-year count,
-  // 86,400 s today); the hover states what a step is at deep time.
+  // 30 lunar orbits at the genesis, where the owner read it as a sidereal month. The options are
+  // captured here in J2000 position units and converted to the epoch's units at use
+  // (`stepPosOfDate`, item I): every step is the SI duration its label names, at every epoch.
   addTooltip(ctrlFolder.addBinding(o, '1 second equals', {
     label: 'Time step',
     options: {
@@ -21330,7 +21339,7 @@ function setupGUI() {
       '100,000 years': sYear * 100000,
       '1,000,000 years': sYear * 1000000,
     }
-  }).on('change', () => { o.speedFact = Number(o['1 second equals']); }), 'Scene time per real second under Play, and the Step buttons’ stride. The steps are DAYS OF POSITION, fixed when the page loads: one day is 1/365.2422 of the position’s tropical-year count — 86,400 s today, and at deep time the count year is the tropical year of date, so a "day" is 0.90 SI days (3.9 solar days of date) at the genesis; "1 year" is 365 such days, "30 days" thirty of them (27 SI days at the genesis — seven sidereal months there, not one). The Moon’s months of date are in its Planet Info rows.');
+  }).on('change', () => { o.speedFact = Number(o['1 second equals']); }), 'Scene time per real second under Play, and the Step buttons’ stride — SI durations at every epoch: "1 hour" is 3,600 s and "1 day" 86,400 s at the genesis as today, where the solar day of date is 5.5 h, so one "day" step is 4.4 solar days of date there and "30 days" is 33 sidereal months of date (the Moon’s months of date are in its Planet Info rows). The whole-year steps move the civil date by that many years under the Step buttons and advance 365 SI days per year under Play.');
   ctrlFolder.addBinding(o, 'speed', { label: 'Speed \u00D7', min: -5, max: 5, step: 0.5 });
 
   // Navigation toolbar — compact button row
@@ -23068,7 +23077,7 @@ function render(now) {
   //    real delta — they are rate limits, not motion.
   smoothedDeltaMs = smoothedDeltaMs * 0.9 + Math.min(Math.max(deltaMs, 4), 100) * 0.1;
   if (o.Run) {
-    o.pos += Number(o.speedFact) * o.speed * (smoothedDeltaMs * 0.001);
+    o.pos += stepPosOfDate(Number(o.speedFact)) * o.speed * (smoothedDeltaMs * 0.001);
     // Throttle CSS2D label updates to 30 Hz during playback
     labelElapsed += delta;
     if (labelElapsed >= 0.033) {

@@ -316,7 +316,10 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   its hover, never a number; the gate reads the panel's live fields against
   the Node model at the same engine year — which is the TT Julian year of the
   instant, never the position-count year the UT bridge returns (25 kyr apart
-  at 400 Ma, 2.6 Myr at the genesis). (§1.38)
+  at 400 Ma, 2.6 Myr at the genesis). A time step captured as a fraction of
+  the position's year COUNT shrinks with the tropical year of date — "1 hour"
+  was 53.9 min at the genesis; a step is converted to the epoch's position
+  units at use, so every option is the SI duration its label names. (§1.38)
 - **A cumulative integral has TWO axes — the time it counts over and the age
   it reads its integrand at** — the lunar arguments counted months in SI-year
   ticks (right) and read the month history at the tick count as if it were

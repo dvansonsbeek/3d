@@ -63,14 +63,14 @@ On phones and tablets, the interface adapts automatically:
 
 ### Time Speed
 
-Two controls in **Simulation Controls** set how fast time passes: the **Time step** dropdown is the simulated time per real second, and the **Speed ×** slider (−5 … +5 in steps of 0.5) multiplies it — a negative value runs time backwards.
+Two controls in **Simulation Controls** set how fast time passes: the **Time step** dropdown is the simulated time per real second, and the **Speed ×** slider (−5 … +5 in steps of 0.5) multiplies it — a negative value runs time backwards. Every step is the SI duration its label names at every epoch: a "day" is 86,400 s at the genesis too, where the solar day of date is 5.5 h.
 
 | Time step | Use Case |
 |---------|----------|
 | 1 second | Observe current positions in real time |
 | 1 minute · 1 hour | Earth's rotation, the Moon against the stars |
 | 1 day · 1 week | Daily motion, the lunar phases |
-| 1 month | Track lunar cycles |
+| 30 days | Track lunar cycles (thirty days, not a month of date — the Moon's months are in its Planet Info rows) |
 | 1 year | Observe annual patterns |
 | 10 years | See planetary alignments |
 | 100 years | Watch precession begin |
@@ -258,7 +258,7 @@ When the Planet Orbit Analysis panel is open:
 
 ### See Venus's 5-Petal Pattern
 
-1. Set the Time step to **1 month**
+1. Set the Time step to **30 days**
 2. Enable the Venus trace (Tracing)
 3. Watch for 8 years (simulation time)
 4. Venus traces a 5-pointed star pattern relative to Earth
