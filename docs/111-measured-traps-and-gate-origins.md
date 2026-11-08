@@ -1526,6 +1526,20 @@ beside an of-date statement stay as they are. The literal is a code-surface
 vocabulary-ratchet term since (one hit left, a constant's; the count may only
 fall), so the phrase cannot return unseen.
 
+**A retired convention's bookkeeping shown as a second observable** (plan 30
+item L). The Moon's table carried a "Full Moon cycle (equinox-frame partner)"
+and a "Draconic year (precession-frame partner)" beside the observed rows:
+the frame-free conjunction frequencies with the equinox's rate 1/T_p added or
+subtracted — the frozen clock's count per anchor interval in the
+equinox-co-rotating frame, a device retired in plan 09. The arithmetic was
+right and the hovers said "not a directly-observed period"; the LABEL said
+there were two Full Moon cycles, 0.018 days apart today and 160 solar days
+apart at the genesis (1,595.7 observed, 1,434.4 "partner"). A conjunction has
+no frame, so the rows are gone; the "↳ years" sub-rows keep their tropical
+years of date and name the Julian-year figure in their hover, since the
+Predictions panel's periods are in Julian years (9.61 vs 8.63 for the of-date
+apsidal period at the genesis — one quantity, two year units).
+
 **A step sized in the position's year count** (plan 30 item I; the owner:
 "1 hour" moved 54 minutes at the genesis). The time-step dropdown captured its
 options at load as fractions of the position's tropical-year count — 1/8,760

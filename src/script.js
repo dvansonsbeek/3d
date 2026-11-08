@@ -809,9 +809,8 @@ let   moonNodalMonth = _MOON_PERIODS_J2000.moonNodalMonthDays;  // Phase 2: muta
 let   moonSynodicMonth = _MOON_PERIODS_J2000.moonSynodicMonthDays;  // Phase 2: mutable
 let   moonTropicalMonth = _MOON_PERIODS_J2000.moonTropicalMonthDays;  // Phase 2: mutable
 let   moonFullMoonCycleEarth = _MOON_PERIODS_J2000.moonFullMoonCycleEarthDays;  // Phase 6.5: mutable
-let   moonFullMoonCycleICRF = _MOON_PERIODS_J2000.moonFullMoonCycleICRFDays;  // Phase 6.5: mutable — the precessing-frame partner (the OBSERVED supermoon cycle is the Earth-named 411.784 d)
 let   moonApsidalMeetsNodalindays = _MOON_PERIODS_J2000.moonApsidalMeetsNodalDays;  // Phase 6.5: mutable
-let   moonDraconicYearICRF = _MOON_PERIODS_J2000.moonDraconicYearICRFDays;  // Phase 6.5: mutable — the mixed-frame partner (346.607 d; NOT the observable)
+let   moonDraconicYearICRF = _MOON_PERIODS_J2000.moonDraconicYearICRFDays;  // Phase 6.5: mutable — an INTERMEDIATE of the eclipse year (the harmonic sum of the year and the star-referenced node, frames mixed); not displayed (plan 30 item L)
 let   moonDraconicYearEarth = _MOON_PERIODS_J2000.moonDraconicYearEarthDays;  // Phase 6.5: mutable — THE OBSERVED ECLIPSE YEAR (346.620 d; removing one equinox turn compensates the mixed-frame intermediate above: ≡ tropical⊕of-date ≡ sidereal⊕star-referenced)
 
 // ─── E2. Mass calculations ──────────────────────────────────────────────
@@ -3297,8 +3296,8 @@ function recomputeMoonDerivedForEpoch(t_Ma) {
   const Tp_days = _axialPrecessionPeriodYearsAtAge(t_Ma) * DAYS_PER_JULIAN_YEAR * SECONDS_PER_DAY / (meanLodSecondsAtAge(t_Ma) ?? SECONDS_PER_DAY);
   // Earth-frame full-moon beat: beat of synodic + anomalistic
   moonFullMoonCycleEarth         = (moonSynodicMonth / (moonSynodicMonth - moonAnomalisticMonth)) * moonAnomalisticMonth;
-  // equinox-of-date variants — 1/T_E = 1/T_star ∓ 1/T_p (the full-moon cycle and the perigee advance prograde, the node regresses)
-  moonFullMoonCycleICRF          = 1 / (1 / moonFullMoonCycleEarth + 1 / Tp_days);
+  // equinox-of-date variants — 1/T_E = 1/T_star ∓ 1/T_p (the perigee advances prograde, the node regresses);
+  // the full-moon cycle is a conjunction cycle and has no equinox-frame variant (plan 30 item L)
   moonNodalPrecessionindaysICRF  = 1 / (1 / moonNodalPrecessionindaysEarth - 1 / Tp_days);
   moonApsidalPrecessionindaysICRF = 1 / (1 / moonApsidalPrecessionindaysEarth + 1 / Tp_days);
   // Apsidal-meets-nodal: beat of anomalistic + nodal months
@@ -28561,44 +28560,43 @@ const planetStats = {
       {label : () => `Full Moon cycle (observed)`,
        value : [ { v: () => moonFullMoonCycleEarth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
        hover : [`Time between successive perigee full moons ("supermoon" alignments) — a physical conjunction cycle, frame-independent: there is only one observed value. This is the beat frequency between the synodic month (phase cycle) and the anomalistic month (perigee cycle): P = P_syn × P_anom / (P_syn − P_anom) = ${fmtNum(moonSynodicMonth,4,',')} × ${fmtNum(moonAnomalisticMonth,4,',')} / ${fmtNum(moonSynodicMonth - moonAnomalisticMonth,4,',')} = ${fmtNum(moonFullMoonCycleEarth,4,',')} d. All OF DATE — derived from the month chain at the scene's epoch, whose J2000 values are the three IAU month inputs`]},
-      {label : () => `Full Moon cycle (equinox-frame partner)`,
-       value : [ { v: () => moonFullMoonCycleICRF, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Bookkeeping partner of the observed cycle in the equinox-co-rotating frame: the count per anchor interval differs by one cycle per axial precession period (the lunar chain's calendar convention). Not a directly-observed period — conjunction cycles are frame-independent; this value carries the frame arithmetic. All derived from the 3 lunar month inputs`]},
      null,
       {label : () => `Draconic year (observed — eclipse year)`,
        value : [ { v: () => moonDraconicYearEarth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
        hover : [`Time for the Sun to return to the Moon's ascending node — the ECLIPSE YEAR (eclipses can only occur when the Sun is near a lunar node). A physical conjunction cycle, frame-independent: tropical year ⊕ of-date node and sidereal year ⊕ star-referenced node give the same value (the general precession cancels). Matches the observed 346.620 d. All OF DATE — derived from the month chain at the scene's epoch, whose J2000 values are the three IAU month inputs`]},
-      {label : () => `Draconic year (precession-frame partner)`,
-       value : [ { v: () => moonDraconicYearICRF, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Bookkeeping partner of the eclipse year in the frame co-rotating with the equinox: the count per anchor interval differs by one cycle per axial precession period (the frozen clock’s calendar convention; equivalently the harmonic sum with frames mixed, 1/P = 1/${fmtNum(meansolaryearlengthinDays,4,',')} + 1/${fmtNum(moonNodalPrecessionindaysEarth,4,',')}). Not a directly-observed period; carries the frame arithmetic of the lunar chain. All OF DATE — derived from the month chain at the scene's epoch, whose J2000 values are the three IAU month inputs`]},
     null,
       {label : () => `Apsidal precession (of date)`,
        value : [ { v: () => moonApsidalPrecessionindaysICRF, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
        hover : [`Time for the Moon's line of apsides (the perigee–apogee axis) to complete one full prograde rotation relative to the EQUINOX OF DATE — the observed ≈${fmtNum(moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')}-year cycle (the Meeus/IERS observable). The star-referenced period is the row below; the two differ by the general precession (one cycle per axial precession period — the chain's calendar convention). Note: internal *ICRF variable names are legacy — the values are of-date. All OF DATE — derived from the month chain at the scene's epoch, whose J2000 values are the three IAU month inputs`]},
       {label : () => ``,
-       value : [ { v: () => moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }]},
+       value : [ { v: () => moonApsidalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }],
+       hover : () => [`The row above in TROPICAL YEARS OF DATE (the year of ${fmtNum(meansolaryearlengthinDays,1,',')} solar days at this epoch). In Julian years of 365.25 SI days — the unit of the Predictions panel's precession periods and the lunisolar clock — ${fmtNum(moonApsidalPrecessionindaysICRF*meanlengthofday/(DAYS_PER_JULIAN_YEAR*SECONDS_PER_DAY),4,',')} yr. Today the two years differ by 2e-5; at the genesis the tropical year is 328 SI days, so the two readings part by 10 %.`]},
       {label : () => `Apsidal precession (fixed stars)`,
        value : [ { v: () => moonApsidalPrecessionindaysEarth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
        hover : [`Time for the Moon's perigee to complete one full rotation against the fixed star background (star-referenced / inertial). This is the beat frequency between the sidereal and anomalistic months: P = P_sid × P_anom / (P_anom − P_sid). ≈ ${fmtNum(moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years — reproduced from first principles by the planetary laboratory (3-body gravity) to 1 part in 10,000. Note: internal *Earth variable names are legacy — the values are star-referenced. All OF DATE — derived from the month chain at the scene's epoch, whose J2000 values are the three IAU month inputs`]},
       {label : () => ``,
-       value : [ { v: () => moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }]},
+       value : [ { v: () => moonApsidalPrecessionindaysEarth/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }],
+       hover : () => [`The row above in TROPICAL YEARS OF DATE; in Julian years of 365.25 SI days (the Predictions panel's unit) ${fmtNum(moonApsidalPrecessionindaysEarth*meanlengthofday/(DAYS_PER_JULIAN_YEAR*SECONDS_PER_DAY),4,',')} yr.`]},
      null,
       {label : () => `Nodal precession (of date)`,
        value : [ { v: () => moonNodalPrecessionindaysICRF, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
        hover : [`Time for the Moon's ascending node to complete one full westward regression relative to the EQUINOX OF DATE — the observed ≈${fmtNum(moonNodalPrecessionindaysICRF/meansolaryearlengthinDays,2,',')}-year cycle (the Meeus/IERS 18.61-yr observable; the retrograde node is chased by the precessing equinox, so the apparent cycle is slower than the true regression — and where the equinox regresses FASTER than the node, as at the genesis with a 9-yr precession period, the node moves forward against the equinox of date and this row reads NEGATIVE: −14,424 solar days there, a prograde cycle of the frame, not of the orbit). The star-referenced period is the row below. Note: internal *ICRF variable names are legacy — the values are of-date. All OF DATE — derived from the month chain at the scene's epoch, whose J2000 values are the three IAU month inputs`]},
       {label : () => ``,
-       value : [ { v: () => moonNodalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }]},
+       value : [ { v: () => moonNodalPrecessionindaysICRF/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }],
+       hover : () => [`The row above in TROPICAL YEARS OF DATE; in Julian years of 365.25 SI days (the Predictions panel's unit) ${fmtNum(moonNodalPrecessionindaysICRF*meanlengthofday/(DAYS_PER_JULIAN_YEAR*SECONDS_PER_DAY),4,',')} yr (negative where the equinox regresses faster than the node — see the row above).`]},
       {label : () => `Nodal precession (fixed stars)`,
        value : [ { v: () => moonNodalPrecessionindaysEarth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
        hover : [`Time for the Moon's ascending node to complete one full westward regression against the fixed star background (star-referenced / inertial — the true regression). This is the beat frequency between the sidereal and draconic months: P = P_sid × P_drac / (P_sid − P_drac). ≈ ${fmtNum(moonNodalPrecessionindaysEarth/meansolaryearlengthinDays,2,',')} years — reproduced from first principles by the planetary laboratory (3-body gravity) to 1 part in 10,000. Note: internal *Earth variable names are legacy — the values are star-referenced. All OF DATE — derived from the month chain at the scene's epoch, whose J2000 values are the three IAU month inputs`]},
       {label : () => ``,
-       value : [ { v: () => moonNodalPrecessionindaysEarth/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }]},
+       value : [ { v: () => moonNodalPrecessionindaysEarth/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }],
+       hover : () => [`The row above in TROPICAL YEARS OF DATE; in Julian years of 365.25 SI days (the Predictions panel's unit) ${fmtNum(moonNodalPrecessionindaysEarth*meanlengthofday/(DAYS_PER_JULIAN_YEAR*SECONDS_PER_DAY),4,',')} yr.`]},
     null,
       {label : () => `Nodal meets Apsidal precession`,
        value : [ { v: () => moonApsidalMeetsNodalindays, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
        hover : [`Time for the Moon's apsidal and nodal precession cycles to realign — when perigee and the ascending node return to the same relative position. This is the beat frequency between the anomalistic and draconic months: P = P_anom × P_drac / (P_anom − P_drac). ≈ ${fmtNum(moonApsidalMeetsNodalindays/meansolaryearlengthinDays,2,',')} years. All OF DATE — derived from the month chain at the scene's epoch, whose J2000 values are the three IAU month inputs`]},
       {label : () => ``,
-       value : [ { v: () => moonApsidalMeetsNodalindays/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }]},
+       value : [ { v: () => moonApsidalMeetsNodalindays/meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_TROPICAL_YEARS_OF_DATE }],
+       hover : () => [`The row above in TROPICAL YEARS OF DATE; in Julian years of 365.25 SI days (the Predictions panel's unit) ${fmtNum(moonApsidalMeetsNodalindays*meanlengthofday/(DAYS_PER_JULIAN_YEAR*SECONDS_PER_DAY),4,',')} yr.`]},
 
     {header : '—  Orbital Orientation to Ecliptic —' },
       {label : () => `Longitude of perigee (ϖ)`,
