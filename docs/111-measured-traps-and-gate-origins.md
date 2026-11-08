@@ -1646,53 +1646,72 @@ tropical year shortens to 328 SI days there); the 365.25-day "UT years" are
 
 **The design (option H, the owner's decision 2026-11-08: "there cannot be two
 clocks; UT is the correct movement of the Earth").** ONE clock, UT, at every
-position. Inside ±3,000 yr the civil calendar on it, untouched (the records'
-era). Beyond, the count form `Y dD/N` — Y the count year (the orbit the Earth
-is on, numbered on from today's calendar year), D the solar day of date within
-it (the day that holds the year's first instant is day 1), N the solar days
-the year holds — and the Time the fraction of that solar day in 24 "hours", so
-12:00 is Greenwich mean noon and the globe turns 15° per hour of the day of
-date. A FORMAT seam on the position alone; the instant the same on both
-sides; the Julian Day field the same count everywhere. The parser takes both
-forms, and a civil `Y-M-D` whose year lies wholly beyond the seam as that
-day-of-year of the count year (the straddling years −1000 and 5000 and a year
-of margin keep their civil reading — a build without the margin landed
-−1000-07-21 a day early, the count year's boundary 0.85 d from the civil Jan 1
-there). The Date and the Time are read off ONE UT instant rounded to the
-second (the 24:00:00 carry); the entry functions hold their own guard; the
-whole-year Step moves the position by N years of date wherever the label has
-no civil date to move (the first build's buttons stuck at −1000, the owner's
-report; and the step rewrites the strings itself — two clicks inside one
-20-Hz frame had stepped the same Date twice). The ENGINE-facing scene year
-(`o.currentYear`) is untouched — the physics, the epoch sync and every
-engine-year reader are bit-identical; the LABEL's year (`_sceneLabelYear`)
-seeds the cardinal rows, the perihelion-date rows (whose solve read the TT
-civil year's calendar JD as a UT day — ΔT off, the +990 Myr instability of
-plan 30's dump) and the Orbit Analysis paper, each in the label year's own
-span. TT is a read-only row ("Engine age (TT)") and the hovers, and the
-registry carries the triple (`genesisEdgeAgeTTGyr` 4.429, `genesisEdgeOrbitsG`
-4.432, `genesisEdgeSolarDaysT` 2.471, `genesisEdgeUtCalendarYearsG` 6.76 — the
-last written once, as a day count). Measured after the build: the edge label
-`-4431580253 d1329/1430 14:48:03` (a count year of 1,430 solar days); typed ≡
-displayed on the keystroke route at both seams ± 20 d and at −1 Myr, −400 Myr,
-−2 Gyr and inside the edge, to the Time field's half second plus the double's
-grain of the UT count plus the POSITION's resolution in UT days (6e-8 d at
-the seam, 1.2e-4 d at −2 Gyr, 3.9e-3 d inside the edge: one ulp of a 4.4e9-yr
-position is 1,430 solar days × 9.5e-7 yr = 1.4e-3 UT days and the bridge's
-inverse lands no closer — the plan's defect 8; a first row read 0 there only
-because the typed value was the table's own forward image, and the label is
-rounded to twice the JD's ulp where that exceeds a second, 42 s at the edge,
-so a typed midnight stays a grid point); one-day walks across both seams showing both forms
-with the parsed instant advancing one solar day per step (`-1000 d183/365
-03:12 | -1000-07-01 03:12`; `5000-06-20 04:24 | 5000 d185/365 04:24`).
+position — and, after the owner's review of the first build, ONE format: the
+Date field is the civil calendar on the UT day count everywhere (a calendar
+year is 365.25 of today's days, so far back it counts days, not orbits — −6.76
+billion at the 4.43-Ga edge, said so in its hover), and a new editable **Year
+of date** field beside it counts the orbits: the tropical years of date from
+the calendar year 2000 (year 2000 · day 1 is 2000-01-01, so the two fields
+agree in the era and part by a day per ~3,300 yr today, 7.8 days per
+millennium under the Julian calendar) and the solar day of date within the
+current one — `−399998000 · day 217/403`, the edge `−4431580253 · day 1288/1430`;
+typing `Y`, `Y d217` or `Y · day 217/403` lands on it at the Time shown, and
+the orbit count is the age in uniform time to 0.06 % at the genesis. The
+first build had written the orbit count INTO the Date field beyond ±3,000 yr
+as `Y dD/N` — a format seam; the owner found the one field in two forms less
+clear, not more, and saw the Earth move differently across −1000: the
+whole-year Step there added N years of POSITION, 100 tropical years of date
+being 36,524.22 solar days, so the 0.22 day turned the globe 79° per 100-yr
+step while the civil step inside the seam keeps the time of day and the globe
+still. The step is the civil one everywhere now — N calendar years at the
+same time of day, a whole number of solar days — and the Date, Time and Year
+of date are read off ONE UT instant rounded to the second, or where that is
+coarser to a power of two covering both the UT count's ulp and the POSITION's
+resolution in solar days of date (one ulp of a 4.4e9-yr position is 1,430 d ×
+9.5e-7 yr = 1.4e-3 d): the Time field's quantum at depth — 5 s at 400 Ma, 42 s
+at −2 Gyr, 5.6 min of the 5.5-h day at the edge — so a typed midnight stays a
+grid point (a typed day 172 00:00 had read back as day 171 23:59 at −2.46 Gyr
+and −4.4 Gyr). The parsers take one Newton step on the forward UT map
+(`_refinePosToUTJD`), so a typed label lands on the position whose displayed
+label it is — the bridge's inverse carries its own tolerance, 2.8 ulps of the
+position at the edge. The entry functions hold their own guard, a guarded
+refresh serves the preset jumps (the genesis button had re-landed 126 s off
+its own label), and the step rewrites its strings itself (two clicks inside
+one 20-Hz frame had stepped the same Date twice; the first build's buttons
+had stuck at −1000, where the count form gave `addYears` no date to move). The
+ENGINE-facing scene year (`o.currentYear`) is untouched — the physics, the
+epoch sync and every engine-year reader are bit-identical; beyond ±3,000 yr
+the per-year solves (`_sceneLabelYear`: the cardinal rows, the perihelion-date
+rows — whose seed had read the TT civil year's calendar JD as a UT day, ΔT
+off, the +990 Myr instability of plan 30's dump — and the Orbit Analysis
+paper) run in the ORBIT year, where a calendar year of 365.25 UT days holds
+0.9 orbits at 400 Ma and may hold a cardinal point twice or not at all. TT is
+a read-only row ("Engine age (TT)") and the hovers, and the registry carries
+the triple (`genesisEdgeAgeTTGyr` 4.429, `genesisEdgeOrbitsG` 4.432,
+`genesisEdgeSolarDaysT` 2.471, `genesisEdgeUtCalendarYearsG` 6.76 — the last
+written once, as a day count). Measured after the build: typed ≡ displayed on
+the keystroke route through the Date/Time fields AND the Year of date field at
+both former seams ± 20 d and at −1 Myr, −400 Myr, −2 Gyr and inside the edge,
+to the Time field's half second plus the double's grain of the UT count plus
+the POSITION's resolution in UT days (through the Date: 6e-8 d at the seam,
+0 at −2 Gyr, 2.9e-3 d inside the edge, the position's resolution — the plan's
+defect 8, a first row having read 0 there only because the typed value was
+the table's own forward image; through the Year of date: 0 at every depth,
+the orbit year being the table's own axis), the strings identical both ways;
+one-day walks across both former seams with
+the parsed instant advancing one solar day per step and the Year of date's
+day with it; the Step buttons ten whole years out and back across each
+former seam, every step 1.00 yr of position.
 
-**The gate** (epoch-consistency, §2): the typed-back rows; the two seam
-walks; the count form's day 1 (`Y d1`, `Y` alone and, beyond the margin,
-`Y-01-01` the same midnight) at −1001, 5001, −399,998,000 and −2 Gyr; the
-Step buttons ten whole years out and back across each seam; and the
-Engine-age row at the past edge against `genesisEdgeAgeTTGyr`. The surface
-golden's epochs are typed in the count form and the snapshot's tour dates
-re-recorded with this reason.
+**The gate** (epoch-consistency, §2): the typed-back rows through both
+routes; the two walks; the orbit year's day 1 (`Y d1`, `Y` alone and `Y · day
+1/N` the same midnight) at −1001, 5001, −399,998,000 and −2 Gyr; the era
+agreement (the Year of date is the calendar year, its day the calendar's
+day-of-year within one); the Step buttons; the honest edge through the Year
+of date field (−5,000,000,000 orbits) and through a Date beyond the edge's
+UT count (−9,000,000,000); and the Engine-age row at the past edge against
+`genesisEdgeAgeTTGyr`. The surface golden's deep epochs are typed through the
+Year of date field and the snapshot's tour dates re-recorded with this reason.
 
 **The lesson.** A label is written on ONE clock, and its year unit is a unit
 OF DATE: a calendar that fixes the day count per year prints a day count, not
@@ -1728,14 +1747,16 @@ Moon's ring ≡ the cited distance at the labelled age (each read after a
 rendered frame — the ring is the render loop's), and the browser's navigable
 range ≡ the twin's — born from the Earth–Moon genesis search landing on the
 3.08-Ga system; and since §1.40 the one-clock label rows: the displayed Date
-and Time typed back through the pane's inputs land on the same UT instant at
-both seams ± 20 d and at the four deep positions, one-day walks across each
-seam show both label forms with the parsed instant advancing one solar day
-per step, the count form's day 1 is the midnight of the count year's first
-day, the Step buttons cross each seam by whole years and return, and the
-Engine-age row at the past edge reads the registry's TT age — born from the
-owner's globe turning 106° on a one-year typed step at −1000, and the Step
-buttons sticking there in the first build), plus
+and Time, and the displayed Year of date, typed back through the pane's
+inputs land on the same UT instant at both former seams ± 20 d and at the
+four deep positions, one-day walks across each former seam advance the
+parsed instant one solar day per step and the Year of date's day with it,
+the orbit year's day 1 is the midnight of the year's first day, the Year of
+date equals the calendar year in the era, the Step buttons cross each former
+seam by whole years and return, and the Engine-age row at the past edge
+reads the registry's TT age — born from the owner's globe turning 106° on a
+one-year typed step at −1000, and from the first build's Step buttons
+sticking there and turning the globe 79° per 100-yr step beyond), plus
 `test:perf` — the deep-time performance gate (RATIO thresholds, deep vs
 in-table cost, runner-speed independent; born from four ungated ratio
 regressions, one owner-bisected at 28×; since §1.35 the deep-edge spin read —

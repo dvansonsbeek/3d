@@ -207,35 +207,45 @@ domainRows.edge = await s.page.evaluate(({ beforeJD, afterJD }) => {
   // it both land on the edge, and all three fields read the edge (owner, 2026-11-03)
   const edgePos = T.navigablePosRange().posMin;
   const edgeLabel = T.sceneDateLabel(edgePos);
-  T.enterDateTime('-5000000000-01-01', '00:00:00'); const viaDate = T.clockFields();
+  // (plan 29: the Date is the civil UT calendar everywhere — a year of 365.25 solar days — so the
+  // date typed must lie beyond the edge's UT count, 6.76 billion calendar years; the Year of date
+  // field counts orbits, so −5,000,000,000 there lies beyond the 4.43-billion-orbit edge)
+  T.enterDateTime('-9000000000-01-01', '00:00:00'); const viaDate = T.clockFields();
+  T.jumpJD(2451545); T.enterYearOfDate('-5000000000', '00:00:00'); const viaYear = T.clockFields();
   T.jumpJD(2451545); T.enterJulianDay(beforeJD); const viaJD = T.clockFields();
-  return { past, future, edgeLabel, viaDate, viaJD };
+  return { past, future, edgeLabel, viaDate, viaYear, viaJD };
 }, { beforeJD: jdFromPos(navigablePosRange().posMin) - 1e6, afterJD: jdFromPos(navigablePosRange().posMax) + 1e6 });
-// plan 29 (one clock, doc 111 §1.40): the LABEL on the UT clock. (1) Typed ≡ displayed on the
-// KEYSTROKE route (the pane's inputs, as a user types) at both seams ±20 d and at the four deep
-// landings: the displayed Date and Time typed back land on the same UT instant and, inside the
-// double's grain, show the same strings (the former TT form landed a −1000 date 7 h off through
-// the hook, and a 24:00:00 a day early). (2) Across each seam in one-UT-day steps: the label's
-// parsed instant is the landing's and advances one solar day per step, both forms seen — a FORMAT
-// change, no clock jump. (3) The count form's day 1 at 00:00 is the midnight of the day that holds
-// the count year's first instant; `Y` alone and a civil `Y-01-01` typed beyond the seam read the
-// same. (4) The 'Engine age (TT)' row at the past edge is the registry's TT age of the edge.
+// plan 29 (one clock, doc 111 §1.40): the LABEL on the UT clock — the civil calendar at every
+// position and the Year of date (the orbit count) beside it. (1) Typed ≡ displayed on the
+// KEYSTROKE route (the pane's inputs, as a user types) at both former seams ±20 d and at the four
+// deep landings, through the Date/Time fields AND through the Year of date field: each lands on
+// the same UT instant and, inside the double's grain, shows the same strings (the former TT form
+// landed a −1000 date 7 h off through the hook, and a 24:00:00 a day early). (2) Across each
+// former seam in one-UT-day steps: the label's parsed instant is the landing's and advances one
+// solar day per step; the Year of date's day advances one per step. (3) The orbit year's day 1 at
+// 00:00 is the midnight of the day that holds the year's first instant; `Y` alone, `Y d1` and
+// `Y · day 1/N` read the same. (4) In the era the Year of date equals the calendar year and its
+// day the calendar's day-of-year within a day. (5) The 'Engine age (TT)' row at the past edge is
+// the registry's TT age of the edge.
 const SEAM_JDS = [jdFromPos(-3000), jdFromPos(3000)];
 const LABEL_PROBE_JDS = [SEAM_JDS[0] - 20, SEAM_JDS[0] + 20, SEAM_JDS[1] - 20, SEAM_JDS[1] + 20, ...CLOCK_JDS];
 const LABEL_SEAM_WALKS = SEAM_JDS.map((jd) => Array.from({ length: 7 }, (_, k) => jd - 3 + k));
 const COUNT_YEARS = [-1001, 5001, -399998000, -2000000000];
-domainRows.label = await s.page.evaluate(({ probeJDs, walks, countYears }) => {
+const ERA_JD = 2461000.5;   // 2025-11-21 00:00 UT
+domainRows.label = await s.page.evaluate(({ probeJDs, walks, countYears, eraJD }) => {
   const T = window.__test__;
   const closure = probeJDs.map((jd) => {
     T.jumpJD(jd); const f0 = T.clockFields();
     T.typeDateTime(f0.date, f0.time); const f1 = T.clockFields();
-    return { jd, pos: f0.pos, date: f0.date, time: f0.time, date1: f1.date, time1: f1.time, jd1: f1.julianDay };
+    T.jumpJD(jd); T.typeYearOfDate(f0.yearOfDate); const f2 = T.clockFields();
+    return { jd, pos: f0.pos, date: f0.date, time: f0.time, yearOfDate: f0.yearOfDate, date1: f1.date, time1: f1.time, jd1: f1.julianDay, jd2: f2.julianDay, yearOfDate2: f2.yearOfDate };
   });
-  const walk = walks.map((jds) => jds.map((jd) => { T.jumpJD(jd); const f = T.clockFields(); return { jd, pos: f.pos, date: f.date, time: f.time, jdParsed: T.jdOfPos(T.posOfDateTime(f.date, f.time)) }; }));
+  const walk = walks.map((jds) => jds.map((jd) => { T.jumpJD(jd); const f = T.clockFields(); return { jd, pos: f.pos, date: f.date, time: f.time, yearOfDate: f.yearOfDate, jdParsed: T.jdOfPos(T.posOfDateTime(f.date, f.time)) }; }));
   const count = countYears.map((Y) => {
-    const p = T.posOfDateTime(`${Y} d1`, '00:00:00');
-    return { Y, day1: T.jdOfPos(p), bare: T.jdOfPos(T.posOfDateTime(`${Y}`, '00:00:00')), civil: T.jdOfPos(T.posOfDateTime(`${Y}-01-01`, '00:00:00')), yearStartJD: T.jdOfPos(Y - 2000.5), label: T.sceneDateLabel(p) };
+    const p = T.posOfYearOfDate(`${Y} d1`, '00:00:00');
+    return { Y, day1: T.jdOfPos(p), bare: T.jdOfPos(T.posOfYearOfDate(`${Y}`, '00:00:00')), dotted: T.jdOfPos(T.posOfYearOfDate(`${Y} · day 1/999`, '00:00:00')), yearStartJD: T.jdOfPos(T.orbitYearStartPos(Y)), label: T.yearOfDateLabel(p) };
   });
+  T.jumpJD(eraJD); const era = T.clockFields();
   // (5) the Step buttons cross each seam by whole years (the owner 2026-11-08: stuck at −1000 —
   // the civil-date step had no civil date to move in the count form): 1-year steps from 5 years
   // inside each seam, 10 out and 10 back, every step ≈ one year of position
@@ -248,8 +258,8 @@ domainRows.label = await s.page.evaluate(({ probeJDs, walks, countYears }) => {
     T.setStepYears(7 / 365);
     return { start, positions: out, labels: out.length ? [T.sceneDateLabel(out[5]), T.sceneDateLabel(out[10])] : [] };
   });
-  return { closure, walk, count, steps, edgeAge: T.engineAgeText(T.navigablePosRange().posMin) };
-}, { probeJDs: LABEL_PROBE_JDS, walks: LABEL_SEAM_WALKS, countYears: COUNT_YEARS });
+  return { closure, walk, count, steps, era, edgeAge: T.engineAgeText(T.navigablePosRange().posMin) };
+}, { probeJDs: LABEL_PROBE_JDS, walks: LABEL_SEAM_WALKS, countYears: COUNT_YEARS, eraJD: ERA_JD });
 
 const pageErrors = s.errors.length;
 await s.dispose();
@@ -474,7 +484,7 @@ for (const jd of DOMAIN_EDGE_JDS) {
       console.log(`${okD ? '  ok ' : 'FAIL '} tour Devonian station vs the registry  day ${dev ? dev.dayHours.toFixed(2) : '-'} / ${regLod} h · year ${dev ? dev.yearSolarDays.toFixed(2) : '-'} / ${regDays} solar days  rel ${Number(dL).toExponential(1)} / ${Number(dD).toExponential(1)}`);
     }
     const edgeJD = jdFromPos(twin.posMin);
-    for (const [label, f] of [['the Date field', domainRows.edge.viaDate], ['the Julian Day field', domainRows.edge.viaJD]]) {
+    for (const [label, f] of [['the Date field', domainRows.edge.viaDate], ['the Year of date field', domainRows.edge.viaYear], ['the Julian Day field', domainRows.edge.viaJD]]) {
       const dPos = f.pos - twin.posMin, dJD = f.julianDay - edgeJD;
       const okF = Number.isFinite(dPos) && Math.abs(dPos) <= TOL_RANGE_YEARS && Number.isFinite(dJD) && Math.abs(dJD) <= 2 * Math.abs(twin.posMin) * Number.EPSILON * 1500 && f.date === domainRows.edge.edgeLabel;
       if (!okF) fail++;
@@ -488,31 +498,39 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const L = domainRows.label;
     const labelTol = (/** @type {number} */ jd, /** @type {number} */ pos) => 0.5 / 86400 + 4 * Math.abs(jd) * Number.EPSILON + 2 * Math.abs(pos) * Number.EPSILON * 1500;
     for (const r of L.closure) {
-      const dJD = r.jd1 - r.jd, tol = labelTol(r.jd, r.pos);
-      const sameStrings = Math.abs(r.jd) < 1e10 ? (r.date1 === r.date && r.time1 === r.time) : true;
-      const okL = Number.isFinite(dJD) && Math.abs(dJD) <= tol && sameStrings;
+      const dJD = r.jd1 - r.jd, dJD2 = r.jd2 - r.jd, tol = labelTol(r.jd, r.pos);
+      const sameStrings = Math.abs(r.jd) < 1e10 ? (r.date1 === r.date && r.time1 === r.time && r.yearOfDate2 === r.yearOfDate) : true;
+      const okL = Number.isFinite(dJD) && Math.abs(dJD) <= tol && Number.isFinite(dJD2) && Math.abs(dJD2) <= tol && sameStrings;
       if (!okL) fail++;
-      console.log(`${okL ? '  ok ' : 'FAIL '} label typed back (keystrokes) JD ${r.jd.toFixed(2).padStart(18)}  ${r.date} ${r.time} → ${r.date1} ${r.time1}  Δ ${Number(dJD).toExponential(2)} d (tol ${tol.toExponential(1)})`);
+      console.log(`${okL ? '  ok ' : 'FAIL '} label typed back (keystrokes) JD ${r.jd.toFixed(2).padStart(18)}  ${r.date} ${r.time} → ${r.date1} ${r.time1}  Δ ${Number(dJD).toExponential(2)} d · ${r.yearOfDate} → ${r.yearOfDate2}  Δ ${Number(dJD2).toExponential(2)} d (tol ${tol.toExponential(1)})`);
     }
     for (const seq of L.walk) {
-      const forms = new Set(seq.map((r) => (/ d\d+\//.test(r.date) ? 'count' : 'civil')));
-      let okW = forms.size === 2;
+      let okW = true;
+      const dayOf = (/** @type {string} */ s) => Number((/day (\d+)\//.exec(s) || [])[1]);
       for (let k = 0; k < seq.length; k++) {
         const r = seq[k], tol = labelTol(r.jd, r.pos);
         if (!(Number.isFinite(r.jdParsed) && Math.abs(r.jdParsed - r.jd) <= tol)) okW = false;
         if (k > 0 && Math.abs((r.jdParsed - seq[k - 1].jdParsed) - 1) > 2 * tol) okW = false;
+        if (k > 0 && !(dayOf(r.yearOfDate) === dayOf(seq[k - 1].yearOfDate) + 1 || dayOf(r.yearOfDate) === 1)) okW = false;
       }
       if (!okW) fail++;
-      console.log(`${okW ? '  ok ' : 'FAIL '} label seam walk (${seq[0].jd < 2451545 ? 'past' : 'future'} seam, 1-day steps, both forms ${forms.size === 2 ? 'seen' : 'NOT seen'})  ${seq.map((r) => `${r.date} ${r.time.slice(0, 5)}`).join(' | ')}`);
+      console.log(`${okW ? '  ok ' : 'FAIL '} label walk (${seq[0].jd < 2451545 ? 'past' : 'future'} former seam, 1-day steps: one solar day per step, the Year of date's day with it)  ${seq.map((r) => `${r.date} ${r.time.slice(0, 5)} (${r.yearOfDate})`).join(' | ')}`);
     }
     for (const r of L.count) {
       const midnight = Math.floor(r.yearStartJD + 0.5) - 0.5, tol = labelTol(r.yearStartJD, r.Y - 2000.5);
-      // a civil Y-01-01 reads as the count year's day 1 only for a year wholly beyond the seam (the
-      // straddling years and a year of margin keep their civil reading — 5001-01-01 is a civil date)
-      const civilReadsAsCount = Math.abs(r.Y - 2000.5) > 3000 + 1;
-      const okC = [r.day1, r.bare, ...(civilReadsAsCount ? [r.civil] : [])].every((v) => Number.isFinite(v) && Math.abs(v - midnight) <= tol) && r.label.startsWith(`${r.Y} d1/`);
+      const okC = [r.day1, r.bare, r.dotted].every((v) => Number.isFinite(v) && Math.abs(v - midnight) <= tol) && r.label.startsWith(`${r.Y} · day 1/`);
       if (!okC) fail++;
-      console.log(`${okC ? '  ok ' : 'FAIL '} count form day 1 of ${r.Y}: the midnight of the year's first day  Δ ${Number(r.day1 - midnight).toExponential(2)} / ${Number(r.bare - midnight).toExponential(2)} / ${Number(r.civil - midnight).toExponential(2)} d  label ${r.label}`);
+      console.log(`${okC ? '  ok ' : 'FAIL '} Year of date day 1 of ${r.Y}: the midnight of the orbit year's first day  Δ ${Number(r.day1 - midnight).toExponential(2)} / ${Number(r.bare - midnight).toExponential(2)} / ${Number(r.dotted - midnight).toExponential(2)} d  label ${r.label}`);
+    }
+    {
+      // the era: the orbit count is the calendar year, its day the calendar's day-of-year ± 1 (a
+      // tropical year is 365.2422 days; the calendar keeps step with leap days, the count does not)
+      const e = L.era, civilYear = Number(e.date.slice(0, 4));
+      const m = /^(-?\d+) · day (\d+)\/(\d+)$/.exec(e.yearOfDate);
+      const civilDoy = Math.round(jdToDecimalYear(e.julianDay) * 0 + (e.julianDay - (2451544.5 + Math.round((civilYear - 2000) * 365.2425)))) + 1;
+      const okE = m !== null && Number(m[1]) === civilYear && Math.abs(Number(m[2]) - civilDoy) <= 1 && Number(m[3]) === 365;
+      if (!okE) fail++;
+      console.log(`${okE ? '  ok ' : 'FAIL '} Year of date in the era: ${e.date} ↔ ${e.yearOfDate} (calendar day-of-year ${civilDoy})`);
     }
     for (const st of L.steps) {
       const p = st.positions;

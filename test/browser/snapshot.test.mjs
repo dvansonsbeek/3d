@@ -450,7 +450,7 @@ Object.assign(measured, await s.page.evaluate(() => {
 await s.page.evaluate(() => window.__test__.tourStart());
 await s.page.waitForFunction(() => { const st = window.__test__.tourState(); return st.visible && !st.landing; }, null, { timeout: 60000 });
 await s.page.waitForTimeout(500);
-Object.assign(measured, await s.page.evaluate(() => { const T = window.__test__; const st = T.tourState(); return { 'tour.start.index': st.index, 'tour.start.visible': st.visible, 'tour.start.title': st.title, 'tour.start.date': T.clockFields().date, 'tour.start.onEdge': T.clockFields().pos === T.navigablePosRange().posMin }; }));
+Object.assign(measured, await s.page.evaluate(() => { const T = window.__test__; const st = T.tourState(); return { 'tour.start.index': st.index, 'tour.start.visible': st.visible, 'tour.start.title': st.title, 'tour.start.date': T.clockFields().date, 'tour.start.yearOfDate': T.clockFields().yearOfDate, 'tour.start.onEdge': T.clockFields().pos === T.navigablePosRange().posMin }; }));
 await s.page.evaluate(() => window.__test__.tourNext());
 await s.page.waitForFunction(() => { const st = window.__test__.tourState(); return st.index === 1 && st.visible && !st.landing; }, null, { timeout: 60000 });
 await s.page.waitForTimeout(500);

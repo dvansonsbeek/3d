@@ -3139,112 +3139,147 @@ function posFromJDClamped(jd) {
   return jd < startmodelJD ? r.posMin : r.posMax;
 }
 
-// ── THE LABEL SEAM (plan 27, doc 111 §1.36; plan 29 option H: ONE clock, doc 111 §1.40) ───
+// ── THE LABEL: ONE clock, UT — the civil calendar everywhere, and the YEAR OF DATE beside it
+// (plan 27 doc 111 §1.36; plan 29 option H as the owner reviewed it, doc 111 §1.40) ──────────
 // Every label is written on the UT clock — the solar-day count the Earth's own rotation keeps,
-// the records' axis, the Julian Day field's count — at every position. Inside
-// ±DEEP_LABEL_SEAM_YEARS of the scene epoch the Date is the civil calendar date of that UT
-// Julian Day (daysToDate: Julian before 1582-10-15, Gregorian from it). Beyond it the civil
-// calendar means nothing: it attaches 365.25 of TODAY's days to a year, and a year of date holds
-// 403 solar days at 400 Ma and 1,430 at the genesis, so a civil year on the deep day count is a
-// day count in disguise (6.76 Gyr at the 4.43-Ga edge). There the Date is the COUNT FORM
-// `Y dD/N`: Y the position's own year — the count of tropical years of date, the orbit the Earth
-// is on, numbered on from today's calendar year — D the solar day of date within it (the day
-// that holds the year's first instant is day 1) and N the solar days that year holds; the Time is
-// the fraction of that solar day in 24 "hours", so 12:00 is Greenwich mean noon and the globe
-// turns 15° per hour at every epoch, as UT means. The seam is a FORMAT seam on the position,
-// never a clock seam: the instant is the same on both sides and the Julian Day field reads the
-// same count everywhere. (The former form wrote the TT instant's civil date beyond the seam — a
-// second clock on the same panel, 7 h from the UT one at the seam and 341 Myr from the UT count
-// at −2 Gyr: a −1000 date typed as 16:00:00 landed at 09:18:55.) The ENGINE-facing scene year
-// (o.currentYear, sceneYearOfDate) is untouched — the civil year of the TT instant beyond the
-// seam, the age every physics read and the epoch sync take; the LABEL's year is _sceneLabelYear.
+// the records' axis, the Julian Day field's count — at every position, and the Date is the civil
+// calendar date of that UT Julian Day at every position (daysToDate: Julian before 1582-10-15,
+// Gregorian from it): ONE format, ONE clock, no seam a visitor sees. A calendar year is 365.25 of
+// TODAY's days, while a year of date holds 403 solar days at 400 Ma and 1,430 at the genesis, so
+// far back the calendar counts days, not orbits: −6.76 billion at the 4.43-Ga edge, where the
+// Earth has made 4.43 billion orbits. Beside it the YEAR OF DATE field counts those orbits — the
+// tropical years of date from the civil year 2000 (its day 1 is 2000-01-01), the position's own
+// unit — and the solar day of date within the current one: `−399998000 · day 217/403`; typing a
+// year (and a day) lands on it at the Time shown. The two agree in the era (the count parts from
+// the calendar by one day per ~3,300 yr today, 7.8 days per millennium under the Julian calendar)
+// and the orbit count is the age in uniform time to 0.06 % at the genesis (the 'Engine age (TT)'
+// row under About; the registry's genesisEdge* triple). (The first build of plan 29 wrote the
+// orbit count INTO the Date field beyond ±3,000 yr as `Y dD/N` — the owner read it as less clear,
+// not more, and the Step buttons' position arithmetic turned the globe 79° per 100-yr step there;
+// plan 27's form before it wrote the TT instant's civil date — a second clock on the same panel,
+// 7 h from the UT one at the seam: 106° of globe on a one-year typed step at −1000.) The
+// ENGINE-facing scene year (o.currentYear, sceneYearOfDate) keeps its seam — the civil year of
+// the TT instant beyond ±DEEP_LABEL_SEAM_YEARS, the age every physics read and the epoch sync
+// take, bit-identical — and the per-year solves (the cardinal rows, the perihelion dates, the
+// Orbit Analysis paper) run in the ORBIT year beyond it (_sceneLabelYear), where a calendar year
+// of 365.25 UT days may hold a cardinal point twice or not at all.
 const DEEP_LABEL_SEAM_YEARS = 3000;
-/** A typed civil `Y-M-D` is read as a civil UT date wherever its year can be shown in the civil
- *  form — the two years that straddle a seam (−1000, 5000) included, with a year of margin; a
- *  year wholly beyond reads as a count year with the month-day as its day-of-year (the civil
- *  date of the UT count there is ΔT from the year typed: 20 Myr at −400 Myr). */
-function _civilYearIsHonoured(year) {
-  return !DEEP_TIME_MODE_ENABLED || !Number.isFinite(year) || Math.abs(year - startmodelYear) <= DEEP_LABEL_SEAM_YEARS + 1;
-}
-/** The ONE seam predicate: the count form beyond ±DEEP_LABEL_SEAM_YEARS of position. */
-function _labelIsCountForm(pos) {
+/** Beyond ±DEEP_LABEL_SEAM_YEARS of position the per-year solves run in the orbit year. */
+function _deepYearSolve(pos) {
   return DEEP_TIME_MODE_ENABLED && Number.isFinite(pos) && Math.abs(pos) > DEEP_LABEL_SEAM_YEARS;
 }
-/** The seam predicate for a UT Julian Day — decided on its position; the civil year settles it
- *  outside a ±1-yr band at the seam (the count year lies within 0.1 yr of the civil one there),
- *  so the bridge is solved only inside the band. */
-function _labelIsCountFormJd(jdUT) {
-  if (!DEEP_TIME_MODE_ENABLED || !Number.isFinite(jdUT)) return false;
-  const off = Math.abs(julianDateToDecimalYear(jdUT) - startmodelYear);
-  if (off < DEEP_LABEL_SEAM_YEARS - 1) return false;
-  if (off > DEEP_LABEL_SEAM_YEARS + 1) return true;
-  return _labelIsCountForm(posFromJD(jdUT));
-}
-/** The seam predicate for a LABEL year: a count year that is shown in the count form over any part
- *  of its span (the span [Y − 2000.5, Y − 1999.5) of position reaches beyond the seam: Y ≤ −1000 or
- *  Y ≥ 5000 — the two years that straddle a seam count). A civil year within 0.1 yr of the seam may
- *  fall on this side — the year-seeded finders below move their seed by that much and find the
- *  same crossings. */
-function _labelYearIsCount(year) {
+/** The label-year twin: a year handed to the solves is an orbit year when any part of its span
+ *  lies beyond the seam (the two straddling years count; a civil year within 0.1 yr of the seam
+ *  may fall on this side — the seed then moves by that much and finds the same crossings). */
+function _labelYearIsOrbit(year) {
   if (!DEEP_TIME_MODE_ENABLED || !Number.isFinite(year)) return false;
-  const p = year - startmodelYear;   // the count year's first position
+  const p = _orbitYearStartPos(year);
   return p < -DEEP_LABEL_SEAM_YEARS || p + 1 > DEEP_LABEL_SEAM_YEARS;
 }
 /** The label's Julian Day for a position: the UT Julian Day, rounded to the second the Time
- *  field shows, so the Date and the Time read ONE instant (a time that rounded up to 24:00:00
- *  stood under the previous date, and the field round trip then landed a day early — plan 29
- *  defect 9). Beyond ~1e9 days the double's own grain (42 s at the genesis) is the rounding. */
+ *  field shows, so the Date, the Time and the Year of date read ONE instant (a time that rounded
+ *  up to 24:00:00 stood under the previous date, and the field round trip then landed a day
+ *  early — plan 29 defect 9). */
 function _labelJdOfPos(pos) {
   const jd = jdFromPos(pos);
   if (!Number.isFinite(jd)) return jd;
-  // beyond ~2.6e10 days (70 Myr) the double's own grain exceeds a second: round to twice the
-  // ulp — a power of two, so a typed midnight stays a grid point and the field round trip
-  // (parse → position → UT day, ±1 ulp) lands on the label it started from (a typed d172 00:00
-  // read back as d171 23:59 at −2.46 Gyr before this)
-  const ulp = 2 ** Math.floor(Math.log2(Math.abs(jd) || 1)) * Number.EPSILON;
-  if (2 * ulp > 1 / SECONDS_PER_DAY) return Math.round(jd / (2 * ulp)) * (2 * ulp);
-  const r = Math.round(jd * SECONDS_PER_DAY) / SECONDS_PER_DAY;
-  return Number.isFinite(r) ? r : jd;
-}
-/** The UT day grid's first day (midnight = JD + 0.5 integer) of a count year: the day that holds
- *  the position-year's first instant. @param {number} year @returns {number} the day index */
-function _countYearFirstDayIndex(year) {
-  return Math.floor(jdFromPos(year - startmodelYear) + 0.5);
-}
-/** The count form's parts for a position (the day grid decides the year: a day holds one year's
- *  first instant and belongs to that year). @param {number} pos
- *  @returns {{ year: number, day: number, days: number }} */
-function _countFormOfPos(pos) {
-  const dayIdx = Math.floor(_labelJdOfPos(pos) + 0.5);
-  let year = Math.floor(startmodelYear + pos);
-  let first = _countYearFirstDayIndex(year);
-  if (dayIdx < first) { year -= 1; first = _countYearFirstDayIndex(year); }
-  else { const next = _countYearFirstDayIndex(year + 1); if (dayIdx >= next) { year += 1; first = next; } }
-  return { year, day: dayIdx - first + 1, days: _countYearFirstDayIndex(year + 1) - first };
-}
-/** The count form `Y dD/N` (`Y` alone is day 1; the `/N` is informational; a D past the year's
- *  end runs on into the next year) — or, typed with a year beyond the seam, a civil `Y-M-D`
- *  read as that day-of-year of count year Y. Null for a civil date inside the seam.
- *  @returns {{ year: number, day: number } | null} */
-const _COUNT_FORM_RE = /^\s*(-?\d+)(?:\s+d(\d+)(?:\/\d+)?)?\s*$/;
-function _parseCountForm(dateStr) {
-  const m = _COUNT_FORM_RE.exec(dateStr);
-  if (m) {
-    const year = parseInt(m[1], 10), day = m[2] === undefined ? 1 : parseInt(m[2], 10);
-    return _labelYearIsCount(year) && day >= 1 ? { year, day } : null;
+  // Beyond ~70 Myr the double's own grain exceeds a second — the UT count's ulp (42 s at the
+  // genesis) and the POSITION's resolution in solar days of date (one ulp of a 4.4e9-yr position
+  // is 1,430 d × 9.5e-7 yr = 1.4e-3 d there): round to a power of two covering both, so a typed
+  // midnight stays a grid point and the field round trip (parse → position → UT day) lands on
+  // the label it started from (a typed day 172 00:00 read back as day 171 23:59 at −2.46 Gyr
+  // before this). The grain is the Time field's quantum at depth: 5 s at 400 Ma, 42 s at
+  // −2 Gyr, 5.6 min of the 5.5-h day at the edge.
+  const ulpJd = 2 ** Math.floor(Math.log2(Math.abs(jd) || 1)) * Number.EPSILON;
+  if (2 * ulpJd <= 1 / SECONDS_PER_DAY) {
+    const r = Math.round(jd * SECONDS_PER_DAY) / SECONDS_PER_DAY;
+    return Number.isFinite(r) ? r : jd;
   }
-  const c = /^(-?\d+)-(\d{1,2})-(\d{1,2})$/.exec(dateStr);
-  if (!c) return null;
-  const year = parseInt(c[1], 10);
-  if (_civilYearIsHonoured(year)) return null;
-  try { return { year, day: Math.round(dateToDays(dateStr) - dateToDays(`${year}-01-01`)) + 1 }; } catch { return null; }
+  const ulpPos = 2 ** Math.floor(Math.log2(Math.abs(pos) || 1)) * Number.EPSILON;
+  const daysPerYear = jdFromPos(pos + 1) - jd;   // solar days of date per year of date
+  const g = 2 ** Math.ceil(Math.log2(Math.max(2 * ulpJd, 2 * ulpPos * (Number.isFinite(daysPerYear) && daysPerYear > 0 ? daysPerYear : 1500))));
+  return Math.round(jd / g) * g;
+}
+/** One Newton step of a parsed position on the forward UT map, so a typed label lands on the
+ *  position whose displayed label it is: the bridge's inverse carries its own tolerance (3.9e-3
+ *  UT days at the edge, 2.8 ulps of the position — a typed midnight read back as 23:59 of the
+ *  day before), and the forward map is the display's. In the era the step is 1e-13 yr. */
+function _refinePosToUTJD(pos, jd) {
+  if (!DEEP_TIME_MODE_ENABLED || !Number.isFinite(pos) || !Number.isFinite(jd)) return pos;
+  const back = jdFromPos(pos);
+  const h = Math.max(1e-4, Math.abs(pos) * 1e-9);
+  const slope = (jdFromPos(pos + h) - back) / h;   // solar days of date per year of date
+  if (!Number.isFinite(back) || !Number.isFinite(slope) || slope <= 0) return pos;
+  return pos + (jd - back) / slope;
+}
+/** The orbit count's zero: the position of the civil 2000-01-01 00:00 UT, so that year 2000 ·
+ *  day 1 is that day and the count agrees with the calendar in the era; one tropical year of
+ *  date — the position's own unit — per year from there. (Plan 30 item H: the position's own
+ *  zero stays the scene epoch 2000.5, 11 days from a civil year boundary; the FIELD's zero is
+ *  this one.) */
+let _orbitYearZeroPosCache = null;
+function _orbitYearZeroPos() {
+  if (_orbitYearZeroPosCache === null) _orbitYearZeroPosCache = posFromJD(startmodelJD + dateToDays('2000-01-01'));
+  return _orbitYearZeroPosCache;
+}
+/** The position of the first instant of an orbit year. */
+function _orbitYearStartPos(year) { return _orbitYearZeroPos() + (year - 2000); }
+/** The UT day grid's first day (midnight = JD + 0.5 integer) of an orbit year: the day that holds
+ *  the year's first instant. @param {number} year @returns {number} the day index */
+function _orbitYearFirstDayIndex(year) {
+  return Math.floor(jdFromPos(_orbitYearStartPos(year)) + 0.5);
+}
+/** The year of date of a position: the orbit year (the day grid decides it — a day holds one
+ *  year's first instant and belongs to that year), the solar day of date within it and the days
+ *  it holds. @param {number} pos @returns {{ year: number, day: number, days: number }} */
+function yearOfDateOfPos(pos) {
+  const dayIdx = Math.floor(_labelJdOfPos(pos) + 0.5);
+  let year = 2000 + Math.floor(pos - _orbitYearZeroPos());
+  let first = _orbitYearFirstDayIndex(year);
+  if (dayIdx < first) { year -= 1; first = _orbitYearFirstDayIndex(year); }
+  else { const next = _orbitYearFirstDayIndex(year + 1); if (dayIdx >= next) { year += 1; first = next; } }
+  return { year, day: dayIdx - first + 1, days: _orbitYearFirstDayIndex(year + 1) - first };
+}
+/** The 'Year of date' field's string for a position. */
+function yearOfDateLabel(pos) {
+  if (!Number.isFinite(pos)) return '—';
+  const y = yearOfDateOfPos(pos);
+  return `${y.year} · day ${y.day}/${y.days}`;
+}
+/** The 'Year of date' field's parse: `Y`, `Y d217`, `Y day 217`, `Y · day 217/403` (the /N is
+ *  informational; a day past the year's end runs on into the next year; `Y` alone is day 1).
+ *  @returns {{ year: number, day: number } | null} */
+const _YEAR_OF_DATE_RE = /^\s*(-?\d+)(?:\s*[·,]?\s*(?:day|d)\s*(\d+)(?:\s*\/\s*\d+)?)?\s*$/i;
+function parseYearOfDate(str) {
+  const m = typeof str === 'string' ? _YEAR_OF_DATE_RE.exec(str) : null;
+  if (!m) return null;
+  const year = parseInt(m[1], 10), day = m[2] === undefined ? 1 : parseInt(m[2], 10);
+  return Number.isFinite(year) && day >= 1 ? { year, day } : null;
+}
+function isValidYearOfDate(str) { return parseYearOfDate(str) !== null; }
+/** Year of date + time → scene time coordinate: the midnight of day D of the orbit year plus the
+ *  time, through the position table's inverse, clamped to the navigable domain (the honest
+ *  edge). A year outside the domain lands on the edge it lies past BEFORE any table read — the
+ *  deep chain throws, not null, beyond its built range. Null for an unparsable string. */
+function posFromYearOfDate(str, timeStr) {
+  const y = parseYearOfDate(str);
+  if (y === null) return null;
+  const dayFrac = timeToPos(timeStr) / sDay;
+  if (DEEP_TIME_MODE_ENABLED) {
+    const r = navigablePosRange(), p = _orbitYearStartPos(y.year);
+    if (p < r.posMin - 1 || p > r.posMax + 1) { noteNavigableEdge(p < 0 ? 'past' : 'future'); return p < 0 ? r.posMin : r.posMax; }
+  }
+  const jd = _orbitYearFirstDayIndex(y.year) - 0.5 + (y.day - 1) + dayFrac;
+  const p = posFromJD(jd);
+  if (p === null || !Number.isFinite(p)) return posFromJDClamped(jd);
+  return clampPosToNavigable(_refinePosToUTJD(p, jd));
 }
 /** The ENGINE-facing scene year for a UT Julian Day (o.currentYear's axis — every physics
  *  read, the deep-time epoch sync and the engine-year readers take it): the civil decimal year
  *  of the UT day inside the seam, the civil decimal year of the position's TT instant beyond
  *  (the position table's own, the curve-only axis the model's finders and bridge read — NOT
- *  the Moon block's absolute clock, which adds the 56-s deltaTStart). NOT the label's year
- *  beyond the seam: the Date field shows the count year there (_sceneLabelYear). */
+ *  the Moon block's absolute clock, which adds the 56-s deltaTStart). Not a label: the Date
+ *  field is the civil UT date everywhere and the Year of date field the orbit count. */
 function sceneYearOfDate(jdUT) {
   const civil = julianDateToDecimalYear(jdUT);
   if (!DEEP_TIME_MODE_ENABLED || Math.abs(civil - J2000_CALENDAR_YEAR) <= DEEP_LABEL_SEAM_YEARS) return civil;
@@ -3254,55 +3289,43 @@ function sceneYearOfDate(jdUT) {
   const jdTT = jdTTFromPos(pos);
   return julianDateToDecimalYear(jdTT === null ? jdFromPos(pos) : jdTT);
 }
-/** The LABEL's year for a position — the civil year of the UT Julian Day inside the seam (the
- *  Date field's year, floor(o.currentYear) there), the count year beyond. The consumers that
- *  work "in the year the Date shows" (the cardinal rows, the perihelion dates, the Orbit
- *  Analysis paper) read this; the physics reads o.currentYear. */
+/** The year the per-year solves run in for a position — the civil year of the UT Julian Day
+ *  inside the seam (floor(o.currentYear) there, as before), the ORBIT year beyond (the cardinal
+ *  rows, the perihelion dates, the Orbit Analysis paper: each has exactly one instant per orbit;
+ *  a calendar year of 365.25 UT days holds 0.9 orbits at 400 Ma). The physics reads o.currentYear. */
 function _sceneLabelYear(pos) {
-  if (_labelIsCountForm(pos)) return _countFormOfPos(pos).year;
+  if (_deepYearSolve(pos)) return yearOfDateOfPos(pos).year;
   return Math.floor(julianDateToDecimalYear(jdFromPos(pos)));
 }
-/** The UT Julian Day of a label year's midpoint — the cardinal finders' seed (each cardinal
+/** The UT Julian Day of a solve year's midpoint — the cardinal finders' seed (each cardinal
  *  point falls once in a tropical year, so the crossing nearest the midpoint is this year's):
- *  the civil July 2 noon inside the seam, as before; the count year's own midpoint beyond. */
+ *  the civil July 2 noon inside the seam, as before; the orbit year's own midpoint beyond. */
 function _labelYearMidJD(year) {
-  if (_labelYearIsCount(year)) return jdFromPos(year - startmodelYear + 0.5);
+  if (_labelYearIsOrbit(year)) return jdFromPos(_orbitYearStartPos(year) + 0.5);
   return jdFromPos(posFromDateTime(`${year}-07-02`, '12:00:00'));
 }
-/** The UT Julian Day `dayOfYear` days of a 365.25-day year into a label year — the Sun-longitude
+/** The UT Julian Day `dayOfYear` days of a 365.25-day year into a solve year — the Sun-longitude
  *  solver's seed: the civil January 1 plus the days inside the seam (the former seed, verbatim);
- *  the count year's own span, scaled, beyond (the former seed read the TT civil year's calendar
+ *  the orbit year's own span, scaled, beyond (the former seed read the TT civil year's calendar
  *  JD as a UT day — ΔT off, 341 Myr at −2 Gyr: the perihelion rows' instability at +990 Myr). */
 function _labelYearDayJD(year, dayOfYear) {
-  if (_labelYearIsCount(year)) {
-    const jd0 = jdFromPos(year - startmodelYear);
-    return jd0 + (dayOfYear / DAYS_PER_JULIAN_YEAR) * (jdFromPos(year + 1 - startmodelYear) - jd0);
+  if (_labelYearIsOrbit(year)) {
+    const jd0 = jdFromPos(_orbitYearStartPos(year));
+    return jd0 + (dayOfYear / DAYS_PER_JULIAN_YEAR) * (jdFromPos(_orbitYearStartPos(year + 1)) - jd0);
   }
   return dateTimeToJulianDay(`${year}-01-01`, '00:00:00') + dayOfYear;
 }
-/** The Date string for a position: the civil date of the UT Julian Day inside the seam, the
- *  count form `Y dD/N` beyond — one instant (_labelJdOfPos) with posToTime. */
+/** The Date string for a position: the civil date of the UT Julian Day — one instant
+ *  (_labelJdOfPos) with posToTime and yearOfDateLabel. */
 function sceneDateLabel(pos) {
-  if (_labelIsCountForm(pos)) { const c = _countFormOfPos(pos); return `${c.year} d${c.day}/${c.days}`; }
   return daysToDate(_labelJdOfPos(pos) - startmodelJD);
 }
-/** Date+time → scene time coordinate, on the UT clock in both forms. The civil route
- *  (dateToDays, NOT dateTimeToJulianDay, to keep its pre-reform convention; the day fraction
- *  from timeToPos) gives the UT Julian Day; the count form (or a civil Y-M-D whose year lies
- *  beyond the seam, read as its day-of-year) lands on the UT day grid of the count year —
- *  midnight of day D plus the time. Both go through the position table's inverse and clamp to
- *  the navigable domain (the honest edge: a year beyond the table lands on the edge it lies past). */
+/** Date+time → scene time coordinate: the civil route (dateToDays, NOT dateTimeToJulianDay, to
+ *  keep its pre-reform convention; the day fraction from timeToPos) gives the UT Julian Day, the
+ *  position table's inverse the position, clamped to the navigable domain (the honest edge). */
 function posFromDateTime(dateStr, timeStr) {
-  const dayFrac = timeToPos(timeStr) / sDay;
-  const c = _parseCountForm(dateStr);
-  if (c !== null) {
-    // a count year outside the navigable domain lands on the edge it lies past BEFORE any table
-    // read (the deep chain throws, not null, beyond its built range — a year before the genesis)
-    const r = navigablePosRange(), p = c.year - startmodelYear;
-    if (DEEP_TIME_MODE_ENABLED && (p < r.posMin - 1 || p > r.posMax + 1)) { noteNavigableEdge(p < 0 ? 'past' : 'future'); return p < 0 ? r.posMin : r.posMax; }
-    return posFromJDClamped(_countYearFirstDayIndex(c.year) - 0.5 + (c.day - 1) + dayFrac);
-  }
-  return clampPosToNavigable(posFromJD(startmodelJD + dateToDays(dateStr) + dayFrac));
+  const jd = startmodelJD + dateToDays(dateStr) + timeToPos(timeStr) / sDay;
+  return clampPosToNavigable(_refinePosToUTJD(posFromJD(jd), jd));
 }
 /** The position whose TT instant is January 1 of an ENGINE year (the tour's stations: the card's
  *  rows are the package model at that year) — the edge it lies past when beyond the table. */
@@ -4679,7 +4702,7 @@ if (typeof window !== 'undefined') {
     // functions the root controls' change handlers call, then the scene pose of the landing.
     enterDateTime: (dateStr, timeStr) => { o.Date = dateStr; o.Time = timeStr; o._rootEntry.enterDateTime(); forceSceneUpdate(); },
     enterJulianDay: (jd) => { o.julianDay = jd; o._rootEntry.enterJulianDay(jd); forceSceneUpdate(); },
-    clockFields: () => ({ date: o.Date, time: o.Time, julianDay: o.julianDay, pos: o.pos }),
+    clockFields: () => ({ date: o.Date, time: o.Time, julianDay: o.julianDay, pos: o.pos, yearOfDate: o.yearOfDate }),
     // plan 29 (one clock): the KEYSTROKE route — the Date and Time inputs set and committed as a
     // user does (the pane's change handlers, the validators, the entry guard); the label parser
     // and the label's year for a position; the 'Engine age (TT)' row's text; a landing by position
@@ -4692,6 +4715,13 @@ if (typeof window !== 'undefined') {
     labelYear: (pos) => _sceneLabelYear(pos),
     engineAgeText: (pos) => engineAgeTextAt(pos),
     enterPos: (pos) => { o._rootEntry.enterPos(pos); forceSceneUpdate(); },
+    // the Year of date field (plan 29): its entry path, its keystroke route, its parser, its
+    // string and the orbit year's first position
+    enterYearOfDate: (str, timeStr) => { o.yearOfDate = str; if (timeStr !== undefined) o.Time = timeStr; o._rootEntry.enterYearOfDate(); forceSceneUpdate(); },
+    typeYearOfDate: (str) => { const el = o._rootCtrls.yearCtrl.element.querySelector('input'); el.value = str; el.dispatchEvent(new Event('change', { bubbles: true })); forceSceneUpdate(); },
+    posOfYearOfDate: (str, timeStr) => posFromYearOfDate(str, timeStr),
+    yearOfDateLabel: (pos) => yearOfDateLabel(pos),
+    orbitYearStartPos: (year) => _orbitYearStartPos(year),
     // The perihelion-date rows' solve against the certified Sun it rides
     // (plan 20 §1b.11): the instant's JD, the Sun's longitude there and the target.
     perihelionDateProbe: () => {
@@ -6157,14 +6187,11 @@ let o = {
   'Step by': function (dir) {
     const years = Math.round(this.speedFact / SYEAR_J2000);
     if (years >= 1 && Math.abs(this.speedFact - years * SYEAR_J2000) < 1e-6 * SYEAR_J2000) {
-      // a whole-year step moves the LABEL's year (plan 29): inside the seam the civil date by N
-      // calendar years, as before; in the count form, or when the target year lies beyond the
-      // seam, the position by N years of date — the count's own unit (the count form has no
-      // civil date to move: the buttons stuck at −1000 until this branch, the owner 2026-11-08)
-      const m = /^\s*(-?\d+)-/.exec(this.Date);
-      const targetCivilYear = m ? parseInt(m[1], 10) + dir * years : NaN;
-      if (_labelIsCountForm(this.pos) || !_civilYearIsHonoured(targetCivilYear) || !Number.isFinite(targetCivilYear)) this.pos += dir * years;
-      else this.pos = posFromDateTime(addYears(this.Date, dir * years), this.Time);
+      // a whole-year step moves the civil date by N calendar years at the same time of day — a
+      // whole number of solar days, so the globe's lit face stays put between steps at every
+      // age (plan 29: the Date is the civil UT date at every position; a step of N years of
+      // position turned the globe 79° per 100-yr step, the 0.22 day of 100 tropical years)
+      this.pos = posFromDateTime(addYears(this.Date, dir * years), this.Time);
     } else {
       this.pos += dir * stepPosOfDate(this.speedFact);
     }
@@ -6173,6 +6200,7 @@ let o = {
     this.pos = clampPosToNavigable(this.pos);
     this.Date = sceneDateLabel(this.pos);
     this.Time = posToTime(this.pos);
+    this.yearOfDate = yearOfDateLabel(this.pos);
     positionChanged = true;
   },
 
@@ -10648,7 +10676,7 @@ function _hiCalendarFromJD(jd) {
 function _hiMonthSunLongitudes(year) {
   return _HI_MONTHS.map((_, i) => {
     try {
-      const jd = _labelYearIsCount(year) ? jdFromPos(year - startmodelYear + i / 12) : jdFromPos(posFromDateTime(`${year}-${String(i + 1).padStart(2, '0')}-01`, '00:00:00'));
+      const jd = _labelYearIsOrbit(year) ? jdFromPos(_orbitYearStartPos(year) + i / 12) : jdFromPos(posFromDateTime(`${year}-${String(i + 1).padStart(2, '0')}-01`, '00:00:00'));
       return _hiWrap360(_tierModelB().eclipse.sunLonDegAtJD(jd));
     } catch { return _hiWrap360(360 * (i - 2) / 12); }
   });
@@ -21392,9 +21420,32 @@ function setupGUI() {
     updatePosition();                                   // o.pos clamped, o.julianDay from it
     o.Date = sceneDateLabel(o.pos);
     o.Time = posToTime(o.pos);
+    o.yearOfDate = yearOfDateLabel(o.pos);
     dateCtrl.refresh();
     timeCtrl.refresh();
     jdCtrl.refresh();
+    yearCtrl.refresh();
+    _rootUpdating = was;
+  };
+  /** The Year of date field's path (plan 29): o.yearOfDate holds the entry (`Y`, `Y d217`,
+   *  `Y · day 217/403`), the time of day is the Time field's; the position is clamped and every
+   *  string re-derived from the landing. */
+  const enterYearOfDate = () => {
+    const was = _rootUpdating; _rootUpdating = true;
+    const p = posFromYearOfDate(o.yearOfDate, o.Time);
+    if (p !== null && Number.isFinite(p)) {
+      o.pos = p;
+      o.julianDay = jdFromPos(o.pos);
+      o.Day = posToDays(o.pos);
+      positionChanged = true;
+    }
+    o.Date = sceneDateLabel(o.pos);
+    o.Time = posToTime(o.pos);
+    o.yearOfDate = yearOfDateLabel(o.pos);
+    dateCtrl.refresh();
+    timeCtrl.refresh();
+    jdCtrl.refresh();
+    yearCtrl.refresh();
     _rootUpdating = was;
   };
   /** The Julian Day field's path: the position is clamped; when the landing moved, the Julian Day
@@ -21409,11 +21460,13 @@ function setupGUI() {
     if (o.pos !== raw) o.julianDay = jdFromPos(o.pos);
     o.Date = sceneDateLabel(o.pos);
     o.Time = posToTime(o.pos);
+    o.yearOfDate = yearOfDateLabel(o.pos);
     o.Day = posToDays(o.pos);
     positionChanged = true;
     dateCtrl.refresh();
     timeCtrl.refresh();
     jdCtrl.refresh();
+    yearCtrl.refresh();
     _rootUpdating = was;
   };
   /** A landing by POSITION (the Origin tour's stations — their instant is an engine year, not a
@@ -21425,21 +21478,24 @@ function setupGUI() {
     o.Day = posToDays(o.pos);
     o.Date = sceneDateLabel(o.pos);
     o.Time = posToTime(o.pos);
+    o.yearOfDate = yearOfDateLabel(o.pos);
     positionChanged = true;
     dateCtrl.refresh();
     timeCtrl.refresh();
     jdCtrl.refresh();
+    yearCtrl.refresh();
     _rootUpdating = was;
   };
-  /** Refresh the three fields under the guard — for the jumps that set o.pos themselves (the
+  /** Refresh the four fields under the guard — for the jumps that set o.pos themselves (the
    *  eclipse presets, the genesis button): an unguarded refresh() fired the change handlers,
    *  which re-landed on the rounded label (3 ulps = 126 s at the genesis, the snapshot's drift). */
   const refreshFields = () => {
     const was = _rootUpdating; _rootUpdating = true;
-    dateCtrl.refresh(); timeCtrl.refresh(); jdCtrl.refresh();
+    o.yearOfDate = yearOfDateLabel(o.pos);
+    dateCtrl.refresh(); timeCtrl.refresh(); jdCtrl.refresh(); yearCtrl.refresh();
     _rootUpdating = was;
   };
-  o._rootEntry = { enterDateTime, enterJulianDay, enterPos, refreshFields };
+  o._rootEntry = { enterDateTime, enterJulianDay, enterYearOfDate, enterPos, refreshFields };
   // When Date or Time changes → recompute position, then refresh JD + perihelion display
   const dateCtrl = gui.addBinding(o, 'Date', { label: 'Date (Y-M-D)' })
     .on('change', ({ value, last }) => {
@@ -21449,8 +21505,8 @@ function setupGUI() {
       blurActiveInput();
       _rootUpdating = false;
     });
-  // plan 29 (one clock, doc 111 §1.40): the three fields' hovers name the clock and both forms
-  addTooltip(dateCtrl, 'The date on the UT clock — the Earth\'s own count of solar days, the records\' axis. Inside ±3,000 years of today: the civil calendar date (Julian before 1582-10-15, Gregorian from it). Beyond: the year of date and the solar day of date in it — "-399998000 d217/403" is day 217 of the 403-solar-day year numbered −399,998,000, the count of the Earth\'s orbits on from today\'s calendar year, each count year beginning about 11 days before its civil namesake would (the scene epoch is 2000-06-21, half a year into the count year 2000) — a calendar of 365.25 of today\'s days would read 6.76 billion years for an age of 4.43. Type either form; a Y-M-D typed beyond ±3,000 years is read as that day-of-year of the year Y. The age in uniform time is the "Engine age (TT)" row under About.');
+  // plan 29 (one clock, doc 111 §1.40): the fields' hovers name the clock and the two counts
+  addTooltip(dateCtrl, 'The civil calendar date on the UT clock — the Earth\'s own count of solar days, the records\' axis — at every position (Julian before 1582-10-15, Gregorian from it). A calendar year is 365.25 of today\'s days, while a year of date holds 403 solar days 400 million years ago and 1,430 at the Earth–Moon genesis, so far back this field counts days, not orbits: it reads −6.76 billion at the genesis edge, where the Earth has made 4.43 billion orbits. The "Year of date" field below counts those orbits, and the "Engine age (TT)" row under About gives the age in uniform time.');
 
   const timeCtrl = gui.addBinding(o, 'Time', { label: 'Time (UT)' })
     .on('change', ({ value, last }) => {
@@ -21475,6 +21531,19 @@ function setupGUI() {
       _rootUpdating = false;
     });
   addTooltip(jdCtrl, 'The UT Julian Day — the count of solar days from −4712-01-01 noon, one unit per solar day of date at every epoch: the day the Earth\'s rotation counts, the eclipse records\' axis. 2.471 trillion of them reach the Earth–Moon genesis edge.');
+
+  // plan 29 (the owner's review): the YEAR OF DATE — the Earth's orbit of date and the solar day
+  // of date within it, editable; the Date field above stays the calendar everywhere
+  o.yearOfDate = '';
+  const yearCtrl = gui.addBinding(o, 'yearOfDate', { label: 'Year of date' })
+    .on('change', ({ value, last }) => {
+      if (!last || !isValidYearOfDate(value) || _rootUpdating || o._renderLoopRefreshing) return;
+      _rootUpdating = true;
+      enterYearOfDate();
+      blurActiveInput();
+      _rootUpdating = false;
+    });
+  addTooltip(yearCtrl, 'The Earth\'s orbit of date — the count of tropical years of date from the calendar year 2000 (year 2000 · day 1 is 2000-01-01) — and the solar day of date within it, with the days that year holds: 365 today, 403 at 400 million years ago, 1,430 at the Earth–Moon genesis. Type a year, and a day as "d217" or "day 217", to land on it at the Time shown. It agrees with the calendar year today (the two part by one day in ~3,300 years under today\'s calendar, 7.8 days per millennium under the Julian calendar before 1582) and is the age in uniform time to 0.06 % at the genesis: 4.432 billion orbits at the edge for 4.429 billion years of TT (the "Engine age (TT)" row under About).');
 
   // The three "what the scene stands on" rows live at the TOP of the About folder (owner
   // 2026-11-05: not in the root group, which is the time navigation), read-only, in this order:
@@ -21503,13 +21572,13 @@ function setupGUI() {
   o._surfaceCtrls = { surface: surfaceCtrl, bodies: bodiesCtrl };
 
   // Store root controls for selective render-loop refresh
-  o._rootCtrls = { dateCtrl, timeCtrl, jdCtrl };
+  o._rootCtrls = { dateCtrl, timeCtrl, jdCtrl, yearCtrl };
 
   // Make root controls visually prominent
-  [dateCtrl, timeCtrl, jdCtrl].forEach(c => {
+  [dateCtrl, timeCtrl, jdCtrl, yearCtrl].forEach(c => {
     c.element.classList.add('root-control');
   });
-  jdCtrl.element.classList.add('root-control-last');
+  yearCtrl.element.classList.add('root-control-last');
 
   // ── Simulation Controls ──
   const ctrlFolder = gui.addFolder({ title: 'Simulation Controls' });
@@ -23309,8 +23378,9 @@ function render(now) {
     o.Day           = posToDays(o.pos);
     o.Date          = sceneDateLabel(o.pos);
     o.Time          = posToTime(o.pos);
+    o.yearOfDate    = yearOfDateLabel(o.pos);
     // PLAN 27 (doc 111 §1.36): the JD follows the POSITION — one mapping; the strings are its
-    // display (beyond the label seam the Date is a season date a civil parser would misread).
+    // display (the civil UT date, the time, the year of date — plan 29).
     o.julianDay     = jdFromPos(o.pos);
     o.currentYear = sceneYearOfDate(o.julianDay)
     // plan 27 step B: the 'Domain' row — rewritten only when its text changes
@@ -23342,7 +23412,7 @@ function render(now) {
       const ae = document.activeElement;
       const ctrls = o._rootCtrls;
       o._renderLoopRefreshing = true;
-      [ctrls.dateCtrl, ctrls.timeCtrl, ctrls.jdCtrl].forEach(c => {
+      [ctrls.dateCtrl, ctrls.timeCtrl, ctrls.jdCtrl, ctrls.yearCtrl].forEach(c => {
         if (c && !c.element.contains(ae)) c.refresh();
       });
       o._renderLoopRefreshing = false;
@@ -26210,8 +26280,9 @@ function forceSceneUpdate (mode) {
   }
 
   o.Day           = posToDays(o.pos);
-  o.Date          = sceneDateLabel(o.pos);   // ONE label on ONE clock (plan 27, plan 29): the count form beyond the seam — the UT count's civil date read −6.76 Gyr at the genesis edge
+  o.Date          = sceneDateLabel(o.pos);   // ONE clock (plan 27, plan 29): the civil UT date everywhere, the orbit count beside it
   o.Time          = posToTime(o.pos);
+  o.yearOfDate    = yearOfDateLabel(o.pos);
   o.currentYear   = sceneYearOfDate(o.julianDay); // Required for updatePredictions & updateAscendingNodes
   if (o._engineAgeCtrl) o.engineAge = engineAgeTextAt(o.pos);
 
@@ -26973,13 +27044,8 @@ function decToDMSFromRadians(rad) {
  * Convert Julian Day to calendar date string
  */
 function jdToDateString(jd) {
-  // Beyond the label seam a UT Julian Day's label is the count form — the Date/Time fields'
-  // convention (plan 27, plan 29; doc 111 §1.36, §1.40): the civil date of the UT count means
-  // nothing there (the reports and the analemma chart print this).
-  if (_labelIsCountFormJd(jd)) {
-    const p = posFromJD(jd);
-    if (Number.isFinite(p)) return { date: sceneDateLabel(p), time: posToTime(p) };
-  }
+  // The civil UT date at every position — the Date/Time fields' one clock (plan 29, doc 111
+  // §1.40); the reports and the analemma chart print this.
   // Julian Day to calendar date conversion — the one-home converter
   const { year, month, day, dayFrac } = jdToCalendar(jd);
   const { hour: hours, minute: mins, second: secs } = dayFractionToHMS(dayFrac);
@@ -37490,8 +37556,6 @@ function isValidTime(value) {
  * @returns {boolean}
  */
 function isValidDate(value) {
-  // 0) plan 29: the count form `Y dD/N` (or `Y` alone) of a year beyond the label seam
-  if (typeof value === 'string' && _COUNT_FORM_RE.test(value)) return _parseCountForm(value) !== null;
   // 1) Parse with a single regex; preserve leading “-” on year
   const m = /^(-?\d+)-(\d{1,2})-(\d{1,2})$/.exec(value);
   if (!m) return false;
@@ -37569,12 +37633,7 @@ function dayToDate(jd) {
     throw new TypeError('dayToDate: julian day must be a finite number');
   }
 
-  // PLAN 29 (doc 111 §1.40): beyond the label seam the strings are the count form — the same
-  // label sceneDateLabel and posToTime write from the position, on the one UT clock.
-  if (_labelIsCountFormJd(jd)) {
-    const p = posFromJD(jd);
-    if (Number.isFinite(p)) return { calendar: 'count', date: sceneDateLabel(p), time: posToTime(p) };
-  }
+  // PLAN 29 (doc 111 §1.40): the civil UT date at every position — the Date/Time fields' one clock.
   // the one-home converter: Julian before the reform, Gregorian from it
   const cal = jdToCalendar(jd);
   const isGregorian = cal.calendar === 'Gregorian';

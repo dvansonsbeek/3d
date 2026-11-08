@@ -25,18 +25,19 @@ const OUT = resolve('packages/fixtures/regression/surface-rows.json');
 const write = process.argv.includes('--write');
 const PLANT = process.env.ESSRT_SURFACE_PLANT;
 
-/** The seven epochs, as the Date field takes them (plan 29, one clock: the civil UT date inside
- *  ±3,000 yr of today; beyond, the count form `Y dD` — the year of date and the solar day of date
- *  in it; a civil Y-M-D typed there is read as that day-of-year). The genesis epoch is typed as a
- *  year before the edge: the honest edge lands it ON the edge, whose label is recorded. */
+/** The seven epochs, as the fields take them (plan 29, one clock): today through the Date field
+ *  (the civil UT calendar, at every position); the deep epochs through the Year of date field —
+ *  the orbit count and the solar day of date in it (`Y d172`), the age in uniform time to 0.06 %.
+ *  The genesis epoch is typed as an orbit year before the edge: the honest edge lands it ON the
+ *  edge, whose label is recorded. */
 const EPOCHS = [
   { key: 'today', date: '2026-11-07' },
-  { key: 'm3000', date: '-3000 d172' },
-  { key: 'm400Myr', date: '-399998000 d172' },
-  { key: 'm2460Myr', date: '-2459998000 d172' },
-  { key: 'm4400Myr', date: '-4399998000 d172' },
-  { key: 'genesis', date: '-5000000000' },
-  { key: 'p990Myr', date: '990002000 d172' },
+  { key: 'm3000', year: '-3000 d172' },
+  { key: 'm400Myr', year: '-399998000 d172' },
+  { key: 'm2460Myr', year: '-2459998000 d172' },
+  { key: 'm4400Myr', year: '-4399998000 d172' },
+  { key: 'genesis', year: '-5000000000' },
+  { key: 'p990Myr', year: '990002000 d172' },
 ];
 /** The Predictions panel's live numeric fields (the cardinal rows arrive on a timer after a
  *  landing and are gated by epoch-consistency; the fields here are the landing frame's). */
@@ -56,14 +57,16 @@ const bodies = await s.page.evaluate(() => window.__test__.planetInfoBodies());
 /** @type {Record<string, { info: Record<string, any[]>, pred: Record<string, number> }>} */
 const perEpoch = {};
 for (const e of EPOCHS) {
-  await s.page.evaluate((d) => window.__test__.enterDateTime(d, '00:00:00'), e.date);
+  await s.page.evaluate((e) => { const T = window.__test__; if (e.year) T.enterYearOfDate(e.year, '00:00:00'); else T.enterDateTime(e.date, '00:00:00'); }, e);
   await s.page.waitForTimeout(1500);
   perEpoch[e.key] = await s.page.evaluate(({ bodies, PRED_KEYS }) => {
     const T = window.__test__;
     const info = {}; for (const b of bodies) info[b] = T.planetInfoRowsDump(b);
-    return { date: T.clockFields().date, info, pred: T.predictionsProbe(PRED_KEYS) };
+    const f = T.clockFields();
+    return { date: f.date, yearOfDate: f.yearOfDate, info, pred: T.predictionsProbe(PRED_KEYS) };
   }, { bodies, PRED_KEYS });
-  if (!perEpoch[e.key].date.startsWith(e.date) && e.key !== 'genesis') console.log(`  note: ${e.key} landed on ${perEpoch[e.key].date}`);
+  const typed = e.year ? e.year.replace(/ d(\d+)$/, ' · day $1/') : e.date, landed = e.year ? perEpoch[e.key].yearOfDate : perEpoch[e.key].date;
+  if (!landed.startsWith(typed) && e.key !== 'genesis') console.log(`  note: ${e.key} landed on ${landed}`);
 }
 const pageErrors = s.errors.length;
 await s.dispose();
