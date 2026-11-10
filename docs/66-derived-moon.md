@@ -250,10 +250,24 @@ classical constant:
   The scene Moon is prograde at every epoch out to ±1 Gyr by construction.
 
 Certified references of the framework-native default: argument drift vs
-Meeus M′ +0.37° at −135 / +0.58° at −584 with F ≈ 0 — the
-predicted-ë-vs-secular-ë difference (minutes-class in eclipse timing),
-with in-window rows at zero (a pure-ICRF comparison drifts
-+1.4°/century). NASA full-canon recall 99.58 / tight-window 74.62 / type
+the Meeus polynomial M′ <!--v:lunarArgumentMpAheadAtMinus135Deg-->0.11<!--/v-->° at −135 /
+<!--v:lunarArgumentMpAheadAtMinus584Deg-->0.21<!--/v-->° at −584 /
+<!--v:lunarArgumentMpAheadAtMinus1500Deg-->0.54<!--/v-->° at −1500, F
+<!--v:lunarArgumentFAheadAtMinus584Deg-->-0.03<!--/v-->° at −584 — the
+predicted-ë-vs-secular-ë difference: ϖ and Ω ride the e channel's own
+curvature (about a seventh of the secular-theory ë, see the
+`lpSecularCompletion` note above — L′ carries that convention, ϖ and Ω do
+not), so the model's perigee carries
+<!--v:lunarPerigeeTailShareAtMinus1500-->0.13<!--/v--> and its node
+<!--v:lunarNodeTailShareAtMinus1500-->0.20<!--/v--> of the polynomials'
+T³ + T⁴ tails at −1500; in eclipse timing a cos M′ term of
+<!--v:lunarCanonModelAnomalyTermMinus1000To0Min-->-2.0<!--/v--> min over
+−1000…0 and <!--v:lunarCanonModelAnomalyTermMinus1999ToMinus1000Min-->-5.7<!--/v--> min
+over −1999…−1000, the lunar canon's
+remainder once the opposition-vs-greatest-eclipse term is removed
+(doc 112 §7, doc 111 §1.41 d — written by the sweep's artifact), with
+in-window rows at zero (a pure-ICRF comparison drifts +1.4°/century).
+NASA full-canon recall 99.58 / tight-window 74.62 / type
 98.66 (model event total 12,070 vs NASA's 12,064; all mismatch samples
 knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical audit
 split 3 confirmed · 13 off-peak · 5 regional · 0 ΔT-signal · 5 geographic

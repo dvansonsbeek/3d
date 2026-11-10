@@ -354,6 +354,39 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   126 s off its own label); a step rewrites its strings itself (two clicks in
   one frame stepped the same Date twice); the per-year solves run in the
   ORBIT year where a calendar year holds 0.9 orbits. (§1.40)
+- **A residual's SPECTRUM is a gate the tolerances cannot replace** — plan 32
+  read every residual series against its external record through one harness
+  (doc 112, `data/residual-spectrum-sweep.json`): no line without external
+  physics stands anywhere, and three stood INSIDE the instruments. A referee
+  sampled every 10 days and interpolated with a cubic across its own 29.5-d
+  barycentre wobble gave every cardinal series a 0.5-min line at 2.715 yr (the
+  Moon's elongation aliased by the yearly sampling) — the gate's, not the
+  Sun's: take the known oscillation out before interpolating. The lunar canon
+  residual's 7-min line at 3.617 yr was the twelfth harmonic of F under
+  full-moon sampling — a residual LINEAR in the node distance, i.e. an EVENT
+  DEFINITION (the finder's opposition against the canon's greatest eclipse;
+  83 % of the variance): name the convention on both sides before reading a
+  residual, and read a smooth function of a sampled argument as that argument's
+  high harmonic. The Sun's Σk ≠ 0 planetary arguments drift 0.51° per century
+  outside their fit window and its barycentre term lacks the D ± M′ sidebands
+  (0.43″, 0.18″) — §1.15 measured. UNDER the definition term one line stood
+  with physics the instruments do not supply: a 5-min full-moon-cycle term a
+  probe had missed because its grid stopped short of the line, and the one-term
+  node regression had half-absorbed (sin 2F correlates with sin M′ under
+  eclipse sampling: slope −25.9 for the geometry's −29.6; the five-term fit
+  reads −29.4) — a phase of M′: the model's lunar perigee and node match the
+  Meeus/ELP polynomials in T² and carry 0.13 / 0.20 of their T³ tails, the
+  model's M′ 0.54° ahead at −1500 (Meeus Ch. 49 as the third instrument, by
+  era) — doc 66's "predicted-ë-vs-secular-ë" drift measured: ϖ and Ω ride
+  the e channel's own ë (a seventh of the secular-theory ë), L′ alone carries
+  the secular completion. One series, named physics — L′'s completion
+  extended to ϖ and Ω, never a polynomial; a doc's hand-written drift row
+  was stale by 3×. Harness rules: time-order a series before
+  its lag-one correlation; trigonometry once per frequency, not per surrogate;
+  ρ ≈ 1 at a dense cadence means "n cycles seen", never a significance; a bare
+  `createModel()` has no banked series; a null names its grid's extent; a
+  regressor shared with the sampling is fitted jointly and read against the
+  prediction. (§1.41)
 
 ---
 

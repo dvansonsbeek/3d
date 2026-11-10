@@ -1938,6 +1938,48 @@ export const VALUES = {
     return out;
   })(),
 
+  // ── The residual spectra sweep (plan 32, doc 112) ──────────────────────────
+  // Reads data/residual-spectrum-sweep.json — the governed artifact written by
+  // tools/explore/residual-spectra/write-sweep.mjs --write: every residual series the model
+  // produces against an external record through one spectral harness, the probes that read its
+  // lines, and the decision's counts. PUBLISHED research content: what stands and what does not.
+  ...(() => {
+    const sw = () => rd('data/residual-spectrum-sweep.json');
+    return {
+      residualSweepSeriesCount: { get: () => sw().decision.seriesAnalysed, render: (v) => String(v), note: 'the residual series analysed by the plan-32 sweep (ΔT, LR04, the paleo anchors, the Sun and its cardinal instants against Horizons, the lunar canon, La2004)' },
+      residualSweepLinesAboveFloor: { get: () => sw().decision.linesAboveRedNoiseFloor, render: (v) => String(v), note: 'spectral lines above the red-noise p < 0.01 floor across the sweep, span-scale families excluded' },
+      residualSweepLinesNamed: { get: () => sw().decision.linesNamedByAnArgumentOrTone, render: (v) => String(v), note: 'of those, the lines a named astronomical argument or a primary-family mixing tone accounts for within half the resolution' },
+      residualSweepSurvivorsWithoutPhysics: { get: () => sw().decision.survivorsWithoutExternalPhysicsInTwoSeries, render: (v) => String(v), note: 'the pre-registered criterion: a line without external physics standing in two independent series — none' },
+      lunarCanonNodeTermCorrelation: { get: () => sw().probes.lunarNode.onNodeDistance.r, render: (v) => Number(v).toFixed(2), note: 'the correlation of the lunar canon\'s dynamical-time timing residual with the eclipse\'s node distance — the opposition-versus-greatest-eclipse definition term' },
+      lunarCanonNodeTermSlopeMinPerDeg: { get: () => sw().probes.lunarNode.onNodeDistance.slope, render: (v) => Number(v).toFixed(2), unit: 'min/°', note: 'its slope: minutes of timing residual per degree of node distance' },
+      lunarCanonTimingSdTDMin: { get: () => sw().probes.lunarNode.sdTDMin, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the lunar canon\'s timing residual in dynamical time (canon TD − model TT), sd over 12,064 eclipses' },
+      lunarCanonTimingSdAfterNodeTermMin: { get: () => sw().probes.lunarNode.sdAfterSin2FMin, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the same after the node-distance (sin 2F) term alone' },
+      lunarCanonTimingSdAfterFiveTermMin: { get: () => sw().probes.lunarNode.fiveTerm.sdAfterMin, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the same after the five-term fit (the node term, its anomaly sidebands and the direct anomaly phase) — the finder\'s own remainder' },
+      lunarCanonFiveTermRemainderFmcLineMin: { get: () => sw().series['lunar-canon-TD-five-term-removed'].lines[0].amplitude, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the full-moon-cycle line left in the five-term remainder — the anomaly term\'s growth with age, which one span-wide coefficient cannot remove' },
+      lunarCanonNodeTermFittedMin: { get: () => sw().probes.lunarNode.fiveTerm.coefficients.sin2F, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the node term\'s coefficient in the five-term fit (minutes per unit sin 2F)' },
+      lunarCanonNodeTermPredictedMin: { get: () => sw().probes.lunarNode.fiveTerm.predicted.slopeMinPerSin2F, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the coefficient the shadow geometry predicts for the greatest-eclipse offset: −i²Ḟ/2λ̇²' },
+      lunarCanonDirectAnomalyTermMin: { get: () => sw().probes.lunarNode.fiveTerm.directAnomalyAmplitudeMin, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the direct anomaly term (cos M′, sin M′) of the canon − model timing residual over −1999…3000 — the full-moon-cycle line; zero by the geometry, it is the model\'s M′ phase against the ephemeris\'s' },
+      lunarArgumentMpAheadAtMinus1500Deg: { get: () => sw().probes.lunarArguments.find((r) => r.year === -1500).modelMinusPolynomialArcsec.Mp / 3600, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s lunar mean anomaly M′ ahead of the Meeus/ELP polynomial at −1500' },
+      lunarArgumentMpAheadAtMinus3000Deg: { get: () => sw().probes.lunarArguments.find((r) => r.year === -3000).modelMinusPolynomialArcsec.Mp / 3600, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the same at −3000' },
+      lunarArgumentMpAheadAtMinus584Deg: { get: () => sw().probes.lunarArguments.find((r) => r.year === -584).modelMinusPolynomialArcsec.Mp / 3600, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the same at −584 (the eclipse audit\'s reference instant; doc 66\'s drift row)' },
+      lunarArgumentMpAheadAtMinus135Deg: { get: () => sw().probes.lunarArguments.find((r) => r.year === -135).modelMinusPolynomialArcsec.Mp / 3600, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the same at −135 (doc 66\'s drift row)' },
+      lunarCanonModelAnomalyTermMinus1000To0Min: { get: () => sw().probes.lunarThirdInstrument.byEra.find((e) => e.era[0] === -1000).modelMinusMeeus.coefficients.cosMp, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the cos M′ coefficient of (model opposition TT − Meeus Ch. 49 full moon TD) over −1000…0 — the model\'s M′ phase against the ephemeris\'s, in eclipse timing' },
+      lunarCanonModelAnomalyTermMinus1999ToMinus1000Min: { get: () => sw().probes.lunarThirdInstrument.byEra.find((e) => e.era[0] === -1999).modelMinusMeeus.coefficients.cosMp, render: (v) => Number(v).toFixed(1), unit: 'min', note: 'the same over −1999…−1000' },
+      lunarArgumentFAheadAtMinus584Deg: { get: () => sw().probes.lunarArguments.find((r) => r.year === -584).modelMinusPolynomialArcsec.F / 3600, render: (v) => Number(v).toFixed(2), unit: '°', note: 'the model\'s argument of latitude F against the Meeus/ELP polynomial at −584' },
+      lunarPerigeeTailShareAtMinus1500: { get: () => sw().probes.lunarArguments.find((r) => r.year === -1500).shareOfTailCarried.perigee, render: (v) => Number(v).toFixed(2), note: 'the share of the ephemeris polynomial\'s T³+T⁴ tail in the lunar perigee longitude the model\'s apsidal chain carries at −1500 (1 = the polynomial)' },
+      lunarNodeTailShareAtMinus1500: { get: () => sw().probes.lunarArguments.find((r) => r.year === -1500).shareOfTailCarried.node, render: (v) => Number(v).toFixed(2), note: 'the same for the node longitude' },
+      residualSweepLinesStandingWithPhysics: { get: () => sw().decision.linesStandingWithNamedPhysics.length, render: (v) => String(v), note: 'lines standing against their record with physics the instruments do not supply, one series each — the lunar canon\'s full-moon-cycle line' },
+      cardinalGateInterpolationLineMin: { get: () => sw().probes.cardinal.interpolation.cubic4.amplitudesMin.dAlias, render: (v) => Number(v).toFixed(2), unit: 'min', note: 'the 2.715-yr line in the cardinal-instant comparison with the gate\'s cubic crossing (the Moon\'s elongation aliased by the yearly sampling)' },
+      cardinalGateInterpolationLineDewobbledMin: { get: () => sw().probes.cardinal.interpolation.cubic4Dewobbled.amplitudesMin.dAlias, render: (v) => Number(v).toFixed(2), unit: 'min', note: 'the same line with the barycentre wobble removed before the interpolation — the line is the gate\'s' },
+      josePairRefitLineSeconds: { get: () => sw().series['deltaT-spline-refit-bond+hallstatt'].lines[0].amplitude, render: (v) => Number(v).toFixed(0), unit: 's', note: 'the strongest line of the SMH2016 spline residual re-fitted without the Jose pair' },
+      josePairRefitLineFirstHalfSeconds: { get: () => sw().series['deltaT-spline-refit-bond+hallstatt'].lines[0].amplitudeFirstHalf, render: (v) => Number(v).toFixed(0), unit: 's', note: 'that line in the first half of the record (−720…645)' },
+      josePairRefitLineSecondHalfSeconds: { get: () => sw().series['deltaT-spline-refit-bond+hallstatt'].lines[0].amplitudeSecondHalf, render: (v) => Number(v).toFixed(0), unit: 's', note: 'and in the second (645…2010) — an episode, not a line' },
+      lr04ResidualToneKyr: { get: () => sw().series['lr04-post-mpt'].lines[0].periodYears, render: (v) => Number(v).toFixed(1), unit: 'kyr', note: 'the strongest LR04 residual peak in the post-MPT window — the obliquity − eccentricity difference tone' },
+      lr04ResidualToneSharePct: { get: () => 100 * sw().series['lr04-post-mpt'].lines[0].power, render: (v) => Number(v).toFixed(0), unit: '%', note: 'its share of the post-MPT residual variance' },
+      la2004PrecessionRateDriftArcsecPerYr: { get: () => sw().series['la2004-perihelion'].trend.slope / 1000, render: (v) => Number(v).toFixed(4), unit: '″/yr', note: 'the linear drift of the perihelion of date against La2004 over −10 Myr…0 — the precession-rate difference between La2004\'s tidal model and the composed law on the cited history' },
+    };
+  })(),
+
   // ── Scene-vs-JPL published comparison (K6/K7 verdict keys) ──────────────
   // Reads data/chain-vs-jpl-rms.json — the governed artifact banked by
   // tools/verify/measure-rms-by-epoch.js --write (joint RA+Dec RMS,

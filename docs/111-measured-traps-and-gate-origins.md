@@ -1720,6 +1720,121 @@ an age, wherever the day has changed. A seam between two clocks is a step of
 only near 1900). And a test hook takes the same guard as the handler it
 stands in for, or it measures itself.
 
+### 1.41 A residual's SPECTRUM is a gate the tolerances cannot replace — three things the spectra found inside the instruments, and one under them
+
+**What plan 32 did (doc 112 is the record, `data/residual-spectrum-sweep.json`
+the artifact).** Every residual series the model produces against an external
+record — ΔT against Espenak & Meeus and against Stephenson, Morrison &
+Hohenkerk's observations and spline; LR04 against the climate formula per
+regime; the 45 paleo anchors; the certified Sun and its cardinal instants
+against JPL Horizons; the lunar canon's 12,064 timings; the Earth's e, ε, ϖ
+against La2004 — through one harness (a weighted Lomb–Scargle with AR(1) and
+white surrogate floors on the maximum over the grid, the edge/interior and
+two-halves splits) with a pre-registered rule: a line with no external physics
+standing in two independent series reopens the theory. None did. Every line
+that stands is known physics (the LR04 residual's 73-kyr tone is the obliquity
+minus the 97-kyr eccentricity line — the state-dependent response's mixing
+product; the La2004 residuals are one precession-rate history 4 parts in 10⁴
+apart over 10 Myr) — or an INSTRUMENT, or, in ONE series, a named difference
+between the model and the ephemeris that the instrument's term had covered
+(d). Three were inside the instruments:
+
+**(a) A referee read through the gate's own interpolation.** The Horizons
+swap gate (`sun-vs-horizons.js`) finds each cardinal crossing with a Lagrange
+cubic through four 10-day rows of Horizons' longitude, which carries the
+6.44″ barycentre wobble at 29.53 d; a cubic across 30 days follows that
+wobble to a few arcseconds, in step with the Moon's phase, and the Moon's
+elongation advances 12.368 cycles a year — so every cardinal series carried a
+0.5-min line at 2.715 yr and a 6.40-yr doublet, stable over six millennia,
+that the apparent Sun's own residual does not hold (its barycentre term is
+right to 0.03″). Removing the wobble before interpolating takes the line from
+0.53 to 0.07 min and the doublet to 0.007; the gate's cardinal rms is 1.24 min,
+not 1.32. The cardinal tier's own part of the residual is 2 s rms. Rule: when a
+referee is sampled, the interpolation across its own short-period content is
+part of the comparison; take the known oscillation out before interpolating,
+or sample the referee densely at the crossings.
+
+**(b) An event's DEFINITION is part of a comparison.** The lunar canon's
+dynamical-time residual (canon TD − model TT, free of both ΔT conventions)
+carried one line of 7 min at 3.617 yr, ninety times the floor, in both halves
+alike. No combination of the lunar arguments to |k| ≤ 8 matched it; its
+frequency is 8 cycles per 358 lunations — the twelfth harmonic of F under
+full-moon sampling, which is no perturbation but the sawtooth an eclipse's
+node distance traces from season to season: a residual LINEAR in that
+distance. Regressed on it: r = −0.91, −0.86 min per degree (±19 min at the
+window's ±22° edge; gamma alone r = 0.00, its sign flipping between the
+nodes), the sd 10.1 → 4.1 min. The source says why: `findLunarEclipsesInRange`
+returns the opposition in longitude, bisected to a second, where the canon
+times GREATEST ECLIPSE — the solar finder refines to minimum γ, the lunar
+finder does not. The canon-recall gate's "tight" count (9,868 of 12,064
+within 15 min) carried the offset from the day it was written. Rule: name the
+event convention on both sides of a comparison before reading its residual;
+a residual that is a smooth function of a sampled argument shows up as a
+HIGH HARMONIC of that argument, not as the argument itself.
+
+**(c) A windowed argument outside its window.** The certified Sun's residual
+against Horizons at the named planetary arguments, fitted directly in three
+300-yr windows: every Venus and Jupiter term keeps a constant phase and grows
+linearly with the distance from J2000 (2V − 3E: 0.14″ at 1850, 0.67″ at −250,
+1.20″ at −2350), and the growth sorts by the sum of the coefficients — the
+frame-free arguments (V − E, 2V − 2E) drift 2.7° per unit at −2350, the
+Σk ≠ 0 ones (2V − 3E, 3V − 4E, J) share one extra 22° (0.51° per century).
+§1.15's rule, "a term with Σk ≠ ±1 stays a constant row with its window
+named", measured outside the window: the constant row's phase is the
+window's. Beside it two terms the Sun does not carry at all, the barycentre
+term's elliptic sidebands D − M′ (0.43″) and D + M′ (0.18″), the same at every
+epoch. Both are bounded harmonics on named periods (the whitelist's rule), a
+refit when the owner calls for one.
+
+**(d) Under the instrument's term, the model's lunar perigee against the
+ephemeris's.** The remainder after (b)'s node term was declared "nothing
+above a minute" by a probe whose frequency grid stopped at 0.82 of the
+Nyquist rate — short of the full-moon cycle's 0.887 cycles per year. The
+generator's grid reached it: a 4.9-min line at 1.127 yr, 280 times the floor.
+Two faults in the reading, one finding under them. The one-term regression
+was BIASED: under eclipse sampling sin 2F correlates with sin M′ (r −0.32),
+so the node slope came out −25.9 min where the shadow geometry predicts
+−29.6 (−i²Ḟ/2λ̇²) and the five-term fit measures −29.4, with a cos M′
+modulation of −0.144 against the speed of date's −0.128 — and a DIRECT
+anomaly term of 5.0 min the geometry puts at zero. A direct anomaly term in
+a timing is a phase of M′, and a third instrument placed it: Meeus Ch. 49's
+full-moon instants on the ephemeris's own arguments. The canon against Meeus
+carries the pure definition term in every era and no anomaly term (the
+canon's M′ is the polynomial's); the model against Meeus is 0.3 min in the
+fit window and grows a cos M′ term into the past, −0.5 / −2.0 / −5.7 min per
+millennium before 1000 — the model's M′ 0.05°, 0.20°, 0.55° ahead. Read
+directly (the composer's `moonArgs` against `pureMeeusArgs`): the model's ϖ
+and Ω match the Meeus polynomials in T² (plan 23's construction) and carry
+0.13 and 0.20 of their T³ + T⁴ tails at −1500. The lunar theory's record
+had named it (doc 66: "the predicted-ë-vs-secular-ë difference"): ϖ and Ω
+ride the deep eccentricity channel on the model's own e(t), whose J2000
+curvature is about a seventh of the secular-theory ë that ELP's T³
+embodies; L′ carries the secular convention through `lpSecularCompletion`
+(derived at 98.8 %, DE441-confirmed), ϖ and Ω have no such carrier — and the
+doc's drift row (+0.37° at −135 / +0.58° at −584) was a hand-written number
+from an earlier state; it is script-written now. The Moon's longitude error
+is EoC · δM′ · cos M′: ~100″ at −750, 650″ at −3000, inside the ancient ΔT
+scatter, invisible to every tolerance gate. By the rule it is one series
+with its physics named — the completion L′ has, extended to ϖ and Ω, never
+a polynomial. Rules: a probe's null names the grid's extent beside it (a line
+outside the grid is not absent); a regressor shared with the sampling is
+fitted JOINTLY with the terms it correlates with, and its coefficient is
+read against the prediction; and a residual term the geometry puts at zero
+is a model-vs-reference term — hand it a third instrument on the reference's
+own arguments before attributing it.
+
+**The sweep's own lessons** (doc 112 §1): a series is put in TIME ORDER before
+its lag-one correlation is read (LR04 arrives by age; the estimator stepping
+backwards read ρ = 0, the "red-noise" floor was the white one and eight lines
+"stood"); the surrogate floor's trigonometry is computed once per frequency,
+not once per surrogate (14 min → seconds per series); a smooth residual at a
+dense cadence has ρ ≈ 1 and its AR(1) floor near the whole variance — the
+statement is "1.5 cycles seen", never a significance; and a bare
+`createModel()` has no banked series (its hybrid domain is null), so a
+comparison of the published elements passes the three banked artifacts in.
+The gate: `check:artifacts` on the governed artifact; `docs:tables` on doc
+112's blocks; the registry's `residualSweep*` keys.
+
 ---
 
 ## 2. The browser tier's gates and their origins
