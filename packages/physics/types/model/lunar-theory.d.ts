@@ -13,6 +13,10 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
         planetaryCarrier: (T: number) => number;
         obliquityCarrier: (T: number) => number;
         lpSecularCompletion: (T: number) => number;
+        apsidalNodalSecularCompletion: (T: number) => {
+            w: number;
+            om: number;
+        };
         bundle: {
             LP0: number;
             D0: number;

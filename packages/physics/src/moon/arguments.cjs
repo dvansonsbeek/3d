@@ -396,6 +396,28 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
   // (unnamed — read only inside ±Tq ≈ 279 cy, the fine tier; its coarse tier never exists)
   const secCarrier = makeDeepCarrier(secIntegrand);
 
+  /** The SAME completion for the perigee and the node (plan 32 follow-up, doc 111 §1.41 d).
+   *  ϖ and Ω ride the e channel through the physical exponents, so their T³ was the channel's
+   *  own ë where ELP's polynomials embody the secular theory's — measured as 0.13 / 0.20 of the
+   *  polynomials' T³ + T⁴ tails at −1500, the model's M′ 0.54° ahead there, 1.66° at −3000, a
+   *  cos M′ term of 2.0 / 5.7 min per millennium in the lunar canon's timings. To first order in
+   *  Δ(e²) the channel factor is (g/g₀)^s − 1 ≈ s · (3/2) · Δ(e²) / (1 − e₀²), so the two
+   *  completions are L′'s carrier scaled by K_W/K_PL and K_N/K_PL with
+   *  K = rate_ICRF · s_phys · 3 / (2 (1 − e₀²)) — one carrier, three scalings, zero new
+   *  constants; the secular Taylor reproduces Meeus's ϖ T³ at 96.6 % (bundle.T3_W, the
+   *  documented check). Bounded as L′'s: the carrier saturates at the taper edge, and the frozen
+   *  offset beyond it — the integrated window mismatch — is L′'s scaled by the same ratios
+   *  (≈ −6.5× for ϖ, ≈ +1.1× for Ω), the honest statement of the perigee phase past ±28 kyr.
+   *  @param {number} T Julian centuries from J2000 @returns {{w: number, om: number}} degrees */
+  function apsidalNodalSecularCompletion(T) {
+    if (T === 0) return { w: 0, om: 0 };
+    const k = kPlValue();
+    if (k === 0) return { w: 0, om: 0 };
+    const lp = lpSecularCompletion(T);
+    const g = 1.5 / (1 - eccentricityJ2000 * eccentricityJ2000);
+    return { w: lp * (bundle.W_ICRF * bundle.S_W_PHYS * g) / k, om: lp * (bundle.N_ICRF * bundle.S_N_PHYS * g) / k };
+  }
+
   // ── Deep-time branch: always-chains (Stage B) ────────────────────────────
   /** @type {number | null} */
   let argsY0 = null;
@@ -561,11 +583,11 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
     // carried the frame share in the Meeus-effective exponents: in the window the
     // two agreed to 0.006″/cy², beyond it M′ and F inherited the whole wobble —
     // measured 2.5° at ±10 kyr, 39° at −1 Myr.)
-    const pF = rateCompInit().pFix(dy), fr = frameRemainder(Tj);
+    const pF = rateCompInit().pFix(dy), fr = frameRemainder(Tj), sc = apsidalNodalSecularCompletion(Tj);
     const Lp = A.LP0 + 360 * Ntrop + planetaryCarrier(Tj) + obliquityCarrier(Tj)
       + lpSecularCompletion(Tj) + pF;
-    const w = (A.LP0 - A.MP0) + 360 * Naps + pF + fr;            // perigee ϖ (of-date, advance)
-    const om = (A.LP0 - A.F0) - 360 * Nnod + pF + fr;            // node Ω (of-date, regression)
+    const w = (A.LP0 - A.MP0) + 360 * Naps + pF + fr + sc.w;     // perigee ϖ (of-date, advance)
+    const om = (A.LP0 - A.F0) - 360 * Nnod + pF + fr + sc.om;    // node Ω (of-date, regression)
     const Lsun = sunMeanLonDegAtJdTT(jd);          // the certified Sun's mean longitude (unwrapped)
     const ws = sunPerihelionLonDegAtJdTT(jd) + 180;   // the Sun's perihelion = Earth's mean ϖ of date + 180° (wrapped; M wraps)
     void A;
@@ -616,8 +638,9 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
     // other tails) — the T² is Meeus-exact as before, the frame share no longer
     // rides the eccentricity channel's wiggle. The deep branch carries the model's
     // own precession of date (pFix) in its place.
-    const w = (A.LP0 - A.MP0) + A.W_ICRF * (T + channelIntegral(T, A.S_W_PHYS)) + A.P0 * T + A.T2F * Tc2;   // perigee ϖ (of-date)
-    const om = (A.LP0 - A.F0) + A.N_ICRF * (T + channelIntegral(T, A.S_N_PHYS)) + A.P0 * T + A.T2F * Tc2;   // node Ω (of-date)
+    const sc = apsidalNodalSecularCompletion(T);   // the secular-ë completion, as the deep branch's (doc 111 §1.41 d)
+    const w = (A.LP0 - A.MP0) + A.W_ICRF * (T + channelIntegral(T, A.S_W_PHYS)) + A.P0 * T + A.T2F * Tc2 + sc.w;   // perigee ϖ (of-date)
+    const om = (A.LP0 - A.F0) + A.N_ICRF * (T + channelIntegral(T, A.S_N_PHYS)) + A.P0 * T + A.T2F * Tc2 + sc.om;   // node Ω (of-date)
     const Lsun = sunMeanLonDegAtJdTT(jdTT);               // the certified Sun's mean longitude of date
     const ws = sunPerihelionLonDegAtJdTT(jdTT) + 180;     // the Sun's perihelion of date
     return {
@@ -651,7 +674,7 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
 
   // _rateCompletion: probe hook (instruments/verification) — the (d′) state:
   // whether the completion is live, its measured ṗΔ, and the five anchors.
-  return { argsAt, fwArgs, fwArgsDeep, pureMeeusArgs, planetaryCarrier, obliquityCarrier, lpSecularCompletion, bundle,
+  return { argsAt, fwArgs, fwArgsDeep, pureMeeusArgs, planetaryCarrier, obliquityCarrier, lpSecularCompletion, apsidalNodalSecularCompletion, bundle,
     recordCarrierPrefixes, carrierSeatStatus,
     _rateCompletion: () => ({ rc: rateCompInit(), anchors: anchorsInit() }) };
 }

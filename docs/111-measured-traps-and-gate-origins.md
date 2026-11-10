@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.11
+modelVersion: v27.12
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -1839,7 +1839,25 @@ from an earlier state; it is script-written now. The Moon's longitude error
 is EoC · δM′ · cos M′: ~100″ at −750, 650″ at −3000, inside the ancient ΔT
 scatter, invisible to every tolerance gate. By the rule it is one series
 with its physics named — the completion L′ has, extended to ϖ and Ω, never
-a polynomial. Rules: a probe's null names the grid's extent beside it (a line
+a polynomial.
+
+*Fixed in the follow-up.* The open question was whether ELP's ϖ/Ω cubic is
+the secular-ë convention alone; the bundle's own documented check answered
+it — the secular Taylor on the shipped e₀, ė, ë (`bundle.T3_W`) reproduces
+Meeus's ϖ T³ at 96.6 % and Ω's at 113 % of a 4″ term. To first order in
+Δ(e²) the channel factor is s · (3/2) · Δ(e²)/(1 − e₀²), so the two
+completions are L′'s carrier scaled by K_W/K_PL and K_N/K_PL with
+K = rate_ICRF · s_phys · 3/(2(1 − e₀²)) — `apsidalNodalSecularCompletion`,
+one carrier, three scalings, no new constant, zero through T², bounded at
+the taper edge (the frozen offsets beyond it are L′'s scaled: ≈ −6.5× on ϖ,
+≈ +1.1× on Ω — doc 66 carries them script-written). The scaled carrier
+predicted the measured drift at 103–108 % before it shipped; live, the
+model's M′ sits −124″ from the polynomial at −1500 (was +1,935″), −150″ at
+−3000 (was +5,965″), ϖ within 0.05° and Ω within 25″ over ±3,000 yr. Rules:
+a documented Taylor check that is "not consumed" is a prediction waiting
+to be read against a measurement — read it before building; and a
+correction that exists for one of-date longitude is owed to the others
+riding the same channel. Rules of the finding: a probe's null names the grid's extent beside it (a line
 outside the grid is not absent); a regressor shared with the sampling is
 fitted JOINTLY with the terms it correlates with, and its coefficient is
 read against the prediction; and a residual term the geometry puts at zero

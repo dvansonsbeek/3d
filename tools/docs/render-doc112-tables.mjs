@@ -183,11 +183,13 @@ function blockDecision() {
     `| span-scale families (a smooth curvature's Fourier terms, ≤ 6 cycles of the span) | ${D.linesInLongPeriodFamilies} |`,
     `| lines above the floor the classifiers did not name, read against the probes (§3–§5) | ${D.linesAboveFloorUnnamed.length} |`,
     `| lines standing against their record with physics the instruments do not supply (one series each) | ${(D.linesStandingWithNamedPhysics || []).length} |`,
+    `| lines that stood with named physics and were closed by a follow-up | ${(D.closedByTheFollowUp || []).length} |`,
     `| survivors without external physics in two independent series | ${D.survivorsWithoutExternalPhysicsInTwoSeries} |`,
     '',
     `Unnamed lines by series: ${D.linesAboveFloorUnnamed.map((l) => `${l.series} ${per(l.periodYears)} (${g(l.amplitude, 3)}${l.stands ? '' : ', unstable'})`).join('; ') || 'none'}.`,
     '',
     ...(D.linesStandingWithNamedPhysics || []).map((l) => `Standing with named physics: ${l.series} at ${f(l.periodYears, 4)} yr (${l.name}), ${f(l.amplitudeMin, 2)} min over the whole span — ${l.physics}.`),
+    ...(D.closedByTheFollowUp || []).map((l) => `Closed by the follow-up: ${l.series} at ${f(l.periodYears, 4)} yr (${l.name}) stood at ${f(l.amplitudeBeforeTheCompletionMin, 2)} min over the whole span — ${l.physics} — and reads ${f(l.amplitudeMin, 2)} min since ${l.closedBy}; the model's M′ against the polynomial, before → after: ${['-3000', '-1500', '-500', '0'].map((y) => `${f(l.modelMinusPolynomialMpArcsecBefore[y], 0)}″ → ${f(l.modelMinusPolynomialMpArcsecAfter[y], 0)}″ at ${y}`).join(', ')}.`),
   ].join('\n');
 }
 

@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.11
+modelVersion: v27.12
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -182,7 +182,29 @@ classical constant:
   `u2-dense-de441.mjs`). Zero through T² by construction (modern era:
   ULP-class), saturating beyond the taper — the frozen offset is the
   honest statement of the multi-mode e(t) divergence, not a claim of
-  zero.
+  zero. The perigee and the node ride the SAME completion
+  (`apsidalNodalSecularCompletion`, the plan-32 follow-up): ϖ and Ω run
+  on the e channel through the physical exponents, so their T³ was the
+  channel's own ë where ELP's embodies the secular theory's — 0.13 / 0.20
+  of the polynomials' T³ + T⁴ tails at −1500 before the completion, the
+  model's M′ 0.54° ahead there and a cos M′ term of 2.0 / 5.7 min per
+  millennium in the lunar canon's timings (doc 111 §1.41 d, doc 112 §7).
+  To first order in Δ(e²) the channel factor is s · (3/2) · Δ(e²)/(1 − e₀²),
+  so the two completions are L′'s carrier scaled by K_W/K_PL and K_N/K_PL
+  with K = rate_ICRF · s_phys · 3/(2(1 − e₀²)) — one carrier, three
+  scalings, no new constant; the secular Taylor reproduces Meeus's ϖ T³
+  at 96.6 % (`bundle.T3_W`, the documented check), and with the completion
+  live the arguments sit within 0.05° of the polynomials over ±3,000 yr.
+  The frozen offsets beyond the taper edge are
+  <!--v:lunarCompletionFrozenLpPastDeg-->-13.4<!--/v-->° /
+  <!--v:lunarCompletionFrozenLpFutureDeg-->2.9<!--/v-->° on L′,
+  <!--v:lunarCompletionFrozenPerigeePastDeg-->86<!--/v-->° /
+  <!--v:lunarCompletionFrozenPerigeeFutureDeg-->-18<!--/v-->° on ϖ and
+  <!--v:lunarCompletionFrozenNodePastDeg-->-14.4<!--/v-->° /
+  <!--v:lunarCompletionFrozenNodeFutureDeg-->3.1<!--/v-->° on Ω (past /
+  future) — the integrated window mismatch, bounded by construction: the
+  deep perigee phase is stated to that width, as the deep Moon's display
+  class has always been.
   The of-date RATES are completed the same way (the rate-completion pair
   in `fwArgsDeep`): (i) `pFix = ∫(p_dyn − p_kin) dy` on Lp, ϖ AND Ω alike
   (plan 23 — ONE equinox for the three of-date longitudes) — p_dyn the
@@ -241,7 +263,9 @@ classical constant:
   T²/T³/T⁴ tails at |T| ≤ 100 cy — unclamped, the fitted T⁴ tail cancels
   the lunar mean motion at year ≈ 1,989,000 and reverses it beyond. The
   secular-ë completion carrier saturates at its taper edge (±28 kyr) to a
-  frozen Lp offset of −17.5° (past) / +7.0° (future) — bounded by
+  frozen Lp offset of <!--v:lunarCompletionFrozenLpPastDeg-->-13.4<!--/v-->° (past) /
+  <!--v:lunarCompletionFrozenLpFutureDeg-->2.9<!--/v-->° (future), and the
+  perigee's and node's completions to theirs (above) — bounded by
   construction, so no polynomial reaches deep time and the bounded-harmonic
   claim is untouched. The rate completion is likewise bounded: the pFix
   table freezes beyond ±1 Myr, the five rate anchors freeze at the
@@ -250,26 +274,26 @@ classical constant:
   The scene Moon is prograde at every epoch out to ±1 Gyr by construction.
 
 Certified references of the framework-native default: argument drift vs
-the Meeus polynomial M′ <!--v:lunarArgumentMpAheadAtMinus135Deg-->0.11<!--/v-->° at −135 /
-<!--v:lunarArgumentMpAheadAtMinus584Deg-->0.21<!--/v-->° at −584 /
-<!--v:lunarArgumentMpAheadAtMinus1500Deg-->0.54<!--/v-->° at −1500, F
-<!--v:lunarArgumentFAheadAtMinus584Deg-->-0.03<!--/v-->° at −584 — the
+the Meeus polynomial M′ <!--v:lunarArgumentMpAheadAtMinus135Deg-->-0.01<!--/v-->° at −135 /
+<!--v:lunarArgumentMpAheadAtMinus584Deg-->-0.02<!--/v-->° at −584 /
+<!--v:lunarArgumentMpAheadAtMinus1500Deg-->-0.03<!--/v-->° at −1500, F
+<!--v:lunarArgumentFAheadAtMinus584Deg-->0.01<!--/v-->° at −584 — the
 predicted-ë-vs-secular-ë difference: ϖ and Ω ride the e channel's own
 curvature (about a seventh of the secular-theory ë, see the
 `lpSecularCompletion` note above — L′ carries that convention, ϖ and Ω do
 not), so the model's perigee carries
-<!--v:lunarPerigeeTailShareAtMinus1500-->0.13<!--/v--> and its node
-<!--v:lunarNodeTailShareAtMinus1500-->0.20<!--/v--> of the polynomials'
+<!--v:lunarPerigeeTailShareAtMinus1500-->1.06<!--/v--> and its node
+<!--v:lunarNodeTailShareAtMinus1500-->1.02<!--/v--> of the polynomials'
 T³ + T⁴ tails at −1500; in eclipse timing a cos M′ term of
-<!--v:lunarCanonModelAnomalyTermMinus1000To0Min-->-2.0<!--/v--> min over
-−1000…0 and <!--v:lunarCanonModelAnomalyTermMinus1999ToMinus1000Min-->-5.7<!--/v--> min
+<!--v:lunarCanonModelAnomalyTermMinus1000To0Min-->0.2<!--/v--> min over
+−1000…0 and <!--v:lunarCanonModelAnomalyTermMinus1999ToMinus1000Min-->0.3<!--/v--> min
 over −1999…−1000, the lunar canon's
 remainder once the opposition-vs-greatest-eclipse term is removed
 (doc 112 §7, doc 111 §1.41 d — written by the sweep's artifact), with
 in-window rows at zero (a pure-ICRF comparison drifts +1.4°/century).
-NASA full-canon recall <!--v:lunarCanonRecallPercent-->99.92<!--/v--> % /
-tight-window <!--v:lunarCanonRecallTightPercent-->97.85<!--/v--> % / type
-<!--v:lunarCanonRecallTypeAccuracyPercent-->99.49<!--/v--> %
+NASA full-canon recall <!--v:lunarCanonRecallPercent-->99.93<!--/v--> % /
+tight-window <!--v:lunarCanonRecallTightPercent-->99.49<!--/v--> % / type
+<!--v:lunarCanonRecallTypeAccuracyPercent-->99.55<!--/v--> %
 (<!--v:lunarCanonRecallModelOnly-->26<!--/v--> model-only events against
 NASA's <!--v:lunarCanonRecallEvents-->12,064<!--/v-->; the mismatches
 knife-edge at the γ ≈ 1.0/1.5 boundaries — `data/lunar-canon-recall.json`,
@@ -848,7 +872,7 @@ the measured MPP02-vs-JPL comparison floor (~0.33″); dense 2-day JPL
 arbiter λ 2.22″ / β 0.38″; the 179-syzygy fleet Δ-instrument improving;
 NASA centerlines mean <!--v:centerlinesMeanArcsec-->6.2<!--/v-->″ / max
 <!--v:centerlinesMaxArcsec-->10.7<!--/v-->″; audit verdicts 3/13/5/0/5;
-Babylon −135 BestGap <!--v:babylon135BestGapKm-->154<!--/v--> km
+Babylon −135 BestGap <!--v:babylon135BestGapKm-->120<!--/v--> km
 (doc 103). What remains is genuinely floor: the ~0.8″ λ post-census
 residual (sub-0.04″ deep dust + beyond-3-body), the doctrine-blocked
 ~5e-5 parameter class (the three biggest Meeus head amplitudes off by

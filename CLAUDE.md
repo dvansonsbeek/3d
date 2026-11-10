@@ -386,7 +386,10 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   era) — doc 66's "predicted-ë-vs-secular-ë" drift measured: ϖ and Ω ride
   the e channel's own ë (a seventh of the secular-theory ë), L′ alone carries
   the secular completion. One series, named physics — L′'s completion
-  extended to ϖ and Ω, never a polynomial; a doc's hand-written drift row
+  extended to ϖ and Ω (`apsidalNodalSecularCompletion`: one carrier scaled
+  by K_W/K_PL and K_N/K_PL, the bundle's "not consumed" Taylor check having
+  predicted the drift at 97 %; M′ within 0.04° of the polynomial over
+  ±3 kyr since), never a polynomial; a doc's hand-written drift row
   was stale by 3×. Harness rules: time-order a series before
   its lag-one correlation; trigonometry once per frequency, not per surrogate;
   ρ ≈ 1 at a dense cadence means "n cycles seen", never a significance; a bare

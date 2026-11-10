@@ -46,6 +46,16 @@ export async function composedContext() {
 
 const w180 = (d) => ((d + 540) % 360 + 360) % 360 - 180;
 
+/** The secular-ë completion carriers at the taper edge and beyond: the frozen offsets L′, ϖ and Ω
+ *  carry past ±SECULAR_COMPLETION_TAPER_YEARS (degrees), read at ±300 cy and at ±10,000 cy (identical by
+ *  construction — the carrier saturates), with the ϖ/Ω scalings they ride on. */
+export async function lunarCompletionSaturation() {
+  const { moonArgs } = await composedContext();
+  const at = (T) => ({ T, lpDeg: moonArgs.lpSecularCompletion(T), ...(() => { const s = moonArgs.apsidalNodalSecularCompletion(T); return { perigeeDeg: s.w, nodeDeg: s.om }; })() });
+  const past = at(-300), future = at(300), deepPast = at(-10000), deepFuture = at(10000);
+  return { past, future, saturated: Math.abs(deepPast.lpDeg - past.lpDeg) < 1e-12 && Math.abs(deepFuture.lpDeg - future.lpDeg) < 1e-12, perigeeOverLp: past.perigeeDeg / past.lpDeg, nodeOverLp: past.nodeDeg / past.lpDeg };
+}
+
 /** The model's lunar arguments against the pure Meeus Ch. 47 polynomials (model − polynomial,
  *  arcseconds) at Julian-year epochs, with the polynomials' own T³ + T⁴ tails of the perigee
  *  ϖ = L′ − M′ and the node Ω = L′ − F beside the model's departure in each. */

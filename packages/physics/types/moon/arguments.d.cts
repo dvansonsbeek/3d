@@ -89,6 +89,10 @@ export function createMoonArguments({ constants, fns, checkpoints }: {
     planetaryCarrier: (T: number) => number;
     obliquityCarrier: (T: number) => number;
     lpSecularCompletion: (T: number) => number;
+    apsidalNodalSecularCompletion: (T: number) => {
+        w: number;
+        om: number;
+    };
     bundle: {
         LP0: number;
         D0: number;

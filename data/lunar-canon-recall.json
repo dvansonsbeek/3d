@@ -7,39 +7,39 @@
   "matchWindowMinutes": 180,
   "tightWindowMinutes": 15,
   "canonEvents": 12064,
-  "modelEvents": 12080,
-  "matched": 11992,
-  "matchedTight": 11805,
-  "typeMismatch": 62,
+  "modelEvents": 12082,
+  "matched": 12002,
+  "matchedTight": 12002,
+  "typeMismatch": 54,
   "modelOnly": 26,
-  "nasaOnly": 10,
-  "recallPercent": 99.92,
-  "tightRecallPercent": 97.85,
-  "typeAccuracyPercent": 99.49,
+  "nasaOnly": 8,
+  "recallPercent": 99.93,
+  "tightRecallPercent": 99.49,
+  "typeAccuracyPercent": 99.55,
   "byEra": {
     "-2000..-1501": {
-      "n": 1215,
-      "signedMedianMinutes": -6.3
+      "n": 1219,
+      "signedMedianMinutes": -9.01
     },
     "-1500..-1001": {
       "n": 1210,
-      "signedMedianMinutes": 6.23
+      "signedMedianMinutes": 6.24
     },
     "-1000..-501": {
       "n": 1199,
-      "signedMedianMinutes": 0.23
+      "signedMedianMinutes": 0.4
     },
     "-500..-1": {
       "n": 1188,
-      "signedMedianMinutes": -0.2
+      "signedMedianMinutes": 0.19
     },
     "0..499": {
-      "n": 1189,
-      "signedMedianMinutes": -2.22
+      "n": 1187,
+      "signedMedianMinutes": -2.23
     },
     "500..999": {
       "n": 1205,
-      "signedMedianMinutes": -3.22
+      "signedMedianMinutes": -3.25
     },
     "1000..1499": {
       "n": 1217,
@@ -55,11 +55,11 @@
     },
     "2500..2999": {
       "n": 1204,
-      "signedMedianMinutes": -1.36
+      "signedMedianMinutes": -1.34
     },
     "3000..3499": {
       "n": 3,
-      "signedMedianMinutes": 7.08
+      "signedMedianMinutes": 7.05
     }
   },
   "inputs": {
@@ -96,7 +96,7 @@
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
       "packages/physics/src/moon/apparent.cjs": "sha256:c3d473accead7e6c2f3a8765dbba6b31868809909d688ab3060c88e721caf112",
-      "packages/physics/src/moon/arguments.cjs": "sha256:9647bf57d21be1fd45016f95357980169acdab05b5fd318feec4c8bce7b71f15",
+      "packages/physics/src/moon/arguments.cjs": "sha256:82a65f50ec9e9df18a38cf42872a1c97506869819347e6acadb5b170a7c85bfd",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7e7df509816f6a02ef3a99e8032d18bdf9939f23bbf842f2862dc1164fda7349",
       "packages/physics/src/moon/month-chain.cjs": "sha256:3465792a575f5d497e50fde8371d5a3273f727639e4eb994d1fe73743d961b14",
       "packages/physics/src/moon/series-extension.cjs": "sha256:f93ac2d259b3abbffda1b0e5232e6b310854da38ad8bc2bb89a40195ee4d273b",

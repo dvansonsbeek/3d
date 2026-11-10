@@ -12,9 +12,9 @@
     "unmatchedCanon": 0,
     "typeAgree": 1446,
     "meanAbsResidualMinutes": 0.812,
-    "meanAbsResidualMinutesFull": 0.812425465470758,
+    "meanAbsResidualMinutesFull": 0.8124543769092395,
     "rmsResidualMinutes": 0.881,
-    "rmsResidualMinutesFull": 0.8807795697993598,
+    "rmsResidualMinutesFull": 0.8807374632703004,
     "maxAbsResidualMinutes": 1.893
   },
   "visibility": {
@@ -141,11 +141,11 @@
     "found": true,
     "type": "Partial",
     "canonType": "Partial",
-    "magnitudeUmbral": 0.9149,
+    "magnitudeUmbral": 0.9223,
     "canonMagnitudeUmbral": 0.9199,
-    "ttResidualMinutes": 1.3,
+    "ttResidualMinutes": -1.74,
     "visibleFromBabylon": true,
-    "babylonMoonAltitudeDeg": 34.02
+    "babylonMoonAltitudeDeg": 34.65
   },
   "dtBands": {
     "overall": {
@@ -284,10 +284,10 @@
     "bins": {
       "100": {
         "n": 195,
-        "signedMeanMinutes": -0.07
+        "signedMeanMinutes": -0.02
       },
       "500": {
-        "n": 201,
+        "n": 200,
         "signedMeanMinutes": 0.08
       },
       "1000": {
@@ -307,24 +307,24 @@
         "signedMeanMinutes": 0.92
       },
       "-750": {
-        "n": 190,
-        "signedMeanMinutes": -1.82
+        "n": 189,
+        "signedMeanMinutes": -1.73
       },
       "-650": {
         "n": 204,
-        "signedMeanMinutes": -1.42
+        "signedMeanMinutes": -1.43
       },
       "-550": {
-        "n": 203,
-        "signedMeanMinutes": -1.61
+        "n": 204,
+        "signedMeanMinutes": -1.56
       },
       "-450": {
         "n": 192,
-        "signedMeanMinutes": -1.27
+        "signedMeanMinutes": -1.19
       },
       "-350": {
         "n": 185,
-        "signedMeanMinutes": -0.95
+        "signedMeanMinutes": -0.93
       },
       "-250": {
         "n": 183,
@@ -332,29 +332,29 @@
       },
       "-100": {
         "n": 200,
-        "signedMeanMinutes": -0.4
+        "signedMeanMinutes": -0.37
       }
     },
     "driftVsModernMinutes": {
-      "100": -0.85,
+      "100": -0.8,
       "500": -0.7,
       "1000": -0.56,
       "1500": -0.24,
       "1800": 0.1,
       "2000": 0.14,
-      "-750": -2.6,
-      "-650": -2.2,
-      "-550": -2.39,
-      "-450": -2.05,
-      "-350": -1.73,
+      "-750": -2.51,
+      "-650": -2.21,
+      "-550": -2.34,
+      "-450": -1.97,
+      "-350": -1.71,
       "-250": -1.79,
-      "-100": -1.18
+      "-100": -1.15
     },
-    "effectiveDeltaNdotArcsecPerCy2": 0.21,
+    "effectiveDeltaNdotArcsecPerCy2": 0.2,
     "predictedReducedResidualMinutes": {
-      "-800": 1.4,
+      "-800": 1.3,
       "-700": -3.2,
-      "-600": -3.6,
+      "-600": -3.7,
       "-500": -9.4,
       "-400": -12.1
     }
@@ -368,41 +368,41 @@
     "perCentury": {
       "-800": {
         "n": 2,
-        "medianMinutes": 24,
-        "seMinutes": 48.8,
-        "preRegisteredMinutes": 1.4,
+        "medianMinutes": 24.2,
+        "seMinutes": 49.5,
+        "preRegisteredMinutes": 1.3,
         "z": 0.5
       },
       "-700": {
         "n": 6,
-        "medianMinutes": -26.2,
-        "seMinutes": 9.9,
+        "medianMinutes": -25.9,
+        "seMinutes": 10.6,
         "preRegisteredMinutes": -3.2,
-        "z": -2.3
+        "z": -2.1
       },
       "-600": {
         "n": 21,
-        "medianMinutes": -11.1,
-        "seMinutes": 7,
-        "preRegisteredMinutes": -3.6,
-        "z": -1.1
+        "medianMinutes": -10.6,
+        "seMinutes": 7.6,
+        "preRegisteredMinutes": -3.7,
+        "z": -0.9
       },
       "-500": {
         "n": 14,
-        "medianMinutes": 3.4,
-        "seMinutes": 10.7,
+        "medianMinutes": 2.8,
+        "seMinutes": 10.3,
         "preRegisteredMinutes": -9.4,
         "z": 1.2
       },
       "-400": {
         "n": 27,
-        "medianMinutes": -12,
-        "seMinutes": 3.1,
+        "medianMinutes": -12.8,
+        "seMinutes": 2.8,
         "preRegisteredMinutes": -12.1,
-        "z": 0
+        "z": -0.3
       }
     },
-    "chi2": 8.2,
+    "chi2": 7.1,
     "chi2Centuries": 5
   },
   "denseTargets": {
@@ -415,78 +415,78 @@
     "perCentury": {
       "400": {
         "n": 5,
-        "medianSeconds": -438,
+        "medianSeconds": -435,
         "seSeconds": 365
       },
       "500": {
         "n": 11,
-        "medianSeconds": -271,
-        "seSeconds": 344
+        "medianSeconds": -251,
+        "seSeconds": 336
       },
       "800": {
         "n": 5,
-        "medianSeconds": -9,
+        "medianSeconds": -12,
         "seSeconds": 562
       },
       "900": {
         "n": 17,
-        "medianSeconds": -382,
-        "seSeconds": 175
+        "medianSeconds": -384,
+        "seSeconds": 174
       },
       "1000": {
         "n": 39,
-        "medianSeconds": -78,
-        "seSeconds": 110
+        "medianSeconds": -80,
+        "seSeconds": 111
       },
       "1100": {
         "n": 4,
-        "medianSeconds": 788,
-        "seSeconds": 48
+        "medianSeconds": 785,
+        "seSeconds": 45
       },
       "1200": {
         "n": 17,
-        "medianSeconds": 131,
+        "medianSeconds": 129,
         "seSeconds": 124
       },
       "-800": {
         "n": 2,
-        "medianSeconds": 1439,
-        "seSeconds": 2926
+        "medianSeconds": 1454,
+        "seSeconds": 2972
       },
       "-700": {
         "n": 6,
-        "medianSeconds": -1573,
-        "seSeconds": 593
+        "medianSeconds": -1554,
+        "seSeconds": 636
       },
       "-600": {
         "n": 21,
-        "medianSeconds": -663,
-        "seSeconds": 420
+        "medianSeconds": -639,
+        "seSeconds": 459
       },
       "-500": {
         "n": 14,
-        "medianSeconds": 205,
-        "seSeconds": 639
+        "medianSeconds": 167,
+        "seSeconds": 621
       },
       "-400": {
         "n": 27,
-        "medianSeconds": -722,
-        "seSeconds": 188
+        "medianSeconds": -769,
+        "seSeconds": 167
       },
       "-300": {
         "n": 13,
-        "medianSeconds": -1153,
-        "seSeconds": 1347
+        "medianSeconds": -1123,
+        "seSeconds": 1391
       },
       "-200": {
         "n": 50,
-        "medianSeconds": 111,
-        "seSeconds": 192
+        "medianSeconds": 65,
+        "seSeconds": 197
       },
       "-100": {
         "n": 15,
-        "medianSeconds": 105,
-        "seSeconds": 355
+        "medianSeconds": 118,
+        "seSeconds": 375
       }
     },
     "chi2CenturiesUsed": [
@@ -505,13 +505,13 @@
       "1200"
     ],
     "ablationChi2": {
-      "fullStack": 34,
-      "minus_bond": 38.7,
-      "minus_hallstatt": 42.8,
-      "minus_jose5": 33.3,
-      "minus_jose4": 27.5,
-      "minus_resonator": 69.2,
-      "noCycles": 49.4
+      "fullStack": 38.5,
+      "minus_bond": 38.6,
+      "minus_hallstatt": 47.2,
+      "minus_jose5": 37.5,
+      "minus_jose4": 30.8,
+      "minus_resonator": 79.6,
+      "noCycles": 51.9
     }
   },
   "inputs": {
@@ -554,7 +554,7 @@
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
       "packages/physics/src/moon/apparent.cjs": "sha256:c3d473accead7e6c2f3a8765dbba6b31868809909d688ab3060c88e721caf112",
-      "packages/physics/src/moon/arguments.cjs": "sha256:9647bf57d21be1fd45016f95357980169acdab05b5fd318feec4c8bce7b71f15",
+      "packages/physics/src/moon/arguments.cjs": "sha256:82a65f50ec9e9df18a38cf42872a1c97506869819347e6acadb5b170a7c85bfd",
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7e7df509816f6a02ef3a99e8032d18bdf9939f23bbf842f2862dc1164fda7349",
       "packages/physics/src/moon/month-chain.cjs": "sha256:3465792a575f5d497e50fde8371d5a3273f727639e4eb994d1fe73743d961b14",
       "packages/physics/src/moon/series-extension.cjs": "sha256:f93ac2d259b3abbffda1b0e5232e6b310854da38ad8bc2bb89a40195ee4d273b",

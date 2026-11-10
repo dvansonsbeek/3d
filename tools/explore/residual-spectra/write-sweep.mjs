@@ -20,7 +20,7 @@ import { seriesLr04, seriesLa2004 } from './series-records.mjs';
 import { seriesPaleo } from './series-paleo.mjs';
 import { sunResidualRows, seriesSunYearly, seriesSunWindow, seriesCardinal } from './series-sun.mjs';
 import { sunNamedTable, densePeaks, cardinalProbes, lunarCanonPairs, lunarNodeRegression, lunarThirdInstrument, ARG_FREQ, SUN_NAMED_TERMS, YEAR } from './probes.mjs';
-import { lunarArgumentsAgainstMeeus } from './model-internals.mjs';
+import { lunarArgumentsAgainstMeeus, lunarCompletionSaturation } from './model-internals.mjs';
 
 const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -167,6 +167,7 @@ probes.lunarGreatest = regGreatest;
 // against the polynomials directly — the full-moon-cycle line's attribution
 probes.lunarThirdInstrument = lunarThirdInstrument(pairs);
 probes.lunarArguments = await lunarArgumentsAgainstMeeus();
+probes.lunarCompletionSaturation = await lunarCompletionSaturation();
 log(`lunar third instrument: model M′ phase vs the polynomial by era ${probes.lunarThirdInstrument.byEra.map((e) => `${e.era[0]}…${e.era[1]} ${e.impliedModelMpPhaseDeg.toFixed(3)}°`).join(', ')}`);
 
 // the decision's counts
@@ -187,15 +188,21 @@ const decision = {
   // (probes.lunarThirdInstrument, probes.lunarArguments) — the perigee's and node's cubic secular
   // terms the model's chains carry only a fraction of; ONE series, so the rule's reopening threshold
   // (two independent series) is not met, and the line is a named input for the owner's decision
-  linesStandingWithNamedPhysics: [{
-    series: 'lunar-canon-TD', periodYears: 1 / (ARG_FREQ.Mp - ARG_FREQ.D), name: 'the full-moon cycle (the anomaly at full moon)',
-    amplitudeMin: probes.lunarGreatest.anomalyTwoTerm.amplitudeMin, amplitudeUnderTheDefinitionTermMin: probes.lunarNode.fiveTerm.directAnomalyAmplitudeMin,
-    physics: 'the cos M′ term of the shipped instant\'s residual (the span mean of a term growing into the past: −0.5 / −2.0 / −5.7 min per millennium before 1000 in probes.lunarThirdInstrument; the sin M′ part of the opposition instant\'s 5-min pair was the definition offset\'s own form and left with the instant) — the model\'s perigee and node ride the deep eccentricity channel (the physical exponents s_ϖ, s_Ω on the model\'s own e(t)), Meeus-exact in T² by construction; their T³ is the channel\'s own ë, about a seventh of the secular-theory ë that ELP\'s polynomials embody — L′ carries that convention through lpSecularCompletion, ϖ and Ω do not (doc 66\'s "predicted-ë-vs-secular-ë" drift, here measured): the model\'s M′ runs ahead of the polynomial\'s by the complement, 0 in the fit window, 0.2° at −500, 0.54° at −1500, 1.66° at −3000',
-    modelMinusPolynomialMpArcsec: Object.fromEntries(probes.lunarArguments.map((r) => [r.year, r.modelMinusPolynomialArcsec.Mp])),
-  }],
+  // the entry stands while the shipped instant's anomaly term exceeds the finder's own remainder's share of
+  // it (0.5 min); once the perigee/node completion carries the secular ë it moves to closedByTheFollowUp
+  ...(probes.lunarGreatest.anomalyTwoTerm.amplitudeMin > 0.5 ? { linesStandingWithNamedPhysics: [lunarStandingEntry()] } : { linesStandingWithNamedPhysics: [], closedByTheFollowUp: [{ ...lunarStandingEntry(), closedBy: 'apsidalNodalSecularCompletion (moon/arguments.cjs): L′\'s secular-ë carrier scaled to ϖ and Ω — the model\'s M′ within 0.04° of the polynomial over ±3,000 yr', modelMinusPolynomialMpArcsecAfter: Object.fromEntries(probes.lunarArguments.map((r) => [r.year, r.modelMinusPolynomialArcsec.Mp])) }] }),
   survivorsWithoutExternalPhysicsInTwoSeries: 0,
   rule: 'a survivor with no external physics in ≥ 2 independent series reopens the theory; none → the framework stands and the next input is a cited ocean-dissipation history (plan 32 §0); a line standing WITH named physics in one series is an input, listed above',
 };
+function lunarStandingEntry() {
+  return {
+    series: 'lunar-canon-TD', periodYears: 1 / (ARG_FREQ.Mp - ARG_FREQ.D), name: 'the full-moon cycle (the anomaly at full moon)',
+    amplitudeMin: probes.lunarGreatest.anomalyTwoTerm.amplitudeMin, amplitudeUnderTheDefinitionTermMin: probes.lunarNode.fiveTerm.directAnomalyAmplitudeMin,
+    amplitudeBeforeTheCompletionMin: 1.69, modelMinusPolynomialMpArcsecBefore: { '-3000': 5965, '-1500': 1935, '-500': 665, '0': 325, '500': 128, '3000': -55, '5000': -1184 },
+    physics: 'the cos M′ term of the shipped instant\'s residual (the span mean of a term growing into the past: −0.5 / −2.0 / −5.7 min per millennium before 1000 in probes.lunarThirdInstrument; the sin M′ part of the opposition instant\'s 5-min pair was the definition offset\'s own form and left with the instant) — the model\'s perigee and node ride the deep eccentricity channel (the physical exponents s_ϖ, s_Ω on the model\'s own e(t)), Meeus-exact in T² by construction; their T³ is the channel\'s own ë, about a seventh of the secular-theory ë that ELP\'s polynomials embody — L′ carries that convention through lpSecularCompletion, ϖ and Ω do not (doc 66\'s "predicted-ë-vs-secular-ë" drift, here measured): the model\'s M′ runs ahead of the polynomial\'s by the complement, 0 in the fit window, 0.2° at −500, 0.54° at −1500, 1.66° at −3000',
+    modelMinusPolynomialMpArcsec: Object.fromEntries(probes.lunarArguments.map((r) => [r.year, r.modelMinusPolynomialArcsec.Mp])),
+  };
+}
 
 const doc = {
   _description: 'Plan 32 — the residual spectra: every residual series the model produces against an external record (ΔT: Espenak & Meeus 2006, Stephenson–Morrison–Hohenkerk 2016; LR04 per regime; the paleo anchors; the certified Sun and its cardinal instants against JPL Horizons; the lunar canon; the Earth\'s e, ε, ϖ against La2004), each through ONE harness (a generalised weighted Lomb–Scargle with AR(1) and white surrogate floors on the maximum over the grid, the edge/interior and two-halves splits), with the probes that read the lines (the named-argument table, the cardinal tier split and crossing interpolation, the lunar node-distance regression) and the decision\'s counts. GENERATED by tools/explore/residual-spectra/write-sweep.mjs --write; doc 112 and the registry\'s residualSweep* keys render from it.',
