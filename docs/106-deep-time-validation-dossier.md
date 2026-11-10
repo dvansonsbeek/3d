@@ -134,13 +134,13 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   `data/lunar-alignment-summary.json`): the model's lunar finder vs the
   NASA 5-Millennium Canon on the TT axis
   (<!--v:lunarCanonMatched-->1,450<!--/v-->/<!--v:lunarCanonEvents-->1,450<!--/v-->
-  matched 1600–2200, <!--v:lunarCanonTypeAgree-->1,447<!--/v--> types agree);
+  matched 1600–2200, <!--v:lunarCanonTypeAgree-->1,446<!--/v--> types agree);
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
   <!--v:lunarBabylon746MagnitudeUmbral-->0.915<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->35.2<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->34.0<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (model ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,214<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
@@ -152,11 +152,11 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   <!--v:lunarDtBoundsBabylon135HighSeconds-->12,140<!--/v-->] s contains the
   model's <!--v:lunarDtBoundsBabylon135FrameworkSeconds-->11,982<!--/v--> s);
   and the measured framework-vs-ELP lunar-theory drift
-  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.22<!--/v--> ″/cy²) with the
+  (Δṅ ≈ <!--v:lunarTheoryDriftDeltaNdot-->0.21<!--/v--> ″/cy²) with the
   PRE-REGISTERED re-reduction prediction pinned before the contact-time
   machinery existed — and now MEASURED against it: the Phase C
-  differential re-reduction (<!--v:lunarPhaseCIdentified-->69<!--/v-->/<!--v:lunarPhaseCTotal-->75<!--/v--> Babylonian observations identified)
-  is statistically consistent with the pinned column, χ² = <!--v:lunarPhaseCChi2-->9.2<!--/v--> over <!--v:lunarPhaseCCenturies-->5<!--/v-->
+  differential re-reduction (<!--v:lunarPhaseCIdentified-->70<!--/v-->/<!--v:lunarPhaseCTotal-->75<!--/v--> Babylonian observations identified)
+  is statistically consistent with the pinned column, χ² = <!--v:lunarPhaseCChi2-->8.2<!--/v--> over <!--v:lunarPhaseCCenturies-->5<!--/v-->
   centuries under the E5 basis — the dLOD/dt stack survives its
   falsification test — [doc 102 §Phase C verdict](102-gia-alpha-lunar-validation.md).
 - **The certified Sun** — the eclipse chain's Sun is assembled from the

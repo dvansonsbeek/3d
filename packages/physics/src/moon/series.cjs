@@ -5,8 +5,9 @@
  * scene block (both the full production evaluation), and hosts the
  * TRUNCATED eclipse-finder variant beside it. The dual form is DELIBERATE
  * (doc 66 §Layer 1b): the truncated `_eclMoon*` helpers are the form the
- * certified eclipse statistics were produced with (NASA canon recall
- * 99.58/74.62/98.66, knife-edge at the γ ≈ 1.0/1.5 boundaries) — upgrading
+ * certified eclipse statistics were produced with (the NASA canon recall,
+ * tight-window and type figures live in data/lunar-canon-recall.json; the
+ * mismatches are knife-edge at the γ ≈ 1.0/1.5 boundaries) — upgrading
  * them to the full series is a RE-CERTIFICATION item, not a refactor.
  *
  * Full scene form: 60 longitude + 60 latitude terms with E/E² scaling on

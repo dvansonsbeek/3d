@@ -75,13 +75,13 @@
       {
         "century": -2900,
         "n": 3652,
-        "mean": 0.961151,
+        "mean": 0.96115,
         "sd": 1.729523
       },
       {
         "century": -2800,
         "n": 3653,
-        "mean": 1.766735,
+        "mean": 1.766737,
         "sd": 1.714668
       },
       {
@@ -99,38 +99,38 @@
       {
         "century": -2500,
         "n": 3652,
-        "mean": 2.147449,
+        "mean": 2.14745,
         "sd": 1.603237
       },
       {
         "century": -2400,
         "n": 3653,
-        "mean": 2.143923,
+        "mean": 2.143922,
         "sd": 1.581145
       },
       {
         "century": -2300,
         "n": 3652,
-        "mean": 2.466373,
+        "mean": 2.466374,
         "sd": 1.53572
       },
       {
         "century": -2200,
         "n": 3653,
         "mean": 2.812512,
-        "sd": 1.575713
+        "sd": 1.575712
       },
       {
         "century": -2100,
         "n": 3652,
-        "mean": 3.284343,
+        "mean": 3.284342,
         "sd": 1.550858
       },
       {
         "century": -2000,
         "n": 3653,
-        "mean": 2.958262,
-        "sd": 1.485517
+        "mean": 2.958263,
+        "sd": 1.485516
       },
       {
         "century": -1900,
@@ -141,26 +141,26 @@
       {
         "century": -1800,
         "n": 3653,
-        "mean": 3.446855,
+        "mean": 3.446854,
         "sd": 1.535088
       },
       {
         "century": -1700,
         "n": 3652,
-        "mean": 3.139663,
-        "sd": 1.452579
+        "mean": 3.139664,
+        "sd": 1.452578
       },
       {
         "century": -1600,
         "n": 3653,
-        "mean": 3.842511,
+        "mean": 3.84251,
         "sd": 1.419737
       },
       {
         "century": -1500,
         "n": 3653,
         "mean": 3.231407,
-        "sd": 1.401283
+        "sd": 1.401282
       },
       {
         "century": -1400,
@@ -177,7 +177,7 @@
       {
         "century": -1200,
         "n": 3652,
-        "mean": 4.085237,
+        "mean": 4.085238,
         "sd": 1.355986
       },
       {
@@ -190,7 +190,7 @@
         "century": -1000,
         "n": 3652,
         "mean": 4.435173,
-        "sd": 1.222467
+        "sd": 1.222468
       },
       {
         "century": -900,
@@ -213,19 +213,19 @@
       {
         "century": -600,
         "n": 3652,
-        "mean": 4.452002,
+        "mean": 4.452003,
         "sd": 1.209169
       },
       {
         "century": -500,
         "n": 3653,
         "mean": 4.002522,
-        "sd": 1.138114
+        "sd": 1.138115
       },
       {
         "century": -400,
         "n": 3652,
-        "mean": 4.887232,
+        "mean": 4.887233,
         "sd": 1.153502
       },
       {
@@ -237,7 +237,7 @@
       {
         "century": -200,
         "n": 3652,
-        "mean": 4.630692,
+        "mean": 4.630691,
         "sd": 1.139557
       },
       {
@@ -249,7 +249,7 @@
       {
         "century": 0,
         "n": 3653,
-        "mean": 4.527432,
+        "mean": 4.527431,
         "sd": 1.05255
       },
       {
@@ -495,19 +495,19 @@
       {
         "century": -2800,
         "n": 400,
-        "mean": -0.733795,
+        "mean": -0.733796,
         "sd": 0.818828
       },
       {
         "century": -2700,
         "n": 400,
-        "mean": -0.593837,
+        "mean": -0.593836,
         "sd": 0.821629
       },
       {
         "century": -2600,
         "n": 400,
-        "mean": -0.720685,
+        "mean": -0.720684,
         "sd": 0.778742
       },
       {
@@ -537,19 +537,19 @@
       {
         "century": -2100,
         "n": 400,
-        "mean": -1.345161,
+        "mean": -1.34516,
         "sd": 0.743579
       },
       {
         "century": -2000,
         "n": 400,
-        "mean": -1.202433,
+        "mean": -1.202434,
         "sd": 0.730654
       },
       {
         "century": -1900,
         "n": 400,
-        "mean": -1.548558,
+        "mean": -1.548557,
         "sd": 0.768164
       },
       {
@@ -562,7 +562,7 @@
         "century": -1700,
         "n": 400,
         "mean": -1.27543,
-        "sd": 0.71195
+        "sd": 0.711949
       },
       {
         "century": -1600,
@@ -585,13 +585,13 @@
       {
         "century": -1300,
         "n": 400,
-        "mean": -1.626052,
+        "mean": -1.626051,
         "sd": 0.678135
       },
       {
         "century": -1200,
         "n": 400,
-        "mean": -1.660194,
+        "mean": -1.660195,
         "sd": 0.683297
       },
       {
@@ -609,7 +609,7 @@
       {
         "century": -900,
         "n": 400,
-        "mean": -1.983666,
+        "mean": -1.983667,
         "sd": 0.660717
       },
       {
@@ -856,7 +856,7 @@
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
       "packages/physics/src/earth/sidereal-year-channel.cjs": "sha256:7077d355235d43014b26313105cfbba8d8406ca0a63ffeedb59183b864497b6c",
       "packages/physics/src/earth/year-lengths.cjs": "sha256:6b3a7fb60a65cd71a266d66918588429c514f15c29519fda85bdcbecbaac4465",
-      "packages/physics/src/eclipse/finders.cjs": "sha256:ed1aa23f18f407a5335ab313b8109e2aa7318b23ede95906609cc3321507e2bd",
+      "packages/physics/src/eclipse/finders.cjs": "sha256:ee2676c730f06ce1b0bffecaf2a2c4f38e6600f42191714a9edb422bb5b52b7d",
       "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:aab1e8c685ea1a461832e6fbd62ef3520af78a1bb3cf8db5556852e29023f63d",
       "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
       "packages/physics/src/model/cardinal-instants.js": "sha256:72b4dc78f2ee10720ffdf79cb39be16ee5aece012a07498e14470c944246fe58",

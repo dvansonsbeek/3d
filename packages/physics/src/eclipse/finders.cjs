@@ -101,9 +101,15 @@ function createEclipseFinders(deps) {
 
   /**
    * Find all lunar-eclipse-class oppositions in [jdStart, jdEnd].
+   * Events are timed at GREATEST ECLIPSE — the Moon's least distance from the
+   * shadow axis (NASA's canon convention), refined from the opposition in
+   * longitude as the solar finder refines its conjunctions to minimum γ. The
+   * two instants differ by −(i²Ḟ/2λ̇²)·sin 2F ≈ 29 min × sin 2F (doc 111
+   * §1.41 b: 83 % of the canon's dynamical-time residual while the opposition
+   * was returned). The type and the magnitudes read the least distance.
    * @param {number} jdStart @param {number} jdEnd
-   * @returns {Array<{jd: number, beta: number, moonDistance_km: number,
-   *   type: string, magnitudeUmbral: number, magnitudePenumbral: number}>}
+   * @returns {Array<{jd: number, jdOpposition: number, beta: number, leastDistanceDeg: number,
+   *   moonDistance_km: number, type: string, magnitudeUmbral: number, magnitudePenumbral: number}>}
    */
   function findLunarEclipsesInRange(jdStart, jdEnd) {
     // Step size: small fraction of synodic month for reliable zero-crossing
@@ -119,18 +125,24 @@ function createEclipseFinders(deps) {
     const R_MOON_KM = K.moonDiameterKm / 2;
     const R_SUN_KM = K.sunDiameterKm / 2;
     const D_SUN_KM = deps.getSunDistanceKm();
-    const umbraApex_rad = Math.atan((R_SUN_KM - R_EARTH_KM) / D_SUN_KM);
-    const penumbraApex_rad = Math.atan((R_SUN_KM + R_EARTH_KM) / D_SUN_KM);
 
-    // Shadow radii carry the standard ~2% atmospheric enlargement (Danjon
-    // rule / Chauvenet's 1/50, as used by the NASA Lunar Canon and Meeus
-    // Ch. 54).
-    const SHADOW_ENLARGEMENT = 1.02;
+    // Shadow radii under DANJON's rule — the Earth's radius enlarged by 1/85 (an
+    // opaque atmospheric layer of ~75 km), the convention of the NASA Five
+    // Millennium Canon the finder is gated on. Chauvenet's 1/50 (Meeus Ch. 54's
+    // ×1.02 on the radii) shipped until the plan-32 follow-up, when the events
+    // were still classified by the opposition's |β| rather than the least
+    // distance from the axis: the two errors cancelled (99.49 % type agreement
+    // either way); alone on the least distance the ×1.02 read 99.32 % with 135
+    // model-only grazers against Danjon's 99.49 % and 26 (doc 111 §1.41 b).
+    const DANJON_EARTH_RADIUS_FACTOR = 1 + 1 / 85;
+    const R_SHADOW_KM = R_EARTH_KM * DANJON_EARTH_RADIUS_FACTOR;
+    const umbraApex_rad = Math.atan((R_SUN_KM - R_SHADOW_KM) / D_SUN_KM);
+    const penumbraApex_rad = Math.atan((R_SUN_KM + R_SHADOW_KM) / D_SUN_KM);
     /** @param {number} D_MOON_KM */
     const _shadowGeometry = (D_MOON_KM) => {
       const moonR = Math.atan(R_MOON_KM / D_MOON_KM) * _rad2deg;
-      const umbraR = Math.atan((R_EARTH_KM - D_MOON_KM * Math.tan(umbraApex_rad)) / D_MOON_KM) * _rad2deg * SHADOW_ENLARGEMENT;
-      const penumR = Math.atan((R_EARTH_KM + D_MOON_KM * Math.tan(penumbraApex_rad)) / D_MOON_KM) * _rad2deg * SHADOW_ENLARGEMENT;
+      const umbraR = Math.atan((R_SHADOW_KM - D_MOON_KM * Math.tan(umbraApex_rad)) / D_MOON_KM) * _rad2deg;
+      const penumR = Math.atan((R_SHADOW_KM + D_MOON_KM * Math.tan(penumbraApex_rad)) / D_MOON_KM) * _rad2deg;
       return {
         moonR, umbraR, penumR,
         totalMax: umbraR - moonR,
@@ -146,6 +158,49 @@ function createEclipseFinders(deps) {
       while (d > 180) d -= 360;
       while (d <= -180) d += 360;
       return d;
+    };
+
+    // The Moon's geocentric angular distance σ from the shadow axis (the anti-Sun
+    // direction): cos σ = cos β · cos(λ_M − λ_S − 180°). Greatest eclipse is its
+    // minimum — in the fundamental plane the canon's distance is D_moon · sin σ,
+    // and D_moon moves ~1e-4 over the ±45-min window, so the two minima coincide
+    // to the second.
+    const _d2r = Math.PI / 180;
+    /** @param {number} jd */
+    const axisDistanceDeg = (jd) => {
+      const dLon = oppDiff(jd) * _d2r;
+      const beta = deps.moonBetaDegAt(jd) * _d2r;
+      const cosSigma = Math.cos(beta) * Math.cos(dLon);
+      return Math.acos(Math.max(-1, Math.min(1, cosSigma))) / _d2r;
+    };
+
+    // Refine the opposition JD to greatest eclipse: a coarse 1-min scan over
+    // ±45 min (the offset reaches ±22 min at the node-distance window's edge),
+    // then parabolic interpolation on the 3 points around the minimum — the
+    // solar finder's refineMinGamma, on σ.
+    /** @param {number} jdOpp @returns {{jd: number, sigmaDeg: number}} */
+    const refineGreatest = (jdOpp) => {
+      const stepMin = 1 / (24 * 60);
+      let bestJD = jdOpp, bestS = axisDistanceDeg(jdOpp);
+      for (let dt = -45; dt <= 45; dt++) {
+        if (dt === 0) continue;
+        const jd = jdOpp + dt * stepMin;
+        const s = axisDistanceDeg(jd);
+        if (s < bestS) { bestS = s; bestJD = jd; }
+      }
+      const yL = axisDistanceDeg(bestJD - stepMin);
+      const y0 = bestS;
+      const yR = axisDistanceDeg(bestJD + stepMin);
+      const denom = yL - 2 * y0 + yR;
+      if (Math.abs(denom) > 1e-15) {
+        const delta = 0.5 * (yL - yR) / denom;
+        if (Math.abs(delta) < 1) {
+          const refinedJD = bestJD + delta * stepMin;
+          const refinedS = axisDistanceDeg(refinedJD);
+          if (refinedS < bestS) return { jd: refinedJD, sigmaDeg: refinedS };
+        }
+      }
+      return { jd: bestJD, sigmaDeg: bestS };
     };
 
     const results = [];
@@ -164,12 +219,16 @@ function createEclipseFinders(deps) {
           if (hi - lo < 1 / 86400) break;
         }
         const jdOpp = (lo + hi) / 2;
-        const beta = deps.moonBetaDegAt(jdOpp);
-        const absB = Math.abs(beta);
+        // Greatest eclipse: the least distance from the shadow axis, and the
+        // instant it is reached — the type and the magnitudes read that distance.
+        const greatest = refineGreatest(jdOpp);
+        const jdGreatest = greatest.jd;
+        const beta = deps.moonBetaDegAt(jdGreatest);
+        const absB = greatest.sigmaDeg;
 
         // Per-event shadow geometry using the actual Moon distance at this
-        // opposition — closes the ~5.5% perigee/apogee threshold variation.
-        const D_moon_jd = deps.moonDistanceKmAt(jdOpp);
+        // instant — closes the ~5.5% perigee/apogee threshold variation.
+        const D_moon_jd = deps.moonDistanceKmAt(jdGreatest);
         const G = _shadowGeometry(D_moon_jd);
 
         let type = null;
@@ -181,8 +240,10 @@ function createEclipseFinders(deps) {
           const magUmbral = Math.max(0, (G.partialMax - absB) / (2 * G.moonR));
           const magPenumbral = Math.max(0, (G.penumMax - absB) / (2 * G.moonR));
           results.push({
-            jd: jdOpp,
+            jd: jdGreatest,
+            jdOpposition: jdOpp,
             beta: beta,
+            leastDistanceDeg: absB,
             moonDistance_km: D_moon_jd,
             type: type,
             magnitudeUmbral: magUmbral,    // 0 for Penumbral-only; (0,1) Partial; ≥1 Total

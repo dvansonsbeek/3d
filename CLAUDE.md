@@ -367,14 +367,20 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   DEFINITION (the finder's opposition against the canon's greatest eclipse;
   83 % of the variance): name the convention on both sides before reading a
   residual, and read a smooth function of a sampled argument as that argument's
-  high harmonic. The Sun's Σk ≠ 0 planetary arguments drift 0.51° per century
+  high harmonic. Fixing it exposed a second cancellation: the shadow carried
+  Chauvenet's ×1.02 where the canon uses Danjon's 1/85 — hidden by the 0.5 %
+  the opposition's |β| overstates the least distance (99.49 % type agreement
+  either way; the canon's rule ships: tight recall 82 → 98 %, the 1600–2200
+  dynamical residual 9.8 → 0.9 min). The Sun's Σk ≠ 0 planetary arguments drift 0.51° per century
   outside their fit window and its barycentre term lacks the D ± M′ sidebands
   (0.43″, 0.18″) — §1.15 measured. UNDER the definition term one line stood
-  with physics the instruments do not supply: a 5-min full-moon-cycle term a
+  with physics the instruments do not supply: a 5-min full-moon-cycle pair a
   probe had missed because its grid stopped short of the line, and the one-term
   node regression had half-absorbed (sin 2F correlates with sin M′ under
   eclipse sampling: slope −25.9 for the geometry's −29.6; the five-term fit
-  reads −29.4) — a phase of M′: the model's lunar perigee and node match the
+  reads −29.4); its sin M′ part was the offset's own remaining form and left
+  with the instant, its cos M′ part (1.7 min over the span, 5.7 min at −1500)
+  is a phase of M′: the model's lunar perigee and node match the
   Meeus/ELP polynomials in T² and carry 0.13 / 0.20 of their T³ tails, the
   model's M′ 0.54° ahead at −1500 (Meeus Ch. 49 as the third instrument, by
   era) — doc 66's "predicted-ë-vs-secular-ë" drift measured: ϖ and Ω ride

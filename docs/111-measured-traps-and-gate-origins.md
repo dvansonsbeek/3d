@@ -1772,6 +1772,25 @@ event convention on both sides of a comparison before reading its residual;
 a residual that is a smooth function of a sampled argument shows up as a
 HIGH HARMONIC of that argument, not as the argument itself.
 
+*Fixed in the follow-up.* The lunar finder now refines each opposition to
+the Moon's least distance from the shadow axis (a 1-min scan over ±45 min
+and a parabola, the solar finder's `refineMinGamma` on σ) and classifies by
+that distance; the opposition instant stays on the event as `jdOpposition`,
+so the sweep's record of the definition term stays reproducible. The
+re-measurement exposed a SECOND cancellation (§1.2): the shadow radii carried
+Chauvenet's 1/50 enlargement (Meeus Ch. 54's ×1.02) where the canon uses
+Danjon's rule (the Earth's radius + 1/85). With the opposition's |β| — 0.5 %
+larger than the least distance — the oversized shadow had been hidden:
+99.49 % type agreement either way; on the least distance alone the ×1.02 read
+99.32 % with 135 model-only grazers, Danjon 99.49 % with 26, so the canon's
+own rule ships. Measured: tight recall 81.8 → 97.85 %; the alignment gate's
+dynamical-time residual over 1600–2200 rms 9.82 → 0.88 min (max 19.3 → 1.9);
+recall 100.00 → 99.92 % (10 penumbral grazers at the limit, against 26
+model-only — the scatter is now two-sided where 83 model-only and 0 missed
+was one-sided); the Babylon −746 partial 1.3 min; the 2024 pair 2.5 and
+2.3 min from NASA's instants (the constant mean-Sun offset). What the
+remainder holds is the model's M′ against the ephemeris's — (d).
+
 **(c) A windowed argument outside its window.** The certified Sun's residual
 against Horizons at the named planetary arguments, fitted directly in three
 300-yr windows: every Venus and Jupiter term keeps a constant phase and grows
@@ -1796,9 +1815,13 @@ was BIASED: under eclipse sampling sin 2F correlates with sin M′ (r −0.32),
 so the node slope came out −25.9 min where the shadow geometry predicts
 −29.6 (−i²Ḟ/2λ̇²) and the five-term fit measures −29.4, with a cos M′
 modulation of −0.144 against the speed of date's −0.128 — and a DIRECT
-anomaly term of 5.0 min the geometry puts at zero. A direct anomaly term in
-a timing is a phase of M′, and a third instrument placed it: Meeus Ch. 49's
-full-moon instants on the ephemeris's own arguments. The canon against Meeus
+anomaly pair of 5.0 min the geometry puts at zero. The pair was two things,
+told apart only by timing the finder at greatest eclipse: its sin M′ part
+(4.7 min) was the definition offset's own form beyond the five regressors
+and vanished with the instant (0.05 min left); its cos M′ part (1.7 min)
+stayed. A cos M′ term in a timing is a phase of M′, and a third instrument
+placed it: Meeus Ch. 49's full-moon instants on the ephemeris's own
+arguments (both sides oppositions — the finder's instant does not enter). The canon against Meeus
 carries the pure definition term in every era and no anomaly term (the
 canon's M′ is the polynomial's); the model against Meeus is 0.3 min in the
 fit window and grows a cos M′ term into the past, −0.5 / −2.0 / −5.7 min per

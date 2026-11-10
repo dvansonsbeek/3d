@@ -19,8 +19,8 @@ being a cited ocean-dissipation history.* Every number in the tables is written 
 registry's (`tools/docs/model-values.mjs`, the `residualSweep*`, `lunarCanon*`, `cardinalGate*`,
 `josePairRefit*`, `lr04Residual*` and `la2004*` keys).
 
-**The answer.** <!--v:residualSweepSeriesCount-->31<!--/v--> series,
-<!--v:residualSweepLinesAboveFloor-->77<!--/v--> lines above the red-noise floor,
+**The answer.** <!--v:residualSweepSeriesCount-->33<!--/v--> series,
+<!--v:residualSweepLinesAboveFloor-->89<!--/v--> lines above the red-noise floor,
 <!--v:residualSweepSurvivorsWithoutPhysics-->0<!--/v--> survivors without external physics under
 the rule, and <!--v:residualSweepLinesStandingWithPhysics-->1<!--/v--> line standing in one series
 with physics named. Every line that stands is one of five known things: a mixing product of the
@@ -92,9 +92,8 @@ the series at its own cadence; the floor the AR(1) p < 0.01 level of normalised 
 | 5 | the Sun − Horizons, 10-d cadence, −2500…−2200 | 10,957 | -2,500 … -2,200 yr | 2.75 ″ | 0.971 | 0.095 | 3 | 3.986 yr | 1.20 | 3.04 | yes | 2V − 3E |
 | 5 | the Sun − Horizons, 10-d cadence, −400…−100 | 10,957 | -400.0 … -100.0 yr | 4.75 ″ | 0.950 | 0.063 | 6 | 1.000 yr | 0.754 | 3.29 | yes | annual (M) |
 | 5 | the Sun − Horizons, 10-d cadence, 1700…2000 | 10,958 | 1,700 … 2,000 yr | 1.63 ″ | 0.936 | 0.050 | 4 | 1.000 yr | 0.834 | 7.10 | yes | annual (M) |
-| 6 | the lunar canon − the finder, UT | 12,064 | -1,998 … 3,001 yr | 11.1 min | 0.000 | 0.002 | 21 | 3.617 yr | 6.98 | 75.85 | yes | the node-distance sawtooth (12F under full-moon sampling — the opposition-vs-greatest-eclipse definition term, §7) |
-| 6 | the lunar canon − the finder, dynamical time | 12,064 | -1,998 … 3,001 yr | 10.1 min | 0.000 | 0.002 | 14 | 3.617 yr | 7.04 | 90.35 | yes | the node-distance sawtooth (12F under full-moon sampling — the opposition-vs-greatest-eclipse definition term, §7) |
-| 6 | dynamical time, the node-distance term removed | 12,064 | -1,998 … 3,001 yr | 4.11 min | 0.000 | 0.002 | 27 | 1.127 yr | 4.86 | 284.09 | yes | (unnamed — see the probes) |
+| 6 | the lunar canon − the finder, UT | 12,054 | -1,998 … 3,001 yr | 5.16 min | 0.724 | 0.011 | 9 | 1,428 yr | 4.24 | 35.07 | yes | a span-scale family (3.50 cycles) |
+| 6 | the lunar canon − the finder, dynamical time | 12,054 | -1,998 … 3,001 yr | 2.47 min | 0.000 | 0.002 | 24 | 1.127 yr | 1.68 | 104.24 | no | (unnamed — see the probes) |
 | 7 | e − La2004 (×10³), a linear trend removed | 4,999 | -9,996 … 0.000 kyr | 0.129 ‰ | 0.570 | 0.015 | 6 | 94.97 kyr | 0.0605 | 7.28 | yes | the solutions' own eccentricity line eccentricity g4−g5 (94.9 kyr) |
 | 7 | ε − La2004 (″), a linear trend removed | 4,999 | -9,996 … 0.000 kyr | 795 ″ | 0.947 | 0.115 | 1 | 40.76 kyr | 695 | 3.31 | no | the solutions' own obliquity line obliquity p+s3 (40.9 kyr) |
 | 7 | ϖ of date − La2004 (″), a linear trend removed | 4,999 | -9,996 … 0.000 kyr | 22692 ″ | 0.369 | 0.010 | 4 | 4,443 kyr | 9668 | 9.86 | no | a span-scale family (2.25 cycles) |
@@ -238,44 +237,59 @@ its own instrument (doc 111 §1.5's class).
 
 Series 6 matches the NASA Five Millennium Canon's 12,064 lunar eclipses to the model's finder as
 the recall generator does. In UT the residual carries, beside its lines, the ΔT stack against the
-canon's own ΔT polynomial — not independent of §3. In dynamical time (the canon's TD against the
-model's TT) that family is gone and one line dominates: 3.617 years, seven minutes, ninety times
-the floor, identical in both halves. No combination of the lunar arguments matches it; its
-frequency is eight cycles per 358 lunations, the twelfth harmonic of the argument of latitude under
-full-moon sampling — which is not a perturbation but the sawtooth an eclipse's distance from the
-node traces from season to season, the signature of a residual LINEAR in that distance. Regressed
-on the node distance the residual gives r = <!--v:lunarCanonNodeTermCorrelation-->-0.91<!--/v-->,
+canon's own ΔT polynomial — not independent of §3. The sweep read the finder as it then stood —
+returning the OPPOSITION in longitude, bisected to a second — and that instant is kept on every
+event as `jdOpposition` since the follow-up, so the record below stays reproducible; the shipped
+instant is now greatest eclipse (the end of this section).
+
+*At the opposition instant.* In dynamical time (the canon's TD against the model's TT) the ΔT
+family is gone and one line dominates: 3.617 years, seven minutes, ninety times the floor,
+identical in both halves. No combination of the lunar arguments matches it; its frequency is eight
+cycles per 358 lunations, the twelfth harmonic of the argument of latitude under full-moon sampling
+— which is not a perturbation but the sawtooth an eclipse's distance from the node traces from
+season to season, the signature of a residual LINEAR in that distance. Regressed on the node
+distance the residual gives r = <!--v:lunarCanonNodeTermCorrelation-->-0.91<!--/v-->,
 <!--v:lunarCanonNodeTermSlopeMinPerDeg-->-0.86<!--/v--> min per degree (gamma alone gives zero:
 its sign flips between the nodes, the node distance's does not), and the sd falls from
 <!--v:lunarCanonTimingSdTDMin-->10.1<!--/v--> to
-<!--v:lunarCanonTimingSdAfterNodeTermMin-->4.1<!--/v--> min. The cause is in the finder's source:
-`findLunarEclipsesInRange` returns the OPPOSITION in longitude, bisected to a second, where the
-canon times GREATEST ECLIPSE — the solar finder refines its conjunctions to minimum γ, the lunar
-finder does not (`packages/physics/src/eclipse/finders.cjs`). The canon-recall gate's "tight"
-count has carried that definition offset since it was written.
+<!--v:lunarCanonTimingSdAfterNodeTermMin-->4.1<!--/v--> min. The cause was in the finder's source:
+the canon times GREATEST ECLIPSE, the solar finder refines its conjunctions to minimum γ, and the
+lunar finder did not (`packages/physics/src/eclipse/finders.cjs`). The canon-recall gate's "tight"
+count had carried that definition offset since it was written.
 
-What remains after the one term is not the lunar theory's own difference yet. The remainder's
-spectrum has one line, 1.127 years — the full-moon cycle, the anomaly at full moon — at nearly five
-minutes, and a first probe missed it because its frequency grid stopped short of the line (0.82 of
-the Nyquist rate for a 0.887 cycle/yr line). The one-term slope is biased: under eclipse sampling
-sin 2F correlates with sin M′ (r −0.32), so the regression absorbs part of an anomaly term into the
-node term and leaves the rest. The five-term fit — the node term, its two anomaly sidebands (the
-Moon's speed of date is in the offset's denominator), and a direct cos M′, sin M′ pair — is the
-measurement: the node coefficient is
+The remainder's spectrum has one line, 1.127 years — the full-moon cycle, the anomaly at full
+moon — at nearly five minutes, and a first probe missed it because its frequency grid stopped
+short of the line (0.82 of the Nyquist rate for a 0.887 cycle/yr line). The one-term slope is
+biased: under eclipse sampling sin 2F correlates with sin M′ (r −0.32), so the regression absorbs
+part of an anomaly term into the node term and leaves the rest. The five-term fit — the node term,
+its two anomaly sidebands (the Moon's speed of date is in the offset's denominator), and a direct
+cos M′, sin M′ pair — reads the node coefficient as
 <!--v:lunarCanonNodeTermFittedMin-->-29.4<!--/v--> min against the shadow geometry's
 <!--v:lunarCanonNodeTermPredictedMin-->-29.6<!--/v--> (−i²Ḟ/2λ̇²), its cos M′ modulation −0.144
-against the speed-of-date −0.128, and the direct anomaly term is
-<!--v:lunarCanonDirectAnomalyTermMin-->5.0<!--/v--> min where the geometry predicts zero. The sd
-falls to <!--v:lunarCanonTimingSdAfterFiveTermMin-->2.2<!--/v--> min; what the remainder still
-holds at the full-moon cycle (<!--v:lunarCanonFiveTermRemainderFmcLineMin-->1.6<!--/v--> min) is
-the anomaly term's growth with age, which one span-wide coefficient cannot take out — the by-era
-table below carries it.
+against the speed-of-date −0.128, a direct pair of
+<!--v:lunarCanonDirectAnomalyTermMin-->5.0<!--/v--> min where the geometry predicts zero, and an sd
+of <!--v:lunarCanonTimingSdAfterFiveTermMin-->2.2<!--/v--> min after it (what the remainder still
+holds at the full-moon cycle, <!--v:lunarCanonFiveTermRemainderFmcLineMin-->1.6<!--/v--> min, is a
+term growing with age that one span-wide coefficient cannot take out). The direct pair is two
+things, which the follow-up separated: its sin M′ part (4.7 min) is the offset's own form beyond
+the five regressors — it vanishes with the instant — and its cos M′ part (1.7 min) is the span
+mean of a term that grows into the past, the one that stands.
 
-A direct anomaly term in a timing residual is a phase of M′, and a third instrument places it:
-Meeus Ch. 49's full-moon instants, on the ephemeris's own arguments, read against both sides. The
-canon − Meeus difference carries the pure definition term in every era with no anomaly term at all
-— the canon's M′ is the polynomial's. The model − Meeus difference is 0.3 min in the fit window and
-acquires a cos M′ term into the past: −0.5,
+*At the shipped instant.* The finder now refines each opposition to the Moon's least distance
+from the shadow axis and classifies by it (`findLunarEclipsesInRange`, doc 111 §1.41 b, where the
+second cancellation that re-measurement exposed — Chauvenet's ×1.02 shadow where the canon uses
+Danjon's 1/85 — is recorded). Against the canon the residual is
+<!--v:lunarCanonTimingSdGreatestMin-->2.4<!--/v--> min sd with the node term gone
+(<!--v:lunarCanonGreatestNodeTermMin-->0.04<!--/v--> min), one anomaly term of
+<!--v:lunarCanonGreatestAnomalyTermMin-->1.7<!--/v--> min in cos M′, and
+<!--v:lunarCanonGreatestRemainderMin-->2.1<!--/v--> min after it — the finder's own remainder.
+
+A cos M′ term in a timing residual is a phase of M′, and a third instrument places it: Meeus
+Ch. 49's full-moon instants, on the ephemeris's own arguments, read against both sides (both
+oppositions, so the finder's instant does not enter). The canon − Meeus difference carries the
+pure definition term in every era with no anomaly term at all — the canon's M′ is the
+polynomial's. The model − Meeus difference is 0.3 min in the fit window and acquires a cos M′
+term into the past: −0.5,
 <!--v:lunarCanonModelAnomalyTermMinus1000To0Min-->-2.0<!--/v-->,
 <!--v:lunarCanonModelAnomalyTermMinus1999ToMinus1000Min-->-5.7<!--/v--> min for the three
 millennia before 1000, the model's M′ ahead of the polynomial by 0.05°, 0.20°, 0.55°. The
@@ -298,26 +312,29 @@ convention through its completion carrier (`lpSecularCompletion`, bounded, taper
 T², derived at 98.8 % and confirmed against DE441 — `moon/arguments.cjs`); ϖ and Ω have no such
 carrier. In the eclipse timings the gap is the Moon's longitude error EoC · δM′ · cos M′: about
 100″ at −750 (three minutes of timing at the anomaly's phase, inside the ancient ΔT scatter),
-650″ at −3000. The finder's own remainder is the 2.2 min.
+650″ at −3000.
 
 <!-- generated:doc112-lunar -->
 | the lunar canon against the finder | value |
 |:---|---:|
-| matched eclipses | 12,064 |
-| residual in UT (canon UT − model UT) | -1.68 ± 10.94 min |
-| residual in dynamical time (canon TD − model TT) | -0.31 ± 10.11 min |
-| the node distance u of the mean argument of latitude at the canon instant spans | -22.2° … 22.4° |
-| regression of the dynamical-time residual on u | slope -0.8602 min/°, r = -0.9113 |
-| regression on sin 2F | slope -25.90 min, r = -0.9135 |
-| regression on gamma (its sign flips between the nodes) | r = 0.0001 |
-| residual after the sin 2F term | 4.112 min sd |
+| matched eclipses | 12,054 |
+| residual in UT (canon UT − model UT, the shipped greatest-eclipse instant) | -1.71 ± 4.87 min |
+| residual in dynamical time (canon TD − model TT, the shipped instant) | -0.34 ± 2.45 min |
+| its node term in the five-term fit (sin 2F) | 0.04 min |
+| its direct anomaly term (cos M′, sin M′) — the model's M′ against the ephemeris's | 1.69 min; remainder 2.136 min sd |
+| the same residual at the OPPOSITION instant the finder bisects first (the record of §1.41 b) | -0.31 ± 10.10 min |
+| the node distance u of the mean argument of latitude at the canon instant spans | -22.2° … 22.3° |
+| regression of the dynamical-time residual on u | slope -0.8600 min/°, r = -0.9112 |
+| regression on sin 2F | slope -25.89 min, r = -0.9135 |
+| regression on gamma (its sign flips between the nodes) | r = 0.0006 |
+| residual after the sin 2F term | 4.111 min sd |
 | correlation of sin 2F with sin M′ under eclipse sampling (the one-term slope's bias) | -0.322 |
 
 | the five-term fit of the dynamical-time residual | fitted (min) | the shadow geometry predicts |
 |:---|---:|---:|
 | sin 2F (the node term) | -29.39 | -29.62 (−i²Ḟ/2λ̇²) |
 | sin 2F · cos M′ (the speed of date on it), as a ratio to the node term | -0.144 | -0.128 (≈ −2.3 e) |
-| sin 2F · sin M′ | -0.08 | 0 |
+| sin 2F · sin M′ | -0.09 | 0 |
 | cos M′ (direct) | 1.69 | 0 |
 | sin M′ (direct) | -4.71 | 0 |
 | the direct anomaly term's amplitude | 5.00 | 0 |
@@ -325,18 +342,18 @@ carrier. In the eclipse timings the gap is the Moon's longitude error EoC · δM
 
 | by eclipse type | n | slope on u (min/°) | r |
 |:---|---:|---:|---:|
-| Penumbral | 4,378 | -0.9049 | -0.9512 |
+| Penumbral | 4,368 | -0.9047 | -0.9513 |
 | Partial | 4,207 | -0.8299 | -0.8783 |
 | Total | 3,479 | -0.4090 | -0.4904 |
 
 | era | n | canon − Meeus 49: sd → after the definition terms (min) | its cos M′ | model − Meeus 49: sd (min) | its cos M′ (min) | the model's M′ phase it implies | the polynomial's own T³+T⁴ in M′ at the midpoint |
 |:---|---:|---:|---:|---:|---:|---:|---:|
-| -1999 … -1000 | 2,429 | 9.89 → 1.77 | 0.02 | 4.16 | -5.66 | 0.554° | -0.717° |
-| -1000 … 0 | 2,391 | 9.74 → 1.66 | 0.01 | 1.55 | -2.01 | 0.197° | -0.251° |
-| 0 … 1000 | 2,395 | 9.73 → 1.56 | 0.05 | 0.50 | -0.48 | 0.047° | -0.052° |
+| -1999 … -1000 | 2,425 | 9.88 → 1.77 | 0.02 | 4.16 | -5.66 | 0.554° | -0.717° |
+| -1000 … 0 | 2,387 | 9.72 → 1.66 | 0.01 | 1.55 | -2.01 | 0.197° | -0.251° |
+| 0 … 1000 | 2,394 | 9.72 → 1.56 | 0.05 | 0.50 | -0.48 | 0.047° | -0.052° |
 | 1000 … 1600 | 1,449 | 9.83 → 1.52 | 0.00 | 0.30 | -0.10 | 0.010° | -0.005° |
 | 1600 … 2200 | 1,450 | 9.80 → 1.49 | 0.04 | 0.31 | -0.06 | 0.006° | -0.000° |
-| 2200 … 3000 | 1,947 | 9.89 → 1.47 | 0.04 | 0.37 | 0.00 | -0.000° | 0.003° |
+| 2200 … 3000 | 1,946 | 9.89 → 1.47 | 0.04 | 0.37 | 0.00 | -0.000° | 0.003° |
 
 | epoch | model − polynomial: L′ (″) | M′ (″) | F (″) | perigee ϖ (″) | the polynomial's T³+T⁴ in ϖ (″) | share the model carries | node Ω (″) | the polynomial's T³+T⁴ in Ω (″) | share |
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -359,9 +376,11 @@ carrier. In the eclipse timings the gap is the Moon's longitude error EoC · δM
 
 | series | strongest lines (period yr, amplitude min, × floor, stands) |
 |:---|:---|
-| lunar-canon-TD | 3.6174 / 7.040 / 90.4× / stands; 1.2033 / 2.288 / 10.5× / stands; 1.1274 / 1.684 / 5.7× / unstable; 1.3822 / 1.655 / 5.4× / stands; 1.8030 / 1.589 / 5.0× / stands; 3.6135 / 1.410 / 4.0× / stands |
-| lunar-canon-TD-node-term-removed | 1.1274 / 4.859 / 284.1× / stands; 1.1270 / 1.431 / 24.7× / unstable; 1.1277 / 1.364 / 22.6× / stands; 1.1280 / 0.904 / 9.8× / unstable; 3.6181 / 0.884 / 9.0× / stands; 1.1267 / 0.837 / 8.4× / unstable |
-| lunar-canon-TD-five-term-removed | 1.1272 / 1.567 / 78.4× / stands; 1.1276 / 1.483 / 70.3× / stands; 2499.6511 / 0.771 / 18.9× / unstable; 1.1279 / 0.742 / 17.6× / unstable; 1.1269 / 0.688 / 15.1× / unstable; 1.1281 / 0.473 / 7.2× / stands |
+| lunar-canon-TD | 1.1274 / 1.684 / 104.2× / unstable; 2499.6511 / 0.742 / 20.2× / unstable; 1666.4341 / 0.391 / 5.6× / stands; 1249.8255 / 0.311 / 3.5× / unstable; 3.6194 / 0.301 / 3.4× / unstable; 3.6155 / 0.295 / 3.2× / unstable |
+| lunar-canon-TD-anomaly-term-removed | 1.1272 / 1.572 / 99.0× / stands; 1.1276 / 1.484 / 88.2× / stands; 1.1279 / 0.746 / 22.3× / unstable; 2499.6511 / 0.744 / 22.1× / stands; 1.1269 / 0.688 / 19.0× / unstable; 1.1281 / 0.479 / 9.2× / stands |
+| lunar-canon-TD-opposition | 3.6174 / 7.056 / 98.1× / stands; 1.2033 / 2.285 / 11.3× / stands; 1.1274 / 1.689 / 6.1× / unstable; 1.3822 / 1.646 / 5.8× / stands; 1.8030 / 1.596 / 5.4× / stands; 3.6135 / 1.422 / 4.3× / stands |
+| lunar-canon-TD-opposition-node-term-removed | 1.1274 / 4.858 / 306.6× / stands; 1.1270 / 1.431 / 26.6× / unstable; 1.1277 / 1.364 / 24.3× / stands; 1.1280 / 0.900 / 10.5× / unstable; 3.6181 / 0.887 / 9.8× / stands; 1.1267 / 0.835 / 9.1× / unstable |
+| lunar-canon-TD-opposition-five-term-removed | 1.1272 / 1.568 / 90.5× / stands; 1.1276 / 1.484 / 81.1× / stands; 2499.6511 / 0.771 / 21.8× / unstable; 1.1279 / 0.741 / 20.3× / unstable; 1.1269 / 0.688 / 17.4× / unstable; 1.1281 / 0.473 / 8.2× / stands |
 <!-- /generated:doc112-lunar -->
 
 ## 8. The Earth's elements against La2004
@@ -402,17 +421,17 @@ interval with edges — the Pangaea dissipation episode — not a period. Hypoth
 <!-- generated:doc112-decision -->
 | the sweep's counts | |
 |:---|---:|
-| residual series analysed | 31 |
-| lines above the red-noise floor (p < 0.01 over each grid), span-scale families excluded | 77 |
-| of them named by an astronomical argument or a primary-family mixing tone within half the resolution | 48 |
-| span-scale families (a smooth curvature's Fourier terms, ≤ 6 cycles of the span) | 31 |
-| lines above the floor the classifiers did not name, read against the probes (§3–§5) | 29 |
+| residual series analysed | 33 |
+| lines above the red-noise floor (p < 0.01 over each grid), span-scale families excluded | 89 |
+| of them named by an astronomical argument or a primary-family mixing tone within half the resolution | 49 |
+| span-scale families (a smooth curvature's Fourier terms, ≤ 6 cycles of the span) | 38 |
+| lines above the floor the classifiers did not name, read against the probes (§3–§5) | 40 |
 | lines standing against their record with physics the instruments do not supply (one series each) | 1 |
 | survivors without external physics in two independent series | 0 |
 
-Unnamed lines by series: lunar-canon-UT 1.203 (2.29); lunar-canon-UT 714.2 (1.80); lunar-canon-UT 833.2 (1.75, unstable); lunar-canon-UT 1.127 (1.68, unstable); lunar-canon-UT 1.382 (1.66); lunar-canon-TD 1.203 (2.29); lunar-canon-TD 1.127 (1.68, unstable); lunar-canon-TD 1.382 (1.66); lunar-canon-TD 1.803 (1.59); lunar-canon-TD 3.614 (1.41); lunar-canon-TD 3.621 (1.31); lunar-canon-TD 1.059 (1.15); lunar-canon-TD 2.237 (0.861); lunar-canon-TD-node-term-removed 1.127 (4.86); lunar-canon-TD-node-term-removed 1.127 (1.43, unstable); lunar-canon-TD-node-term-removed 1.128 (1.36); lunar-canon-TD-node-term-removed 1.128 (0.904, unstable); lunar-canon-TD-node-term-removed 1.127 (0.837, unstable); lunar-canon-TD-node-term-removed 1.128 (0.618); lunar-canon-TD-node-term-removed 1.126 (0.605); lunar-canon-TD-node-term-removed 1.059 (0.592); lunar-canon-TD-five-term-removed 1.127 (1.57); lunar-canon-TD-five-term-removed 1.128 (1.48); lunar-canon-TD-five-term-removed 1.128 (0.742, unstable); lunar-canon-TD-five-term-removed 1.127 (0.688, unstable); lunar-canon-TD-five-term-removed 1.128 (0.473); lunar-canon-TD-five-term-removed 1.127 (0.474, unstable); lunar-canon-TD-five-term-removed 1.126 (0.353, unstable); lunar-canon-TD-five-term-removed 1.128 (0.345, unstable).
+Unnamed lines by series: lunar-canon-UT 714.2 (1.80); lunar-canon-UT 1.127 (1.67, unstable); lunar-canon-UT 624.9 (0.966); lunar-canon-UT 454.5 (0.734, unstable); lunar-canon-TD 1.127 (1.68, unstable); lunar-canon-TD 1.092 (0.266); lunar-canon-TD 1.638 (0.239, unstable); lunar-canon-TD 1.125 (0.231, unstable); lunar-canon-TD-anomaly-term-removed 1.127 (1.57); lunar-canon-TD-anomaly-term-removed 1.128 (1.48); lunar-canon-TD-anomaly-term-removed 1.128 (0.746, unstable); lunar-canon-TD-anomaly-term-removed 1.127 (0.688, unstable); lunar-canon-TD-anomaly-term-removed 1.128 (0.479); lunar-canon-TD-anomaly-term-removed 1.127 (0.473, unstable); lunar-canon-TD-anomaly-term-removed 1.126 (0.351, unstable); lunar-canon-TD-anomaly-term-removed 1.128 (0.350, unstable); lunar-canon-TD-opposition 1.203 (2.29); lunar-canon-TD-opposition 1.127 (1.69, unstable); lunar-canon-TD-opposition 1.382 (1.65); lunar-canon-TD-opposition 1.803 (1.60); lunar-canon-TD-opposition 3.614 (1.42); lunar-canon-TD-opposition 3.621 (1.31); lunar-canon-TD-opposition 1.059 (1.14); lunar-canon-TD-opposition 2.237 (0.854); lunar-canon-TD-opposition-node-term-removed 1.127 (4.86); lunar-canon-TD-opposition-node-term-removed 1.127 (1.43, unstable); lunar-canon-TD-opposition-node-term-removed 1.128 (1.36); lunar-canon-TD-opposition-node-term-removed 1.128 (0.900, unstable); lunar-canon-TD-opposition-node-term-removed 1.127 (0.835, unstable); lunar-canon-TD-opposition-node-term-removed 1.128 (0.617); lunar-canon-TD-opposition-node-term-removed 1.126 (0.603); lunar-canon-TD-opposition-node-term-removed 1.059 (0.587); lunar-canon-TD-opposition-five-term-removed 1.127 (1.57); lunar-canon-TD-opposition-five-term-removed 1.128 (1.48); lunar-canon-TD-opposition-five-term-removed 1.128 (0.741, unstable); lunar-canon-TD-opposition-five-term-removed 1.127 (0.688, unstable); lunar-canon-TD-opposition-five-term-removed 1.128 (0.473); lunar-canon-TD-opposition-five-term-removed 1.127 (0.474, unstable); lunar-canon-TD-opposition-five-term-removed 1.126 (0.352, unstable); lunar-canon-TD-opposition-five-term-removed 1.128 (0.345, unstable).
 
-Standing with named physics: lunar-canon-TD-node-term-removed at 1.1274 yr (the full-moon cycle (the anomaly at full moon)), 5.00 min over the whole span — the model's perigee and node ride the deep eccentricity channel (the physical exponents s_ϖ, s_Ω on the model's own e(t)), Meeus-exact in T² by construction; their T³ is the channel's own ë, about a seventh of the secular-theory ë that ELP's polynomials embody — L′ carries that convention through lpSecularCompletion, ϖ and Ω do not (doc 66's "predicted-ë-vs-secular-ë" drift, here measured): the model's M′ runs ahead of the polynomial's by the complement, 0 in the fit window, 0.2° at −500, 0.54° at −1500, 1.66° at −3000.
+Standing with named physics: lunar-canon-TD at 1.1274 yr (the full-moon cycle (the anomaly at full moon)), 1.69 min over the whole span — the cos M′ term of the shipped instant's residual (the span mean of a term growing into the past: −0.5 / −2.0 / −5.7 min per millennium before 1000 in probes.lunarThirdInstrument; the sin M′ part of the opposition instant's 5-min pair was the definition offset's own form and left with the instant) — the model's perigee and node ride the deep eccentricity channel (the physical exponents s_ϖ, s_Ω on the model's own e(t)), Meeus-exact in T² by construction; their T³ is the channel's own ë, about a seventh of the secular-theory ë that ELP's polynomials embody — L′ carries that convention through lpSecularCompletion, ϖ and Ω do not (doc 66's "predicted-ë-vs-secular-ë" drift, here measured): the model's M′ runs ahead of the polynomial's by the complement, 0 in the fit window, 0.2° at −500, 0.54° at −1500, 1.66° at −3000.
 <!-- /generated:doc112-decision -->
 
 By the plan's rule the framework stands as what it is: the one line standing with physics outside

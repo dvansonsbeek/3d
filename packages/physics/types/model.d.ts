@@ -308,7 +308,9 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         sunApparentLonDegAtJD: (jdUT: number) => number;
         findLunarInRange: (jdStart: number, jdEnd: number) => {
             jd: number;
+            jdOpposition: number;
             beta: number;
+            leastDistanceDeg: number;
             moonDistance_km: number;
             type: string;
             magnitudeUmbral: number;

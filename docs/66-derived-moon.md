@@ -267,9 +267,13 @@ over −1999…−1000, the lunar canon's
 remainder once the opposition-vs-greatest-eclipse term is removed
 (doc 112 §7, doc 111 §1.41 d — written by the sweep's artifact), with
 in-window rows at zero (a pure-ICRF comparison drifts +1.4°/century).
-NASA full-canon recall 99.58 / tight-window 74.62 / type
-98.66 (model event total 12,070 vs NASA's 12,064; all mismatch samples
-knife-edge at the γ ≈ 1.0/1.5 boundaries); 26-event historical audit
+NASA full-canon recall <!--v:lunarCanonRecallPercent-->99.92<!--/v--> % /
+tight-window <!--v:lunarCanonRecallTightPercent-->97.85<!--/v--> % / type
+<!--v:lunarCanonRecallTypeAccuracyPercent-->99.49<!--/v--> %
+(<!--v:lunarCanonRecallModelOnly-->26<!--/v--> model-only events against
+NASA's <!--v:lunarCanonRecallEvents-->12,064<!--/v-->; the mismatches
+knife-edge at the γ ≈ 1.0/1.5 boundaries — `data/lunar-canon-recall.json`,
+the finder timing greatest eclipse since the plan-32 follow-up); 26-event historical audit
 split 3 confirmed · 13 off-peak · 5 regional · 0 ΔT-signal · 5 geographic
 (an umbra-centerline distance class, not visibility — the penumbra can
 still cover these sites; the entire first-hand ancient corpus is
@@ -334,8 +338,10 @@ scaling. Source: `public/input/meeus-lunar-tables.json → distanceTerms`,
 single-sourced to all three runtimes through the constants generator.
 The full series is load-bearing at syzygy — the 2D-family terms
 (evection, variation, …) all peak there; the series lands 0.1 km from
-JPL at the 2024 Apr 8 eclipse, and the lunar-canon gate reads 1450/1450
-matched with 99.8% type agreement on it.
+JPL at the 2024 Apr 8 eclipse, and the lunar-canon gate reads
+<!--v:lunarCanonMatched-->1,450<!--/v-->/<!--v:lunarCanonEvents-->1,450<!--/v-->
+matched over 1600–2200 with <!--v:lunarCanonTypeAgree-->1,446<!--/v--> of
+them the canon's type.
 
 **Deep-time completeness.** (i) The Driver-1 ratio is evaluated AT THE
 EVALUATED EPOCH in all three runtimes (the series threads the evaluation

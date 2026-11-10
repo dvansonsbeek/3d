@@ -94,12 +94,15 @@ function blockCardinal() {
 }
 
 function blockLunar() {
-  const L = P.lunarNode;
+  const L = P.lunarNode, LG = P.lunarGreatest;
   const rows = [
     `| the lunar canon against the finder | value |`, '|:---|---:|',
     `| matched eclipses | ${L.n.toLocaleString('en-US')} |`,
-    `| residual in UT (canon UT − model UT) | ${f(L.meanUTMin, 2)} ± ${f(L.sdUTMin, 2)} min |`,
-    `| residual in dynamical time (canon TD − model TT) | ${f(L.meanTDMin, 2)} ± ${f(L.sdTDMin, 2)} min |`,
+    `| residual in UT (canon UT − model UT, the shipped greatest-eclipse instant) | ${f(LG.meanUTMin, 2)} ± ${f(LG.sdUTMin, 2)} min |`,
+    `| residual in dynamical time (canon TD − model TT, the shipped instant) | ${f(LG.meanTDMin, 2)} ± ${f(LG.sdTDMin, 2)} min |`,
+    `| its node term in the five-term fit (sin 2F) | ${f(LG.fiveTerm.coefficients.sin2F, 2)} min |`,
+    `| its direct anomaly term (cos M′, sin M′) — the model's M′ against the ephemeris's | ${f(LG.anomalyTwoTerm.amplitudeMin, 2)} min; remainder ${f(LG.anomalyTwoTerm.sdAfterMin, 3)} min sd |`,
+    `| the same residual at the OPPOSITION instant the finder bisects first (the record of §1.41 b) | ${f(L.meanTDMin, 2)} ± ${f(L.sdTDMin, 2)} min |`,
     `| the node distance u of the mean argument of latitude at the canon instant spans | ${f(L.uRangeDeg[0], 1)}° … ${f(L.uRangeDeg[1], 1)}° |`,
     `| regression of the dynamical-time residual on u | slope ${f(L.onNodeDistance.slope, 4)} min/°, r = ${f(L.onNodeDistance.r, 4)} |`,
     `| regression on sin 2F | slope ${f(L.onSin2F.slope, 2)} min, r = ${f(L.onSin2F.r, 4)} |`,
@@ -134,7 +137,7 @@ function blockLunar() {
   }
   rows.push('');
   rows.push('| series | strongest lines (period yr, amplitude min, × floor, stands) |', '|:---|:---|');
-  for (const id of ['lunar-canon-TD', 'lunar-canon-TD-node-term-removed', 'lunar-canon-TD-five-term-removed']) { const s = S[id]; if (!s) continue; rows.push(`| ${id} | ${s.lines.slice(0, 6).map((l) => `${f(l.periodYears, 4)} / ${f(l.amplitude, 3)} / ${f(l.overAr1Floor, 1)}× / ${l.stands ? 'stands' : 'unstable'}`).join('; ')} |`); }
+  for (const id of ['lunar-canon-TD', 'lunar-canon-TD-anomaly-term-removed', 'lunar-canon-TD-opposition', 'lunar-canon-TD-opposition-node-term-removed', 'lunar-canon-TD-opposition-five-term-removed']) { const s = S[id]; if (!s) continue; rows.push(`| ${id} | ${s.lines.slice(0, 6).map((l) => `${f(l.periodYears, 4)} / ${f(l.amplitude, 3)} / ${f(l.overAr1Floor, 1)}× / ${l.stands ? 'stands' : 'unstable'}`).join('; ')} |`); }
   return rows.join('\n');
 }
 

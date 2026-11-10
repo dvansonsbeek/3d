@@ -35,7 +35,9 @@ export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
         sunLonDegAt: (jd: number) => number;
         findLunarEclipsesInRange: (jdStart: number, jdEnd: number) => Array<{
             jd: number;
+            jdOpposition: number;
             beta: number;
+            leastDistanceDeg: number;
             moonDistance_km: number;
             type: string;
             magnitudeUmbral: number;

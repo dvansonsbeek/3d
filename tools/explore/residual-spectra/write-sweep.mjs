@@ -149,13 +149,20 @@ log(`lunar canon: ${pairs.length} matched of ${canonEvents} (the finder found ${
 const lunarMeta = { record: 'NASA Five Millennium Canon of lunar eclipses (public/input/lunar-eclipses-nasa.json)', model: 'eclipse.findLunarInRange, matched within 180 min as the recall generator does', cadence: 'irregular (~2.4 per year)', n: pairs.length, modelEvents, canonEvents, span: [-1999, 3000] };
 const fMaxLunar = fMaxFor(pairs.map((p) => p.t), 1);
 const lunarSpan = Math.max(...pairs.map((p) => p.t)) - Math.min(...pairs.map((p) => p.t)), lunarCls = (fr) => sawtoothHarmonic(fr, lunarSpan);
-run({ id: 'lunar-canon-UT', t: pairs.map((p) => p.t), y: pairs.map((p) => p.dUT), w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (canon UT − model UT)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
-run({ id: 'lunar-canon-TD', t: pairs.map((p) => p.t), y: pairs.map((p) => p.dTD), w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (canon TD − model TT)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
-const reg = lunarNodeRegression(pairs);
-run({ id: 'lunar-canon-TD-node-term-removed', t: pairs.map((p) => p.t), y: reg.residualAfterSin2F, w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (after the sin 2F node term)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
-run({ id: 'lunar-canon-TD-five-term-removed', t: pairs.map((p) => p.t), y: reg.residualAfterFiveTerm, w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (after the five-term fit: sin 2F, its anomaly sidebands, and the direct cos M′/sin M′ phase)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
-delete reg.residualAfterSin2F; delete reg.residualAfterFiveTerm;
+// the shipped instant (greatest eclipse since the plan-32 follow-up) in UT and in dynamical time
+run({ id: 'lunar-canon-UT', t: pairs.map((p) => p.t), y: pairs.map((p) => p.dUT), w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (canon UT − model UT, the finder\'s greatest-eclipse instant)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
+run({ id: 'lunar-canon-TD', t: pairs.map((p) => p.t), y: pairs.map((p) => p.dTD), w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (canon TD − model TT, the finder\'s greatest-eclipse instant)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
+const regGreatest = lunarNodeRegression(pairs, 'dTD');
+run({ id: 'lunar-canon-TD-anomaly-term-removed', t: pairs.map((p) => p.t), y: regGreatest.residualAfterAnomalyTwoTerm, w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (the greatest-eclipse instant after the fitted cos M′/sin M′ pair — the finder\'s own remainder)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
+// the OPPOSITION instant the finder bisects first (kept on every event as jdOpposition): the record of the
+// definition-term finding (doc 111 §1.41 b) and the regression chain that read the anomaly phase under it
+run({ id: 'lunar-canon-TD-opposition', t: pairs.map((p) => p.t), y: pairs.map((p) => p.dTDOpposition), w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (canon TD − model TT at the OPPOSITION in longitude — the pre-follow-up instant)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
+const reg = lunarNodeRegression(pairs, 'dTDOpposition');
+run({ id: 'lunar-canon-TD-opposition-node-term-removed', t: pairs.map((p) => p.t), y: reg.residualAfterSin2F, w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (the opposition instant after the sin 2F node term)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
+run({ id: 'lunar-canon-TD-opposition-five-term-removed', t: pairs.map((p) => p.t), y: reg.residualAfterFiveTerm, w: pairs.map(() => 1), meta: { ...lunarMeta, unit: 'min (the opposition instant after the five-term fit: sin 2F, its anomaly sidebands, and the direct cos M′/sin M′ phase)' } }, { surrogates: 300, analyse: { oversample: 4, fMaxFactor: fMaxLunar }, classify: lunarCls });
+for (const r of [reg, regGreatest]) { delete r.residualAfterSin2F; delete r.residualAfterFiveTerm; delete r.residualAfterAnomalyTwoTerm; }
 probes.lunarNode = reg;
+probes.lunarGreatest = regGreatest;
 // the third instrument (Meeus Ch. 49 on the ephemeris's arguments) by era, and the model's arguments read
 // against the polynomials directly — the full-moon-cycle line's attribution
 probes.lunarThirdInstrument = lunarThirdInstrument(pairs);
@@ -181,9 +188,9 @@ const decision = {
   // terms the model's chains carry only a fraction of; ONE series, so the rule's reopening threshold
   // (two independent series) is not met, and the line is a named input for the owner's decision
   linesStandingWithNamedPhysics: [{
-    series: 'lunar-canon-TD-node-term-removed', periodYears: 1 / (ARG_FREQ.Mp - ARG_FREQ.D), name: 'the full-moon cycle (the anomaly at full moon)',
-    amplitudeMin: probes.lunarNode.fiveTerm.directAnomalyAmplitudeMin,
-    physics: 'the model\'s perigee and node ride the deep eccentricity channel (the physical exponents s_ϖ, s_Ω on the model\'s own e(t)), Meeus-exact in T² by construction; their T³ is the channel\'s own ë, about a seventh of the secular-theory ë that ELP\'s polynomials embody — L′ carries that convention through lpSecularCompletion, ϖ and Ω do not (doc 66\'s "predicted-ë-vs-secular-ë" drift, here measured): the model\'s M′ runs ahead of the polynomial\'s by the complement, 0 in the fit window, 0.2° at −500, 0.54° at −1500, 1.66° at −3000',
+    series: 'lunar-canon-TD', periodYears: 1 / (ARG_FREQ.Mp - ARG_FREQ.D), name: 'the full-moon cycle (the anomaly at full moon)',
+    amplitudeMin: probes.lunarGreatest.anomalyTwoTerm.amplitudeMin, amplitudeUnderTheDefinitionTermMin: probes.lunarNode.fiveTerm.directAnomalyAmplitudeMin,
+    physics: 'the cos M′ term of the shipped instant\'s residual (the span mean of a term growing into the past: −0.5 / −2.0 / −5.7 min per millennium before 1000 in probes.lunarThirdInstrument; the sin M′ part of the opposition instant\'s 5-min pair was the definition offset\'s own form and left with the instant) — the model\'s perigee and node ride the deep eccentricity channel (the physical exponents s_ϖ, s_Ω on the model\'s own e(t)), Meeus-exact in T² by construction; their T³ is the channel\'s own ë, about a seventh of the secular-theory ë that ELP\'s polynomials embody — L′ carries that convention through lpSecularCompletion, ϖ and Ω do not (doc 66\'s "predicted-ë-vs-secular-ë" drift, here measured): the model\'s M′ runs ahead of the polynomial\'s by the complement, 0 in the fit window, 0.2° at −500, 0.54° at −1500, 1.66° at −3000',
     modelMinusPolynomialMpArcsec: Object.fromEntries(probes.lunarArguments.map((r) => [r.year, r.modelMinusPolynomialArcsec.Mp])),
   }],
   survivorsWithoutExternalPhysicsInTwoSeries: 0,
@@ -200,6 +207,7 @@ const doc = {
     'data/nbody-secular-series.json', 'data/spin-axis-checkpoints.json', 'data/lunar-cumulative-checkpoints.json',
     ...['01', '02', '03', '04', '05', '06', '07', '08', '09'].map((n) => `data/rspa20160404supp2/Table-S${n}.txt`),
     'public/input/stephenson-2016-deltaT-polynomial.json', 'public/input/lunar-eclipses-nasa.json', 'public/input/climate-formula-coefficients.json',
+    'packages/physics/src/eclipse/finders.cjs', 'packages/physics/src/moon/series.cjs', 'packages/physics/src/moon/arguments.cjs',
     'tools/explore/residual-spectra/spectrum.mjs', 'tools/explore/residual-spectra/series.mjs', 'tools/explore/residual-spectra/series-records.mjs', 'tools/explore/residual-spectra/series-paleo.mjs', 'tools/explore/residual-spectra/series-sun.mjs', 'tools/explore/residual-spectra/probes.mjs', 'tools/explore/residual-spectra/model-internals.mjs', 'tools/explore/residual-spectra/write-sweep.mjs',
   ]),
 };

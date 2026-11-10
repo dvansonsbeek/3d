@@ -132,7 +132,10 @@ export function lunarCanonPairs(m, { startYear = -1999, endYear = 3000, matchMin
     for (let k = -1; k <= 1; k++) { const j = i + k; if (j < 0 || j >= nasa.length || used[j]) continue; const d = Math.abs(nasa[j].jd - ev.jd); if (d < bestD) { bestD = d; best = j; } }
     if (best >= 0 && bestD * 1440 <= matchMin) {
       used[best] = 1; const n = nasa[best], F = meanF(n.jd_TD), Mp = meanMp(n.jd_TD) * Math.PI / 180;
-      pairs.push({ t: 2000 + (ev.jd - 2451545) / 365.25, dUT: (n.jd - ev.jd) * 1440, dTD: (n.jd_TD - ttOf(ev.jd)) * 1440, canonJdTD: n.jd_TD, modelJdTT: ttOf(ev.jd), u: ((((F + 90) % 180) + 180) % 180) - 90, sin2F: Math.sin(2 * F * Math.PI / 180), cosMp: Math.cos(Mp), sinMp: Math.sin(Mp), gamma: n.gamma, type: n.type });
+      // ev.jd is the finder's shipped instant (greatest eclipse since the plan-32 follow-up); ev.jdOpposition
+      // the opposition in longitude it bisects first — the series on it reproduces the definition-term record
+      const jdOpp = typeof ev.jdOpposition === 'number' ? ev.jdOpposition : ev.jd;
+      pairs.push({ t: 2000 + (ev.jd - 2451545) / 365.25, dUT: (n.jd - ev.jd) * 1440, dTD: (n.jd_TD - ttOf(ev.jd)) * 1440, dTDOpposition: (n.jd_TD - ttOf(jdOpp)) * 1440, canonJdTD: n.jd_TD, modelJdTT: ttOf(jdOpp), modelJdTTGreatest: ttOf(ev.jd), u: ((((F + 90) % 180) + 180) % 180) - 90, sin2F: Math.sin(2 * F * Math.PI / 180), cosMp: Math.cos(Mp), sinMp: Math.sin(Mp), gamma: n.gamma, type: n.type });
     }
   }
   return { pairs, modelEvents: events.length, canonEvents: nasa.length };
@@ -181,20 +184,22 @@ export function greatestEclipseOffsetPrediction() {
  *  geometry does NOT predict — it is the model's M′ against the ephemeris's (lunarThirdInstrument).
  *  Under eclipse sampling sin 2F correlates with sin M′ (r ≈ −0.32), so the one-term slope is biased;
  *  the five-term fit is the measurement. The residual after each is returned for the spectra. */
-export function lunarNodeRegression(pairs) {
-  const d = pairs.map((p) => p.dTD), u = pairs.map((p) => p.u), s2 = pairs.map((p) => p.sin2F), g = pairs.map((p) => p.gamma);
+export function lunarNodeRegression(pairs, key = 'dTDOpposition') {
+  const d = pairs.map((p) => p[key]), u = pairs.map((p) => p.u), s2 = pairs.map((p) => p.sin2F), g = pairs.map((p) => p.gamma);
   const onU = regress(u, d), onSin2F = regress(s2, d), onGamma = regress(g, d);
   const afterSin2F = d.map((v, i) => v - (onSin2F.intercept + onSin2F.slope * s2[i]));
   const five = ols(pairs.map(DEFINITION_REGRESSORS), d);
+  const two = ols(pairs.map((p) => [p.cosMp, p.sinMp]), d);
   const byType = {};
-  for (const ty of [...new Set(pairs.map((p) => p.type))]) { const sel = pairs.filter((p) => p.type === ty); byType[ty] = { n: sel.length, ...regress(sel.map((p) => p.u), sel.map((p) => p.dTD)) }; }
+  for (const ty of [...new Set(pairs.map((p) => p.type))]) { const sel = pairs.filter((p) => p.type === ty); byType[ty] = { n: sel.length, ...regress(sel.map((p) => p.u), sel.map((p) => p[key])) }; }
   const c = named(five.coef);
   return {
-    n: pairs.length, meanUTMin: mean(pairs.map((p) => p.dUT)), sdUTMin: sdOf(pairs.map((p) => p.dUT)), meanTDMin: mean(d), sdTDMin: sdOf(d), uRangeDeg: [Math.min(...u), Math.max(...u)],
+    instant: key, n: pairs.length, meanUTMin: mean(pairs.map((p) => p.dUT)), sdUTMin: sdOf(pairs.map((p) => p.dUT)), meanTDMin: mean(d), sdTDMin: sdOf(d), uRangeDeg: [Math.min(...u), Math.max(...u)],
     onNodeDistance: onU, onSin2F, onGamma, sdAfterSin2FMin: sdOf(afterSin2F), byType,
     correlationSin2FSinMp: correlation(s2, pairs.map((p) => p.sinMp)),
     fiveTerm: { coefficients: c, sdAfterMin: sdOf(five.residual), anomalyModulationCosMp: c.sin2FcosMp / c.sin2F, directAnomalyAmplitudeMin: Math.hypot(c.cosMp, c.sinMp), predicted: greatestEclipseOffsetPrediction() },
-    residualAfterSin2F: afterSin2F, residualAfterFiveTerm: five.residual,
+    anomalyTwoTerm: { coefficients: { intercept: two.coef[0], cosMp: two.coef[1], sinMp: two.coef[2] }, amplitudeMin: Math.hypot(two.coef[1], two.coef[2]), sdAfterMin: sdOf(two.residual) },
+    residualAfterSin2F: afterSin2F, residualAfterFiveTerm: five.residual, residualAfterAnomalyTwoTerm: two.residual,
   };
 }
 
@@ -247,14 +252,14 @@ export function lunarThirdInstrument(pairs, eras = [[-1999, -1000], [-1000, 0], 
   for (const p of pairs) {
     const k = (p.canonJdTD - 2451550.09766) / 29.530588861; const fm = meeusFullMoonJDE(k);
     if (Math.abs(fm.jde - p.canonJdTD) > 0.5) continue;
-    rows.push({ t: p.t, canonMinusMeeusMin: (p.canonJdTD - fm.jde) * 1440, modelMinusMeeusMin: (p.modelJdTT - fm.jde) * 1440, canonMinusModelMin: p.dTD, x: [Math.sin(2 * fm.F), Math.cos(fm.Mp), Math.sin(fm.Mp), Math.sin(2 * fm.F) * Math.cos(fm.Mp), Math.sin(2 * fm.F) * Math.sin(fm.Mp)] });
+    rows.push({ t: p.t, canonMinusMeeusMin: (p.canonJdTD - fm.jde) * 1440, modelMinusMeeusMin: (p.modelJdTT - fm.jde) * 1440, canonMinusModelOppositionMin: p.dTDOpposition, canonMinusModelMin: p.dTD, x: [Math.sin(2 * fm.F), Math.cos(fm.Mp), Math.sin(fm.Mp), Math.sin(2 * fm.F) * Math.cos(fm.Mp), Math.sin(2 * fm.F) * Math.sin(fm.Mp)] });
   }
   const fit = (sel, key) => { const y = sel.map((r) => r[key]); const o = ols(sel.map((r) => r.x), y); return { mean: mean(y), sd: sdOf(y), coefficients: named(o.coef), sdAfter: sdOf(o.residual) }; };
   const era = (a, b) => {
     const sel = rows.filter((r) => r.t >= a && r.t < b); if (sel.length < 50) return null;
-    const cm = fit(sel, 'canonMinusMeeusMin'), mm = fit(sel, 'modelMinusMeeusMin'), cmod = fit(sel, 'canonMinusModelMin');
+    const cm = fit(sel, 'canonMinusMeeusMin'), mm = fit(sel, 'modelMinusMeeusMin'), cmo = fit(sel, 'canonMinusModelOppositionMin'), cmod = fit(sel, 'canonMinusModelMin');
     const Tmid = ((a + b) / 2 - 2000) / 100;
-    return { era: [a, b], n: sel.length, canonMinusMeeus: cm, modelMinusMeeus: mm, canonMinusModel: cmod, impliedModelMpPhaseDeg: -mm.coefficients.cosMp / (0.40614 * 1440) * 180 / Math.PI, meeusMpTailAtMidpointDeg: meeusArgumentTailArcsec(Tmid).Mp / 3600 };
+    return { era: [a, b], n: sel.length, canonMinusMeeus: cm, modelMinusMeeus: mm, canonMinusModelOpposition: cmo, canonMinusModel: cmod, impliedModelMpPhaseDeg: -mm.coefficients.cosMp / (0.40614 * 1440) * 180 / Math.PI, meeusMpTailAtMidpointDeg: meeusArgumentTailArcsec(Tmid).Mp / 3600 };
   };
   return { n: rows.length, full: era(-Infinity, Infinity), byEra: eras.map(([a, b]) => era(a, b)).filter(Boolean) };
 }

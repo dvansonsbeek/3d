@@ -4462,63 +4462,48 @@
     "record": "NASA Five Millennium Canon of lunar eclipses (public/input/lunar-eclipses-nasa.json)",
     "model": "eclipse.findLunarInRange, matched within 180 min as the recall generator does",
     "cadence": "irregular (~2.4 per year)",
-    "n": 12064,
-    "modelEvents": 12147,
+    "n": 12054,
+    "modelEvents": 12080,
     "canonEvents": 12064,
     "span": [
      -1999,
      3000
     ],
-    "unit": "min (canon UT − model UT)"
+    "unit": "min (canon UT − model UT, the finder's greatest-eclipse instant)"
    },
-   "n": 12064,
-   "span": 4999.302161573441,
-   "tMin": -1998.48164853562,
-   "tMax": 3000.8205130378205,
-   "unit": "min (canon UT − model UT)",
-   "rms": 11.071690162953063,
-   "rmsRaw": 11.071690162953063,
+   "n": 12054,
+   "span": 4999.3021613068795,
+   "tMin": -1998.481672850477,
+   "tMax": 3000.820488456402,
+   "unit": "min (canon UT − model UT, the finder's greatest-eclipse instant)",
+   "rms": 5.160534666486657,
+   "rmsRaw": 5.160534666486657,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0,
-    "tau": 0
+    "rho": 0.7243490352141058,
+    "tau": 1.2862010883754176
    },
    "grid": {
-    "fMin": 0.000050006979358358485,
-    "fMax": 0.9999895662286331,
+    "fMin": 0.00005000697936102484,
+    "fMax": 0.9999895662819207,
     "nFreq": 19997,
     "oversample": 4
    },
-   "floorAr1p99": 0.002453905590590532,
-   "floorWhitep99": 0.0024295539985645462,
+   "floorAr1p99": 0.010872779318884624,
+   "floorWhitep99": 0.0023948237501614828,
    "surrogates": 300,
-   "linesAboveAr1": 21,
+   "linesAboveAr1": 9,
    "lines": [
     {
-     "periodYears": 3.617440059025373,
-     "amplitude": 6.982773471251167,
-     "power": 0.18612010182431493,
-     "overAr1Floor": 75.84648021423072,
-     "overWhiteFloor": 76.60669486427562,
-     "amplitudeInterior": 7.143805656652334,
-     "amplitudeFirstHalf": 6.974758413309774,
-     "amplitudeSecondHalf": 7.031145837299863,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the node-distance sawtooth (12F under full-moon sampling — the opposition-vs-greatest-eclipse definition term, §7)"
-    },
-    {
-     "periodYears": 1428.37204616384,
-     "amplitude": 4.211284845400097,
-     "power": 0.07443223282001804,
-     "overAr1Floor": 30.332150146862798,
-     "overWhiteFloor": 30.636171438871024,
-     "amplitudeInterior": 3.2325810552624987,
-     "amplitudeFirstHalf": 4.442174925618893,
-     "amplitudeSecondHalf": 3.694683736172985,
+     "periodYears": 1428.3720460876802,
+     "amplitude": 4.240321819546268,
+     "power": 0.3812691802782651,
+     "overAr1Floor": 35.06639554580579,
+     "overWhiteFloor": 159.2055282784615,
+     "amplitudeInterior": 3.2526623800951926,
+     "amplitudeFirstHalf": 4.4860538685015,
+     "amplitudeSecondHalf": 3.7271624784429447,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4526,14 +4511,14 @@
      "named": null
     },
     {
-     "periodYears": 2221.912071810418,
-     "amplitude": 3.91838342345063,
-     "power": 0.061112692451520775,
-     "overAr1Floor": 24.904255765118503,
-     "overWhiteFloor": 25.153872886804738,
-     "amplitudeInterior": 3.044318798677992,
-     "amplitudeFirstHalf": 4.506650740770216,
-     "amplitudeSecondHalf": 3.484221153014847,
+     "periodYears": 2221.9120716919465,
+     "amplitude": 3.9173616904976654,
+     "power": 0.30898852637250573,
+     "overAr1Floor": 28.41854113932325,
+     "overWhiteFloor": 129.02349342062047,
+     "amplitudeInterior": 3.031841094389828,
+     "amplitudeFirstHalf": 4.482517140133882,
+     "amplitudeSecondHalf": 3.49785709924813,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4541,14 +4526,14 @@
      "named": null
     },
     {
-     "periodYears": 1052.4846655944082,
-     "amplitude": 3.105209789301449,
-     "power": 0.04033759415434089,
-     "overAr1Floor": 16.438119831918087,
-     "overWhiteFloor": 16.602880272746997,
-     "amplitudeInterior": 1.971066938443264,
-     "amplitudeFirstHalf": 4.435747739563542,
-     "amplitudeSecondHalf": 2.27694651714099,
+     "periodYears": 1052.484665538291,
+     "amplitude": 3.0964043345224677,
+     "power": 0.2025247286440592,
+     "overAr1Floor": 18.62676714980315,
+     "overWhiteFloor": 84.56769673776743,
+     "amplitudeInterior": 1.9471375417951775,
+     "amplitudeFirstHalf": 4.459613796186513,
+     "amplitudeSecondHalf": 2.2243690063863393,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4556,14 +4541,14 @@
      "named": null
     },
     {
-     "periodYears": 4999.302161573441,
-     "amplitude": 2.5566326071688596,
-     "power": 0.027195187087444367,
-     "overAr1Floor": 11.082409686714904,
-     "overWhiteFloor": 11.193489464943815,
-     "amplitudeInterior": 2.804591317900927,
-     "amplitudeFirstHalf": 10.034685427638662,
-     "amplitudeSecondHalf": 1.8902332654435567,
+     "periodYears": 4999.3021613068795,
+     "amplitude": 2.5088320792142986,
+     "power": 0.13228496452344035,
+     "overAr1Floor": 12.16661909928387,
+     "overWhiteFloor": 55.23787064268107,
+     "amplitudeInterior": 2.7429375970585324,
+     "amplitudeFirstHalf": 10.09302861012557,
+     "amplitudeSecondHalf": 1.8153128890549783,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4571,14 +4556,14 @@
      "named": null
     },
     {
-     "periodYears": 1.2032738820807969,
-     "amplitude": 2.2934626936102624,
-     "power": 0.022001577712636146,
-     "overAr1Floor": 8.96594302445901,
-     "overWhiteFloor": 9.055809307237189,
-     "amplitudeInterior": 2.306336333272194,
-     "amplitudeFirstHalf": 2.3617579616866893,
-     "amplitudeSecondHalf": 2.225253621246922,
+     "periodYears": 714.1860230438404,
+     "amplitude": 1.798495514047736,
+     "power": 0.068317794959907,
+     "overAr1Floor": 6.283379157824692,
+     "overWhiteFloor": 28.527274692052114,
+     "amplitudeInterior": 1.187807653742224,
+     "amplitudeFirstHalf": 2.134606771492961,
+     "amplitudeSecondHalf": 1.8982977071021196,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4586,29 +4571,29 @@
      "named": null
     },
     {
-     "periodYears": 714.1860230819198,
-     "amplitude": 1.804809683651716,
-     "power": 0.013620194182803842,
-     "overAr1Floor": 5.550414912061122,
-     "overWhiteFloor": 5.6060471143473505,
-     "amplitudeInterior": 1.1998332904202407,
-     "amplitudeFirstHalf": 2.128753179096708,
-     "amplitudeSecondHalf": 1.9349022641552502,
-     "stands": true,
+     "periodYears": 833.2170268844803,
+     "amplitude": 1.7397831278441198,
+     "power": 0.0639445092187023,
+     "overAr1Floor": 5.881155806008026,
+     "overWhiteFloor": 26.70113373244713,
+     "amplitudeInterior": 0.762236368233937,
+     "amplitudeFirstHalf": 0.8084678235681207,
+     "amplitudeSecondHalf": 2.7487418660052234,
+     "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
-     "longFamily": false,
+     "longFamily": true,
      "named": null
     },
     {
-     "periodYears": 833.2170269289064,
-     "amplitude": 1.753137219145796,
-     "power": 0.012858156383798773,
-     "overAr1Floor": 5.239874114596422,
-     "overWhiteFloor": 5.292393744446824,
-     "amplitudeInterior": 0.7948208965686356,
-     "amplitudeFirstHalf": 0.8234677082343446,
-     "amplitudeSecondHalf": 2.757531696934393,
+     "periodYears": 1.1274290266243427,
+     "amplitude": 1.674899061969021,
+     "power": 0.05914864537120421,
+     "overAr1Floor": 5.440066760894392,
+     "overWhiteFloor": 24.698537989368038,
+     "amplitudeInterior": 1.2297694500530607,
+     "amplitudeFirstHalf": 3.2443209804000035,
+     "amplitudeSecondHalf": 0.11242482656189884,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4616,30 +4601,30 @@
      "named": null
     },
     {
-     "periodYears": 1.127429026684422,
-     "amplitude": 1.6774833810318392,
-     "power": 0.011744339810496858,
-     "overAr1Floor": 4.785978668262696,
-     "overWhiteFloor": 4.833948871865275,
-     "amplitudeInterior": 1.2303707693156123,
-     "amplitudeFirstHalf": 3.2619079883359166,
-     "amplitudeSecondHalf": 0.10445330577222511,
-     "stands": false,
+     "periodYears": 624.9127701633603,
+     "amplitude": 0.966345835100455,
+     "power": 0.019694322358510513,
+     "overAr1Floor": 1.8113420479622904,
+     "overWhiteFloor": 8.223704294390151,
+     "amplitudeInterior": 0.5920084078137577,
+     "amplitudeFirstHalf": 1.3885614063650942,
+     "amplitudeSecondHalf": 0.7320304897531502,
+     "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": false,
      "named": null
     },
     {
-     "periodYears": 1.3820726136083215,
-     "amplitude": 1.6565203543271778,
-     "power": 0.011343537309883935,
-     "overAr1Floor": 4.622646182225012,
-     "overWhiteFloor": 4.668979292736872,
-     "amplitudeInterior": 1.6814951526175161,
-     "amplitudeFirstHalf": 1.699298555863763,
-     "amplitudeSecondHalf": 1.6748760327021532,
-     "stands": true,
+     "periodYears": 454.4820146642619,
+     "amplitude": 0.734111687766187,
+     "power": 0.011362964578060948,
+     "overAr1Floor": 1.0450837127104138,
+     "overWhiteFloor": 4.744802024489169,
+     "amplitudeInterior": 0.17892286278739586,
+     "amplitudeFirstHalf": 1.0303448115881257,
+     "amplitudeSecondHalf": 0.7138779239724696,
+     "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": false,
@@ -4653,22 +4638,22 @@
     "record": "NASA Five Millennium Canon of lunar eclipses (public/input/lunar-eclipses-nasa.json)",
     "model": "eclipse.findLunarInRange, matched within 180 min as the recall generator does",
     "cadence": "irregular (~2.4 per year)",
-    "n": 12064,
-    "modelEvents": 12147,
+    "n": 12054,
+    "modelEvents": 12080,
     "canonEvents": 12064,
     "span": [
      -1999,
      3000
     ],
-    "unit": "min (canon TD − model TT)"
+    "unit": "min (canon TD − model TT, the finder's greatest-eclipse instant)"
    },
-   "n": 12064,
-   "span": 4999.302161573441,
-   "tMin": -1998.48164853562,
-   "tMax": 3000.8205130378205,
-   "unit": "min (canon TD − model TT)",
-   "rms": 10.113977074028075,
-   "rmsRaw": 10.113977074028075,
+   "n": 12054,
+   "span": 4999.3021613068795,
+   "tMin": -1998.481672850477,
+   "tMax": 3000.820488456402,
+   "unit": "min (canon TD − model TT, the finder's greatest-eclipse instant)",
+   "rms": 2.469132154982977,
+   "rmsRaw": 2.469132154982977,
    "detrend": "none",
    "trend": null,
    "ar1": {
@@ -4676,55 +4661,25 @@
     "tau": 0
    },
    "grid": {
-    "fMin": 0.000050006979358358485,
-    "fMax": 0.9999895662286331,
+    "fMin": 0.00005000697936102484,
+    "fMax": 0.9999895662819207,
     "nFreq": 19997,
     "oversample": 4
    },
-   "floorAr1p99": 0.002453905590590532,
-   "floorWhitep99": 0.0024295539985645462,
+   "floorAr1p99": 0.0022739171390855433,
+   "floorWhitep99": 0.0023948237501614828,
    "surrogates": 300,
-   "linesAboveAr1": 14,
+   "linesAboveAr1": 24,
    "lines": [
     {
-     "periodYears": 3.617440059025373,
-     "amplitude": 7.040025166178837,
-     "power": 0.22171950598067347,
-     "overAr1Floor": 90.35372299197408,
-     "overWhiteFloor": 91.25934476520054,
-     "amplitudeInterior": 7.077619765893594,
-     "amplitudeFirstHalf": 7.065609518949161,
-     "amplitudeSecondHalf": 7.0378759211475215,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the node-distance sawtooth (12F under full-moon sampling — the opposition-vs-greatest-eclipse definition term, §7)"
-    },
-    {
-     "periodYears": 1.2032738820807969,
-     "amplitude": 2.2880104125524956,
-     "power": 0.02566337726072827,
-     "overAr1Floor": 10.458176288091174,
-     "overWhiteFloor": 10.562999330696485,
-     "amplitudeInterior": 2.295694198672653,
-     "amplitudeFirstHalf": 2.3548573990048505,
-     "amplitudeSecondHalf": 2.227435552484777,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": null
-    },
-    {
-     "periodYears": 1.127429026684422,
-     "amplitude": 1.6843617613461979,
-     "power": 0.0138771598752265,
-     "overAr1Floor": 5.655131936794262,
-     "overWhiteFloor": 5.711813725245681,
-     "amplitudeInterior": 1.230164668959074,
-     "amplitudeFirstHalf": 3.258914254147686,
-     "amplitudeSecondHalf": 0.12746972814511462,
+     "periodYears": 1.1274290266243427,
+     "amplitude": 1.6837222939024745,
+     "power": 0.23702932251160452,
+     "overAr1Floor": 104.23832884558229,
+     "overWhiteFloor": 98.97568557837363,
+     "amplitudeInterior": 1.2307788900881753,
+     "amplitudeFirstHalf": 3.2453264229432914,
+     "amplitudeSecondHalf": 0.13249364578182096,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4732,14 +4687,89 @@
      "named": null
     },
     {
-     "periodYears": 1.382168139777357,
-     "amplitude": 1.6554992711587315,
-     "power": 0.013266503339241327,
-     "overAr1Floor": 5.4062810688852725,
-     "overWhiteFloor": 5.46046860743971,
-     "amplitudeInterior": 1.6722179032523805,
-     "amplitudeFirstHalf": 1.7060176107332754,
-     "amplitudeSecondHalf": 1.6669989697263752,
+     "periodYears": 2499.6510806534397,
+     "amplitude": 0.7419863594416773,
+     "power": 0.0458974516212076,
+     "overAr1Floor": 20.184311394770205,
+     "overWhiteFloor": 19.165273276629538,
+     "amplitudeInterior": 0.5306224523261337,
+     "amplitudeFirstHalf": 1.248757946385579,
+     "amplitudeSecondHalf": 0.37084147635816156,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": true,
+     "named": null
+    },
+    {
+     "periodYears": 1666.4340537689602,
+     "amplitude": 0.39054902333186975,
+     "power": 0.012748410884677366,
+     "overAr1Floor": 5.606365625883863,
+     "overWhiteFloor": 5.323319047515602,
+     "amplitudeInterior": 0.2376861337555188,
+     "amplitudeFirstHalf": 0.2872675887080473,
+     "amplitudeSecondHalf": 0.3092108019182618,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": true,
+     "named": null
+    },
+    {
+     "periodYears": 1249.8255403267203,
+     "amplitude": 0.3108885433801297,
+     "power": 0.00804482897754793,
+     "overAr1Floor": 3.537872528100633,
+     "overWhiteFloor": 3.3592572217498127,
+     "amplitudeInterior": 0.3012668557303725,
+     "amplitudeFirstHalf": 0.7024978632738716,
+     "amplitudeSecondHalf": 0.11039531554661085,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": true,
+     "named": null
+    },
+    {
+     "periodYears": 3.619404279678985,
+     "amplitude": 0.30104208021229284,
+     "power": 0.007669157469261056,
+     "overAr1Floor": 3.3726635581563937,
+     "overWhiteFloor": 3.2023890980469543,
+     "amplitudeInterior": 0.2595578694719881,
+     "amplitudeFirstHalf": 0.19965714033986748,
+     "amplitudeSecondHalf": 0.07499246955579997,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": "the node-distance sawtooth (12F under full-moon sampling — the opposition-vs-greatest-eclipse definition term, §7)"
+    },
+    {
+     "periodYears": 3.6154779687626815,
+     "amplitude": 0.2946291071484616,
+     "power": 0.0073730358518328066,
+     "overAr1Floor": 3.242438224814945,
+     "overWhiteFloor": 3.078738404584322,
+     "amplitudeInterior": 0.23445292962522912,
+     "amplitudeFirstHalf": 0.22341546132809886,
+     "amplitudeSecondHalf": 0.011081224049005174,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": "the node-distance sawtooth (12F under full-moon sampling — the opposition-vs-greatest-eclipse definition term, §7)"
+    },
+    {
+     "periodYears": 1.092087195960699,
+     "amplitude": 0.2656921769451694,
+     "power": 0.005940022621924729,
+     "overAr1Floor": 2.612242337165158,
+     "overWhiteFloor": 2.480358991564283,
+     "amplitudeInterior": 0.2565903640263311,
+     "amplitudeFirstHalf": 0.2754317189531579,
+     "amplitudeSecondHalf": 0.25588454173160646,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4747,14 +4777,100 @@
      "named": null
     },
     {
-     "periodYears": 1.8030122303033262,
-     "amplitude": 1.589004332249101,
-     "power": 0.012169127032055018,
-     "overAr1Floor": 4.959085255242652,
-     "overWhiteFloor": 5.0087905184428525,
-     "amplitudeInterior": 1.6283288942463434,
-     "amplitudeFirstHalf": 1.6913358316271097,
-     "amplitudeSecondHalf": 1.4708045209758922,
+     "periodYears": 999.8604322613763,
+     "amplitude": 0.25334445365918445,
+     "power": 0.005397325103677469,
+     "overAr1Floor": 2.3735803785040317,
+     "overWhiteFloor": 2.2537462739433445,
+     "amplitudeInterior": 0.26959878259536085,
+     "amplitudeFirstHalf": 0.10533736998904478,
+     "amplitudeSecondHalf": 0.10032117465185601,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": true,
+     "named": null
+    },
+    {
+     "periodYears": 1.6381755259466144,
+     "amplitude": 0.23878832333763736,
+     "power": 0.004781232604406844,
+     "overAr1Floor": 2.1026415264760345,
+     "overWhiteFloor": 1.9964862149393858,
+     "amplitudeInterior": 0.17342129230401088,
+     "amplitudeFirstHalf": 0.39805162883568673,
+     "amplitudeSecondHalf": 0.021051561879100445,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1.1253986518788897,
+     "amplitude": 0.23117861979894097,
+     "power": 0.004458014299489296,
+     "overAr1Floor": 1.960499889315267,
+     "overWhiteFloor": 1.8615208318310241,
+     "amplitudeInterior": 0.1572156276565978,
+     "amplitudeFirstHalf": 0.418523006154765,
+     "amplitudeSecondHalf": 0.024405898219239223,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    }
+   ]
+  },
+  "lunar-canon-TD-anomaly-term-removed": {
+   "id": "lunar-canon-TD-anomaly-term-removed",
+   "meta": {
+    "record": "NASA Five Millennium Canon of lunar eclipses (public/input/lunar-eclipses-nasa.json)",
+    "model": "eclipse.findLunarInRange, matched within 180 min as the recall generator does",
+    "cadence": "irregular (~2.4 per year)",
+    "n": 12054,
+    "modelEvents": 12080,
+    "canonEvents": 12064,
+    "span": [
+     -1999,
+     3000
+    ],
+    "unit": "min (the greatest-eclipse instant after the fitted cos M′/sin M′ pair — the finder's own remainder)"
+   },
+   "n": 12054,
+   "span": 4999.3021613068795,
+   "tMin": -1998.481672850477,
+   "tMax": 3000.820488456402,
+   "unit": "min (the greatest-eclipse instant after the fitted cos M′/sin M′ pair — the finder's own remainder)",
+   "rms": 2.1363784964324184,
+   "rmsRaw": 2.1363784964324184,
+   "detrend": "none",
+   "trend": null,
+   "ar1": {
+    "rho": 0.07158866559568304,
+    "tau": 0.1573019077719669
+   },
+   "grid": {
+    "fMin": 0.00005000697936102484,
+    "fMax": 0.9999895662819207,
+    "nFreq": 19997,
+    "oversample": 4
+   },
+   "floorAr1p99": 0.0027334490062748164,
+   "floorWhitep99": 0.0023948237501614828,
+   "surrogates": 300,
+   "linesAboveAr1": 38,
+   "lines": [
+    {
+     "periodYears": 1.127238367826154,
+     "amplitude": 1.5721115396924976,
+     "power": 0.27052584288979775,
+     "overAr1Floor": 98.96868105780918,
+     "overWhiteFloor": 112.96273593059038,
+     "amplitudeInterior": 1.1326967527045995,
+     "amplitudeFirstHalf": 1.7656303444139305,
+     "amplitudeSecondHalf": 1.3017542087798877,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4762,14 +4878,14 @@
      "named": null
     },
     {
-     "periodYears": 3.61351800619665,
-     "amplitude": 1.4102045518001904,
-     "power": 0.009709204510605493,
-     "overAr1Floor": 3.9566332738452967,
-     "overWhiteFloor": 3.996290889744366,
-     "amplitudeInterior": 0.9148829245567427,
-     "amplitudeFirstHalf": 2.210003690932917,
-     "amplitudeSecondHalf": 1.9897991571573452,
+     "periodYears": 1.1276197499287226,
+     "amplitude": 1.4839986250605577,
+     "power": 0.2412045359579758,
+     "overAr1Floor": 88.24182759739601,
+     "overWhiteFloor": 100.71911803184322,
+     "amplitudeInterior": 1.118621678998786,
+     "amplitudeFirstHalf": 1.7732988835690664,
+     "amplitudeSecondHalf": 1.1551695180324089,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4777,14 +4893,265 @@
      "named": null
     },
     {
-     "periodYears": 1.8087200295128554,
-     "amplitude": 1.3685070653000766,
-     "power": 0.00906506296207554,
-     "overAr1Floor": 3.694136806581069,
-     "overWhiteFloor": 3.731163401773104,
-     "amplitudeInterior": 1.3976960349219292,
-     "amplitudeFirstHalf": 1.4218196536989396,
-     "amplitudeSecondHalf": 1.2601559292861835,
+     "periodYears": 1.1278741480674543,
+     "amplitude": 0.7462446842551088,
+     "power": 0.06108860861414849,
+     "overAr1Floor": 22.348545180069383,
+     "overWhiteFloor": 25.508603132079884,
+     "amplitudeInterior": 0.28575403937997024,
+     "amplitudeFirstHalf": 1.5426410285206258,
+     "amplitudeSecondHalf": 0.15801451481508447,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 2499.6510806534397,
+     "amplitude": 0.7438750557735673,
+     "power": 0.060445103348398116,
+     "overAr1Floor": 22.11312638708178,
+     "overWhiteFloor": 25.239896399191093,
+     "amplitudeInterior": 0.5360922100769123,
+     "amplitudeFirstHalf": 1.250332620452933,
+     "amplitudeSecondHalf": 0.37663663947523734,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": true,
+     "named": null
+    },
+    {
+     "periodYears": 1.1269207464207367,
+     "amplitude": 0.6876620339890523,
+     "power": 0.05182914233330526,
+     "overAr1Floor": 18.96107892056079,
+     "overWhiteFloor": 21.642153135407323,
+     "amplitudeInterior": 0.32201673478683107,
+     "amplitudeFirstHalf": 1.311294857643897,
+     "amplitudeSecondHalf": 0.1080801528739535,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1.1281286610197427,
+     "amplitude": 0.47877385422582275,
+     "power": 0.025114210666686433,
+     "overAr1Floor": 9.187737034433447,
+     "overWhiteFloor": 10.486872223892462,
+     "amplitudeInterior": 0.2719782416493061,
+     "amplitudeFirstHalf": 0.6567962380269771,
+     "amplitudeSecondHalf": 0.32262029613663956,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1.1266667781416404,
+     "amplitude": 0.4731070508381147,
+     "power": 0.024307596777903954,
+     "overAr1Floor": 8.89264688022503,
+     "overWhiteFloor": 10.150056669625435,
+     "amplitudeInterior": 0.1759890531068482,
+     "amplitudeFirstHalf": 0.6034997464878773,
+     "amplitudeSecondHalf": 0.3218163628614609,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1666.4340537689602,
+     "amplitude": 0.3862237223171513,
+     "power": 0.016339265829684695,
+     "overAr1Floor": 5.977527216412967,
+     "overWhiteFloor": 6.822742520648101,
+     "amplitudeInterior": 0.24432628160992764,
+     "amplitudeFirstHalf": 0.290115763990761,
+     "amplitudeSecondHalf": 0.31727257315590934,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": true,
+     "named": null
+    },
+    {
+     "periodYears": 1.1264129243077778,
+     "amplitude": 0.3511266234674181,
+     "power": 0.013517726705449594,
+     "overAr1Floor": 4.945300488291071,
+     "overWhiteFloor": 5.644560149588501,
+     "amplitudeInterior": 0.24446819719742258,
+     "amplitudeFirstHalf": 0.6649510043303261,
+     "amplitudeSecondHalf": 0.056435506439317135,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1.1283832888633314,
+     "amplitude": 0.3495881472009941,
+     "power": 0.013385597301151256,
+     "overAr1Floor": 4.896962507961083,
+     "overWhiteFloor": 5.58938723580333,
+     "amplitudeInterior": 0.29551894898588343,
+     "amplitudeFirstHalf": 0.7121894443615592,
+     "amplitudeSecondHalf": 0.07453062109438954,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    }
+   ]
+  },
+  "lunar-canon-TD-opposition": {
+   "id": "lunar-canon-TD-opposition",
+   "meta": {
+    "record": "NASA Five Millennium Canon of lunar eclipses (public/input/lunar-eclipses-nasa.json)",
+    "model": "eclipse.findLunarInRange, matched within 180 min as the recall generator does",
+    "cadence": "irregular (~2.4 per year)",
+    "n": 12054,
+    "modelEvents": 12080,
+    "canonEvents": 12064,
+    "span": [
+     -1999,
+     3000
+    ],
+    "unit": "min (canon TD − model TT at the OPPOSITION in longitude — the pre-follow-up instant)"
+   },
+   "n": 12054,
+   "span": 4999.3021613068795,
+   "tMin": -1998.481672850477,
+   "tMax": 3000.820488456402,
+   "unit": "min (canon TD − model TT at the OPPOSITION in longitude — the pre-follow-up instant)",
+   "rms": 10.106192992686127,
+   "rmsRaw": 10.106192992686127,
+   "detrend": "none",
+   "trend": null,
+   "ar1": {
+    "rho": 0,
+    "tau": 0
+   },
+   "grid": {
+    "fMin": 0.00005000697936102484,
+    "fMax": 0.9999895662819207,
+    "nFreq": 19997,
+    "oversample": 4
+   },
+   "floorAr1p99": 0.0022739171390855433,
+   "floorWhitep99": 0.0023948237501614828,
+   "surrogates": 300,
+   "linesAboveAr1": 15,
+   "lines": [
+    {
+     "periodYears": 3.61744005883256,
+     "amplitude": 7.0562296894877345,
+     "power": 0.2231761614004546,
+     "overAr1Floor": 98.14612747507809,
+     "overWhiteFloor": 93.19105900190185,
+     "amplitudeInterior": 7.087658205370508,
+     "amplitudeFirstHalf": 7.09881338844625,
+     "amplitudeSecondHalf": 7.039886272983285,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": "the node-distance sawtooth (12F under full-moon sampling — the opposition-vs-greatest-eclipse definition term, §7)"
+    },
+    {
+     "periodYears": 1.2032738820166755,
+     "amplitude": 2.2850562351537884,
+     "power": 0.025646715940191925,
+     "overAr1Floor": 11.278650175663728,
+     "overWhiteFloor": 10.709228993767315,
+     "amplitudeInterior": 2.297376835449715,
+     "amplitudeFirstHalf": 2.3478395962046106,
+     "amplitudeSecondHalf": 2.2283048934127123,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1.1274290266243427,
+     "amplitude": 1.6887303643330294,
+     "power": 0.013974998803988711,
+     "overAr1Floor": 6.145781903736722,
+     "overWhiteFloor": 5.835502008465708,
+     "amplitudeInterior": 1.2332139211257787,
+     "amplitudeFirstHalf": 3.270579931763558,
+     "amplitudeSecondHalf": 0.12349570634863961,
+     "stands": false,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1.3821681397037013,
+     "amplitude": 1.6462879579335765,
+     "power": 0.013136382919651298,
+     "overAr1Floor": 5.776983995526812,
+     "overWhiteFloor": 5.485323468487196,
+     "amplitudeInterior": 1.6711240469333994,
+     "amplitudeFirstHalf": 1.689339794282803,
+     "amplitudeSecondHalf": 1.6664082656004904,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1.80301223020724,
+     "amplitude": 1.5962679617743312,
+     "power": 0.012305365583507238,
+     "overAr1Floor": 5.411527699050567,
+     "overWhiteFloor": 5.138317833484609,
+     "amplitudeInterior": 1.6369600361581724,
+     "amplitudeFirstHalf": 1.7047420389362582,
+     "amplitudeSecondHalf": 1.4731733722162363,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 3.613518006004046,
+     "amplitude": 1.4217325958805036,
+     "power": 0.009880749698253912,
+     "overAr1Floor": 4.34525494725259,
+     "overWhiteFloor": 4.125877613159488,
+     "amplitudeInterior": 0.9097069076508296,
+     "amplitudeFirstHalf": 2.237089546326803,
+     "amplitudeSecondHalf": 1.9945535571012363,
+     "stands": true,
+     "aboveAr1": true,
+     "aboveWhite": true,
+     "longFamily": false,
+     "named": null
+    },
+    {
+     "periodYears": 1.808720029416465,
+     "amplitude": 1.3878690430462217,
+     "power": 0.009336860073563212,
+     "overAr1Floor": 4.106068736224062,
+     "overWhiteFloor": 3.8987671109131217,
+     "amplitudeInterior": 1.408035484074146,
+     "amplitudeFirstHalf": 1.457989369825454,
+     "amplitudeSecondHalf": 1.2630108073283126,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4792,14 +5159,14 @@
      "named": "the node-distance sawtooth's harmonic 2"
     },
     {
-     "periodYears": 3.6213706349678128,
-     "amplitude": 1.3087107806703553,
-     "power": 0.008430933964170493,
-     "overAr1Floor": 3.4357205902699746,
-     "overWhiteFloor": 3.470157061399641,
-     "amplitudeInterior": 1.0839149422204186,
-     "amplitudeFirstHalf": 1.6033949059447907,
-     "amplitudeSecondHalf": 1.9125506335409876,
+     "periodYears": 3.6213706347747903,
+     "amplitude": 1.3062137938264957,
+     "power": 0.008413908295301155,
+     "overAr1Floor": 3.7001824519801154,
+     "overWhiteFloor": 3.513372662490843,
+     "amplitudeInterior": 1.0873673741877674,
+     "amplitudeFirstHalf": 1.5886054808068462,
+     "amplitudeSecondHalf": 1.908154605166129,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4807,14 +5174,14 @@
      "named": null
     },
     {
-     "periodYears": 1.059230290073751,
-     "amplitude": 1.1467737524790051,
-     "power": 0.006433731206627973,
-     "overAr1Floor": 2.621833224268297,
-     "overWhiteFloor": 2.648112044609511,
-     "amplitudeInterior": 1.1335176137886205,
-     "amplitudeFirstHalf": 1.1912847516877612,
-     "amplitudeSecondHalf": 1.1515552827878188,
+     "periodYears": 1.059230290017306,
+     "amplitude": 1.137538129952004,
+     "power": 0.006339618735119347,
+     "overAr1Floor": 2.7879726249254744,
+     "overWhiteFloor": 2.6472172470695883,
+     "amplitudeInterior": 1.1296720291703548,
+     "amplitudeFirstHalf": 1.1706616943301429,
+     "amplitudeSecondHalf": 1.1565383567198844,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4822,14 +5189,14 @@
      "named": null
     },
     {
-     "periodYears": 2.236824233366003,
-     "amplitude": 0.8607296032518319,
-     "power": 0.003566696780126996,
-     "overAr1Floor": 1.4534775884628353,
-     "overWhiteFloor": 1.4680458974092807,
-     "amplitudeInterior": 0.851559832505511,
-     "amplitudeFirstHalf": 0.8495172654754654,
-     "amplitudeSecondHalf": 0.8829913948639847,
+     "periodYears": 2.2368242332467934,
+     "amplitude": 0.8535195014267573,
+     "power": 0.0035118171537580007,
+     "overAr1Floor": 1.544390995342196,
+     "overWhiteFloor": 1.4664198789247849,
+     "amplitudeInterior": 0.8511486396568323,
+     "amplitudeFirstHalf": 0.8378491454137137,
+     "amplitudeSecondHalf": 0.8809775028653294,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4838,28 +5205,28 @@
     }
    ]
   },
-  "lunar-canon-TD-node-term-removed": {
-   "id": "lunar-canon-TD-node-term-removed",
+  "lunar-canon-TD-opposition-node-term-removed": {
+   "id": "lunar-canon-TD-opposition-node-term-removed",
    "meta": {
     "record": "NASA Five Millennium Canon of lunar eclipses (public/input/lunar-eclipses-nasa.json)",
     "model": "eclipse.findLunarInRange, matched within 180 min as the recall generator does",
     "cadence": "irregular (~2.4 per year)",
-    "n": 12064,
-    "modelEvents": 12147,
+    "n": 12054,
+    "modelEvents": 12080,
     "canonEvents": 12064,
     "span": [
      -1999,
      3000
     ],
-    "unit": "min (after the sin 2F node term)"
+    "unit": "min (the opposition instant after the sin 2F node term)"
    },
-   "n": 12064,
-   "span": 4999.302161573441,
-   "tMin": -1998.48164853562,
-   "tMax": 3000.8205130378205,
-   "unit": "min (after the sin 2F node term)",
-   "rms": 4.111792585027116,
-   "rmsRaw": 4.111792585027116,
+   "n": 12054,
+   "span": 4999.3021613068795,
+   "tMin": -1998.481672850477,
+   "tMax": 3000.820488456402,
+   "unit": "min (the opposition instant after the sin 2F node term)",
+   "rms": 4.110533113894428,
+   "rmsRaw": 4.110533113894428,
    "detrend": "none",
    "trend": null,
    "ar1": {
@@ -4867,25 +5234,25 @@
     "tau": 0
    },
    "grid": {
-    "fMin": 0.000050006979358358485,
-    "fMax": 0.9999895662286331,
+    "fMin": 0.00005000697936102484,
+    "fMax": 0.9999895662819207,
     "nFreq": 19997,
     "oversample": 4
    },
-   "floorAr1p99": 0.002453905590590532,
-   "floorWhitep99": 0.0024295539985645462,
+   "floorAr1p99": 0.0022739171390855433,
+   "floorWhitep99": 0.0023948237501614828,
    "surrogates": 300,
-   "linesAboveAr1": 27,
+   "linesAboveAr1": 29,
    "lines": [
     {
-     "periodYears": 1.127365466585951,
-     "amplitude": 4.858862748805459,
-     "power": 0.6971351810278505,
-     "overAr1Floor": 284.0920953524072,
-     "overWhiteFloor": 286.9395705712814,
-     "amplitudeInterior": 4.537645560724785,
-     "amplitudeFirstHalf": 5.573544554081175,
-     "amplitudeSecondHalf": 4.117575138429764,
+     "periodYears": 1.127365466525875,
+     "amplitude": 4.858097847346465,
+     "power": 0.6971554263151092,
+     "overAr1Floor": 306.5878761947634,
+     "overWhiteFloor": 291.10928362394105,
+     "amplitudeInterior": 4.537251358830765,
+     "amplitudeFirstHalf": 5.573579749994409,
+     "amplitudeSecondHalf": 4.117000781971084,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4893,14 +5260,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1270477735614945,
-     "amplitude": 1.4310726662942546,
-     "power": 0.06054087143995908,
-     "overAr1Floor": 24.671230903137527,
-     "overWhiteFloor": 24.918512400106543,
-     "amplitudeInterior": 0.6148306711191017,
-     "amplitudeFirstHalf": 3.067086014968382,
-     "amplitudeSecondHalf": 1.5593564482994033,
+     "periodYears": 1.1270477735014357,
+     "amplitude": 1.4310973691517148,
+     "power": 0.060583693476873125,
+     "overAr1Floor": 26.642876486359956,
+     "overWhiteFloor": 25.29776709989116,
+     "amplitudeInterior": 0.614705636592894,
+     "amplitudeFirstHalf": 3.070760642524059,
+     "amplitudeSecondHalf": 1.5591040046624047,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4908,14 +5275,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1277469347113462,
-     "amplitude": 1.364497375636288,
-     "power": 0.05535579227939298,
-     "overAr1Floor": 22.558240419539377,
-     "overWhiteFloor": 22.784343263042867,
-     "amplitudeInterior": 0.9225557187129879,
-     "amplitudeFirstHalf": 1.2730168674968234,
-     "amplitudeSecondHalf": 1.6124037874535257,
+     "periodYears": 1.12774693465125,
+     "amplitude": 1.3640691826247857,
+     "power": 0.05535284989126767,
+     "overAr1Floor": 24.34250964550443,
+     "overWhiteFloor": 23.113538057878053,
+     "amplitudeInterior": 0.9257586651830316,
+     "amplitudeFirstHalf": 1.2720714836503908,
+     "amplitudeSecondHalf": 1.6121000267979917,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4923,14 +5290,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1280013902471564,
-     "amplitude": 0.903906207091206,
-     "power": 0.02413324066835713,
-     "overAr1Floor": 9.834624755286315,
-     "overWhiteFloor": 9.933197896657484,
-     "amplitudeInterior": 0.15580802487136344,
-     "amplitudeFirstHalf": 1.616773592394356,
-     "amplitudeSecondHalf": 0.556804552280926,
+     "periodYears": 1.1280013901870467,
+     "amplitude": 0.9004795211930753,
+     "power": 0.023963952315149414,
+     "overAr1Floor": 10.538621616083393,
+     "overWhiteFloor": 10.006561991684576,
+     "amplitudeInterior": 0.15674231301968639,
+     "amplitudeFirstHalf": 1.6123712136341866,
+     "amplitudeSecondHalf": 0.5561103163562848,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4938,14 +5305,14 @@
      "named": null
     },
     {
-     "periodYears": 3.618094562383257,
-     "amplitude": 0.8840896567593768,
-     "power": 0.022204473457041334,
-     "overAr1Floor": 9.048625807848554,
-     "overWhiteFloor": 9.13932082602832,
-     "amplitudeInterior": 0.8846271822556877,
-     "amplitudeFirstHalf": 0.884725082708838,
-     "amplitudeSecondHalf": 0.799558342048273,
+     "periodYears": 3.6180945621904095,
+     "amplitude": 0.886988367720653,
+     "power": 0.022376650432032873,
+     "overAr1Floor": 9.840574244069268,
+     "overWhiteFloor": 9.343756687950007,
+     "amplitudeInterior": 0.8880240402689168,
+     "amplitudeFirstHalf": 0.8917441635336637,
+     "amplitudeSecondHalf": 0.801628829493204,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4953,14 +5320,14 @@
      "named": "the node-distance sawtooth (12F under full-moon sampling — the opposition-vs-greatest-eclipse definition term, §7)"
     },
     {
-     "periodYears": 1.1267302595391933,
-     "amplitude": 0.8372379107114307,
-     "power": 0.020720272939867026,
-     "overAr1Floor": 8.44379385226499,
-     "overWhiteFloor": 8.528426596860653,
-     "amplitudeInterior": 0.2753415944740286,
-     "amplitudeFirstHalf": 1.2344365912496618,
-     "amplitudeSecondHalf": 0.8604886666904003,
+     "periodYears": 1.1267302594791513,
+     "amplitude": 0.8354029982524006,
+     "power": 0.020647873032258443,
+     "overAr1Floor": 9.080310217707403,
+     "overWhiteFloor": 8.621875839867615,
+     "amplitudeInterior": 0.2754686350465124,
+     "amplitudeFirstHalf": 1.2289934479825093,
+     "amplitudeSecondHalf": 0.8598038258003892,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4968,14 +5335,14 @@
      "named": null
     },
     {
-     "periodYears": 2499.6510807867207,
-     "amplitude": 0.7690131166051628,
-     "power": 0.01744277193297878,
-     "overAr1Floor": 7.108167486093538,
-     "overWhiteFloor": 7.179413152901518,
-     "amplitudeInterior": 0.5525549612986844,
-     "amplitudeFirstHalf": 1.2929396625852427,
-     "amplitudeSecondHalf": 0.3737615275532493,
+     "periodYears": 2499.6510806534397,
+     "amplitude": 0.7681420076563318,
+     "power": 0.01741025265983266,
+     "overAr1Floor": 7.6565026757457835,
+     "overWhiteFloor": 7.26995156059342,
+     "amplitudeInterior": 0.5525517192224403,
+     "amplitudeFirstHalf": 1.2916256588050952,
+     "amplitudeSecondHalf": 0.37349324795048283,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4983,14 +5350,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1282559606353864,
-     "amplitude": 0.6183526748380165,
-     "power": 0.011310249502076892,
-     "overAr1Floor": 4.609080946490318,
-     "overWhiteFloor": 4.655278091682394,
-     "amplitudeInterior": 0.38416728459505073,
-     "amplitudeFirstHalf": 0.8124169402724097,
-     "amplitudeSecondHalf": 0.5685690979947355,
+     "periodYears": 1.128255960575263,
+     "amplitude": 0.6167866933892968,
+     "power": 0.011261203295340604,
+     "overAr1Floor": 4.952336697664059,
+     "overWhiteFloor": 4.702309844129974,
+     "amplitudeInterior": 0.38428572798032473,
+     "amplitudeFirstHalf": 0.8082752455151457,
+     "amplitudeSecondHalf": 0.5682152366430464,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4998,14 +5365,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1264763771012622,
-     "amplitude": 0.6052556913773444,
-     "power": 0.010828398066088705,
-     "overAr1Floor": 4.41271991376117,
-     "overWhiteFloor": 4.45694891839673,
-     "amplitudeInterior": 0.3654168987835542,
-     "amplitudeFirstHalf": 0.9904407155319993,
-     "amplitudeSecondHalf": 0.39062217626623075,
+     "periodYears": 1.1264763770412336,
+     "amplitude": 0.6034417682347474,
+     "power": 0.010767944763070669,
+     "overAr1Floor": 4.735416510120066,
+     "overWhiteFloor": 4.49634122859546,
+     "amplitudeInterior": 0.3646516214974447,
+     "amplitudeFirstHalf": 0.9903866018017677,
+     "amplitudeSecondHalf": 0.39055437765496465,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5013,14 +5380,14 @@
      "named": null
     },
     {
-     "periodYears": 1.059286399316789,
-     "amplitude": 0.591927080991183,
-     "power": 0.010365079269445129,
-     "overAr1Floor": 4.223911184354397,
-     "overWhiteFloor": 4.266247745705233,
-     "amplitudeInterior": 0.5788765665119793,
-     "amplitudeFirstHalf": 0.6165782819574975,
-     "amplitudeSecondHalf": 0.6003466141504669,
+     "periodYears": 1.0592863992603412,
+     "amplitude": 0.5869328465248719,
+     "power": 0.010195384776811084,
+     "overAr1Floor": 4.4836219409961275,
+     "overWhiteFloor": 4.257258921924259,
+     "amplitudeInterior": 0.5768787196031989,
+     "amplitudeFirstHalf": 0.6071585322536598,
+     "amplitudeSecondHalf": 0.6001622135437218,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5029,54 +5396,54 @@
     }
    ]
   },
-  "lunar-canon-TD-five-term-removed": {
-   "id": "lunar-canon-TD-five-term-removed",
+  "lunar-canon-TD-opposition-five-term-removed": {
+   "id": "lunar-canon-TD-opposition-five-term-removed",
    "meta": {
     "record": "NASA Five Millennium Canon of lunar eclipses (public/input/lunar-eclipses-nasa.json)",
     "model": "eclipse.findLunarInRange, matched within 180 min as the recall generator does",
     "cadence": "irregular (~2.4 per year)",
-    "n": 12064,
-    "modelEvents": 12147,
+    "n": 12054,
+    "modelEvents": 12080,
     "canonEvents": 12064,
     "span": [
      -1999,
      3000
     ],
-    "unit": "min (after the five-term fit: sin 2F, its anomaly sidebands, and the direct cos M′/sin M′ phase)"
+    "unit": "min (the opposition instant after the five-term fit: sin 2F, its anomaly sidebands, and the direct cos M′/sin M′ phase)"
    },
-   "n": 12064,
-   "span": 4999.302161573441,
-   "tMin": -1998.48164853562,
-   "tMax": 3000.8205130378205,
-   "unit": "min (after the five-term fit: sin 2F, its anomaly sidebands, and the direct cos M′/sin M′ phase)",
-   "rms": 2.175951784743974,
-   "rmsRaw": 2.175951784743974,
+   "n": 12054,
+   "span": 4999.3021613068795,
+   "tMin": -1998.481672850477,
+   "tMax": 3000.820488456402,
+   "unit": "min (the opposition instant after the five-term fit: sin 2F, its anomaly sidebands, and the direct cos M′/sin M′ phase)",
+   "rms": 2.1763255867563998,
+   "rmsRaw": 2.1763255867563998,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.09894598623927553,
-    "tau": 0.17916138464060766
+    "rho": 0.09809693914036798,
+    "tau": 0.1786444748700631
    },
    "grid": {
-    "fMin": 0.000050006979358358485,
-    "fMax": 0.9999895662286331,
+    "fMin": 0.00005000697936102484,
+    "fMax": 0.9999895662819207,
     "nFreq": 19997,
     "oversample": 4
    },
-   "floorAr1p99": 0.00330352936083315,
-   "floorWhitep99": 0.0024295539985645462,
+   "floorAr1p99": 0.0028663828681743686,
+   "floorWhitep99": 0.0023948237501614828,
    "surrogates": 300,
    "linesAboveAr1": 38,
    "lines": [
     {
-     "periodYears": 1.127238367886223,
-     "amplitude": 1.5669209145500538,
-     "power": 0.25901611486062315,
-     "overAr1Floor": 78.40587643371188,
-     "overWhiteFloor": 106.61056103863412,
-     "amplitudeInterior": 1.1277411243747049,
-     "amplitudeFirstHalf": 1.7574626256132104,
-     "amplitudeSecondHalf": 1.2971110001682036,
+     "periodYears": 1.127238367826154,
+     "amplitude": 1.5678607612366926,
+     "power": 0.25927795846257823,
+     "overAr1Floor": 90.45475443680532,
+     "overWhiteFloor": 108.2659876097751,
+     "amplitudeInterior": 1.1290648110472365,
+     "amplitudeFirstHalf": 1.7595646620609282,
+     "amplitudeSecondHalf": 1.2971268614665235,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5084,14 +5451,14 @@
      "named": null
     },
     {
-     "periodYears": 1.127619749988812,
-     "amplitude": 1.4831839091711254,
-     "power": 0.23223574856106724,
-     "overAr1Floor": 70.29928394597268,
-     "overWhiteFloor": 95.58781105432483,
-     "amplitudeInterior": 1.1195307131313212,
-     "amplitudeFirstHalf": 1.7720073065480835,
-     "amplitudeSecondHalf": 1.1546627743654916,
+     "periodYears": 1.1276197499287226,
+     "amplitude": 1.483651692239633,
+     "power": 0.2323263784919666,
+     "overAr1Floor": 81.05210963667875,
+     "overWhiteFloor": 97.01189011354212,
+     "amplitudeInterior": 1.1196585539611825,
+     "amplitudeFirstHalf": 1.7720002467130485,
+     "amplitudeSecondHalf": 1.1549312036882982,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5099,14 +5466,14 @@
      "named": null
     },
     {
-     "periodYears": 2499.6510807867207,
-     "amplitude": 0.7706784841669676,
-     "power": 0.06255672329944546,
-     "overAr1Floor": 18.936330350540203,
-     "overWhiteFloor": 25.748233353284537,
-     "amplitudeInterior": 0.5520453310101738,
-     "amplitudeFirstHalf": 1.3018402458997103,
-     "amplitudeSecondHalf": 0.3806112048277179,
+     "periodYears": 2499.6510806534397,
+     "amplitude": 0.7707878946949369,
+     "power": 0.06253960926632843,
+     "overAr1Floor": 21.81830276782271,
+     "overWhiteFloor": 26.114493503796005,
+     "amplitudeInterior": 0.5522778774287271,
+     "amplitudeFirstHalf": 1.3028087263188224,
+     "amplitudeSecondHalf": 0.38068522346146105,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5114,14 +5481,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1278741481275574,
-     "amplitude": 0.7417575431597578,
-     "power": 0.05817205414158576,
-     "overAr1Floor": 17.609062244542837,
-     "overWhiteFloor": 23.94351151526394,
-     "amplitudeInterior": 0.28779948690277035,
-     "amplitudeFirstHalf": 1.5287632051019007,
-     "amplitudeSecondHalf": 0.16003464545639529,
+     "periodYears": 1.1278741480674543,
+     "amplitude": 0.7414153050319362,
+     "power": 0.058107461288612806,
+     "overAr1Floor": 20.272051558004915,
+     "overWhiteFloor": 24.263773601165692,
+     "amplitudeInterior": 0.28773354674857443,
+     "amplitudeFirstHalf": 1.5280927154227932,
+     "amplitudeSecondHalf": 0.16020240032348898,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5129,14 +5496,14 @@
      "named": null
     },
     {
-     "periodYears": 1.126920746480789,
-     "amplitude": 0.6882370649155165,
-     "power": 0.050040221645975394,
-     "overAr1Floor": 15.147503224658868,
-     "overWhiteFloor": 20.596464073463963,
-     "amplitudeInterior": 0.32057394401813216,
-     "amplitudeFirstHalf": 1.313025637186705,
-     "amplitudeSecondHalf": 0.10558081489848825,
+     "periodYears": 1.1269207464207367,
+     "amplitude": 0.688095054729279,
+     "power": 0.05000698318398016,
+     "overAr1Floor": 17.44602360668942,
+     "overWhiteFloor": 20.881279125701084,
+     "amplitudeInterior": 0.32067659578665464,
+     "amplitudeFirstHalf": 1.3134402254465967,
+     "amplitudeSecondHalf": 0.10552781688805643,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5144,14 +5511,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1281286610798593,
-     "amplitude": 0.4730382159418366,
-     "power": 0.023625911618775256,
-     "overAr1Floor": 7.151718370929448,
-     "overWhiteFloor": 9.72438218402808,
-     "amplitudeInterior": 0.2616245932265499,
-     "amplitudeFirstHalf": 0.645014911703471,
-     "amplitudeSecondHalf": 0.32305317043582993,
+     "periodYears": 1.1281286610197427,
+     "amplitude": 0.4729420049128858,
+     "power": 0.023615141242525967,
+     "overAr1Floor": 8.238655590893451,
+     "overWhiteFloor": 9.860909906599014,
+     "amplitudeInterior": 0.2617929700017931,
+     "amplitudeFirstHalf": 0.6451893964286923,
+     "amplitudeSecondHalf": 0.3229890881409209,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5159,14 +5526,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1266667782016793,
-     "amplitude": 0.47444434770943966,
-     "power": 0.023559401011410585,
-     "overAr1Floor": 7.131585173945269,
-     "overWhiteFloor": 9.697006539196162,
-     "amplitudeInterior": 0.1758129371549035,
-     "amplitudeFirstHalf": 0.6048423167616533,
-     "amplitudeSecondHalf": 0.3217279126880403,
+     "periodYears": 1.1266667781416404,
+     "amplitude": 0.47394855659845,
+     "power": 0.02350832715368485,
+     "overAr1Floor": 8.20139117307018,
+     "overWhiteFloor": 9.816307839814803,
+     "amplitudeInterior": 0.17564413699004755,
+     "amplitudeFirstHalf": 0.6039655437368521,
+     "amplitudeSecondHalf": 0.32167768835628774,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5174,14 +5541,14 @@
      "named": null
     },
     {
-     "periodYears": 1666.4340538578133,
-     "amplitude": 0.3985230211349587,
-     "power": 0.0167652376408066,
-     "overAr1Floor": 5.07494736979677,
-     "overWhiteFloor": 6.900541272477175,
-     "amplitudeInterior": 0.25046716168610883,
-     "amplitudeFirstHalf": 0.2897660167719509,
-     "amplitudeSecondHalf": 0.31983703697174987,
+     "periodYears": 1666.4340537689602,
+     "amplitude": 0.39859144235407534,
+     "power": 0.016765811952983312,
+     "overAr1Floor": 5.849118112983157,
+     "overWhiteFloor": 7.000854218124735,
+     "amplitudeInterior": 0.2502437741586063,
+     "amplitudeFirstHalf": 0.29135987442233824,
+     "amplitudeSecondHalf": 0.3200045734238578,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5189,14 +5556,14 @@
      "named": null
     },
     {
-     "periodYears": 1.126412924367803,
-     "amplitude": 0.352802754360816,
-     "power": 0.013154536065365176,
-     "overAr1Floor": 3.981964326191913,
-     "overWhiteFloor": 5.41438308147803,
-     "amplitudeInterior": 0.24607922456060188,
-     "amplitudeFirstHalf": 0.6649583810333666,
-     "amplitudeSecondHalf": 0.05718883237899378,
+     "periodYears": 1.1264129243077778,
+     "amplitude": 0.35208479139776705,
+     "power": 0.013097547526309624,
+     "overAr1Floor": 4.569364292444156,
+     "overWhiteFloor": 5.469107079561265,
+     "amplitudeInterior": 0.2460115440311991,
+     "amplitudeFirstHalf": 0.6651274803367708,
+     "amplitudeSecondHalf": 0.057125957359904105,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5204,14 +5571,14 @@
      "named": null
     },
     {
-     "periodYears": 1.1283832889234615,
-     "amplitude": 0.3447334439619706,
-     "power": 0.012546845408012664,
-     "overAr1Floor": 3.79801237935671,
-     "overWhiteFloor": 5.164258713914455,
-     "amplitudeInterior": 0.2968839047247411,
-     "amplitudeFirstHalf": 0.7174469039262683,
-     "amplitudeSecondHalf": 0.07107538143551352,
+     "periodYears": 1.1283832888633314,
+     "amplitude": 0.3454089775745457,
+     "power": 0.012592137885171908,
+     "overAr1Floor": 4.393041147776599,
+     "overWhiteFloor": 5.258064558747933,
+     "amplitudeInterior": 0.29663799226022664,
+     "amplitudeFirstHalf": 0.7176253130128589,
+     "amplitudeSecondHalf": 0.07109944521187478,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -5994,37 +6361,38 @@
    }
   },
   "lunarNode": {
-   "n": 12064,
-   "meanUTMin": -1.6760619963560655,
-   "sdUTMin": 10.944091522314817,
-   "meanTDMin": -0.3078075731204037,
-   "sdTDMin": 10.109292099444763,
+   "instant": "dTDOpposition",
+   "n": 12054,
+   "meanUTMin": -1.7077144263604274,
+   "sdUTMin": 4.8697874165112145,
+   "meanTDMin": -0.3137824640434556,
+   "sdTDMin": 10.101320575582077,
    "uRangeDeg": [
     -22.200182085856795,
-    22.371516473591328
+    22.271362762898207
    ],
    "onNodeDistance": {
-    "slope": -0.8601974002996632,
-    "intercept": -0.31814234228368493,
-    "r": -0.9113300452336128
+    "slope": -0.8599670406820025,
+    "intercept": -0.3205883270424668,
+    "r": -0.911248249594272
    },
    "onSin2F": {
-    "slope": -25.897528377711673,
-    "intercept": -0.3169189919665117,
-    "r": -0.9135466444414924
+    "slope": -25.88917817902737,
+    "intercept": -0.31924713374741304,
+    "r": -0.9134592245840745
    },
    "onGamma": {
-    "slope": 0.001581850132178592,
-    "intercept": -0.3078115119455898,
-    "r": 0.00014246527517654207
+    "slope": 0.006818483166034308,
+    "intercept": -0.3137994721823548,
+    "r": 0.0006140753898782091
    },
-   "sdAfterSin2FMin": 4.111792585027116,
+   "sdAfterSin2FMin": 4.1105331138944265,
    "byType": {
     "Penumbral": {
-     "n": 4378,
-     "slope": -0.9049304830300187,
-     "intercept": -0.35723377568875536,
-     "r": -0.9512417800690203
+     "n": 4368,
+     "slope": -0.9047319498733332,
+     "intercept": -0.3635584372121438,
+     "r": -0.9512517424689657
     },
     "Partial": {
      "n": 4207,
@@ -6039,73 +6407,170 @@
      "r": -0.4903537017122986
     }
    },
-   "correlationSin2FSinMp": -0.32171278434727696,
+   "correlationSin2FSinMp": -0.32224404989035166,
    "fiveTerm": {
     "coefficients": {
-     "intercept": -0.44080327203013864,
-     "sin2F": -29.38952883206531,
-     "cosMp": 1.6853419721775276,
-     "sinMp": -4.712225268674832,
-     "sin2FcosMp": 4.2344039930559,
-     "sin2FsinMp": -0.08126478872290227
+     "intercept": -0.4416510620697269,
+     "sin2F": -29.38675469475448,
+     "cosMp": 1.685249585648184,
+     "sinMp": -4.711042694211151,
+     "sin2FcosMp": 4.235879871155568,
+     "sin2FsinMp": -0.08826881131369277
     },
-    "sdAfterMin": 2.175951784743974,
-    "anomalyModulationCosMp": -0.14407866207218584,
-    "directAnomalyAmplitudeMin": 5.004542391260247,
+    "sdAfterMin": 2.1763255867563998,
+    "anomalyModulationCosMp": -0.14414248579519637,
+    "directAnomalyAmplitudeMin": 5.003397788763915,
     "predicted": {
      "slopeMinPerSin2F": -29.615918093141854,
      "anomalyModulationCosMp": -0.12755511564267197
     }
+   },
+   "anomalyTwoTerm": {
+    "coefficients": {
+     "intercept": -0.4382257126133492,
+     "cosMp": 1.6984041522275803,
+     "sinMp": 0.042022740976651776
+    },
+    "amplitudeMin": 1.698923946226869,
+    "sdAfterMin": 10.030053137008068
+   }
+  },
+  "lunarGreatest": {
+   "instant": "dTD",
+   "n": 12054,
+   "meanUTMin": -1.7077144263604274,
+   "sdUTMin": 4.8697874165112145,
+   "meanTDMin": -0.3409818122919043,
+   "sdTDMin": 2.4454743921082143,
+   "uRangeDeg": [
+    -22.200182085856795,
+    22.271362762898207
+   ],
+   "onNodeDistance": {
+    "slope": 0.00045116335732744116,
+    "intercept": -0.34097824174111,
+    "r": 0.001974711952474939
+   },
+   "onSin2F": {
+    "slope": 0.014693847522120327,
+    "intercept": -0.3409787107248003,
+    "r": 0.002141516697222288
+   },
+   "onGamma": {
+    "slope": -0.011993815947076556,
+    "intercept": -0.34095189471601645,
+    "r": -0.004461761325304744
+   },
+   "sdAfterSin2FMin": 2.4454687845143597,
+   "byType": {
+    "Penumbral": {
+     "n": 4368,
+     "slope": 0.0007345243943939625,
+     "intercept": -0.3691503148644506,
+     "r": 0.004434871212689531
+    },
+    "Partial": {
+     "n": 4207,
+     "slope": 0.0008863525958733311,
+     "intercept": -0.34506640344289186,
+     "r": 0.0033167201552849255
+    },
+    "Total": {
+     "n": 3479,
+     "slope": -0.0055435100663769905,
+     "intercept": -0.3003402555771905,
+     "r": -0.010300159605852762
+    }
+   },
+   "correlationSin2FSinMp": -0.32224404989035166,
+   "fiveTerm": {
+    "coefficients": {
+     "intercept": -0.469807351291682,
+     "sin2F": 0.044030281511626024,
+     "cosMp": 1.6874535521962524,
+     "sinMp": 0.05430631184338842,
+     "sin2FcosMp": 0.06622475218217413,
+     "sin2FsinMp": -0.06397877909159054
+    },
+    "sdAfterMin": 2.136188963742578,
+    "anomalyModulationCosMp": 1.5040728768606157,
+    "directAnomalyAmplitudeMin": 1.688327179881252,
+    "predicted": {
+     "slopeMinPerSin2F": -29.615918093141854,
+     "anomalyModulationCosMp": -0.12755511564267197
+    }
+   },
+   "anomalyTwoTerm": {
+    "coefficients": {
+     "intercept": -0.46461978871368725,
+     "cosMp": 1.6872946524629056,
+     "sinMp": 0.046775307628217
+    },
+    "amplitudeMin": 1.6879428822189544,
+    "sdAfterMin": 2.1363784964324193
    }
   },
   "lunarThirdInstrument": {
-   "n": 12064,
+   "n": 12054,
    "full": {
     "era": [
      null,
      null
     ],
-    "n": 12064,
+    "n": 12054,
     "canonMinusMeeus": {
-     "mean": 1.0908989630644494,
-     "sd": 9.882115207927063,
+     "mean": 1.0845596592682343,
+     "sd": 9.872859072487685,
      "coefficients": {
-      "intercept": 1.0745824479418138,
-      "sin2F": -28.22148767990605,
-      "cosMp": 0.029272198765834444,
-      "sinMp": 0.39699680155691136,
-      "sin2FcosMp": 4.046185558338524,
-      "sin2FsinMp": -0.02347289973137962
+      "intercept": 1.0742967023263539,
+      "sin2F": -28.21669667694819,
+      "cosMp": 0.029916182588161772,
+      "sinMp": 0.3963697141483363,
+      "sin2FcosMp": 4.043769916523433,
+      "sin2FsinMp": -0.025738793834941914
      },
-     "sdAfter": 1.9657863497202077
+     "sdAfter": 1.9659885785045006
     },
     "modelMinusMeeus": {
-     "mean": 1.3987065361848532,
-     "sd": 2.029417064415167,
+     "mean": 1.3983421233116897,
+     "sd": 2.029099376435122,
      "coefficients": {
-      "intercept": 1.4428859902787263,
-      "sin2F": -0.026033026172672113,
-      "cosMp": -1.6480529721988249,
-      "sinMp": -0.028163212201573952,
-      "sin2FcosMp": -0.007690041349837299,
-      "sin2FsinMp": -0.0090076346601003
+      "intercept": 1.4427176059069544,
+      "sin2F": -0.02431707689388818,
+      "cosMp": -1.6473443457717323,
+      "sinMp": -0.02894981411289526,
+      "sin2FcosMp": -0.01168618186808657,
+      "sin2FsinMp": -0.004928281089792111
      },
-     "sdAfter": 1.6612359289129823
+     "sdAfter": 1.6610753273406982
+    },
+    "canonMinusModelOpposition": {
+     "mean": -0.3137824640434556,
+     "sd": 10.101320575582077,
+     "coefficients": {
+      "intercept": -0.3684209035805999,
+      "sin2F": -28.192379600054437,
+      "cosMp": 1.6772605283598832,
+      "sinMp": 0.42531952826123326,
+      "sin2FcosMp": 4.05545609839154,
+      "sin2FsinMp": -0.020810512745149504
+     },
+     "sdAfter": 2.677687704887734
     },
     "canonMinusModel": {
-     "mean": -0.3078075731204037,
-     "sd": 10.109292099444763,
+     "mean": -0.3409818122919043,
+     "sd": 2.4454743921082143,
      "coefficients": {
-      "intercept": -0.3683035423369122,
-      "sin2F": -28.195454653733528,
-      "cosMp": 1.677325170964648,
-      "sinMp": 0.4251600137584869,
-      "sin2FcosMp": 4.053875599688383,
-      "sin2FsinMp": -0.014465265071278047
+      "intercept": -0.38606911184762593,
+      "sin2F": 0.05446304816074372,
+      "cosMp": 1.6776244725077505,
+      "sinMp": 0.04364917467458863,
+      "sin2FcosMp": 0.026340351579377103,
+      "sin2FsinMp": -0.012650205746220963
      },
-     "sdAfter": 2.6773117301793685
+     "sdAfter": 2.1379712650959655
     },
-    "impliedModelMpPhaseDeg": 0.1614565033010372,
+    "impliedModelMpPhaseDeg": 0.161387080565849,
     "meeusMpTailAtMidpointDeg": null
    },
    "byEra": [
@@ -6114,47 +6579,60 @@
       -1999,
       -1000
      ],
-     "n": 2429,
+     "n": 2425,
      "canonMinusMeeus": {
-      "mean": 3.1303621788373843,
-      "sd": 9.892044288873187,
+      "mean": 3.102676924310394,
+      "sd": 9.876573238702866,
       "coefficients": {
-       "intercept": 3.0804774541939652,
-       "sin2F": -28.13907323262422,
-       "cosMp": 0.020372506452147564,
-       "sinMp": 0.4140368622406244,
-       "sin2FcosMp": 4.0765026251448875,
-       "sin2FsinMp": -0.06863875036553622
+       "intercept": 3.08138786319193,
+       "sin2F": -28.14440761449831,
+       "cosMp": 0.02012671770960612,
+       "sinMp": 0.412245357500561,
+       "sin2FcosMp": 4.078611311534625,
+       "sin2FsinMp": -0.0584357744343545
       },
-      "sdAfter": 1.7683757940095945
+      "sdAfter": 1.769400027785308
      },
      "modelMinusMeeus": {
-      "mean": 1.0796054904937695,
-      "sd": 4.163335867718584,
+      "mean": 1.0771114245057105,
+      "sd": 4.163979965953843,
       "coefficients": {
-       "intercept": 1.2481733600118359,
-       "sin2F": -0.015364606746920218,
-       "cosMp": -5.659166436165174,
-       "sinMp": -0.007765892315121176,
-       "sin2FcosMp": 0.10526652615185846,
-       "sin2FsinMp": -0.110426238728027
+       "intercept": 1.2480730163048988,
+       "sin2F": -0.01514761424239062,
+       "cosMp": -5.657645155137898,
+       "sinMp": -0.009898958153993559,
+       "sin2FcosMp": 0.09836930750952834,
+       "sin2FsinMp": -0.09954232104227305
       },
-      "sdAfter": 1.1729086089114522
+      "sdAfter": 1.173000047107902
+     },
+     "canonMinusModelOpposition": {
+      "mean": 2.0255654998046837,
+      "sd": 10.721340355898262,
+      "coefficients": {
+       "intercept": 1.833314846887031,
+       "sin2F": -28.129260000255865,
+       "cosMp": 5.677771872847482,
+       "sinMp": 0.4221443156545533,
+       "sin2FcosMp": 3.9802420040250897,
+       "sin2FsinMp": 0.041106546607915385
+      },
+      "sdAfter": 2.1425821058227084
      },
      "canonMinusModel": {
-      "mean": 2.050756688343615,
-      "sd": 10.730893968084342,
+      "mean": 1.920678511953231,
+      "sd": 4.22467940822844,
       "coefficients": {
-       "intercept": 1.8323040941821296,
-       "sin2F": -28.123708625877242,
-       "cosMp": 5.679538942617299,
-       "sinMp": 0.4218027545557442,
-       "sin2FcosMp": 3.971236098993021,
-       "sin2FsinMp": 0.041787488362490376
+       "intercept": 1.7490693254309724,
+       "sin2F": 0.06464853787309378,
+       "cosMp": 5.68998484715367,
+       "sinMp": 0.03445409428533385,
+       "sin2FcosMp": -0.07477573662189269,
+       "sin2FsinMp": 0.023393889419927375
       },
-      "sdAfter": 2.1413474755340864
+      "sdAfter": 1.303503790351604
      },
-     "impliedModelMpPhaseDeg": 0.5544173881515194,
+     "impliedModelMpPhaseDeg": 0.5542683512459432,
      "meeusMpTailAtMidpointDeg": -0.7168233227761223
     },
     {
@@ -6162,47 +6640,60 @@
       -1000,
       0
      ],
-     "n": 2391,
+     "n": 2387,
      "canonMinusMeeus": {
-      "mean": 1.6015801302051005,
-      "sd": 9.740468738403292,
+      "mean": 1.5873240268113076,
+      "sd": 9.724696313211547,
       "coefficients": {
-       "intercept": 1.5595685325632092,
-       "sin2F": -28.174169919391435,
-       "cosMp": 0.010833003782923224,
-       "sinMp": 0.4008678423348258,
-       "sin2FcosMp": 4.0156026564236225,
-       "sin2FsinMp": -0.06936716287191078
+       "intercept": 1.560047522046801,
+       "sin2F": -28.168672741033816,
+       "cosMp": 0.012887262585529172,
+       "sinMp": 0.3964573974514099,
+       "sin2FcosMp": 4.015905211934554,
+       "sin2FsinMp": -0.06536279584678399
       },
-      "sdAfter": 1.6631603779457844
+      "sdAfter": 1.6625734358448185
      },
      "modelMinusMeeus": {
-      "mean": 1.1899980694672543,
-      "sd": 1.551165515984403,
+      "mean": 1.1896981029553946,
+      "sd": 1.5519405060899192,
       "coefficients": {
-       "intercept": 1.2373836211586822,
-       "sin2F": -0.11899333602296276,
-       "cosMp": -2.0080731068007167,
-       "sinMp": -0.013707600806582466,
-       "sin2FcosMp": -0.018117582612382107,
-       "sin2FsinMp": -0.03953939697320023
+       "intercept": 1.2372575600413527,
+       "sin2F": -0.12011430724758076,
+       "cosMp": -2.009378475353205,
+       "sinMp": -0.013197298403357642,
+       "sin2FcosMp": -0.012941819592435547,
+       "sin2FsinMp": -0.03886324095482497
       },
-      "sdAfter": 0.6162744709766353
+      "sdAfter": 0.616379436253402
+     },
+     "canonMinusModelOpposition": {
+      "mean": 0.397625923855913,
+      "sd": 9.809545381362193,
+      "coefficients": {
+       "intercept": 0.3227899620054482,
+       "sin2F": -28.048558433786255,
+       "cosMp": 2.0222657379387363,
+       "sinMp": 0.40965469585476744,
+       "sin2FcosMp": 4.028847031526993,
+       "sin2FsinMp": -0.026499554891958613
+      },
+      "sdAfter": 1.8075504452119349
      },
      "canonMinusModel": {
-      "mean": 0.4115820607378462,
-      "sd": 9.823621002686755,
+      "mean": 0.34233229176289975,
+      "sd": 1.6351357445131893,
       "coefficients": {
-       "intercept": 0.32218491140452693,
-       "sin2F": -28.05517658336849,
-       "cosMp": 2.018906110583641,
-       "sinMp": 0.41457544314140815,
-       "sin2FcosMp": 4.033720239036007,
-       "sin2FsinMp": -0.029827765898709706
+       "intercept": 0.294314980644444,
+       "sin2F": 0.16639805213335723,
+       "cosMp": 2.024939289752401,
+       "sinMp": 0.03193273464873516,
+       "sin2FcosMp": 0.03502475706878633,
+       "sin2FsinMp": 0.053367456251901244
       },
-      "sdAfter": 1.808398397467305
+      "sdAfter": 0.7819029080248521
      },
-     "impliedModelMpPhaseDeg": 0.19672696670928347,
+     "impliedModelMpPhaseDeg": 0.19685485109501574,
      "meeusMpTailAtMidpointDeg": -0.2507297067936288
     },
     {
@@ -6210,47 +6701,60 @@
       0,
       1000
      ],
-     "n": 2395,
+     "n": 2394,
      "canonMinusMeeus": {
-      "mean": 0.6200410014870023,
-      "sd": 9.726360835200417,
+      "mean": 0.6271600244300706,
+      "sd": 9.722151596175356,
       "coefficients": {
-       "intercept": 0.5864935639206899,
-       "sin2F": -28.205482495332163,
-       "cosMp": 0.04980220567894427,
-       "sinMp": 0.3984707715707304,
-       "sin2FcosMp": 3.988396153980323,
-       "sin2FsinMp": 0.021738595924563713
+       "intercept": 0.5865579370509008,
+       "sin2F": -28.205136096529365,
+       "cosMp": 0.04975098556802402,
+       "sinMp": 0.39859311295926697,
+       "sin2FcosMp": 3.9880827427202417,
+       "sin2FsinMp": 0.022344455476528403
       },
-      "sdAfter": 1.5617456537224426
+      "sdAfter": 1.5620684139657557
      },
      "modelMinusMeeus": {
-      "mean": 1.637457301540763,
-      "sd": 0.5020714086573724,
+      "mean": 1.6375313519983363,
+      "sd": 0.5021631819023245,
       "coefficients": {
-       "intercept": 1.651340103316024,
-       "sin2F": 0.14276488998837406,
-       "cosMp": -0.47670639799552317,
-       "sinMp": -0.03857230699027736,
-       "sin2FcosMp": -0.0697304470861874,
-       "sin2FsinMp": 0.030686886363621223
+       "intercept": 1.6515267908617977,
+       "sin2F": 0.1437694759412728,
+       "cosMp": -0.4768549406680736,
+       "sinMp": -0.038217506571257845,
+       "sin2FcosMp": -0.07063936636307634,
+       "sin2FsinMp": 0.03244393052893184
       },
-      "sdAfter": 0.3668888800499537
+      "sdAfter": 0.36684429814477804
+     },
+     "canonMinusModelOpposition": {
+      "mean": -1.0103713275682658,
+      "sd": 9.794786225627792,
+      "coefficients": {
+       "intercept": -1.064968853810897,
+       "sin2F": -28.348905572470645,
+       "cosMp": 0.5266059262360983,
+       "sinMp": 0.4368106195305249,
+       "sin2FcosMp": 4.058722109083321,
+       "sin2FsinMp": -0.010099475052403077
+      },
+      "sdAfter": 1.635323759421285
      },
      "canonMinusModel": {
-      "mean": -1.0174163000537608,
-      "sd": 9.798805937124486,
+      "mean": -1.045348487542312,
+      "sd": 0.5551078419511445,
       "coefficients": {
-       "intercept": -1.0648465393953341,
-       "sin2F": -28.348247385320548,
-       "cosMp": 0.5265086036744682,
-       "sinMp": 0.4370430785610081,
-       "sin2FcosMp": 4.0581266010665145,
-       "sin2FsinMp": -0.008948290439057042
+       "intercept": -1.0604719292213771,
+       "sin2F": -0.11757339864323776,
+       "cosMp": 0.51172729741333,
+       "sinMp": 0.04728033712410474,
+       "sin2FcosMp": 0.03605970436856463,
+       "sin2FsinMp": -0.028589837318104473
       },
-      "sdAfter": 1.634993990505371
+      "sdAfter": 0.41709634541690266
      },
-     "impliedModelMpPhaseDeg": 0.04670198678074058,
+     "impliedModelMpPhaseDeg": 0.04671653921376643,
      "meeusMpTailAtMidpointDeg": -0.05186357099042546
     },
     {
@@ -6285,7 +6789,7 @@
       },
       "sdAfter": 0.2915803790491736
      },
-     "canonMinusModel": {
+     "canonMinusModelOpposition": {
       "mean": -1.3550008801014528,
       "sd": 9.86591394402791,
       "coefficients": {
@@ -6297,6 +6801,19 @@
        "sin2FsinMp": -0.07138168293653052
       },
       "sdAfter": 1.5762160972403634
+     },
+     "canonMinusModel": {
+      "mean": -1.3030933595684744,
+      "sd": 0.3474236647734187,
+      "coefficients": {
+       "intercept": -1.3054953621953558,
+       "sin2F": -0.061335297393669316,
+       "cosMp": 0.11549739225637015,
+       "sinMp": 0.05609628846266476,
+       "sin2FcosMp": 0.0537239407753629,
+       "sin2FsinMp": -0.004580539846551994
+      },
+      "sdAfter": 0.33454560098500735
      },
      "impliedModelMpPhaseDeg": 0.009528458500245118,
      "meeusMpTailAtMidpointDeg": -0.005084361101021505
@@ -6333,7 +6850,7 @@
       },
       "sdAfter": 0.3003032282774223
      },
-     "canonMinusModel": {
+     "canonMinusModelOpposition": {
       "mean": -1.7957845038894948,
       "sd": 9.78585033983082,
       "coefficients": {
@@ -6346,6 +6863,19 @@
       },
       "sdAfter": 1.5387329375981222
      },
+     "canonMinusModel": {
+      "mean": -1.7452935479324438,
+      "sd": 0.3443355603712283,
+      "coefficients": {
+       "intercept": -1.7488098537039454,
+       "sin2F": 0.0973990836771895,
+       "cosMp": 0.10259947910111025,
+       "sinMp": 0.040920927039092454,
+       "sin2FcosMp": 0.0077736483988602246,
+       "sin2FsinMp": 0.008356903890850465
+      },
+      "sdAfter": 0.3335342305236014
+     },
      "impliedModelMpPhaseDeg": 0.006008764528288354,
      "meeusMpTailAtMidpointDeg": -0.000014415379864482294
     },
@@ -6354,47 +6884,60 @@
       2200,
       3000
      ],
-     "n": 1947,
+     "n": 1946,
      "canonMinusMeeus": {
-      "mean": 0.09617622729350679,
-      "sd": 9.893677264419663,
+      "mean": 0.10462645801188154,
+      "sd": 9.889192186055253,
       "coefficients": {
-       "intercept": 0.08106238726183067,
-       "sin2F": -28.289145247458876,
-       "cosMp": 0.036473565908371,
-       "sinMp": 0.37778972369310104,
-       "sin2FcosMp": 4.02788538798369,
-       "sin2FsinMp": 0.05128980757459502
+       "intercept": 0.08153563177082762,
+       "sin2F": -28.287093524953978,
+       "cosMp": 0.0364447283204999,
+       "sinMp": 0.3768634738964565,
+       "sin2FcosMp": 4.027535304150806,
+       "sin2FsinMp": 0.04726812296928929
       },
-      "sdAfter": 1.4718778117663964
+      "sdAfter": 1.472132634615843
      },
      "modelMinusMeeus": {
-      "mean": 1.4637636787075843,
-      "sd": 0.373187499383288,
+      "mean": 1.4639624404622373,
+      "sd": 0.373180328813673,
       "coefficients": {
-       "intercept": 1.4638647530651183,
-       "sin2F": -0.148950786393059,
-       "cosMp": 0.0010098843090398683,
-       "sinMp": -0.05942498462685252,
-       "sin2FcosMp": 0.05272200869462955,
-       "sin2FsinMp": -0.0015618010160544417
+       "intercept": 1.4640717008701563,
+       "sin2F": -0.1480535768938187,
+       "cosMp": 0.0009972737548780098,
+       "sinMp": -0.0598300297117681,
+       "sin2FcosMp": 0.05256891852788216,
+       "sin2FsinMp": -0.003320466538422606
       },
-      "sdAfter": 0.36693748726197284
+      "sdAfter": 0.3669371613503516
+     },
+     "canonMinusModelOpposition": {
+      "mean": -1.359335982450356,
+      "sd": 9.849273337268231,
+      "coefficients": {
+       "intercept": -1.3825360690993287,
+       "sin2F": -28.139039948060255,
+       "cosMp": 0.03544745456562184,
+       "sinMp": 0.43669350360822623,
+       "sin2FcosMp": 3.974966385622936,
+       "sin2FsinMp": 0.050588589507714096
+      },
+      "sdAfter": 1.544463171156694
      },
      "canonMinusModel": {
-      "mean": -1.3675874514140773,
-      "sd": 9.853469319385626,
+      "mean": -1.3675443511092529,
+      "sd": 0.44229693463940595,
       "coefficients": {
-       "intercept": -1.3828023658032875,
-       "sin2F": -28.14019446106591,
-       "cosMp": 0.03546368159933105,
-       "sinMp": 0.43721470831995524,
-       "sin2FcosMp": 3.975163379289073,
-       "sin2FsinMp": 0.05285160859065323
+       "intercept": -1.368298700990507,
+       "sin2F": 0.17815803692167922,
+       "cosMp": 0.025620078364523093,
+       "sinMp": 0.05424854693773886,
+       "sin2FcosMp": -0.010428610722567093,
+       "sin2FsinMp": 0.007793168486596372
       },
-      "sdAfter": 1.544103700906397
+      "sdAfter": 0.43571084804487653
      },
-     "impliedModelMpPhaseDeg": -0.00009893637645555614,
+     "impliedModelMpPhaseDeg": -0.00009770094530497516,
      "meeusMpTailAtMidpointDeg": 0.0030109488043986482
     }
    ]
@@ -6739,193 +7282,260 @@
   ]
  },
  "decision": {
-  "seriesAnalysed": 31,
-  "linesAboveRedNoiseFloor": 77,
-  "linesInLongPeriodFamilies": 31,
-  "linesNamedByAnArgumentOrTone": 48,
+  "seriesAnalysed": 33,
+  "linesAboveRedNoiseFloor": 89,
+  "linesInLongPeriodFamilies": 38,
+  "linesNamedByAnArgumentOrTone": 49,
   "linesAboveFloorUnnamed": [
    {
     "series": "lunar-canon-UT",
-    "periodYears": 1.2032738820807969,
-    "amplitude": 2.2934626936102624,
+    "periodYears": 714.1860230438404,
+    "amplitude": 1.798495514047736,
     "stands": true
    },
    {
     "series": "lunar-canon-UT",
-    "periodYears": 714.1860230819198,
-    "amplitude": 1.804809683651716,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-UT",
-    "periodYears": 833.2170269289064,
-    "amplitude": 1.753137219145796,
+    "periodYears": 1.1274290266243427,
+    "amplitude": 1.674899061969021,
     "stands": false
    },
    {
     "series": "lunar-canon-UT",
-    "periodYears": 1.127429026684422,
-    "amplitude": 1.6774833810318392,
-    "stands": false
+    "periodYears": 624.9127701633603,
+    "amplitude": 0.966345835100455,
+    "stands": true
    },
    {
     "series": "lunar-canon-UT",
-    "periodYears": 1.3820726136083215,
-    "amplitude": 1.6565203543271778,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD",
-    "periodYears": 1.2032738820807969,
-    "amplitude": 2.2880104125524956,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD",
-    "periodYears": 1.127429026684422,
-    "amplitude": 1.6843617613461979,
+    "periodYears": 454.4820146642619,
+    "amplitude": 0.734111687766187,
     "stands": false
    },
    {
     "series": "lunar-canon-TD",
-    "periodYears": 1.382168139777357,
-    "amplitude": 1.6554992711587315,
+    "periodYears": 1.1274290266243427,
+    "amplitude": 1.6837222939024745,
+    "stands": false
+   },
+   {
+    "series": "lunar-canon-TD",
+    "periodYears": 1.092087195960699,
+    "amplitude": 0.2656921769451694,
     "stands": true
    },
    {
     "series": "lunar-canon-TD",
-    "periodYears": 1.8030122303033262,
-    "amplitude": 1.589004332249101,
-    "stands": true
+    "periodYears": 1.6381755259466144,
+    "amplitude": 0.23878832333763736,
+    "stands": false
    },
    {
     "series": "lunar-canon-TD",
-    "periodYears": 3.61351800619665,
-    "amplitude": 1.4102045518001904,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD",
-    "periodYears": 3.6213706349678128,
-    "amplitude": 1.3087107806703553,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD",
-    "periodYears": 1.059230290073751,
-    "amplitude": 1.1467737524790051,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD",
-    "periodYears": 2.236824233366003,
-    "amplitude": 0.8607296032518319,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD-node-term-removed",
-    "periodYears": 1.127365466585951,
-    "amplitude": 4.858862748805459,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD-node-term-removed",
-    "periodYears": 1.1270477735614945,
-    "amplitude": 1.4310726662942546,
+    "periodYears": 1.1253986518788897,
+    "amplitude": 0.23117861979894097,
     "stands": false
    },
    {
-    "series": "lunar-canon-TD-node-term-removed",
-    "periodYears": 1.1277469347113462,
-    "amplitude": 1.364497375636288,
+    "series": "lunar-canon-TD-anomaly-term-removed",
+    "periodYears": 1.127238367826154,
+    "amplitude": 1.5721115396924976,
     "stands": true
    },
    {
-    "series": "lunar-canon-TD-node-term-removed",
-    "periodYears": 1.1280013902471564,
-    "amplitude": 0.903906207091206,
+    "series": "lunar-canon-TD-anomaly-term-removed",
+    "periodYears": 1.1276197499287226,
+    "amplitude": 1.4839986250605577,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-anomaly-term-removed",
+    "periodYears": 1.1278741480674543,
+    "amplitude": 0.7462446842551088,
     "stands": false
    },
    {
-    "series": "lunar-canon-TD-node-term-removed",
-    "periodYears": 1.1267302595391933,
-    "amplitude": 0.8372379107114307,
+    "series": "lunar-canon-TD-anomaly-term-removed",
+    "periodYears": 1.1269207464207367,
+    "amplitude": 0.6876620339890523,
     "stands": false
    },
    {
-    "series": "lunar-canon-TD-node-term-removed",
-    "periodYears": 1.1282559606353864,
-    "amplitude": 0.6183526748380165,
+    "series": "lunar-canon-TD-anomaly-term-removed",
+    "periodYears": 1.1281286610197427,
+    "amplitude": 0.47877385422582275,
     "stands": true
    },
    {
-    "series": "lunar-canon-TD-node-term-removed",
-    "periodYears": 1.1264763771012622,
-    "amplitude": 0.6052556913773444,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD-node-term-removed",
-    "periodYears": 1.059286399316789,
-    "amplitude": 0.591927080991183,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD-five-term-removed",
-    "periodYears": 1.127238367886223,
-    "amplitude": 1.5669209145500538,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD-five-term-removed",
-    "periodYears": 1.127619749988812,
-    "amplitude": 1.4831839091711254,
-    "stands": true
-   },
-   {
-    "series": "lunar-canon-TD-five-term-removed",
-    "periodYears": 1.1278741481275574,
-    "amplitude": 0.7417575431597578,
+    "series": "lunar-canon-TD-anomaly-term-removed",
+    "periodYears": 1.1266667781416404,
+    "amplitude": 0.4731070508381147,
     "stands": false
    },
    {
-    "series": "lunar-canon-TD-five-term-removed",
-    "periodYears": 1.126920746480789,
-    "amplitude": 0.6882370649155165,
+    "series": "lunar-canon-TD-anomaly-term-removed",
+    "periodYears": 1.1264129243077778,
+    "amplitude": 0.3511266234674181,
     "stands": false
    },
    {
-    "series": "lunar-canon-TD-five-term-removed",
-    "periodYears": 1.1281286610798593,
-    "amplitude": 0.4730382159418366,
+    "series": "lunar-canon-TD-anomaly-term-removed",
+    "periodYears": 1.1283832888633314,
+    "amplitude": 0.3495881472009941,
+    "stands": false
+   },
+   {
+    "series": "lunar-canon-TD-opposition",
+    "periodYears": 1.2032738820166755,
+    "amplitude": 2.2850562351537884,
     "stands": true
    },
    {
-    "series": "lunar-canon-TD-five-term-removed",
-    "periodYears": 1.1266667782016793,
-    "amplitude": 0.47444434770943966,
+    "series": "lunar-canon-TD-opposition",
+    "periodYears": 1.1274290266243427,
+    "amplitude": 1.6887303643330294,
     "stands": false
    },
    {
-    "series": "lunar-canon-TD-five-term-removed",
-    "periodYears": 1.126412924367803,
-    "amplitude": 0.352802754360816,
+    "series": "lunar-canon-TD-opposition",
+    "periodYears": 1.3821681397037013,
+    "amplitude": 1.6462879579335765,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition",
+    "periodYears": 1.80301223020724,
+    "amplitude": 1.5962679617743312,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition",
+    "periodYears": 3.613518006004046,
+    "amplitude": 1.4217325958805036,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition",
+    "periodYears": 3.6213706347747903,
+    "amplitude": 1.3062137938264957,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition",
+    "periodYears": 1.059230290017306,
+    "amplitude": 1.137538129952004,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition",
+    "periodYears": 2.2368242332467934,
+    "amplitude": 0.8535195014267573,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-node-term-removed",
+    "periodYears": 1.127365466525875,
+    "amplitude": 4.858097847346465,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-node-term-removed",
+    "periodYears": 1.1270477735014357,
+    "amplitude": 1.4310973691517148,
     "stands": false
    },
    {
-    "series": "lunar-canon-TD-five-term-removed",
-    "periodYears": 1.1283832889234615,
-    "amplitude": 0.3447334439619706,
+    "series": "lunar-canon-TD-opposition-node-term-removed",
+    "periodYears": 1.12774693465125,
+    "amplitude": 1.3640691826247857,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-node-term-removed",
+    "periodYears": 1.1280013901870467,
+    "amplitude": 0.9004795211930753,
+    "stands": false
+   },
+   {
+    "series": "lunar-canon-TD-opposition-node-term-removed",
+    "periodYears": 1.1267302594791513,
+    "amplitude": 0.8354029982524006,
+    "stands": false
+   },
+   {
+    "series": "lunar-canon-TD-opposition-node-term-removed",
+    "periodYears": 1.128255960575263,
+    "amplitude": 0.6167866933892968,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-node-term-removed",
+    "periodYears": 1.1264763770412336,
+    "amplitude": 0.6034417682347474,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-node-term-removed",
+    "periodYears": 1.0592863992603412,
+    "amplitude": 0.5869328465248719,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-five-term-removed",
+    "periodYears": 1.127238367826154,
+    "amplitude": 1.5678607612366926,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-five-term-removed",
+    "periodYears": 1.1276197499287226,
+    "amplitude": 1.483651692239633,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-five-term-removed",
+    "periodYears": 1.1278741480674543,
+    "amplitude": 0.7414153050319362,
+    "stands": false
+   },
+   {
+    "series": "lunar-canon-TD-opposition-five-term-removed",
+    "periodYears": 1.1269207464207367,
+    "amplitude": 0.688095054729279,
+    "stands": false
+   },
+   {
+    "series": "lunar-canon-TD-opposition-five-term-removed",
+    "periodYears": 1.1281286610197427,
+    "amplitude": 0.4729420049128858,
+    "stands": true
+   },
+   {
+    "series": "lunar-canon-TD-opposition-five-term-removed",
+    "periodYears": 1.1266667781416404,
+    "amplitude": 0.47394855659845,
+    "stands": false
+   },
+   {
+    "series": "lunar-canon-TD-opposition-five-term-removed",
+    "periodYears": 1.1264129243077778,
+    "amplitude": 0.35208479139776705,
+    "stands": false
+   },
+   {
+    "series": "lunar-canon-TD-opposition-five-term-removed",
+    "periodYears": 1.1283832888633314,
+    "amplitude": 0.3454089775745457,
     "stands": false
    }
   ],
   "linesStandingWithNamedPhysics": [
    {
-    "series": "lunar-canon-TD-node-term-removed",
+    "series": "lunar-canon-TD",
     "periodYears": 1.127404326494982,
     "name": "the full-moon cycle (the anomaly at full moon)",
-    "amplitudeMin": 5.004542391260247,
-    "physics": "the model's perigee and node ride the deep eccentricity channel (the physical exponents s_ϖ, s_Ω on the model's own e(t)), Meeus-exact in T² by construction; their T³ is the channel's own ë, about a seventh of the secular-theory ë that ELP's polynomials embody — L′ carries that convention through lpSecularCompletion, ϖ and Ω do not (doc 66's \"predicted-ë-vs-secular-ë\" drift, here measured): the model's M′ runs ahead of the polynomial's by the complement, 0 in the fit window, 0.2° at −500, 0.54° at −1500, 1.66° at −3000",
+    "amplitudeMin": 1.6879428822189544,
+    "amplitudeUnderTheDefinitionTermMin": 5.003397788763915,
+    "physics": "the cos M′ term of the shipped instant's residual (the span mean of a term growing into the past: −0.5 / −2.0 / −5.7 min per millennium before 1000 in probes.lunarThirdInstrument; the sin M′ part of the opposition instant's 5-min pair was the definition offset's own form and left with the instant) — the model's perigee and node ride the deep eccentricity channel (the physical exponents s_ϖ, s_Ω on the model's own e(t)), Meeus-exact in T² by construction; their T³ is the channel's own ë, about a seventh of the secular-theory ë that ELP's polynomials embody — L′ carries that convention through lpSecularCompletion, ϖ and Ω do not (doc 66's \"predicted-ë-vs-secular-ë\" drift, here measured): the model's M′ runs ahead of the polynomial's by the complement, 0 in the fit window, 0.2° at −500, 0.54° at −1500, 1.66° at −3000",
     "modelMinusPolynomialMpArcsec": {
      "0": 325.35843774676323,
      "500": 128.03536467254162,
@@ -6969,6 +7579,7 @@
    "data/rspa20160404supp2/Table-S08.txt": "sha256:01c14ec2e51a770c70a635658de6da3e73ebbf5d991747b292869d99174e233f",
    "data/rspa20160404supp2/Table-S09.txt": "sha256:87911eb88e5700535003ffa2c2c365a44fffc03913a06384cc9bcd221cb96471",
    "data/spin-axis-checkpoints.json": "sha256:f1003887bb0761674c16f07e4e16df4446750136114a04e32c8c76e0998954dd",
+   "packages/physics/src/eclipse/finders.cjs": "sha256:ee2676c730f06ce1b0bffecaf2a2c4f38e6600f42191714a9edb422bb5b52b7d",
    "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
    "packages/physics/src/model/cardinal-instants.js": "sha256:72b4dc78f2ee10720ffdf79cb39be16ee5aece012a07498e14470c944246fe58",
    "packages/physics/src/model/context.js": "sha256:402e15396eeb7b919b2ae18c19e20a1e0efbc515a194282f106aac3cd32d775f",
@@ -6988,17 +7599,19 @@
    "packages/physics/src/model/surface.js": "sha256:948078e5315366b854e3c6ce4c069a7b0274f7251651fbae51fad15737f2df96",
    "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
    "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
+   "packages/physics/src/moon/arguments.cjs": "sha256:9647bf57d21be1fd45016f95357980169acdab05b5fd318feec4c8bce7b71f15",
+   "packages/physics/src/moon/series.cjs": "sha256:3c75f74ec256afedcda3ba39fcd57c55227514b6d18564134c31ccea6328e0e1",
    "public/input/climate-formula-coefficients.json": "sha256:bd72d29fe65cb38b5064be7409430407547433089b0689c048d231fb620e6892",
    "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
    "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
    "tools/explore/residual-spectra/model-internals.mjs": "sha256:3908bbb91ec79911a22659140305fd697414c5e38fcd448072cdef04719a7f51",
-   "tools/explore/residual-spectra/probes.mjs": "sha256:cd79e57f16644c2b3b2d9ca1ac2e33ba4aa5693373fc465035bc029652430c4f",
+   "tools/explore/residual-spectra/probes.mjs": "sha256:476707a7de59c7069a127bca713e5f95844333631537f6925c4e6ea104750989",
    "tools/explore/residual-spectra/series-paleo.mjs": "sha256:603d8f43f6c9575b6df077ca8b5af98b4b011bba241de40887ffa07f91787e6b",
    "tools/explore/residual-spectra/series-records.mjs": "sha256:882eba638ba8f7ee3dcb7b88859cccfe08bc1b02c10634a7cd793c0e9d4b9770",
    "tools/explore/residual-spectra/series-sun.mjs": "sha256:6072f4b7c2521096a8c771a23e2d7a7ae16ab4a9aba59ccceae011e9c91647f6",
    "tools/explore/residual-spectra/series.mjs": "sha256:68861afd9b495db71b452fe2edfe916788bbdf2aee9b300b6c1eb9d301bd4ea6",
    "tools/explore/residual-spectra/spectrum.mjs": "sha256:b9d13048b4ab37aa6f1cd512c05beadc0b84c311cd352bfc14ec106881181bc4",
-   "tools/explore/residual-spectra/write-sweep.mjs": "sha256:79045b6fdf155eebebb823ed7a45a7b9713ec195181e986fb1ae0a40e1533762"
+   "tools/explore/residual-spectra/write-sweep.mjs": "sha256:bd9a17b0b47ad0796b0894f29c874b48a9b0963b5d11c93af3ee78b7615fa904"
   }
  }
 }

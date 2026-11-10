@@ -7,59 +7,59 @@
   "matchWindowMinutes": 180,
   "tightWindowMinutes": 15,
   "canonEvents": 12064,
-  "modelEvents": 12147,
-  "matched": 12002,
-  "matchedTight": 9868,
+  "modelEvents": 12080,
+  "matched": 11992,
+  "matchedTight": 11805,
   "typeMismatch": 62,
-  "modelOnly": 83,
-  "nasaOnly": 0,
-  "recallPercent": 100,
-  "tightRecallPercent": 81.8,
+  "modelOnly": 26,
+  "nasaOnly": 10,
+  "recallPercent": 99.92,
+  "tightRecallPercent": 97.85,
   "typeAccuracyPercent": 99.49,
   "byEra": {
     "-2000..-1501": {
-      "n": 1219,
-      "signedMedianMinutes": -6.39
+      "n": 1215,
+      "signedMedianMinutes": -6.3
     },
     "-1500..-1001": {
       "n": 1210,
-      "signedMedianMinutes": 6
+      "signedMedianMinutes": 6.23
     },
     "-1000..-501": {
-      "n": 1200,
-      "signedMedianMinutes": 0.9
+      "n": 1199,
+      "signedMedianMinutes": 0.23
     },
     "-500..-1": {
-      "n": 1191,
-      "signedMedianMinutes": -0.71
+      "n": 1188,
+      "signedMedianMinutes": -0.2
     },
     "0..499": {
-      "n": 1190,
-      "signedMedianMinutes": -1.08
+      "n": 1189,
+      "signedMedianMinutes": -2.22
     },
     "500..999": {
       "n": 1205,
-      "signedMedianMinutes": -2.94
+      "signedMedianMinutes": -3.22
     },
     "1000..1499": {
       "n": 1217,
-      "signedMedianMinutes": -0.5
+      "signedMedianMinutes": -0.11
     },
     "1500..1999": {
       "n": 1216,
-      "signedMedianMinutes": -1.42
+      "signedMedianMinutes": -1.55
     },
     "2000..2499": {
       "n": 1208,
-      "signedMedianMinutes": -7.54
+      "signedMedianMinutes": -7.92
     },
     "2500..2999": {
-      "n": 1205,
-      "signedMedianMinutes": -1.58
+      "n": 1204,
+      "signedMedianMinutes": -1.36
     },
     "3000..3499": {
       "n": 3,
-      "signedMedianMinutes": -5.6
+      "signedMedianMinutes": 7.08
     }
   },
   "inputs": {
@@ -75,7 +75,7 @@
       "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:bff29c52aad9d30fbc7aec355812a3fbd40cc3eae507c487332cd16cda4ee1fa",
       "packages/physics/src/earth/sidereal-channel-artifact.cjs": "sha256:a46f99abbf000b8c59ec31d1c048a05fb5ae6515554f5e33f208d8dcd3f5cdf8",
       "packages/physics/src/earth/year-lengths.cjs": "sha256:6b3a7fb60a65cd71a266d66918588429c514f15c29519fda85bdcbecbaac4465",
-      "packages/physics/src/eclipse/finders.cjs": "sha256:ed1aa23f18f407a5335ab313b8109e2aa7318b23ede95906609cc3321507e2bd",
+      "packages/physics/src/eclipse/finders.cjs": "sha256:ee2676c730f06ce1b0bffecaf2a2c4f38e6600f42191714a9edb422bb5b52b7d",
       "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
       "packages/physics/src/model/cardinal-instants.js": "sha256:72b4dc78f2ee10720ffdf79cb39be16ee5aece012a07498e14470c944246fe58",
       "packages/physics/src/model/context.js": "sha256:402e15396eeb7b919b2ae18c19e20a1e0efbc515a194282f106aac3cd32d775f",
@@ -100,7 +100,7 @@
       "packages/physics/src/moon/deep-ecc-channel.cjs": "sha256:7e7df509816f6a02ef3a99e8032d18bdf9939f23bbf842f2862dc1164fda7349",
       "packages/physics/src/moon/month-chain.cjs": "sha256:3465792a575f5d497e50fde8371d5a3273f727639e4eb994d1fe73743d961b14",
       "packages/physics/src/moon/series-extension.cjs": "sha256:f93ac2d259b3abbffda1b0e5232e6b310854da38ad8bc2bb89a40195ee4d273b",
-      "packages/physics/src/moon/series.cjs": "sha256:161402138d58e7416847ca011ef9123ac71aebaf0591af6ccc3cc755e320fe69",
+      "packages/physics/src/moon/series.cjs": "sha256:3c75f74ec256afedcda3ba39fcd57c55227514b6d18564134c31ccea6328e0e1",
       "packages/physics/src/phase/deep-calendar.cjs": "sha256:71f83e6a9065c0a94e0e29702c354b8a58f64c180163215a9b5a2cf5ee8d803a",
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
       "public/input/climate-formula-coefficients.json": "sha256:bd72d29fe65cb38b5064be7409430407547433089b0689c048d231fb620e6892",

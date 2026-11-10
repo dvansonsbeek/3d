@@ -354,7 +354,9 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
         sunApparentLonDegAtJD: (jdUT: number) => number;
         findLunarInRange: (jdStart: number, jdEnd: number) => {
             jd: number;
+            jdOpposition: number;
             beta: number;
+            leastDistanceDeg: number;
             moonDistance_km: number;
             type: string;
             magnitudeUmbral: number;
