@@ -51,25 +51,14 @@ export function densePeaks(rows, window, top = 12) {
   return peaks.slice(0, top).map((p) => { const r = ((p.f % TROP) + TROP) % TROP, al = Math.min(r, TROP - r); return { periodDays: YEAR / p.f, periodYears: 1 / p.f, amplitudeArcsec: lsFitAtOmega(t, y, w, 2 * Math.PI * p.f).amplitude, yearlyAliasYears: 1 / al }; });
 }
 
-/** The Horizons crossing of `target` inside cell i by a Lagrange interpolant through n rows. */
-function crossing(rows, i, target, n, valueOf) {
-  const lo = i - (n / 2 - 1), P = [];
-  for (let k = 0; k < n; k++) P.push([rows[lo + k][0], valueOf(lo + k)]);
-  const t0 = P[0][0], x = P.map((p) => p[0] - t0), base = P[n / 2 - 1][1];
-  const yv = P.map((p) => base + wrap180(p[1] - base)), tgt = base + wrap180(target - base);
-  const L = (t) => { let s = 0; for (let j = 0; j < n; j++) { let l = yv[j]; for (let k = 0; k < n; k++) if (k !== j) l *= (t - x[k]) / (x[j] - x[k]); s += l; } return s; };
-  const dL = (t, h = 1e-3) => (L(t + h) - L(t - h)) / (2 * h);
-  const a = n / 2 - 1;
-  let t = x[a] + (tgt - yv[a]) / (yv[a + 1] - yv[a]) * (x[a + 1] - x[a]);
-  for (let k = 0; k < 12; k++) { const g = L(t) - tgt; t -= g / dL(t); if (Math.abs(g) < 1e-10) break; }
-  return t0 + t;
-}
-const meanD = (jdTT) => { const T = (jdTT - 2451545) / 36525; return (297.8501921 + 445267.1114034 * T - 0.0018819 * T * T) * Math.PI / 180; };
-const wobbleDeg = (jdTT) => 6.44 / 3600 * Math.sin(meanD(jdTT));
+/** The Horizons crossing of `target` inside cell i by a Lagrange interpolant through n rows, and
+ *  the reference's barycentre wobble — ONE home tools/lib/horizons-crossing.js (the gate's). */
+const { crossingJD: crossing, horizonsCrossingJD: gateCrossing } = require(join(ROOT, 'tools', 'lib', 'horizons-crossing.js'));
 
 /** B: the cardinal series split into the apparent Sun's part and the cardinal tier's part, and the
- *  gate's crossing method against a quintic and a de-wobbled cubic (one type suffices for the
- *  attribution; the split is read for all four). Minutes of time throughout. */
+ *  three crossing methods — the bare cubic (the gate's until the plan-32 follow-up), a quintic, and
+ *  the de-wobbled cubic the gate reads since (one type suffices for the attribution; the split is
+ *  read for all four on the gate's crossing). Minutes of time throughout. */
 export function cardinalProbes(m, horizonsRows, { typesForSplit = ['VE', 'SS', 'AE', 'WS'], typeForInterp = 'VE' } = {}) {
   const rows = horizonsRows;
   const dTs = (jd) => m.eclipse.deltaTSecondsAtJD(jd);
@@ -78,11 +67,11 @@ export function cardinalProbes(m, horizonsRows, { typesForSplit = ['VE', 'SS', '
   const ttOf = (jdUT) => { const jb = jdUT + BRIDGE_DAYS; return jb + dTs(jb) / 86400; };
   const RATE = 360 * 3600 / (365.2422 * 1440);
   const TARGETS = { VE: 0, SS: 90, AE: 180, WS: 270 };
-  const lonRow = (k) => rows[k][1], lonRowNoWobble = (k) => rows[k][1] - wobbleDeg(rows[k][0]);
+  const lonRow = (k) => rows[k][1];
   const methods = {
     cubic4: (i, target) => crossing(rows, i, target, 4, lonRow),
     quintic6: (i, target) => crossing(rows, i, target, 6, lonRow),
-    cubic4Dewobbled: (i, target) => { let jd = crossing(rows, i, target, 4, lonRowNoWobble); for (let k = 0; k < 3; k++) jd = crossing(rows, i, target - wobbleDeg(jd), 4, lonRowNoWobble); return jd; },
+    cubic4Dewobbled: (i, target) => gateCrossing(rows, i, target, 4),   // the gate's since the follow-up
   };
   const split = Object.fromEntries(typesForSplit.map((k) => [k, { t: [], total: [], app: [], tier: [] }]));
   const interp = Object.fromEntries(Object.keys(methods).map((k) => [k, { t: [], sunPart: [] }]));
@@ -91,7 +80,7 @@ export function cardinalProbes(m, horizonsRows, { typesForSplit = ['VE', 'SS', '
     for (const [type, target] of Object.entries(TARGETS)) {
       const da = wrap180(a - target), db = wrap180(b - target);
       if (!(da < 0 && db >= 0 && (db - da) < 40)) continue;
-      const jdH = methods.cubic4(i, target), yH = yearOf(jdH);
+      const jdH = methods.cubic4Dewobbled(i, target), yH = yearOf(jdH);   // the split on the gate's crossing
       if (typesForSplit.includes(type)) {
         const year = Math.round(yH - 0.5 + (target / 360));
         let jdM = m.cardinal.jd(year, type), dMin = (ttOf(jdM) - jdH) * 1440;

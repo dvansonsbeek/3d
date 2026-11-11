@@ -72,7 +72,18 @@
  *       constants. The Earth-around-EMB wobble is DERIVED: amplitude
  *       a_M·μ/AU with μ = 1/(1+M_E/M_M), injected by the model wiring
  *       from live package constants (6.4399″ at current constants), sign
- *       negative in the subtract convention.
+ *       negative in the subtract convention. PLAN 32 FOLLOW-UP (doc 112
+ *       §5, TODO item 3): the model wiring injects the wobble as the
+ *       EXACT geometry of its own Moon (`embWobbleArcsecAtT`: Earth =
+ *       EMB − μ·R_M, so the geocentric Sun's longitude offset is
+ *       atan2(ρ·sin Δ, r_S + ρ·cos Δ) with ρ = μ·r_M·cos β_M from the full
+ *       lunar series and Δ = λ_M − λ_S) — the carrier form 6.44″·sin D
+ *       lacked the lunar equation's own sidebands, which the sweep read
+ *       in every window against Horizons: D − M′ 0.44″, D + M′ 0.18″ (the
+ *       Moon's equation of centre and distance), D ∓ M 0.19 / 0.07″ (the
+ *       Sun's); on the exact geometry all four and the D line itself
+ *       read ≤ 0.04″, no constant fitted. The amplitude form stays as the
+ *       instruments' fallback when nothing is injected.
  *
  * THE CONSTANT-ATTRIBUTION RULE (v1's 20.3h-lite trap, still honored):
  * the table carries NO constant term — the constant is attributed to the
@@ -330,7 +341,8 @@ function computeCarrierRatesDegPerCy({ meanSiderealYearDays, moonSiderealMonthDa
  * @param {{ embWobbleArcsec: number,
  *           carrierRatesDegPerCy: { planets: number[], moonElongation: number },
  *           eccVectorOfDate?: (bodyIndex: number, T: number) => [number, number],
- *           moonElongationDegAtT?: (T: number) => number }} opts
+ *           moonElongationDegAtT?: (T: number) => number,
+ *           embWobbleArcsecAtT?: (T: number) => number }} opts
  *   - embWobbleArcsec: the DERIVED Earth-around-EMB wobble amplitude
  *     a_M·μ/AU in arcsec (μ = 1/(1+M_E/M_M));
  *   - carrierRatesDegPerCy.planets: the six mean-longitude rates (deg/
@@ -346,12 +358,16 @@ function computeCarrierRatesDegPerCy({ meanSiderealYearDays, moonSiderealMonthDa
  *     the framework's own argument (ṅ included). The constant-rate carrier
  *     D₀ + D₁·T ran ~29° off it at ±9000 yr: the lunar equation (6.44″) read
  *     as the largest short-period line left against DE441 at −9000 (2.8″ at
- *     29.53 d; the −9000 bin's scatter 4.13 → 3.62″ on the argument of date).
+ *     29.53 d; the −9000 bin's scatter 4.13 → 3.62″ on the argument of date);
+ *   - embWobbleArcsecAtT: the lunar equation (arcsec) as the EXACT geometry
+ *     of the model's own Moon at T (the model wiring derives it — see the
+ *     header); when present it replaces embWobbleArcsec·sin D, whose
+ *     sidebands D ± M′ and D ± M the sweep read against Horizons.
  *   Injected by the model wiring so the carrier↔table matched pair tracks the
  *   constants and the embedded artifact.
  * @returns {{ sunPlanetaryCompletionDeg: (T: number) => number }}
  */
-function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, eccVectorOfDate = eccVectorOfDateEmbedded, moonElongationDegAtT = undefined }) {
+function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, eccVectorOfDate = eccVectorOfDateEmbedded, moonElongationDegAtT = undefined, embWobbleArcsecAtT = undefined }) {
   if (!Number.isFinite(embWobbleArcsec)) {
     throw new Error('createSunPlanetaryCompletion: embWobbleArcsec must be a finite number (derived a_M·μ/AU in arcsec)');
   }
@@ -386,8 +402,12 @@ function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, e
       const e = Math.hypot(q, p), w = Math.atan2(p, q);
       table += e * (a * Math.cos(th + w) + b * Math.sin(th + w));
     }
-    const D = moonElongationDegAtT ? moonElongationDegAtT(T) * D2R : (ARG_D0 + D1 * T) * D2R;
-    const arcsec = -table - embWobbleArcsec * Math.sin(D);
+    // the lunar equation: the exact geometry of the model's own Moon when injected, else the
+    // carrier form on the mean elongation of date (or the constant-rate carrier)
+    let wobble;
+    if (embWobbleArcsecAtT) wobble = embWobbleArcsecAtT(T);
+    else { const D = moonElongationDegAtT ? moonElongationDegAtT(T) * D2R : (ARG_D0 + D1 * T) * D2R; wobble = embWobbleArcsec * Math.sin(D); }
+    const arcsec = -table - wobble;
     return arcsec / 3600;
   }
   return { sunPlanetaryCompletionDeg };

@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.12
+modelVersion: v27.13
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -382,10 +382,10 @@ L(t) = L₀ + mean tropical rate · t + D(t)          (mean longitude)
    the IAU/Laskar drift expression to 0.1 s over −1000..+3000. THE
    OBSERVATION-CLASS CHECK (plan 06 I1, JPL Horizons' apparent Sun on a
    10-day TT grid over ±3000 yr, <!--v:sunVsHorizonsN-->219,152<!--/v--> instants): the model's apparent
-   Sun sits <!--v:sunVsHorizonsMeanArcsec-->2.50<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.26<!--/v-->″ over the whole
+   Sun sits <!--v:sunVsHorizonsMeanArcsec-->2.50<!--/v-->″ from Horizons on average with sd <!--v:sunVsHorizonsSdArcsec-->2.23<!--/v-->″ over the whole
    span — near zero in 1000–3000 (<!--v:sunVsHorizonsMeanP1000Arcsec-->2.0<!--/v--> / <!--v:sunVsHorizonsMeanP2000Arcsec-->−0.9<!--/v-->″),
    <!--v:sunVsHorizonsMeanM2000Arcsec-->3.7<!--/v-->″ at −2000..−1000 (the size of the difference between the model's
-   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.79<!--/v-->″ scatter in
+   equinox of date and Horizons' of-date frame) — and <!--v:sunVsHorizonsModernSdArcsec-->0.71<!--/v-->″ scatter in
    1970–2049 (mean offset <!--v:sunVsHorizonsModernMeanArcsec-->0.84<!--/v-->″, the L0 anchor and aberration conventions).
 
 **e(t) and ϖ(t)** are the banked N-body series' Earth elements — the mean

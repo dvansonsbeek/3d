@@ -14,6 +14,7 @@ import { model } from './series.mjs';
 const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const { J2000_JD } = require('@essrt/physics/constants/units');
+const { horizonsCrossingJD: crossingOfRows } = require(join(ROOT, 'tools', 'lib', 'horizons-crossing.js'));
 const wrap180 = (d) => ((((d + 540) % 360) + 360) % 360) - 180;
 const yearOf = (jd) => 2000 + (jd - J2000_JD) / 365.25;
 
@@ -49,23 +50,15 @@ export function seriesSunWindow(rows, yearFrom, yearTo) {
 }
 
 /** Series 8 — the cardinal instants, Horizons crossing − the model's instant, minutes, one series
- *  per type (VE, SS, AE, WS), the gate's own crossing finder (a Lagrange cubic through four rows). */
+ *  per type (VE, SS, AE, WS), the gate's own crossing finder (a Lagrange cubic through four rows on
+ *  the longitude with the barycentre wobble removed — ONE home tools/lib/horizons-crossing.js). */
 export function seriesCardinal() {
   const m = model();
   const rows = cache().rows;
   const dTs = (jd) => m.eclipse.deltaTSecondsAtJD(jd);
   const BRIDGE_DAYS = m.eclipse.ttBridgeSeconds / 86400;
   const TARGETS = { VE: 0, SS: 90, AE: 180, WS: 270 };
-  function horizonsCrossingJD(i, target) {
-    const P = [rows[i - 1], rows[i], rows[i + 1], rows[i + 2]];
-    const t0 = P[0][0], x = P.map((p) => p[0] - t0), base = P[1][1];
-    const yv = P.map((p) => base + wrap180(p[1] - base)), tgt = base + wrap180(target - base);
-    const L = (t) => { let s = 0; for (let j = 0; j < 4; j++) { let l = yv[j]; for (let k = 0; k < 4; k++) if (k !== j) l *= (t - x[k]) / (x[j] - x[k]); s += l; } return s; };
-    const dL = (t, h = 1e-3) => (L(t + h) - L(t - h)) / (2 * h);
-    let t = x[1] + (tgt - yv[1]) / (yv[2] - yv[1]) * (x[2] - x[1]);
-    for (let k = 0; k < 8; k++) { const f = L(t) - tgt; t -= f / dL(t); if (Math.abs(f) < 1e-10) break; }
-    return t0 + t;
-  }
+  const horizonsCrossingJD = (i, target) => crossingOfRows(rows, i, target, 4);
   const ttOf = (jdUT) => { const jb = jdUT + BRIDGE_DAYS; return jb + dTs(jb) / 86400; };
   const per = Object.fromEntries(Object.keys(TARGETS).map((k) => [k, { t: [], y: [] }]));
   for (let i = 1; i < rows.length - 2; i++) {
@@ -80,5 +73,5 @@ export function seriesCardinal() {
       per[type].t.push(yH); per[type].y.push(-dMin);   // record − model
     }
   }
-  return Object.entries(per).map(([type, s]) => ({ id: `cardinal-${type}-horizons`, t: s.t, y: s.y, w: s.t.map(() => 1), meta: { record: `Horizons ${type} crossings (the gate's cubic through the 10-d rows)`, model: 'cardinal.jd(year, type) on the finder axis UT + bridge + curve', unit: 'min', cadence: '1 yr', span: [s.t[0], s.t[s.t.length - 1]] } }));
+  return Object.entries(per).map(([type, s]) => ({ id: `cardinal-${type}-horizons`, t: s.t, y: s.y, w: s.t.map(() => 1), meta: { record: `Horizons ${type} crossings (the gate's cubic through the 10-d rows, the barycentre wobble removed first)`, model: 'cardinal.jd(year, type) on the finder axis UT + bridge + curve', unit: 'min', cadence: '1 yr', span: [s.t[0], s.t[s.t.length - 1]] } }));
 }

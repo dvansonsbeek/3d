@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.12
+modelVersion: v27.13
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -64,7 +64,14 @@ Two minutes; it has caught a 583.7″ regression.
 Step 6a2 (`npm run fit:6a2` → `data/02-solar-measurements-window.csv`,
 −4000…+4000, ~48k rows, gitignored) + `npm run check:csv-smoke` (bit-exact
 window compare, fail-proven; tools/fit/README Step 6a2) — regenerate it
-whenever the engine's frame of date moves. The full-period file
+whenever the engine's frame of date moves. The full compare is local-only and
+25 min, and the CSV went 6.3 s stale at −3997 unseen (2026-11-06); since the
+plan-32 follow-up `npm run check:csv-smoke:short` sits in `npm run check`
+— one window around 2000 (1980..2020, ~10 s), bit-exact at 86 µs of JD, so a
+Sun, frame or clock change in the era fails by name (the Sun's lunar-equation
+correction read 15 s at 1993 the day it was added). Only a window containing
+2000 is cheap: the exporter seeds at J2000 and chains outward, writing every
+year on the way. SKIPs where the gitignored CSV is absent. The full-period file
 (`data/02-solar-measurements.csv`, 160 MB, one row per year of the anchor
 unit) is RETIRED and deleted: it was the C-4b-era campaign record, stale
 against every later movement arc (measured SS@−997 off 2.9 h), and no gate
@@ -1754,6 +1761,19 @@ referee is sampled, the interpolation across its own short-period content is
 part of the comparison; take the known oscillation out before interpolating,
 or sample the referee densely at the crossings.
 
+*Fixed in the follow-up.* The crossing finder has ONE home,
+`tools/lib/horizons-crossing.js`: the Lagrange cubic on the longitude with
+the 6.44″ wobble (at the mean elongation, Meeus 47.2 through T²) taken out,
+the target shifted by the wobble at the solved instant, three passes — the
+probes' de-wobbled method, now the gate's and the sweep's alike (the gate,
+`series-sun.mjs` and `probes.mjs` had three copies of the cubic). The wobble
+model is an interpolation aid, not the model's barycentre term: an error in it
+leaves a residual oscillation the cubic handles as before. The gate's cardinal
+sd 1.01 → 0.91 min with the Sun statistic unchanged to the sixth decimal
+(0.90 min once (c)'s exact lunar equation moved the Sun itself);
+`data/sun-vs-horizons-summary.json` re-recorded as its own reason, the sweep
+regenerated on the same finder.
+
 **(b) An event's DEFINITION is part of a comparison.** The lunar canon's
 dynamical-time residual (canon TD − model TT, free of both ΔT conventions)
 carried one line of 7 min at 3.617 yr, ninety times the floor, in both halves
@@ -1804,6 +1824,28 @@ window's. Beside it two terms the Sun does not carry at all, the barycentre
 term's elliptic sidebands D − M′ (0.43″) and D + M′ (0.18″), the same at every
 epoch. Both are bounded harmonics on named periods (the whitelist's rule), a
 refit when the owner calls for one.
+
+*Fixed in the follow-up — the sidebands; measured and left — the drift.* The
+sidebands were the lunar equation's own: the completion carried the
+Earth-around-EMB wobble as 6.44″·sin D, the leading term of a geometry the
+model already holds. The wiring now derives it exactly — the Earth sits at
+EMB − μ·R_M, so the geocentric Sun's longitude is turned by
+atan2(ρ·sin Δ, r_S + ρ·cos Δ) with ρ = μ·r_M·cos β_M from the full lunar
+series and Δ = λ_M − λ_S on the Sun's own L(t), e(t), ϖ(t) (the Earth's
+perihelion + 180°), r_S of date (`embWobbleArcsecAtT`, `sun-and-eclipses.js`).
+Against Horizons D − M′ 0.44 → 0.03″, D + M′ 0.18 → 0.00″, D ∓ M 0.19 / 0.07
+→ 0.00″, the D line 0.03 → 0.01″, no constant fitted; the 1700–2000 window
+rms 1.627 → 1.586″. The drift was read per COMPOSED family (the ±M sideband
+rows share a frequency; a row's own offset is not a quantity): the Σk = 0
+families do not drift (≤ 0.05°/cy — the carriers are right to 0.02°/cy), the
+Σk = −1 ones drift by 0.58 (2V − 3E, 3V − 4E), 0.36–0.39 (E − 2Ma, E − 2J)
+and 0.18°/cy (J) per unit Σk — not one frame rate, not a per-planet carrier
+error (Jupiter's would read three values), and the sideband rows on the
+e-vectors of date halve one Venus family, leave Mars and Jupiter, flip the
+degenerate 3V − 4E pair and add 0.9–1.4″ to Σk = 0 families that carry no
+residual. It stays what the table extracted it as, a constant row with its
+window named, ≤ 1.3″ at −2650 inside the Sun's ancient scatter; the scratch
+measurement is reproducible from the sweep's rows and the table's literals.
 
 **(d) Under the instrument's term, the model's lunar perigee against the
 ephemeris's.** The remainder after (b)'s node term was declared "nothing
@@ -2113,7 +2155,7 @@ points to; each gate's header states its own plant in full):
 |---|---|---|
 | `ESSRT_CAL_PLANT=1` | `test/browser/calendar-conversion.test.mjs` | one expected calendar golden perturbed |
 | `ESSRT_CHART_EXPORT_PLANT=1/2/3` | `test/browser/chart-export.test.mjs` | the PNG width by one pixel / a caption line / one printed figure number |
-| `ESSRT_CSV_SMOKE_PLANT=1` | `test/csv-window-smoke.test.mjs` | one expected window-CSV row |
+| `ESSRT_CSV_SMOKE_PLANT=1` | `test/csv-window-smoke.test.mjs` | one expected window-CSV row (the full run and the chain's `check:csv-smoke:short` window alike) |
 | `ESSRT_DT_SLOPE_PLANT=1` | `tools/verify/deltat-slope-basis.js` | +0.43 ms/day on the implied ΔT slope (the historical two-bases split) |
 | `ESSRT_LITERALS_PLANT=1` | `tools/constants/check-literals.mjs` | a retired-input file re-entering |
 | `ESSRT_OBLIQ_REALIZED_PLANT=1` | `tools/verify/obliquity-hybrid.js` | the predicted realized obliquity period × 1.005 |

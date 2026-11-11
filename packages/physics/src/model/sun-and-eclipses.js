@@ -206,10 +206,32 @@ export function assembleSunAndEclipses(ctx) {
   // framework's own Moon elongation of date (ṅ included) — the constant-rate
   // carrier ran ~29° off it at ±9000 yr.
   const carrierRatesDegPerCy = computeCarrierRatesDegPerCy({ meanSiderealYearDays, moonSiderealMonthDays: moonSiderealMonthInput });
+  // PLAN 32 FOLLOW-UP (doc 112 §5, TODO item 3) — the lunar equation as the EXACT geometry of the
+  // model's own Moon, zero fitted constants: the Earth sits at EMB − μ·R_M (μ = 1/(1+M_E/M_M)), so
+  // the geocentric Sun's longitude is the EMB-centric one turned by atan2(ρ·sin Δ, r_S + ρ·cos Δ)
+  // with ρ = μ·r_M·cos β_M (the full lunar series of date) and Δ = λ_M − λ_S, λ_S the Sun's true
+  // longitude on its own L(t), e(t), ϖ(t) (the Earth's perihelion + 180°; the equation of centre to
+  // e³), r_S its distance of date on the same elements. The carrier form embWobbleArcsec·sin D
+  // carried only the leading term: the sweep read its missing sidebands against Horizons in every
+  // window — D − M′ 0.44″, D + M′ 0.18″ (the Moon's equation of centre and distance), D − M 0.19″,
+  // D + M 0.07″ (the Sun's), the D line itself 0.03″; on the exact geometry all five read ≤ 0.04″
+  // and the 1700–2000 window rms 1.627 → 1.586″ (tools/explore/residual-spectra, the sweep's §5).
+  const MU_MOON = 1 / (1 + MASS_RATIO_EARTH_MOON), D2R = Math.PI / 180, ARCSEC_PER_RAD = 648000 / Math.PI;
+  const embWobbleArcsecAtT = /** @param {number} T Julian centuries TT from J2000 @returns {number} arcsec */ (T) => {
+    const year = 2000 + 100 * T;   // the engine year (Julian years from J2000 on the TT axis)
+    const ev = moonSeries.sceneEvalAt(T * julianCenturyDays);
+    const e = sunEccentricityAt(year), periSunDeg = sunPerihelionDegAt(year) + 180;
+    const M = (sunMeanLongitudeDegAt(year) - periSunDeg) * D2R;
+    const nu = M + (2 * e - e * e * e / 4) * Math.sin(M) + 1.25 * e * e * Math.sin(2 * M) + (13 / 12) * e * e * e * Math.sin(3 * M);
+    const rS = currentAUDistance * (1 - e * e) / (1 + e * Math.cos(nu));
+    const rho = MU_MOON * ev.distKm * Math.cos(ev.latDeg * D2R), dl = (ev.lonDeg - periSunDeg) * D2R - nu;
+    return Math.atan2(rho * Math.sin(dl), rS + rho * Math.cos(dl)) * ARCSEC_PER_RAD;
+  };
   const { sunPlanetaryCompletionDeg } = createSunPlanetaryCompletion({
     embWobbleArcsec,
     carrierRatesDegPerCy,
     moonElongationDegAtT: /** @param {number} T */ (T) => moonArgs.argsAt(j2000JD + T * julianCenturyDays).D,
+    embWobbleArcsecAtT,
   });
   const besselian = createBesselian({
     moonFullAtDaysTT: /** @param {number} dDaysTT */ (dDaysTT) => {

@@ -56,14 +56,14 @@
             "utc": "18:44",
             "groundGapKm": 8.8,
             "sunAltDeg": 64.4,
-            "shadowPlaneKm": 8.3,
+            "shadowPlaneKm": 8.4,
             "shadowPlaneArcsec": 4.5
           },
           {
             "utc": "18:46",
             "groundGapKm": 8.9,
             "sunAltDeg": 63.6,
-            "shadowPlaneKm": 8.3,
+            "shadowPlaneKm": 8.4,
             "shadowPlaneArcsec": 4.5
           }
         ],
@@ -74,150 +74,76 @@
         "points": [
           {
             "utc": "18:20",
-            "groundGapKm": 12.6,
+            "groundGapKm": 13.8,
             "sunAltDeg": 63.7,
-            "shadowPlaneKm": 12.5,
-            "shadowPlaneArcsec": 6.7
+            "shadowPlaneKm": 13.8,
+            "shadowPlaneArcsec": 7.4
           },
           {
             "utc": "18:22",
-            "groundGapKm": 12.6,
+            "groundGapKm": 13.8,
             "sunAltDeg": 63.8,
-            "shadowPlaneKm": 12.6,
-            "shadowPlaneArcsec": 6.8
+            "shadowPlaneKm": 13.8,
+            "shadowPlaneArcsec": 7.4
           },
           {
             "utc": "18:24",
-            "groundGapKm": 12.6,
+            "groundGapKm": 13.8,
             "sunAltDeg": 63.9,
-            "shadowPlaneKm": 12.6,
-            "shadowPlaneArcsec": 6.8
+            "shadowPlaneKm": 13.8,
+            "shadowPlaneArcsec": 7.4
           }
         ],
-        "meanShadowPlaneArcsec": 6.8
+        "meanShadowPlaneArcsec": 7.4
       },
       {
         "label": "2026 Aug 12 Total (Iberia, low sun)",
         "points": [
           {
             "utc": "18:24",
-            "groundGapKm": 8.4,
+            "groundGapKm": 10.5,
             "sunAltDeg": 14.3,
-            "shadowPlaneKm": 5.2,
-            "shadowPlaneArcsec": 2.8
+            "shadowPlaneKm": 6.2,
+            "shadowPlaneArcsec": 3.3
           },
           {
             "utc": "18:26",
-            "groundGapKm": 9.5,
+            "groundGapKm": 11.9,
             "sunAltDeg": 12.6,
-            "shadowPlaneKm": 5.3,
-            "shadowPlaneArcsec": 2.8
+            "shadowPlaneKm": 6.3,
+            "shadowPlaneArcsec": 3.4
           },
           {
             "utc": "18:28",
-            "groundGapKm": 11.4,
+            "groundGapKm": 14.3,
             "sunAltDeg": 10.4,
-            "shadowPlaneKm": 5.3,
-            "shadowPlaneArcsec": 2.9
+            "shadowPlaneKm": 6.4,
+            "shadowPlaneArcsec": 3.4
           },
           {
             "utc": "18:30",
-            "groundGapKm": 15.3,
+            "groundGapKm": 19.3,
             "sunAltDeg": 7.6,
-            "shadowPlaneKm": 5.2,
-            "shadowPlaneArcsec": 2.8
+            "shadowPlaneKm": 6.3,
+            "shadowPlaneArcsec": 3.4
           }
         ],
-        "meanShadowPlaneArcsec": 2.8
+        "meanShadowPlaneArcsec": 3.4
       },
       {
         "label": "1999 Aug 11 Total (Romania)",
         "points": [
           {
             "utc": "11:02",
-            "groundGapKm": 13.2,
+            "groundGapKm": 14.3,
             "sunAltDeg": 59.3,
-            "shadowPlaneKm": 13.1,
-            "shadowPlaneArcsec": 7.1
+            "shadowPlaneKm": 14.3,
+            "shadowPlaneArcsec": 7.7
           },
           {
             "utc": "11:04",
-            "groundGapKm": 13.1,
-            "sunAltDeg": 59.3,
-            "shadowPlaneKm": 13.1,
-            "shadowPlaneArcsec": 7
-          }
-        ],
-        "meanShadowPlaneArcsec": 7.1
-      },
-      {
-        "label": "2023 Apr 20 Hybrid (Timor)",
-        "points": [
-          {
-            "utc": "04:14",
-            "groundGapKm": 2.9,
-            "sunAltDeg": 66.6,
-            "shadowPlaneKm": 2.8,
-            "shadowPlaneArcsec": 1.5
-          },
-          {
-            "utc": "04:16",
-            "groundGapKm": 2.9,
-            "sunAltDeg": 66.7,
-            "shadowPlaneKm": 2.8,
-            "shadowPlaneArcsec": 1.5
-          }
-        ],
-        "meanShadowPlaneArcsec": 1.5
-      },
-      {
-        "label": "2001 Jun 21 Total (Atlantic-Africa)",
-        "points": [
-          {
-            "utc": "11:56",
-            "groundGapKm": 19.9,
-            "sunAltDeg": 54.8,
-            "shadowPlaneKm": 19.8,
-            "shadowPlaneArcsec": 10.7
-          },
-          {
-            "utc": "12:06",
-            "groundGapKm": 19.8,
-            "sunAltDeg": 55.1,
-            "shadowPlaneKm": 19.8,
-            "shadowPlaneArcsec": 10.6
-          },
-          {
-            "utc": "12:16",
-            "groundGapKm": 19.9,
-            "sunAltDeg": 54.3,
-            "shadowPlaneKm": 19.7,
-            "shadowPlaneArcsec": 10.6
-          }
-        ],
-        "meanShadowPlaneArcsec": 10.6
-      },
-      {
-        "label": "2002 Dec 04 Total (Africa-Indian O.)",
-        "points": [
-          {
-            "utc": "06:30",
-            "groundGapKm": 18.1,
-            "sunAltDeg": 49.2,
-            "shadowPlaneKm": 14.4,
-            "shadowPlaneArcsec": 7.7
-          },
-          {
-            "utc": "07:00",
-            "groundGapKm": 15,
-            "sunAltDeg": 64.9,
-            "shadowPlaneKm": 14.2,
-            "shadowPlaneArcsec": 7.7
-          },
-          {
-            "utc": "07:30",
             "groundGapKm": 14.3,
-            "sunAltDeg": 72.2,
+            "sunAltDeg": 59.3,
             "shadowPlaneKm": 14.3,
             "shadowPlaneArcsec": 7.7
           }
@@ -225,27 +151,101 @@
         "meanShadowPlaneArcsec": 7.7
       },
       {
+        "label": "2023 Apr 20 Hybrid (Timor)",
+        "points": [
+          {
+            "utc": "04:14",
+            "groundGapKm": 3.4,
+            "sunAltDeg": 66.6,
+            "shadowPlaneKm": 3.3,
+            "shadowPlaneArcsec": 1.8
+          },
+          {
+            "utc": "04:16",
+            "groundGapKm": 3.3,
+            "sunAltDeg": 66.7,
+            "shadowPlaneKm": 3.3,
+            "shadowPlaneArcsec": 1.8
+          }
+        ],
+        "meanShadowPlaneArcsec": 1.8
+      },
+      {
+        "label": "2001 Jun 21 Total (Atlantic-Africa)",
+        "points": [
+          {
+            "utc": "11:56",
+            "groundGapKm": 19.1,
+            "sunAltDeg": 54.8,
+            "shadowPlaneKm": 19,
+            "shadowPlaneArcsec": 10.2
+          },
+          {
+            "utc": "12:06",
+            "groundGapKm": 18.9,
+            "sunAltDeg": 55.1,
+            "shadowPlaneKm": 18.9,
+            "shadowPlaneArcsec": 10.2
+          },
+          {
+            "utc": "12:16",
+            "groundGapKm": 19,
+            "sunAltDeg": 54.3,
+            "shadowPlaneKm": 18.9,
+            "shadowPlaneArcsec": 10.1
+          }
+        ],
+        "meanShadowPlaneArcsec": 10.2
+      },
+      {
+        "label": "2002 Dec 04 Total (Africa-Indian O.)",
+        "points": [
+          {
+            "utc": "06:30",
+            "groundGapKm": 19.3,
+            "sunAltDeg": 49.2,
+            "shadowPlaneKm": 15.3,
+            "shadowPlaneArcsec": 8.2
+          },
+          {
+            "utc": "07:00",
+            "groundGapKm": 15.9,
+            "sunAltDeg": 64.9,
+            "shadowPlaneKm": 15.1,
+            "shadowPlaneArcsec": 8.1
+          },
+          {
+            "utc": "07:30",
+            "groundGapKm": 15.2,
+            "sunAltDeg": 72.2,
+            "shadowPlaneKm": 15.2,
+            "shadowPlaneArcsec": 8.2
+          }
+        ],
+        "meanShadowPlaneArcsec": 8.2
+      },
+      {
         "label": "2006 Mar 29 Total (Africa-Turkey)",
         "points": [
           {
             "utc": "09:30",
-            "groundGapKm": 16,
+            "groundGapKm": 16.1,
             "sunAltDeg": 56.4,
             "shadowPlaneKm": 14.5,
             "shadowPlaneArcsec": 7.8
           },
           {
             "utc": "09:40",
-            "groundGapKm": 15.3,
+            "groundGapKm": 15.4,
             "sunAltDeg": 60.7,
-            "shadowPlaneKm": 14.5,
+            "shadowPlaneKm": 14.6,
             "shadowPlaneArcsec": 7.8
           },
           {
             "utc": "09:50",
             "groundGapKm": 14.9,
             "sunAltDeg": 64.1,
-            "shadowPlaneKm": 14.5,
+            "shadowPlaneKm": 14.6,
             "shadowPlaneArcsec": 7.8
           }
         ],
@@ -256,77 +256,77 @@
         "points": [
           {
             "utc": "10:12",
-            "groundGapKm": 10.1,
+            "groundGapKm": 11.1,
             "sunAltDeg": 33,
-            "shadowPlaneKm": 9.8,
-            "shadowPlaneArcsec": 5.3
+            "shadowPlaneKm": 10.8,
+            "shadowPlaneArcsec": 5.8
           },
           {
             "utc": "10:20",
-            "groundGapKm": 9.9,
+            "groundGapKm": 10.8,
             "sunAltDeg": 33.5,
-            "shadowPlaneKm": 9.8,
-            "shadowPlaneArcsec": 5.3
+            "shadowPlaneKm": 10.8,
+            "shadowPlaneArcsec": 5.8
           },
           {
             "utc": "10:28",
-            "groundGapKm": 9.8,
+            "groundGapKm": 10.8,
             "sunAltDeg": 33.3,
-            "shadowPlaneKm": 9.8,
-            "shadowPlaneArcsec": 5.3
+            "shadowPlaneKm": 10.8,
+            "shadowPlaneArcsec": 5.8
           }
         ],
-        "meanShadowPlaneArcsec": 5.3
+        "meanShadowPlaneArcsec": 5.8
       },
       {
         "label": "2009 Jul 22 Total (China-Pacific)",
         "points": [
           {
             "utc": "01:30",
-            "groundGapKm": 18.3,
+            "groundGapKm": 18.6,
             "sunAltDeg": 50.2,
-            "shadowPlaneKm": 14.1,
-            "shadowPlaneArcsec": 7.6
+            "shadowPlaneKm": 14.4,
+            "shadowPlaneArcsec": 7.7
           },
           {
             "utc": "02:00",
-            "groundGapKm": 15,
+            "groundGapKm": 15.2,
             "sunAltDeg": 69.4,
-            "shadowPlaneKm": 14.1,
-            "shadowPlaneArcsec": 7.6
+            "shadowPlaneKm": 14.3,
+            "shadowPlaneArcsec": 7.7
           },
           {
             "utc": "02:30",
-            "groundGapKm": 14.1,
+            "groundGapKm": 14.3,
             "sunAltDeg": 84.9,
-            "shadowPlaneKm": 14.1,
-            "shadowPlaneArcsec": 7.6
+            "shadowPlaneKm": 14.3,
+            "shadowPlaneArcsec": 7.7
           }
         ],
-        "meanShadowPlaneArcsec": 7.6
+        "meanShadowPlaneArcsec": 7.7
       },
       {
         "label": "2012 Nov 13 Total (Pacific)",
         "points": [
           {
             "utc": "21:00",
-            "groundGapKm": 24.2,
+            "groundGapKm": 24.3,
             "sunAltDeg": 37.8,
-            "shadowPlaneKm": 16.2,
+            "shadowPlaneKm": 16.3,
             "shadowPlaneArcsec": 8.7
           },
           {
             "utc": "21:30",
-            "groundGapKm": 17.8,
+            "groundGapKm": 17.9,
             "sunAltDeg": 56.5,
-            "shadowPlaneKm": 16.1,
-            "shadowPlaneArcsec": 8.6
+            "shadowPlaneKm": 16.2,
+            "shadowPlaneArcsec": 8.7
           },
           {
             "utc": "22:00",
-            "groundGapKm": 16.2,
+            "groundGapKm": 16.3,
             "sunAltDeg": 66.9,
-            "shadowPlaneKm": 16.1,
+            "shadowPlaneKm": 16.2,
             "shadowPlaneArcsec": 8.7
           }
         ],
@@ -337,85 +337,85 @@
         "points": [
           {
             "utc": "19:16",
-            "groundGapKm": 9.3,
+            "groundGapKm": 8.5,
             "sunAltDeg": 49.3,
-            "shadowPlaneKm": 9.2,
-            "shadowPlaneArcsec": 4.9
+            "shadowPlaneKm": 8.4,
+            "shadowPlaneArcsec": 4.5
           },
           {
             "utc": "19:22",
-            "groundGapKm": 9.3,
+            "groundGapKm": 8.5,
             "sunAltDeg": 49.6,
-            "shadowPlaneKm": 9.2,
-            "shadowPlaneArcsec": 5
+            "shadowPlaneKm": 8.5,
+            "shadowPlaneArcsec": 4.5
           },
           {
             "utc": "19:28",
-            "groundGapKm": 9.2,
+            "groundGapKm": 8.4,
             "sunAltDeg": 49.5,
-            "shadowPlaneKm": 9.2,
-            "shadowPlaneArcsec": 4.9
+            "shadowPlaneKm": 8.4,
+            "shadowPlaneArcsec": 4.5
           }
         ],
-        "meanShadowPlaneArcsec": 4.9
+        "meanShadowPlaneArcsec": 4.5
       },
       {
         "label": "2020 Dec 14 Total (Pacific-Chile)",
         "points": [
           {
             "utc": "15:30",
-            "groundGapKm": 10.8,
+            "groundGapKm": 11.7,
             "sunAltDeg": 59.5,
-            "shadowPlaneKm": 9.7,
-            "shadowPlaneArcsec": 5.2
+            "shadowPlaneKm": 10.5,
+            "shadowPlaneArcsec": 5.6
           },
           {
             "utc": "15:42",
-            "groundGapKm": 10.2,
+            "groundGapKm": 11.1,
             "sunAltDeg": 65.1,
-            "shadowPlaneKm": 9.6,
-            "shadowPlaneArcsec": 5.2
+            "shadowPlaneKm": 10.5,
+            "shadowPlaneArcsec": 5.6
           },
           {
             "utc": "15:54",
-            "groundGapKm": 9.9,
+            "groundGapKm": 10.7,
             "sunAltDeg": 69.5,
-            "shadowPlaneKm": 9.7,
-            "shadowPlaneArcsec": 5.2
+            "shadowPlaneKm": 10.5,
+            "shadowPlaneArcsec": 5.6
           }
         ],
-        "meanShadowPlaneArcsec": 5.2
+        "meanShadowPlaneArcsec": 5.6
       },
       {
         "label": "2021 Dec 04 Total (Antarctica)",
         "points": [
           {
             "utc": "07:28",
-            "groundGapKm": 13.7,
+            "groundGapKm": 13.9,
             "sunAltDeg": 16.9,
-            "shadowPlaneKm": 13.3,
-            "shadowPlaneArcsec": 7.1
+            "shadowPlaneKm": 13.4,
+            "shadowPlaneArcsec": 7.2
           },
           {
             "utc": "07:32",
-            "groundGapKm": 13.4,
+            "groundGapKm": 13.6,
             "sunAltDeg": 17.2,
-            "shadowPlaneKm": 13.3,
-            "shadowPlaneArcsec": 7.1
+            "shadowPlaneKm": 13.4,
+            "shadowPlaneArcsec": 7.2
           },
           {
             "utc": "07:36",
-            "groundGapKm": 13.3,
+            "groundGapKm": 13.5,
             "sunAltDeg": 17.1,
-            "shadowPlaneKm": 13.3,
+            "shadowPlaneKm": 13.5,
             "shadowPlaneArcsec": 7.2
           }
         ],
-        "meanShadowPlaneArcsec": 7.1
+        "meanShadowPlaneArcsec": 7.2
       }
     ],
-    "meanShadowPlaneArcsec": 6.2,
-    "maxShadowPlaneArcsec": 10.7
+    "meanShadowPlaneArcsec": 6.4,
+    "maxShadowPlaneArcsec": 10.2
   },
   "inputs": {
     "generator": "node tools/verify/eclipse-audit.js --write",
@@ -432,7 +432,7 @@
       "packages/physics/src/earth/year-lengths.cjs": "sha256:6b3a7fb60a65cd71a266d66918588429c514f15c29519fda85bdcbecbaac4465",
       "packages/physics/src/eclipse/besselian.cjs": "sha256:819e5b5785b320a4512f464060006bcb6a52db93050a135e58ddda0a9fe8d28a",
       "packages/physics/src/eclipse/finders.cjs": "sha256:ee2676c730f06ce1b0bffecaf2a2c4f38e6600f42191714a9edb422bb5b52b7d",
-      "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:aab1e8c685ea1a461832e6fbd62ef3520af78a1bb3cf8db5556852e29023f63d",
+      "packages/physics/src/eclipse/sun-planetary-completion.cjs": "sha256:6781421c8dcad0534dc15b091c179fd9f4949cf6fed14d28e7921687c7502e01",
       "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
       "packages/physics/src/model/cardinal-instants.js": "sha256:72b4dc78f2ee10720ffdf79cb39be16ee5aece012a07498e14470c944246fe58",
       "packages/physics/src/model/context.js": "sha256:402e15396eeb7b919b2ae18c19e20a1e0efbc515a194282f106aac3cd32d775f",
@@ -448,7 +448,7 @@
       "packages/physics/src/model/planet-records.js": "sha256:0a062111bcd59414736f56b027306690dae054dc4b5ce86812b14f09ff312f7c",
       "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",
       "packages/physics/src/model/published-periods.js": "sha256:1e18f705212f7aeec39bcddeb9fadbba04e2fad2041a97874705f4076cd57189",
-      "packages/physics/src/model/sun-and-eclipses.js": "sha256:211b018632bdcae2d7a228e15ac778d1ecf38996417e82d120dade42440c2690",
+      "packages/physics/src/model/sun-and-eclipses.js": "sha256:52a2a4dee428be534a2e22faf96e8a651798d1fc6de0d6de859f8635d6f67720",
       "packages/physics/src/model/surface.js": "sha256:948078e5315366b854e3c6ce4c069a7b0274f7251651fbae51fad15737f2df96",
       "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
       "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",

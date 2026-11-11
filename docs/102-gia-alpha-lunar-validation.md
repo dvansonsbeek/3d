@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.12
+modelVersion: v27.13
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -363,7 +363,12 @@ events vs <!--v:lunarCanonRecallEvents-->12,064<!--/v--> NASA events over 5,000 
 Physical-event recall <!--v:lunarCanonRecallPercent-->99.93<!--/v--> %; the unmatched
 edges (<!--v:lunarCanonRecallModelOnly-->26<!--/v--> model-only /
 <!--v:lunarCanonRecallMissed-->8<!--/v--> NASA-only) are grazing penumbrals at the
-outer eclipse threshold — threshold-convention scatter with no directional bias.
+outer eclipse threshold — threshold-convention scatter with no directional bias
+(measured 2026-11-10 by replaying the generator's matching: every NASA-only
+event is a canon penumbral with |γ| between 1.54 and 1.58, the penumbral
+limit, and the nearest model event is a lunation away — the model's least
+distance sits just outside the penumbra for those oppositions, as the
+model-only ones sit just inside for the canon's).
 Type accuracy on matched events <!--v:lunarCanonRecallTypeAccuracyPercent-->99.55<!--/v--> %;
 the <!--v:lunarCanonRecallTypeMismatches-->54<!--/v--> mismatches are boundary-straddlers
 (Total↔Partial with umbral magnitude within ~0.02 of 1.0, or
@@ -651,13 +656,15 @@ follow-up re-timed the ancient records with the completed lunar
 arguments (removing it leaves the misfit unchanged; before the
 completion it raised it by about a tenth); no cycles <!--v:lunarDenseChi2NoCycles-->51.9<!--/v-->
 (the stack takes a quarter off the misfit); minus
-jose5/hallstatt/jose4 = <!--v:lunarDenseChi2MinusJose5-->37.5<!--/v-->/<!--v:lunarDenseChi2MinusHallstatt-->47.2<!--/v-->/<!--v:lunarDenseChi2MinusJose4-->30.8<!--/v--> — the Joses and Hallstatt
-receive no independent support from this corpus (removing Hallstatt or
-Jose4 even lowers the misfit; for the Joses, consistent with their
-~179-yr period averaging out in century bins; for Hallstatt this stands
-in open tension with the canon-based ablation above, which validated it
-— different dataset, different centuries; recorded as tension, not
-verdict). Residual structure
+jose5/hallstatt/jose4 = <!--v:lunarDenseChi2MinusJose5-->37.5<!--/v-->/<!--v:lunarDenseChi2MinusHallstatt-->47.2<!--/v-->/<!--v:lunarDenseChi2MinusJose4-->30.8<!--/v--> — the Joses receive
+no independent support from this corpus (removing either lowers the
+misfit, consistent with their ~179-yr period averaging out in century
+bins), and Hallstatt is supported by it since the plan-32 follow-up
+re-timed the ancient records with the completed lunar arguments
+(removing it raises the misfit by about a fifth), in agreement with the
+canon-based ablation above — the tension this passage recorded before
+the re-timing, when removing Hallstatt lowered the misfit, is resolved.
+Residual structure
 remains at full-stack χ²/dof ≈ 3.5 (e.g. −300 at −1,123 ± 1,391 s)
 — characterized in the next section: it is not Earth rotation, and
 the stack stays as shipped.
@@ -666,7 +673,8 @@ the stack stays as shipped.
 
 The "tune or extend the stack" question the χ²/dof ≈ 3.5 residual opens
 has a measured answer (`tools/explore/dense-targets-residual-structure.mjs`,
-same 244-row corpus and machinery as the gate): **neither** — no cycle
+the gate's corpus and machinery — 244 rows identified when that frozen
+script was run, <!--v:lunarDenseIdentified-->246<!--/v--> now): **neither** — no cycle
 is added, removed, or retuned. The verdict is triple-locked: the
 structure fails the LOD-continuity veto, Stephenson's own spline
 misfits it identically, and no admissible Sun form absorbs it (a

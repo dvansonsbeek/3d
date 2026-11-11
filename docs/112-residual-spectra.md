@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.12
+modelVersion: v27.13
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -20,7 +20,7 @@ registry's (`tools/docs/model-values.mjs`, the `residualSweep*`, `lunarCanon*`, 
 `josePairRefit*`, `lr04Residual*` and `la2004*` keys).
 
 **The answer.** <!--v:residualSweepSeriesCount-->33<!--/v--> series,
-<!--v:residualSweepLinesAboveFloor-->63<!--/v--> lines above the red-noise floor,
+<!--v:residualSweepLinesAboveFloor-->40<!--/v--> lines above the red-noise floor,
 <!--v:residualSweepSurvivorsWithoutPhysics-->0<!--/v--> survivors without external physics under
 the rule, and <!--v:residualSweepLinesStandingWithPhysics-->0<!--/v--> lines standing with physics
 named — the <!--v:residualSweepLinesClosedByTheFollowUp-->1<!--/v--> line that stood when the sweep
@@ -92,19 +92,19 @@ the series at its own cadence; the floor the AR(1) p < 0.01 level of normalised 
 | 4 | LR04 − the formula, pre-iNHG window | 585 | -5,320 … -2,700 kyr | 0.113 ‰ | 0.629 | 0.118 | 1 | 2,096 kyr | 0.0609 | 1.29 | yes | a span-scale family (1.25 cycles) |
 | 4 | LR04 − the formula, the full-record fit | 2,115 | -5,320 … 0.000 kyr | 0.250 ‰ | 0.892 | 0.157 | 0 | 90.17 kyr | 0.0842 | 0.36 | no | obliquity p+s6 (53.6) − eccentricity g3−g2 (130.7) |
 | 5 | the certified Sun − Horizons, yearly means | 6,000 | -2,999 … 3,000 yr | 3.24 ″ | 0.936 | 0.081 | 1 | 2,666 yr | 0.943 | 1.35 | no | a span-scale family (2.25 cycles) |
-| 5 | the Sun − Horizons, 10-d cadence, −2500…−2200 | 10,957 | -2,500 … -2,200 yr | 2.75 ″ | 0.971 | 0.095 | 3 | 3.986 yr | 1.20 | 3.04 | yes | 2V − 3E |
-| 5 | the Sun − Horizons, 10-d cadence, −400…−100 | 10,957 | -400.0 … -100.0 yr | 4.75 ″ | 0.950 | 0.063 | 6 | 1.000 yr | 0.754 | 3.29 | yes | annual (M) |
-| 5 | the Sun − Horizons, 10-d cadence, 1700…2000 | 10,958 | 1,700 … 2,000 yr | 1.63 ″ | 0.936 | 0.050 | 4 | 1.000 yr | 0.834 | 7.10 | yes | annual (M) |
+| 5 | the Sun − Horizons, 10-d cadence, −2500…−2200 | 10,957 | -2,500 … -2,200 yr | 2.73 ″ | 0.991 | 0.252 | 1 | 3.986 yr | 1.20 | 1.20 | yes | 2V − 3E |
+| 5 | the Sun − Horizons, 10-d cadence, −400…−100 | 10,957 | -400.0 … -100.0 yr | 4.74 ″ | 0.986 | 0.178 | 2 | 1.000 yr | 0.755 | 1.30 | yes | annual (M) |
+| 5 | the Sun − Horizons, 10-d cadence, 1700…2000 | 10,958 | 1,700 … 2,000 yr | 1.59 ″ | 0.982 | 0.152 | 2 | 1.000 yr | 0.834 | 2.70 | yes | annual (M) |
 | 6 | the lunar canon − the finder, UT | 12,056 | -1,998 … 3,001 yr | 4.78 min | 0.992 | 0.261 | 2 | 1,428 yr | 4.25 | 1.76 | yes | a span-scale family (3.50 cycles) |
 | 6 | the lunar canon − the finder, dynamical time | 12,056 | -1,998 … 3,001 yr | 1.42 min | 0.917 | 0.034 | 2 | 2,500 yr | 0.712 | 3.95 | yes | a span-scale family (2.00 cycles) |
 | 7 | e − La2004 (×10³), a linear trend removed | 4,999 | -9,996 … 0.000 kyr | 0.129 ‰ | 0.570 | 0.015 | 6 | 94.97 kyr | 0.0605 | 7.28 | yes | the solutions' own eccentricity line eccentricity g4−g5 (94.9 kyr) |
 | 7 | ε − La2004 (″), a linear trend removed | 4,999 | -9,996 … 0.000 kyr | 795 ″ | 0.947 | 0.115 | 1 | 40.76 kyr | 695 | 3.31 | no | the solutions' own obliquity line obliquity p+s3 (40.9 kyr) |
 | 7 | ϖ of date − La2004 (″), a linear trend removed | 4,999 | -9,996 … 0.000 kyr | 22692 ″ | 0.369 | 0.010 | 4 | 4,443 kyr | 9668 | 9.86 | no | a span-scale family (2.25 cycles) |
 | 7 | ϖ of date − La2004 (″), a quadratic removed | 4,999 | -9,996 … 0.000 kyr | 17985 ″ | 0.000 | 0.005 | 2 | 4,998 kyr | 3795 | 4.34 | yes | a span-scale family (2.00 cycles) |
-| 8 | the vernal equinox instants − Horizons | 6,000 | -3,000 … 2,999 yr | 1.34 min | 0.554 | 0.013 | 10 | 2.715 yr | 0.538 | 11.66 | yes | the Moon's elongation aliased by the yearly sampling — the GATE's cubic across the barycentre wobble (§6) |
-| 8 | the June solstice instants − Horizons | 6,000 | -2,999 … 2,999 yr | 1.41 min | 0.613 | 0.015 | 8 | 2.715 yr | 0.561 | 8.83 | yes | the Moon's elongation aliased by the yearly sampling — the GATE's cubic across the barycentre wobble (§6) |
-| 8 | the autumnal equinox instants − Horizons | 6,000 | -2,999 … 3,000 yr | 1.50 min | 0.696 | 0.020 | 8 | 2.715 yr | 0.496 | 6.09 | yes | the Moon's elongation aliased by the yearly sampling — the GATE's cubic across the barycentre wobble (§6) |
-| 8 | the December solstice instants − Horizons | 6,001 | -3,000 … 3,000 yr | 1.47 min | 0.674 | 0.017 | 7 | 2.715 yr | 0.465 | 7.26 | yes | the Moon's elongation aliased by the yearly sampling — the GATE's cubic across the barycentre wobble (§6) |
+| 8 | the vernal equinox instants − Horizons | 6,000 | -3,000 … 2,999 yr | 1.26 min | 0.789 | 0.028 | 4 | 3.984 yr | 0.371 | 3.34 | no | 2V − 2E (aliased) |
+| 8 | the June solstice instants − Horizons | 6,000 | -2,999 … 2,999 yr | 1.33 min | 0.830 | 0.035 | 3 | 2,666 yr | 0.406 | 2.60 | no | a span-scale family (2.25 cycles) |
+| 8 | the autumnal equinox instants − Horizons | 6,000 | -2,999 … 3,000 yr | 1.44 min | 0.907 | 0.061 | 1 | 2,666 yr | 0.412 | 1.72 | yes | a span-scale family (2.25 cycles) |
+| 8 | the December solstice instants − Horizons | 6,001 | -3,000 … 3,000 yr | 1.41 min | 0.892 | 0.053 | 2 | 2,667 yr | 0.363 | 1.91 | no | a span-scale family (2.25 cycles) |
 <!-- /generated:doc112-series -->
 
 ## 3. ΔT and the Jose pair
@@ -127,6 +127,14 @@ red-noise floor, and it is <!--v:josePairRefitLineFirstHalfSeconds-->17<!--/v-->
 half of the record and <!--v:josePairRefitLineSecondHalfSeconds-->115<!--/v--> s in the second.
 That is an episode of Stephenson's smoothed curve in the second millennium, not a stationary line
 of the Earth's rotation; the timed observations cannot see it. The pair is a fit convenience.
+
+*The follow-up's decision (TODO item 4): the pair stays.* The joint fitter run with the pair
+excluded (`DT_CORRECTIONS_DISABLED=1 DT_FLAGS=bond,hallstatt node tools/fit/dt-corrections-fit.js
+--joint`, report mode) scores the telescopic canon at 23.2 s rms against 12.5 s with all four
+cycles and the full window at 73.3 s against 21.4 s — the modern record does see the pair, and the
+fitter's own composite rule (full-window rms ≤ 40 s) would not accept the two-cycle stack. The
+timed ancient corpus is indifferent (doc 102's ablation). A convenience the record it was fitted on
+needs is kept as what the paper calls it, a labelled hypothesis; nothing in the stack moves.
 
 <!-- generated:doc112-jose -->
 | the re-fit on the SMH2016 spline | Bond (s) | Hallstatt (s) | Jose5 (s) | Jose4 (s) | residual rms (s) | power at 897 yr (× AR(1) / × white) | power at 716 yr |
@@ -179,29 +187,42 @@ coefficients: the frame-free arguments (V − E, 2V − 2E) drift by a few degre
 term with Σk ≠ ±1 stays a constant row with its window named", here measured outside its window.
 The barycentre term itself is right to a few hundredths of an arcsecond at every epoch.
 
+*The follow-up (TODO item 3).* The sidebands were the lunar equation's own: the completion carried
+the Earth-around-EMB wobble as 6.44″·sin D, the leading term of a geometry the model already holds,
+and the wiring now derives it exactly on the model's own Moon — the Earth sits at EMB − μ·R_M, so the
+geocentric Sun's longitude is turned by atan2(ρ·sin Δ, r_S + ρ·cos Δ) with ρ = μ·r_M·cos β_M from the
+full lunar series and Δ = λ_M − λ_S on the Sun's own elements of date (`embWobbleArcsecAtT`, doc 111
+§1.41 c). The table below is the re-run on it: D ± M′ and D ± M read ≤ 0.04″ in every window, no
+constant fitted. The drift was then measured per composed family, since the ±M sideband rows share a
+frequency and a row's own offset is not a quantity: the Σk = 0 families do not drift (the carriers
+are right to 0.02°/cy), the Σk = −1 ones by 0.58 (the Venus families), 0.36–0.39 (Mars, Jupiter)
+and 0.18°/cy (Jupiter alone) per unit Σk — not one frame rate, not a carrier error, and the
+sideband rows on the e-vectors of date make it worse where there is no residual. It stays a constant
+row with its window named, ≤ 1.3″ at −2650 inside the Sun's ancient scatter.
+
 <!-- generated:doc112-sun-named -->
 | argument | period (yr) | -2500…-2200 (″, °) | -400…-100 (″, °) | 1700…2000 (″, °) |
 |:---|---:|---:|---:|---:|
-| D (the barycentre term) | 0.0809 | 0.035″ -144° | 0.030″ -164° | 0.029″ -169° |
-| D − M′ | 1.1274 | 0.407″ -126° | 0.436″ -114° | 0.435″ -111° |
-| D + M′ | 0.0390 | 0.177″ 46° | 0.177″ 54° | 0.177″ 57° |
-| D − M | 0.0880 | 0.191″ -166° | 0.184″ -168° | 0.176″ -169° |
-| D + M | 0.0748 | 0.069″ -18° | 0.066″ -21° | 0.063″ -22° |
+| D (the barycentre term) | 0.0809 | 0.021″ -91° | 0.011″ -93° | 0.008″ -92° |
+| D − M′ | 1.1274 | 0.041″ -14° | 0.030″ -50° | 0.012″ -84° |
+| D + M′ | 0.0390 | 0.001″ 118° | 0.001″ 139° | 0.001″ 148° |
+| D − M | 0.0880 | 0.000″ -31° | 0.000″ -65° | 0.000″ -81° |
+| D + M | 0.0748 | 0.000″ 93° | 0.001″ 93° | 0.000″ 127° |
 | M′ | 0.0754 | 0.071″ -43° | 0.071″ -32° | 0.071″ -28° |
-| annual (M) | 1.0000 | 0.552″ 109° | 0.762″ 129° | 0.835″ 147° |
-| semi-annual (2M) | 0.5000 | 0.002″ 55° | 0.009″ 180° | 0.018″ 168° |
-| V − E | 1.5987 | 0.232″ 103° | 0.181″ 106° | 0.133″ 107° |
-| 2V − 2E | 0.7993 | 0.514″ -149° | 0.417″ -148° | 0.323″ -147° |
-| 2V − 3E | 3.9834 | 1.204″ 52° | 0.667″ 50° | 0.143″ 57° |
-| 3V − 4E | 1.1408 | 0.827″ -22° | 0.501″ -24° | 0.162″ -17° |
+| annual (M) | 1.0000 | 0.553″ 109° | 0.763″ 129° | 0.835″ 147° |
+| semi-annual (2M) | 0.5000 | 0.002″ 56° | 0.009″ 179° | 0.018″ 169° |
+| V − E | 1.5987 | 0.231″ 103° | 0.181″ 107° | 0.134″ 108° |
+| 2V − 2E | 0.7993 | 0.514″ -149° | 0.417″ -148° | 0.322″ -147° |
+| 2V − 3E | 3.9834 | 1.204″ 52° | 0.668″ 50° | 0.142″ 57° |
+| 3V − 4E | 1.1408 | 0.830″ -21° | 0.491″ -22° | 0.147″ -14° |
 | 3V − 5E | 8.1020 | 0.129″ -45° | 0.143″ 7° | 0.125″ -15° |
-| E − J | 1.0921 | 0.230″ -123° | 0.150″ -123° | 0.095″ -104° |
-| 2E − 2J | 0.5460 | 0.188″ 128° | 0.106″ 126° | 0.059″ 122° |
-| J | 11.8620 | 0.569″ -37° | 0.312″ -16° | 0.107″ 60° |
-| 2E − 2Mars | 1.0677 | 0.129″ 55° | 0.146″ 59° | 0.120″ 55° |
-| the lunar node Ω (nutation) | 18.6130 | 0.771″ -161° | 0.379″ -164° | 0.015″ 159° |
+| E − J | 1.0921 | 0.243″ -122° | 0.142″ -118° | 0.081″ -107° |
+| 2E − 2J | 0.5460 | 0.188″ 128° | 0.105″ 126° | 0.059″ 122° |
+| J | 11.8620 | 0.569″ -38° | 0.312″ -17° | 0.108″ 60° |
+| 2E − 2Mars | 1.0677 | 0.126″ 55° | 0.144″ 59° | 0.122″ 54° |
+| the lunar node Ω (nutation) | 18.6130 | 0.770″ -161° | 0.380″ -164° | 0.014″ 158° |
 
-Window rms: 2.752″ (-2500…-2200, n 10,957); 4.753″ (-400…-100, n 10,957); 1.627″ (1700…2000, n 10,958). The direct weighted least-squares fit of a cosine/sine pair at each named frequency; amplitude in arcseconds of longitude, phase of the record − model difference.
+Window rms: 2.730″ (-2500…-2200, n 10,957); 4.739″ (-400…-100, n 10,957); 1.586″ (1700…2000, n 10,958). The direct weighted least-squares fit of a cosine/sine pair at each named frequency; amplitude in arcseconds of longitude, phase of the record − model difference.
 <!-- /generated:doc112-sun-named -->
 
 ## 6. The cardinal instants and the gate's own interpolation
@@ -216,24 +237,28 @@ to the former: the tier's own part is two seconds rms. Yet the dense residual ho
 fraction of that at the alias. The one quantity left is the crossing instant: Horizons' longitude
 carries the 6.44″ barycentre wobble with a 29.5-day period, and a cubic across thirty days
 follows it to a few arcseconds, in step with the Moon's phase. With the wobble removed before the
-interpolation the line falls from <!--v:cardinalGateInterpolationLineMin-->0.53<!--/v--> to
-<!--v:cardinalGateInterpolationLineDewobbledMin-->0.07<!--/v--> min and the doublet vanishes; the
+interpolation the line falls from <!--v:cardinalGateInterpolationLineMin-->0.52<!--/v--> to
+<!--v:cardinalGateInterpolationLineDewobbledMin-->0.01<!--/v--> min and the doublet vanishes; the
 Venus and D − M′ lines, which are the Sun's, do not move. The gate's cardinal statistic was in part
-its own instrument (doc 111 §1.5's class).
+its own instrument (doc 111 §1.5's class). Since the follow-up the gate, this series and the probes'
+split read the de-wobbled crossing from one home (`tools/lib/horizons-crossing.js`): the gate's
+cardinal sd is <!--v:cardinalVsHorizonsSdMin-->0.90<!--/v--> min, the 2.715-yr line is gone from
+the four series (the table below), and the three-method comparison stays as the record of what the
+bare cubic carried.
 
 <!-- generated:doc112-cardinal -->
 | cardinal type | n | rms total (min) | the apparent Sun's part | the cardinal tier's part | 2.715 yr: total / Sun / tier (min) | 6.40-yr doublet: total / Sun / tier (min) |
 |:---|---:|---:|---:|---:|:---|:---|
-| VE | 6,000 | 1.339 | 1.319 | 0.026 | 0.538 / 0.531 / 0.006 | 0.207 / 0.205 / 0.002 |
-| SS | 6,000 | 1.410 | 1.371 | 0.040 | 0.563 / 0.547 / 0.016 | 0.196 / 0.190 / 0.005 |
-| AE | 6,000 | 1.500 | 1.525 | 0.030 | 0.495 / 0.500 / 0.005 | 0.207 / 0.209 / 0.003 |
-| WS | 6,000 | 1.467 | 1.511 | 0.044 | 0.460 / 0.473 / 0.013 | 0.197 / 0.203 / 0.006 |
+| VE | 6,000 | 1.257 | 1.238 | 0.024 | 0.011 / 0.010 / 0.000 | 0.008 / 0.008 / 0.000 |
+| SS | 6,000 | 1.326 | 1.290 | 0.037 | 0.011 / 0.011 / 0.000 | 0.004 / 0.004 / 0.000 |
+| AE | 6,000 | 1.435 | 1.460 | 0.029 | 0.018 / 0.018 / 0.001 | 0.006 / 0.006 / 0.000 |
+| WS | 6,000 | 1.407 | 1.449 | 0.043 | 0.005 / 0.005 / 0.000 | 0.005 / 0.005 / 0.000 |
 
 | the Horizons crossing found by (VE) | rms of the Sun's part (min) | 2.715 yr (min) | 6.3988 yr | 6.4245 yr | 2V − 3E alias 3.98 yr | D − M′ alias 8.85 yr |
 |:---|---:|---:|---:|---:|---:|---:|
-| a Lagrange cubic through four 10-d rows (the gate) | 1.319 | 0.531 | 0.205 | 0.208 | 0.344 | 0.168 |
-| a quintic through six rows | 1.260 | 0.361 | 0.143 | 0.145 | 0.344 | 0.168 |
-| the cubic on the longitude with the 6.44″ barycentre wobble removed first | 1.244 | 0.071 | 0.008 | 0.006 | 0.345 | 0.169 |
+| a Lagrange cubic through four 10-d rows (the gate) | 1.313 | 0.522 | 0.205 | 0.208 | 0.344 | 0.002 |
+| a quintic through six rows | 1.253 | 0.348 | 0.143 | 0.145 | 0.344 | 0.002 |
+| the cubic on the longitude with the 6.44″ barycentre wobble removed first | 1.238 | 0.010 | 0.008 | 0.006 | 0.344 | 0.001 |
 <!-- /generated:doc112-cardinal -->
 
 ## 7. The lunar canon and the event's definition
@@ -444,9 +469,9 @@ interval with edges — the Pangaea dissipation episode — not a period. Hypoth
 | the sweep's counts | |
 |:---|---:|
 | residual series analysed | 33 |
-| lines above the red-noise floor (p < 0.01 over each grid), span-scale families excluded | 63 |
-| of them named by an astronomical argument or a primary-family mixing tone within half the resolution | 47 |
-| span-scale families (a smooth curvature's Fourier terms, ≤ 6 cycles of the span) | 33 |
+| lines above the red-noise floor (p < 0.01 over each grid), span-scale families excluded | 40 |
+| of them named by an astronomical argument or a primary-family mixing tone within half the resolution | 24 |
+| span-scale families (a smooth curvature's Fourier terms, ≤ 6 cycles of the span) | 25 |
 | lines above the floor the classifiers did not name, read against the probes (§3–§5) | 16 |
 | lines standing against their record with physics the instruments do not supply (one series each) | 0 |
 | lines that stood with named physics and were closed by a follow-up | 1 |

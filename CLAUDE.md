@@ -103,7 +103,13 @@ Each line names the rule; doc 111 §1.n carries the measurement.
 - **Capture a baseline before touching shared machinery.** (§1.5)
 - **The solar-measurements check is the WINDOW CSV** — `npm run fit:6a2` +
   `npm run check:csv-smoke`, regenerated whenever the engine's frame of date
-  moves; the 160 MB full-period file is retired. (§1.6)
+  moves; the 160 MB full-period file is retired. The local CSV went 6.3 s
+  stale at −3997 unseen while the full compare stayed out of the chain, so
+  `check:csv-smoke:short` (one window around 2000, 1980..2020, ~10 s — the
+  exporter seeds at J2000 and chains outward, so only a window containing
+  2000 is cheap; the compare is bit-exact at 86 µs, where any Sun, frame or
+  clock change in the era shows) sits in `npm run check` and fails by name;
+  it SKIPs where the gitignored CSV is absent. (§1.6)
 - **Coefficients, runtime evaluation form AND numerics are a MATCHED PAIR** —
   never ship one without the other (~1162-minute-class error). (§1.7)
 - **The braid law's counter-rotating sign is physics, not convention.** (§1.8)
@@ -361,7 +367,9 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   sampled every 10 days and interpolated with a cubic across its own 29.5-d
   barycentre wobble gave every cardinal series a 0.5-min line at 2.715 yr (the
   Moon's elongation aliased by the yearly sampling) — the gate's, not the
-  Sun's: take the known oscillation out before interpolating. The lunar canon
+  Sun's: take the known oscillation out before interpolating (the crossing
+  finder has ONE home, `tools/lib/horizons-crossing.js`, since the follow-up —
+  the gate's cardinal sd 1.01 → 0.90 min). The lunar canon
   residual's 7-min line at 3.617 yr was the twelfth harmonic of F under
   full-moon sampling — a residual LINEAR in the node distance, i.e. an EVENT
   DEFINITION (the finder's opposition against the canon's greatest eclipse;
@@ -373,7 +381,10 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   either way; the canon's rule ships: tight recall 82 → 98 %, the 1600–2200
   dynamical residual 9.8 → 0.9 min). The Sun's Σk ≠ 0 planetary arguments drift 0.51° per century
   outside their fit window and its barycentre term lacks the D ± M′ sidebands
-  (0.43″, 0.18″) — §1.15 measured. UNDER the definition term one line stood
+  (0.43″, 0.18″) — §1.15 measured (the sidebands were the lunar equation's
+  own: derived since on the model's Moon, ≤ 0.04″; the drift read per
+  COMPOSED family is family-specific, 0.18–0.58°/cy per unit Σk — not a
+  frame rate, not the carriers — and stays recorded). UNDER the definition term one line stood
   with physics the instruments do not supply: a 5-min full-moon-cycle pair a
   probe had missed because its grid stopped short of the line, and the one-term
   node regression had half-absorbed (sin 2F correlates with sin M′ under

@@ -3464,13 +3464,13 @@
    "tMin": -2999.5,
    "tMax": 2999.5,
    "unit": "″ (yearly mean)",
-   "rms": 3.242671140821033,
-   "rmsRaw": 3.242671140821033,
+   "rms": 3.2423756331775313,
+   "rmsRaw": 3.2423756331775313,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.9358740107001515,
-    "tau": 15.08877886277201
+    "rho": 0.9359647943493419,
+    "tau": 15.110895213738411
    },
    "grid": {
     "fMin": 0.00004167361226871145,
@@ -3478,20 +3478,20 @@
     "nFreq": 11998,
     "oversample": 4
    },
-   "floorAr1p99": 0.08066751625419849,
+   "floorAr1p99": 0.08078567234387043,
    "floorWhitep99": 0.004335349204757383,
    "surrogates": 1000,
    "linesAboveAr1": 1,
    "lines": [
     {
      "periodYears": 2666.2222222222217,
-     "amplitude": 0.9432533977850164,
-     "power": 0.10889434998863867,
-     "overAr1Floor": 1.349915741120529,
-     "overWhiteFloor": 25.11778056289993,
-     "amplitudeInterior": 0.39951170471919395,
-     "amplitudeFirstHalf": 1.0464502414607437,
-     "amplitudeSecondHalf": 1.8845469791791596,
+     "amplitude": 0.9432625845486228,
+     "power": 0.1089456443924996,
+     "overAr1Floor": 1.3485763159680602,
+     "overWhiteFloor": 25.12961222891766,
+     "amplitudeInterior": 0.3995213441620697,
+     "amplitudeFirstHalf": 1.0464143721577013,
+     "amplitudeSecondHalf": 1.8845913611874519,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -3517,13 +3517,13 @@
    "tMin": -2499.986310746064,
    "tMax": -2200.0273785078716,
    "unit": "″",
-   "rms": 2.752243128017383,
-   "rmsRaw": 2.752243128017383,
+   "rms": 2.7304471115306708,
+   "rmsRaw": 2.7304471115306708,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.9705308512419633,
-    "tau": 0.915299125863542
+    "rho": 0.991144561632885,
+    "tau": 3.078007285960797
    },
    "grid": {
     "fMin": 0.0008334474260679092,
@@ -3531,55 +3531,25 @@
     "nFreq": 3999,
     "oversample": 4
    },
-   "floorAr1p99": 0.09452232667740325,
+   "floorAr1p99": 0.2519941662907291,
    "floorWhitep99": 0.0022374207455816046,
    "surrogates": 1000,
-   "linesAboveAr1": 3,
+   "linesAboveAr1": 1,
    "lines": [
     {
      "periodYears": 3.9861652124676596,
-     "amplitude": 1.198591054744668,
-     "power": 0.28763368209447854,
-     "overAr1Floor": 3.0430237194239633,
-     "overWhiteFloor": 128.55591987447573,
-     "amplitudeInterior": 1.1984339241661897,
-     "amplitudeFirstHalf": 1.2092265522663792,
-     "amplitudeSecondHalf": 1.1985514173354386,
+     "amplitude": 1.1983713912105616,
+     "power": 0.30203788117143343,
+     "overAr1Floor": 1.198590767466292,
+     "overWhiteFloor": 134.99377878205934,
+     "amplitudeInterior": 1.1976629271714367,
+     "amplitudeFirstHalf": 1.209349137075366,
+     "amplitudeSecondHalf": 1.1978150260550198,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": false,
      "named": "2V − 3E"
-    },
-    {
-     "periodYears": 1.1405282594607928,
-     "amplitude": 0.8166888875955959,
-     "power": 0.1334487855451171,
-     "overAr1Floor": 1.4118229019114878,
-     "overWhiteFloor": 59.64402797669951,
-     "amplitudeInterior": 0.8519382637443468,
-     "amplitudeFirstHalf": 0.7798319937070656,
-     "amplitudeSecondHalf": 0.8763482296718008,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "3V − 4E"
-    },
-    {
-     "periodYears": 18.459011214657995,
-     "amplitude": 0.7712900606574274,
-     "power": 0.11817035327818175,
-     "overAr1Floor": 1.2501845588448879,
-     "overWhiteFloor": 52.81543648486375,
-     "amplitudeInterior": 0.7733821100012007,
-     "amplitudeFirstHalf": 0.7497670134838866,
-     "amplitudeSecondHalf": 0.793058760039071,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the lunar node Ω (nutation)"
     }
    ]
   },
@@ -3600,13 +3570,13 @@
    "tMin": -399.9863107460642,
    "tMax": -100.02737850787116,
    "unit": "″",
-   "rms": 4.752723134774538,
-   "rmsRaw": 4.752723134774538,
+   "rms": 4.738789104935951,
+   "rmsRaw": 4.738789104935951,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.9504199946637552,
-    "tau": 0.5384033828500937
+    "rho": 0.9861274429917365,
+    "tau": 1.9598521562408617
    },
    "grid": {
     "fMin": 0.0008334474260679079,
@@ -3614,20 +3584,20 @@
     "nFreq": 3999,
     "oversample": 4
    },
-   "floorAr1p99": 0.06328269674906704,
+   "floorAr1p99": 0.17819299659818202,
    "floorWhitep99": 0.0022374207455919254,
    "surrogates": 1000,
-   "linesAboveAr1": 6,
+   "linesAboveAr1": 2,
    "lines": [
     {
      "periodYears": 0.9998631074606246,
-     "amplitude": 0.7543119329768446,
-     "power": 0.20845133677048047,
-     "overAr1Floor": 3.293970508195095,
-     "overWhiteFloor": 93.165908638848,
-     "amplitudeInterior": 0.7716358852065288,
-     "amplitudeFirstHalf": 0.6844159927047784,
-     "amplitudeSecondHalf": 0.834483001993523,
+     "amplitude": 0.7547195875872077,
+     "power": 0.2308378784850975,
+     "overAr1Floor": 1.295437435207555,
+     "overWhiteFloor": 103.17142135196735,
+     "amplitudeInterior": 0.7735330360542434,
+     "amplitudeFirstHalf": 0.6846856614707663,
+     "amplitudeSecondHalf": 0.835008461866356,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -3636,78 +3606,18 @@
     },
     {
      "periodYears": 3.9861652124676605,
-     "amplitude": 0.6659740023772315,
-     "power": 0.16259783453612084,
-     "overAr1Floor": 2.5693885199119295,
-     "overWhiteFloor": 72.67199736860599,
-     "amplitudeInterior": 0.6668317824417127,
-     "amplitudeFirstHalf": 0.6873448454334478,
-     "amplitudeSecondHalf": 0.6485708750358959,
+     "amplitude": 0.6661807813735362,
+     "power": 0.17997698559625455,
+     "overAr1Floor": 1.010011555067427,
+     "overWhiteFloor": 80.43949085161466,
+     "amplitudeInterior": 0.6676057051002195,
+     "amplitudeFirstHalf": 0.6877788264157589,
+     "amplitudeSecondHalf": 0.6486632681105867,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": false,
      "named": "2V − 3E"
-    },
-    {
-     "periodYears": 1.1405282594607928,
-     "amplitude": 0.49113922335044397,
-     "power": 0.08837725910834704,
-     "overAr1Floor": 1.3965469812196327,
-     "overWhiteFloor": 39.499615475750055,
-     "amplitudeInterior": 0.4550432420473655,
-     "amplitudeFirstHalf": 0.4522606236861206,
-     "amplitudeSecondHalf": 0.5580758476651599,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "3V − 4E"
-    },
-    {
-     "periodYears": 239.96714579055444,
-     "amplitude": 0.47277198473950777,
-     "power": 0.08058251764303884,
-     "overAr1Floor": 1.2733736358071188,
-     "overWhiteFloor": 36.01580873950472,
-     "amplitudeInterior": 0.4678798158231279,
-     "amplitudeFirstHalf": 0.5983444571002531,
-     "amplitudeSecondHalf": 0.42755127149561517,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": true,
-     "named": null
-    },
-    {
-     "periodYears": 1.127665158790182,
-     "amplitude": 0.4278755771114333,
-     "power": 0.0670768784213223,
-     "overAr1Floor": 1.059956068043374,
-     "overWhiteFloor": 29.979555053949696,
-     "amplitudeInterior": 0.3789174042617757,
-     "amplitudeFirstHalf": 0.3705335420678787,
-     "amplitudeSecondHalf": 0.5169319418165038,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "D − M′"
-    },
-    {
-     "periodYears": 0.7993575809145738,
-     "amplitude": 0.41650681772641757,
-     "power": 0.06354845405333444,
-     "overAr1Floor": 1.0041995255878742,
-     "overWhiteFloor": 28.402549756694174,
-     "amplitudeInterior": 0.4210447865192323,
-     "amplitudeFirstHalf": 0.41558798230965155,
-     "amplitudeSecondHalf": 0.4168403830974036,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "2V − 2E"
     }
    ]
   },
@@ -3728,13 +3638,13 @@
    "tMin": 1700,
    "tMax": 1999.9863107460644,
    "unit": "″",
-   "rms": 1.626621159838617,
-   "rmsRaw": 1.626621159838617,
+   "rms": 1.5864970764376929,
+   "rmsRaw": 1.5864970764376929,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.9355279991563883,
-    "tau": 0.4108160378142298
+    "rho": 0.9824190533905383,
+    "tau": 1.543553197755866
    },
    "grid": {
     "fMin": 0.0008333713607739342,
@@ -3742,20 +3652,20 @@
     "nFreq": 3999,
     "oversample": 4
    },
-   "floorAr1p99": 0.050162278360514116,
+   "floorAr1p99": 0.1519188941885839,
    "floorWhitep99": 0.0023022202238163272,
    "surrogates": 1000,
-   "linesAboveAr1": 4,
+   "linesAboveAr1": 2,
    "lines": [
     {
      "periodYears": 0.9999543691535774,
-     "amplitude": 0.8341569669962495,
-     "power": 0.3562163712096454,
-     "overAr1Floor": 7.101279743506342,
-     "overWhiteFloor": 154.72732257522927,
-     "amplitudeInterior": 0.8444701252528091,
-     "amplitudeFirstHalf": 0.8582687534124647,
-     "amplitudeSecondHalf": 0.8129596838195675,
+     "amplitude": 0.83375876079842,
+     "power": 0.4099775598293658,
+     "overAr1Floor": 2.6986607690840736,
+     "overWhiteFloor": 178.07921048915,
+     "amplitudeInterior": 0.8438462491016487,
+     "amplitudeFirstHalf": 0.8577847732552211,
+     "amplitudeSecondHalf": 0.812653718140864,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -3764,111 +3674,66 @@
     },
     {
      "periodYears": 399.98174766141926,
-     "amplitude": 0.6315762856326212,
-     "power": 0.2275681108937398,
-     "overAr1Floor": 4.536638253514277,
-     "overWhiteFloor": 98.84723821794354,
-     "amplitudeInterior": 0.6887896794397043,
-     "amplitudeFirstHalf": 0.7349550563413516,
-     "amplitudeSecondHalf": 0.7565752296424749,
+     "amplitude": 0.6310622974692447,
+     "power": 0.26169290718197413,
+     "overAr1Floor": 1.7225830176009753,
+     "overWhiteFloor": 113.66979773471583,
+     "amplitudeInterior": 0.6896418239129557,
+     "amplitudeFirstHalf": 0.7346172038920082,
+     "amplitudeSecondHalf": 0.7543399529623996,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": true,
      "named": null
-    },
-    {
-     "periodYears": 1.1267091483420544,
-     "amplitude": 0.4240444217554993,
-     "power": 0.09199197015563552,
-     "overAr1Floor": 1.8338873983054205,
-     "overWhiteFloor": 39.95793677945499,
-     "amplitudeInterior": 0.39466884282617215,
-     "amplitudeFirstHalf": 0.43175301312161557,
-     "amplitudeSecondHalf": 0.434485642873841,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "D − M′"
-    },
-    {
-     "periodYears": 0.7994305416284269,
-     "amplitude": 0.3215595060730269,
-     "power": 0.05291218896057934,
-     "overAr1Floor": 1.0548202890686451,
-     "overWhiteFloor": 22.98311361059467,
-     "amplitudeInterior": 0.3207665072035502,
-     "amplitudeFirstHalf": 0.3270228399423414,
-     "amplitudeSecondHalf": 0.3157048767057681,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "2V − 2E"
     }
    ]
   },
   "cardinal-VE-horizons": {
    "id": "cardinal-VE-horizons",
    "meta": {
-    "record": "Horizons VE crossings (the gate's cubic through the 10-d rows)",
+    "record": "Horizons VE crossings (the gate's cubic through the 10-d rows, the barycentre wobble removed first)",
     "model": "cardinal.jd(year, type) on the finder axis UT + bridge + curve",
     "unit": "min",
     "cadence": "1 yr",
     "span": [
-     -2999.6759905519566,
-     2999.195018995867
+     -2999.675990974344,
+     2999.19501901892
     ]
    },
    "n": 6000,
-   "span": 5998.871009547824,
-   "tMin": -2999.6759905519566,
-   "tMax": 2999.195018995867,
+   "span": 5998.871009993264,
+   "tMin": -2999.675990974344,
+   "tMax": 2999.19501901892,
    "unit": "min",
-   "rms": 1.339077590174705,
-   "rmsRaw": 1.339077590174705,
+   "rms": 1.2573777606228633,
+   "rmsRaw": 1.2573777606228633,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.5543820287604497,
-    "tau": 1.6951625422146472
+    "rho": 0.7889741973306685,
+    "tau": 4.2189329490794965
    },
    "grid": {
-    "fMin": 0.00004167450835367174,
-    "fMax": 0.4999690767191063,
+    "fMin": 0.00004167450835057724,
+    "fMax": 0.4999690766818551,
     "nFreq": 11997,
     "oversample": 4
    },
-   "floorAr1p99": 0.013023830683754116,
-   "floorWhitep99": 0.004357632784699314,
+   "floorAr1p99": 0.027750493793500877,
+   "floorWhitep99": 0.00435763421387564,
    "surrogates": 300,
-   "linesAboveAr1": 10,
+   "linesAboveAr1": 4,
    "lines": [
     {
-     "periodYears": 2.7153427677024884,
-     "amplitude": 0.5378453203309229,
-     "power": 0.15181854980953327,
-     "overAr1Floor": 11.656981228949117,
-     "overWhiteFloor": 34.839684138279004,
-     "amplitudeInterior": 0.5391191948633719,
-     "amplitudeFirstHalf": 0.5607594011483528,
-     "amplitudeSecondHalf": 0.5149616349470454,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the Moon's elongation aliased by the yearly sampling — the GATE's cubic across the barycentre wobble (§6)"
-    },
-    {
-     "periodYears": 3.9839754338681947,
-     "amplitude": 0.37055854778605063,
-     "power": 0.07207390968278425,
-     "overAr1Floor": 5.5340023555964235,
-     "overWhiteFloor": 16.53969327930818,
-     "amplitudeInterior": 0.3609138585376967,
-     "amplitudeFirstHalf": 0.559842547519243,
-     "amplitudeSecondHalf": 0.1812748950648585,
+     "periodYears": 3.983975434164689,
+     "amplitude": 0.37052124823181454,
+     "power": 0.09270602279024359,
+     "overAr1Floor": 3.3406981324402665,
+     "overWhiteFloor": 21.274392994035104,
+     "amplitudeInterior": 0.3612321178883792,
+     "amplitudeFirstHalf": 0.5594850955253857,
+     "amplitudeSecondHalf": 0.18155874667787103,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -3876,14 +3741,14 @@
      "named": "2V − 2E (aliased)"
     },
     {
-     "periodYears": 2666.1648931323666,
-     "amplitude": 0.35105816531281253,
-     "power": 0.06767110111736245,
-     "overAr1Floor": 5.195944477516524,
-     "overWhiteFloor": 15.529326233034547,
-     "amplitudeInterior": 0.11051280315059467,
-     "amplitudeFirstHalf": 0.44785114401774995,
-     "amplitudeSecondHalf": 0.6965029846555222,
+     "periodYears": 2666.1648933303395,
+     "amplitude": 0.3507219570310859,
+     "power": 0.08689331833491556,
+     "overAr1Floor": 3.131235032483128,
+     "overWhiteFloor": 19.94048010230612,
+     "amplitudeInterior": 0.11054609398762502,
+     "amplitudeFirstHalf": 0.44745531435394903,
+     "amplitudeSecondHalf": 0.6964258051345132,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -3891,14 +3756,14 @@
      "named": null
     },
     {
-     "periodYears": 1845.8064644762537,
-     "amplitude": 0.2544456777799984,
-     "power": 0.03466904858282045,
-     "overAr1Floor": 2.6619701549150596,
-     "overWhiteFloor": 7.9559362378013425,
-     "amplitudeInterior": 0.21824075367045428,
-     "amplitudeFirstHalf": 0.15186005498198266,
-     "amplitudeSecondHalf": 0.3067034235978069,
+     "periodYears": 1845.806464613312,
+     "amplitude": 0.25470768787747783,
+     "power": 0.044693818965106324,
+     "overAr1Floor": 1.6105594119400335,
+     "overWhiteFloor": 10.25644117232044,
+     "amplitudeInterior": 0.21796225323441326,
+     "amplitudeFirstHalf": 0.15239865499609956,
+     "amplitudeSecondHalf": 0.3067349624216019,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -3906,157 +3771,67 @@
      "named": null
     },
     {
-     "periodYears": 1333.0824465661829,
-     "amplitude": 0.23065812853148743,
-     "power": 0.02764270719737349,
-     "overAr1Floor": 2.1224713272612576,
-     "overWhiteFloor": 6.343514601421583,
-     "amplitudeInterior": 0.10100672326606998,
-     "amplitudeFirstHalf": 0.2289891814738354,
-     "amplitudeSecondHalf": 0.2570998395111478,
+     "periodYears": 1333.0824466651698,
+     "amplitude": 0.23062174440519495,
+     "power": 0.03555176963564757,
+     "overAr1Floor": 1.281122054987495,
+     "overWhiteFloor": 8.15850250175729,
+     "amplitudeInterior": 0.10090211503126045,
+     "amplitudeFirstHalf": 0.22884835016351351,
+     "amplitudeSecondHalf": 0.25705911885884186,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": true,
      "named": null
-    },
-    {
-     "periodYears": 6.424493718391041,
-     "amplitude": 0.21056777762446058,
-     "power": 0.023271567431020827,
-     "overAr1Floor": 1.7868450532031028,
-     "overWhiteFloor": 5.340414986947233,
-     "amplitudeInterior": 0.1906168270396851,
-     "amplitudeFirstHalf": 0.23230783734259253,
-     "amplitudeSecondHalf": 0.2143536481294368,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the gate's interpolation error, the beat of the wobble with the 10-d grid (§6)"
-    },
-    {
-     "periodYears": 6.39879574351747,
-     "amplitude": 0.2072121255752081,
-     "power": 0.02253515145804074,
-     "overAr1Floor": 1.7303013226477995,
-     "overWhiteFloor": 5.171420487097265,
-     "amplitudeInterior": 0.2103106687503936,
-     "amplitudeFirstHalf": 0.20150873786958157,
-     "amplitudeSecondHalf": 0.21334116485635998,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the gate's interpolation error, the beat of the wobble with the 10-d grid (§6)"
-    },
-    {
-     "periodYears": 8.09564238805401,
-     "amplitude": 0.19113619171803406,
-     "power": 0.019172508695030132,
-     "overAr1Floor": 1.4721097932381644,
-     "overWhiteFloor": 4.399753178457206,
-     "amplitudeInterior": 0.18498277485775108,
-     "amplitudeFirstHalf": 0.2696329967678309,
-     "amplitudeSecondHalf": 0.11290113618836466,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "3V − 4E (aliased)"
-    },
-    {
-     "periodYears": 1090.703819917786,
-     "amplitude": 0.1818329127092158,
-     "power": 0.017236551861702636,
-     "overAr1Floor": 1.3234625265209763,
-     "overWhiteFloor": 3.955485171266443,
-     "amplitudeInterior": 0.10600931041338561,
-     "amplitudeFirstHalf": 0.13777617785116383,
-     "amplitudeSecondHalf": 0.23608243260336395,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": true,
-     "named": null
-    },
-    {
-     "periodYears": 8.847892344466104,
-     "amplitude": 0.1676453071989991,
-     "power": 0.014752005667338303,
-     "overAr1Floor": 1.132693293205962,
-     "overWhiteFloor": 3.385325564635943,
-     "amplitudeInterior": 0.16725454935204728,
-     "amplitudeFirstHalf": 0.17148613539364901,
-     "amplitudeSecondHalf": 0.1684335792627922,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "D − M′ (aliased)"
     }
    ]
   },
   "cardinal-SS-horizons": {
    "id": "cardinal-SS-horizons",
    "meta": {
-    "record": "Horizons SS crossings (the gate's cubic through the 10-d rows)",
+    "record": "Horizons SS crossings (the gate's cubic through the 10-d rows, the barycentre wobble removed first)",
     "model": "cardinal.jd(year, type) on the finder axis UT + bridge + curve",
     "unit": "min",
     "cadence": "1 yr",
     "span": [
-     -2999.4185242845097,
-     2999.4468371630246
+     -2999.41852483802,
+     2999.4468377437797
     ]
    },
    "n": 6000,
-   "span": 5998.865361447534,
-   "tMin": -2999.4185242845097,
-   "tMax": 2999.4468371630246,
+   "span": 5998.8653625818,
+   "tMin": -2999.41852483802,
+   "tMax": 2999.4468377437797,
    "unit": "min",
-   "rms": 1.4101338981176172,
-   "rmsRaw": 1.4101338981176172,
+   "rms": 1.3264146836257524,
+   "rmsRaw": 1.3264146836257524,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.6128860371072703,
-    "tau": 2.0425368158038864
+    "rho": 0.8297865403759419,
+    "tau": 5.359315889658295
    },
    "grid": {
-    "fMin": 0.000041674547591392296,
-    "fMax": 0.4999695474539974,
+    "fMin": 0.00004167454758351247,
+    "fMax": 0.49996954735951543,
     "nFreq": 11997,
     "oversample": 4
    },
-   "floorAr1p99": 0.015246326544485583,
-   "floorWhitep99": 0.004357531247100922,
+   "floorAr1p99": 0.0348171631046508,
+   "floorWhitep99": 0.004357532387492127,
    "surrogates": 300,
-   "linesAboveAr1": 8,
+   "linesAboveAr1": 3,
    "lines": [
     {
-     "periodYears": 2.7153402111337828,
-     "amplitude": 0.5614678638802567,
-     "power": 0.13461349400600242,
-     "overAr1Floor": 8.829241169223845,
-     "overWhiteFloor": 30.892146578538288,
-     "amplitudeInterior": 0.5646174248764713,
-     "amplitudeFirstHalf": 0.5579366575312391,
-     "amplitudeSecondHalf": 0.5697014432895153,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the Moon's elongation aliased by the yearly sampling — the GATE's cubic across the barycentre wobble (§6)"
-    },
-    {
-     "periodYears": 2666.1623828655706,
-     "amplitude": 0.40666762071021645,
-     "power": 0.0730453696418855,
-     "overAr1Floor": 4.791014375085988,
-     "overWhiteFloor": 16.76301683217597,
-     "amplitudeInterior": 0.19303878321500068,
-     "amplitudeFirstHalf": 0.39246009828502443,
-     "amplitudeSecondHalf": 0.8574498248177476,
+     "periodYears": 2666.1623833696895,
+     "amplitude": 0.40625905341682733,
+     "power": 0.09059935115726334,
+     "overAr1Floor": 2.6021462715082975,
+     "overWhiteFloor": 20.79143494545674,
+     "amplitudeInterior": 0.19323644949466717,
+     "amplitudeFirstHalf": 0.39204899944542204,
+     "amplitudeSecondHalf": 0.8574611946145941,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4064,14 +3839,14 @@
      "named": null
     },
     {
-     "periodYears": 3.983310332966982,
-     "amplitude": 0.3956365794002832,
-     "power": 0.06683461971485691,
-     "overAr1Floor": 4.383653958863304,
-     "overWhiteFloor": 15.337725864690512,
-     "amplitudeInterior": 0.4042734032906421,
-     "amplitudeFirstHalf": 0.5601981271897949,
-     "amplitudeSecondHalf": 0.23967463603334013,
+     "periodYears": 3.9833103337190554,
+     "amplitude": 0.3957902714465003,
+     "power": 0.08313391445027829,
+     "overAr1Floor": 2.387727977733299,
+     "overWhiteFloor": 19.078209192180903,
+     "amplitudeInterior": 0.40461487839119836,
+     "amplitudeFirstHalf": 0.5597892045608669,
+     "amplitudeSecondHalf": 0.24045348071523504,
      "stands": true,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4079,233 +3854,68 @@
      "named": "2V − 3E"
     },
     {
-     "periodYears": 1845.8047265992416,
-     "amplitude": 0.28456540677705355,
-     "power": 0.034478983942565704,
-     "overAr1Floor": 2.261461726007459,
-     "overWhiteFloor": 7.912504119277325,
-     "amplitudeInterior": 0.2964960698325651,
-     "amplitudeFirstHalf": 0.13929728360354648,
-     "amplitudeSecondHalf": 0.28655095436117506,
+     "periodYears": 1845.8047269482465,
+     "amplitude": 0.28455033334392704,
+     "power": 0.04284859504391872,
+     "overAr1Floor": 1.2306745071425735,
+     "overWhiteFloor": 9.833224686272315,
+     "amplitudeInterior": 0.29642790623238363,
+     "amplitudeFirstHalf": 0.13986579747934103,
+     "amplitudeSecondHalf": 0.28585516524886595,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": true,
      "named": null
-    },
-    {
-     "periodYears": 1090.7027929904611,
-     "amplitude": 0.22517023414391193,
-     "power": 0.02149970458498116,
-     "overAr1Floor": 1.410156375848932,
-     "overWhiteFloor": 4.933918626351785,
-     "amplitudeInterior": 0.07911022614606322,
-     "amplitudeFirstHalf": 0.1726438519314971,
-     "amplitudeSecondHalf": 0.3014248077371192,
-     "stands": false,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": true,
-     "named": null
-    },
-    {
-     "periodYears": 1411.4977321053027,
-     "amplitude": 0.2167786069673644,
-     "power": 0.02054246520884687,
-     "overAr1Floor": 1.3473714569150979,
-     "overWhiteFloor": 4.714243924817254,
-     "amplitudeInterior": 0.15468566663663422,
-     "amplitudeFirstHalf": 0.2510925304049108,
-     "amplitudeSecondHalf": 0.3486018968022332,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": true,
-     "named": null
-    },
-    {
-     "periodYears": 6.400496517949018,
-     "amplitude": 0.21768242447049796,
-     "power": 0.020232674356517853,
-     "overAr1Floor": 1.3270524081642323,
-     "overWhiteFloor": 4.643150722092632,
-     "amplitudeInterior": 0.20479840283124678,
-     "amplitudeFirstHalf": 0.22637147789830606,
-     "amplitudeSecondHalf": 0.2189866619573697,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the gate's interpolation error, the beat of the wobble with the 10-d grid (§6)"
-    },
-    {
-     "periodYears": 6.4262082072284,
-     "amplitude": 0.2114614087966163,
-     "power": 0.019091021351632487,
-     "overAr1Floor": 1.2521718786442682,
-     "overWhiteFloor": 4.381155353580953,
-     "amplitudeInterior": 0.20711341783179169,
-     "amplitudeFirstHalf": 0.20865521888986568,
-     "amplitudeSecondHalf": 0.22119991457539337,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the gate's interpolation error, the beat of the wobble with the 10-d grid (§6)"
     }
    ]
   },
   "cardinal-AE-horizons": {
    "id": "cardinal-AE-horizons",
    "meta": {
-    "record": "Horizons AE crossings (the gate's cubic through the 10-d rows)",
+    "record": "Horizons AE crossings (the gate's cubic through the 10-d rows, the barycentre wobble removed first)",
     "model": "cardinal.jd(year, type) on the finder axis UT + bridge + curve",
     "unit": "min",
     "cadence": "1 yr",
     "span": [
-     -2999.172349811047,
-     2999.703973188739
+     -2999.172350027432,
+     2999.703974306767
     ]
    },
    "n": 6000,
-   "span": 5998.876322999786,
-   "tMin": -2999.172349811047,
-   "tMax": 2999.703973188739,
+   "span": 5998.876324334199,
+   "tMin": -2999.172350027432,
+   "tMax": 2999.703974306767,
    "unit": "min",
-   "rms": 1.49975411925356,
-   "rmsRaw": 1.49975411925356,
+   "rms": 1.4352544042590922,
+   "rmsRaw": 1.4352544042590922,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.6962174901669884,
-    "tau": 2.761663114842138
+    "rho": 0.9068251654136097,
+    "tau": 10.224151720653365
    },
    "grid": {
-    "fMin": 0.00004167447144084236,
-    "fMax": 0.4999686338756811,
+    "fMin": 0.000041674471431572126,
+    "fMax": 0.49996863376446454,
     "nFreq": 11997,
     "oversample": 4
    },
-   "floorAr1p99": 0.019820784848100025,
-   "floorWhitep99": 0.004357488339140584,
+   "floorAr1p99": 0.061448541586196496,
+   "floorWhitep99": 0.004357488175076702,
    "surrogates": 300,
-   "linesAboveAr1": 8,
+   "linesAboveAr1": 1,
    "lines": [
     {
-     "periodYears": 2.715345172796407,
-     "amplitude": 0.49580120117152254,
-     "power": 0.12077421023324893,
-     "overAr1Floor": 6.093311196242871,
-     "overWhiteFloor": 27.71647353554798,
-     "amplitudeInterior": 0.49543424681212705,
-     "amplitudeFirstHalf": 0.4715636528487256,
-     "amplitudeSecondHalf": 0.5221084911285041,
+     "periodYears": 2666.167255259644,
+     "amplitude": 0.4121055498321488,
+     "power": 0.10595984425359618,
+     "overAr1Floor": 1.724367113008887,
+     "overWhiteFloor": 24.316725598855136,
+     "amplitudeInterior": 0.21193432585659222,
+     "amplitudeFirstHalf": 0.393041665326133,
+     "amplitudeSecondHalf": 0.8142399174053353,
      "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the Moon's elongation aliased by the yearly sampling — the GATE's cubic across the barycentre wobble (§6)"
-    },
-    {
-     "periodYears": 2666.167254666571,
-     "amplitude": 0.41236187982436356,
-     "power": 0.08634789674715203,
-     "overAr1Floor": 4.356431766395423,
-     "overWhiteFloor": 19.815978845323126,
-     "amplitudeInterior": 0.21172573265005842,
-     "amplitudeFirstHalf": 0.3932785017160597,
-     "amplitudeSecondHalf": 0.8142135906570999,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": true,
-     "named": null
-    },
-    {
-     "periodYears": 1845.8080993845495,
-     "amplitude": 0.2922430704882458,
-     "power": 0.043106540165455905,
-     "overAr1Floor": 2.1748149982864073,
-     "overWhiteFloor": 9.892519912963827,
-     "amplitudeInterior": 0.18816729790634576,
-     "amplitudeFirstHalf": 0.2207460513954345,
-     "amplitudeSecondHalf": 0.3305488591764409,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": true,
-     "named": null
-    },
-    {
-     "periodYears": 3.982656479999625,
-     "amplitude": 0.2172708502670716,
-     "power": 0.02319042746317618,
-     "overAr1Floor": 1.1700055089089554,
-     "overWhiteFloor": 5.321971204115711,
-     "amplitudeInterior": 0.21893013163253572,
-     "amplitudeFirstHalf": 0.2850037605929268,
-     "amplitudeSecondHalf": 0.1538326717483286,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "2V − 3E"
-    },
-    {
-     "periodYears": 1333.0836273332861,
-     "amplitude": 0.2171037997344762,
-     "power": 0.022923871673105077,
-     "overAr1Floor": 1.156557212481044,
-     "overWhiteFloor": 5.260799315788024,
-     "amplitudeInterior": 0.14990785906691573,
-     "amplitudeFirstHalf": 0.16088181512108043,
-     "amplitudeSecondHalf": 0.30503486277450975,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": true,
-     "named": null
-    },
-    {
-     "periodYears": 6.424499408835211,
-     "amplitude": 0.20691650227328237,
-     "power": 0.021034650278309332,
-     "overAr1Floor": 1.0612420466450734,
-     "overWhiteFloor": 4.827241897440841,
-     "amplitudeInterior": 0.20167512328371104,
-     "amplitudeFirstHalf": 0.19486674820001773,
-     "amplitudeSecondHalf": 0.22348195321972217,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the gate's interpolation error, the beat of the wobble with the 10-d grid (§6)"
-    },
-    {
-     "periodYears": 6.398801411199864,
-     "amplitude": 0.2065797781274636,
-     "power": 0.02096708022340302,
-     "overAr1Floor": 1.0578329962253172,
-     "overWhiteFloor": 4.8117352455241,
-     "amplitudeInterior": 0.1944524519001559,
-     "amplitudeFirstHalf": 0.22113722863273194,
-     "amplitudeSecondHalf": 0.20531074325034676,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the gate's interpolation error, the beat of the wobble with the 10-d grid (§6)"
-    },
-    {
-     "periodYears": 1090.7047859999616,
-     "amplitude": 0.2064858495591015,
-     "power": 0.0208015579094031,
-     "overAr1Floor": 1.0494820497179802,
-     "overWhiteFloor": 4.773749529644349,
-     "amplitudeInterior": 0.09543622680455555,
-     "amplitudeFirstHalf": 0.1755837605346742,
-     "amplitudeSecondHalf": 0.25902485066395287,
-     "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": true,
@@ -4316,63 +3926,48 @@
   "cardinal-WS-horizons": {
    "id": "cardinal-WS-horizons",
    "meta": {
-    "record": "Horizons WS crossings (the gate's cubic through the 10-d rows)",
+    "record": "Horizons WS crossings (the gate's cubic through the 10-d rows, the barycentre wobble removed first)",
     "model": "cardinal.jd(year, type) on the finder axis UT + bridge + curve",
     "unit": "min",
     "cadence": "1 yr",
     "span": [
-     -2999.929690889099,
-     2999.9520451708836
+     -2999.929691004845,
+     2999.9520462713463
     ]
    },
    "n": 6001,
-   "span": 5999.881736059982,
-   "tMin": -2999.929690889099,
-   "tMax": 2999.9520451708836,
+   "span": 5999.881737276191,
+   "tMin": -2999.929691004845,
+   "tMax": 2999.9520462713463,
    "unit": "min",
-   "rms": 1.467249912665825,
-   "rmsRaw": 1.467249912665825,
+   "rms": 1.4071373720314007,
+   "rmsRaw": 1.4071373720314007,
    "detrend": "none",
    "trend": null,
    "ar1": {
-    "rho": 0.6736604200835404,
-    "tau": 2.5314090319417635
+    "rho": 0.8918194276093115,
+    "tau": 8.734092888611986
    },
    "grid": {
-    "fMin": 0.00004166748796021614,
-    "fMax": 0.499968188034539,
+    "fMin": 0.000041667487951769904,
+    "fMax": 0.49996818793318004,
     "nFreq": 11999,
     "oversample": 4
    },
-   "floorAr1p99": 0.01734445978681944,
-   "floorWhitep99": 0.004369303661293528,
+   "floorAr1p99": 0.052756967499967465,
+   "floorWhitep99": 0.004369298822547068,
    "surrogates": 300,
-   "linesAboveAr1": 7,
+   "linesAboveAr1": 2,
    "lines": [
     {
-     "periodYears": 2.715185761312567,
-     "amplitude": 0.46480663933505173,
-     "power": 0.12584770094354997,
-     "overAr1Floor": 7.255786717507645,
-     "overWhiteFloor": 28.802690474090983,
-     "amplitudeInterior": 0.4615926719823344,
-     "amplitudeFirstHalf": 0.4772061077455786,
-     "amplitudeSecondHalf": 0.4550277389312435,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the Moon's elongation aliased by the yearly sampling — the GATE's cubic across the barycentre wobble (§6)"
-    },
-    {
-     "periodYears": 2666.6141049155476,
-     "amplitude": 0.3639523431625726,
-     "power": 0.08056302460162365,
-     "overAr1Floor": 4.64488520206584,
-     "overWhiteFloor": 18.438412810560536,
-     "amplitudeInterior": 0.14117224698445918,
-     "amplitudeFirstHalf": 0.4441371788906317,
-     "amplitudeSecondHalf": 0.6729152738672234,
+     "periodYears": 2666.614105456085,
+     "amplitude": 0.3634473798367127,
+     "power": 0.10056758835272857,
+     "overAr1Floor": 1.906242779264949,
+     "overWhiteFloor": 23.01687122743027,
+     "amplitudeInterior": 0.14134310844588355,
+     "amplitudeFirstHalf": 0.4437530681274829,
+     "amplitudeSecondHalf": 0.6728221178545541,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
@@ -4380,79 +3975,19 @@
      "named": null
     },
     {
-     "periodYears": 1714.251924588566,
-     "amplitude": 0.30772041450037224,
-     "power": 0.05426488548601233,
-     "overAr1Floor": 3.1286581509589477,
-     "overWhiteFloor": 12.419572932577376,
-     "amplitudeInterior": 0.05099171952668447,
-     "amplitudeFirstHalf": 0.2625763051656226,
-     "amplitudeSecondHalf": 0.45106525429472816,
+     "periodYears": 1714.2519249360544,
+     "amplitude": 0.30751698071741485,
+     "power": 0.0678392325450532,
+     "overAr1Floor": 1.2858819556885075,
+     "overWhiteFloor": 15.526343081635817,
+     "amplitudeInterior": 0.05123424633762936,
+     "amplitudeFirstHalf": 0.26237024521175256,
+     "amplitudeSecondHalf": 0.45106066105836706,
      "stands": false,
      "aboveAr1": true,
      "aboveWhite": true,
      "longFamily": true,
      "named": null
-    },
-    {
-     "periodYears": 1333.3070524577734,
-     "amplitude": 0.23281933040844774,
-     "power": 0.03125732614525836,
-     "overAr1Floor": 1.8021504578085341,
-     "overWhiteFloor": 7.1538461430727525,
-     "amplitudeInterior": 0.10749364331793358,
-     "amplitudeFirstHalf": 0.18635895253262544,
-     "amplitudeSecondHalf": 0.33198591364796226,
-     "stands": false,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": true,
-     "named": null
-    },
-    {
-     "periodYears": 6.423856248457594,
-     "amplitude": 0.20494855599342288,
-     "power": 0.02447324615480717,
-     "overAr1Floor": 1.4110123033872237,
-     "overWhiteFloor": 5.601177682295006,
-     "amplitudeInterior": 0.20302914426402277,
-     "amplitudeFirstHalf": 0.20559140265528295,
-     "amplitudeSecondHalf": 0.20507290144523455,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the gate's interpolation error, the beat of the wobble with the 10-d grid (§6)"
-    },
-    {
-     "periodYears": 6.398167673750351,
-     "amplitude": 0.20337460408930014,
-     "power": 0.024092193361915912,
-     "overAr1Floor": 1.3890425910078947,
-     "overWhiteFloor": 5.5139663501399765,
-     "amplitudeInterior": 0.1871489118272371,
-     "amplitudeFirstHalf": 0.2147901767585442,
-     "amplitudeSecondHalf": 0.21240681430343264,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "the gate's interpolation error, the beat of the wobble with the 10-d grid (§6)"
-    },
-    {
-     "periodYears": 8.099739096941608,
-     "amplitude": 0.19030128017331574,
-     "power": 0.02109366978920259,
-     "overAr1Floor": 1.2161618204582125,
-     "overWhiteFloor": 4.827695995603526,
-     "amplitudeInterior": 0.1936196739039363,
-     "amplitudeFirstHalf": 0.27424271838022646,
-     "amplitudeSecondHalf": 0.10607049056018815,
-     "stands": true,
-     "aboveAr1": true,
-     "aboveWhite": true,
-     "longFamily": false,
-     "named": "3V − 4E (aliased)"
     }
    ]
   },
@@ -5131,115 +4666,115 @@
      -2200
     ],
     "n": 10957,
-    "rmsArcsec": 2.752243128017383,
+    "rmsArcsec": 2.7304471115306708,
     "terms": [
      {
       "label": "D (the barycentre term)",
       "periodYears": 0.08085034593566051,
-      "amplitudeArcsec": 0.03462081742034018,
-      "phaseDeg": -144.3002692409112
+      "amplitudeArcsec": 0.020685453691290136,
+      "phaseDeg": -90.93667176054238
      },
      {
       "label": "D − M′",
       "periodYears": 1.127404326494982,
-      "amplitudeArcsec": 0.4072816104357608,
-      "phaseDeg": -125.68444629542991
+      "amplitudeArcsec": 0.040653486900342185,
+      "phaseDeg": -14.452400421001322
      },
      {
       "label": "D + M′",
       "periodYears": 0.039025829476138446,
-      "amplitudeArcsec": 0.17696033587872256,
-      "phaseDeg": 45.680477633580544
+      "amplitudeArcsec": 0.0006685505511788624,
+      "phaseDeg": 117.87268368680556
      },
      {
       "label": "D − M",
       "periodYears": 0.08796190909868767,
-      "amplitudeArcsec": 0.190879761536394,
-      "phaseDeg": -165.5364944358034
+      "amplitudeArcsec": 0.0003260715865577624,
+      "phaseDeg": -31.06297582483192
      },
      {
       "label": "D + M",
       "periodYears": 0.07480268271062039,
-      "amplitudeArcsec": 0.0687482952964778,
-      "phaseDeg": -17.804829941292116
+      "amplitudeArcsec": 0.0003644301385964072,
+      "phaseDeg": 93.07708928859489
      },
      {
       "label": "M′",
       "periodYears": 0.07544024607255305,
-      "amplitudeArcsec": 0.0714642210508338,
-      "phaseDeg": -42.52814866611854
+      "amplitudeArcsec": 0.07103615470303616,
+      "phaseDeg": -42.57600131643019
      },
      {
       "label": "annual (M)",
       "periodYears": 1.000026381930185,
-      "amplitudeArcsec": 0.55249443376941,
-      "phaseDeg": 109.10455202004238
+      "amplitudeArcsec": 0.5528279573371672,
+      "phaseDeg": 109.02080173167883
      },
      {
       "label": "semi-annual (2M)",
       "periodYears": 0.5000131909650924,
-      "amplitudeArcsec": 0.002146494456679125,
-      "phaseDeg": 54.77212950516756
+      "amplitudeArcsec": 0.002255517583217188,
+      "phaseDeg": 55.949197136561914
      },
      {
       "label": "V − E",
       "periodYears": 1.5986875499380433,
-      "amplitudeArcsec": 0.23151133883700048,
-      "phaseDeg": 102.70261793308356
+      "amplitudeArcsec": 0.23077261947177632,
+      "phaseDeg": 103.07969943471184
      },
      {
       "label": "2V − 2E",
       "periodYears": 0.7993437749690216,
-      "amplitudeArcsec": 0.5144601995305607,
-      "phaseDeg": -148.82124099015417
+      "amplitudeArcsec": 0.513616353853711,
+      "phaseDeg": -148.8450864945667
      },
      {
       "label": "2V − 3E",
       "periodYears": 3.983371590258813,
-      "amplitudeArcsec": 1.203821889268016,
-      "phaseDeg": 52.1536283807346
+      "amplitudeArcsec": 1.2035178137487637,
+      "phaseDeg": 52.14036732074249
      },
      {
       "label": "3V − 4E",
       "periodYears": 1.140827498989753,
-      "amplitudeArcsec": 0.827341853230261,
-      "phaseDeg": -22.2768019139382
+      "amplitudeArcsec": 0.8302007309129921,
+      "phaseDeg": -21.158353975377967
      },
      {
       "label": "3V − 5E",
       "periodYears": 8.10202926608845,
-      "amplitudeArcsec": 0.12923411658083628,
-      "phaseDeg": -44.677410187399815
+      "amplitudeArcsec": 0.12931004959059164,
+      "phaseDeg": -44.594578363658066
      },
      {
       "label": "E − J",
       "periodYears": 1.0920850037593568,
-      "amplitudeArcsec": 0.22968272754075408,
-      "phaseDeg": -123.44202962092568
+      "amplitudeArcsec": 0.243293162680264,
+      "phaseDeg": -122.06127814764533
      },
      {
       "label": "2E − 2J",
       "periodYears": 0.5460425018796784,
-      "amplitudeArcsec": 0.18776990190988216,
-      "phaseDeg": 127.70593615002875
+      "amplitudeArcsec": 0.18812982339345388,
+      "phaseDeg": 127.69673072525016
      },
      {
       "label": "J",
       "periodYears": 11.861982203969884,
-      "amplitudeArcsec": 0.569062062644054,
-      "phaseDeg": -37.48219440795155
+      "amplitudeArcsec": 0.569171850397117,
+      "phaseDeg": -37.536941750405795
      },
      {
       "label": "2E − 2Mars",
       "periodYears": 1.0676743315260036,
-      "amplitudeArcsec": 0.12857081689704405,
-      "phaseDeg": 54.5289020500436
+      "amplitudeArcsec": 0.12648539323714217,
+      "phaseDeg": 55.46228761902835
      },
      {
       "label": "the lunar node Ω (nutation)",
       "periodYears": 18.612950034223132,
-      "amplitudeArcsec": 0.7707129091998652,
-      "phaseDeg": -160.95408619606584
+      "amplitudeArcsec": 0.7704312373925293,
+      "phaseDeg": -160.96315481041975
      }
     ]
    },
@@ -5249,115 +4784,115 @@
      -100
     ],
     "n": 10957,
-    "rmsArcsec": 4.752723134774538,
+    "rmsArcsec": 4.738789104935951,
     "terms": [
      {
       "label": "D (the barycentre term)",
       "periodYears": 0.08085034593566051,
-      "amplitudeArcsec": 0.02984456051660603,
-      "phaseDeg": -163.81132144986245
+      "amplitudeArcsec": 0.010539453572567217,
+      "phaseDeg": -92.75570204722597
      },
      {
       "label": "D − M′",
       "periodYears": 1.127404326494982,
-      "amplitudeArcsec": 0.436284889977738,
-      "phaseDeg": -113.59211384775921
+      "amplitudeArcsec": 0.029878774175795268,
+      "phaseDeg": -50.24383382684717
      },
      {
       "label": "D + M′",
       "periodYears": 0.039025829476138446,
-      "amplitudeArcsec": 0.17736110502923944,
-      "phaseDeg": 53.637350965622694
+      "amplitudeArcsec": 0.0005530657230396814,
+      "phaseDeg": 139.28716449290005
      },
      {
       "label": "D − M",
       "periodYears": 0.08796190909868767,
-      "amplitudeArcsec": 0.18425617462214758,
-      "phaseDeg": -168.25657164959165
+      "amplitudeArcsec": 0.00007496305669143088,
+      "phaseDeg": -65.38343305742863
      },
      {
       "label": "D + M",
       "periodYears": 0.07480268271062039,
-      "amplitudeArcsec": 0.06578074265412755,
-      "phaseDeg": -20.50978769560332
+      "amplitudeArcsec": 0.0006312007291982992,
+      "phaseDeg": 92.55035058578487
      },
      {
       "label": "M′",
       "periodYears": 0.07544024607255305,
-      "amplitudeArcsec": 0.0712334364708287,
-      "phaseDeg": -32.198903962887584
+      "amplitudeArcsec": 0.07085492301224726,
+      "phaseDeg": -31.951998183643635
      },
      {
       "label": "annual (M)",
       "periodYears": 1.000026381930185,
-      "amplitudeArcsec": 0.7619905645180921,
-      "phaseDeg": 128.98012099622224
+      "amplitudeArcsec": 0.7629425000739616,
+      "phaseDeg": 129.04009716985195
      },
      {
       "label": "semi-annual (2M)",
       "periodYears": 0.5000131909650924,
-      "amplitudeArcsec": 0.009020661003779035,
-      "phaseDeg": 179.97089641514256
+      "amplitudeArcsec": 0.009191495374516271,
+      "phaseDeg": 179.38385150442934
      },
      {
       "label": "V − E",
       "periodYears": 1.5986875499380433,
-      "amplitudeArcsec": 0.180698044664739,
-      "phaseDeg": 106.17832122394591
+      "amplitudeArcsec": 0.18110545051616178,
+      "phaseDeg": 106.62687600944503
      },
      {
       "label": "2V − 2E",
       "periodYears": 0.7993437749690216,
-      "amplitudeArcsec": 0.41650254284713184,
-      "phaseDeg": -148.32776336633273
+      "amplitudeArcsec": 0.4172249010232656,
+      "phaseDeg": -148.25479824911517
      },
      {
       "label": "2V − 3E",
       "periodYears": 3.983371590258813,
-      "amplitudeArcsec": 0.6672654599540632,
-      "phaseDeg": 49.70604968427351
+      "amplitudeArcsec": 0.6675540621226917,
+      "phaseDeg": 49.69045763701958
      },
      {
       "label": "3V − 4E",
       "periodYears": 1.140827498989753,
-      "amplitudeArcsec": 0.5007679222494632,
-      "phaseDeg": -23.800288190550454
+      "amplitudeArcsec": 0.4911278735665934,
+      "phaseDeg": -22.215451277864005
      },
      {
       "label": "3V − 5E",
       "periodYears": 8.10202926608845,
-      "amplitudeArcsec": 0.14346383558719836,
-      "phaseDeg": 7.070340213699399
+      "amplitudeArcsec": 0.14340384669985995,
+      "phaseDeg": 7.052068826414792
      },
      {
       "label": "E − J",
       "periodYears": 1.0920850037593568,
-      "amplitudeArcsec": 0.1502377236840198,
-      "phaseDeg": -122.89880037089904
+      "amplitudeArcsec": 0.14235693762832066,
+      "phaseDeg": -117.95272752099596
      },
      {
       "label": "2E − 2J",
       "periodYears": 0.5460425018796784,
-      "amplitudeArcsec": 0.1055670661575155,
-      "phaseDeg": 125.92124840144392
+      "amplitudeArcsec": 0.10548692306903008,
+      "phaseDeg": 126.13640609741333
      },
      {
       "label": "J",
       "periodYears": 11.861982203969884,
-      "amplitudeArcsec": 0.3119007529538599,
-      "phaseDeg": -16.460008314342552
+      "amplitudeArcsec": 0.31163682457856573,
+      "phaseDeg": -16.51000444806059
      },
      {
       "label": "2E − 2Mars",
       "periodYears": 1.0676743315260036,
-      "amplitudeArcsec": 0.14609193031758602,
-      "phaseDeg": 59.329697561092054
+      "amplitudeArcsec": 0.14366444284996013,
+      "phaseDeg": 58.59213773408283
      },
      {
       "label": "the lunar node Ω (nutation)",
       "periodYears": 18.612950034223132,
-      "amplitudeArcsec": 0.37931448250301725,
-      "phaseDeg": -163.78414170499985
+      "amplitudeArcsec": 0.37954153115075423,
+      "phaseDeg": -163.75811156303317
      }
     ]
    },
@@ -5367,115 +4902,115 @@
      2000
     ],
     "n": 10958,
-    "rmsArcsec": 1.626621159838617,
+    "rmsArcsec": 1.5864970764376929,
     "terms": [
      {
       "label": "D (the barycentre term)",
       "periodYears": 0.08085034593566051,
-      "amplitudeArcsec": 0.029184062976550466,
-      "phaseDeg": -169.11999531235557
+      "amplitudeArcsec": 0.008386920116600811,
+      "phaseDeg": -92.41228156926205
      },
      {
       "label": "D − M′",
       "periodYears": 1.127404326494982,
-      "amplitudeArcsec": 0.4345899413252065,
-      "phaseDeg": -111.27302957353697
+      "amplitudeArcsec": 0.012191561779721199,
+      "phaseDeg": -84.11178197908077
      },
      {
       "label": "D + M′",
       "periodYears": 0.039025829476138446,
-      "amplitudeArcsec": 0.1773169085700628,
-      "phaseDeg": 56.85437484730125
+      "amplitudeArcsec": 0.0005178083859333859,
+      "phaseDeg": 147.5542956828664
      },
      {
       "label": "D − M",
       "periodYears": 0.08796190909868767,
-      "amplitudeArcsec": 0.17572077884409296,
-      "phaseDeg": -169.11975324875436
+      "amplitudeArcsec": 0.00009845940781414401,
+      "phaseDeg": -80.62508166302972
      },
      {
       "label": "D + M",
       "periodYears": 0.07480268271062039,
-      "amplitudeArcsec": 0.06269732374772301,
-      "phaseDeg": -21.97132077108518
+      "amplitudeArcsec": 0.00020761682654000887,
+      "phaseDeg": 127.23091063125206
      },
      {
       "label": "M′",
       "periodYears": 0.07544024607255305,
-      "amplitudeArcsec": 0.07116415949332125,
-      "phaseDeg": -27.561955339493718
+      "amplitudeArcsec": 0.07117016175267825,
+      "phaseDeg": -27.636623310073606
      },
      {
       "label": "annual (M)",
       "periodYears": 1.000026381930185,
-      "amplitudeArcsec": 0.8353798374455635,
-      "phaseDeg": 147.02660692667533
+      "amplitudeArcsec": 0.8349176922048107,
+      "phaseDeg": 147.13595021470277
      },
      {
       "label": "semi-annual (2M)",
       "periodYears": 0.5000131909650924,
-      "amplitudeArcsec": 0.01837012287012346,
-      "phaseDeg": 168.38947230580496
+      "amplitudeArcsec": 0.01843655463221233,
+      "phaseDeg": 169.020165040497
      },
      {
       "label": "V − E",
       "periodYears": 1.5986875499380433,
-      "amplitudeArcsec": 0.13265186902671142,
-      "phaseDeg": 107.12001156408988
+      "amplitudeArcsec": 0.13372654532874437,
+      "phaseDeg": 107.90667881857009
      },
      {
       "label": "2V − 2E",
       "periodYears": 0.7993437749690216,
-      "amplitudeArcsec": 0.32280960544990717,
-      "phaseDeg": -146.869814169094
+      "amplitudeArcsec": 0.32226188692154,
+      "phaseDeg": -146.90131488921216
      },
      {
       "label": "2V − 3E",
       "periodYears": 3.983371590258813,
-      "amplitudeArcsec": 0.1431964302332497,
-      "phaseDeg": 56.88855333225847
+      "amplitudeArcsec": 0.1424395610092802,
+      "phaseDeg": 56.84419394086025
      },
      {
       "label": "3V − 4E",
       "periodYears": 1.140827498989753,
-      "amplitudeArcsec": 0.16224755509536878,
-      "phaseDeg": -16.50186018630108
+      "amplitudeArcsec": 0.14704192424844745,
+      "phaseDeg": -13.540511198086826
      },
      {
       "label": "3V − 5E",
       "periodYears": 8.10202926608845,
-      "amplitudeArcsec": 0.12495775385309857,
-      "phaseDeg": -14.936182449019757
+      "amplitudeArcsec": 0.12505825030820483,
+      "phaseDeg": -14.900362679214949
      },
      {
       "label": "E − J",
       "periodYears": 1.0920850037593568,
-      "amplitudeArcsec": 0.09511528825296732,
-      "phaseDeg": -103.89331743299812
+      "amplitudeArcsec": 0.08123429898725619,
+      "phaseDeg": -106.91009676009024
      },
      {
       "label": "2E − 2J",
       "periodYears": 0.5460425018796784,
-      "amplitudeArcsec": 0.058993303252077606,
-      "phaseDeg": 122.15324971762027
+      "amplitudeArcsec": 0.0588842434799125,
+      "phaseDeg": 122.21884573931666
      },
      {
       "label": "J",
       "periodYears": 11.861982203969884,
-      "amplitudeArcsec": 0.10682504072582466,
-      "phaseDeg": 60.31464819310633
+      "amplitudeArcsec": 0.10766607080580672,
+      "phaseDeg": 60.44509863516431
      },
      {
       "label": "2E − 2Mars",
       "periodYears": 1.0676743315260036,
-      "amplitudeArcsec": 0.1200062071557982,
-      "phaseDeg": 55.00759023343876
+      "amplitudeArcsec": 0.12168989959434799,
+      "phaseDeg": 53.7227325564072
      },
      {
       "label": "the lunar node Ω (nutation)",
       "periodYears": 18.612950034223132,
-      "amplitudeArcsec": 0.014586965475710754,
-      "phaseDeg": 159.48648643670145
+      "amplitudeArcsec": 0.014497351676796501,
+      "phaseDeg": 158.07771290442784
      }
     ]
    }
@@ -5490,74 +5025,74 @@
      {
       "periodDays": 1455.9468438538127,
       "periodYears": 3.9861652124676596,
-      "amplitudeArcsec": 1.198591054744668,
+      "amplitudeArcsec": 1.1983713912105616,
       "yearlyAliasYears": 3.9861652124676605
      },
      {
       "periodDays": 416.5779467680546,
       "periodYears": 1.1405282594607928,
-      "amplitudeArcsec": 0.8166888875955959,
+      "amplitudeArcsec": 0.8180864951094613,
       "yearlyAliasYears": 8.114599998511286
      },
      {
       "periodDays": 6742.153846153833,
       "periodYears": 18.459011214657995,
-      "amplitudeArcsec": 0.7712900606574274,
+      "amplitudeArcsec": 0.7708393307398828,
       "yearlyAliasYears": 18.459011214657988
      },
      {
       "periodDays": 4339.009900990097,
       "periodYears": 11.879561672799719,
-      "amplitudeArcsec": 0.5702779795005076,
+      "amplitudeArcsec": 0.5704136662108994,
       "yearlyAliasYears": 11.879561672799731
      },
      {
       "periodDays": 365.1999999999931,
       "periodYears": 0.9998631074606246,
-      "amplitudeArcsec": 0.5532665106402382,
+      "amplitudeArcsec": 0.5533298768699909,
       "yearlyAliasYears": 8653.843625777266
      },
      {
       "periodDays": 5766.315789473672,
       "periodYears": 15.787312223062758,
-      "amplitudeArcsec": 0.5393976689928773,
+      "amplitudeArcsec": 0.5395121167730658,
       "yearlyAliasYears": 15.787312223062738
      },
      {
       "periodDays": 291.96535642904803,
       "periodYears": 0.7993575809145738,
-      "amplitudeArcsec": 0.5144702114982806,
+      "amplitudeArcsec": 0.5136446815570435,
       "yearlyAliasYears": 3.9843299357896163
      },
      {
-      "periodDays": 439.55867602807837,
-      "periodYears": 1.2034460671542186,
-      "amplitudeArcsec": 0.41527816930289535,
-      "yearlyAliasYears": 5.914560439904121
-     },
-     {
-      "periodDays": 411.879699248114,
-      "periodYears": 1.127665158790182,
-      "amplitudeArcsec": 0.4058982844663137,
-      "yearlyAliasYears": 8.831324794425642
+      "periodDays": 439.11823647294,
+      "periodYears": 1.202240209371499,
+      "amplitudeArcsec": 0.42166706021884715,
+      "yearlyAliasYears": 5.943860552943284
      },
      {
       "periodDays": 1427.4918566775175,
       "periodYears": 3.908259703429206,
-      "amplitudeArcsec": 0.27062838448225623,
+      "amplitudeArcsec": 0.2700961597690564,
       "yearlyAliasYears": 3.9082597034292053
      },
      {
       "periodDays": 6260.571428571415,
       "periodYears": 17.140510413610993,
-      "amplitudeArcsec": 0.26135621778019086,
+      "amplitudeArcsec": 0.260836729472214,
       "yearlyAliasYears": 17.14051041361097
      },
      {
       "periodDays": 2883.157894736845,
       "periodYears": 7.893656111531403,
-      "amplitudeArcsec": 0.2569293472453742,
+      "amplitudeArcsec": 0.25711566425964777,
       "yearlyAliasYears": 7.89365611153141
+     },
+     {
+      "periodDays": 1485.5593220338903,
+      "periodYears": 4.067239759161917,
+      "amplitudeArcsec": 0.24271825468841632,
+      "yearlyAliasYears": 4.067239759161918
      }
     ]
    },
@@ -5570,74 +5105,74 @@
      {
       "periodDays": 365.1999999999931,
       "periodYears": 0.9998631074606246,
-      "amplitudeArcsec": 0.7543119329768446,
+      "amplitudeArcsec": 0.7547195875872077,
       "yearlyAliasYears": 8653.843625777266
      },
      {
       "periodDays": 1455.946843853813,
       "periodYears": 3.9861652124676605,
-      "amplitudeArcsec": 0.6659740023772315,
+      "amplitudeArcsec": 0.6661807813735362,
       "yearlyAliasYears": 3.9861652124676605
      },
      {
       "periodDays": 416.5779467680546,
       "periodYears": 1.1405282594607928,
-      "amplitudeArcsec": 0.49113922335044397,
+      "amplitudeArcsec": 0.48648908026565474,
       "yearlyAliasYears": 8.114599998511286
      },
      {
       "periodDays": 87648.00000000001,
       "periodYears": 239.96714579055444,
-      "amplitudeArcsec": 0.47277198473950777,
+      "amplitudeArcsec": 0.4724729497350376,
       "yearlyAliasYears": 239.9671457905499
-     },
-     {
-      "periodDays": 411.879699248114,
-      "periodYears": 1.127665158790182,
-      "amplitudeArcsec": 0.4278755771114333,
-      "yearlyAliasYears": 8.831324794425642
      },
      {
       "periodDays": 291.96535642904803,
       "periodYears": 0.7993575809145738,
-      "amplitudeArcsec": 0.41650681772641757,
+      "amplitudeArcsec": 0.4172107148402492,
       "yearlyAliasYears": 3.9843299357896163
      },
      {
       "periodDays": 6742.153846153836,
       "periodYears": 18.459011214658005,
-      "amplitudeArcsec": 0.37751548686733466,
+      "amplitudeArcsec": 0.37764816480931557,
       "yearlyAliasYears": 18.459011214657988
      },
      {
       "periodDays": 4339.009900990099,
       "periodYears": 11.879561672799722,
-      "amplitudeArcsec": 0.31576705972179886,
+      "amplitudeArcsec": 0.3154853733735253,
       "yearlyAliasYears": 11.879561672799731
      },
      {
       "periodDays": 439.11823647294,
       "periodYears": 1.202240209371499,
-      "amplitudeArcsec": 0.22838174537285655,
+      "amplitudeArcsec": 0.22665273382069728,
       "yearlyAliasYears": 5.943860552943284
      },
      {
       "periodDays": 2864.3137254901994,
       "periodYears": 7.842063587926624,
-      "amplitudeArcsec": 0.21483930299070755,
+      "amplitudeArcsec": 0.21499483539079167,
       "yearlyAliasYears": 7.842063587926621
      },
      {
       "periodDays": 5766.315789473675,
       "periodYears": 15.787312223062765,
-      "amplitudeArcsec": 0.20581183926790536,
+      "amplitudeArcsec": 0.20576526326142333,
       "yearlyAliasYears": 15.787312223062793
      },
      {
       "periodDays": 1068.8780487804897,
       "periodYears": 2.9264286072018884,
-      "amplitudeArcsec": 0.20231216862498194,
+      "amplitudeArcsec": 0.20241011905261036,
       "yearlyAliasYears": 2.926428607201889
+     },
+     {
+      "periodDays": 367.0351758793901,
+      "periodYears": 1.0048875451865575,
+      "amplitudeArcsec": 0.19088299689555138,
+      "yearlyAliasYears": 204.70288639989505
      }
     ]
    },
@@ -5650,74 +5185,74 @@
      {
       "periodDays": 365.23333333334415,
       "periodYears": 0.9999543691535774,
-      "amplitudeArcsec": 0.8341569669962495,
+      "amplitudeArcsec": 0.83375876079842,
       "yearlyAliasYears": 41190.84971414295
      },
      {
       "periodDays": 146093.3333333334,
       "periodYears": 399.98174766141926,
-      "amplitudeArcsec": 0.6315762856326212,
+      "amplitudeArcsec": 0.6310622974692447,
       "yearlyAliasYears": 399.98174766142637
-     },
-     {
-      "periodDays": 411.5305164319354,
-      "periodYears": 1.1267091483420544,
-      "amplitudeArcsec": 0.4240444217554993,
-      "yearlyAliasYears": 8.890401721689347
      },
      {
       "periodDays": 291.9920053297829,
       "periodYears": 0.7994305416284269,
-      "amplitudeArcsec": 0.3215595060730269,
+      "amplitudeArcsec": 0.3211251385591613,
       "yearlyAliasYears": 3.9861432599069526
      },
      {
       "periodDays": 14609.333333333336,
       "periodYears": 39.99817476614192,
-      "amplitudeArcsec": 0.20694874618649275,
+      "amplitudeArcsec": 0.2062999164384197,
       "yearlyAliasYears": 39.99817476614192
      },
      {
       "periodDays": 1068.9756097560944,
       "periodYears": 2.926695714595741,
-      "amplitudeArcsec": 0.20628823022693282,
+      "amplitudeArcsec": 0.2052163398622975,
       "yearlyAliasYears": 2.9266957145957404
      },
      {
       "periodDays": 2902.5165562913876,
       "periodYears": 7.946657238306332,
-      "amplitudeArcsec": 0.18267287425886336,
+      "amplitudeArcsec": 0.1823177970343819,
       "yearlyAliasYears": 7.946657238306339
-     },
-     {
-      "periodDays": 32.12725406832254,
-      "periodYears": 0.08795962783934988,
-      "amplitudeArcsec": 0.17355678304910926,
-      "yearlyAliasYears": 2.7128414633019484
-     },
-     {
-      "periodDays": 33.50508370919997,
-      "periodYears": 0.09173191980616009,
-      "amplitudeArcsec": 0.173374994922959,
-      "yearlyAliasYears": 10.110799976900903
-     },
-     {
-      "periodDays": 367.06867671692874,
-      "periodYears": 1.0049792654809822,
-      "amplitudeArcsec": 0.17141712344388554,
-      "yearlyAliasYears": 200.96661209889032
      },
      {
       "periodDays": 363.4162520729791,
       "periodYears": 0.9949794717946039,
-      "amplitudeArcsec": 0.17051618847890623,
+      "amplitudeArcsec": 0.17219670507664772,
       "yearlyAliasYears": 199.02456464133368
      },
      {
-      "periodDays": 417.01236917222735,
-      "periodYears": 1.141717643182005,
-      "amplitudeArcsec": 0.15912962378324802,
-      "yearlyAliasYears": 8.054898611347724
+      "periodDays": 367.06867671692874,
+      "periodYears": 1.0049792654809822,
+      "amplitudeArcsec": 0.1694866687361245,
+      "yearlyAliasYears": 200.96661209889032
+     },
+     {
+      "periodDays": 450.90534979424854,
+      "periodYears": 1.234511566856259,
+      "amplitudeArcsec": 0.15623972927223548,
+      "yearlyAliasYears": 5.263590256569118
+     },
+     {
+      "periodDays": 728.0398671096324,
+      "periodYears": 1.9932645232296573,
+      "amplitudeArcsec": 0.15108735989142863,
+      "yearlyAliasYears": 2.006695151725859
+     },
+     {
+      "periodDays": 416.6159695817595,
+      "periodYears": 1.1406323602512236,
+      "amplitudeArcsec": 0.14832280119428948,
+      "yearlyAliasYears": 8.109334316734055
+     },
+     {
+      "periodDays": 1456.0797342192654,
+      "periodYears": 3.9865290464593164,
+      "amplitudeArcsec": 0.14403084255089674,
+      "yearlyAliasYears": 3.9865290464593164
      }
     ]
    }
@@ -5726,129 +5261,129 @@
    "split": {
     "VE": {
      "n": 6000,
-     "rmsTotalMin": 1.339077590174705,
-     "rmsSunPartMin": 1.319068739096106,
-     "rmsTierPartMin": 0.02557695813673678,
+     "rmsTotalMin": 1.2573777606228633,
+     "rmsSunPartMin": 1.2381003640915478,
+     "rmsTierPartMin": 0.02390476790139255,
      "amplitudesMin": {
       "total": {
-       "dAlias": 0.5377354303599561,
-       "doubletA": 0.20726501882194726,
-       "doubletB": 0.21061915467682887,
-       "venus2V3E": 0.35197346209735314,
-       "venus3V5E": 0.13369538933685987,
-       "dMinusMpAlias": 0.16947835428403665
+       "dAlias": 0.010918415952317849,
+       "doubletA": 0.008015228241444846,
+       "doubletB": 0.005837585607770584,
+       "venus2V3E": 0.35197683647921374,
+       "venus3V5E": 0.13372692226982053,
+       "dMinusMpAlias": 0.001407869688702771
       },
       "sunPart": {
-       "dAlias": 0.5314340358355062,
-       "doubletA": 0.20504580865306848,
-       "doubletB": 0.20819288623121607,
-       "venus2V3E": 0.344466159352431,
-       "venus3V5E": 0.130334313400508,
-       "dMinusMpAlias": 0.16758651350048576
+       "dAlias": 0.01049121839486954,
+       "doubletA": 0.007914791002826924,
+       "doubletB": 0.005781477093517263,
+       "venus2V3E": 0.3444749866158466,
+       "venus3V5E": 0.1303738573261516,
+       "dMinusMpAlias": 0.00138046201128377
       },
       "tierPart": {
-       "dAlias": 0.006323217918610056,
-       "doubletA": 0.0023163702293877374,
-       "doubletB": 0.0024839753404575795,
-       "venus2V3E": 0.007651422323462166,
-       "venus3V5E": 0.00365521144422797,
-       "dMinusMpAlias": 0.001922490466102256
+       "dAlias": 0.00043010557773361086,
+       "doubletA": 0.00010722012832258789,
+       "doubletB": 0.0000608308531673751,
+       "venus2V3E": 0.007645897226658272,
+       "venus3V5E": 0.0036556933351127217,
+       "dMinusMpAlias": 0.00003229040611877766
       }
      }
     },
     "SS": {
      "n": 6000,
-     "rmsTotalMin": 1.4101338981176172,
-     "rmsSunPartMin": 1.3711940433183134,
-     "rmsTierPartMin": 0.039725207444166466,
+     "rmsTotalMin": 1.3264146836257524,
+     "rmsSunPartMin": 1.2898021045298873,
+     "rmsTierPartMin": 0.03732723427957417,
      "amplitudesMin": {
       "total": {
-       "dAlias": 0.5628746540687337,
-       "doubletA": 0.19553027861669053,
-       "doubletB": 0.19495087592094512,
-       "venus2V3E": 0.3988162223488262,
-       "venus3V5E": 0.18174131878068742,
-       "dMinusMpAlias": 0.17642384682584022
+       "dAlias": 0.010512731439156126,
+       "doubletA": 0.003869294210924838,
+       "doubletB": 0.0014407034833487519,
+       "venus2V3E": 0.398998755538988,
+       "venus3V5E": 0.18158273924030652,
+       "dMinusMpAlias": 0.0022312053030827538
       },
       "sunPart": {
-       "dAlias": 0.5472789158898413,
-       "doubletA": 0.19008596882326292,
-       "doubletB": 0.18967039597269245,
-       "venus2V3E": 0.3887093240939046,
-       "venus3V5E": 0.1774806714352189,
-       "dMinusMpAlias": 0.17157192385567482
+       "dAlias": 0.010617924761700882,
+       "doubletA": 0.0037992135156536926,
+       "doubletB": 0.0014226256457684431,
+       "venus2V3E": 0.388883708361391,
+       "venus3V5E": 0.1773321983279382,
+       "dMinusMpAlias": 0.0021961227189166055
       },
       "tierPart": {
-       "dAlias": 0.015603422822296122,
-       "doubletA": 0.005461573781141646,
-       "doubletB": 0.005296472183174599,
-       "venus2V3E": 0.010109814031161941,
-       "venus3V5E": 0.00427403023260004,
-       "dMinusMpAlias": 0.004853247060958538
+       "dAlias": 0.0001221785722838983,
+       "doubletA": 0.00007160974626103262,
+       "doubletB": 0.000018080804223818454,
+       "venus2V3E": 0.0101180173739038,
+       "venus3V5E": 0.004264122851116693,
+       "dMinusMpAlias": 0.00004128845959593276
       }
      }
     },
     "AE": {
      "n": 6000,
-     "rmsTotalMin": 1.49975411925356,
-     "rmsSunPartMin": 1.5246118075951272,
-     "rmsTierPartMin": 0.030498160816529445,
+     "rmsTotalMin": 1.4352544042590922,
+     "rmsSunPartMin": 1.4598297923919463,
+     "rmsTierPartMin": 0.029347189719320425,
      "amplitudesMin": {
       "total": {
-       "dAlias": 0.4949219258019563,
-       "doubletA": 0.20658213667860895,
-       "doubletB": 0.20691344772945996,
-       "venus2V3E": 0.20928838201905042,
-       "venus3V5E": 0.19632967242049482,
-       "dMinusMpAlias": 0.1693306057297395
+       "dAlias": 0.017864358187390808,
+       "doubletA": 0.006418936270156025,
+       "doubletB": 0.004848900114108869,
+       "venus2V3E": 0.20950621250049672,
+       "venus3V5E": 0.19637666057684963,
+       "dMinusMpAlias": 0.003151161984738181
       },
       "sunPart": {
-       "dAlias": 0.5003745525691023,
-       "doubletA": 0.20911863423534957,
-       "doubletB": 0.20919380100087448,
-       "venus2V3E": 0.21309147471510084,
-       "venus3V5E": 0.20013335155599116,
-       "dMinusMpAlias": 0.17128140081106688
+       "dAlias": 0.018470997227452934,
+       "doubletA": 0.006478482456682226,
+       "doubletB": 0.004871909453368461,
+       "venus2V3E": 0.2133010317842984,
+       "venus3V5E": 0.20018383015482794,
+       "dMinusMpAlias": 0.0032055277324652015
       },
       "tierPart": {
-       "dAlias": 0.005460009172026886,
-       "doubletA": 0.002539715618766445,
-       "doubletB": 0.0022919043574981587,
-       "venus2V3E": 0.003906601070119331,
-       "venus3V5E": 0.0038324645194548765,
-       "dMinusMpAlias": 0.0019746864340426692
+       "dAlias": 0.0006097448889625722,
+       "doubletA": 0.000059622605550495116,
+       "doubletB": 0.00002305736892114881,
+       "venus2V3E": 0.0039004263405613333,
+       "venus3V5E": 0.0038365837711262733,
+       "dMinusMpAlias": 0.00005578587514698806
       }
      }
     },
     "WS": {
      "n": 6000,
-     "rmsTotalMin": 1.4672742324884256,
-     "rmsSunPartMin": 1.511030567591093,
-     "rmsTierPartMin": 0.04442230257632595,
+     "rmsTotalMin": 1.4072212705217213,
+     "rmsSunPartMin": 1.4493045516249985,
+     "rmsTierPartMin": 0.04269118003191628,
      "amplitudesMin": {
       "total": {
-       "dAlias": 0.45972332643405844,
-       "doubletA": 0.19734403991440275,
-       "doubletB": 0.19490513057520253,
-       "venus2V3E": 0.1357614427282638,
-       "venus3V5E": 0.17923063204779396,
-       "dMinusMpAlias": 0.16643303377030505
+       "dAlias": 0.004920080625728275,
+       "doubletA": 0.004586620157754045,
+       "doubletB": 0.00464271105408671,
+       "venus2V3E": 0.13559310400880623,
+       "venus3V5E": 0.17958871899068016,
+       "dMinusMpAlias": 0.0017555171289314196
       },
       "sunPart": {
-       "dAlias": 0.4730099349970426,
-       "doubletA": 0.20295035254048926,
-       "doubletB": 0.20058739948036233,
-       "venus2V3E": 0.13862612849965242,
-       "venus3V5E": 0.18398101112862628,
-       "dMinusMpAlias": 0.17126091440105276
+       "dAlias": 0.004804722166301948,
+       "doubletA": 0.004717397906778849,
+       "doubletB": 0.004759724309508357,
+       "venus2V3E": 0.1384541859523067,
+       "venus3V5E": 0.1843440393329896,
+       "dMinusMpAlias": 0.0017892458489457413
       },
       "tierPart": {
-       "dAlias": 0.013313824606933434,
-       "doubletA": 0.005614760143836486,
-       "doubletB": 0.005692074751663481,
-       "venus2V3E": 0.0028734402382012613,
-       "venus3V5E": 0.0047624440674464965,
-       "dMinusMpAlias": 0.004829358013056406
+       "dAlias": 0.00042360450531851826,
+       "doubletA": 0.00013298188339891007,
+       "doubletB": 0.0001172139906008893,
+       "venus2V3E": 0.0028694091503375565,
+       "venus3V5E": 0.004766884063106329,
+       "dMinusMpAlias": 0.000035519769816637075
       }
      }
     }
@@ -5857,40 +5392,40 @@
     "cubic4": {
      "type": "VE",
      "n": 6000,
-     "rmsSunPartMin": 1.319068739096106,
+     "rmsSunPartMin": 1.3127429288254486,
      "amplitudesMin": {
-      "dAlias": 0.5314340358355062,
-      "doubletA": 0.20504580865306848,
-      "doubletB": 0.20819288623121607,
-      "venus2V3E": 0.344466159352431,
-      "venus3V5E": 0.130334313400508,
-      "dMinusMpAlias": 0.16758651350048576
+      "dAlias": 0.5224775809819716,
+      "doubletA": 0.2052480582647628,
+      "doubletB": 0.2080765553160821,
+      "venus2V3E": 0.3444289364570713,
+      "venus3V5E": 0.13051803283648195,
+      "dMinusMpAlias": 0.002452897482852709
      }
     },
     "quintic6": {
      "type": "VE",
      "n": 6000,
-     "rmsSunPartMin": 1.2597170639478923,
+     "rmsSunPartMin": 1.253209563013411,
      "amplitudesMin": {
-      "dAlias": 0.3607279455774555,
-      "doubletA": 0.14291250187121804,
-      "doubletB": 0.14543757554004955,
-      "venus2V3E": 0.344480700210326,
-      "venus3V5E": 0.13031087815395948,
-      "dMinusMpAlias": 0.16792194267710084
+      "dAlias": 0.3482605366691881,
+      "doubletA": 0.14311434276020288,
+      "doubletB": 0.1453208270344651,
+      "venus2V3E": 0.3444434890412937,
+      "venus3V5E": 0.13049452540188985,
+      "dMinusMpAlias": 0.002118354364860055
      }
     },
     "cubic4Dewobbled": {
      "type": "VE",
      "n": 6000,
-     "rmsSunPartMin": 1.244026752860577,
+     "rmsSunPartMin": 1.2381003640915478,
      "amplitudesMin": {
-      "dAlias": 0.07061014273870314,
-      "doubletA": 0.007985618005095337,
-      "doubletB": 0.005624978467602686,
-      "venus2V3E": 0.3445121856878973,
-      "venus3V5E": 0.1301901142504175,
-      "dMinusMpAlias": 0.16869477443924336
+      "dAlias": 0.01049121839486954,
+      "doubletA": 0.007914791002826924,
+      "doubletB": 0.005781477093517263,
+      "venus2V3E": 0.3444749866158466,
+      "venus3V5E": 0.1303738573261516,
+      "dMinusMpAlias": 0.00138046201128377
      }
     }
    }
@@ -6835,9 +6370,9 @@
  },
  "decision": {
   "seriesAnalysed": 33,
-  "linesAboveRedNoiseFloor": 63,
-  "linesInLongPeriodFamilies": 33,
-  "linesNamedByAnArgumentOrTone": 47,
+  "linesAboveRedNoiseFloor": 40,
+  "linesInLongPeriodFamilies": 25,
+  "linesNamedByAnArgumentOrTone": 24,
   "linesAboveFloorUnnamed": [
    {
     "series": "lunar-canon-TD-opposition",
@@ -7004,7 +6539,7 @@
    "data/jpl-sun-ecliptic-longitude-tt.json": "sha256:1b3ef502d849b1a3cbffca70e91fe7ed29b6331073688b81addf617a9e8d5ed5",
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
-   "data/lunar-cumulative-checkpoints.json": "sha256:16d37eb00dfb7daa0527bc0e55c88408320ec0a4095d2c7e3a2145d9bb573841",
+   "data/lunar-cumulative-checkpoints.json": "sha256:cfda5ed07c4dda9d7bc9dd8524caef84a4a021c81936ee590f6d2f7daaa62975",
    "data/nbody-secular-series.json": "sha256:06c90ff051da522bb4a05e069e0565279b213d11f648bdc272a546a582dbc610",
    "data/paleo-validation-anchors.json": "sha256:718e8f7fbd986a667130bbfec9957d723fb4547d425ab191dce5ebd9bd7e3bfd",
    "data/rspa20160404supp2/Table-S01.txt": "sha256:9dbb9523275f9ecd3ffd644a5ec9f276d0ae9209294eb00d54968b47dac3e028",
@@ -7016,7 +6551,7 @@
    "data/rspa20160404supp2/Table-S07.txt": "sha256:113eb913705bc106797ec63bf150d9f0276505d47ca22948e64257b72b9dfd44",
    "data/rspa20160404supp2/Table-S08.txt": "sha256:01c14ec2e51a770c70a635658de6da3e73ebbf5d991747b292869d99174e233f",
    "data/rspa20160404supp2/Table-S09.txt": "sha256:87911eb88e5700535003ffa2c2c365a44fffc03913a06384cc9bcd221cb96471",
-   "data/spin-axis-checkpoints.json": "sha256:c00a1f646a704673a0c3a00ba2288f439adf65e6a0be1ee4ddac4478ead313be",
+   "data/spin-axis-checkpoints.json": "sha256:83ef96d727a92f2cf1bcdb38e68a760c5b38eae7fcd6c0c21e9e857cc3c9ce8f",
    "packages/physics/src/eclipse/finders.cjs": "sha256:ee2676c730f06ce1b0bffecaf2a2c4f38e6600f42191714a9edb422bb5b52b7d",
    "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
    "packages/physics/src/model/cardinal-instants.js": "sha256:72b4dc78f2ee10720ffdf79cb39be16ee5aece012a07498e14470c944246fe58",
@@ -7033,7 +6568,7 @@
    "packages/physics/src/model/planet-records.js": "sha256:0a062111bcd59414736f56b027306690dae054dc4b5ce86812b14f09ff312f7c",
    "packages/physics/src/model/planet-spin-channel.js": "sha256:709d2b68bd4586fb3d2c47eff91157aee546386df2509859a19d54000f85d659",
    "packages/physics/src/model/published-periods.js": "sha256:1e18f705212f7aeec39bcddeb9fadbba04e2fad2041a97874705f4076cd57189",
-   "packages/physics/src/model/sun-and-eclipses.js": "sha256:211b018632bdcae2d7a228e15ac778d1ecf38996417e82d120dade42440c2690",
+   "packages/physics/src/model/sun-and-eclipses.js": "sha256:52a2a4dee428be534a2e22faf96e8a651798d1fc6de0d6de859f8635d6f67720",
    "packages/physics/src/model/surface.js": "sha256:948078e5315366b854e3c6ce4c069a7b0274f7251651fbae51fad15737f2df96",
    "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
    "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
@@ -7043,13 +6578,14 @@
    "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
    "public/input/stephenson-2016-deltaT-polynomial.json": "sha256:e8f9611c0e6173d2e2807c46bf920673e533c085b9366e1dfc424c6fd1186df7",
    "tools/explore/residual-spectra/model-internals.mjs": "sha256:a3d660a884b6917eac86596e44bae78d408aa79ee829f5996c866266766ca1e1",
-   "tools/explore/residual-spectra/probes.mjs": "sha256:476707a7de59c7069a127bca713e5f95844333631537f6925c4e6ea104750989",
+   "tools/explore/residual-spectra/probes.mjs": "sha256:ed83788f5d74fd23356e67c01d47fa97ecf927c0af9a6fbbfcc64b5581394fe7",
    "tools/explore/residual-spectra/series-paleo.mjs": "sha256:603d8f43f6c9575b6df077ca8b5af98b4b011bba241de40887ffa07f91787e6b",
    "tools/explore/residual-spectra/series-records.mjs": "sha256:882eba638ba8f7ee3dcb7b88859cccfe08bc1b02c10634a7cd793c0e9d4b9770",
-   "tools/explore/residual-spectra/series-sun.mjs": "sha256:6072f4b7c2521096a8c771a23e2d7a7ae16ab4a9aba59ccceae011e9c91647f6",
+   "tools/explore/residual-spectra/series-sun.mjs": "sha256:5808ff9a44d70c327ed0ed4ffcbac6e85f0885cd4f08432d12e28163da8997b6",
    "tools/explore/residual-spectra/series.mjs": "sha256:68861afd9b495db71b452fe2edfe916788bbdf2aee9b300b6c1eb9d301bd4ea6",
    "tools/explore/residual-spectra/spectrum.mjs": "sha256:b9d13048b4ab37aa6f1cd512c05beadc0b84c311cd352bfc14ec106881181bc4",
-   "tools/explore/residual-spectra/write-sweep.mjs": "sha256:7200f6dc4c7a9e9b494e280de4a18a1494cfe5d8ee677c1edd196e60b83a47d8"
+   "tools/explore/residual-spectra/write-sweep.mjs": "sha256:5282eab63cb995081426c7f7a2b2ff8bd26a12ca13895223cec25ac44c00923c",
+   "tools/lib/horizons-crossing.js": "sha256:b178dc4864ee41b56bbe5f879b7ae5273d546eeffc53a0f12a72c9ebc105788d"
   }
  }
 }

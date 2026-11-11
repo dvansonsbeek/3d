@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.12
+modelVersion: v27.13
 coefficients: sha256:7c135a128a54451c
 status: current
 ---
@@ -165,8 +165,8 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   ϖ(t) (the banked N-body series), and the derived planetary completion
   (the Sun's long inequalities from the model's own engine), shared by
   all three runtimes. Against JPL Horizons over ±3000 yr it reads
-  <!--v:sunVsHorizonsMeanArcsec-->2.50<!--/v-->″ mean / <!--v:sunVsHorizonsSdArcsec-->2.26<!--/v-->″ sd
-  (modern sd <!--v:sunVsHorizonsModernSdArcsec-->0.79<!--/v-->″); the Babylon −135 umbra
+  <!--v:sunVsHorizonsMeanArcsec-->2.50<!--/v-->″ mean / <!--v:sunVsHorizonsSdArcsec-->2.23<!--/v-->″ sd
+  (modern sd <!--v:sunVsHorizonsModernSdArcsec-->0.71<!--/v-->″); the Babylon −135 umbra
   track sits <!--v:babylon135BestGapKm-->120<!--/v--> km from the documented
   station — [doc 103](103-babylon-eclipse-bce135.md). The era-device
   Sun assembly this bullet once described (the fitted eccentricity channel

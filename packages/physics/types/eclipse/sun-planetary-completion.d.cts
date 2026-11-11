@@ -2,7 +2,8 @@
  * @param {{ embWobbleArcsec: number,
  *           carrierRatesDegPerCy: { planets: number[], moonElongation: number },
  *           eccVectorOfDate?: (bodyIndex: number, T: number) => [number, number],
- *           moonElongationDegAtT?: (T: number) => number }} opts
+ *           moonElongationDegAtT?: (T: number) => number,
+ *           embWobbleArcsecAtT?: (T: number) => number }} opts
  *   - embWobbleArcsec: the DERIVED Earth-around-EMB wobble amplitude
  *     a_M·μ/AU in arcsec (μ = 1/(1+M_E/M_M));
  *   - carrierRatesDegPerCy.planets: the six mean-longitude rates (deg/
@@ -18,12 +19,16 @@
  *     the framework's own argument (ṅ included). The constant-rate carrier
  *     D₀ + D₁·T ran ~29° off it at ±9000 yr: the lunar equation (6.44″) read
  *     as the largest short-period line left against DE441 at −9000 (2.8″ at
- *     29.53 d; the −9000 bin's scatter 4.13 → 3.62″ on the argument of date).
+ *     29.53 d; the −9000 bin's scatter 4.13 → 3.62″ on the argument of date);
+ *   - embWobbleArcsecAtT: the lunar equation (arcsec) as the EXACT geometry
+ *     of the model's own Moon at T (the model wiring derives it — see the
+ *     header); when present it replaces embWobbleArcsec·sin D, whose
+ *     sidebands D ± M′ and D ± M the sweep read against Horizons.
  *   Injected by the model wiring so the carrier↔table matched pair tracks the
  *   constants and the embedded artifact.
  * @returns {{ sunPlanetaryCompletionDeg: (T: number) => number }}
  */
-export function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, eccVectorOfDate, moonElongationDegAtT }: {
+export function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegPerCy, eccVectorOfDate, moonElongationDegAtT, embWobbleArcsecAtT }: {
     embWobbleArcsec: number;
     carrierRatesDegPerCy: {
         planets: number[];
@@ -31,6 +36,7 @@ export function createSunPlanetaryCompletion({ embWobbleArcsec, carrierRatesDegP
     };
     eccVectorOfDate?: (bodyIndex: number, T: number) => [number, number];
     moonElongationDegAtT?: (T: number) => number;
+    embWobbleArcsecAtT?: (T: number) => number;
 }): {
     sunPlanetaryCompletionDeg: (T: number) => number;
 };

@@ -215,6 +215,7 @@ const doc = {
     ...['01', '02', '03', '04', '05', '06', '07', '08', '09'].map((n) => `data/rspa20160404supp2/Table-S${n}.txt`),
     'public/input/stephenson-2016-deltaT-polynomial.json', 'public/input/lunar-eclipses-nasa.json', 'public/input/climate-formula-coefficients.json',
     'packages/physics/src/eclipse/finders.cjs', 'packages/physics/src/moon/series.cjs', 'packages/physics/src/moon/arguments.cjs',
+    'tools/lib/horizons-crossing.js',   // the cardinal crossing finder — one home with the swap gate
     'tools/explore/residual-spectra/spectrum.mjs', 'tools/explore/residual-spectra/series.mjs', 'tools/explore/residual-spectra/series-records.mjs', 'tools/explore/residual-spectra/series-paleo.mjs', 'tools/explore/residual-spectra/series-sun.mjs', 'tools/explore/residual-spectra/probes.mjs', 'tools/explore/residual-spectra/model-internals.mjs', 'tools/explore/residual-spectra/write-sweep.mjs',
   ]),
 };
