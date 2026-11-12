@@ -25,13 +25,16 @@ export function computeSolarTorqueShare(c: {
  *   moonDistanceJ2000Metres: number,
  *   yearToTMa: (year: number) => number,
  *   meanObliquityCosRatioAtAge?: (tMa: number) => (number | null),
+ *   lunarRegimeFactorAtAge?: (tMa: number) => (number | null),
  * }} deps - p0 = the model's derived J2000 rate, 1,296,000/axial0 (S5; a
  *   number or a LAZY getter — the callers' certified year laws read the
  *   deep-time factory this is built inside, so the anchor is resolved on
  *   the first RATE use, never at construction; the torque term needs no
  *   anchor); lodJ2000Seconds the SAME day basis lodSecondsAtAge(0) returns;
  *   meanObliquityCosRatioAtAge the cited mean obliquity's cos ε̄(t)/cos ε̄(0)
- *   (OPTIONAL — absent, the rate of date is the constant alone, bit-identical).
+ *   (OPTIONAL — absent, the rate of date is the constant alone, bit-identical);
+ *   lunarRegimeFactorAtAge the Laplace-plane regime factor R(t) on the lunar
+ *   term (OPTIONAL — absent, R ≡ 1, bit-identical).
  * @returns {{
  *   composedRateArcsecPerYrAtAge: (tMa: number) => (number | null),
  *   composedPeriodYearsAtAge: (tMa: number) => (number | null),
@@ -56,6 +59,7 @@ export function createComposedPrecession(deps: {
     moonDistanceJ2000Metres: number;
     yearToTMa: (year: number) => number;
     meanObliquityCosRatioAtAge?: (tMa: number) => (number | null);
+    lunarRegimeFactorAtAge?: (tMa: number) => (number | null);
 }): {
     composedRateArcsecPerYrAtAge: (tMa: number) => (number | null);
     composedPeriodYearsAtAge: (tMa: number) => (number | null);

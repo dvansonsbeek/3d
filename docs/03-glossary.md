@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.13
-coefficients: sha256:7c135a128a54451c
+modelVersion: v27.14
+coefficients: sha256:617134ba66522681
 status: current
 ---
 
@@ -176,7 +176,7 @@ The angle between Earth's rotational axis and the perpendicular to its orbital p
 ## Scientific References
 
 ### Expanding Solar System Resonance Theory (ESSRT)
-The deep-time model: two physically independent drivers stretch the model's periods across geological time. **Driver 1** — Earth–Moon tidal evolution (the day lengthens, the Moon recedes; the mean lunisolar precession period follows the composed torque rate). **Driver 2** — solar mass loss (every orbit slowly expands via Kepler's third law). The axial precession period was <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr at the Devonian (380 Ma), is <!--v:axialPrecRound-->~25,772<!--/v--> yr today and reaches <!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr at +200 Myr; the climate formula's precession-band lines ride it, its eccentricity-band lines are planetary beats that do not. Validated against Wells 1963 (Devonian coral growth bands), Wu et al. 2024 (650-Myr cyclostratigraphy) and the Earth–Moon genesis epoch. Full theory: [Doc 99](99-expanding-solar-system-resonance-theory.md).
+The deep-time model: two physically independent drivers stretch the model's periods across geological time. **Driver 1** — Earth–Moon tidal evolution (the day lengthens, the Moon recedes; the mean lunisolar precession period follows the composed torque rate). **Driver 2** — solar mass loss (every orbit slowly expands via Kepler's third law). The axial precession period was <!--v:axialPrecAtDevonian-->21,244<!--/v--> yr at the Devonian (380 Ma), is <!--v:axialPrecRound-->~25,772<!--/v--> yr today and reaches <!--v:axialPrecAt200MyrFuture-->28,310<!--/v--> yr at +200 Myr; the climate formula's precession-band lines ride it, its eccentricity-band lines are planetary beats that do not. Validated against Wells 1963 (Devonian coral growth bands), Wu et al. 2024 (650-Myr cyclostratigraphy) and the Earth–Moon genesis epoch. Full theory: [Doc 99](99-expanding-solar-system-resonance-theory.md).
 
 ### Souami & Souchay (2012)
 A scientific paper providing high-precision values for planetary orbital inclinations and ascending nodes relative to the invariable plane. The published reference the model's invariable-plane quantities are stated beside.

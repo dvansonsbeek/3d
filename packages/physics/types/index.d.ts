@@ -77,5 +77,6 @@ export { CHAIN_ARTIFACT, CHAIN_ARTIFACT_HASH } from "./planets/chain-artifact.js
 export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from "./moon/deep-modes-artifact.cjs";
 export { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_YEARS } from "./earth/year-lengths.cjs";
 export { computeSolarTorqueShare, createComposedPrecession } from "./earth/precession-composed.cjs";
+export { createLaplacePlaneRegime, testParticleTiltFromEquatorDeg } from "./earth/laplace-plane.cjs";
 export { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH } from "./deltat/moon-distance-artifact.cjs";
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from "./climate/l1-orbital.cjs";

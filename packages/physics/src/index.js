@@ -168,6 +168,10 @@ export { computeSolarTorqueShare, createComposedPrecession } from './earth/prece
 // The cited mean obliquity of date — the second column read from the Earth–Moon
 // history; the precession RATE of date carries its cos ε̄(t)/cos ε̄(0) on the constant.
 export { createMeanObliquityHistory } from './earth/mean-obliquity-history.cjs';
+// The Laplace-plane regime of the lunar orbit (plan 31 A): the composed law's
+// lunar term carries its regime factor R(t), the free inclination is derived on
+// the cited distance, the lunar node and perigee of date carry the oblateness term.
+export { createLaplacePlaneRegime, testParticleTiltFromEquatorDeg } from './earth/laplace-plane.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';

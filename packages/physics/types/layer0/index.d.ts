@@ -1,8 +1,9 @@
-export function createEpochPrimitives({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge, meanObliquityCosRatioAtAge }: {
+export function createEpochPrimitives({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge, meanObliquityCosRatioAtAge, lunarRegimeFactorAtAge }: {
     params: EpochParams;
     alphaAtAgeMa: (tMa: number) => number;
     moonDistanceMetresAtAge: (tMa: number) => number | null;
     meanObliquityCosRatioAtAge?: (tMa: number) => number | null;
+    lunarRegimeFactorAtAge?: (tMa: number) => number | null;
 }): EpochPrimitives;
 export type EpochParams = {
     /**

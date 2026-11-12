@@ -62,6 +62,7 @@
  *     precessionPeriodYearsAtAge: (tMa: number) => (number | null),
  *     modulation: (tMa: number, s: number) => number,
  *     distanceMetresAtAge: (tMa: number) => number|null,
+ *     laplaceRegime?: () => ({ nodePeriodSecondsAtAge: (tMa: number) => number|null, perigeePeriodSecondsAtAge: (tMa: number) => number|null } | null),
  *   },
  * }} deps — fns are the ENGINE'S OWN layer-0/1 evaluators and the shared
  *   eccentricity channel's modulation; constants are the engine's derived
@@ -71,6 +72,11 @@
  *   month's equinox turn; within 0.1 ms of the IAU input at J2000).
  *   fns.distanceMetresAtAge is the engine's CITED distance history
  *   (deltat/moon-distance-history; null beyond the span).
+ *   fns.laplaceRegime (OPTIONAL, a LAZY getter — the regime reads this chain's
+ *   SOLAR perigee/node forms, so it is built after it) is the Laplace-plane
+ *   regime (earth/laplace-plane, plan 31 A): with it the published perigee and
+ *   node of date are the oblateness term of date plus the solar term, exact
+ *   at the J2000 anchor; absent, the solar form alone (bit-identical).
  */
 function createMoonMonthChain({ constants, fns }) {
   const {
@@ -81,7 +87,7 @@ function createMoonMonthChain({ constants, fns }) {
     moonSiderealMonthJ2000Seconds,
     sPerigee, sNode,
   } = constants;
-  const { meanLodSecondsAtAge, meanSiderealYearSecondsAtAge, precessionPeriodYearsAtAge, modulation, distanceMetresAtAge } = fns;
+  const { meanLodSecondsAtAge, meanSiderealYearSecondsAtAge, precessionPeriodYearsAtAge, modulation, distanceMetresAtAge, laplaceRegime } = fns;
   if (typeof distanceMetresAtAge !== 'function') throw new Error('month-chain: fns.distanceMetresAtAge (the cited distance history) is required');
   void aMoonNowMetres;
 
@@ -142,10 +148,11 @@ function createMoonMonthChain({ constants, fns }) {
   // The of-date perigee and node are the engines' count compositions of this
   // chain's inertial periods with the tropical month.
 
-  /** Perigee precession period in seconds — Brouwer–Clemence m² scaling ×
-   *  e_E-channel modulation (the factored law: period = invariant mean /
-   *  rate modulation). @param {number} tMa @returns {number | null} */
-  function perigeePrecessionSecondsAtAge(tMa) {
+  /** The SOLAR perigee precession period in seconds — Brouwer–Clemence m²
+   *  scaling × e_E-channel modulation (the factored law: period = invariant
+   *  mean / rate modulation); the observed J2000 period at the anchor.
+   *  @param {number} tMa @returns {number | null} */
+  function perigeePrecessionSolarSecondsAtAge(tMa) {
     if (tMa === 0) return moonApsidalJ2000Seconds;
     const tSmT = siderealMonthSecondsAtAge(tMa);
     const tYrT = meanSiderealYearSecondsAtAge(tMa);
@@ -156,8 +163,9 @@ function createMoonMonthChain({ constants, fns }) {
       / modulation(tMa, sPerigee);
   }
 
-  /** @param {number} tMa @returns {number | null} */
-  function nodePrecessionSecondsAtAge(tMa) {
+  /** The SOLAR node precession period in seconds (the same form).
+   *  @param {number} tMa @returns {number | null} */
+  function nodePrecessionSolarSecondsAtAge(tMa) {
     if (tMa === 0) return moonNodalJ2000Seconds;
     const tSmT = siderealMonthSecondsAtAge(tMa);
     const tYrT = meanSiderealYearSecondsAtAge(tMa);
@@ -166,6 +174,19 @@ function createMoonMonthChain({ constants, fns }) {
       * Math.pow(tYrT / meanSiderealYearJ2000Seconds, 2)
       * (moonSiderealMonthJ2000Seconds / tSmT)
       / modulation(tMa, sNode);
+  }
+
+  /** The PUBLISHED perigee precession period of date: the Laplace regime's
+   *  (the oblateness term of date plus the solar term) when injected, else
+   *  the solar form. @param {number} tMa @returns {number | null} */
+  function perigeePrecessionSecondsAtAge(tMa) {
+    const r = laplaceRegime ? laplaceRegime() : null;
+    return r ? r.perigeePeriodSecondsAtAge(tMa) : perigeePrecessionSolarSecondsAtAge(tMa);
+  }
+  /** The PUBLISHED node precession period of date (same rule). @param {number} tMa @returns {number | null} */
+  function nodePrecessionSecondsAtAge(tMa) {
+    const r = laplaceRegime ? laplaceRegime() : null;
+    return r ? r.nodePeriodSecondsAtAge(tMa) : nodePrecessionSolarSecondsAtAge(tMa);
   }
 
   /** Anomalistic month in seconds (perigee-to-perigee).
@@ -209,6 +230,7 @@ function createMoonMonthChain({ constants, fns }) {
     distanceCorrectedKmAtAge, siderealMonthSecondsAtAge,
     synodicMonthSecondsAtAge, tropicalMonthSecondsAtAge,
     perigeePrecessionSecondsAtAge, nodePrecessionSecondsAtAge,
+    perigeePrecessionSolarSecondsAtAge, nodePrecessionSolarSecondsAtAge,
     anomalisticMonthSecondsAtAge, nodalMonthSecondsAtAge,
     apsidalMeetsNodalSecondsAtAge, lunarLevelingSecondsAtAge,
   };

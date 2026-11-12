@@ -2,7 +2,7 @@
 // The fitted coefficients' shapes for TypeScript consumers (§2g); values live
 // in coefficients.js, emitted VERBATIM from the fit artifacts under data/.
 
-export declare const COEFFICIENTS_HASH: "7c135a128a54451c";
+export declare const COEFFICIENTS_HASH: "617134ba66522681";
 
 export declare const FITTED_COEFFICIENTS: {
   readonly BALANCE_PRESETS: Array<Array<number | string>>;
@@ -275,28 +275,28 @@ export declare const FITTED_COEFFICIENTS: {
             "ratio": number;
             "label": string;
           };
-          "27.2689": {
+          "27.2690": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "28.8424": {
+          "28.8425": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "29.0048": {
+          "29.0049": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "29.6172": {
+          "29.6173": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
@@ -310,35 +310,35 @@ export declare const FITTED_COEFFICIENTS: {
             "ratio": number;
             "label": string;
           };
-          "39.5561": {
+          "39.5562": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "40.2293": {
+          "40.2294": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "40.9240": {
+          "40.9241": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "41.6446": {
+          "41.6447": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;
             "ratio": number;
             "label": string;
           };
-          "53.6175": {
+          "53.6178": {
             "period_kyr": number;
             "lr04_post_mpt_amp": number;
             "epica_amp": number;

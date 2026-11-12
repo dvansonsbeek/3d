@@ -60,15 +60,18 @@
 /**
  * @param {{params: EpochParams, alphaAtAgeMa: (tMa: number) => number,
  *   moonDistanceMetresAtAge: (tMa: number) => number|null,
- *   meanObliquityCosRatioAtAge?: (tMa: number) => number|null}} deps —
+ *   meanObliquityCosRatioAtAge?: (tMa: number) => number|null,
+ *   lunarRegimeFactorAtAge?: (tMa: number) => number|null}} deps —
  *   moonDistanceMetresAtAge is the engine's cited distance history
  *   (deltat/moon-distance-history: Farhat et al. 2022 as a shape on the
  *   J2000 anchor — the cited input);
  *   meanObliquityCosRatioAtAge the cited mean obliquity's cos ε̄(t)/cos ε̄(0)
- *   (earth/mean-obliquity-history) — OPTIONAL, absent → 1.
+ *   (earth/mean-obliquity-history) — OPTIONAL, absent → 1;
+ *   lunarRegimeFactorAtAge the Laplace-plane regime factor R(t) on the
+ *   composed law's lunar term (earth/laplace-plane) — OPTIONAL, absent → 1.
  * @returns {EpochPrimitives}
  */
-export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge, meanObliquityCosRatioAtAge }) => {
+export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMetresAtAge, meanObliquityCosRatioAtAge, lunarRegimeFactorAtAge }) => {
   /**
    * Years before the epoch, in Ma. The ONE place this conversion lives.
    * @param {number} year
@@ -90,6 +93,14 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
    * @returns {number|null}
    */
   const meanObliquityCosRatioCore = (t) => (meanObliquityCosRatioAtAge ? meanObliquityCosRatioAtAge(t) : 1);
+
+  /**
+   * R(t), the Laplace-plane regime factor on the composed law's lunar term;
+   * 1 when no regime is injected (the product by 1 is exact).
+   * @param {number} t age in Ma
+   * @returns {number|null}
+   */
+  const lunarRegimeFactorCore = (t) => (lunarRegimeFactorAtAge ? lunarRegimeFactorAtAge(t) : 1);
 
   /**
    * Length of day from angular-momentum conservation: as the Moon recedes it
@@ -128,9 +139,10 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
    * Tropical year of date — the sidereal year less the equinox's own motion
    * over one year: one turn per the composed lunisolar precession period
    * T_p(t), i.e. 1/T_trop = 1/T_sid + ψ̇(t)/(1,296,000″ · Julian-year s) with
-   * ψ̇(t) the RATE of date, spelled as (LOD₀/LOD(t))·p₀·[f_S + (1 − f_S)(a₀/a_M)³]
-   * × cos ε̄(t)/cos ε̄(0) — the cited mean obliquity's factor (injected, 1 when
-   * absent). (The retired calendar convention, doc 109 §23, read 0.086 % slow
+   * ψ̇(t) the RATE of date, spelled as (LOD₀/LOD(t))·p₀·[f_S + (1 − f_S)(a₀/a_M)³·R(t)]
+   * × cos ε̄(t)/cos ε̄(0) — the cited mean obliquity's factor and the lunar
+   * term's Laplace-plane regime factor (both injected, 1 when absent). (The
+   * retired calendar convention, doc 109 §23, read 0.086 % slow
    * on the equinox term — 1.0 s of year at J2000.) The
    * SAME operations as deltat/deep-time.cjs tropicalYearSecondsFromLod (the
    * layer0 gate holds the twins bit-identical). Past the tidal chain's
@@ -146,7 +158,8 @@ export const createEpochPrimitives = ({ params: p, alphaAtAgeMa, moonDistanceMet
     const lod = lodSecondsCore(t);
     const a = moonDistanceMetresCore(t);
     const lf = (a === null || !(a > 0)) ? null : Math.pow(p.moonDistanceNowM / a, 3);
-    const term = lf === null ? null : p.precessionSolarShareJ2000 + (1 - p.precessionSolarShareJ2000) * lf;
+    const R = lf === null ? null : lunarRegimeFactorCore(t);
+    const term = (lf === null || R === null) ? null : p.precessionSolarShareJ2000 + (1 - p.precessionSolarShareJ2000) * lf * R;
     const p0 = p.precessionRateJ2000ArcsecPerYr;
     const f = meanObliquityCosRatioCore(t);
     const rate = (lod === null || !(lod > 0) || term === null || f === null) ? p0 : (p.lodNowH13Seconds / lod) * p0 * term * f;

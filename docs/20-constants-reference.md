@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.13
-coefficients: sha256:7c135a128a54451c
+modelVersion: v27.14
+coefficients: sha256:617134ba66522681
 status: current
 ---
 
@@ -40,7 +40,7 @@ Per the [Expanding Solar System Resonance Theory (Doc 99)](99-expanding-solar-sy
 | Planet orbital periods (Part 4 `orbitalPeriodInputDays`) | `meanPlanetOrbitalPeriodAtAge(t_Ma, T_p_J2000_s)` |
 | α(t) GIA correction → ΔT | `meanDeltaTSecondsAtAge(t_Ma)` |
 
-The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,315<!--/v--> yr. (The fitted unit that once scaled with it left the model at plan 09; the device wheels that carried its periods as a J2000 pose were deleted at plan 11.)
+The clocks evolve under two physically independent drivers: **Driver 1** = Earth-Moon tidal evolution (LOD grows, Moon recedes; the composed lunisolar precession period T_p(t) follows it); **Driver 2** = solar mass loss (every planet's orbit slowly expands via Kepler's 3rd law). At Devonian (380 Ma) T_p ≈ <!--v:axialPrecAtDevonian-->21,244<!--/v--> yr; at +200 Myr T_p ≈ <!--v:axialPrecAt200MyrFuture-->28,310<!--/v--> yr. (The fitted unit that once scaled with it left the model at plan 09; the device wheels that carried its periods as a J2000 pose were deleted at plan 11.)
 
 For the canonical derivation chain from `t_Ma` through LOD, the composed precession period, AU, M_Sun, Kepler year, Moon distance, Moon period, anomalistic year, stellar/sidereal days, and planet orbital + synodic periods, see [Doc 99 — ESSRT](99-expanding-solar-system-resonance-theory.md) and the `mean*AtAge` family — ONE home since plan 13 B2, `@essrt/physics/deltat/deep-time-chain` (`createDeepTimeChain`; `tools/lib/deep-time.js` and the package model are its consumers). (The per-planet integer-label tabulation on the anchor's eight-unit interval is archived.)
 

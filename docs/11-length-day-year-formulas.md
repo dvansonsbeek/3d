@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.13
-coefficients: sha256:7c135a128a54451c
+modelVersion: v27.14
+coefficients: sha256:617134ba66522681
 status: current
 ---
 
@@ -56,21 +56,30 @@ moves is T_p. Today the clock is 25,772 yr and the tropical year is 20 min
 shorter than the sidereal. At the end of the cited Earth–Moon history (the
 Hadean edge: the Moon at <!--v:moonDistanceAtHadeanRE-->6.19<!--/v--> R⊕, the day
 <!--v:lodAtHadeanHr-->5.51<!--/v--> h) the composed clock is
-<!--v:axialPrecAtHadeanYr-->8.81<!--/v--> yr, so the equinox runs round the orbit
+<!--v:axialPrecAtHadeanYr-->2024.50<!--/v--> yr, so the equinox runs round the orbit
 once every nine years and the tropical year is
-<!--v:tropicalYearAtHadeanSiDays-->327.8<!--/v--> SI days against a sidereal year
+<!--v:tropicalYearAtHadeanSiDays-->364.8<!--/v--> SI days against a sidereal year
 of <!--v:siderealYearAtHadeanSiDays-->364.96<!--/v--> —
-<!--v:tropicalYearAtHadeanSolarDays-->1,429<!--/v--> solar days of date, the count
+<!--v:tropicalYearAtHadeanSolarDays-->1,590<!--/v--> solar days of date, the count
 a rhythmite would record. The ratio to today's tropical year,
-<!--v:tropicalYearAtHadeanOverJ2000-->0.8975<!--/v-->, is the factor by which any
+<!--v:tropicalYearAtHadeanOverJ2000-->0.9987<!--/v-->, is the factor by which any
 unit sized in the position's year count shrinks there (the simulator's time
 steps read 54 minutes for an hour until plan 30 item I; doc 41 §15.7). The
-clock at the edge is the composed law's value at the edge of its domain,
-reproducible, not converged: the law's lunar term carries the J2000 lunar
-inclination to the ecliptic, and inside the Laplace radius (~10–17 R⊕,
-Touma & Wisdom 1994) the Moon's orbit follows Earth's equator, where that
-term is overstated — the edge's T_p is the law's floor, the Earth's was
-longer (doc 99 §Interpretation 2).
+clock at the edge is the COUPLED spin–orbit precession of the Laplace-plane
+regime (plan 31 A, doc 111 §1.42): inside the Laplace radius
+(<!--v:laplaceRadiusAtHadeanRE-->15.15<!--/v--> R⊕ there on the oblateness of
+date, <!--v:laplaceRadiusJ2000RE-->8.40<!--/v--> today) the Moon's orbit
+precesses about Earth's equator and its torque no longer precesses the spin
+about the ecliptic pole, so the law's lunar term carries a regime factor R(t)
+— the ecliptic form it replaced read
+<!--v:axialPrecAtHadeanEclipticFormYr-->8.81<!--/v--> yr at the edge, the solar
+torque alone would give <!--v:axialPrecAtHadeanSolarOnlyYr-->17,540<!--/v-->,
+and the Moon's orbit transmitting the Sun's torque on it lands between. The
+clock is shortest near twice the Laplace radius
+(<!--v:axialPrecMinimumYr-->453<!--/v--> yr at
+<!--v:axialPrecMinimumAgeMa-->4,421<!--/v--> Ma) and lengthens again toward
+the edge; outside <!--v:lunarRegimeOnePercentAgeMa-->3,583<!--/v--> Ma the
+regime moves the lunar term by less than 1 % (doc 99 §Interpretation 2).
 
 ### Key Principle
 
@@ -260,7 +269,7 @@ All precession periods emerge from ratios of year lengths:
 | Axial | `Y_sid / (Y_sid − Y_trop)` | T_p = <!--v:earthAxialPeriod-->25,772<!--/v--> yr |
 | Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | T_peri ≈ <!--v:earthPeriPeriod-->20,936<!--/v--> yr |
 | Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | T_aps ≈ <!--v:earthPeriPeriodICRF-->111,581<!--/v--> yr |
-| Obliquity | the beat of the spin axis's inertial precession against the nodal mode: 1/(1/T_ψ̇ᵢₙ − 1/T_s₃) with T_ψ̇ᵢₙ = <!--v:spinAxisInertialPeriodYearsJ2000-->25,722<!--/v--> yr (the pole's period, 0.097 ″/yr above the equinox clock T_p — IAU's planetary precession). A record sees the window mean of the pole rate, not the J2000 instant: <!--v:obliqCycleRealizedLr04Years-->~40,924<!--/v--> yr over the LR04 record | <!--v:obliqCycleYears-->~41,099<!--/v--> yr at J2000 |
+| Obliquity | the beat of the spin axis's inertial precession against the nodal mode: 1/(1/T_ψ̇ᵢₙ − 1/T_s₃) with T_ψ̇ᵢₙ = <!--v:spinAxisInertialPeriodYearsJ2000-->25,722<!--/v--> yr (the pole's period, 0.097 ″/yr above the equinox clock T_p — IAU's planetary precession). A record sees the window mean of the pole rate, not the J2000 instant: <!--v:obliqCycleRealizedLr04Years-->~40,925<!--/v--> yr over the LR04 record | <!--v:obliqCycleYears-->~41,099<!--/v--> yr at J2000 |
 | Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
 
 These are time-varying — each uses the instantaneous year lengths at the given epoch, so precession periods themselves oscillate slightly.

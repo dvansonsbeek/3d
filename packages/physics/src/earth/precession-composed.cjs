@@ -6,12 +6,17 @@
  * the tidal chain (LOD history) carries BOTH torques, and the lunar torque
  * additionally grows with the recession history as (a₀/a_M(t))³:
  *
- *   ψ̇(t) = [ω(t)/ω₀] · p₀ · [ f_S + (1 − f_S) · (a₀/a_M(t))³ ]
+ *   ψ̇(t) = [ω(t)/ω₀] · p₀ · [ f_S + (1 − f_S) · (a₀/a_M(t))³ · R(t) ]
  *
  * with p₀ the J2000 rate and f_S the solar fraction of the J2000 torque,
  * derived from the shared constants (two-body point-mass torques with the
  * (1 − e²)^(−3/2) eccentricity factors and the lunar-inclination factor
- * 1 − 3/2·sin² i_M; ≈ 0.316, the textbook value). At J2000 every factor is 1.
+ * 1 − 3/2·sin² i_M; ≈ 0.316, the textbook value), and R(t) the lunar term's
+ * LAPLACE-PLANE REGIME FACTOR (earth/laplace-plane.cjs, plan 31 A: the Moon's
+ * averaged ring tilts from the ecliptic toward the equator inside the Laplace
+ * radius and its torque precesses the spin about the ecliptic pole less —
+ * 1 − R > 1 % only inside 4,243 Ma; OPTIONAL, absent → 1, bit-identical).
+ * At J2000 every factor is 1.
  *
  * THE RATE OF DATE vs THE CONSTANT: the law above
  * scales the precession CONSTANT α(t) ∝ ω(t)·[torque term] — the rate at the
@@ -67,13 +72,16 @@ function computeSolarTorqueShare(c) {
  *   moonDistanceJ2000Metres: number,
  *   yearToTMa: (year: number) => number,
  *   meanObliquityCosRatioAtAge?: (tMa: number) => (number | null),
+ *   lunarRegimeFactorAtAge?: (tMa: number) => (number | null),
  * }} deps - p0 = the model's derived J2000 rate, 1,296,000/axial0 (S5; a
  *   number or a LAZY getter — the callers' certified year laws read the
  *   deep-time factory this is built inside, so the anchor is resolved on
  *   the first RATE use, never at construction; the torque term needs no
  *   anchor); lodJ2000Seconds the SAME day basis lodSecondsAtAge(0) returns;
  *   meanObliquityCosRatioAtAge the cited mean obliquity's cos ε̄(t)/cos ε̄(0)
- *   (OPTIONAL — absent, the rate of date is the constant alone, bit-identical).
+ *   (OPTIONAL — absent, the rate of date is the constant alone, bit-identical);
+ *   lunarRegimeFactorAtAge the Laplace-plane regime factor R(t) on the lunar
+ *   term (OPTIONAL — absent, R ≡ 1, bit-identical).
  * @returns {{
  *   composedRateArcsecPerYrAtAge: (tMa: number) => (number | null),
  *   composedPeriodYearsAtAge: (tMa: number) => (number | null),
@@ -107,13 +115,18 @@ function createComposedPrecession(deps) {
     const a = deps.moonDistanceMetresAtAge(tMa);
     return a === null || !(a > 0) ? null : Math.pow(deps.moonDistanceJ2000Metres / a, 3);
   };
-  /** The torque term f_S + (1 − f_S)·(a₀/a_M)³ — the bracket of the composed
+  const regime = deps.lunarRegimeFactorAtAge;
+  /** The torque term f_S + (1 − f_S)·(a₀/a_M)³·R — the bracket of the composed
    * precession rate (deltat/deep-time.cjs; layer0 spells the
-   * SAME operations, the layer0 gate holds them bit-identical).
+   * SAME operations, the layer0 gate holds them bit-identical). R the
+   * Laplace-plane regime factor (1 when no regime is injected: the product
+   * by 1 is exact).
    * @param {number} tMa */
   const torqueTermAtAge = (tMa) => {
     const lf = lunarTorqueFactorAtAge(tMa);
-    return lf === null ? null : fS + (1 - fS) * lf;
+    if (lf === null) return null;
+    const R = regime ? regime(tMa) : 1;
+    return R === null ? null : fS + (1 - fS) * lf * R;
   };
   /** cos ε̄(t)/cos ε̄(0) from the cited mean obliquity — 1 when no history is
    * injected (the constant alone, bit-identical). @param {number} tMa @returns {number|null} */

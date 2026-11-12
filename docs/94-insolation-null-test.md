@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.13
-coefficients: sha256:7c135a128a54451c
+modelVersion: v27.14
+coefficients: sha256:617134ba66522681
 status: current
 ---
 
@@ -488,8 +488,8 @@ two halves* — the regime thesis — not as "spurious".
 |---|---:|---:|---|---|
 | post-MPT | <!--v:l1AuditR2PostMpt-->0.7804<!--/v--> | <!--v:l1AuditCvPositivePostMpt-->4<!--/v--> | <!--v:l1AuditBestCvLinePostMpt-->climatic precession p+g5<!--/v--> (<!--v:l1AuditBestCvDeltaR2PostMpt-->+0.0141<!--/v-->) | <!--v:l1AuditLargestLooLinePostMpt-->eccentricity g4−g5<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PostMpt-->+0.0275<!--/v-->) |
 | iNHG-MPT | <!--v:l1AuditR2InhgMpt-->0.6090<!--/v--> | <!--v:l1AuditCvPositiveInhgMpt-->8<!--/v--> | <!--v:l1AuditBestCvLineInhgMpt-->obliquity p+s3<!--/v--> (<!--v:l1AuditBestCvDeltaR2InhgMpt-->+0.0747<!--/v-->) | <!--v:l1AuditLargestLooLineInhgMpt-->obliquity p+s3<!--/v--> (<!--v:l1AuditLargestLooDeltaR2InhgMpt-->+0.1529<!--/v-->) |
-| pre-iNHG | <!--v:l1AuditR2PreInhg-->0.4547<!--/v--> | <!--v:l1AuditCvPositivePreInhg-->7<!--/v--> | <!--v:l1AuditBestCvLinePreInhg-->obliquity p+s3<!--/v--> (<!--v:l1AuditBestCvDeltaR2PreInhg-->+0.1258<!--/v-->) | <!--v:l1AuditLargestLooLinePreInhg-->obliquity p+s3<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PreInhg-->+0.1374<!--/v-->) |
-| lr04-full | <!--v:l1AuditR2Lr04Full-->0.3329<!--/v--> | <!--v:l1AuditCvPositiveLr04Full-->3<!--/v--> | <!--v:l1AuditBestCvLineLr04Full-->obliquity p+s6<!--/v--> (<!--v:l1AuditBestCvDeltaR2Lr04Full-->+0.0171<!--/v-->) | <!--v:l1AuditLargestLooLineLr04Full-->obliquity p+s3<!--/v--> (<!--v:l1AuditLargestLooDeltaR2Lr04Full-->+0.1304<!--/v-->) |
+| pre-iNHG | <!--v:l1AuditR2PreInhg-->0.4546<!--/v--> | <!--v:l1AuditCvPositivePreInhg-->7<!--/v--> | <!--v:l1AuditBestCvLinePreInhg-->obliquity p+s3<!--/v--> (<!--v:l1AuditBestCvDeltaR2PreInhg-->+0.1258<!--/v-->) | <!--v:l1AuditLargestLooLinePreInhg-->obliquity p+s3<!--/v--> (<!--v:l1AuditLargestLooDeltaR2PreInhg-->+0.1374<!--/v-->) |
+| lr04-full | <!--v:l1AuditR2Lr04Full-->0.3330<!--/v--> | <!--v:l1AuditCvPositiveLr04Full-->3<!--/v--> | <!--v:l1AuditBestCvLineLr04Full-->obliquity p+s6<!--/v--> (<!--v:l1AuditBestCvDeltaR2Lr04Full-->+0.0171<!--/v-->) | <!--v:l1AuditLargestLooLineLr04Full-->obliquity p+s3<!--/v--> (<!--v:l1AuditLargestLooDeltaR2Lr04Full-->+0.1305<!--/v-->) |
 
 Reading: the 41-kyr obliquity line carries both older regimes out of sample
 and is the largest single loss on the full record — where its cross-validated

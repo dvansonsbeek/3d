@@ -22,13 +22,13 @@
     -5.460229128938108
    ],
    "modelFit": {
-    "pArcsecPerYr": 50.52500000000017,
-    "periodYr": 40916.301650735026,
-    "rmsArcsec": 723.3799786475582
+    "pArcsecPerYr": 50.52500000000019,
+    "periodYr": 40916.301650735,
+    "rmsArcsec": 723.1359691201791
    },
    "modelPredicted": {
-    "pMeanArcsecPerYr": 50.51868893808309,
-    "periodYr": 40924.45576370145
+    "pMeanArcsecPerYr": 50.5185771407684,
+    "periodYr": 40924.600239042746
    },
    "la2004Fit": {
     "pArcsecPerYr": 50.53800000000019,
@@ -44,76 +44,76 @@
    "13": {
     "hybridRmsArcsec": 529.2476571088214,
     "hybridCorr": 0.9948674108026703,
-    "modeTableRmsArcsec": 529.6364333510701,
-    "modeTableCorr": 0.9948223466159248
+    "modeTableRmsArcsec": 529.6364340225615,
+    "modeTableCorr": 0.9948223465320954
    },
    "50": {
     "hybridRmsArcsec": 388.515271151428,
     "hybridCorr": 0.998130176502265,
-    "modeTableRmsArcsec": 388.8170235045012,
-    "modeTableCorr": 0.9981071963762522
+    "modeTableRmsArcsec": 388.8170144028675,
+    "modeTableCorr": 0.9981071969574958
    },
    "130": {
     "hybridRmsArcsec": 379.90727214756583,
     "hybridCorr": 0.9961814700400722,
-    "modeTableRmsArcsec": 381.0109578098327,
-    "modeTableCorr": 0.9960953645027931
+    "modeTableRmsArcsec": 381.0105778205288,
+    "modeTableCorr": 0.9960953905285753
    },
    "270": {
     "hybridRmsArcsec": 429.2581106565938,
     "hybridCorr": 0.9924615522020998,
-    "modeTableRmsArcsec": 452.4764468741278,
-    "modeTableCorr": 0.9909036904580327
+    "modeTableRmsArcsec": 452.47325914959947,
+    "modeTableCorr": 0.99090391162109
    },
    "600": {
     "hybridRmsArcsec": 586.3751287544526,
     "hybridCorr": 0.9732954970595473,
-    "modeTableRmsArcsec": 645.0557890600182,
-    "modeTableCorr": 0.9663585384681987
+    "modeTableRmsArcsec": 645.0327125073477,
+    "modeTableCorr": 0.9663614061242087
    },
    "1000": {
     "hybridRmsArcsec": 685.9804515878168,
     "hybridCorr": 0.948335558436917,
-    "modeTableRmsArcsec": 767.8872500445857,
-    "modeTableCorr": 0.9328766101777001
+    "modeTableRmsArcsec": 767.838242298875,
+    "modeTableCorr": 0.9328863996457243
    }
   },
   "windowsEra": {
    "13": {
     "hybridRmsArcsec": 49.944157102338636,
     "hybridCorr": 0.9998292700143777,
-    "modeTableRmsArcsec": 529.6364333510701,
-    "modeTableCorr": 0.9948223466159248
+    "modeTableRmsArcsec": 529.6364340225615,
+    "modeTableCorr": 0.9948223465320954
    },
    "50": {
     "hybridRmsArcsec": 426.79760627742786,
     "hybridCorr": 0.9905694392337773,
-    "modeTableRmsArcsec": 388.8170235045012,
-    "modeTableCorr": 0.9981071963762522
+    "modeTableRmsArcsec": 388.8170144028675,
+    "modeTableCorr": 0.9981071969574958
    },
    "130": {
     "hybridRmsArcsec": 488.2114773546891,
     "hybridCorr": 0.9820574949968871,
-    "modeTableRmsArcsec": 381.0109578098327,
-    "modeTableCorr": 0.9960953645027931
+    "modeTableRmsArcsec": 381.0105778205288,
+    "modeTableCorr": 0.9960953905285753
    },
    "270": {
     "hybridRmsArcsec": 489.73940495182984,
     "hybridCorr": 0.9821222319932994,
-    "modeTableRmsArcsec": 452.4764468741278,
-    "modeTableCorr": 0.9909036904580327
+    "modeTableRmsArcsec": 452.47325914959947,
+    "modeTableCorr": 0.99090391162109
    },
    "600": {
     "hybridRmsArcsec": 547.831379914776,
     "hybridCorr": 0.9724534889428793,
-    "modeTableRmsArcsec": 645.0557890600182,
-    "modeTableCorr": 0.9663585384681987
+    "modeTableRmsArcsec": 645.0327125073477,
+    "modeTableCorr": 0.9663614061242087
    },
    "1000": {
     "hybridRmsArcsec": 643.8617845834913,
     "hybridCorr": 0.9496615204774437,
-    "modeTableRmsArcsec": 767.8872500445857,
-    "modeTableCorr": 0.9328766101777001
+    "modeTableRmsArcsec": 767.838242298875,
+    "modeTableCorr": 0.9328863996457243
    }
   }
  },
@@ -123,10 +123,11 @@
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
    "data/nbody-deep-secular-modes.json": "sha256:87c325fac77d94a45e1381b62a2a4c5cd8253bc4765c8d497a1d9f5466649ccc",
-   "data/nbody-secular-series.json": "sha256:06c90ff051da522bb4a05e069e0565279b213d11f648bdc272a546a582dbc610",
-   "packages/physics/src/deltat/deep-time.cjs": "sha256:646d3c7c61c5617365f42364cf7c32f23621acddacb1f0ee783e24fc82dacf9c",
+   "data/nbody-secular-series.json": "sha256:f2f9dfd5cd3fbae622506028d9c451cbb297e2acc2e64149a3e8ac3eeaf7928b",
+   "packages/physics/src/deltat/deep-time.cjs": "sha256:fa981112f99bfecea4413a98cbc8645a110d8aae9bc314dbc8aaf31dac3a0f60",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256:bff29c52aad9d30fbc7aec355812a3fbd40cc3eae507c487332cd16cda4ee1fa",
-   "packages/physics/src/earth/precession-composed.cjs": "sha256:448b2327fc6f3a6994bfc5cc514fec3dc7ceae2037312ae8343b57b7f948252a",
+   "packages/physics/src/earth/laplace-plane.cjs": "sha256:72f7f912f293df9fa8993db92c5806c604d9f87743d707c0cedec0e1ce3a0d37",
+   "packages/physics/src/earth/precession-composed.cjs": "sha256:c32805dcc84415c6b5137678876d6829e4742201f8b104ba3ef6b2016d885358",
    "packages/physics/src/model.js": "sha256:68abe6a33d1e5cf2d169d31d3ed9817ad2fed5f11aee4132e32ba2d0332f3c65",
    "packages/physics/src/model/cardinal-instants.js": "sha256:72b4dc78f2ee10720ffdf79cb39be16ee5aece012a07498e14470c944246fe58",
    "packages/physics/src/model/context.js": "sha256:402e15396eeb7b919b2ae18c19e20a1e0efbc515a194282f106aac3cd32d775f",
@@ -147,8 +148,8 @@
    "packages/physics/src/model/time-axis.js": "sha256:24c3337f40b7580c748f71c82b79e3c5e1c474b059d92881d81d151a31050988",
    "packages/physics/src/model/year-day-lengths.js": "sha256:738a1e8a0e1cdbc7c1cb9ea3812b652718e4e385c3bafe19e93be52622ad5811",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256:b1d5d59f64af940b6acc1f4c6880c7b2813566dd7099275e61e33ea1b8de5a6b",
-   "tools/lib/deep-time.js": "sha256:6d67fc7219205a835ec935b31bf97bc96b3eb8cac66217e375c4a74c740b6f8b",
-   "tools/verify/obliquity-hybrid.js": "sha256:a65260b9420519fcbbbd94ecae507cf64be7eddf10366a8ab0a870016c7b0bbb"
+   "tools/lib/deep-time.js": "sha256:86eafdbc174de1a87ff5a36a0c2916a62f7219dea9c3498c26a7380e16932dc0",
+   "tools/verify/obliquity-hybrid.js": "sha256:4ca6636c7c9a7d7b4ef2e5754a3f74107631feb81561871d62677d6e0e4e1bc0"
   }
  }
 }

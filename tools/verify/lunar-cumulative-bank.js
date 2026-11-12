@@ -53,6 +53,7 @@ const INPUT_FILES = [
   'packages/physics/src/planets/orbit-chain.cjs',
   'packages/physics/src/deltat/deep-time-chain.js',
   'packages/physics/src/deltat/deep-time.cjs',
+  'packages/physics/src/earth/laplace-plane.cjs',
   // the UT↔TT bridge: the read-path gate's recorded rows cross it (doc 111 §1.16)
   'packages/physics/src/phase/deep-calendar.cjs',
   'packages/physics/src/deltat/moon-distance-history.cjs',

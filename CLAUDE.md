@@ -407,6 +407,30 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   `createModel()` has no banked series; a null names its grid's extent; a
   regressor shared with the sampling is fitted jointly and read against the
   prediction. (§1.41)
+- **A ring near the equator does not precess the spin about the ecliptic
+  pole** — the composed law's lunar term carried the Moon's torque at full
+  strength on the ecliptic at every epoch; inside the Laplace radius (8.4 R⊕
+  today, 15 R⊕ at the cited history's end on the hydrostatic J₂ ∝ ω²) the
+  lunar orbit precesses about the equator and the term shuts off: the edge
+  clock is the COUPLED spin–orbit precession, ~2,000 yr, not the law's 9 and
+  not the solar-only 17,600 (the Moon's orbit still transmits the Sun's torque
+  on it); the lunar term carries R(t) (ONE home `earth/laplace-plane`), 1 at
+  J2000, > 1 % only inside 3.6 Ga. The third law must hold EXACTLY inside the
+  coupled solve (a 2.4 % convention gap between the p_A-anchored lunar term
+  and the direct J₂ coefficient moved the clock 9 %, since the internal pair
+  is 180× the solar torque there) — the regime is a normalised SHAPE, the
+  anchor stays p_A. The free inclination to the Laplace plane is DERIVED on
+  the cited distance (sin i_L ∝ a^{−1/2}, the κ = 1/4 twin the band; 9–16° at
+  the edge), the inclination problem named open; the node and perigee of date
+  carry the oblateness term (3.2 / 1.7 yr at the edge). Farhat's own precession
+  column is the ecliptic form — a cross-check, never this regime's referee.
+  A solve inside a rate is paid by every integrator that reads the rate
+  (the deep calendar 19 s, the genesis landing 10.8 s for 3.1): the slow
+  geometry rides a FIXED 20-kyr grid built on demand under the α-reference
+  pin (rule R2 — the GIA wobble reaches R at 2e-7), the fast solar
+  modulation stays live, the direct solve is the gate's instrument. The
+  lunar LATITUDE of date (the mean plane's tilt, the free inclination in
+  the series, the drawn plane) is the open slice A2. (§1.42)
 
 ---
 
@@ -415,7 +439,9 @@ Each line names the rule; doc 111 §1.n carries the measurement.
 `npm run check` is the enforced chain — lint, typecheck, `check:boundaries`
 (the §2h licensing invariant), purity, `test:calendar` (the one-home
 calendar/angle helpers against the legacy bodies), the layer gates
-(`test:layer0`, `test:cited-history`, `test:layer1`), `test:constants` (the
+(`test:layer0`, `test:cited-history`, `test:laplace-regime` — the
+Laplace-plane regime's anchor, era, limits, referees and edge rows —,
+`test:layer1`), `test:constants` (the
 embed ≡ its sources), `test:counterfactual` (a changed input gives a changed,
 reproducible result with its own hash), `test:planet-model` and `test:model`
 (the planet model and `createModel()` ≡ the shipped Node derivation,
@@ -505,9 +531,12 @@ two-engine interface; the historical gate suite is calibrated on it.
 derivation history and the retired fourth leg: doc 111 §3):
 
 1. **The deep-time scaling split** — the axial precession follows the COMPOSED
-   lunisolar rate ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³] ×
+   lunisolar rate ψ̇(t) = [ω(t)/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a_M(t))³·R(t)] ×
    cos ε̄(t)/cos ε̄(0) on the CITED Earth–Moon history (Farhat et al. 2022: the
-   distance, plan 12 option A, and the mean obliquity ε̄(t), plan 12 §8 (a) —
+   distance, plan 12 option A, and the mean obliquity ε̄(t), plan 12 §8 (a);
+   R(t) the Laplace-plane regime factor of plan 31 A — the coupled spin–orbit
+   precession inside the Laplace radius, 1 at J2000, > 1 % only inside 3.6 Ga,
+   ONE home `earth/laplace-plane` —
    the bracket is the precession CONSTANT's scaling, which the hybrid obliquity
    integration takes; the cosine makes it the RATE; ONE home
    `@essrt/physics/earth/precession-composed`; p₀ the IAU 2006 p_A,

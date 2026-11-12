@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.13
-coefficients: sha256:7c135a128a54451c
+modelVersion: v27.14
+coefficients: sha256:617134ba66522681
 status: current
 ---
 
@@ -327,7 +327,7 @@ model's own ε(t) over the LR04 window sits at <!--v:obliqCycleRealizedFitLr04Ye
 pole turned faster in the past (tidal spin +0.06 ″/yr over 5 Myr, lower
 mean obliquity +0.05, higher mean eccentricity +0.015 — the three of-date
 factors the spin integration already multiplies), and the window mean
-<!--v:spinAxisInertialRateMeanLr04ArcsecPerYr-->50.519<!--/v--> predicts the fitted period to 0.02 % (<!--v:obliqCycleRealizedLr04Years-->~40,924<!--/v-->). The records'
+<!--v:spinAxisInertialRateMeanLr04ArcsecPerYr-->50.519<!--/v--> predicts the fitted period to 0.02 % (<!--v:obliqCycleRealizedLr04Years-->~40,925<!--/v-->). The records'
 "+0.12…+0.20 ″/yr on the obliquity lines" was this mean. ONE home
 `lunisolar.spinAxisInertialRateMeanArcsecPerYr` /
 `obliquityPeriodRealizedYears`; the obliquity lines ride the LR04-window
@@ -1918,6 +1918,164 @@ comparison of the published elements passes the three banked artifacts in.
 The gate: `check:artifacts` on the governed artifact; `docs:tables` on doc
 112's blocks; the registry's `residualSweep*` keys.
 
+### 1.42 A ring near the equator does not precess the spin about the ecliptic pole — the Laplace-plane regime, and three things the build measured
+
+**The trap.** The composed lunisolar law carried the Moon's torque at full
+strength on the ecliptic at every epoch, with the J2000 inclination factor:
+ψ̇ = [ω/ω₀]·p₀·[f_S + (1 − f_S)(a₀/a)³]·cos ε̄/cos ε̄₀. Inside the Laplace
+radius r_L — r_L⁵ = J₂R²a_p³(M_E/M_S)(1 − e²)^{3/2}, 8.4 R⊕ today and
+15.1 R⊕ at the cited history's end where the hydrostatic J₂ ∝ ω² is 19× —
+the lunar orbit precesses about the EQUATOR (Goldreich 1966; Touma &
+Wisdom 1994; Tremaine, Touma & Namouni 2009), and a ring in the equator
+exerts no torque on an axisymmetric bulge. The law's clock at the edge,
+8.96 yr, was the (a₀/a)³ growth of a term that physically shuts off; doc
+99 and doc 106 had called it "a floor". Plan 31 A measured the regime
+first (the plan's status block; `tools/explore/plan31a-laplace-plane-measure.cjs`
+and `plan31a-free-inclination.cjs`, the records), then built it.
+
+**(a) The clock at the edge is ~2,000 yr, not 9 and not 17,600.** The
+test-particle closed form — the Laplace plane's tilt φ from the equator,
+tan 2φ = sin 2ε̄/(cos 2ε̄ + 2(r_L/a)⁵), the spin's lunar term × sin 2φ/sin 2ε̄
+— gave 1,409 yr; the plan's own expectation, "of order 10⁴ yr on the solar
+torque alone", was wrong by the same physics it had named: the Moon's
+orbit still carries the Sun's torque on IT to the Earth (the small-tilt
+limit of the factor is exactly (3/4)(n_s²/n)·L_M/L_spin). The shipped
+form is the COUPLED uniformly precessing state (decision 2026-11-11): the
+spin ŝ and the lunar mean plane n̂ precess together about the ecliptic
+pole at one rate Ω, two equations in (Ω, θ) from the two vector equations
+with the mutual J₂ torque pair by the third law — bracketed by the closed
+form (L_M → 0) and the rigid-lock bound Ω = (α_S L_s + β_S L_M) cos ε̄/
+(L_s + L_M) (a ≪ r_L), both gate rows. The lunar term's regime factor
+R(t) is the Moon's share of Ω against the ecliptic form, normalised to 1
+at J2000 (x/x: the IAU anchor untouched; the closed form's 1 − g₀ = 7e-5
+inside it). Measured on the final build: 1 − R > 1 % only inside 3,583 Ma
+(a = 38.7 R⊕); the lunar term moves 1.8e-3 at 1.4 Ga and 2.8e-3 at
+2.46 Ga (the referees' σ is 8 %); T_p at the edge 2,006–2,025 yr (the
+navigable edge, the table's last sample), bottoming at 453 yr near twice
+the Laplace radius (4,421 Ma, 16.5 R⊕) and lengthening again as the Moon
+enters the equatorial regime; the tropical year of date at the edge
+328 → 365 SI days (1,429 → 1,589 solar days of date). Farhat et al.
+2022's own "Luni-solar precession" column tracks the FORMER law to 4 % at
+the edge and the coupled one not at all: the cited solution's column is
+the classical ecliptic form, a cross-check, never a referee for this
+regime.
+
+**(b) The third law must hold EXACTLY inside the coupled solve.** The
+first build took the Moon's torque on the spin from the composed law's
+lunar term — anchored on the IAU general precession p_A, which carries the
+geodesic term and the planetary share — and the Earth's torque on the ring
+from the direct (3/2)·n·J₂·(R/a)²: 2.4 % apart, a convention, invisible
+anywhere else. Inside the Laplace radius the internal pair is 180× the
+solar torque, so a 2.4 % mismatch left a net torque four times the Sun's
+and moved the clock 9 %; a second build put the free inclination's cosine
+on the ring's angular momentum on one side only, 4 % apart, 3 % on the
+clock. The shipped pair is ONE ring (its angular momentum L_M, its J₂
+coefficient on its quadrupole of date, its torque on the spin by the third
+law); the regime factor is a normalised SHAPE, so the law keeps its p_A
+anchor and the 2.4 % is recorded in the state and pinned by the gate as
+the convention it is. The coupled rate then sits within 1 % of the lock
+bound at the edge, where a/r_L = 0.41.
+
+**(c) The free inclination is a derived history, and the hypothesis "the
+Moon's inclination started near Earth's tilt and was dragged to the
+ecliptic" is right in substance** (the owner, 2026-11-11). Two quantities:
+the inclination to the ECLIPTIC, which early on is the obliquity of THAT
+time (11.9° in the cited column at the edge, not today's 23°) swung by the
+node cycle, and falls to today's 5° through the Laplace-plane transition
+(the plane the orbit precesses about moving from the equator to the
+ecliptic) — and the FREE inclination to the Laplace plane (5.157° today),
+which the Earth's tides damp as the Moon recedes: the secular tidal torque
+on the orbit lies along the pole it precesses about, so |L| grows by its
+projection and sin i_L ∝ a^{−κ}, κ = 1/2 for the torque fully along the
+pole (shipped — the torque model the regime itself rests on, no new
+constant), κ = 1/4 the constant-lag class (the band; Goldreich 1966's ~10°
+at 10 R⊕ between): 5.4–5.6° at 2.46 Ga, 8–13° at 10 R⊕, 9.1–16.2° at the
+edge, a modern rate of 2.5e-7 °/yr (0.9 mas/yr, inside the LLR era's noise). The endpoint is not 0°: that the free
+inclination is 5° today where a formation disk gives ~0° is the open lunar
+inclination problem (Touma & Wisdom 1998; Ward & Canup 2000; Ćuk et al.
+2016), named, not resolved; the Moon's own tides are a stated omission.
+The lunar node and perigee of date carry the oblateness term beside the
+solar one (the month chain's published periods read the regime home; the
+solar forms kept beside them): 3.2 / 1.7 Julian years at the edge against
+the solar 560 / 267, equal near 22 R⊕ (4,400 Ma), exact at the anchors.
+
+**(d) A solve inside a rate is paid by every integrator that reads the
+rate — the slow geometry goes on a fixed grid, the fast content stays live —
+and a new home enters every input list or goes stale unseen.** The first
+build solved the coupled state by bisection to 1e-16 rad — 52 evaluations
+with four trigonometric pairs each — inside the precession rate, so the
+chain's deep reads cost 5–8 µs against the 0.2 µs LOD baseline (the node of
+date 8.5 µs for the solar form's 1.4): the lunar bank's 3.2-h walk passed
+3.9 h, and the browser's deep calendar builds its tables on the same
+tropical year. Three attempts, each measured against the committed code in
+a detached worktree (the former law's Node landing path: the edge instant
+0.38 s, the first-eclipse finder 1.25 s, the calendar's build 0.56 s):
+Newton from the closed-form tilt with the bisection as the deterministic
+fallback, plus a memo of the state by age — a first memo evicted "the Map's
+first key" through a fresh iterator, and with more distinct ages than
+entries (the deep calendar's 731,000) V8's walk over the tombstones made
+every miss cost 26 µs for a 3-µs solve, the calendar 19 s; a ring of keys
+took it to 2.6 s, and a hit had to prove itself on the LOD it was computed
+on, because the chain's α pins change the LOD at a given age (the §1.10
+class); the landing still read 6.3 s in Node and 10.8 s in the browser's
+perf gate (limit 8), because a memo cannot help a first pass over 731,000
+distinct ages. The shipped form is the one the cited histories take: the
+coupled state's SLOW GEOMETRY — R_raw, the plane's tilt θ, the node's
+eigen-ratio ω_L/β_S and the perigee's oblateness part — on a fixed 20-kyr
+grid over the navigable domain, built outward from J2000 in 100-Myr chunks
+as deeper ages are asked for (3 µs a node: a jump to −400 Myr four chunks,
+the genesis forty-five), each node the direct solve, read by cubic Hermite,
+exact at the nodes (node 0 is J2000: R(0) ≡ 1); a node's value never
+depends on when its chunk was built, so the table is pure in age — a FIXED
+grid, never a cache that changes resolution. Two things the first table got
+wrong, both caught by the gate that pins the table against the direct
+solve: (i) it tabulated the node and perigee RATES, which carry the solar
+coefficient's eccentricity modulation — a 100-kyr cycle of 0.5 % that a
+20-kyr grid misses by 3e-5, a degree of node over the era — so the fast
+content stays LIVE (the month chain's solar forms, the former law's own
+reads) and only the slow factor is interpolated: the era to 5e-9 of the
+periods, the transition to 2e-5 (the A/B ratio's own wobble, where the
+arguments are reproducible, not converged); (ii) it built under the shipped
+α, and in the era R carries the GIA channel's 41-kyr ice wobble through the
+LOD at 2e-7, which the grid cannot follow either — rule R2 names the case
+("a table holds α at its J2000 reference, or it defines itself through its
+own output"), so the table builds under the α-reference pin and the gate's
+era tolerance is that wobble (1e-6 of R). Measured on the table: the
+calendar's build 1.3 s, the edge instant 0.54 s, a deep read 0.5 µs. And
+the pass-1 lunar bank, walked on the solve, no longer seats against the
+table (the seat is RELATIVE, 1e-7): the first-eclipse finder at −1 Gyr fell
+back to the whole-span walk and did not return in ten minutes — the "between
+solutions" state, resolved by the bank's re-recording, never by a tolerance.
+Beside it: the bracket test that evaluated F twice is the two inequalities
+it reduces to, and the eccentricity channel's e(t) has an exact-argument
+memo behind a ring (the chain's α memo pattern). The browser perf gate's
+measure of all of it, the first landing on the genesis edge: 3.1 s before
+the plan, 10.8 s on the cold solve, 4.4 s on the table with the banks
+re-recorded (limit 8); the full jump to −400 Myr back at its 0.5 s; the
+spin bank's walk 45 → 21 min, the lunar bank's 233 → 163. And the module had entered no generator's
+`INPUT_FILES`: the banks, the campaigns, the N-body series, the fit and the
+Horizons comparison all run on it through the chain, and an edit of it
+alone would have re-staled nothing (§1.16's class) — it is listed in every
+one of the ten now, which re-stamps them all once.
+
+**What stays open (slice A2).** The lunar LATITUDE series still carries
+Meeus's J2000 amplitudes and the scene draws the orbit at the J2000
+inclination: the mean plane's tilt from the ecliptic (11.8° at the edge)
+and the free inclination of date are not yet in the Moon's latitude, the
+finder's inclination or the drawn plane — §1.15's rule applied to the
+latitude is the next slice, with no bank to re-record.
+
+The gate: `test:laplace-regime` (`packages/physics/test/laplace-plane-regime.test.mjs`,
+in `npm run check`) — the anchor identities, the era (|1 − R| < 1e-6 at
+10 kyr), the two limits, the referees, the edge row (1,000–3,000 yr, two
+orders above the ecliptic form, below the solar-only), the 1 % reach, the
+node of date, the free inclination's monotonicity and band; fail-proven with
+`ESSRT_LAPLACE_PLANT=1` (an equatorial factor planted at 1.4 Ga). The
+registry: `laplaceRadius*`, `lunarRegime*`, `lunarFreeInclination*`,
+`lunarMeanPlane*`, `lunarNode*AtHadean*`, `lunarPerigee*AtHadean*`,
+`axialPrecAtHadeanEclipticFormYr`, `axialPrecAtHadeanSolarOnlyYr`,
+`axialPrecMinimum*`.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -2157,6 +2315,7 @@ points to; each gate's header states its own plant in full):
 | `ESSRT_CHART_EXPORT_PLANT=1/2/3` | `test/browser/chart-export.test.mjs` | the PNG width by one pixel / a caption line / one printed figure number |
 | `ESSRT_CSV_SMOKE_PLANT=1` | `test/csv-window-smoke.test.mjs` | one expected window-CSV row (the full run and the chain's `check:csv-smoke:short` window alike) |
 | `ESSRT_DT_SLOPE_PLANT=1` | `tools/verify/deltat-slope-basis.js` | +0.43 ms/day on the implied ΔT slope (the historical two-bases split) |
+| `ESSRT_LAPLACE_PLANT=1` | `packages/physics/test/laplace-plane-regime.test.mjs` | an equatorial regime factor (0.5) planted at 1.4 Ga, where the Moon is at 53 R⊕ — the referee row fails (§1.42) |
 | `ESSRT_LITERALS_PLANT=1` | `tools/constants/check-literals.mjs` | a retired-input file re-entering |
 | `ESSRT_OBLIQ_REALIZED_PLANT=1` | `tools/verify/obliquity-hybrid.js` | the predicted realized obliquity period × 1.005 |
 | `ESSRT_PERI_SUN_PLANT=1` | `test/browser/perihelion-at-sun.test.mjs` | the expected marker distance shifted by 1 % |

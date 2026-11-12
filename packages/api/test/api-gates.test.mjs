@@ -128,13 +128,15 @@ for (const url of SAMPLE_REQUESTS) {
   const dev = dataOf('/v1/epoch?year=-379998000').epochs[0];
   // the published of-date family is the one-family route inside ±2 Myr (≈ IAU 25,771 yr at
   // J2000), the composed lunisolar period on the SAME derived anchor beyond (the Devonian record:
-  // 21,235 yr at −380 Ma — 1,296,000/the precession RATE of date on the cited Earth–Moon history,
+  // 21,244 yr at −380 Ma — 1,296,000/the precession RATE of date on the cited Earth–Moon history,
   // Farhat et al. 2022's AstroGeo22: the distance and its mean-obliquity column as
-  // cos ε̄(t)/cos ε̄(0) on the constant's scaling — the constant's scaling alone read 21,396 there).
+  // cos ε̄(t)/cos ε̄(0) on the constant's scaling — the constant's scaling alone read 21,396 there;
+  // 21,235 before plan 31 A, whose free inclination of date (5.27° at 380 Ma against the J2000
+  // 5.157°) moves the lunar term by 6e-4 through the Laplace-plane regime factor).
   // The J2000 value is 1,296,000/p_A, the IAU 2006 general precession input.
   if (Math.abs(ep.axialPrecessionYears - 25771.575) > 0.5) failures.push(`epoch axialPrecessionYears@2000: ${ep.axialPrecessionYears}`);
   if (Math.abs(ep.tropicalYearSeconds - 31556925.2) > 1) failures.push(`epoch tropicalYearSeconds@2000: ${ep.tropicalYearSeconds}`);
-  if (Math.abs(dev.axialPrecessionYears - 21235) > 1) failures.push(`epoch axialPrecessionYears@Devonian (the composed period): ${dev.axialPrecessionYears}`);
+  if (Math.abs(dev.axialPrecessionYears - 21244) > 1) failures.push(`epoch axialPrecessionYears@Devonian (the composed period): ${dev.axialPrecessionYears}`);
   const earth = dataOf('/v1/earth?year=2000').years[0];
   if (Math.abs(earth.obliquityDeg - 23.4393) > 0.0002) failures.push(`earth obliquity@2000: ${earth.obliquityDeg}`);
   const ss = dataOf('/v1/cardinal-points?year=2000&types=SS').years[0].points.SS;

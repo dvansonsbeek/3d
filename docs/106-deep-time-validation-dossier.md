@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.13
-coefficients: sha256:7c135a128a54451c
+modelVersion: v27.14
+coefficients: sha256:617134ba66522681
 status: current
 ---
 
@@ -49,7 +49,7 @@ cause — see [doc 99 §mid-Precambrian window](99-expanding-solar-system-resona
 
 Flagship: Wells's Devonian 400 days/yr vs the model's
 <!--v:daysPerYearAtDevonian-->402.83<!--/v--> (the composed precession period at
-380 Ma = <!--v:axialPrecAtDevonian-->21,235<!--/v--> yr) — with **zero free
+380 Ma = <!--v:axialPrecAtDevonian-->21,244<!--/v--> yr) — with **zero free
 parameters** in the composed lunisolar coupling: the deep-time
 trajectory is calibrated to Farhat 2022 and the modern LLR recession rate,
 never to the fossil data it is tested against.
@@ -70,17 +70,23 @@ never to the fossil data it is tested against.
   <!--v:moonDistanceAtHadeanRE-->6.19<!--/v--> R⊕; the former "Roche
   crossing at 4.498 Ga, an unfitted consistency check" was the deleted
   spline's pinned endpoint and is withdrawn (plan 12 option A). Inside the
-  Laplace radius (~10–17 R⊕, Touma & Wisdom 1994 — the earliest part of the
-  history) the composed law's lunar term is overstated, the Moon's orbit
-  following the equator there rather than the ecliptic the term assumes: the
-  edge's clock of <!--v:axialPrecAtHadeanYr-->8.81<!--/v--> yr and everything
-  on it (the tropical year of <!--v:tropicalYearAtHadeanSiDays-->327.8<!--/v-->
-  SI days, the obliquity band, the first eclipse) are the law's values at
-  the edge of its domain — reproducible, not converged (doc 99
-  §Interpretation 2; plan 30 K). One age, three counts (plan 29 H): the
+  Laplace radius (<!--v:laplaceRadiusAtHadeanRE-->15.15<!--/v--> R⊕ at the
+  edge on the oblateness of date; Touma & Wisdom 1994 — the earliest part of
+  the history) the Moon's orbit precesses about the equator and its torque no
+  longer precesses the spin about the ecliptic pole: the composed law's lunar
+  term carries the Laplace-plane regime factor (plan 31 A, doc 111 §1.42),
+  the edge's clock is the coupled spin–orbit precession,
+  <!--v:axialPrecAtHadeanYr-->2024.50<!--/v--> yr (the ecliptic form it
+  replaced read <!--v:axialPrecAtHadeanEclipticFormYr-->8.81<!--/v-->), and
+  everything on it (the tropical year of
+  <!--v:tropicalYearAtHadeanSiDays-->364.8<!--/v--> SI days, the obliquity
+  band, the first eclipse) is the law's value at the edge of its domain —
+  reproducible, not converged; the lunar latitude series still carries the
+  J2000 inclination (slice A2) (doc 99 §Interpretation 2; plan 30 K). One age,
+  three counts (plan 29 H): the
   edge lies <!--v:genesisEdgeAgeTTGyr-->4.429<!--/v--> Gyr back in uniform
   time (TT, the clock radiometric ages are in), which is
-  <!--v:genesisEdgeOrbitsG-->4.432<!--/v--> billion orbits (tropical years of
+  <!--v:genesisEdgeOrbitsG-->4.431<!--/v--> billion orbits (tropical years of
   date — 0.06 % more, the last years before the genesis being 328 SI days)
   and <!--v:genesisEdgeSolarDaysT-->2.471<!--/v--> trillion solar days; a
   365.25-day calendar laid on that day count prints
@@ -96,7 +102,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   the archived doc 91; its scripts and result files were deleted at plan 09
   step 7e ([doc 109 §22](109-model-nbody-engine.md) is the record).
 - **Devonian obliquity beat** — the composed clock's beat 2π/(ψ̇ − |s₃|)
-  reads <!--v:obliqBeatDevonianKyr-->30.6<!--/v--> kyr at 380 Ma (vs <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> today), consistent with Berger, Loutre &
+  reads <!--v:obliqBeatDevonianKyr-->30.7<!--/v--> kyr at 380 Ma (vs <!--v:obliqBeatJ2000Kyr-->41.1<!--/v--> today), consistent with Berger, Loutre &
   Laskar 1992's deep-time solution (29 kyr at 500 Ma) and with the Devonian
   cyclostratigraphic values near 29.5 kyr, and 2–8 % off the Wu 2024
   inferences — the residual attributed to the Pangea-window recession
@@ -140,7 +146,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   both directions); the −746 Feb 6 Babylonian partial (magnitude
   <!--v:lunarBabylon746MagnitudeUmbral-->0.922<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
-  Babylon at <!--v:lunarBabylon746AltitudeDeg-->34.6<!--/v-->°); the
+  Babylon at <!--v:lunarBabylon746AltitudeDeg-->34.7<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions
   (model ΔT mean abs <!--v:lunarDtBandsFrameworkMeanAbsSeconds-->1,214<!--/v--> s —
   statistically identical to Stephenson's own fitted spline at
@@ -178,7 +184,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 | Item | Status | Where |
 |:---|:---|:---|
 | Williams 2000 (620 Ma rhythmites) | documented <!--v:anchorWilliams620DeltaPct-->+7.26<!--/v-->% miss of the smooth formula at the Snowball boundary; asserted as a band — an unexplained improvement fails the gate. Williams conflicts with Wu's 650 Ma anchor on the cited history (the regime fitter that once tried alternatives was deleted at plan 12 option A) | [doc 99 §Williams](99-expanding-solar-system-resonance-theory.md#the-williams-2000-620-ma-discrepancy--honest-discussion) |
-| The mid-Precambrian window (Driver 1½ retired) | the model carries NO thermal-tide pump and no fitted recession regime since plan 12 option A: the distance history is Farhat 2022's ocean-model solution, whose authors' own review concludes the day-length lock "is not supported" once the questionable stromatolite points are dropped. On it the derived precession reads Joffre <!--v:anchorLantinkPrec2460DeltaPct-->+0.59<!--/v--> %, Xiamaling <!--v:anchorXiamalingPrec1400DeltaPct-->+0.87<!--/v--> %, and Zhou 2024's older two sites <!--v:anchorZhouWumishanPrec1480DeltaPct-->−4.75<!--/v--> % / <!--v:anchorZhouChuanlinggouPrec1634DeltaPct-->−5.31<!--/v--> % (1.8–2.6σ) — the OPEN discrepancy, asserted as bands: either the solution lacks the Mesoproterozoic dissipation peak Zhou suspect or the inferred constants are biased; the model states the gap and does not fit it | [doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-cited-history-and-the-record) |
+| The mid-Precambrian window (Driver 1½ retired) | the model carries NO thermal-tide pump and no fitted recession regime since plan 12 option A: the distance history is Farhat 2022's ocean-model solution, whose authors' own review concludes the day-length lock "is not supported" once the questionable stromatolite points are dropped. On it the derived precession reads Joffre <!--v:anchorLantinkPrec2460DeltaPct-->+0.37<!--/v--> %, Xiamaling <!--v:anchorXiamalingPrec1400DeltaPct-->+0.73<!--/v--> %, and Zhou 2024's older two sites <!--v:anchorZhouWumishanPrec1480DeltaPct-->−4.88<!--/v--> % / <!--v:anchorZhouChuanlinggouPrec1634DeltaPct-->−5.46<!--/v--> % (1.8–2.6σ) — the OPEN discrepancy, asserted as bands: either the solution lacks the Mesoproterozoic dissipation peak Zhou suspect or the inferred constants are biased; the model states the gap and does not fit it | [doc 99 §mid-Precambrian window](99-expanding-solar-system-resonance-theory.md#the-mid-precambrian-window-135-ga--the-cited-history-and-the-record) |
 | Wu 2024 Pangea interval (200–500 Ma Moon rows) | the cited Farhat 2022 history (a globally averaged ocean-tide solution) does not carry the supercontinent-era high-dissipation recession; deviations asserted as bands | [doc 99 §Pangea](99-expanding-solar-system-resonance-theory.md#the-pangea-high-tidal-dissipation-interval-the-mid-range-mismatch) |
 | Saturn Laplace–Lagrange bound | the retired law model's documented physical-constraint failure — recorded at the integer-law retirement; its instrument is deleted | [doc 109](109-model-nbody-engine.md), CLAUDE.md §falsification |
 | LOD–climate correlation | fails every null test → open correspondence, not validation | [doc 102](102-gia-alpha-lunar-validation.md) item 7 |

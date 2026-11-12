@@ -114,12 +114,27 @@ function createDeepEccChannel({ earthZ, anchorE, anchorPeriEclipticDeg, anchorZD
   /** cos²(π t / 2T_q), 0 beyond |t| ≥ T_q — dI/dt. @param {number} t */
   const env = (t) => (Tq <= 0 || Math.abs(t) >= Tq) ? 0 : Math.cos(Math.PI * t / (2 * Tq)) ** 2;
 
+  // Exact-argument memo of e(tYr) — a pure dedupe (the deep-time chain's α memo pattern), not a
+  // grid: the lunar node and perigee of date, and since plan 31 A the Laplace-plane regime inside
+  // the precession rate, read the same age in the same pass; eviction through a ring of keys.
+  const ECC_MEMO_MAX = 1 << 14;
+  /** @type {Map<number, number>} */
+  const eccMemo = new Map();
+  const eccRing = new Float64Array(ECC_MEMO_MAX);
+  let eccRingAt = 0;
   /** Earth's e at tYr years from J2000 (negative = past).
    *  @param {number} tYr @returns {number} */
   function eccAt(tYr) {
+    const hit = eccMemo.get(tYr);
+    if (hit !== undefined) return hit;
     const [x, y] = modeSum(tYr);
     const I = iEnv(tYr);
-    return Math.hypot(x + R[0] + DZ[0] * I, y + R[1] + DZ[1] * I);
+    const e = Math.hypot(x + R[0] + DZ[0] * I, y + R[1] + DZ[1] * I);
+    if (eccMemo.size >= ECC_MEMO_MAX) eccMemo.delete(eccRing[eccRingAt]);
+    eccRing[eccRingAt] = tYr;
+    eccRingAt = (eccRingAt + 1) % ECC_MEMO_MAX;
+    eccMemo.set(tYr, e);
+    return e;
   }
 
   /** de/dyear — analytic: d|z|/dt = (z·ż)/|z|, the slope anchor's

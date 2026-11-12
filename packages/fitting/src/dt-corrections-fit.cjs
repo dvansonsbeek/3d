@@ -1848,6 +1848,7 @@ function runJointMode() {
     'packages/physics/src/deltat/moon-distance-history.cjs',
     'packages/physics/src/earth/mean-obliquity-history.cjs',
     'packages/physics/src/earth/precession-composed.cjs',
+    'packages/physics/src/earth/laplace-plane.cjs',
     'packages/physics/src/climate/l1-orbital.cjs',
     'public/input/astro-reference.json',
   ];

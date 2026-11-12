@@ -65,6 +65,7 @@ const INPUT_FILES = [
   'packages/physics/src/deltat/cycles.cjs',
   // the clock every instant here crosses (plan 27 §8 J; doc 111 §1.16): the raw ΔT integrand and the UT↔TT bridge
   'packages/physics/src/deltat/deep-time.cjs',
+  'packages/physics/src/earth/laplace-plane.cjs',
   'packages/physics/src/phase/deep-calendar.cjs',
   // the lunar arguments' cumulative month counts (plan 30 item J; doc 111 §1.39): the integrator's
   // age axis moved the matched-tight count and two era medians, unseen by check:artifacts

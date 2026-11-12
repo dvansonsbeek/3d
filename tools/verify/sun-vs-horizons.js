@@ -67,6 +67,7 @@ const INPUT_FILES = [
   'packages/physics/src/moon/deep-modes-artifact.cjs',
   'packages/physics/src/moon/arguments.cjs',
   'packages/physics/src/deltat/deep-time.cjs',
+  'packages/physics/src/earth/laplace-plane.cjs',
   'packages/physics/src/deltat/cycles.cjs',
   'packages/physics/src/deltat/moon-distance-history.cjs',
   'packages/physics/src/deltat/moon-distance-artifact.cjs',

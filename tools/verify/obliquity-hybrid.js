@@ -133,6 +133,7 @@ const art = {
     'packages/physics/src/earth/deep-orbital-history.cjs',
     'packages/physics/src/deltat/deep-time.cjs',
     'packages/physics/src/earth/precession-composed.cjs',
+    'packages/physics/src/earth/laplace-plane.cjs',
     'tools/lib/deep-time.js',
   ]),
 };

@@ -51,6 +51,7 @@ const INPUT_FILES = [
   'packages/physics/src/earth/deep-orbital-history.cjs',
   'packages/physics/src/earth/frame-of-date.cjs',
   'packages/physics/src/earth/precession-composed.cjs',
+  'packages/physics/src/earth/laplace-plane.cjs',
   'packages/physics/src/climate/l1-orbital.cjs',
   'packages/physics/src/deltat/deep-time.cjs',
   'packages/reference/src/published-curves.cjs',

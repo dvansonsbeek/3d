@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.13
-coefficients: sha256:7c135a128a54451c
+modelVersion: v27.14
+coefficients: sha256:617134ba66522681
 status: current
 ---
 
@@ -470,7 +470,7 @@ shipped model's own ε(t) over the LR04 record, fitted with the full line
 set p + sᵢ and one free p, reads
 <!--v:obliqCycleRealizedFitLr04Years-->~40,916<!--/v--> yr against the
 one-home prediction from the window mean of the pole rate with its
-of-date factors, <!--v:obliqCycleRealizedLr04Years-->~40,924<!--/v--> yr
+of-date factors, <!--v:obliqCycleRealizedLr04Years-->~40,925<!--/v--> yr
 (`createModel().lunisolar.obliquityPeriodRealizedYears`; the generator
 REFUSES beyond 0.1 %, fail-proven), with La2004's series on the same fit
 at <!--v:obliqCycleLa2004FitLr04Years-->~40,900<!--/v--> yr — the J2000
@@ -500,9 +500,9 @@ period T_p(t) is the model's one deep-time clock (the internal unit and
 its thirteen-period identity are deleted, plan 09), and the rock reads it
 directly: the composed rate matches the
 Precambrian precession constants
-(<!--v:anchorXiamalingPrec1400Pred-->86.53<!--/v--> vs Meyers &
+(<!--v:anchorXiamalingPrec1400Pred-->86.42<!--/v--> vs Meyers &
 Malinverno 2018's 85.79 ± 2.72 ″/yr at 1.4 Ga,
-<!--v:anchorLantinkPrec2460Pred-->109.24<!--/v--> vs Lantink et al.
+<!--v:anchorLantinkPrec2460Pred-->109.01<!--/v--> vs Lantink et al.
 2022's 108.6 ± 8.5 ″/yr at 2.46 Ga — both paleo-anchors gate rows). The
 model's earlier deep-time reading, the spin-only clock
 13·1,296,000/(H₀·LOD/LOD₀), fails both rows (24 % and 35 % low) and is
@@ -515,7 +515,7 @@ T_p(t); plan 06 S5 retired its former T_p·13/8 form; the key was named
 and 2.46 Ga: today the readings are degenerate (ψ̇ ≫ s₃ — which is why
 the retired device's eighth-of-unit label always fit), while at 2.46 Ga the beat reads
 <!--v:obliqBeat2460MaKyr-->14.3<!--/v--> kyr against
-<!--v:obliqPrecScaled2460MaKyr-->18.9<!--/v--> for period ∝ T_p — a level
+<!--v:obliqPrecScaled2460MaKyr-->19.0<!--/v--> for period ∝ T_p — a level
 cyclostratigraphy can discriminate. The existing 1.4/2.46-Ga
 confirmations are precession-rate/LOD anchors; the deep-time obliquity
 PERIOD itself is undiscriminated, so this is a pre-registered prediction

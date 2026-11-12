@@ -59,7 +59,8 @@ const toolCall = (name, args) => {
     // the deep-time clock is the composed precession period
     // (21,699 yr at −380 Ma — the unit read 282,329 there, 13.011 of them)
     // T_p is 1,296,000/the precession RATE of date — the cited mean obliquity's cos ε̄(t)/cos ε̄(0) on the constant's scaling
-    ['essrt_epoch', { year: -379998000 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 21235) < 1 && !('h' in d.epochs[0]) ? null : `Devonian T_p: ${d.epochs[0].axialPrecessionYears} h: ${d.epochs[0].h}`)],
+    // 21,244 yr at the Devonian since plan 31 A (the free inclination of date in the Laplace-plane regime factor; 21,235 before)
+    ['essrt_epoch', { year: -379998000 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 21244) < 1 && !('h' in d.epochs[0]) ? null : `Devonian T_p: ${d.epochs[0].axialPrecessionYears} h: ${d.epochs[0].h}`)],
     ['essrt_epoch', { jd: 2451545 }, (d) => (Math.abs(d.epochs[0].axialPrecessionYears - 25771.575) < 0.5 ? null : `T_p via jd: ${d.epochs[0].axialPrecessionYears}`)],
     ['essrt_cardinal_points', { year: 2000, types: 'SS' }, (d) => (Math.abs(d.years[0].points.SS.jd - 2451716.575) < 0.1 ? null : `SS JD: ${d.years[0].points.SS.jd}`)],
     ['essrt_earth', { year: 2000 }, (d) => (Math.abs(d.years[0].obliquityDeg - 23.4393) < 0.0002 ? null : `obliquity: ${d.years[0].obliquityDeg}`)],

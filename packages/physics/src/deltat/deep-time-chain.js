@@ -36,6 +36,11 @@ import { computeMeanTropicalYearJ2000Days } from '../earth/year-lengths.cjs';
 import { createAlphaGiaChannel } from '../climate/l1-orbital.cjs';
 import { createMoonDistanceHistory } from './moon-distance-history.cjs';
 import { createMeanObliquityHistory } from '../earth/mean-obliquity-history.cjs';
+// The Laplace-plane regime of the lunar orbit — ONE home earth/laplace-plane.cjs (plan 31 A):
+// the composed law's lunar term carries its regime factor R(t), the month chain's
+// perigee and node of date carry the oblateness term of date.
+import { createLaplacePlaneRegime } from '../earth/laplace-plane.cjs';
+import { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS } from '../time/navigable-domain.cjs';
 import { createDeltaTCycles } from './cycles.cjs';
 import { createDeepTimeLod } from './deep-time.cjs';
 import { createDeepEccChannel } from '../moon/deep-ecc-channel.cjs';
@@ -287,6 +292,9 @@ export function createDeepTimeChain(deps) {
     },
     moonDistanceMetresAtAge: recession.distanceMetresAtAge,
     meanObliquityCosRatioAtAge: meanObliquity.cosRatioAtAge,
+    // the Laplace-plane regime factor on the lunar term (built below, after the month chain
+    // whose SOLAR node form it reads — a lazy read; every rate is evaluated after assembly)
+    lunarRegimeFactorAtAge: (/** @type {number} */ tMa) => laplaceRegime.regimeFactorAtAge(tMa),
     moiFactorAtAge: earthMoiFactorAtAge,
     precessionPeriodJ2000YearsFn: certifiedAxialPrecessionJ2000Years,
     nodalPeriodYearsFn: () => 1296000 / s3ArcsecPerYr,
@@ -297,7 +305,7 @@ export function createDeepTimeChain(deps) {
   });
 
   // ── Layer 0 primitives ────────────────────────────────────────────────────
-  const l0 = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge, moonDistanceMetresAtAge: recession.distanceMetresAtAge, meanObliquityCosRatioAtAge: meanObliquity.cosRatioAtAge });
+  const l0 = createEpochPrimitives({ params: EPOCH_PARAMS, alphaAtAgeMa: earthMoiFactorAtAge, moonDistanceMetresAtAge: recession.distanceMetresAtAge, meanObliquityCosRatioAtAge: meanObliquity.cosRatioAtAge, lunarRegimeFactorAtAge: (/** @type {number} */ tMa) => laplaceRegime.regimeFactorAtAge(tMa) });
 
   // ── The ONE deep e and the lunar month chain ──────────────────────────────
   const deepEcc = createDeepEccChannel(deps.deepModes);
@@ -340,6 +348,46 @@ export function createDeepTimeChain(deps) {
       precessionPeriodYearsAtAge: meanLunisolarPrecessionPeriodYearsAtAge,
       modulation: eCompModulation,
       distanceMetresAtAge: recession.distanceMetresAtAge,
+      laplaceRegime: () => laplaceRegime,
+    },
+  });
+
+  // ── The Laplace-plane regime of the lunar orbit (plan 31 A) ──────────────
+  // Built after the month chain (it reads the chain's SOLAR perigee/node forms); the LOD core,
+  // layer0 and the month chain read it lazily. J₂ of date hydrostatic on the conservation LOD,
+  // ε̄ the cited mean obliquity, the free inclination derived on the cited distance.
+  const laplaceRegime = createLaplacePlaneRegime({
+    constants: {
+      earthJ2J2000: C.physicalConstants.earthJ2,
+      earthRadiusMetres: EPOCH_PARAMS.earthRadiusM,
+      astronomicalUnitMetres: currentAUDistance * 1000,
+      gmSunM3S2: GM_SUN * 1e9,
+      gmEarthAloneM3S2: GM_EARTH_ALONE * 1e9,
+      gmEarthMoonM3S2: EPOCH_PARAMS.gmEarthMoonM3S2,
+      moonMassKg: EPOCH_PARAMS.moonMassKg,
+      moonEccentricityFactor: EPOCH_PARAMS.moonEccentricityFactor,
+      earthEccentricityJ2000: C.earthOrbital.earthEccentricityJ2000,
+      moonInclinationJ2000Deg: C.moonReference.moonEclipticInclinationJ2000,
+      moonDistanceJ2000Metres: EPOCH_PARAMS.moonDistanceNowM,
+      lodJ2000Seconds: EPOCH_PARAMS.lodNowH13Seconds,
+      precessionSolarShareJ2000: EPOCH_PARAMS.precessionSolarShareJ2000,
+      meanObliquityJ2000Deg: meanObliquity.meanObliquityJ2000Deg,
+      moonNodalJ2000Seconds, moonApsidalJ2000Seconds,
+      // the table's extent: the navigable domain (ONE home time/navigable-domain), past ages positive
+      tableAgeMinMa: -NAVIGABLE_FUTURE_YEARS / 1e6,
+      tableAgeMaxMa: NAVIGABLE_PAST_YEARS / 1e6,
+    },
+    fns: {
+      moonDistanceMetresAtAge: recession.distanceMetresAtAge,
+      lodSecondsAtAge: meanLodSecondsAtAge,
+      meanObliquityDegAtAge: meanObliquity.meanObliquityDegAtAge,
+      iEarthAtAge,
+      lunarNodeSolarPeriodSecondsAtAge: moonChain.nodePrecessionSolarSecondsAtAge,
+      lunarPerigeeSolarPeriodSecondsAtAge: moonChain.perigeePrecessionSolarSecondsAtAge,
+      p0ArcsecPerYr: precessionRateJ2000ArcsecPerYr,
+      // a table chunk is built with α at its J2000 reference (rule R2 — the GIA channel's 41-kyr ice
+      // wobble reaches R through the LOD at 2e-7 in the era, which the 20-kyr grid cannot follow)
+      underAlphaReferencePin: withLatticeAlpha,
     },
   });
 
@@ -435,7 +483,7 @@ export function createDeepTimeChain(deps) {
     EPOCH_PARAMS, ageAnchorYear,
     // the pieces
     alphaGia, earthMoiFactorAtAge, withLatticeAlpha, withShippedAlpha, j2RatioAtYear, iEarthAtAge,
-    recession, meanObliquity, dtCycles, s3ArcsecPerYr, deepLod, l0, deepEcc, eCompModulation, moonChain, moonEccSensitivities,
+    recession, meanObliquity, dtCycles, s3ArcsecPerYr, deepLod, l0, deepEcc, eCompModulation, moonChain, moonEccSensitivities, laplaceRegime,
     // the family
     meanMoonDistanceMetresAtAge: recession.distanceMetresAtAge,
     meanMoonDistanceAtAge: moonChain.distanceKmAtAge,
@@ -448,6 +496,18 @@ export function createDeepTimeChain(deps) {
     meanLunisolarTorquePeriodYearsAtAge: deepLod.lunisolarTorquePeriodYearsAtAge,
     precessionObliquityFactorAtAge: deepLod.precessionObliquityFactorAtAge,
     meanObliquityCitedDegAtAge: meanObliquity.meanObliquityDegAtAge,
+    // the Laplace-plane regime (plan 31 A): the lunar term's factor, the Moon's mean plane of date, the free inclination
+    meanLunarRegimeFactorAtAge: laplaceRegime.regimeFactorAtAge,
+    meanLunarRegimeFactorDirectAtAge: laplaceRegime.regimeFactorDirectAtAge,
+    meanLunarNodePrecessionDirectAtAge: laplaceRegime.nodePeriodDirectSecondsAtAge,
+    meanLunarPerigeePrecessionDirectAtAge: laplaceRegime.perigeePeriodDirectSecondsAtAge,
+    meanLaplaceTiltFromEclipticDegAtAge: laplaceRegime.laplaceTiltFromEclipticDegAtAge,
+    meanLaplaceTiltFromEquatorDegAtAge: laplaceRegime.laplaceTiltFromEquatorDegAtAge,
+    meanLaplaceRadiusMetresAtAge: laplaceRegime.laplaceRadiusMetresAtAge,
+    meanLunarFreeInclinationDegAtAge: laplaceRegime.freeInclinationDegAtAge,
+    meanLunarFreeInclinationBandDegAtAge: laplaceRegime.freeInclinationBandDegAtAge,
+    meanLunarNodeSolarPrecessionAtAge: moonChain.nodePrecessionSolarSecondsAtAge,
+    meanLunarPerigeeSolarPrecessionAtAge: moonChain.perigeePrecessionSolarSecondsAtAge,
     meanAuAtAge, meanSiderealYearSecondsAtAge,
     meanTropicalYearSecondsAtAge: deepLod.tropicalYearSecondsAtAge,
     meanTropicalYearDaysAtAge: deepLod.tropicalYearDaysAtAge,

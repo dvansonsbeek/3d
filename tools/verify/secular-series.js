@@ -859,6 +859,7 @@ const artifact = {
     // change forced this regeneration. The series VALUES were bit-identical.
     'packages/physics/src/deltat/deep-time.cjs',
     'packages/physics/src/earth/precession-composed.cjs',
+    'packages/physics/src/earth/laplace-plane.cjs',
     'tools/lib/deep-time.js',
     'data/nbody-deep-secular-modes.json',
     // plan 07 (measured): the D5 handover boundaries run on the chain

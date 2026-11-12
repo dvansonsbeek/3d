@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.13
-coefficients: sha256:7c135a128a54451c
+modelVersion: v27.14
+coefficients: sha256:617134ba66522681
 status: current
 ---
 
@@ -274,15 +274,15 @@ classical constant:
   The scene Moon is prograde at every epoch out to ±1 Gyr by construction.
 
 Certified references of the framework-native default: argument drift vs
-the Meeus polynomial M′ <!--v:lunarArgumentMpAheadAtMinus135Deg-->-0.01<!--/v-->° at −135 /
+the Meeus polynomial M′ <!--v:lunarArgumentMpAheadAtMinus135Deg-->-0.02<!--/v-->° at −135 /
 <!--v:lunarArgumentMpAheadAtMinus584Deg-->-0.02<!--/v-->° at −584 /
-<!--v:lunarArgumentMpAheadAtMinus1500Deg-->-0.03<!--/v-->° at −1500, F
+<!--v:lunarArgumentMpAheadAtMinus1500Deg-->-0.04<!--/v-->° at −1500, F
 <!--v:lunarArgumentFAheadAtMinus584Deg-->0.01<!--/v-->° at −584 — the
 predicted-ë-vs-secular-ë difference: ϖ and Ω ride the e channel's own
 curvature (about a seventh of the secular-theory ë, see the
 `lpSecularCompletion` note above — L′ carries that convention, ϖ and Ω do
 not), so the model's perigee carries
-<!--v:lunarPerigeeTailShareAtMinus1500-->1.06<!--/v--> and its node
+<!--v:lunarPerigeeTailShareAtMinus1500-->1.07<!--/v--> and its node
 <!--v:lunarNodeTailShareAtMinus1500-->1.02<!--/v--> of the polynomials'
 T³ + T⁴ tails at −1500; in eclipse timing a cos M′ term of
 <!--v:lunarCanonModelAnomalyTermMinus1000To0Min-->0.2<!--/v--> min over

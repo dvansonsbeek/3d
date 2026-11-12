@@ -9,7 +9,7 @@
   "dedupeFrac": 0.005,
   "pArcsecPerYr": 50.28795976713892,
   "pInertialArcsecPerYr": 50.38455190302931,
-  "pObliquityArcsecPerYr": 50.519061941,
+  "pObliquityArcsecPerYr": 50.518949187,
   "obliquityRateWindowKyr": [
    0,
    5320
@@ -56,71 +56,71 @@
   {
    "family": "obliquity",
    "label": "p+s7",
-   "arcsecPerYr": 47.52665525748314,
-   "periodKyr": 27.26890821537337,
+   "arcsecPerYr": 47.52654250348314,
+   "periodKyr": 27.26897290929628,
    "relAmp": 0.10427252954025028
   },
   {
    "family": "obliquity",
    "label": "p+s1",
-   "arcsecPerYr": 44.93381907038557,
-   "periodKyr": 28.842418178831185,
+   "arcsecPerYr": 44.93370631638557,
+   "periodKyr": 28.84249055429909,
    "relAmp": 0.5416339451073867
   },
   {
    "family": "obliquity",
    "label": "p+\u03b614",
-   "arcsecPerYr": 44.682268498028186,
-   "periodKyr": 29.00479415133527,
+   "arcsecPerYr": 44.68215574402819,
+   "periodKyr": 29.004867344011522,
    "relAmp": 0.14236226024182447
   },
   {
    "family": "obliquity",
    "label": "p+\u03b69",
-   "arcsecPerYr": 43.75831412731288,
-   "periodKyr": 29.617228767757034,
+   "arcsecPerYr": 43.75820137331288,
+   "periodKyr": 29.617305083988224,
    "relAmp": 0.1009465170347195
   },
   {
    "family": "obliquity",
    "label": "p+s2",
-   "arcsecPerYr": 43.47655140769007,
-   "periodKyr": 29.809172025791483,
+   "arcsecPerYr": 43.47643865369007,
+   "periodKyr": 29.80924933440936,
    "relAmp": 0.47895780932341964
   },
   {
    "family": "obliquity",
    "label": "p+s4",
-   "arcsecPerYr": 32.76360878675886,
-   "periodKyr": 39.55608212865024,
+   "arcsecPerYr": 32.76349603275886,
+   "periodKyr": 39.55621825900946,
    "relAmp": 0.4849220480959469
   },
   {
    "family": "obliquity",
    "label": "p+\u03b64",
-   "arcsecPerYr": 32.21533017860581,
-   "periodKyr": 40.22929433952141,
+   "arcsecPerYr": 32.21521742460581,
+   "periodKyr": 40.22943514297446,
    "relAmp": 0.3238058217329259
   },
   {
    "family": "obliquity",
    "label": "p+s3",
-   "arcsecPerYr": 31.66847892674709,
-   "periodKyr": 40.923973740507094,
+   "arcsecPerYr": 31.66836617274709,
+   "periodKyr": 40.924119448741926,
    "relAmp": 1.0
   },
   {
    "family": "obliquity",
    "label": "p+\u03b67",
-   "arcsecPerYr": 31.120486305129752,
-   "periodKyr": 41.64459344539142,
+   "arcsecPerYr": 31.120373551129752,
+   "periodKyr": 41.644744330292646,
    "relAmp": 0.17878079100604266
   },
   {
    "family": "obliquity",
    "label": "p+s6",
-   "arcsecPerYr": 24.171196207876783,
-   "periodKyr": 53.61753670998154,
+   "arcsecPerYr": 24.171083453876783,
+   "periodKyr": 53.617786826685894,
    "relAmp": 0.16050040214935987
   },
   {
@@ -219,16 +219,16 @@
   22.44529598528639,
   23.19329171671584,
   23.76005899662999,
-  27.26890821537337,
-  28.842418178831185,
-  29.00479415133527,
-  29.617228767757034,
-  29.809172025791483,
-  39.55608212865024,
-  40.22929433952141,
-  40.923973740507094,
-  41.64459344539142,
-  53.61753670998154,
+  27.26897290929628,
+  28.84249055429909,
+  29.004867344011522,
+  29.617305083988224,
+  29.80924933440936,
+  39.55621825900946,
+  40.22943514297446,
+  40.924119448741926,
+  41.644744330292646,
+  53.617786826685894,
   94.8779191670953,
   96.84902648762181,
   98.8438689567201,
@@ -253,7 +253,7 @@
  "inputs": {
   "generator": "python3 scripts/l1_physical_lines.py --write",
   "files": {
-   "data/t1-engine-frequencies.json": "sha256:681464b27fed95d2243e45c1c01db40353742a676acffbe83293dc07b0dfa9a2",
+   "data/t1-engine-frequencies.json": "sha256:2f779494b4ae2e7eb5fb8edce96dac045d3b080e8c196088b236a85aecd1803b",
    "scripts/l1_physical_lines.py": "sha256:deaa9a381bf57c5b8431bd1b0adc6f9aaef0e0fa9adbab26e30793631f60d7a2"
   }
  }

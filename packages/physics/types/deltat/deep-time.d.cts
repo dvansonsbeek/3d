@@ -98,6 +98,12 @@ export type DeepTimeLodDeps = {
      * constant; absent → 1, the constant alone, bit-identical.
      */
     meanObliquityCosRatioAtAge?: ((tMa: number) => number | null) | undefined;
+    /**
+     * - OPTIONAL
+     * the Laplace-plane regime factor R(t) on the composed law's lunar term
+     * (earth/laplace-plane, plan 31 A); absent → 1, bit-identical.
+     */
+    lunarRegimeFactorAtAge?: ((tMa: number) => number | null) | undefined;
 };
 /**
  * @typedef {Object} DeepTimeLodConstants
@@ -147,6 +153,9 @@ export type DeepTimeLodDeps = {
  *   OPTIONAL cos ε̄(t)/cos ε̄(0) of the cited mean obliquity (earth/mean-
  *   obliquity-history) — the factor the precession RATE of date carries on the
  *   constant; absent → 1, the constant alone, bit-identical.
+ * @property {(tMa: number) => number|null} [lunarRegimeFactorAtAge] - OPTIONAL
+ *   the Laplace-plane regime factor R(t) on the composed law's lunar term
+ *   (earth/laplace-plane, plan 31 A); absent → 1, bit-identical.
  */
 /** @param {DeepTimeLodDeps} deps */
 export function createDeepTimeLod(deps: DeepTimeLodDeps): {

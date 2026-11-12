@@ -62,12 +62,13 @@ for (const t of [0, 0.01, 1, 380, 2460, -200]) {
   const r = withIt.composedRateArcsecPerYrAtAge(t), q = withIt.torqueRateArcsecPerYrAtAge(t) * h.cosRatioAtAge(t);
   check(`with history: rate = torque × factor at ${t} Ma`, r === q, `${r} vs ${q}`);
 }
-// The shipped chain: the torque rate is the pre-§8 published rate's formula, spelled from the pieces.
+// The shipped chain: the torque rate is the pre-§8 published rate's formula, spelled from the pieces —
+// since plan 31 A with the lunar term's Laplace-plane regime factor R(t) (earth/laplace-plane; ≡ 1 at J2000).
 for (const t of [0, 10, 380, 2460]) {
   const w = DT.LOD_NOW_H13_S / DT.meanLodSecondsAtAge(t), lf = Math.pow(DT.A_MOON_NOW_M / DT.meanMoonDistanceMetresAtAge(t), 3);
-  const fS = DT.PRECESSION_SOLAR_SHARE_J2000, p0 = DT.precessionRateJ2000ArcsecPerYr();
+  const fS = DT.PRECESSION_SOLAR_SHARE_J2000, p0 = DT.precessionRateJ2000ArcsecPerYr(), R = DT.meanLunarRegimeFactorAtAge(t);
   const torque = DT.meanLunisolarTorqueRateArcsecPerYrAtAge(t), rate = DT.meanLunisolarPrecessionRateArcsecPerYrAtAge(t);
-  check(`chain torque rate at ${t} Ma`, Math.abs(torque - w * p0 * (fS + (1 - fS) * lf)) < 1e-9, `${torque}`);
+  check(`chain torque rate at ${t} Ma`, Math.abs(torque - w * p0 * (fS + (1 - fS) * lf * R)) < 1e-9, `${torque}`);
   check(`chain rate of date at ${t} Ma`, Math.abs(rate - torque * DT.precessionObliquityFactorAtAge(t)) < 1e-9, `${rate}`);
   check(`chain cited mean at ${t} Ma`, DT.meanObliquityCitedDegAtAge(t) === h.meanObliquityDegAtAge(t), 'the chain reads a different history');
 }

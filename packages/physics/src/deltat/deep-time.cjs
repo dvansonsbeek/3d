@@ -82,6 +82,9 @@ const { SECONDS_PER_JULIAN_YEAR } = require('../constants/units.cjs');
  *   OPTIONAL cos ε̄(t)/cos ε̄(0) of the cited mean obliquity (earth/mean-
  *   obliquity-history) — the factor the precession RATE of date carries on the
  *   constant; absent → 1, the constant alone, bit-identical.
+ * @property {(tMa: number) => number|null} [lunarRegimeFactorAtAge] - OPTIONAL
+ *   the Laplace-plane regime factor R(t) on the composed law's lunar term
+ *   (earth/laplace-plane, plan 31 A); absent → 1, bit-identical.
  */
 
 /** @param {DeepTimeLodDeps} deps */
@@ -129,6 +132,7 @@ function createDeepTimeLod(deps) {
     moonDistanceJ2000Metres: K.aMoonNowMetres,
     yearToTMa: /** @param {number} year */ (year) => (2000 - year) / 1e6,
     meanObliquityCosRatioAtAge: deps.meanObliquityCosRatioAtAge,
+    lunarRegimeFactorAtAge: deps.lunarRegimeFactorAtAge,
   });
 
   /** THE PRECESSION RATE OF DATE ψ̇(t), ″/yr — the constant's scaling
