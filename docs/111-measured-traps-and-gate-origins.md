@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.14
+modelVersion: v27.15
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -1958,7 +1958,29 @@ enters the equatorial regime; the tropical year of date at the edge
 2022's own "Luni-solar precession" column tracks the FORMER law to 4 % at
 the edge and the coupled one not at all: the cited solution's column is
 the classical ecliptic form, a cross-check, never a referee for this
-regime.
+regime — by its authors' own statement (Farhat et al. 2022, their Eq. 7
+and Appendix: the precession frequency is (3/2)(GM_S/a_E³ + GM_M/a_M³)·
+E_d·(Ω/Ω₀²)·cos ε with the lunar inclination zero and "the Laplace plane
+taken as the ecliptic"; "this derivation of the obliquity and precession
+frequency evolutions is only valid in the limit of a distant Moon", and
+"halts of tidal interaction due to Laplace plane transitions are ignored"
+— which is why their figures stop at 3.5 Ga although the published table
+runs to 4.429 Ga). The same caveat reaches the cited MEAN OBLIQUITY the
+model reads to the edge: inside the transition the column is the authors'
+extrapolation past their stated validity; its 11.9° at 6.2 R⊕ agrees with
+the standard scenario's "about 10°" when the Moon formed (Goldreich 1966;
+Touma & Wisdom 1994; the high-obliquity literature cites both), and the
+clock's sensitivity to it is 0.6 % between 10° and 12°. An INDEPENDENT
+check of the coupled clock (2026-11-13): the two vector equations
+integrated IN TIME by RK4 at 2-day steps from a non-steady start (the
+orbit 5° off its plane), with every coefficient rebuilt from first
+principles in SI (DE440's GM, the hydrostatic J₂, the chain's LOD, distance,
+ε̄ and moment of inertia; the lunar term on the bulge from the masses,
+1.0062 of the third-law pair), reads a mean spin precession of 1,912 yr
+over 20 kyr at the edge against the steady state's 2,006 on the p_A
+anchor and the first-principles lock bound's 1,891 — the 2.4 % anchor
+convention plus the start's transient; the 9-yr and the 17,600-yr forms
+are both excluded by two orders.
 
 **(b) The third law must hold EXACTLY inside the coupled solve.** The
 first build took the Moon's torque on the spin from the composed law's
@@ -1990,7 +2012,7 @@ projection and sin i_L ∝ a^{−κ}, κ = 1/2 for the torque fully along the
 pole (shipped — the torque model the regime itself rests on, no new
 constant), κ = 1/4 the constant-lag class (the band; Goldreich 1966's ~10°
 at 10 R⊕ between): 5.4–5.6° at 2.46 Ga, 8–13° at 10 R⊕, 9.1–16.2° at the
-edge, a modern rate of 2.5e-7 °/yr (0.9 mas/yr, inside the LLR era's noise). The endpoint is not 0°: that the free
+edge, a modern rate of 2.6e-10 °/yr (0.9 µas/yr — the module header's 3e-10; three orders below the LLR era's noise). The endpoint is not 0°: that the free
 inclination is 5° today where a formation disk gives ~0° is the open lunar
 inclination problem (Touma & Wisdom 1998; Ward & Canup 2000; Ćuk et al.
 2016), named, not resolved; the Moon's own tides are a stated omission.
@@ -2058,12 +2080,9 @@ Horizons comparison all run on it through the chain, and an edit of it
 alone would have re-staled nothing (§1.16's class) — it is listed in every
 one of the ten now, which re-stamps them all once.
 
-**What stays open (slice A2).** The lunar LATITUDE series still carries
-Meeus's J2000 amplitudes and the scene draws the orbit at the J2000
-inclination: the mean plane's tilt from the ecliptic (11.8° at the edge)
-and the free inclination of date are not yet in the Moon's latitude, the
-finder's inclination or the drawn plane — §1.15's rule applied to the
-latitude is the next slice, with no bank to re-record.
+**Slice A2 — the lunar latitude of date — is §1.43.** The scene's drawn
+plane and its deep obliquity (the walk's 23.2° at the edge against the cited
+11.9° the clock reads) are its browser part.
 
 The gate: `test:laplace-regime` (`packages/physics/test/laplace-plane-regime.test.mjs`,
 in `npm run check`) — the anchor identities, the era (|1 − R| < 1e-6 at
@@ -2075,6 +2094,94 @@ registry: `laplaceRadius*`, `lunarRegime*`, `lunarFreeInclination*`,
 `lunarMeanPlane*`, `lunarNode*AtHadean*`, `lunarPerigee*AtHadean*`,
 `axialPrecAtHadeanEclipticFormYr`, `axialPrecAtHadeanSolarOnlyYr`,
 `axialPrecMinimum*`.
+
+### 1.43 A fitted constant that IS a plane's tilt rides the plane — the lunar latitude of date (plan 31 A2)
+
+Meeus Ch. 47's latitude carries a "flattening of the Earth" family the
+series had kept as three constants: −2235 µ° sin L′ (8.05″) with its
+eccentricity sidebands +127 sin(L′ − M′) and −115 sin(L′ + M′). The
+coupled spin–orbit solve of §1.42 reads, on the model's own constants and
+with nothing fitted, the Laplace plane's tilt from the ecliptic today as
+8.30″ and its e·θ sideband as 126.6 µ° — that constant IS the mean orbit
+plane's tilt, the 3 % the solve sits above the fit is the same
+convention gap R absorbed (§1.42 b), and at the cited history's end the
+same quantity is 11.8°. §1.15 applied: the series is evaluated in the
+Moon's mean plane and composed into the ecliptic by the exact rotation of
+the plane by 2235 µ° × θ(t)/θ(0) about the equinox line (ONE home
+`moon/plane-of-date.cjs`, its shapes composed from the regime's tilt and
+free-inclination readers — the regime module, the chain and the Node
+engine file stay untouched: their hashes are the N-body series', the
+climate chain's, the governed fit's and the spin bank's inputs, and a
+first wiring through them listed a six-hour cascade with a by-hand
+re-close for identical values; the slice `model/lunar-theory.js` carries
+the wiring, so only the model-hashing generators re-run);
+every |kF| = 1 amplitude rides sin i_L(t)/sin i₀ on the derived free
+inclination (§1.42 c), |kF| = 3 its cube, |kF| = 2 — the reduction to the
+ecliptic, 412″ sin 2F in longitude, 110 km of distance — tan²(i_L/2)/tan²(i₀/2).
+All three are exactly 1 at J2000. Measured on the build (the measurement
+`tools/explore/plan31a2-lunar-plane-measure.cjs`, the referee
+`tools/explore/plan31a2-era-referee.cjs` on a cached Horizons DE441
+geocentric vector table, weekly 1970–2049, precessed to the mean ecliptic
+of date by Meeus 21.5 — its λ mean, −1.006″, reproduces the series' recorded
+anchor offset, the frame check):
+
+- **The rotation completes what Meeus truncated.** Against the three
+  constants the exact rotation differs by 0.107″ rms (0.31″ max) in the
+  era — the sidebands at L′ ± (2D − M′) and L′ ± 2D below Meeus's cutoff —
+  and the referee's β scatter drops by exactly that quadrature,
+  1.019 → 1.014″; with the model's 8.30″ in place of the 8.05″ anchor it
+  reads 1.017″: the fitted anchor stays, the shape is the physics (the R
+  precedent). The sideband asymmetry alone (127/−115 against the
+  geometry's 127/−123) is 0.02″.
+- **The longitude's first order is already fitted — re-applying it
+  double-counts.** The rotation's longitude share, +θ tan β cos λ (0.36″
+  rms), sits inside the fitted 7.06″ sin Ω term and the extension tail's
+  derived 0.371″ sin(2F + Ω) = sin(L′ + F) (the tilt's own term, predicted
+  at 0.36″ before it was looked up); applied again the λ scatter rose
+  2.809 → 2.824″. The composition removes the anchor's first order before
+  the rotation: the era longitude is untouched to 3e-4″ (O(θ₀²)), the deep
+  plane carries the full geometry.
+- **The sizes.** At the edge the leading latitude amplitude 5.13° → 16.0°,
+  the orbit's inclination to the ecliptic 4.5–28.1° over the node cycle
+  (the plane's 11.8° ± the free 16.3°), the 2F longitude term 412″ → 1.15°,
+  eclipses in the two seasons where the Sun crosses the mean plane's node
+  line; at 2.46 Ga the scales are 1.094 / 1.198 and the tilt 0.010°; inside
+  ±10 Myr the free inclination moves 9″ (5e-4 of the amplitude), the tilt
+  0.05″; at ±3 kyr 3e-3″ and 3e-4″ — the era rides §1.15's rule at the
+  precision the ephemeris referee can see.
+- **The finder was certified WITHOUT the tilt.** The truncated eclipse
+  finder's latitude was "table only" by design (doc 66 §Layer 1b: the 8″
+  family would move knife-edge canon events) — the canon's Moon has the
+  tilt, and at the edge the finder cannot do without 11.8° of it. The pair
+  is re-certified on the same composition (ONE evaluation per JD — the
+  rotation couples the two coordinates — behind a last-JD memo, pure in
+  jdUT) and the campaigns re-recorded with the reason: the before/after
+  canon statistics are in the campaign recordings' history.
+- **A by-hand rate is not a measurement.** The free inclination's modern
+  rate had been written as 2.5e-7 °/yr in a session note and copied into
+  this section and the plan; the shipped function reads 2.6e-10 °/yr (the
+  module header's 3e-10, 0.9 µas/yr). Derive a quoted rate from the
+  shipped function, never from a by-hand estimate.
+- **An injected function has as many twins as there are injectors.** The
+  scales reached the package model and the browser; the Node engine in
+  `tools/lib/scene-graph.js` built the same series without them and ran
+  the era's unity scales — `test:model` (createModel ≡ the engine,
+  bit-exact) read 1e-7 in β at year 0, the scales' 3-kyr departure from 1.
+  Grep every `createMoonSeries({` before calling a wiring complete; the
+  parity gate is the check, not the grep.
+
+The gate: `test:laplace-regime` gains the plane rows — the scales ≡ 1 at
+J2000 and within 1e-4 at 3 kyr, the edge tilt 11–12.5° on the anchor and
+the free-inclination scale 3.0–3.3, the composition's era identity against
+Meeus's three terms (0.05–0.2″ rms, < 0.4″ max) with the longitude untouched
+to 1e-3″; fail-proven with `ESSRT_LUNAR_PLANE_PLANT=1` (the era tilt planted
+at 1.5× its anchor). The registry: `lunarMeanPlaneTiltJ2000Arcsec`,
+`lunarMeanPlaneTiltModelJ2000Arcsec`, `lunarLatitudeAmplitudeAtHadeanDeg`,
+`lunarOrbitEclipticInclinationAtHadean{Min,Max}Deg`. Open: the scene's
+drawn orbit plane and its deep obliquity (the browser part of A2), the
+1962 sin Ω longitude term and the 382 sin A3 latitude term (the mean
+plane's lag behind the moving ecliptic: 0.47″/yr of ecliptic turn over the
+node's 69,600″/yr = 1.39″, Meeus's 1.375″) stay constant rows, named.
 
 ---
 

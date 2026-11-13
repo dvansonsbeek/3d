@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.14
+modelVersion: v27.15
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -292,9 +292,9 @@ remainder once the opposition-vs-greatest-eclipse term is removed
 (doc 112 §7, doc 111 §1.41 d — written by the sweep's artifact), with
 in-window rows at zero (a pure-ICRF comparison drifts +1.4°/century).
 NASA full-canon recall <!--v:lunarCanonRecallPercent-->99.93<!--/v--> % /
-tight-window <!--v:lunarCanonRecallTightPercent-->99.49<!--/v--> % / type
-<!--v:lunarCanonRecallTypeAccuracyPercent-->99.55<!--/v--> %
-(<!--v:lunarCanonRecallModelOnly-->26<!--/v--> model-only events against
+tight-window <!--v:lunarCanonRecallTightPercent-->99.48<!--/v--> % / type
+<!--v:lunarCanonRecallTypeAccuracyPercent-->99.54<!--/v--> %
+(<!--v:lunarCanonRecallModelOnly-->23<!--/v--> model-only events against
 NASA's <!--v:lunarCanonRecallEvents-->12,064<!--/v-->; the mismatches
 knife-edge at the γ ≈ 1.0/1.5 boundaries — `data/lunar-canon-recall.json`,
 the finder timing greatest eclipse since the plan-32 follow-up); 26-event historical audit
@@ -344,7 +344,14 @@ subtracted because the off-center orbit geometry already provides half.
 ### 1.2 Latitude Series (Table 47.B, 60 terms + 6 additional)
 
 Same table-driven approach for ecliptic latitude (beta).
-Additional corrections: -2235*sin(L'), A3, and Venus/flattening terms.
+Additional corrections: A3 and the Venus pair (A1 ± F); the flattening
+family (−2235 sin L′ with its +127/−115 sidebands) is no longer added as
+constants — it is the Laplace plane's J2000 tilt, and since plan 31 A2 the
+series evaluates in the Moon's mean plane and composes into the ecliptic
+by the exact rotation of the plane by 2235 µ° × θ(t)/θ(0), every F-odd
+amplitude riding the free inclination of date (`moon/plane-of-date.cjs`;
+doc 111 §1.43). The truncated finder forms carry the same composition
+(re-certified there).
 
 ### 1.3 Distance Series (Table 47.A Σr column, 46 non-zero terms)
 
@@ -850,7 +857,10 @@ stay unshipped even where "fitting" them would improve the gates
   oblateness: a twin 3-body integration with the J2 torque on/off
   isolates the family, and the two documented J2-class Meeus head terms
   (λ +1962e-6 sin(Lp−F), β −2235e-6 sin(Lp)) are reproduced at ratio
-  1.028 / 0.971, certifying the amplitude scale at ±3%. Shipped rows:
+  1.028 / 0.971, certifying the amplitude scale at ±3% (and the β term is
+  the Laplace plane's J2000 tilt: the coupled spin–orbit solve of plan 31 A
+  reads it at 1.032 — the two derivations bracket Meeus's fitted anchor,
+  which the series keeps and scales by the tilt of date, doc 111 §1.43). Shipped rows:
   λ −0.544 sin(Mp−Ω) + 0.546 sin(Mp+Ω) + 0.371 sin(2F+Ω)
   + 0.103 sin(2D+Ω); β −0.375 sin(F−Ω) — dt-halving-converged ≤ 0.003″;
 - the main-problem dust — 43 λ + 33 β pure-Delaunay sine rows

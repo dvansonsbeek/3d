@@ -23,6 +23,21 @@
  * Meeus Ch. 47 STRUCTURE and live here, like the argument polynomials
  * (8.2-5 S2 precedent). The 60-term tables are INJECTED — they are fitted
  * coefficients (the engines' two sources are byte-identical).
+ *
+ * THE LUNAR PLANE OF DATE (plan 31 A2; doc 111 §1.43; moon/plane-of-date.cjs,
+ * earth/laplace-plane.cjs): the series is evaluated in the Moon's MEAN orbit
+ * plane (the Laplace plane) and composed into the ecliptic of date. Every
+ * |kF| = 1 amplitude rides sin i_L(t)/sin i₀, |kF| = 3 its cube, |kF| = 2 (the
+ * longitude's and the distance's reduction to the ecliptic) tan²(i_L/2)/tan²(i₀/2)
+ * — §1.15: a term's amplitude is a function of the elements. The three
+ * flattening terms (−2235 sin L′, +127 sin(L′ − M′), −115 sin(L′ + M′)) are the
+ * J2000 tilt's first order; they are replaced by the exact rotation of the
+ * plane by 2235 µ° × θ(t)/θ(0) about the equinox line (8.05″ today, 11.8° at the
+ * cited history's end). The era moves by the sidebands Meeus truncated, 0.107″
+ * rms in latitude (confirmed against Horizons), 3e-4″ in longitude. Absent the
+ * injected scales (no deep chain, or beyond the histories) the form is the era's.
+ * The truncated finder forms are RE-CERTIFIED on the same composition — the
+ * former "table only" latitude omitted the 8″ tilt family the canon's Moon has.
  */
 
 'use strict';
@@ -33,6 +48,13 @@
 // eclipse-location Moon were two different Moons. The truncated finder forms
 // below stay bare by certified design.
 const { moonSeriesExtensionDeg } = require('./series-extension.cjs');
+const { composeEclipticOfDate } = require('./plane-of-date.cjs');
+
+/** Meeus's flattening-term anchor: the J2000 tilt of the Moon's mean plane from the ecliptic, −2235 µ° sin L′. */
+const FLATTENING_TILT_ANCHOR_DEG = 2235e-6;
+/** @typedef {{s1: number, s2: number, s3: number}} FScales — the |kF| = 1, 2, 3 multipliers */
+/** @type {FScales} */
+const F_SCALES_ERA = Object.freeze({ s1: 1, s2: 1, s3: 1 });
 
 /**
  * @typedef {Array<[number, number, number, number, number]>} MeeusTermTable
@@ -65,6 +87,7 @@ const { moonSeriesExtensionDeg } = require('./series-extension.cjs');
  *     jupiterOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     isDeepTime: () => boolean,
  *     isFrameworkNative: () => boolean,
+ *     lunarPlaneScalesAt?: (dDaysTT: number) => ({tiltShape: number, sinScale: number, tanHalfSqScale: number} | null),
  *   },
  * }} deps — argsAt is the engine's dispatcher (probe hook and mode toggle
  *   ride along); eFactorForD preserves each engine's exact E-factor call
@@ -81,9 +104,21 @@ function createMoonSeries({ constants, fns }) {
     argsAt, eFactorForD, eFactorAtJdTT, getMoonDistanceKm, getEccentricityBase, deltaTSeconds,
     jdToSIyear, tropicalOrbitsBetween, apsidalOfDateCyclesBetween,
     siderealOrbitsBetween, jupiterOrbitsBetween, isDeepTime, isFrameworkNative,
+    lunarPlaneScalesAt,
   } = fns;
 
   const D2R = Math.PI / 180;
+
+  /** The lunar plane of date at d days TT from J2000: the tilt shape and the F-class scales
+   *  (plan 31 A2). The era form where no scales are injected or the histories refuse.
+   *  @param {number} dDaysTT @returns {{tiltShape: number, fs: FScales}} */
+  function planeOfDateAt(dDaysTT) {
+    const p = lunarPlaneScalesAt ? lunarPlaneScalesAt(dDaysTT) : null;
+    if (p === null) return { tiltShape: 1, fs: F_SCALES_ERA };
+    return { tiltShape: p.tiltShape, fs: { s1: p.sinScale, s2: p.tanHalfSqScale, s3: p.sinScale * p.sinScale * p.sinScale } };
+  }
+  /** @param {number} kF @param {FScales} fs @returns {number} */
+  const fScaleOf = (kF, fs) => (kF === 0 ? 1 : (kF === 1 || kF === -1) ? fs.s1 : (kF === 2 || kF === -2) ? fs.s2 : fs.s3);
 
   /** A1/A2/A3 in radians at T centuries TT (deep time: A2/A3 chain-integrated).
    *  @param {number} T @param {number} dDaysTT
@@ -109,11 +144,12 @@ function createMoonSeries({ constants, fns }) {
     return { A1, A2: a2Deg * D2R, A3: a3Deg * D2R };
   }
 
-  /** One 60-term table pass with E/E² on M-bearing terms (micro-degrees).
+  /** One 60-term table pass with E/E² on M-bearing terms and the F-class scales
+   *  of the plane of date (micro-degrees).
    *  @param {MeeusTermTable} table @param {number} Dr @param {number} Mr
    *  @param {number} Mpr @param {number} Fr @param {number} E
-   *  @param {number} E2 @returns {number} */
-  function sumTable(table, Dr, Mr, Mpr, Fr, E, E2) {
+   *  @param {number} E2 @param {FScales} fs @returns {number} */
+  function sumTable(table, Dr, Mr, Mpr, Fr, E, E2, fs) {
     let s = 0;
     for (let i = 0; i < table.length; i++) {
       const r = table[i];
@@ -122,17 +158,18 @@ function createMoonSeries({ constants, fns }) {
       const absM = r[1] < 0 ? -r[1] : r[1];
       if (absM === 1) term *= E;
       else if (absM === 2) term *= E2;
+      if (r[3] !== 0) term *= fScaleOf(r[3], fs);
       s += term;
     }
     return s;
   }
 
   /** Σr table pass — COSINE of the argument (Meeus 47.A distance column),
-   *  same E/E² convention. Units 0.001 km.
+   *  same E/E² and F-class conventions. Units 0.001 km.
    *  @param {MeeusTermTable} table @param {number} Dr @param {number} Mr
    *  @param {number} Mpr @param {number} Fr @param {number} E
-   *  @param {number} E2 @returns {number} */
-  function sumTableCos(table, Dr, Mr, Mpr, Fr, E, E2) {
+   *  @param {number} E2 @param {FScales} fs @returns {number} */
+  function sumTableCos(table, Dr, Mr, Mpr, Fr, E, E2, fs) {
     let s = 0;
     for (let i = 0; i < table.length; i++) {
       const r = table[i];
@@ -142,6 +179,7 @@ function createMoonSeries({ constants, fns }) {
       const absM = r[1] < 0 ? -r[1] : r[1];
       if (absM === 1) term *= E;
       else if (absM === 2) term *= E2;
+      if (r[3] !== 0) term *= fScaleOf(r[3], fs);
       s += term;
     }
     return s;
@@ -163,9 +201,9 @@ function createMoonSeries({ constants, fns }) {
   // timing accident — while the Node engines pinned the J2000 constant).
   // Engines whose getter ignores the argument keep their old behavior.
   /** @param {number} Dr @param {number} Mr @param {number} Mpr @param {number} Fr
-   *  @param {number} E @param {number} E2 @param {number} [jdTT] @returns {number} */
-  function fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, jdTT) {
-    const Sr = sumTableCos(moonR, Dr, Mr, Mpr, Fr, E, E2);
+   *  @param {number} E @param {number} E2 @param {FScales} fs @param {number} [jdTT] @returns {number} */
+  function fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, fs, jdTT) {
+    const Sr = sumTableCos(moonR, Dr, Mr, Mpr, Fr, E, E2, fs);
     return (moonRMeanKm + Sr * 1e-3) * (getMoonDistanceKm(jdTT) / moonDistanceJ2000Km);
   }
 
@@ -180,10 +218,11 @@ function createMoonSeries({ constants, fns }) {
    *  elongation; the former +32.75″ was the eclipse tier's mean Sun
    *  compensated — its aberration κ, the I2 long inequality and the trend-ΔT
    *  offset — not a property of the Moon);
-   *  latRad/latDeg — Σb with all six corrections plus the extension (BOTH
-   *  computed from Σb directly: the browser stores radians, the Node engine
-   *  degrees, and (x·D2R)/D2R is not bit-exactly x); distKm — two-term
-   *  ellipse; T.
+   *  latRad/latDeg — the Laplace-frame Σb (the five non-tilt corrections, the
+   *  extension, the F-class scales) composed into the ecliptic of date by the
+   *  tilt rotation (BOTH from the rotation's one asin: the browser stores
+   *  radians, the Node engine degrees, and (x·D2R)/D2R is not bit-exactly x);
+   *  distKm — the Meeus distance of date; T.
    *  @param {number} dDaysTT
    *  @returns {{thetaAddRad: number, lonDeg: number, latRad: number, latDeg: number, distKm: number, T: number}} */
   function sceneEvalAt(dDaysTT) {
@@ -196,38 +235,53 @@ function createMoonSeries({ constants, fns }) {
     const E = eFactorForD(d, T, T2);
     const E2 = E * E;
     const { A1, A2, A3 } = additionalArgs(T, d);
-    const ext = moonSeriesExtensionDeg(T);   // derived tail, degrees → the tables' 1e-6° units
+    const { tiltShape, fs } = planeOfDateAt(d);
+    const ext = moonSeriesExtensionDeg(T, fs);   // derived tail, degrees → the tables' 1e-6° units
 
-    let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2);
+    let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2, fs);
     Sl += 3958 * Math.sin(A1) + 1962 * Math.sin(Lp - Fr) + 318 * Math.sin(A2);
     Sl += ext.dLonDeg * 1e6;
     // Subtract the EoC portion the off-centre orbit geometry already provides.
     const eocHalf = getEccentricityBase() / 2;
     Sl -= (2 * eocHalf / D2R * 1e6) * Math.sin(Mpr);
     Sl -= (1.25 * eocHalf * eocHalf / D2R * 1e6) * Math.sin(2 * Mpr);
-    const thetaAddRad = Sl * 1e-6 * D2R;
 
-    let Sb = sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2);
-    Sb += -2235 * Math.sin(Lp) + 382 * Math.sin(A3);
-    Sb += 175 * Math.sin(A1 - Fr) + 175 * Math.sin(A1 + Fr);
-    Sb += 127 * Math.sin(Lp - Mpr) - 115 * Math.sin(Lp + Mpr);
+    // The Laplace-frame latitude: the table and the extension on the F-class scales, the planetary
+    // corrections (A3's lag of the mean plane behind the moving ecliptic — a constant row, named;
+    // the A1 ± F pair ∝ sin i); the tilt family enters through the composition below.
+    let Sb = sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2, fs);
+    Sb += 382 * Math.sin(A3);
+    Sb += fs.s1 * (175 * Math.sin(A1 - Fr) + 175 * Math.sin(A1 + Fr));
     Sb += ext.dLatDeg * 1e6;
-    const latRad = Sb * 1e-6 * D2R;
-    const latDeg = Sb * 1e-6;
 
     // Full longitude re-adds the EoC half that θ absorbed.
     const fullSl = Sl + (2 * eocHalf / D2R * 1e6) * Math.sin(Mpr)
                      + (1.25 * eocHalf * eocHalf / D2R * 1e6) * Math.sin(2 * Mpr);
-    const lonDeg = Lp / D2R + fullSl * 1e-6;
-    const distKm = fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, j2000JD + d);
-    return { thetaAddRad, lonDeg, latRad, latDeg, distKm, T };
+    const lonFrameDeg = Lp / D2R + fullSl * 1e-6;
+    const c = composeEclipticOfDate(lonFrameDeg, Sb * 1e-6, FLATTENING_TILT_ANCHOR_DEG, tiltShape);
+    // The hierarchy θ increment carries the composition's longitude step beside the EoC-half-subtracted Σl.
+    const thetaAddRad = (Sl * 1e-6 + (c.lonDeg - lonFrameDeg)) * D2R;
+    const distKm = fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, fs, j2000JD + d);
+    return { thetaAddRad, lonDeg: c.lonDeg, latRad: c.latRad, latDeg: c.latDeg, distKm, T };
   }
 
-  /** TRUNCATED eclipse-finder longitude (doc 66 §Layer 1b): the certified
-   *  form — no EoC subtraction, no A3/latitude-family, no LpCorrection.
-   *  Accepts JD_UT; converts to TT via the injected ΔT.
-   *  @param {number} jdUT @returns {number} degrees 0–360 */
-  function truncatedLonDeg(jdUT) {
+  /** THE TRUNCATED eclipse-finder pair (doc 66 §Layer 1b, RE-CERTIFIED in plan 31 A2):
+   *  the longitude keeps its certified shape — no EoC subtraction, no A3/latitude-family,
+   *  no LpCorrection — and the latitude is the table alone in the Laplace frame; both are
+   *  composed into the ecliptic of date by the tilt rotation, so the finder's Moon carries
+   *  the 8″ tilt family the canon's Moon has (the former "table only" latitude omitted it
+   *  by certified design; the statistics are re-recorded with the reason) and the deep
+   *  plane (11.8° at the cited history's end — eclipses in two seasons there). The two
+   *  coordinates are ONE evaluation (the rotation couples them); a last-JD memo serves the
+   *  finders' paired reads, values pure in jdUT. Accepts JD_UT; converts to TT via the
+   *  injected ΔT.
+   *  @param {number} jdUT @returns {{lonDeg: number, betaDeg: number}} lonDeg 0–360 */
+  let truncatedMemoJd = NaN;
+  /** @type {{lonDeg: number, betaDeg: number}} */
+  let truncatedMemo = { lonDeg: 0, betaDeg: 0 };
+  /** @param {number} jdUT @returns {{lonDeg: number, betaDeg: number}} */
+  function truncatedPairAt(jdUT) {
+    if (jdUT === truncatedMemoJd) return truncatedMemo;
     const jdTT = jdUT + deltaTSeconds(jdUT) / 86400;
     const T = (jdTT - j2000JD) / julianCenturyDays;
     const T2 = T * T;
@@ -238,28 +292,23 @@ function createMoonSeries({ constants, fns }) {
     // jdTT, so the truncated path keeps its own E-factor entry.
     const E = eFactorAtJdTT(jdTT, T, T2);
     const E2 = E * E;
-    let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2);
+    const { tiltShape, fs } = planeOfDateAt(jdTT - j2000JD);
+    let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2, fs);
     const A1 = (119.75 + 131.849 * T) * D2R;
     const A2 = (53.09 + (isFrameworkNative() ? fwA2RateDegPerCy : 479264.290) * T) * D2R;
     Sl += 3958 * Math.sin(A1) + 1962 * Math.sin(LpMean * D2R - Fr) + 318 * Math.sin(A2);
-    return (((LpMean + Sl * 1e-6) % 360) + 360) % 360;
+    const Sb = sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2, fs);
+    const c = composeEclipticOfDate(LpMean + Sl * 1e-6, Sb * 1e-6, FLATTENING_TILT_ANCHOR_DEG, tiltShape);
+    truncatedMemo = { lonDeg: ((c.lonDeg % 360) + 360) % 360, betaDeg: c.latDeg };
+    truncatedMemoJd = jdUT;
+    return truncatedMemo;
   }
 
-  /** TRUNCATED eclipse-finder latitude (doc 66 §Layer 1b): table only — the
-   *  six additional corrections are DELIBERATELY absent (the certified
-   *  eclipse statistics were produced with this form; the ~2.2 mdeg
-   *  −2235·sin(Lp) family would move knife-edge canon events).
-   *  @param {number} jdUT @returns {number} degrees */
-  function truncatedBetaDeg(jdUT) {
-    const jdTT = jdUT + deltaTSeconds(jdUT) / 86400;
-    const T = (jdTT - j2000JD) / julianCenturyDays;
-    const T2 = T * T;
-    const args = argsAt(jdTT);
-    const Dr = args.D * D2R, Mr = args.M * D2R, Mpr = args.Mp * D2R, Fr = args.F * D2R;
-    const E = eFactorAtJdTT(jdTT, T, T2);
-    const E2 = E * E;
-    return sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2) * 1e-6;
-  }
+  /** TRUNCATED eclipse-finder longitude (the pair's). @param {number} jdUT @returns {number} degrees 0–360 */
+  function truncatedLonDeg(jdUT) { return truncatedPairAt(jdUT).lonDeg; }
+
+  /** TRUNCATED eclipse-finder latitude (the pair's). @param {number} jdUT @returns {number} degrees */
+  function truncatedBetaDeg(jdUT) { return truncatedPairAt(jdUT).betaDeg; }
 
   /** Full Meeus Ch. 47 distance at JD_UT (shared with the scene form).
    *  @param {number} jdUT @returns {number} km */
@@ -269,7 +318,8 @@ function createMoonSeries({ constants, fns }) {
     const args = argsAt(jdTT);
     const Dr = args.D * D2R, Mr = args.M * D2R, Mpr = args.Mp * D2R, Fr = args.F * D2R;
     const E = eFactorAtJdTT(jdTT, T, T * T);
-    return fullDistanceKm(Dr, Mr, Mpr, Fr, E, E * E, jdTT);
+    const { fs } = planeOfDateAt(jdTT - j2000JD);
+    return fullDistanceKm(Dr, Mr, Mpr, Fr, E, E * E, fs, jdTT);
   }
 
   return { sceneEvalAt, truncatedLonDeg, truncatedBetaDeg, truncatedDistanceKm, additionalArgs };

@@ -429,8 +429,22 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   geometry rides a FIXED 20-kyr grid built on demand under the α-reference
   pin (rule R2 — the GIA wobble reaches R at 2e-7), the fast solar
   modulation stays live, the direct solve is the gate's instrument. The
-  lunar LATITUDE of date (the mean plane's tilt, the free inclination in
-  the series, the drawn plane) is the open slice A2. (§1.42)
+  lunar LATITUDE of date is §1.43; the drawn plane and the scene's deep
+  obliquity are A2's browser part. (§1.42)
+- **A fitted constant that IS a plane's tilt rides the plane** — Meeus's
+  "flattening" latitude term (−2235 µ° sin L′, 8.05″) is the Laplace
+  plane's J2000 tilt (the coupled solve reads 8.30″ and its e·θ sideband
+  126.6 µ° for Meeus's 127, nothing fitted); the series evaluates in the
+  Moon's mean plane and composes into the ecliptic by the exact rotation
+  by 2235 µ° × θ(t)/θ(0) (ONE home `moon/plane-of-date.cjs`; 11.8° at the
+  edge), every F-odd amplitude ∝ sin i_L(t), the 2F families ∝ tan²(i_L/2).
+  The era moves by the sidebands Meeus truncated (0.107″ rms) — confirmed
+  against Horizons (the β scatter drops by exactly that quadrature) —
+  while re-applying the rotation's longitude share DOUBLE-COUNTS the first
+  order the fitted longitude already holds (λ 2.809 → 2.824″): remove the
+  anchor's first order before rotating. The finder was certified WITHOUT
+  the tilt; it is re-certified on the composition. Derive a quoted rate
+  from the shipped function (a by-hand 2.5e-7 °/yr was 2.6e-10). (§1.43)
 
 ---
 

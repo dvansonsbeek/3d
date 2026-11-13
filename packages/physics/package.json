@@ -1,9 +1,9 @@
 {
   "name": "@essrt/physics",
-  "version": "26.13.0",
+  "version": "26.14.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
-    "modelVersion": "v27.14",
+    "modelVersion": "v27.15",
     "_note": "The model identity this package version ships (IP-unified-architecture §10: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
   },
   "type": "module",
@@ -52,6 +52,7 @@
     "./moon/arguments": { "types": "./types/moon/arguments.d.cts", "default": "./src/moon/arguments.cjs" },
     "./moon/series": { "types": "./types/moon/series.d.cts", "default": "./src/moon/series.cjs" },
     "./moon/series-extension": { "types": "./types/moon/series-extension.d.cts", "default": "./src/moon/series-extension.cjs" },
+    "./moon/plane-of-date": { "types": "./types/moon/plane-of-date.d.cts", "default": "./src/moon/plane-of-date.cjs" },
     "./moon/apparent": { "types": "./types/moon/apparent.d.cts", "default": "./src/moon/apparent.cjs" },
     "./planets/geometry": { "types": "./types/planets/geometry.d.cts", "default": "./src/planets/geometry.cjs" },
     "./planets/orbit-chain": { "types": "./types/planets/orbit-chain.d.cts", "default": "./src/planets/orbit-chain.cjs" },

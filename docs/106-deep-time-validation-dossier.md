@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.14
+modelVersion: v27.15
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -81,8 +81,10 @@ never to the fossil data it is tested against.
   everything on it (the tropical year of
   <!--v:tropicalYearAtHadeanSiDays-->364.8<!--/v--> SI days, the obliquity
   band, the first eclipse) is the law's value at the edge of its domain —
-  reproducible, not converged; the lunar latitude series still carries the
-  J2000 inclination (slice A2) (doc 99 §Interpretation 2; plan 30 K). One age,
+  reproducible, not converged; the lunar latitude of date rides the mean
+  plane's tilt (<!--v:lunarMeanPlaneFromEclipticAtHadeanDeg-->11.8<!--/v-->°
+  there) and the derived free inclination (doc 111 §1.43) (doc 99
+  §Interpretation 2; plan 30 K). One age,
   three counts (plan 29 H): the
   edge lies <!--v:genesisEdgeAgeTTGyr-->4.429<!--/v--> Gyr back in uniform
   time (TT, the clock radiometric ages are in), which is
@@ -144,7 +146,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   documented visibility regions vs the api observer tier
   (<!--v:lunarVisibilityInsideAgree-->14<!--/v-->/<!--v:lunarVisibilityChecked-->14<!--/v-->
   both directions); the −746 Feb 6 Babylonian partial (magnitude
-  <!--v:lunarBabylon746MagnitudeUmbral-->0.922<!--/v--> vs canon
+  <!--v:lunarBabylon746MagnitudeUmbral-->0.926<!--/v--> vs canon
   <!--v:lunarBabylon746CanonMagnitudeUmbral-->0.920<!--/v-->, visible from
   Babylon at <!--v:lunarBabylon746AltitudeDeg-->34.7<!--/v-->°); the
   <!--v:lunarDtBandsN-->267<!--/v--> raw Stephenson-2016 timing reductions

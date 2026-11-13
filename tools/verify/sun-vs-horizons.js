@@ -66,6 +66,10 @@ const INPUT_FILES = [
   'packages/physics/src/moon/deep-ecc-channel.cjs',
   'packages/physics/src/moon/deep-modes-artifact.cjs',
   'packages/physics/src/moon/arguments.cjs',
+  // the barycentre term reads the FULL lunar series of date (λ_M, β_M, r_M — plan 32's exact lunar equation)
+  'packages/physics/src/moon/series.cjs',
+  'packages/physics/src/moon/series-extension.cjs',
+  'packages/physics/src/moon/plane-of-date.cjs',
   'packages/physics/src/deltat/deep-time.cjs',
   'packages/physics/src/earth/laplace-plane.cjs',
   'packages/physics/src/deltat/cycles.cjs',

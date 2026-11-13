@@ -53,6 +53,7 @@ const INPUT_FILES = [
   'public/input/lunar-eclipses-nasa.json',
   'packages/physics/src/eclipse/finders.cjs',
   'packages/physics/src/moon/series.cjs',
+  'packages/physics/src/moon/plane-of-date.cjs',
   'packages/physics/src/moon/apparent.cjs',
   ...modelSourceFiles(),
   'packages/physics/src/earth/deep-orbital-history.cjs',

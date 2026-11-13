@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.14
+modelVersion: v27.15
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -358,10 +358,10 @@ matched / type-mismatch / model-only / NASA-only. Two thresholds:
 **Result** (fully-derived e_E channel + carrier split + dynamical
 inclination, the shipped state; the finder timing greatest eclipse under
 Danjon's shadow rule since the plan-32 follow-up —
-`data/lunar-canon-recall.json`): <!--v:lunarCanonRecallModelEvents-->12,082<!--/v--> model
+`data/lunar-canon-recall.json`): <!--v:lunarCanonRecallModelEvents-->12,079<!--/v--> model
 events vs <!--v:lunarCanonRecallEvents-->12,064<!--/v--> NASA events over 5,000 years.
 Physical-event recall <!--v:lunarCanonRecallPercent-->99.93<!--/v--> %; the unmatched
-edges (<!--v:lunarCanonRecallModelOnly-->26<!--/v--> model-only /
+edges (<!--v:lunarCanonRecallModelOnly-->23<!--/v--> model-only /
 <!--v:lunarCanonRecallMissed-->8<!--/v--> NASA-only) are grazing penumbrals at the
 outer eclipse threshold — threshold-convention scatter with no directional bias
 (measured 2026-11-10 by replaying the generator's matching: every NASA-only
@@ -369,11 +369,11 @@ event is a canon penumbral with |γ| between 1.54 and 1.58, the penumbral
 limit, and the nearest model event is a lunation away — the model's least
 distance sits just outside the penumbra for those oppositions, as the
 model-only ones sit just inside for the canon's).
-Type accuracy on matched events <!--v:lunarCanonRecallTypeAccuracyPercent-->99.55<!--/v--> %;
-the <!--v:lunarCanonRecallTypeMismatches-->54<!--/v--> mismatches are boundary-straddlers
+Type accuracy on matched events <!--v:lunarCanonRecallTypeAccuracyPercent-->99.54<!--/v--> %;
+the <!--v:lunarCanonRecallTypeMismatches-->55<!--/v--> mismatches are boundary-straddlers
 (Total↔Partial with umbral magnitude within ~0.02 of 1.0, or
 Penumbral↔Partial within ~0.03 of 0). Tight (15 min) UT recall
-<!--v:lunarCanonRecallTightPercent-->99.49<!--/v--> % — what remains is the model ↔ NASA
+<!--v:lunarCanonRecallTightPercent-->99.48<!--/v--> % — what remains is the model ↔ NASA
 ΔT divergence, captured quantitatively by the per-century diagnostic. Certified under the framework-native lunar
 argument skeleton (`MOON_ARGS_FRAMEWORK_NATIVE` default ON) with the
 fully-derived e_E fluctuation (doc 66 §1): statistically
@@ -640,23 +640,23 @@ S01/S02/S04 Babylonian + S05 Chinese + S09 Arab, −800..+1280;
 S07 excluded pending per-row lunar/solar typing — the 364 trio is
 Theon's SOLAR eclipse) runs through the same differential machinery:
 **<!--v:lunarDenseIdentified-->246<!--/v--> of <!--v:lunarDenseTotal-->257<!--/v--> observations identified**, with per-century MAD-SEs
-of order 120–220 s in the dense centuries (+1000: ±<!--v:lunarDenseSePlus1000Seconds-->111<!--/v--> s,
-n = <!--v:lunarDenseNPlus1000-->39<!--/v-->; −400: ±<!--v:lunarDenseSeMinus400Seconds-->167<!--/v--> s, n = <!--v:lunarDenseNMinus400-->27<!--/v-->) — below the cycle contributions
+of order 120–220 s in the dense centuries (+1000: ±<!--v:lunarDenseSePlus1000Seconds-->110<!--/v--> s,
+n = <!--v:lunarDenseNPlus1000-->39<!--/v-->; −400: ±<!--v:lunarDenseSeMinus400Seconds-->168<!--/v--> s, n = <!--v:lunarDenseNMinus400-->27<!--/v-->) — below the cycle contributions
 (200–550 s), so the eclipse record genuinely discriminates the ΔT
 stack, out of sample (the cycle fit window is 1650–2017). The
 per-cycle ablation χ² (<!--v:lunarDenseCenturies-->13<!--/v--> centuries with n ≥ 5), under the certified
 framework-native Sun with the derived torque term, all from the governed
-artifact's `denseTargets.ablationChi2`: full stack <!--v:lunarDenseChi2FullStack-->38.5<!--/v-->
+artifact's `denseTargets.ablationChi2`: full stack <!--v:lunarDenseChi2FullStack-->38.4<!--/v-->
 (the Meeus-basis class, as it must be, since the torque term restores
-Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->79.6<!--/v--> — the
+Meeus-class BCE timing); **minus resonator <!--v:lunarDenseChi2MinusResonator-->79.5<!--/v--> — the
 Core-mantle swing is confirmed outright by the eclipse record (removing
-it more than doubles the misfit)**; minus bond <!--v:lunarDenseChi2MinusBond-->38.6<!--/v--> — the
+it more than doubles the misfit)**; minus bond <!--v:lunarDenseChi2MinusBond-->38.9<!--/v--> — the
 Bond cycle receives no support from this corpus since the plan-32
 follow-up re-timed the ancient records with the completed lunar
 arguments (removing it leaves the misfit unchanged; before the
-completion it raised it by about a tenth); no cycles <!--v:lunarDenseChi2NoCycles-->51.9<!--/v-->
+completion it raised it by about a tenth); no cycles <!--v:lunarDenseChi2NoCycles-->52.0<!--/v-->
 (the stack takes a quarter off the misfit); minus
-jose5/hallstatt/jose4 = <!--v:lunarDenseChi2MinusJose5-->37.5<!--/v-->/<!--v:lunarDenseChi2MinusHallstatt-->47.2<!--/v-->/<!--v:lunarDenseChi2MinusJose4-->30.8<!--/v--> — the Joses receive
+jose5/hallstatt/jose4 = <!--v:lunarDenseChi2MinusJose5-->37.4<!--/v-->/<!--v:lunarDenseChi2MinusHallstatt-->47.2<!--/v-->/<!--v:lunarDenseChi2MinusJose4-->30.8<!--/v--> — the Joses receive
 no independent support from this corpus (removing either lowers the
 misfit, consistent with their ~179-yr period averaging out in century
 bins), and Hallstatt is supported by it since the plan-32 follow-up

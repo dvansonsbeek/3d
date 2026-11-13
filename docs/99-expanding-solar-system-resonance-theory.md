@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.14
+modelVersion: v27.15
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -1145,7 +1145,7 @@ The shipped chain, written by the engine on the cited history — LOD by conserv
 
 Near genesis the Moon's torque dominates by orders of magnitude ((a₀/a_M)³ ≈ 921 at the input's end, 4.429 Ga), so the precession period collapses to years — a statement of the composition law at the edge of the input's domain, not a calibrated prediction (the distance there is Farhat et al. 2022's solution, read as the ratio a(t)/a(0) on the J2000 distance; the model refuses beyond 4,429 Ma).
 
-The first solar eclipse of the cited history (the registry's `genesisFirstSolarEclipse*` keys: the eclipse tier's finder on the seated model, walking the months of date from the navigable past edge): JD (UT) -2470620550265.96338, 0.66 solar days of date after the edge (4428.9850 Ma), total, γ 0.5177, umbra 1,560 km and penumbra 1,915 km on the fundamental plane, the Moon at 37,884 km, the synodic month of date 0.9068 d — reproducible, not converged (the clock and the lunar node and perigee carry the Laplace-plane regime, plan 31 A; the lunar latitude series still carries Meeus's J2000 inclination, slice A2). The simulator's Solar Eclipses folder lands on it ("Genesis").
+The first solar eclipse of the cited history (the registry's `genesisFirstSolarEclipse*` keys: the eclipse tier's finder on the seated model, walking the months of date from the navigable past edge): JD (UT) -2470620550265.96191, 0.66 solar days of date after the edge (4428.9850 Ma), total, γ 0.5354, umbra 1,561 km and penumbra 1,915 km on the fundamental plane, the Moon at 37,813 km, the synodic month of date 0.9068 d — reproducible, not converged (the clock, the lunar node and perigee and the lunar latitude of date — the mean plane's tilt and the derived free inclination — carry the Laplace-plane regime, plan 31 A and A2). The simulator's Solar Eclipses folder lands on it ("Genesis").
 <!-- /generated:doc99-genesis-table -->
 
 The distance column IS Farhat's (the input, on the model's J2000 anchor); the day-length column is conservation on it, and agrees with his own to 0.01 h at 100 Ma and 0.24 h at 4.4 Ga. Forward of J2000 the input has no future: the chain holds the LLR rate constant there, a labelled extrapolation (Farhat's model accounts for the future recession-rate slowdown; the two part by a few per cent at +0.2 Gyr).

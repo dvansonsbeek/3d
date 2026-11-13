@@ -354,15 +354,24 @@ const D2R = Math.PI / 180;
  * Derived series-extension correction to the full-series Moon:
  * the Delaunay tail plus the A2 planetary tail (longitude only).
  * @param {number} T - Julian centuries TT from J2000
+ * @param {{s1: number, s2: number, s3: number}} [fs] - the F-class scales of the
+ *   lunar plane of date (plan 31 A2; earth/laplace-plane.cjs lunarPlaneScalesAtAge):
+ *   |kF| = 1 terms × s1 (sin i_L/sin i₀), |kF| = 2 × s2 (tan²(i_L/2)/tan²(i₀/2)),
+ *   |kF| = 3 × s3 (s1³). Absent → the era form (every scale 1). The derived node
+ *   family stays unscaled: its 0.371″ sin(2F + Ω) is the J2000 tilt's own first-order
+ *   longitude term, which the composition removes at the anchor (moon/plane-of-date.cjs).
  * @returns {{dLonDeg: number, dLatDeg: number}} degrees — ADD to the
  *   full-series Moon longitude/latitude
  */
-function moonSeriesExtensionDeg(T) {
+function moonSeriesExtensionDeg(T, fs) {
   const poly = /** @param {number[]} p */ (p) => (p[0] + (p[1] + p[2] * T) * T) * D2R;
   const D = poly(DELAUNAY.D), M = poly(DELAUNAY.M), Mp = poly(DELAUNAY.Mp), F = poly(DELAUNAY.F);
+  const s1 = fs ? fs.s1 : 1, s2 = fs ? fs.s2 : 1, s3 = fs ? fs.s3 : 1;
+  /** @param {number} kF @returns {number} */
+  const fScale = (kF) => (kF === 0 ? 1 : (kF === 1 || kF === -1) ? s1 : (kF === 2 || kF === -2) ? s2 : s3);
   let lon = 0, lat = 0;
-  for (const [kD, kM, kMp, kF, s] of LON_TERMS) lon += s * Math.sin(kD * D + kM * M + kMp * Mp + kF * F);
-  for (const [kD, kM, kMp, kF, s] of LAT_TERMS) lat += s * Math.sin(kD * D + kM * M + kMp * Mp + kF * F);
+  for (const [kD, kM, kMp, kF, s] of LON_TERMS) lon += fScale(kF) * s * Math.sin(kD * D + kM * M + kMp * Mp + kF * F);
+  for (const [kD, kM, kMp, kF, s] of LAT_TERMS) lat += fScale(kF) * s * Math.sin(kD * D + kM * M + kMp * Mp + kF * F);
   const l = new Float64Array(5);
   for (let i = 0; i < 5; i++) l[i] = (PLANET_L0[i] + PLANET_L1[i] * T) * D2R;
   for (const [k, cA, sA] of PLANETARY_LON_TERMS) {
@@ -371,7 +380,7 @@ function moonSeriesExtensionDeg(T) {
   }
   const Om = poly(OMEGA);
   for (const [k, s] of NODE_LON_TERMS) lon += s * Math.sin(k[0] * D + k[1] * M + k[2] * Mp + k[3] * F + k[4] * Om);
-  for (const [k, s] of NODE_LAT_TERMS) lat += s * Math.sin(k[0] * D + k[1] * M + k[2] * Mp + k[3] * F + k[4] * Om);
+  for (const [k, s] of NODE_LAT_TERMS) lat += s1 * s * Math.sin(k[0] * D + k[1] * M + k[2] * Mp + k[3] * F + k[4] * Om);
   return { dLonDeg: lon / 3600, dLatDeg: lat / 3600 };
 }
 

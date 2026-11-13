@@ -22,7 +22,10 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   ONE_FAMILY_WINDOW_YEARS,
   // THE deep-time chain (the six browser factories it replaces: the GIA α channel,
   // the Layer-0 primitives, the recession history, the ΔT cycles, the deep e, the month chain)
-  createDeepTimeChain } from '@essrt/physics';
+  createDeepTimeChain,
+  // the lunar plane of date (plan 31 A2): the Laplace tilt's shape and the free inclination's
+  // F-class scales the lunar series rides, on the chain's regime readers (ONE home moon/plane-of-date)
+  createLunarPlaneScales } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -1603,6 +1606,18 @@ function _dtc() {
 }
 /** The GIA channel (createAlphaGiaChannel on the 'lr04-post-mpt' regime) — the chain's. */
 function _alphaGia() { return _dtc().alphaGia; }
+/** PLAN 31 A2 — the lunar plane of date's shapes on the chain's regime readers, built once (the
+ *  package slice's own wiring, model/lunar-theory.js: the browser and the Node model read ONE form). */
+let _lunarPlaneScalesM = null;
+function _lunarPlaneScalesAtAge() {
+  if (_lunarPlaneScalesM === null) {
+    _lunarPlaneScalesM = createLunarPlaneScales({
+      tiltDegAtAge: _dtc().meanLaplaceTiltFromEclipticDegAtAge,
+      freeInclinationDegAtAge: _dtc().meanLunarFreeInclinationDegAtAge,
+    });
+  }
+  return _lunarPlaneScalesM;
+}
 
 // R2 — the α reference pin: while the deep calendar's cumulative-days table is
 // BUILT, α is held at its J2000 reference, or the table defines itself in
@@ -2393,6 +2408,10 @@ const _moonSeries = (() => {
             return dKm === null ? moonDistance : dKm;
           },
           getEccentricityBase: () => moonOrbitalEccentricityBase,
+          // PLAN 31 A2 — the lunar plane of date at the ENGINE age (the distance getter's arithmetic
+          // above, matched); deep-time OFF keeps the era form (J2000 parity), as the distance does.
+          lunarPlaneScalesAt: (dDaysTT) => (DEEP_TIME_MODE_ENABLED
+            ? _lunarPlaneScalesAtAge()(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6) : null),
           deltaTSeconds: (jd) => _eclDeltaT(jd),
           jdToSIyear: (jd) => _jdToSIyear(jd),
           tropicalOrbitsBetween: meanMoonOrbitsBetweenYears,

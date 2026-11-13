@@ -318,6 +318,20 @@ function _moonArgsAtTools(jd_tt) {
 
 // Phase 8.2-6: the Meeus Ch. 47 series lives ONCE in @essrt/physics/moon/series.
 const { createMoonSeries } = _req('@essrt/physics/moon/series');
+// plan 31 A2: the lunar plane of date — the SAME factory the package model and the
+// browser inject (ONE home moon/plane-of-date.cjs), on DT's chain readers; null in
+// snapshot mode (SG_DEEP_TIME=0) keeps the era's unity scales.
+const { createLunarPlaneScales } = _req('@essrt/physics/moon/plane-of-date');
+let _lunarPlaneScalesMTools = null;
+function _lunarPlaneScalesAtAgeTools() {
+  if (_lunarPlaneScalesMTools === null) {
+    _lunarPlaneScalesMTools = createLunarPlaneScales({
+      tiltDegAtAge: DT.meanLaplaceTiltFromEclipticDegAtAge,
+      freeInclinationDegAtAge: DT.meanLunarFreeInclinationDegAtAge,
+    });
+  }
+  return _lunarPlaneScalesMTools;
+}
 let _moonSeriesMTools = null;
 function _moonSeriesM() {
   if (_moonSeriesMTools === null) {
@@ -349,6 +363,8 @@ function _moonSeriesM() {
           return d === null ? C.moonDistance : d / 1000;
         },
         getEccentricityBase: () => C.moonOrbitalEccentricity,
+        lunarPlaneScalesAt: (dDaysTT) => (DEEP_TIME_ENABLED
+          ? _lunarPlaneScalesAtAgeTools()(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6) : null),
         // The TRUNCATED finder forms keep the FINDERS' certified curve-only axis
         // (mirror of the browser's _eclDeltaT; the package finders read the same
         // convention) — the true-TT bridge of R3 item 2 belongs to the SCENE walk

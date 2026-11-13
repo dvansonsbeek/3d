@@ -1,5 +1,13 @@
 export type MeeusTermTable = Array<[number, number, number, number, number]>;
 /**
+ * — the |kF| = 1, 2, 3 multipliers
+ */
+export type FScales = {
+    s1: number;
+    s2: number;
+    s3: number;
+};
+/**
  * @typedef {Array<[number, number, number, number, number]>} MeeusTermTable
  */
 /**
@@ -29,6 +37,7 @@ export type MeeusTermTable = Array<[number, number, number, number, number]>;
  *     jupiterOrbitsBetween: (yearA: number, yearB: number) => (number | null),
  *     isDeepTime: () => boolean,
  *     isFrameworkNative: () => boolean,
+ *     lunarPlaneScalesAt?: (dDaysTT: number) => ({tiltShape: number, sinScale: number, tanHalfSqScale: number} | null),
  *   },
  * }} deps — argsAt is the engine's dispatcher (probe hook and mode toggle
  *   ride along); eFactorForD preserves each engine's exact E-factor call
@@ -68,6 +77,11 @@ export function createMoonSeries({ constants, fns }: {
         jupiterOrbitsBetween: (yearA: number, yearB: number) => (number | null);
         isDeepTime: () => boolean;
         isFrameworkNative: () => boolean;
+        lunarPlaneScalesAt?: (dDaysTT: number) => ({
+            tiltShape: number;
+            sinScale: number;
+            tanHalfSqScale: number;
+        } | null);
     };
 }): {
     sceneEvalAt: (dDaysTT: number) => {

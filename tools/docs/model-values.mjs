@@ -2960,6 +2960,15 @@ export const VALUES = {
       lunarFreeInclinationAt2460MaDeg: { get: () => dtl().meanLunarFreeInclinationDegAtAge(2460), render: (v) => Number(v).toFixed(2), unit: 'degrees' },
       lunarFreeInclinationAt2460MaBandDeg: { get: () => dtl().meanLunarFreeInclinationBandDegAtAge(2460), render: (v) => Number(v).toFixed(2), unit: 'degrees' },
       lunarMeanPlaneFromEclipticAtHadeanDeg: { get: () => dtl().meanLaplaceTiltFromEclipticDegAtAge(genesisMa()), render: (v) => Number(v).toFixed(1), unit: 'degrees', note: 'the lunar orbit\'s MEAN plane (the Laplace plane) at the edge, from the ecliptic — the cited obliquity there less the plane\'s tilt from the equator; the free inclination swings about it with the node cycle' },
+      // plan 31 A2 — the lunar plane of date in the SERIES (moon/plane-of-date.cjs): Meeus's
+      // "flattening" latitude term −2235 µ° sin L′ IS the Laplace plane's J2000 tilt (the coupled solve
+      // reads 8.30″ for its 8.05″; the e·θ sideband 126.6 µ° for Meeus's 127); the series rides the
+      // tilt's shape θ(t)/θ(0) on Meeus's anchor and the free inclination's F-class scales.
+      lunarMeanPlaneTiltJ2000Arcsec: { get: () => 2235e-6 * 3600, render: (v) => Number(v).toFixed(2), unit: '″', note: 'the Moon\'s mean plane from the ecliptic today — Meeus Ch. 47\'s flattening-of-the-Earth latitude term (−2235 µ° sin L′), the anchor the series\' composition keeps' },
+      lunarMeanPlaneTiltModelJ2000Arcsec: { get: () => dtl().meanLaplaceTiltFromEclipticDegAtAge(0) * 3600, render: (v) => Number(v).toFixed(2), unit: '″', note: 'the same from the coupled spin–orbit solve on the model\'s own constants — 3 % above Meeus\'s fitted anchor (the Horizons referee prefers the anchor by 0.003″ of latitude scatter): the shape θ(t)/θ(0) is the physics the series carries' },
+      lunarLatitudeAmplitudeAtHadeanDeg: { get: () => { const d = dtl(); return 5.128122 * Math.sin(d.meanLunarFreeInclinationDegAtAge(genesisMa()) * Math.PI / 180) / Math.sin(d.meanLunarFreeInclinationDegAtAge(0) * Math.PI / 180); }, render: (v) => Number(v).toFixed(1), unit: 'degrees', note: 'the leading latitude amplitude (5.128° sin F today) at the cited history\'s end — the F-odd family ∝ sin i_L on the derived free inclination (moon/plane-of-date.cjs)' },
+      lunarOrbitEclipticInclinationAtHadeanMinDeg: { get: () => { const d = dtl(), t = genesisMa(); return Math.abs(d.meanLaplaceTiltFromEclipticDegAtAge(t) - d.meanLunarFreeInclinationDegAtAge(t)); }, render: (v) => Number(v).toFixed(1), unit: 'degrees', note: 'the lunar orbit\'s inclination to the ECLIPTIC at the edge, its least over the node cycle — the mean plane\'s tilt less the free inclination' },
+      lunarOrbitEclipticInclinationAtHadeanMaxDeg: { get: () => { const d = dtl(), t = genesisMa(); return d.meanLaplaceTiltFromEclipticDegAtAge(t) + d.meanLunarFreeInclinationDegAtAge(t); }, render: (v) => Number(v).toFixed(1), unit: 'degrees', note: 'its greatest — the sum; eclipses come in the two seasons where the Sun crosses the mean plane\'s node line' },
       lunarNodeAtHadeanYr: { get: () => dtl().meanLunarNodePrecessionAtAge(genesisMa()) / (365.25 * 86400), render: (v) => Number(v).toFixed(2), unit: 'Julian yr', note: 'the lunar node\'s regression period of date at the edge — the oblateness term dominating (plan 31 A); the solar form alone is lunarNodeSolarAtHadeanYr' },
       lunarNodeSolarAtHadeanYr: { get: () => dtl().meanLunarNodeSolarPrecessionAtAge(genesisMa()) / (365.25 * 86400), render: (v) => thousands(Math.round(v)), unit: 'Julian yr' },
       lunarPerigeeAtHadeanYr: { get: () => dtl().meanLunarPerigeePrecessionAtAge(genesisMa()) / (365.25 * 86400), render: (v) => Number(v).toFixed(2), unit: 'Julian yr', note: 'the lunar perigee\'s advance period of date at the edge — the oblateness term dominating' },
@@ -2973,8 +2982,8 @@ export const VALUES = {
       // plan 27 step C — the first solar eclipse of the cited history: the model's finder from the
       // navigable domain's past edge (time/navigable-domain through the one bridge — the scene's
       // edge instant), on the Node model seated on both banks. Reproducible, not converged: the
-      // clock and the lunar node and perigee carry the Laplace-plane regime (plan 31 A), the lunar
-      // LATITUDE series still carries Meeus's J2000 inclination (slice A2 follows).
+      // clock, the lunar node and perigee (plan 31 A) and the lunar latitude of date (A2: the mean
+      // plane's tilt and the free inclination in the series) carry the Laplace-plane regime.
       // The scene's "Jump to Earth–Moon genesis" computes the same live (one home: the
       // package finder); an epoch-consistency row pins the two instants.
       genesisFirstSolarEclipseJD: { get: () => genesisEclipse().jd, render: (v) => Number(v).toFixed(5), unit: 'JD (UT)', note: 'the scene\'s UT axis — the Julian Day field lands on it' },

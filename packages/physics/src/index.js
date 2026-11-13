@@ -172,6 +172,7 @@ export { createMeanObliquityHistory } from './earth/mean-obliquity-history.cjs';
 // lunar term carries its regime factor R(t), the free inclination is derived on
 // the cited distance, the lunar node and perigee of date carry the oblateness term.
 export { createLaplacePlaneRegime, testParticleTiltFromEquatorDeg } from './earth/laplace-plane.cjs';
+export { composeEclipticOfDate, createLunarPlaneScales } from './moon/plane-of-date.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';

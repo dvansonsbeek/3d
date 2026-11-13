@@ -8,6 +8,7 @@ import { DAYS_PER_JULIAN_YEAR, J2000_JD, JULIAN_CENTURY_DAYS } from '../constant
 import { createMoonArguments, jdToDecimalYear } from '../moon/arguments.cjs';
 import { createDeepCalendar } from '../phase/deep-calendar.cjs';
 import { createMoonSeries } from '../moon/series.cjs';
+import { createLunarPlaneScales } from '../moon/plane-of-date.cjs';
 import { driver2PeriodSecondsAtAge } from '../planets/orbit-chain.cjs';
 
 /** @param {import('./time-axis.js').Ctx} ctx @returns the bindings the later slices read */
@@ -236,6 +237,12 @@ export function assembleLunarTheory(ctx) {
     - 2 * ((360 * 36525) / C.planetOrbitalElements.jupiter.orbitalPeriodInputDays);
   const fwA3RateDegPerCy = (360 * 36525) / moonSiderealMonth;
 
+  // PLAN 31 A2 — the lunar plane of date's shapes on the chain's regime readers (ONE home).
+  const lunarPlaneScalesAtAge = createLunarPlaneScales({
+    tiltDegAtAge: chain.meanLaplaceTiltFromEclipticDegAtAge,
+    freeInclinationDegAtAge: chain.meanLunarFreeInclinationDegAtAge,
+  });
+
   // Meeus Ch. 47 truncated series (framework-native arguments + E-factor)
   const moonSeries = createMoonSeries({
     constants: {
@@ -274,6 +281,11 @@ export function assembleLunarTheory(ctx) {
         return d === null ? moonDistanceKm : d / 1000;
       },
       getEccentricityBase: () => C.moonReference.moonOrbitalEccentricityBase,
+      // PLAN 31 A2 — the lunar plane of date (the Laplace tilt's shape, the free inclination's
+      // F-class scales; ONE home moon/plane-of-date.cjs on the regime's readers) at the ENGINE age —
+      // the distance getter's arithmetic above, matched. Null beyond the histories: the series keeps
+      // the era form there.
+      lunarPlaneScalesAt: /** @param {number} dDaysTT */ (dDaysTT) => lunarPlaneScalesAtAge(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6),
       deltaTSeconds: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
       jdToSIyear: yearFromJD,
       tropicalOrbitsBetween: mcTropical,

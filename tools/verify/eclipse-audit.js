@@ -153,6 +153,7 @@ const INPUT_FILES = [
   'tools/lib/scene-graph.js',
   'packages/physics/src/eclipse/finders.cjs',
   'packages/physics/src/moon/series.cjs',
+  'packages/physics/src/moon/plane-of-date.cjs',
   // the ONE eccentricity law body (Sun EoC + E-factor flow through it;
   // model.js carries only the wiring — Stage A′ of the engine-switch record):
   'packages/physics/src/moon/apparent.cjs',

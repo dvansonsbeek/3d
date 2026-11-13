@@ -161,5 +161,54 @@ check('free inclination monotone into the past', mono, 'decreased into the past'
 const iEdge = DT.meanLunarFreeInclinationDegAtAge(EDGE_MA), iBand = DT.meanLunarFreeInclinationBandDegAtAge(EDGE_MA);
 check('free inclination at the edge 9–17° with its band ordered', iBand > 8 && iBand < iEdge && iEdge < 17, `${iBand} … ${iEdge}`);
 
+// ── the lunar plane of date (plan 31 A2; doc 111 §1.43 — moon/plane-of-date.cjs, moon/series.cjs) ──
+// ESSRT_LUNAR_PLANE_PLANT=1 — the fail-proof: the era tilt planted at 1.5× its anchor must fail the identity row.
+{
+  const { composeEclipticOfDate, createLunarPlaneScales } = require(join(ROOT, 'packages/physics/src/moon/plane-of-date.cjs'));
+  const { FITTED_COEFFICIENTS: FC } = await import(join(ROOT, 'packages/physics/src/constants/coefficients.js'));
+  const PLANE_PLANT = process.env.ESSRT_LUNAR_PLANE_PLANT === '1';
+  // the shapes on the chain's regime readers — the composer's own wiring (model/lunar-theory.js)
+  const planeScalesAtAge = createLunarPlaneScales({ tiltDegAtAge: DT.meanLaplaceTiltFromEclipticDegAtAge, freeInclinationDegAtAge: DT.meanLunarFreeInclinationDegAtAge });
+  const s0 = planeScalesAtAge(0);
+  check('plane scales ≡ 1 at J2000', s0 !== null && s0.tiltShape === 1 && s0.sinScale === 1 && s0.tanHalfSqScale === 1, JSON.stringify(s0));
+  const s3k = planeScalesAtAge(0.003);
+  check('era: the plane scales within 1e-4 at 3 kyr', s3k !== null && Math.abs(s3k.tiltShape - 1) < 1e-4 && Math.abs(s3k.sinScale - 1) < 1e-6, JSON.stringify(s3k));
+  const sE = planeScalesAtAge(EDGE_MA);
+  check('edge: the tilt shape carries 11–12.5° on Meeus\'s 8.05″ anchor', sE !== null && sE.tiltShape * 2235e-6 > 11 && sE.tiltShape * 2235e-6 < 12.5, `${sE && sE.tiltShape * 2235e-6}`);
+  check('edge: the free inclination scale 3.0–3.3 (16° on 5.16°)', sE !== null && sE.sinScale > 3.0 && sE.sinScale < 3.3 && sE.tanHalfSqScale > 9 && sE.tanHalfSqScale < 11, `${sE && sE.sinScale}, ${sE && sE.tanHalfSqScale}`);
+  // The composition's era identity on Meeus's own polynomials and tables (the question is the FORM):
+  // against the three flattening terms the exact rotation differs by the sidebands Meeus truncated —
+  // 0.107″ rms of latitude, under 0.4″ max (the Horizons DE441 referee, weekly 1970–2049: the β scatter
+  // drops by exactly that quadrature, 1.019 → 1.014″) — and leaves the longitude untouched to 1e-3″
+  // (the fitted longitude already carries the tilt's first order: re-applying it read 2.809 → 2.824″).
+  const D2R = Math.PI / 180;
+  const poly = (/** @type {number[]} */ c, /** @type {number} */ T) => c[0] + c[1] * T + c[2] * T * T + (c[3] || 0) * T ** 3 + (c[4] || 0) * T ** 4;
+  const ARGS = { Lp: [218.3164477, 481267.88123421, -0.0015786, 1 / 538841, -1 / 65194000], D: [297.8501921, 445267.1114034, -0.0018819, 1 / 545868, -1 / 113065000],
+    M: [357.5291092, 35999.0502909, -0.0001536, 1 / 24490000], Mp: [134.9633964, 477198.8675055, 0.0087414, 1 / 69699, -1 / 14712000], F: [93.2720950, 483202.0175233, -0.0036539, -1 / 3526000, 1 / 863310000] };
+  const sumTab = (/** @type {number[][]} */ tab, /** @type {number} */ Dr, /** @type {number} */ Mr, /** @type {number} */ Mpr, /** @type {number} */ Fr, /** @type {number} */ E) => {
+    let s = 0;
+    for (const r of tab) { let t = r[4] * Math.sin(r[0] * Dr + r[1] * Mr + r[2] * Mpr + r[3] * Fr); if (Math.abs(r[1]) === 1) t *= E; else if (Math.abs(r[1]) === 2) t *= E * E; s += t; }
+    return s;
+  };
+  let n = 0, sb = 0, sl = 0, mx = 0;
+  for (let k = -1500; k <= 1500; k++) {
+    const T = k / 50 + 0.00037 * k / 365.25;   // ±30 centuries, de-phased from the month
+    const Lp = poly(ARGS.Lp, T), Dd = poly(ARGS.D, T), M = poly(ARGS.M, T), Mp = poly(ARGS.Mp, T), Fd = poly(ARGS.F, T);
+    const E = 1 - 0.002516 * T - 0.0000074 * T * T;
+    const Dr = Dd * D2R, Mr = M * D2R, Mpr = Mp * D2R, Fr = Fd * D2R, Lpr = Lp * D2R;
+    const A1 = (119.75 + 131.849 * T) * D2R, A2 = (53.09 + 479264.290 * T) * D2R, A3 = (313.45 + 481266.484 * T) * D2R;
+    const lonDeg = Lp + (sumTab(FC.MEEUS_LONGITUDE_TERMS, Dr, Mr, Mpr, Fr, E) + 3958 * Math.sin(A1) + 1962 * Math.sin(Lpr - Fr) + 318 * Math.sin(A2)) * 1e-6;
+    const latBase = (sumTab(FC.MEEUS_LATITUDE_TERMS, Dr, Mr, Mpr, Fr, E) + 382 * Math.sin(A3) + 175 * Math.sin(A1 - Fr) + 175 * Math.sin(A1 + Fr)) * 1e-6;
+    const three = (-2235 * Math.sin(Lpr) + 127 * Math.sin(Lpr - Mpr) - 115 * Math.sin(Lpr + Mpr)) * 1e-6;
+    const c = composeEclipticOfDate(lonDeg, latBase, 2235e-6, PLANE_PLANT ? 1.5 : 1);
+    const dB = (c.latDeg - (latBase + three)) * 3600, dL = (c.lonDeg - lonDeg) * 3600;
+    n++; sb += dB * dB; sl += dL * dL; if (Math.abs(dB) > mx) mx = Math.abs(dB);
+  }
+  const rmsB = Math.sqrt(sb / n), rmsL = Math.sqrt(sl / n);
+  check('era identity: the rotation vs Meeus\'s three terms 0.05–0.2″ rms, < 0.4″ max', rmsB > 0.05 && rmsB < 0.2 && mx < 0.4, `${rmsB}″ rms, ${mx}″ max`);
+  check('era identity: the longitude untouched to 1e-3″', rmsL < 1e-3, `${rmsL}″ rms`);
+  console.log(`  lunar plane of date — era identity ${rmsB.toFixed(3)}″ rms (max ${mx.toFixed(3)}″), longitude ${rmsL.toExponential(1)}″; edge tilt ${(sE ? sE.tiltShape * 2235e-6 : NaN).toFixed(2)}°, sin-scale ${(sE ? sE.sinScale : NaN).toFixed(3)}`);
+}
+
 if (failures.length) { console.error(`laplace-plane-regime: ${failures.length} FAILURE(S)\n  ${failures.join('\n  ')}`); process.exit(1); }
 console.log(`laplace-plane-regime: OK — R ≡ 1 at J2000 (${(1 - r10k).toExponential(1)} at 10 kyr), 1 % reach ${onePct} Ma, r_L ${(DT.meanLaplaceRadiusMetresAtAge(0) / R_E).toFixed(2)} → ${(DT.meanLaplaceRadiusMetresAtAge(EDGE_MA) / R_E).toFixed(2)} R⊕, edge clock ${Tp.toFixed(0)} yr (ecliptic form ${TpEcliptic.toFixed(2)}, solar-only ${TpSolar.toFixed(0)}, lock ${(2 * Math.PI / lock).toFixed(0)}), node ${nodeEdge.toFixed(2)} yr, free inclination ${iBand.toFixed(1)}–${iEdge.toFixed(1)}°`);
