@@ -472,6 +472,24 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   points 14–23 s). Three twins read each rule; the epoch gate reads
   the drawn ε, the ring's two normals and the cap's two points against the
   Node model at −400 Myr, the edge and the genesis eclipse. (§1.44)
+- **A fitted series carries its small parameters at the epoch it was fitted** —
+  Meeus's lunar tables are Hill–Brown theory summed at J2000; the series rode
+  e_E of date (the E factor) and sin i_L of date (§1.43) while the m = n_S/n_M
+  family — the evection ∝ m·e_M, the variation ∝ m², the annual equation
+  ∝ m·e_E, the parallactic ∝ m·a/a′, every solar sideband — sat at J2000
+  (×0.0331 at the edge): 8.8 min of syzygy instant at 400 Ma, 26.5 at
+  2.46 Ga, 3.6 at the edge, 0.13° of latitude there. A term's lowest power of
+  each small parameter follows from its ARGUMENT (the characteristic:
+  m^(|k_D| − |k_M′|), ≥ m¹ for any solar term) and the assignment is TESTED
+  on the fitted amplitudes themselves (divided by their small parameters the
+  six named inequalities read Brown's coefficients; a wrong power reads 13×
+  off); shipped as the leading order in ONE home
+  `moon/solar-perturbation-scales` on the chain's own J2000-normalised
+  ratios, injected by the three twins, its higher-order limit stated (≤ 7 %
+  of a term at 2.46 Ga). An era change at the double's grain (1e-6″ of RA,
+  10 µs of a cardinal instant) is invisible to every tolerance gate and
+  fails every ulp-exact one — the CSV, the fixtures, the campaigns: re-base
+  with the reason, never widen. (§1.45)
 
 ---
 
@@ -482,7 +500,9 @@ Each line names the rule; doc 111 §1.n carries the measurement.
 calendar/angle helpers against the legacy bodies), the layer gates
 (`test:layer0`, `test:cited-history`, `test:laplace-regime` — the
 Laplace-plane regime's anchor, era, limits, referees and edge rows —,
-`test:layer1`), `test:constants` (the
+`test:solar-scales` — the lunar inequalities' m-family of date: the
+characteristic's classical orders, Brown's coefficients on the fitted
+amplitudes, the ratios at J2000 / 3 kyr / the edge —, `test:layer1`), `test:constants` (the
 embed ≡ its sources), `test:counterfactual` (a changed input gives a changed,
 reproducible result with its own hash), `test:planet-model` and `test:model`
 (the planet model and `createModel()` ≡ the shipped Node derivation,

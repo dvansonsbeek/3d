@@ -51,9 +51,16 @@ const { moonSeriesExtensionDeg } = require('./series-extension.cjs');
 // Meeus's flattening-term anchor (the J2000 tilt of the Moon's mean plane from the ecliptic,
 // −2235 µ° sin L′) has ONE home in the plane module — the drawn plane reads the same number.
 const { composeEclipticOfDate, LUNAR_PLANE_TILT_ANCHOR_DEG: FLATTENING_TILT_ANCHOR_DEG } = require('./plane-of-date.cjs');
+// The m-family of date (plan 33 step 1; doc 111 §1.45): every solar inequality's amplitude rides
+// m = n_S/n_M to its Hill–Brown characteristic power, the parallactic family a_M/a_S beside it —
+// ONE home moon/solar-perturbation-scales.cjs; the ratios are injected, exactly 1 at J2000.
+const { solarCharacteristicPower } = require('./solar-perturbation-scales.cjs');
 /** @typedef {{s1: number, s2: number, s3: number}} FScales — the |kF| = 1, 2, 3 multipliers */
 /** @type {FScales} */
 const F_SCALES_ERA = Object.freeze({ s1: 1, s2: 1, s3: 1 });
+/** @typedef {{mRatio: number, aRatio: number, mPow: readonly number[]}} SolarScales — m^0…m^5 of date over J2000, a/a′ */
+/** @type {SolarScales} */
+const SOLAR_SCALES_ERA = Object.freeze({ mRatio: 1, aRatio: 1, mPow: Object.freeze([1, 1, 1, 1, 1, 1]) });
 
 /**
  * @typedef {Array<[number, number, number, number, number]>} MeeusTermTable
@@ -87,6 +94,7 @@ const F_SCALES_ERA = Object.freeze({ s1: 1, s2: 1, s3: 1 });
  *     isDeepTime: () => boolean,
  *     isFrameworkNative: () => boolean,
  *     lunarPlaneScalesAt?: (dDaysTT: number) => ({tiltShape: number, sinScale: number, tanHalfSqScale: number} | null),
+ *     solarScalesAt?: (dDaysTT: number) => ({mRatio: number, aRatio: number} | null),
  *   },
  * }} deps — argsAt is the engine's dispatcher (probe hook and mode toggle
  *   ride along); eFactorForD preserves each engine's exact E-factor call
@@ -103,7 +111,7 @@ function createMoonSeries({ constants, fns }) {
     argsAt, eFactorForD, eFactorAtJdTT, getMoonDistanceKm, getEccentricityBase, deltaTSeconds,
     jdToSIyear, tropicalOrbitsBetween, apsidalOfDateCyclesBetween,
     siderealOrbitsBetween, jupiterOrbitsBetween, isDeepTime, isFrameworkNative,
-    lunarPlaneScalesAt,
+    lunarPlaneScalesAt, solarScalesAt,
   } = fns;
 
   const D2R = Math.PI / 180;
@@ -118,6 +126,24 @@ function createMoonSeries({ constants, fns }) {
   }
   /** @param {number} kF @param {FScales} fs @returns {number} */
   const fScaleOf = (kF, fs) => (kF === 0 ? 1 : (kF === 1 || kF === -1) ? fs.s1 : (kF === 2 || kF === -2) ? fs.s2 : fs.s3);
+
+  /** The solar perturbation's scales of date at d days TT from J2000 (plan 33 step 1): m^0…m^5 and
+   *  a/a′ over their J2000 values. The era constant where no scales are injected or the histories
+   *  refuse — then every term is untouched bit-exactly (no multiplication at all).
+   *  @param {number} dDaysTT @returns {SolarScales} */
+  function solarOfDateAt(dDaysTT) {
+    const s = solarScalesAt ? solarScalesAt(dDaysTT) : null;
+    if (s === null) return SOLAR_SCALES_ERA;
+    const m = s.mRatio, m2 = m * m;
+    return { mRatio: m, aRatio: s.aRatio, mPow: [1, m, m2, m2 * m, m2 * m2, m2 * m2 * m] };
+  }
+  /** A term's m-family factor: m^p by its characteristic, a/a′ beside it for the odd-D (parallactic) family.
+   *  @param {ArrayLike<number>} r @param {SolarScales} ss @returns {number} */
+  function solarScaleOf(r, ss) {
+    const p = solarCharacteristicPower(r[0], r[1], r[2]);
+    const f = p < ss.mPow.length ? ss.mPow[p] : Math.pow(ss.mRatio, p);
+    return (r[0] % 2 !== 0) ? f * ss.aRatio : f;
+  }
 
   /** A1/A2/A3 in radians at T centuries TT (deep time: A2/A3 chain-integrated).
    *  @param {number} T @param {number} dDaysTT
@@ -143,13 +169,14 @@ function createMoonSeries({ constants, fns }) {
     return { A1, A2: a2Deg * D2R, A3: a3Deg * D2R };
   }
 
-  /** One 60-term table pass with E/E² on M-bearing terms and the F-class scales
-   *  of the plane of date (micro-degrees).
+  /** One 60-term table pass with E/E² on M-bearing terms, the F-class scales of the plane of date
+   *  and the m-family scales of the solar perturbation of date (micro-degrees).
    *  @param {MeeusTermTable} table @param {number} Dr @param {number} Mr
    *  @param {number} Mpr @param {number} Fr @param {number} E
-   *  @param {number} E2 @param {FScales} fs @returns {number} */
-  function sumTable(table, Dr, Mr, Mpr, Fr, E, E2, fs) {
+   *  @param {number} E2 @param {FScales} fs @param {SolarScales} ss @returns {number} */
+  function sumTable(table, Dr, Mr, Mpr, Fr, E, E2, fs, ss) {
     let s = 0;
+    const solar = ss !== SOLAR_SCALES_ERA;
     for (let i = 0; i < table.length; i++) {
       const r = table[i];
       const arg = r[0] * Dr + r[1] * Mr + r[2] * Mpr + r[3] * Fr;
@@ -158,6 +185,7 @@ function createMoonSeries({ constants, fns }) {
       if (absM === 1) term *= E;
       else if (absM === 2) term *= E2;
       if (r[3] !== 0) term *= fScaleOf(r[3], fs);
+      if (solar) term *= solarScaleOf(r, ss);
       s += term;
     }
     return s;
@@ -167,9 +195,10 @@ function createMoonSeries({ constants, fns }) {
    *  same E/E² and F-class conventions. Units 0.001 km.
    *  @param {MeeusTermTable} table @param {number} Dr @param {number} Mr
    *  @param {number} Mpr @param {number} Fr @param {number} E
-   *  @param {number} E2 @param {FScales} fs @returns {number} */
-  function sumTableCos(table, Dr, Mr, Mpr, Fr, E, E2, fs) {
+   *  @param {number} E2 @param {FScales} fs @param {SolarScales} ss @returns {number} */
+  function sumTableCos(table, Dr, Mr, Mpr, Fr, E, E2, fs, ss) {
     let s = 0;
+    const solar = ss !== SOLAR_SCALES_ERA;
     for (let i = 0; i < table.length; i++) {
       const r = table[i];
       if (r[4] === 0) continue;
@@ -179,6 +208,7 @@ function createMoonSeries({ constants, fns }) {
       if (absM === 1) term *= E;
       else if (absM === 2) term *= E2;
       if (r[3] !== 0) term *= fScaleOf(r[3], fs);
+      if (solar) term *= solarScaleOf(r, ss);
       s += term;
     }
     return s;
@@ -200,9 +230,9 @@ function createMoonSeries({ constants, fns }) {
   // timing accident — while the Node engines pinned the J2000 constant).
   // Engines whose getter ignores the argument keep their old behavior.
   /** @param {number} Dr @param {number} Mr @param {number} Mpr @param {number} Fr
-   *  @param {number} E @param {number} E2 @param {FScales} fs @param {number} [jdTT] @returns {number} */
-  function fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, fs, jdTT) {
-    const Sr = sumTableCos(moonR, Dr, Mr, Mpr, Fr, E, E2, fs);
+   *  @param {number} E @param {number} E2 @param {FScales} fs @param {SolarScales} ss @param {number} [jdTT] @returns {number} */
+  function fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, fs, ss, jdTT) {
+    const Sr = sumTableCos(moonR, Dr, Mr, Mpr, Fr, E, E2, fs, ss);
     return (moonRMeanKm + Sr * 1e-3) * (getMoonDistanceKm(jdTT) / moonDistanceJ2000Km);
   }
 
@@ -235,9 +265,10 @@ function createMoonSeries({ constants, fns }) {
     const E2 = E * E;
     const { A1, A2, A3 } = additionalArgs(T, d);
     const { tiltShape, fs } = planeOfDateAt(d);
+    const ss = solarOfDateAt(d);
     const ext = moonSeriesExtensionDeg(T, fs);   // derived tail, degrees → the tables' 1e-6° units
 
-    let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2, fs);
+    let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2, fs, ss);
     Sl += 3958 * Math.sin(A1) + 1962 * Math.sin(Lp - Fr) + 318 * Math.sin(A2);
     Sl += ext.dLonDeg * 1e6;
     // Subtract the EoC portion the off-centre orbit geometry already provides.
@@ -248,7 +279,7 @@ function createMoonSeries({ constants, fns }) {
     // The Laplace-frame latitude: the table and the extension on the F-class scales, the planetary
     // corrections (A3's lag of the mean plane behind the moving ecliptic — a constant row, named;
     // the A1 ± F pair ∝ sin i); the tilt family enters through the composition below.
-    let Sb = sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2, fs);
+    let Sb = sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2, fs, ss);
     Sb += 382 * Math.sin(A3);
     Sb += fs.s1 * (175 * Math.sin(A1 - Fr) + 175 * Math.sin(A1 + Fr));
     Sb += ext.dLatDeg * 1e6;
@@ -260,7 +291,7 @@ function createMoonSeries({ constants, fns }) {
     const c = composeEclipticOfDate(lonFrameDeg, Sb * 1e-6, FLATTENING_TILT_ANCHOR_DEG, tiltShape);
     // The hierarchy θ increment carries the composition's longitude step beside the EoC-half-subtracted Σl.
     const thetaAddRad = (Sl * 1e-6 + (c.lonDeg - lonFrameDeg)) * D2R;
-    const distKm = fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, fs, j2000JD + d);
+    const distKm = fullDistanceKm(Dr, Mr, Mpr, Fr, E, E2, fs, ss, j2000JD + d);
     return { thetaAddRad, lonDeg: c.lonDeg, latRad: c.latRad, latDeg: c.latDeg, distKm, T };
   }
 
@@ -292,11 +323,12 @@ function createMoonSeries({ constants, fns }) {
     const E = eFactorAtJdTT(jdTT, T, T2);
     const E2 = E * E;
     const { tiltShape, fs } = planeOfDateAt(jdTT - j2000JD);
-    let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2, fs);
+    const ss = solarOfDateAt(jdTT - j2000JD);
+    let Sl = sumTable(moonL, Dr, Mr, Mpr, Fr, E, E2, fs, ss);
     const A1 = (119.75 + 131.849 * T) * D2R;
     const A2 = (53.09 + (isFrameworkNative() ? fwA2RateDegPerCy : 479264.290) * T) * D2R;
     Sl += 3958 * Math.sin(A1) + 1962 * Math.sin(LpMean * D2R - Fr) + 318 * Math.sin(A2);
-    const Sb = sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2, fs);
+    const Sb = sumTable(moonB, Dr, Mr, Mpr, Fr, E, E2, fs, ss);
     const c = composeEclipticOfDate(LpMean + Sl * 1e-6, Sb * 1e-6, FLATTENING_TILT_ANCHOR_DEG, tiltShape);
     truncatedMemo = { lonDeg: ((c.lonDeg % 360) + 360) % 360, betaDeg: c.latDeg };
     truncatedMemoJd = jdUT;
@@ -318,7 +350,7 @@ function createMoonSeries({ constants, fns }) {
     const Dr = args.D * D2R, Mr = args.M * D2R, Mpr = args.Mp * D2R, Fr = args.F * D2R;
     const E = eFactorAtJdTT(jdTT, T, T * T);
     const { fs } = planeOfDateAt(jdTT - j2000JD);
-    return fullDistanceKm(Dr, Mr, Mpr, Fr, E, E * E, fs, jdTT);
+    return fullDistanceKm(Dr, Mr, Mpr, Fr, E, E * E, fs, solarOfDateAt(jdTT - j2000JD), jdTT);
   }
 
   return { sceneEvalAt, truncatedLonDeg, truncatedBetaDeg, truncatedDistanceKm, additionalArgs };

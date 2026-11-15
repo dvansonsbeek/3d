@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.16
+modelVersion: v27.17
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -2320,6 +2320,69 @@ together), the tilt ≡ anchor × shape to 1e-12; `perihelion-at-sun` keeps its
 J2000 ring row (i_L(0) ≡ the registry constant). The surface golden
 re-records the Moon's three rows and the Earth's deep tilt rows with the
 reason.
+
+### 1.45 A fitted series carries its small parameters at the epoch it was fitted — the m-family of the lunar inequalities (plan 33 step 1)
+
+Meeus Ch. 47's lunar tables are Hill–Brown theory summed at J2000: every
+solar inequality is a power series in m = n_S/n_M (Delaunay 1860–67, Hill
+1878, Brown 1897–1908) — the variation ∝ m², the evection ∝ m·e_M, the annual
+equation ∝ m·e_E, the parallactic inequality ∝ m·a_M/a_S, every solar
+sideband at least m¹ — and the model's series had restored two of its three
+element dependences (the E factor on e_E of date; sin i_L of date, §1.43)
+while the m-family sat at its J2000 amplitude: the §1.9 freeze without its
+pure twin, under §1.15's rule. Plan 33's step 0 measured it before the
+formula it serves was designed (`tools/explore/plan33-step0-amplitudes.mjs`):
+m is ×0.938 at 400 Ma, ×0.764 at 2.46 Ga and ×0.0331 at the cited history's
+end, where a 21.8-h month runs against a 365-SI-day year; the J2000 m-family
+mis-places a syzygy by 8.8 min at 400 Ma, 26.5 min at 2.46 Ga and 3.6 min
+at the edge (the plan's guess of "hours" was wrong — the elongation rate
+grows faster than the misfit on a 22-h month), and the latitude by 0.015 /
+0.054 / 0.134° (a quarter of the Moon's diameter against the shadow at the
+edge). **The rule it adds:** a term's lowest power of each small parameter
+follows from its ARGUMENT — the Hill–Brown characteristic, m^(|k_D| − |k_M′|),
+at least m¹ for any solar term (k_D ≠ 0 or k_M ≠ 0), m⁰ for the pure lunar
+terms; each lunar-eccentricity factor absorbs one power of m in the
+D-families (2D m², 2D ∓ M′ m·e, 2D − 2M′ m·e², 4D m⁴, 4D − M′ m³, D m·a/a′) —
+and the assignment is TESTED on the fitted amplitudes themselves: divided by
+their small parameters to the characteristic's powers, the six named
+inequalities read Brown's coefficients (11/8 → 2.05 with the higher orders,
+15/4 → 5.41, the annual 2.59, the parallactic 3.15, the equation of the
+centre 2.00, 2D − 2M′ 4.55), and a wrong power of m reads 13× off (the
+plant). Shipped as the leading order in ONE home,
+`moon/solar-perturbation-scales.cjs`, on the chain's own ratios m(t)/m(0) and
+(a/a′)(t)/(a/a′)(0) — exactly 1 at J2000, 1.5e-7 per kyr in the era (the
+Moon's recession), null beyond the histories — injected into the series by
+the three twins the way the plane scales are, every table term (longitude,
+latitude, distance) multiplied once. **Its stated limit:** today's fitted
+amplitudes hold the higher orders in m (the leading term is ~2/3 of the
+variation and the evection), which shrink faster than the leading one, so
+the ratio form overstates a deep amplitude by up to a third of the term's
+change — ~2 % of the variation at 400 Ma (1.5 min of instant), ~7 % at
+2.46 Ga (5 min), nothing at the edge where the terms are 0.04°; the published
+Hill–Brown coefficient series is the refinement, if a referee asks. Also
+stated: the planetary rows (A1, A2, A3, the extension's tail) stay constant
+rows; the lunar eccentricity stays a constant whose band on the instant is
+a PHASE (±2e·P_syn/2π: ±9.3 h today, ±0.38 h at the edge — step 0's item 3);
+the Earth's oblateness adds periodic terms near the edge that no Meeus term
+carries (its secular part, the node and perigee of date, is in the chain,
+§1.42). **What the era saw:** the Moon's RA moves 1e-6″ at 2024 and a
+cardinal instant 10 µs at −2000 — invisible to every tolerance gate and
+visible to every ulp-exact one (the window CSV compares a JD to its last bit,
+47–93 µs; the fixtures to 1 ulp): the CSV re-based, the fixtures and the
+goldens re-recorded, the campaigns re-baselined with this reason. Gate
+`test:solar-scales` (`packages/physics/test/solar-perturbation-scales.test.mjs`):
+the 14 classical orders, the six named coefficients in 1–8, the net on every
+term above 0.02° in 0.15–25 (Brown's run from 1/4 for 2D + M′ to ~15 for the
+evection's annual sideband), the ratios ≡ 1 at J2000 and within 1e-5 at
+3 kyr, 0.03–0.04 and 0.09–0.12 at the edge, the evection of date 0.04°
+there; fail-proven with `ESSRT_SOLAR_SCALES_PLANT=1` (p + 1 on the
+variation). Step 0's fourth measurement, the recurrences of date, is the
+argument shift per cycle — ΔF with the half-integer node counts of the inex
+and the tritos, ΔM′, Δλ_sun — on primitive pairs: |ΔF| ≤ 1° selects today's
+tritos, Saros and inex and nothing shorter, |Δλ| ≤ 1° the Metonic alone; of
+date 82/88.5 and 53 months = 4 years at 400 Ma, 214/227.5 and 33 months =
+2 years at 2.46 Ga, 307/308 and the eclipse year itself at the edge — none of
+today's names survives a few hundred million years (plan 30 L(d)).
 
 ---
 

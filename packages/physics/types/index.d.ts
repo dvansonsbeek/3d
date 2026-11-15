@@ -80,6 +80,7 @@ export { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_
 export { computeSolarTorqueShare, createComposedPrecession } from "./earth/precession-composed.cjs";
 export { createLaplacePlaneRegime, testParticleTiltFromEquatorDeg } from "./earth/laplace-plane.cjs";
 export { composeEclipticOfDate, createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG } from "./moon/plane-of-date.cjs";
+export { solarCharacteristicPower, createSolarPerturbationScales } from "./moon/solar-perturbation-scales.cjs";
 export { SCENE_OBLIQUITY_HANDOVER_YEARS, HYBRID_BEAT_TABLE_NODE_YEARS, sceneObliquityHandoverWeight, hybridBeatMeanDeg, hybridBeatBandDeg, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from "./earth/scene-obliquity.cjs";
 export { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH } from "./deltat/moon-distance-artifact.cjs";
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from "./climate/l1-orbital.cjs";

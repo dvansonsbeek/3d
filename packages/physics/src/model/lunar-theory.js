@@ -9,6 +9,7 @@ import { createMoonArguments, jdToDecimalYear } from '../moon/arguments.cjs';
 import { createDeepCalendar } from '../phase/deep-calendar.cjs';
 import { createMoonSeries } from '../moon/series.cjs';
 import { createLunarPlaneScales } from '../moon/plane-of-date.cjs';
+import { createSolarPerturbationScales } from '../moon/solar-perturbation-scales.cjs';
 import { driver2PeriodSecondsAtAge } from '../planets/orbit-chain.cjs';
 
 /** @param {import('./time-axis.js').Ctx} ctx @returns the bindings the later slices read */
@@ -242,6 +243,14 @@ export function assembleLunarTheory(ctx) {
     tiltDegAtAge: chain.meanLaplaceTiltFromEclipticDegAtAge,
     freeInclinationDegAtAge: chain.meanLunarFreeInclinationDegAtAge,
   });
+  // PLAN 33 step 1 — the solar perturbation of date: m = n_S/n_M and a_M/a_S over their J2000 values on
+  // the chain's month, year, distance and AU of date (ONE home moon/solar-perturbation-scales.cjs).
+  const solarPerturbationScalesAtAge = createSolarPerturbationScales({
+    siderealMonthSecondsAtAge: chain.meanMoonSiderealMonthAtAge,
+    siderealYearSecondsAtAge: chain.meanSiderealYearSecondsAtAge,
+    moonDistanceKmAtAge: chain.meanMoonDistanceCorrectedAtAge,
+    auAtAge: chain.meanAuAtAge,
+  });
 
   // Meeus Ch. 47 truncated series (framework-native arguments + E-factor)
   const moonSeries = createMoonSeries({
@@ -286,6 +295,9 @@ export function assembleLunarTheory(ctx) {
       // the distance getter's arithmetic above, matched. Null beyond the histories: the series keeps
       // the era form there.
       lunarPlaneScalesAt: /** @param {number} dDaysTT */ (dDaysTT) => lunarPlaneScalesAtAge(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6),
+      // PLAN 33 step 1 — the m-family of date at the ENGINE age (the same arithmetic). Null beyond the
+      // histories: the series keeps the era form there.
+      solarScalesAt: /** @param {number} dDaysTT */ (dDaysTT) => solarPerturbationScalesAtAge(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6),
       deltaTSeconds: /** @param {number} jd */ (jd) => (jdTTFromUT(jd) - jd) * 86400,
       jdToSIyear: yearFromJD,
       tropicalOrbitsBetween: mcTropical,

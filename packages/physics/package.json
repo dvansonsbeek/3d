@@ -1,9 +1,9 @@
 {
   "name": "@essrt/physics",
-  "version": "26.15.1",
+  "version": "26.16.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
-    "modelVersion": "v27.16",
+    "modelVersion": "v27.17",
     "_note": "The model identity this package version ships (IP-unified-architecture §10: package semver tracks the API axis; the model version + CONSTANTS_HASH/COEFFICIENTS_HASH in src/constants/ carry the scientific identity). The version-pinning gate enforces this pairing against public/input/model-version.json."
   },
   "type": "module",
@@ -53,6 +53,7 @@
     "./moon/series": { "types": "./types/moon/series.d.cts", "default": "./src/moon/series.cjs" },
     "./moon/series-extension": { "types": "./types/moon/series-extension.d.cts", "default": "./src/moon/series-extension.cjs" },
     "./moon/plane-of-date": { "types": "./types/moon/plane-of-date.d.cts", "default": "./src/moon/plane-of-date.cjs" },
+    "./moon/solar-perturbation-scales": { "types": "./types/moon/solar-perturbation-scales.d.cts", "default": "./src/moon/solar-perturbation-scales.cjs" },
     "./earth/scene-obliquity": { "types": "./types/earth/scene-obliquity.d.cts", "default": "./src/earth/scene-obliquity.cjs" },
     "./moon/apparent": { "types": "./types/moon/apparent.d.cts", "default": "./src/moon/apparent.cjs" },
     "./planets/geometry": { "types": "./types/planets/geometry.d.cts", "default": "./src/planets/geometry.cjs" },

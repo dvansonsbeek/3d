@@ -442,7 +442,7 @@
       "packages/physics/src/model/derived-constants.js": "sha256:c401d5dcd0879cea6b6ca010e2e9abc7ec9d9288d2ea88aabc29dc162f7fc99a",
       "packages/physics/src/model/earth-scalars.js": "sha256:f407e27432927c9283f25e42b44809706ad61a99c7216ed448833a27c150c4bf",
       "packages/physics/src/model/inv-plane-elements.js": "sha256:97fc18474b126f589d4e29fc69f9e2d59611577afffed1b2a884360fe37f3117",
-      "packages/physics/src/model/lunar-theory.js": "sha256:9f079060283d0fe42130859aaf9c95f34b3e1dc31cbe77ae8469781f83aef604",
+      "packages/physics/src/model/lunar-theory.js": "sha256:a77eb4012bfd270bfcf607f26cf099c4ff10d57f3e7245597f82863106ebe54e",
       "packages/physics/src/model/moon-epoch.js": "sha256:6ab1a890b71d8459333d4f8c99a386a030ae199855b308fbd3b926fb77c0daad",
       "packages/physics/src/model/one-source-movement.js": "sha256:d1c9c09de173806ad533122f6b6f551899bc2695d181ef057d7d7b52e1bf7893",
       "packages/physics/src/model/planet-elements-of-date.js": "sha256:1069316fec3656c8dc8465314659d5ecf45238c4dce15992b5fdab4985a18731",
@@ -456,7 +456,7 @@
       "packages/physics/src/moon/apparent.cjs": "sha256:c3d473accead7e6c2f3a8765dbba6b31868809909d688ab3060c88e721caf112",
       "packages/physics/src/moon/plane-of-date.cjs": "sha256:64db4313e6ca4f4286eebbc9a2f00f3690f5662585259aa95ccab73d67a8cb56",
       "packages/physics/src/moon/series-extension.cjs": "sha256:857c5fa4c04e79896c25f653cb0bd26a195deea248a38d0191a96dd28ff9c3c9",
-      "packages/physics/src/moon/series.cjs": "sha256:ff02a3b11e52c242a59822ae7c125dd783658548cb93c228fc29dc287ac70e6c",
+      "packages/physics/src/moon/series.cjs": "sha256:3877d5d420c651992f81cd8e55cf6475aec4840b03dd86808cac11aa352b3c1c",
       "packages/physics/src/phase/deep-calendar.cjs": "sha256:71f83e6a9065c0a94e0e29702c354b8a58f64c180163215a9b5a2cf5ee8d803a",
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
       "public/input/climate-formula-coefficients.json": "sha256:51f152c3718c5758e949ef761d5f23a54364a7afad182efb5da3107530398749",
@@ -464,7 +464,7 @@
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
-      "tools/lib/scene-graph.js": "sha256:5c03ab1f29337b7db8977066776d2367efaed231177eb1755f57eca9e0cc4170",
+      "tools/lib/scene-graph.js": "sha256:dc0c0bf08d384b2ddef4698fd9d7636a1628b62c14ce14c89d639172f1906730",
       "tools/verify/eclipse-audit.js": "sha256:a8e3d67bd55867d08739e5f6f8556282735ca2bbdfcb8c58d298f1a400a5a1dd"
     }
   }

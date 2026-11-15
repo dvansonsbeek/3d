@@ -173,6 +173,8 @@ export { createMeanObliquityHistory } from './earth/mean-obliquity-history.cjs';
 // the cited distance, the lunar node and perigee of date carry the oblateness term.
 export { createLaplacePlaneRegime, testParticleTiltFromEquatorDeg } from './earth/laplace-plane.cjs';
 export { composeEclipticOfDate, createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG } from './moon/plane-of-date.cjs';
+// the solar perturbation of the lunar orbit OF DATE (plan 33 step 1): the m-family's Hill–Brown characteristic and the two ratios
+export { solarCharacteristicPower, createSolarPerturbationScales } from './moon/solar-perturbation-scales.cjs';
 // the obliquity a drawn scene shows beyond the hybrid's domain (plan 31 A2): the cited mean with the hybrid's wobble, handed over C¹
 export { SCENE_OBLIQUITY_HANDOVER_YEARS, HYBRID_BEAT_TABLE_NODE_YEARS, sceneObliquityHandoverWeight, hybridBeatMeanDeg, hybridBeatBandDeg, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from './earth/scene-obliquity.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by

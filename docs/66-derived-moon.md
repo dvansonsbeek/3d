@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.16
+modelVersion: v27.17
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -337,6 +337,19 @@ sits beside it.
 Table-driven summation of 60 periodic terms, each with argument D*a + M*b + M'*c + F*d.
 Terms involving M are multiplied by E (or E^2 for |M|=2).
 Additional corrections: A1 (Venus), A2 (Jupiter), L'-F (flattening).
+
+Every amplitude is a function of the elements OF DATE (doc 111 §1.15), three
+scalings on the J2000 table: the E factor carries e_E of date (Meeus's own,
+on the eccentricity channel); the F-class scales carry sin i_L of date
+(|kF| = 1 ∝ sin i, |kF| = 3 its cube, |kF| = 2 ∝ tan²(i/2) — the Laplace-plane
+regime, §1.43); and the m-family carries m = n_S/n_M of date to each term's
+Hill–Brown characteristic power, m^(|k_D| − |k_M′|) with at least m¹ for any
+solar term (the variation m², the evection m·e_M, the annual equation m·e_E,
+the parallactic inequality m·a_M/a_S — the odd-D family also carries a/a′ of
+date), ONE home `moon/solar-perturbation-scales.cjs` (§1.45). All three are
+exactly 1 at J2000; the planetary rows (A1, A2, A3, the extension's tail) are
+constant rows, named; the lunar eccentricity is a constant (its band is a
+phase of the instant, not an error).
 
 The equation-of-center portion (6288774*sin(M') + 213618*sin(2M')) is partially
 subtracted because the off-center orbit geometry already provides half.

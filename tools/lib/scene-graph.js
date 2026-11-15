@@ -322,6 +322,7 @@ const { createMoonSeries } = _req('@essrt/physics/moon/series');
 // browser inject (ONE home moon/plane-of-date.cjs), on DT's chain readers; null in
 // snapshot mode (SG_DEEP_TIME=0) keeps the era's unity scales.
 const { createLunarPlaneScales } = _req('@essrt/physics/moon/plane-of-date');
+const { createSolarPerturbationScales } = _req('@essrt/physics/moon/solar-perturbation-scales');
 let _lunarPlaneScalesMTools = null;
 function _lunarPlaneScalesAtAgeTools() {
   if (_lunarPlaneScalesMTools === null) {
@@ -331,6 +332,20 @@ function _lunarPlaneScalesAtAgeTools() {
     });
   }
   return _lunarPlaneScalesMTools;
+}
+// PLAN 33 step 1 — the solar perturbation of date (mirror of src/script.js _solarScalesAtAge; ONE home
+// moon/solar-perturbation-scales on the chain's month, year, distance and AU of date).
+let _solarScalesMTools = null;
+function _solarScalesAtAgeTools() {
+  if (_solarScalesMTools === null) {
+    _solarScalesMTools = createSolarPerturbationScales({
+      siderealMonthSecondsAtAge: DT.meanMoonSiderealMonthAtAge,
+      siderealYearSecondsAtAge: DT.meanSiderealYearSecondsAtAge,
+      moonDistanceKmAtAge: DT.meanMoonDistanceCorrectedAtAge,
+      auAtAge: DT.meanAuAtAge,
+    });
+  }
+  return _solarScalesMTools;
 }
 let _moonSeriesMTools = null;
 function _moonSeriesM() {
@@ -365,6 +380,9 @@ function _moonSeriesM() {
         getEccentricityBase: () => C.moonOrbitalEccentricity,
         lunarPlaneScalesAt: (dDaysTT) => (DEEP_TIME_ENABLED
           ? _lunarPlaneScalesAtAgeTools()(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6) : null),
+        // PLAN 33 step 1 — the m-family of date at the ENGINE age (the same arithmetic).
+        solarScalesAt: (dDaysTT) => (DEEP_TIME_ENABLED
+          ? _solarScalesAtAgeTools()(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6) : null),
         // The TRUNCATED finder forms keep the FINDERS' certified curve-only axis
         // (mirror of the browser's _eclDeltaT; the package finders read the same
         // convention) — the true-TT bridge of R3 item 2 belongs to the SCENE walk

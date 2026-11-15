@@ -26,6 +26,7 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   // the lunar plane of date (plan 31 A2): the Laplace tilt's shape and the free inclination's
   // F-class scales the lunar series rides, on the chain's regime readers (ONE home moon/plane-of-date)
   createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG,
+  createSolarPerturbationScales,
   // the obliquity a drawn scene shows beyond the hybrid's domain (plan 31 A2): the cited mean with the
   // hybrid's wobble about its beat mean, handed over C¹ (ONE home earth/scene-obliquity)
   sceneObliquityHandoverWeight, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from '@essrt/physics';
@@ -1621,6 +1622,21 @@ function _lunarPlaneScalesAtAge() {
   }
   return _lunarPlaneScalesM;
 }
+// PLAN 33 step 1 — the solar perturbation of date: m = n_S/n_M and a_M/a_S over their J2000 values on the
+// chain's month, year, distance and AU of date (ONE home moon/solar-perturbation-scales; the package
+// model and tools/lib inject the same readers).
+let _solarScalesM = null;
+function _solarScalesAtAge() {
+  if (_solarScalesM === null) {
+    _solarScalesM = createSolarPerturbationScales({
+      siderealMonthSecondsAtAge: _dtc().meanMoonSiderealMonthAtAge,
+      siderealYearSecondsAtAge: _dtc().meanSiderealYearSecondsAtAge,
+      moonDistanceKmAtAge: _dtc().meanMoonDistanceCorrectedAtAge,
+      auAtAge: _dtc().meanAuAtAge,
+    });
+  }
+  return _solarScalesM;
+}
 /** The Laplace plane's tilt from the ecliptic of date, degrees — the series' anchor × the chain's
  *  shape (ONE home moon/plane-of-date: the plane the rendered Moon's latitude rides; 8.05″ today,
  *  11.8° at the cited history's end); the anchor alone outside deep-time mode or the history. */
@@ -2438,6 +2454,9 @@ const _moonSeries = (() => {
           // above, matched); deep-time OFF keeps the era form (J2000 parity), as the distance does.
           lunarPlaneScalesAt: (dDaysTT) => (DEEP_TIME_MODE_ENABLED
             ? _lunarPlaneScalesAtAge()(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6) : null),
+          // PLAN 33 step 1 — the m-family of date at the ENGINE age (the same arithmetic).
+          solarScalesAt: (dDaysTT) => (DEEP_TIME_MODE_ENABLED
+            ? _solarScalesAtAge()(-dDaysTT / DAYS_PER_JULIAN_YEAR / 1e6) : null),
           deltaTSeconds: (jd) => _eclDeltaT(jd),
           jdToSIyear: (jd) => _jdToSIyear(jd),
           tropicalOrbitsBetween: meanMoonOrbitsBetweenYears,

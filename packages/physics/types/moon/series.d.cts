@@ -8,6 +8,14 @@ export type FScales = {
     s3: number;
 };
 /**
+ * — m^0…m^5 of date over J2000, a/a′
+ */
+export type SolarScales = {
+    mRatio: number;
+    aRatio: number;
+    mPow: readonly number[];
+};
+/**
  * @typedef {Array<[number, number, number, number, number]>} MeeusTermTable
  */
 /**
@@ -38,6 +46,7 @@ export type FScales = {
  *     isDeepTime: () => boolean,
  *     isFrameworkNative: () => boolean,
  *     lunarPlaneScalesAt?: (dDaysTT: number) => ({tiltShape: number, sinScale: number, tanHalfSqScale: number} | null),
+ *     solarScalesAt?: (dDaysTT: number) => ({mRatio: number, aRatio: number} | null),
  *   },
  * }} deps — argsAt is the engine's dispatcher (probe hook and mode toggle
  *   ride along); eFactorForD preserves each engine's exact E-factor call
@@ -81,6 +90,10 @@ export function createMoonSeries({ constants, fns }: {
             tiltShape: number;
             sinScale: number;
             tanHalfSqScale: number;
+        } | null);
+        solarScalesAt?: (dDaysTT: number) => ({
+            mRatio: number;
+            aRatio: number;
         } | null);
     };
 }): {
