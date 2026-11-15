@@ -7,6 +7,7 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
     julianCenturyDays: number;
     moonArgs: {
         argsAt: (jdTT: number) => MoonArgsDeg;
+        meanElongationUnwrappedDeg: (jdTT: number) => number | null;
         fwArgs: (jdTT: number) => MoonArgsDeg;
         fwArgsDeep: (jd: number) => MoonArgsDeg | null;
         pureMeeusArgs: (jdTT: number) => MoonArgsDeg;

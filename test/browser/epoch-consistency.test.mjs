@@ -188,7 +188,9 @@ for (const jd of CLOCK_JDS) {
       // plan 30 item A: the Predictions panel's live year and precession fields at this landing
       pred: T.predictionsProbe(['solarYearSeconds', 'siderealYearSeconds', 'anomalisticYearSeconds', 'axialPrecession', 'siderealDayReal', 'stellarDayReal', 'lengthofAU', 'cpSSJD', 'cpSSYearLen', 'cpVEYearLen', 'cpAEYearLen', 'cpWSYearLen']),
       // plan 30 item D: the pane's VIEW of two rows that read a previous landing's value before the fix
-      paneAU: paneOf('Orbital Elements', 'Length of AU (km)'), paneSSLen: paneOf('Cardinal Points/S', 'Year Length (LOD d)'), moonRateDegPerSolarDay };
+      paneAU: paneOf('Orbital Elements', 'Length of AU (km)'), paneSSLen: paneOf('Cardinal Points/S', 'Year Length (LOD d)'), moonRateDegPerSolarDay,
+      // plan 33: the Moon panel's eclipse-formula rows at this landing (the browser's tier model)
+      eclipseFormula: T.eclipseFormulaRows() };
   }, jd));
   domainRows.clock[domainRows.clock.length - 1].cpWaitMs = cpWaitMs;
 }
@@ -412,6 +414,21 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const relMoon = r.moonDistKm / ringKm - 1;
     const okMoon = Number.isFinite(relMoon) && Math.abs(relMoon) <= TOL_MOON_RING_REL;
     if (!okMoon) fail++;
+    // PLAN 33 — the Moon panel's eclipse-formula rows ≡ the Node model's formula at the same UT instant:
+    // the next lunar and solar eclipse (instant, type, regime), the shortest node recurrence and the
+    // seasons per year — one formula, two runtimes, the same banks, so the doubles are identical.
+    {
+      const b = r.eclipseFormula, F = m.eclipse.formula;
+      const nl = F.nextEclipseAfter(r.jd, 'lunar'), ns = F.nextEclipseAfter(r.jd, 'solar');
+      const jdTT = r.jd + m.eclipse.deltaTSecondsAtJD(r.jd) / 86400;
+      const R = F.recurrencesAt(jdTT), S = F.statisticsAt(jdTT);
+      const same = (/** @type {any} */ x, /** @type {any} */ y) => (x === null || y === null) ? x === y : (x.jdUT === y.jdUT && x.type === y.type && x.regime === y.regime);
+      const okF = !!b && !b.error && same(b.lunar, nl) && same(b.solar, ns)
+        && JSON.stringify(b.node0) === JSON.stringify(R && R.node[0] ? [R.node[0].synodicMonths, R.node[0].cycles] : null)
+        && (S ? Math.abs(b.seasons - S.seasonsPerYear) <= 1e-12 : b.seasons === null);
+      if (!okF) fail++;
+      console.log(`${okF ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  eclipse formula rows browser/Node  lunar ${b && b.lunar ? `${b.lunar.type} ${b.lunar.regime} JD ${b.lunar.jdUT.toFixed(5)}` : '—'} / ${nl ? `${nl.type} ${nl.regime} JD ${nl.jdUT.toFixed(5)}` : '—'} · solar ${b && b.solar ? b.solar.type : '—'} / ${ns ? ns.type : '—'} · node ${b ? JSON.stringify(b.node0) : '—'} · seasons ${b && b.seasons !== null ? b.seasons.toFixed(3) : '—'}${b && b.error ? ' · ERROR ' + b.error : ''}`);
+    }
     console.log(`${okMoon ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  placed Moon / its ring  ${r.moonDistKm.toFixed(0)} / ${ringKm.toFixed(0)} km  rel ${Number(relMoon).toExponential(2)}  (bound ${TOL_MOON_RING_REL}, the eccentricity of date)`);
     // THE PUBLISHED WINDOW (doc 111 §1.38, plan 30 item A): the Predictions panel's year and
     // precession rows ≡ the Node model's PUBLISHED values at the same engine year — the TT

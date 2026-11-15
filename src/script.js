@@ -4001,6 +4001,8 @@ if (typeof window !== 'undefined') {
     posOfJD: (jd) => posFromJD(jd),
     genesisEclipse: () => genesisEclipseEvent(),
     jumpToGenesisEclipse: () => jumpToGenesisEclipse(),
+    // PLAN 33 — the Moon panel's eclipse-formula rows at the current position (the tier model's formula)
+    eclipseFormulaRows: () => { const r = _eclipseFormulaRows(); return { jdUT: r.jdUT, jdTT: r.jdTT, lunar: r.lunar && { jdUT: r.lunar.jdUT, jdTT: r.lunar.jdTT, type: r.lunar.type, gamma: r.lunar.gamma, regime: r.lunar.regime, k: r.lunar.k }, solar: r.solar && { jdUT: r.solar.jdUT, jdTT: r.solar.jdTT, type: r.solar.type, gamma: r.solar.gamma, regime: r.solar.regime, k: r.solar.k }, node0: r.recurrences && r.recurrences.node[0] ? [r.recurrences.node[0].synodicMonths, r.recurrences.node[0].cycles] : null, seasons: r.statistics ? r.statistics.seasonsPerYear : null, error: r.error }; },
     solarEclipseFields: () => ({ label: o.eclipseSolarLabel, loc: o.eclipseSolarLoc, gamma: o.eclipseSolarGamma, jd: o.eclipseSolarJD, radii: o.eclipseSolarRadii }),
     solarEclipseRadiiText: (jd) => solarEclipseRadiiText(jd),
     // plan 27 step D: the Origin tour — the stations' values (pure: no jump) and the tour's state
@@ -26634,6 +26636,51 @@ function _tierModelB() {
   }
   return _tierUmbraModel;
 }
+// PLAN 33 — the eclipse formula of date for the Planet Info › Moon rows: the next lunar and the next
+// solar eclipse, the recurrences and the statistics of date at the scene's instant, read from the
+// tier model's formula (ONE home @essrt/physics/eclipse/formula — the finders classify with the same
+// geometry; the epoch gate reads this hook against the Node model). The pair of next eclipses is
+// re-solved only when the scene passes one of them or jumps back (a frame while playing would
+// otherwise re-solve two syzygy walks); the recurrences and the statistics when the instant moves a
+// year. The tier model is the browser's seated package model (the banks), so a deep landing's rows
+// are a seat and a short walk, never an unseated walk.
+let _eclipseFormulaMemo = { model: null, jdUT: NaN, jdTT: NaN, lunar: null, solar: null, recurrences: null, statistics: null, error: null };
+function _eclipseFormulaRows() {
+  const jdUT = jdFromPos(o.pos), jdTT = jdTTFromPos(o.pos);
+  const model = _tierModelB();
+  const M = _eclipseFormulaMemo;
+  const F = model.eclipse.formula;
+  const sameModel = M.model === model;
+  const pairStale = !sameModel || !Number.isFinite(M.jdUT) || jdUT < M.jdUT - 1 || (M.lunar && jdUT > M.lunar.jdUT) || (M.solar && jdUT > M.solar.jdUT) || (!M.lunar && !M.solar && jdUT !== M.jdUT);
+  const slowStale = !sameModel || !Number.isFinite(M.jdTT) || Math.abs(jdTT - M.jdTT) > 365.25;
+  if (!pairStale && !slowStale) return M;
+  try {
+    if (pairStale) { M.lunar = F.nextEclipseAfter(jdUT, 'lunar'); M.solar = F.nextEclipseAfter(jdUT, 'solar'); M.jdUT = jdUT; }
+    if (slowStale) { M.recurrences = Number.isFinite(jdTT) ? F.recurrencesAt(jdTT) : null; M.statistics = Number.isFinite(jdTT) ? F.statisticsAt(jdTT) : null; M.jdTT = jdTT; }
+    M.error = null;
+  } catch (e) {
+    M.lunar = null; M.solar = null; M.recurrences = null; M.statistics = null; M.jdUT = jdUT; M.jdTT = jdTT; M.error = String(e && e.message);
+  }
+  M.model = model;
+  return M;
+}
+/** The "next eclipse" row text: the civil instant (UT, the Date field's calendar), the type, γ and the regime tag. */
+function _eclipseFormulaRowText(e) {
+  if (!e) return '—';
+  const { date, time } = dayToDateNew(e.jdUT, 'julianday', 'julian-gregorian-calendar');
+  return `${date} ${time} · ${e.type} · γ ${e.gamma.toFixed(3)} · ${e.regime}`;
+}
+/** A recurrence row's text: the month count against the second period's count, the span in solar days of date and in years of date, today's name where the pair is today's. */
+function _eclipseRecurrenceText(list, i, unit) {
+  const r = list && list[i];
+  if (!r) return '—';
+  return `${r.synodicMonths} months = ${r.cycles} ${unit} · ${Math.round(r.spanSolarDays).toLocaleString('en-US')} solar d · ${r.spanYears.toFixed(2)} yr · Δ ${r.shiftDegPerCycle.toFixed(2)}°/cycle${r.name ? ' · ' + r.name : ''}`;
+}
+/** The statistics row's text (mean elements of date): eclipses per year by class, the seasons per year, flagged approximate inside the Laplace-plane regime. */
+function _eclipseStatisticsText(s) {
+  if (!s) return '—';
+  return `${s.lunar.perYear.any.toFixed(2)} lunar (${s.lunar.perYear.umbral.toFixed(2)} umbral) · ${s.solar.perYear.any.toFixed(2)} solar (${s.solar.perYear.central.toFixed(2)} central) · ${s.seasonsPerYear.toFixed(2)} seasons/yr${s.approximate ? ' · approximate (Laplace-plane regime)' : ''}`;
+}
 /**
  * The planets' spin channel rows for the planet panels'
  * "Long-Period Cycles" section. Every value is read from the package model's
@@ -29194,61 +29241,33 @@ const planetStats = {
        }},{ small: '' }],
        hover : [`Current lunar phase based on Moon-Sun elongation angle. 8 traditional phases, each spanning 45°`]},
 
-    {header : '—  Eclipse Cycles: Metonic —' },
-      {label : () => `235 Synodic Months`,
-       value : [ { v: () => 235*moonSynodicMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Metonic cycle: 235 lunations ≈ 19 solar years. Moon phases repeat on the same calendar dates`]},
-      {label : () => `255 Draconic months`,
-       value : [ { v: () => 255*moonNodalMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Near-equivalent in draconic months: 255 node-to-node periods ≈ 1 Metonic cycle`]},
-      {label : () => `19 Solar years`,
-       value : [ { v: () => 19*meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`19 tropical years of date — the calendar length of one Metonic cycle — in solar days OF DATE, the unit of the month rows beside it (the mean family: the chain's tropical year over the day of date). The Metonic coincidence is today's: at the genesis 235 synodic months are 928 solar days and 19 years 27,163.`]},
+    {header : '—  Eclipse recurrences of date —' },
+      {label : () => `Node recurrence 1`,
+       value : [ { v: () => _eclipseRecurrenceText(_eclipseFormulaRows().recurrences?.node, 0, 'node returns') },{ small: '' }],
+       hover : [`The shortest month count after which the Moon's node distance F nearly repeats at a syzygy — the shift of F per cycle within 1° (a half-integer node count closes at the OPPOSITE node). The pairs are computed from the synodic and draconic months OF DATE (the eclipse formula of date, plan 33); today they are the tritos 135/146.5, the Saros 223/242 and the inex 358/388.5 — names that are today's coincidences: at the Earth–Moon genesis the node locks near 1:1 with the month, at 400 Ma the pair is 82/88.5 (6.2 yr).`]},
+      {label : () => `Node recurrence 2`,
+       value : [ { v: () => _eclipseRecurrenceText(_eclipseFormulaRows().recurrences?.node, 1, 'node returns') },{ small: '' }],
+       hover : [`The second-shortest node recurrence of date (see the first row).`]},
+      {label : () => `Node recurrence 3`,
+       value : [ { v: () => _eclipseRecurrenceText(_eclipseFormulaRows().recurrences?.node, 2, 'node returns') },{ small: '' }],
+       hover : [`The third-shortest node recurrence of date (see the first row).`]},
+      {label : () => `Anomaly recurrence (the type)`,
+       value : [ { v: () => { const a = _eclipseFormulaRows().recurrences?.anomaly; const named = a ? a.filter((r) => r.name) : null; return _eclipseRecurrenceText(named && named.length ? named : a, 0, 'perigee returns'); } },{ small: '' }],
+       hover : [`The month count after which the Moon's anomaly M′ nearly repeats at a syzygy (the shift within 3.5°) — the recurrence of the TYPE (the Moon's distance): today the Saros, 223 months = 239 anomalistic months (2.8° per cycle). Of date, from the synodic and anomalistic months of date; the named pair where today's is in the list, else the shortest.`]},
+      {label : () => `Season recurrence (the year)`,
+       value : [ { v: () => _eclipseRecurrenceText(_eclipseFormulaRows().recurrences?.year, 0, 'years') },{ small: '' }],
+       hover : [`The shortest month count that is nearly a whole number of tropical years of date (the Sun's longitude shift per cycle within 1°) — the recurrence of the SEASON: today the Metonic cycle, 235 months = 19 years (the Callippic is four of them). At 400 Ma 53 months = 4 years, at 2.46 Ga 33 months = 2 years, at the genesis the eclipse year itself.`]},
 
-    {header : '—  Eclipse Cycles: Saros —' },
-      {label : () => `223 Synodic Months`,
-       value : [ { v: () => 223*moonSynodicMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Saros cycle: after 223 lunations, Sun/Moon/node geometry nearly repeats, producing similar eclipses`]},
-      {label : () => `239 Anomalistic Months`,
-       value : [ { v: () => 239*moonAnomalisticMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Near-equivalent: 239 perigee-to-perigee periods ≈ 1 Saros`]},
-      {label : () => `242 Draconic months`,
-       value : [ { v: () => 242*moonNodalMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Near-equivalent: 242 node-to-node periods ≈ 1 Saros. Key for eclipse recurrence`]},
-      {label : () => `19 Draconic year cycles`,
-       value : [ { v: () => 19*moonDraconicYearEarth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Near-equivalent: 19 draconic years ≈ 1 Saros`]},
-
-    {header : '—  Eclipse Cycles: Exeligmos (3× Saros) —' },
-      {label : () => `3 × 223 Synodic Months`,
-       value : [ { v: () => 3*223*moonSynodicMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Exeligmos: triple Saros cycle. Nearly whole days, so eclipses repeat at nearly the same longitude`]},
-      {label : () => `3 × 239 Anomalistic Months`,
-       value : [ { v: () => 3*239*moonAnomalisticMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Triple Saros in anomalistic months`]},
-      {label : () => `3 × 242 Draconic months`,
-       value : [ { v: () => 3*242*moonNodalMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Triple Saros in draconic months`]},
-      {label : () => `3 × 19 Draconic year cycles`,
-       value : [ { v: () => 3*19*moonDraconicYearEarth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Triple Saros in draconic years`]},
-
-    {header : '—  Eclipse Cycles: Callippic —' },
-      {label : () => `940 Synodic Months`,
-       value : [ { v: () => 940*moonSynodicMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Callippic cycle: 4 Metonic cycles minus 1 day. Corrects the small Metonic drift`]},
-      {label : () => `1020 Draconic months`,
-       value : [ { v: () => 1020*moonNodalMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Near-equivalent in draconic months: 1020 ≈ 4 × 255`]},
-      {label : () => `1016 Sidereal Months`,
-       value : [ { v: () => 1016*moonSiderealMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Near-equivalent in sidereal months: 1016 ≈ 4 × 254`]},
-      {label : () => `1016 Tropical Months`,
-       value : [ { v: () => 1016*moonTropicalMonth, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`Near-equivalent in tropical months`]},
-      {label : () => `76 Solar years`,
-       value : [ { v: () => 76*meansolaryearlengthinDays, dec:10, sep:',' },{ small: UNIT_SOLAR_DAYS_OF_DATE }],
-       hover : [`76 tropical years of date = 4 × 19 Metonic years — the calendar length of one Callippic cycle — in solar days OF DATE, the unit of the month rows beside it (the mean family, as the Metonic row).`]},
+    {header : '—  Next eclipses (formula of date) —' },
+      {label : () => `Next lunar eclipse`,
+       value : [ { v: () => _eclipseFormulaRowText(_eclipseFormulaRows().lunar) },{ small: 'UT · type · γ · regime' }],
+       hover : [`The first lunar eclipse after the scene's instant from the eclipse FORMULA of date (plan 33: the finders' condition in closed form on the model's arguments of date — the mean syzygy from the cumulative counts, the periodic corrections with their amplitudes of date, greatest eclipse at the least distance from the shadow axis, Danjon's shadow at the Moon's distance of date). γ is the signed least distance in Earth radii. The regime tag: 'certified' inside the NASA Five Millennium Canon's span (−1999…+3000), where the formula is gated to minutes against dated records; 'reproducible' beyond, where the Moon's phase in its orbit is the model's, reproducible but not a certified prediction — there the statistics row is the prediction.`]},
+      {label : () => `Next solar eclipse`,
+       value : [ { v: () => _eclipseFormulaRowText(_eclipseFormulaRows().solar) },{ small: 'UT · type · γ · regime' }],
+       hover : [`The first solar eclipse after the scene's instant from the eclipse formula of date; γ in Earth radii at greatest eclipse (minimum γ), the type by the topocentric Moon against the Sun (total/annular) or the partial limit. The regime tag as the lunar row's.`]},
+      {label : () => `Eclipses per year (mean elements)`,
+       value : [ { v: () => _eclipseStatisticsText(_eclipseFormulaRows().statistics) },{ small: '' }],
+       hover : [`The statistics of eclipses at this epoch on the MEAN elements of date — what the formula predicts where it names no date: the share of syzygies within the class limits for a node distance uniform over the syzygies (the limits from Danjon's shadow at the mean Moon distance of date and the orbit's inclination to the ecliptic of date), times the synodic months per year; the eclipse seasons per year from the Sun's return to the regressing node. Inside the Laplace-plane regime (the genesis side, tilt > 1°) the node regresses about the Laplace plane and the seasons follow the equinoxes — the estimate is flagged approximate.`]},
     ],
 
     sun: [
@@ -31609,10 +31628,8 @@ const TAB_CONFIG = {
     'Orbital Orientation to Ecliptic': 2,
     'Position & Anomalies':          2,
     'Time Calculations':             2,
-    'Eclipse Cycles: Metonic':       3,
-    'Eclipse Cycles: Saros':         3,
-    'Eclipse Cycles: Exeligmos (3\u00D7 Saros)': 3,
-    'Eclipse Cycles: Callippic':     3,
+    'Eclipse recurrences of date':   3,
+    'Next eclipses (formula of date)': 3,
   },
 };
 

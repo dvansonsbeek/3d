@@ -83,6 +83,7 @@ export function createMoonArguments({ constants, fns, checkpoints }: {
     } | null;
 }): {
     argsAt: (jdTT: number) => MoonArgsDeg;
+    meanElongationUnwrappedDeg: (jdTT: number) => number | null;
     fwArgs: (jdTT: number) => MoonArgsDeg;
     fwArgsDeep: (jd: number) => MoonArgsDeg | null;
     pureMeeusArgs: (jdTT: number) => MoonArgsDeg;

@@ -379,6 +379,68 @@ solar day (`dayLengthSeconds`); the equation of time is the certified Sun's; an
 observer who counts noons over an integer-day window measures this term and can
 derive it from both.
 
+## The eclipse formula of date
+
+Meeus Ch. 54 writes the k-th syzygy as a Julian Day from the synodic month and a
+polynomial in T, corrects it by a series in D, M, M′, F, reads γ off F and the
+type off γ against the shadow radii. The model carries every one of those inputs
+OF DATE, so its formula (`packages/physics/src/eclipse/formula.cjs`, plan 33;
+`createModel().eclipse.formula`) is Meeus generalised to every epoch, not copied
+— the finders' condition in closed form on the model's own arguments of date:
+
+1. **The mean syzygy** — Newton on the unwrapped mean elongation D = L′ − L_sun
+   of the cumulative counts (`moon/arguments` `meanElongationUnwrappedDeg`): the
+   k-th mean new Moon is D = 360k, the full Moon 360k + 180°; the slope 360° per
+   synodic month of date. The count reaches 5e14° at the genesis (0.06° per
+   ulp): it is the SEED of the true solve, never the instant.
+2. **The true syzygy** — the series' elongation λ_M − λ_S brought to the offset
+   by a fixed-slope Newton walk (360/P_syn per UT day — the UT axis counts
+   solar days of date, 5.5 h at the genesis), with the finders' bisection as the
+   fallback where the clock's grain makes the residual a staircase. The finders
+   bisect the same condition to 1/86,400 d; the two agree to 0.3 s in the era.
+3. **Greatest eclipse** — t* = t₀ − β·β̇/(λ̇² + β̇²) on the rates at the syzygy,
+   then ONE parabolic refinement on the distance function (σ for the lunar side,
+   γ for the solar): NASA's greatest-eclipse convention, the finders' own.
+4. **γ and the type** — the SAME functions the finders classify with (ONE home:
+   Danjon's enlarged shadow at the Moon's distance of date for the lunar side,
+   the topocentric total/annular rule for the solar).
+5. **The civil instant** — TT → UT through the one bridge (`phase/deep-calendar`'s
+   ΔT at a TT instant; doc 111 §1.36).
+6. **The recurrences of date** (the corollary) — the smallest month counts after
+   which the node, the anomaly or the season nearly repeats: the shift of the
+   argument per cycle on primitive pairs (|ΔF| ≤ 1° with half-integer node
+   counts closing at the opposite node, |ΔM′| ≤ 3.5°, |Δλ_sun| ≤ 1°). Today the
+   tritos 135/146.5, the Saros 223/242, the inex 358/388.5 and the Metonic
+   235/19 by construction; 82/88.5 and 53 months = 4 years at 400 Ma;
+   103/109.5 (shortest) and 214/227.5 (the smallest shift) at 2.46 Ga; at the
+   genesis the node locks near 1:1 with the 22-h month and the eclipse year is
+   the year. None of today's names survives a few hundred million years.
+
+**Standing by regime.** Inside the NASA Five Millennium Canon's span
+(−1999…+3000) the formula is gated to minutes against dated records — the tag
+`certified`. Beyond, the Moon's phase in its orbit is reproducible, not
+certifiable (doc 111 §1.36): the formula's dates are the model's, and its
+STATISTICS on the mean elements of date (`statisticsAt` — eclipses per year by
+class, the seasons per year, the limits in the node distance) are the
+prediction, flagged approximate inside the Laplace-plane regime where the node
+regresses about the Laplace plane and the seasons follow the equinoxes. At the
+genesis edge the clock's own grain bounds every instant: a UT Julian Day of
+2.5e12 has a 47-s ulp and the bridge's residual carries ~1e-3 d of jitter —
+0.4° of lunar longitude, ~3 min of syzygy, ~1 h of greatest eclipse (doc 111
+§1.46); there nearly every syzygy in season is an eclipse.
+
+**The gate** `tools/verify/eclipse-formula.js`: the formula against the finders
+in 25 one-year windows over the canon's span and at the four deep positions
+(the same events, types and least distances; the instants to the grain), today's
+recurrences exactly and the step-0 epochs pinned, the mean-syzygy correction's
+sin M′ coefficient of date against the longitude table on the m-family's scales
+(the J2000 amplitudes fail at 2.46 Ga and the edge), the regime tags and the
+statistics; fail-proven two ways. **The surfaces:** Planet Info › Moon's
+"Eclipse recurrences of date" and "Next eclipses (formula of date)" rows — the
+four fixed Metonic/Saros/Exeligmos/Callippic tables they replace were today's
+coincidences (plan 30 L(d)); the epoch gate reads the rows against the Node
+formula at the four deep positions, bit-identical.
+
 ## Implementation
 
 ### JavaScript (`script.js`)

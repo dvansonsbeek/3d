@@ -490,6 +490,25 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   10 µs of a cardinal instant) is invisible to every tolerance gate and
   fails every ulp-exact one — the CSV, the fixtures, the campaigns: re-base
   with the reason, never widen. (§1.45)
+- **The clock's grain is the eclipse instant's, and a leash is in the axis's
+  unit** — the eclipse formula of date (`eclipse/formula.cjs`, the finders'
+  condition in closed form; the finders classify with its geometry, moved
+  verbatim: every fixture stood) agrees with the finders to 0.3 s in the era
+  and to the UT Julian Day's ulp at depth (3 s at 400 Ma, 17 s at −2 Gyr); at
+  the genesis edge the bridge's residual f = TT − ΔT/86400 − UT, three
+  1e12-day numbers, cannot be evaluated below ~1e-3 d, so the TT of a UT
+  instant jitters non-monotonically by a few ulps: 0.4° of lunar longitude,
+  ~3 min of syzygy, ~1 h of greatest eclipse, a limit-grazing type the
+  INSTANT's — the edge's eclipses (the registry's genesis one included) are
+  reproducible to that, never beyond; a walk there carries the grain (floor,
+  acceptance and stencils in ulp, a bisection fallback, the division guarded).
+  A slope measured over one degree of elongation read 68 for 397 (one degree
+  is four ulp) — the slope is the analytic rate of date, 360/P_syn per UT day;
+  a half-month leash written as the SI month TIMES the solar day of date
+  (0.1 UT d for 1.97) refused every syzygy whose correction passed 9°, and a
+  deep window of "14 months" in SI days was 3 months of UT — §1.36's class; a
+  refused syzygy is skipped, never the end of a search. A record quoting the
+  pair with the smallest shift is not the shortest pair — pin both. (§1.46)
 
 ---
 
@@ -584,8 +603,10 @@ model reproduces a spread of nodes bit-exactly and a model loaded with the
 table reads the same drawn obliquity as one without; its check mode re-reads
 the spread, §1.44). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (16 generators, 8 gates — the
-newest gate, `deep-clock-axes.js`, reads the deep clock against the chain, §1.37).
+test:verify:list` the full classification (16 generators, 9 gates — the
+newest gate, `eclipse-formula.js`, reads the eclipse formula of date against the
+finders, today's recurrences and the amplitudes of date, §1.46; `deep-clock-axes.js`
+reads the deep clock against the chain, §1.37).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

@@ -13,7 +13,7 @@ export function assembleSurface(ctx) {
     MASS_RATIO_EARTH_MOON, M_SUN, PLANET_KEYS, PUBLISHED_PLANET_RECORDS, anomalisticYearDays, ascendingNodeDeg,
     besselian, cardinalCrossingJdUT, cardinalCrossingNearJdUT, cardinalTargetDeg, certifiedAxialPrecessionJ2000Years,
     chain, dayLengthSeconds, deepCalendar, deepLod, deltaTSeconds, earthMoiFactorAtAge, earthPerihelionDeg, eccentricityAt,
-    eclipseFinders, evalClimateL1, frameworkDeltaTSecondsAtJD, inclinationDeg, j2000JD, jdFromYear, jdTTFromUT,
+    eclipseFinders, eclipseFormula, evalClimateL1, frameworkDeltaTSecondsAtJD, inclinationDeg, j2000JD, jdFromYear, jdTTFromUT,
     julianCenturyDays, lodRealSeconds, meanLengthOfDay, meanSiderealYearDays, moonDistanceCorrected, moonDistanceKm,
     moonDistanceKmAtYearOrNaN, moonOrbitalShift, moonSeries, moonSiderealMonth, moonSiderealMonthDaysAt,
     moonSynodicMonthDays, oneSourceM, recordLunarCumulativeBank, recordSunCumulativeBank, lunarSeatStatus, sunSeatStatus, planetAscNodeDeg, planetEccentricity, planetInclinationDeg, planetPerihelionDeg,
@@ -334,8 +334,15 @@ export function assembleSurface(ctx) {
         - sunPlanetaryCompletionDeg((jdTTFromUT(jd) - j2000JD) / julianCenturyDays),
       /** The APPARENT Sun (completed geometric − the derived aberration constant + the leading nutation terms on the model's own arguments) — the quantity Horizons' observer ecliptic longitude is; the cardinal instants are its crossings. @param {number} jdUT @returns {number} */
       sunApparentLonDegAtJD: /** @param {number} jdUT @returns {number} */ (jdUT) => sunApparentLonDegAtJdUT(jdUT),
-      findLunarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd),
-      findSolarInRange: /** @param {number} jdStart @param {number} jdEnd */ (jdStart, jdEnd) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd),
+      findLunarInRange: /** @param {number} jdStart @param {number} jdEnd @param {{stepDays?: number}} [opts] */ (jdStart, jdEnd, opts) => eclipseFinders.findLunarEclipsesInRange(jdStart, jdEnd, opts),
+      findSolarInRange: /** @param {number} jdStart @param {number} jdEnd @param {{stepDays?: number}} [opts] */ (jdStart, jdEnd, opts) => eclipseFinders.findSolarEclipsesInRange(jdStart, jdEnd, opts),
+      /** PLAN 33 — the eclipse formula of date (eclipse/formula.cjs): the finders' condition in closed
+       *  form on the arguments of date — eclipseAt(k, kind), syzygiesInRange / eclipsesInRange /
+       *  nextEclipseAfter on the UT axis, statisticsAt and recurrencesAt on the periods of date, the
+       *  regime tag ('certified' inside the canon's span, 'reproducible' beyond). The finders and the
+       *  formula classify with the same geometry (ONE home); the gate tools/verify/eclipse-formula.js
+       *  reads the two against each other. */
+      formula: eclipseFormula,
       deltaTSecondsAtJD: frameworkDeltaTSecondsAtJD,
       /** The ΔT trend anchor at J2000 (seconds): the TT − UT bridge every finder axis adds to a
        *  true-UT JD. The joint ΔT fit's output, shipped in its own artifact (FIT.DT_ANCHOR —

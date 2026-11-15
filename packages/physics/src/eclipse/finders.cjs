@@ -35,6 +35,11 @@
 
 'use strict';
 
+// The shadow geometry and the type rules — ONE home, eclipse/formula.cjs (plan 33): the formula
+// of date and the finders classify with the same functions (moved from here verbatim; the fixtures
+// stood bit-identical).
+const { lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii } = require('./formula.cjs');
+
 /**
  * @typedef {Object} FrameworkSunDeps
  * @property {number} sunMeanLongitudeJ2000Deg - L0 anchor (input anchor, 280.46646)
@@ -108,48 +113,31 @@ function createEclipseFinders(deps) {
    * §1.41 b: 83 % of the canon's dynamical-time residual while the opposition
    * was returned). The type and the magnitudes read the least distance.
    * @param {number} jdStart @param {number} jdEnd
+   * @param {{stepDays?: number}} [opts] the scan step in days (default: the J2000 synodic month / 60 — every
+   *   era caller, bit-identical; the eclipse-formula gate passes the month OF DATE at the deep positions)
    * @returns {Array<{jd: number, jdOpposition: number, beta: number, leastDistanceDeg: number,
    *   moonDistance_km: number, type: string, magnitudeUmbral: number, magnitudePenumbral: number}>}
    */
-  function findLunarEclipsesInRange(jdStart, jdEnd) {
+  function findLunarEclipsesInRange(jdStart, jdEnd, opts) {
     // Step size: small fraction of synodic month for reliable zero-crossing
     // detection (~6° diff change per step, well clear of the 30° wrap filter).
-    const STEP_DAYS = deps.getSynodicMonthDays() / 60;
+    const stepOpt = (opts && typeof opts.stepDays === 'number' && Number.isFinite(opts.stepDays) && opts.stepDays > 0) ? opts.stepDays : null;
+    const STEP_DAYS = stepOpt !== null ? stepOpt : deps.getSynodicMonthDays() / 60;
 
     // Per-event-distance geometry — the shadow angular radii are computed
     // PER OPPOSITION using each event's Moon distance (perigee vs apogee
     // varies the threshold by ~5.5%, which dominates type-classification
-    // at boundary cases).
-    const _rad2deg = 180 / Math.PI;
-    const R_EARTH_KM = K.rEarthMetres / 1000;
-    const R_MOON_KM = K.moonDiameterKm / 2;
-    const R_SUN_KM = K.sunDiameterKm / 2;
+    // at boundary cases). Shadow radii under DANJON's rule (eclipse/formula.cjs,
+    // the ONE home — the Earth's radius enlarged by 1/85, the convention of the
+    // NASA Five Millennium Canon the finder is gated on; Chauvenet's 1/50 shipped
+    // until the plan-32 follow-up, when the events were still classified by the
+    // opposition's |β| rather than the least distance from the axis: the two
+    // errors cancelled, 99.49 % type agreement either way; alone on the least
+    // distance the ×1.02 read 99.32 % with 135 model-only grazers against
+    // Danjon's 99.49 % and 26 — doc 111 §1.41 b).
     const D_SUN_KM = deps.getSunDistanceKm();
-
-    // Shadow radii under DANJON's rule — the Earth's radius enlarged by 1/85 (an
-    // opaque atmospheric layer of ~75 km), the convention of the NASA Five
-    // Millennium Canon the finder is gated on. Chauvenet's 1/50 (Meeus Ch. 54's
-    // ×1.02 on the radii) shipped until the plan-32 follow-up, when the events
-    // were still classified by the opposition's |β| rather than the least
-    // distance from the axis: the two errors cancelled (99.49 % type agreement
-    // either way); alone on the least distance the ×1.02 read 99.32 % with 135
-    // model-only grazers against Danjon's 99.49 % and 26 (doc 111 §1.41 b).
-    const DANJON_EARTH_RADIUS_FACTOR = 1 + 1 / 85;
-    const R_SHADOW_KM = R_EARTH_KM * DANJON_EARTH_RADIUS_FACTOR;
-    const umbraApex_rad = Math.atan((R_SUN_KM - R_SHADOW_KM) / D_SUN_KM);
-    const penumbraApex_rad = Math.atan((R_SUN_KM + R_SHADOW_KM) / D_SUN_KM);
     /** @param {number} D_MOON_KM */
-    const _shadowGeometry = (D_MOON_KM) => {
-      const moonR = Math.atan(R_MOON_KM / D_MOON_KM) * _rad2deg;
-      const umbraR = Math.atan((R_SHADOW_KM - D_MOON_KM * Math.tan(umbraApex_rad)) / D_MOON_KM) * _rad2deg;
-      const penumR = Math.atan((R_SHADOW_KM + D_MOON_KM * Math.tan(penumbraApex_rad)) / D_MOON_KM) * _rad2deg;
-      return {
-        moonR, umbraR, penumR,
-        totalMax: umbraR - moonR,
-        partialMax: umbraR + moonR,
-        penumMax: penumR + moonR,
-      };
-    };
+    const _shadowGeometry = (D_MOON_KM) => lunarShadowGeometry(D_MOON_KM, D_SUN_KM, K);
 
     // Wrapped opposition diff: 0 means Moon at opposition (Sun + 180°)
     /** @param {number} jd */
@@ -164,15 +152,9 @@ function createEclipseFinders(deps) {
     // direction): cos σ = cos β · cos(λ_M − λ_S − 180°). Greatest eclipse is its
     // minimum — in the fundamental plane the canon's distance is D_moon · sin σ,
     // and D_moon moves ~1e-4 over the ±45-min window, so the two minima coincide
-    // to the second.
-    const _d2r = Math.PI / 180;
+    // to the second. (eclipse/formula.cjs axisDistanceDeg — the ONE home.)
     /** @param {number} jd */
-    const axisDistanceDeg = (jd) => {
-      const dLon = oppDiff(jd) * _d2r;
-      const beta = deps.moonBetaDegAt(jd) * _d2r;
-      const cosSigma = Math.cos(beta) * Math.cos(dLon);
-      return Math.acos(Math.max(-1, Math.min(1, cosSigma))) / _d2r;
-    };
+    const sigmaDegAt = (jd) => axisDistanceDeg(oppDiff(jd), deps.moonBetaDegAt(jd));
 
     // Refine the opposition JD to greatest eclipse: a coarse 1-min scan over
     // ±45 min (the offset reaches ±22 min at the node-distance window's edge),
@@ -181,22 +163,22 @@ function createEclipseFinders(deps) {
     /** @param {number} jdOpp @returns {{jd: number, sigmaDeg: number}} */
     const refineGreatest = (jdOpp) => {
       const stepMin = 1 / (24 * 60);
-      let bestJD = jdOpp, bestS = axisDistanceDeg(jdOpp);
+      let bestJD = jdOpp, bestS = sigmaDegAt(jdOpp);
       for (let dt = -45; dt <= 45; dt++) {
         if (dt === 0) continue;
         const jd = jdOpp + dt * stepMin;
-        const s = axisDistanceDeg(jd);
+        const s = sigmaDegAt(jd);
         if (s < bestS) { bestS = s; bestJD = jd; }
       }
-      const yL = axisDistanceDeg(bestJD - stepMin);
+      const yL = sigmaDegAt(bestJD - stepMin);
       const y0 = bestS;
-      const yR = axisDistanceDeg(bestJD + stepMin);
+      const yR = sigmaDegAt(bestJD + stepMin);
       const denom = yL - 2 * y0 + yR;
       if (Math.abs(denom) > 1e-15) {
         const delta = 0.5 * (yL - yR) / denom;
         if (Math.abs(delta) < 1) {
           const refinedJD = bestJD + delta * stepMin;
-          const refinedS = axisDistanceDeg(refinedJD);
+          const refinedS = sigmaDegAt(refinedJD);
           if (refinedS < bestS) return { jd: refinedJD, sigmaDeg: refinedS };
         }
       }
@@ -230,24 +212,18 @@ function createEclipseFinders(deps) {
         // instant — closes the ~5.5% perigee/apogee threshold variation.
         const D_moon_jd = deps.moonDistanceKmAt(jdGreatest);
         const G = _shadowGeometry(D_moon_jd);
+        const cls = lunarTypeAt(absB, G);   // the ONE type rule (eclipse/formula.cjs)
 
-        let type = null;
-        if (absB <= G.totalMax) type = 'Total';
-        else if (absB <= G.partialMax) type = 'Partial';
-        else if (absB <= G.penumMax) type = 'Penumbral';
-
-        if (type) {
-          const magUmbral = Math.max(0, (G.partialMax - absB) / (2 * G.moonR));
-          const magPenumbral = Math.max(0, (G.penumMax - absB) / (2 * G.moonR));
+        if (cls.type) {
           results.push({
             jd: jdGreatest,
             jdOpposition: jdOpp,
             beta: beta,
             leastDistanceDeg: absB,
             moonDistance_km: D_moon_jd,
-            type: type,
-            magnitudeUmbral: magUmbral,    // 0 for Penumbral-only; (0,1) Partial; ≥1 Total
-            magnitudePenumbral: magPenumbral,
+            type: cls.type,
+            magnitudeUmbral: cls.magnitudeUmbral,    // 0 for Penumbral-only; (0,1) Partial; ≥1 Total
+            magnitudePenumbral: cls.magnitudePenumbral,
           });
         }
       }
@@ -272,29 +248,16 @@ function createEclipseFinders(deps) {
     // is not the era's: 0.9 d at the Earth–Moon genesis against 29.5 d (doc 111 §1.35).
     const stepOpt = (opts && typeof opts.stepDays === 'number' && Number.isFinite(opts.stepDays) && opts.stepDays > 0) ? opts.stepDays : null;
     const STEP_DAYS = stepOpt !== null ? stepOpt : deps.getSynodicMonthDays() / 60;
-    const _rad2deg = 180 / Math.PI;
     const R_EARTH_KM = K.rEarthMetres / 1000;
-    const R_MOON_KM = K.moonDiameterKm / 2;
-    const R_SUN_KM = K.sunDiameterKm / 2;
     const D_SUN_KM = deps.getSunDistanceKm();
-    const sunAppR = Math.atan(R_SUN_KM / D_SUN_KM) * _rad2deg;  // ~0.266°
 
     // Per-event geometry at conjunction (Meeus Ch. 54 simplified geocentric
-    // form). "Topocentric" Moon size: at the sub-Moon point an observer is
-    // 1 Earth-radius closer than the geocenter (ratio ≈ 1.017) — this is
-    // what distinguishes total from annular when geocentric Moon ≈ Sun.
+    // form; eclipse/formula.cjs solarShadowGeometry — the ONE home). "Topocentric"
+    // Moon size: at the sub-Moon point an observer is 1 Earth-radius closer than
+    // the geocenter (ratio ≈ 1.017) — this is what distinguishes total from
+    // annular when geocentric Moon ≈ Sun.
     /** @param {number} D_MOON_KM */
-    const _solarGeometry = (D_MOON_KM) => {
-      const moonAppR_geo = Math.atan(R_MOON_KM / D_MOON_KM) * _rad2deg;
-      const moonAppR_topo = Math.atan(R_MOON_KM / (D_MOON_KM - R_EARTH_KM)) * _rad2deg;
-      const parallax = Math.atan(R_EARTH_KM / D_MOON_KM) * _rad2deg;  // ~0.95°
-      return {
-        moonAppR_geo, moonAppR_topo, parallax, sunAppR,
-        partialLim: sunAppR + moonAppR_geo + parallax,
-        centralLim: parallax - Math.abs(moonAppR_topo - sunAppR),
-        isTotal: moonAppR_topo > sunAppR,
-      };
-    };
+    const _solarGeometry = (D_MOON_KM) => solarShadowGeometry(D_MOON_KM, D_SUN_KM, K);
 
     // Wrapped conjunction diff: 0 means Moon at conjunction with the Sun
     /** @param {number} jd */
@@ -306,30 +269,12 @@ function createEclipseFinders(deps) {
     };
 
     // Geocentric γ (Earth-radii): perpendicular distance from Earth's center
-    // to the Sun–Moon line. NASA's "greatest eclipse" TD is the moment of
-    // MINIMUM γ — typically 5–15 min from longitude conjunction, because at
-    // conjunction the Moon may still be approaching in the β direction.
-    const _d2r = Math.PI / 180;
+    // to the Sun–Moon line (eclipse/formula.cjs gammaEarthRadii — the ONE home).
+    // NASA's "greatest eclipse" TD is the moment of MINIMUM γ — typically 5–15
+    // min from longitude conjunction, because at conjunction the Moon may still
+    // be approaching in the β direction.
     /** @param {number} jd */
-    const gammaAtJd = (jd) => {
-      const sunLonR = sunLonDegAt(jd) * _d2r;
-      const moonLonR = deps.moonLonDegAt(jd) * _d2r;
-      const moonBetR = deps.moonBetaDegAt(jd) * _d2r;
-      const D_moon = deps.moonDistanceKmAt(jd);
-      const D_sun = D_SUN_KM;
-      const sX = D_sun * Math.cos(sunLonR), sY = D_sun * Math.sin(sunLonR);
-      const cb = Math.cos(moonBetR);
-      const mX = D_moon * cb * Math.cos(moonLonR);
-      const mY = D_moon * cb * Math.sin(moonLonR);
-      const mZ = D_moon * Math.sin(moonBetR);
-      const dX = mX - sX, dY = mY - sY, dZ = mZ;
-      const dLen = Math.sqrt(dX*dX + dY*dY + dZ*dZ);
-      const ux = dX/dLen, uy = dY/dLen, uz = dZ/dLen;
-      // Perpendicular distance from origin to the line through Moon along u
-      const proj = mX*ux + mY*uy + mZ*uz;
-      const perpX = mX - proj*ux, perpY = mY - proj*uy, perpZ = mZ - proj*uz;
-      return Math.sqrt(perpX*perpX + perpY*perpY + perpZ*perpZ) / R_EARTH_KM;
-    };
+    const gammaAtJd = (jd) => gammaEarthRadii(sunLonDegAt(jd), deps.moonLonDegAt(jd), deps.moonBetaDegAt(jd), deps.moonDistanceKmAt(jd), D_SUN_KM, R_EARTH_KM);
 
     // Refine conjunction-JD to true min-γ JD: coarse 1-min scan over ±20 min,
     // then parabolic interpolation on the 3 points around the minimum.
@@ -379,13 +324,7 @@ function createEclipseFinders(deps) {
         const absB = Math.abs(beta);
         const D_moon = deps.moonDistanceKmAt(jdGreatest);
         const G = _solarGeometry(D_moon);
-
-        let type = null;
-        if (absB <= G.centralLim) {
-          type = G.isTotal ? 'Total' : 'Annular';
-        } else if (absB <= G.partialLim) {
-          type = 'Partial';
-        }
+        const type = solarTypeAt(absB, G);   // the ONE type rule (eclipse/formula.cjs)
 
         if (type) {
           results.push({

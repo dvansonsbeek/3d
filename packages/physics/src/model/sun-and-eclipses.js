@@ -7,12 +7,14 @@ import { ONE_FAMILY_WINDOW_YEARS } from '../earth/year-lengths.cjs';
 import { DAYS_PER_JULIAN_YEAR } from '../constants/units.cjs';
 import { createBesselian } from '../eclipse/besselian.cjs';
 import { createEclipseFinders } from '../eclipse/finders.cjs';
+import { createEclipseFormula } from '../eclipse/formula.cjs';
+import { composeEclipticInclinationDeg } from '../moon/plane-of-date.cjs';
 import { computeCarrierRatesDegPerCy, createSunPlanetaryCompletion } from '../eclipse/sun-planetary-completion.cjs';
 
 /** @param {import('./lunar-theory.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleSunAndEclipses(ctx) {
   const {
-    C, F, late, options, MASS_RATIO_EARTH_MOON, currentAUDistance, frameworkDeltaTSecondsAtJD, j2000JD,
+    C, F, late, options, MASS_RATIO_EARTH_MOON, chain, currentAUDistance, deepCalendar, frameworkDeltaTSecondsAtJD, j2000JD,
     julianCenturyDays, meanSiderealYearDays, meanSolarYearDays, moonArgs, moonDistanceKm, moonSeries,
     moonSiderealMonthInput, moonSynodicMonthDays, sceneObliquityDeg, oneFamilyTropicalYearSeconds, sunEccentricityAt,
     sunPerihelionDegAt,
@@ -168,6 +170,62 @@ export function assembleSunAndEclipses(ctx) {
     },
   });
 
+  // PLAN 33 — the eclipse formula of date: the finders' condition in closed form on the model's
+  // arguments of date (eclipse/formula.cjs, the ONE home of the shadow geometry the finders
+  // classify with). The same truncated series, the same Sun, the same ΔT bridge as the finders;
+  // the mean elongation from the lunar arguments' cumulative counts; TT → UT through the deep
+  // calendar's ΔT at a TT instant; the periods, the mean Moon distance and the orbit's inclination
+  // of date from the chain (the Laplace-plane regime's composed inclination at the node of date).
+  const DAYS_PER_YEAR = julianCenturyDays / 100;
+  /** @param {number} jdTT @returns {number} the engine age in Myr before J2000 */
+  const ageMaOfTT = (jdTT) => (j2000JD - jdTT) / DAYS_PER_YEAR / 1e6;
+  const eclipseFormula = createEclipseFormula({
+    moonLonDegAt: /** @param {number} jd */ (jd) => moonSeries.truncatedLonDeg(jd),
+    moonBetaDegAt: /** @param {number} jd */ (jd) => moonSeries.truncatedBetaDeg(jd),
+    moonDistanceKmAt: /** @param {number} jd */ (jd) => moonSeries.truncatedDistanceKm(jd),
+    sunLonDegAt: /** @param {number} jd */ (jd) => eclipseFinders.sunLonDegAt(jd),
+    deltaTSecondsAt: frameworkDeltaTSecondsAtJD,
+    // the one bridge's inverse: ΔT at the TT instant (phase/deep-calendar); the era fallback where
+    // the table is absent (a legacy engine) is one fixed-point step on the UT reading
+    jdUTFromTT: /** @param {number} jdTT */ (jdTT) => {
+      const dT = deepCalendar.deltaTSecondsAtJdTT(jdTT);
+      return dT !== null && Number.isFinite(dT) ? jdTT - dT / 86400 : jdTT - frameworkDeltaTSecondsAtJD(jdTT) / 86400;
+    },
+    meanElongationUnwrappedDegAt: /** @param {number} jdTT */ (jdTT) => moonArgs.meanElongationUnwrappedDeg(jdTT),
+    argsAt: /** @param {number} jdTT */ (jdTT) => moonArgs.argsAt(jdTT),
+    getSunDistanceKm: () => currentAUDistance,
+    periodsOfDateAt: /** @param {number} jdTT */ (jdTT) => {
+      if (!chain) return null;
+      const tMa = ageMaOfTT(jdTT);
+      /** @param {number | null | undefined} v @returns {number} */
+      const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : NaN);
+      const syn = num(chain.meanSynodicMonthAtAge(tMa)), drac = num(chain.meanNodalMonthAtAge(tMa)), anom = num(chain.meanAnomalisticMonthAtAge(tMa));
+      const sid = num(chain.meanMoonSiderealMonthAtAge(tMa)), trop = num(chain.meanTropicalYearSecondsAtAge(tMa)), sidY = num(chain.meanSiderealYearSecondsAtAge(tMa));
+      const lod = num(chain.meanSolarDaySecondsAtAge(tMa)), dist = num(chain.meanMoonDistanceCorrectedAtAge(tMa));
+      const tilt = num(chain.meanLaplaceTiltFromEclipticDegAtAge(tMa)), free = num(chain.meanLunarFreeInclinationDegAtAge(tMa));
+      if ([syn, drac, anom, sid, trop, sidY, lod, dist, tilt, free].some(Number.isNaN)) return null;
+      const a = moonArgs.argsAt(jdTT);
+      const nodeDeg = ((a.Lp - a.F) % 360 + 360) % 360;   // the node of date, Ω = L′ − F
+      return {
+        synodicDays: syn / 86400, draconicDays: drac / 86400, anomalisticDays: anom / 86400, siderealMonthDays: sid / 86400,
+        tropicalYearDays: trop / 86400, siderealYearDays: sidY / 86400, solarDayDays: lod / 86400,
+        moonDistanceKm: dist, inclinationDeg: composeEclipticInclinationDeg(free, tilt, nodeDeg), laplaceTiltDeg: tilt,
+      };
+    },
+    jdTTDomain: () => {
+      const r = deepCalendar.navigableYearRange();
+      const lo = Number.isFinite(r.yearMin) ? deepCalendar.yearToJDTT(r.yearMin) : null, hi = Number.isFinite(r.yearMax) ? deepCalendar.yearToJDTT(r.yearMax) : null;
+      return { min: lo === null ? -Infinity : lo, max: hi === null ? Infinity : hi };
+    },
+    constants: {
+      rEarthMetres: (C.bodyDiametersKm.earth / 2) * 1000,
+      moonDiameterKm: C.bodyDiametersKm.moon,
+      sunDiameterKm: C.bodyDiametersKm.sun,
+      j2000JD,
+      julianCenturyDays,
+    },
+  });
+
   // 20.3g — the solar-eclipse LOCATION tier: shadow geometry on the FULL
   // series (sceneEvalAt — the truncated finder forms omit the fitted Lp
   // anchor and the −2235·sin(Lp) β family, deliberate for finder
@@ -272,6 +330,6 @@ export function assembleSunAndEclipses(ctx) {
     },
   });
 
-  return { besselian, eclipseFinders, sunL0Deg, sunMeanLongitudeDegAt, sunPlanetaryCompletionDeg, sunTropicalRateDegPerCy, recordSunCumulativeBank, sunSeatStatus };
+  return { besselian, eclipseFinders, eclipseFormula, sunL0Deg, sunMeanLongitudeDegAt, sunPlanetaryCompletionDeg, sunTropicalRateDegPerCy, recordSunCumulativeBank, sunSeatStatus };
 }
 /** @typedef {import('./lunar-theory.js').Ctx & ReturnType<typeof assembleSunAndEclipses>} Ctx */

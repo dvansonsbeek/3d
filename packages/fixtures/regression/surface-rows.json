@@ -33,9 +33,9 @@
    }
   ],
   "summary": {
-   "rows": 776,
-   "moving": 615,
-   "blankSomewhere": 29,
+   "rows": 768,
+   "moving": 607,
+   "blankSomewhere": 31,
    "hoverAtJ2000OnMoving": 0
   },
   "rows": {
@@ -3261,8 +3261,8 @@
      "p990Myr": "First Quarter | "
     }
    },
-   "moon#075 235 Synodic Months": {
-    "header": "Eclipse Cycles: Metonic",
+   "moon#075 Node recurrence 1": {
+    "header": "Eclipse recurrences of date",
     "static": false,
     "class": {
      "moves": true,
@@ -3270,53 +3270,53 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6,939.6883760689 | solar days of date",
-     "m3000": "6,939.6898529234 | solar days of date",
-     "m400Myr": "7,151.3693606393 | solar days of date",
-     "m2460Myr": "7,407.1878004860 | solar days of date",
-     "m4400Myr": "4,297.4235127442 | solar days of date",
-     "genesis": "928.2718655206 | solar days of date",
-     "p990Myr": "6,169.3108166916 | solar days of date"
+     "today": "88 months = 95.5 node returns · 2,599 solar d · 7.11 yr · Δ -1.00°/cycle | ",
+     "m3000": "88 months = 95.5 node returns · 2,599 solar d · 7.11 yr · Δ -0.99°/cycle | ",
+     "m400Myr": "82 months = 88.5 node returns · 2,495 solar d · 6.19 yr · Δ 0.26°/cycle | ",
+     "m2460Myr": "103 months = 109.5 node returns · 3,247 solar d · 6.24 yr · Δ -0.75°/cycle | ",
+     "m4400Myr": "29 months = 29.5 node returns · 530 solar d · 0.49 yr · Δ 0.22°/cycle | ",
+     "genesis": "153 months = 153.5 node returns · 604 solar d · 0.38 yr · Δ -0.67°/cycle | ",
+     "p990Myr": "5 months = 5.5 node returns · 131 solar d · 0.47 yr · Δ 0.15°/cycle | "
     }
    },
-   "moon#076 255 Draconic months": {
-    "header": "Eclipse Cycles: Metonic",
+   "moon#076 Node recurrence 2": {
+    "header": "Eclipse recurrences of date",
     "static": false,
     "class": {
      "moves": true,
-     "blank": false,
+     "blank": true,
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6,939.1163003655 | solar days of date",
-     "m3000": "6,939.1157265124 | solar days of date",
-     "m400Myr": "7,189.9942788166 | solar days of date",
-     "m2460Myr": "7,560.6136355931 | solar days of date",
-     "m4400Myr": "4,584.0310508185 | solar days of date",
-     "genesis": "1,004.0048578896 | solar days of date",
-     "p990Myr": "6,085.3334794125 | solar days of date"
+     "today": "135 months = 146.5 node returns · 3,987 solar d · 10.92 yr · Δ 0.52°/cycle · tritos | ",
+     "m3000": "135 months = 146.5 node returns · 3,987 solar d · 10.92 yr · Δ 0.53°/cycle · tritos | ",
+     "m400Myr": "391 months = 422 node returns · 11,899 solar d · 29.51 yr · Δ -0.95°/cycle | ",
+     "m2460Myr": "111 months = 118 node returns · 3,499 solar d · 6.73 yr · Δ 0.94°/cycle | ",
+     "m4400Myr": "695 months = 707 node returns · 12,709 solar d · 11.85 yr · Δ -0.99°/cycle | ",
+     "genesis": "154 months = 154.5 node returns · 608 solar d · 0.38 yr · Δ 0.50°/cycle | ",
+     "p990Myr": "— | "
     }
    },
-   "moon#077 19 Solar years": {
-    "header": "Eclipse Cycles: Metonic",
+   "moon#077 Node recurrence 3": {
+    "header": "Eclipse recurrences of date",
     "static": false,
     "class": {
      "moves": true,
-     "blank": false,
+     "blank": true,
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6,939.6015814834 | solar days of date",
-     "m3000": "6,939.6086813031 | solar days of date",
-     "m400Myr": "7,660.7298501621 | solar days of date",
-     "m2460Myr": "9,881.7254146511 | solar days of date",
-     "m4400Myr": "20,370.0536291935 | solar days of date",
-     "genesis": "30,189.8906853970 | solar days of date",
-     "p990Myr": "5,292.3355733902 | solar days of date"
+     "today": "223 months = 242 node returns · 6,585 solar d · 18.03 yr · Δ -0.48°/cycle · Saros | ",
+     "m3000": "223 months = 242 node returns · 6,585 solar d · 18.03 yr · Δ -0.45°/cycle · Saros | ",
+     "m400Myr": "473 months = 510.5 node returns · 14,394 solar d · 35.70 yr · Δ -0.69°/cycle | ",
+     "m2460Myr": "214 months = 227.5 node returns · 6,745 solar d · 12.97 yr · Δ 0.19°/cycle | ",
+     "m4400Myr": "724 months = 736.5 node returns · 13,240 solar d · 12.35 yr · Δ -0.77°/cycle | ",
+     "genesis": "307 months = 308 node returns · 1,213 solar d · 0.76 yr · Δ -0.17°/cycle | ",
+     "p990Myr": "— | "
     }
    },
-   "moon#078 223 Synodic Months": {
-    "header": "Eclipse Cycles: Saros",
+   "moon#078 Anomaly recurrence (the type)": {
+    "header": "Eclipse recurrences of date",
     "static": false,
     "class": {
      "moves": true,
@@ -3324,17 +3324,17 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6,585.3213100569 | solar days of date",
-     "m3000": "6,585.3227114975 | solar days of date",
-     "m400Myr": "6,786.1930528620 | solar days of date",
-     "m2460Myr": "7,028.9484234399 | solar days of date",
-     "m4400Myr": "4,077.9806099658 | solar days of date",
-     "genesis": "880.8707489833 | solar days of date",
-     "p990Myr": "5,854.2821792435 | solar days of date"
+     "today": "223 months = 239 perigee returns · 6,585 solar d · 18.03 yr · Δ -2.82°/cycle · Saros | ",
+     "m3000": "223 months = 239 perigee returns · 6,585 solar d · 18.03 yr · Δ -3.02°/cycle · Saros | ",
+     "m400Myr": "74 months = 79 perigee returns · 2,252 solar d · 5.59 yr · Δ -2.42°/cycle | ",
+     "m2460Myr": "18 months = 19 perigee returns · 567 solar d · 1.09 yr · Δ -1.19°/cycle | ",
+     "m4400Myr": "60 months = 61 perigee returns · 1,097 solar d · 1.02 yr · Δ -2.55°/cycle | ",
+     "genesis": "1 months = 1 perigee returns · 4 solar d · 0.00 yr · Δ 0.37°/cycle | ",
+     "p990Myr": "61 months = 66 perigee returns · 1,601 solar d · 5.75 yr · Δ 0.58°/cycle | "
     }
    },
-   "moon#079 239 Anomalistic Months": {
-    "header": "Eclipse Cycles: Saros",
+   "moon#079 Season recurrence (the year)": {
+    "header": "Eclipse recurrences of date",
     "static": false,
     "class": {
      "moves": true,
@@ -3342,17 +3342,17 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6,585.5373842901 | solar days of date",
-     "m3000": "6,585.5536348420 | solar days of date",
-     "m400Myr": "6,813.3520893532 | solar days of date",
-     "m2460Myr": "7,138.0215657611 | solar days of date",
-     "m4400Myr": "4,299.4216275669 | solar days of date",
-     "genesis": "943.0971876453 | solar days of date",
-     "p990Myr": "5,798.8334228164 | solar days of date"
+     "today": "235 months = 19 years · 6,940 solar d · 19.00 yr · Δ 0.09°/cycle · Metonic | ",
+     "m3000": "235 months = 19 years · 6,940 solar d · 19.00 yr · Δ 0.08°/cycle · Metonic | ",
+     "m400Myr": "53 months = 4 years · 1,613 solar d · 4.00 yr · Δ 0.07°/cycle | ",
+     "m2460Myr": "33 months = 2 years · 1,040 solar d · 2.00 yr · Δ -0.02°/cycle | ",
+     "m4400Myr": "176 months = 3 years · 3,218 solar d · 3.00 yr · Δ 0.73°/cycle | ",
+     "genesis": "402 months = 1 years · 1,588 solar d · 1.00 yr · Δ -0.23°/cycle | ",
+     "p990Myr": "191 months = 18 years · 5,014 solar d · 18.00 yr · Δ 0.52°/cycle | "
     }
    },
-   "moon#080 242 Draconic months": {
-    "header": "Eclipse Cycles: Saros",
+   "moon#080 Next lunar eclipse": {
+    "header": "Next eclipses (formula of date)",
     "static": false,
     "class": {
      "moves": true,
@@ -3360,17 +3360,17 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6,585.3574301508 | solar days of date",
-     "m3000": "6,585.3568855530 | solar days of date",
-     "m400Myr": "6,823.4455508770 | solar days of date",
-     "m2460Myr": "7,175.1705875041 | solar days of date",
-     "m4400Myr": "4,350.3353501886 | solar days of date",
-     "genesis": "952.8202965070 | solar days of date",
-     "p990Myr": "5,775.1007922268 | solar days of date"
+     "today": "2027-02-20 23:14:36 · Penumbral · γ -1.049 · certified | UT · type · γ · regime",
+     "m3000": "-3000-09-19 17:10:53 · Partial · γ -0.788 · reproducible | UT · type · γ · regime",
+     "m400Myr": "-420002768-04-02 19:30:24 · Total · γ -0.265 · reproducible | UT · type · γ · regime",
+     "m2460Myr": "-3072754597-09-07 10:51:27 · Partial · γ 0.784 · reproducible | UT · type · γ · regime",
+     "m4400Myr": "-6662400240-06-24 17:11:29 · Partial · γ 1.136 · reproducible | UT · type · γ · regime",
+     "genesis": "-6764195131-10-03 09:54:51 · Total · γ 0.627 · reproducible | UT · type · γ · regime",
+     "p990Myr": "871597408-02-20 00:49:29 · Penumbral · γ -1.468 · reproducible | UT · type · γ · regime"
     }
    },
-   "moon#081 19 Draconic year cycles": {
-    "header": "Eclipse Cycles: Saros",
+   "moon#081 Next solar eclipse": {
+    "header": "Next eclipses (formula of date)",
     "static": false,
     "class": {
      "moves": true,
@@ -3378,17 +3378,17 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6,585.7813956086 | solar days of date",
-     "m3000": "6,585.7580075591 | solar days of date",
-     "m400Myr": "7,293.3476297166 | solar days of date",
-     "m2460Myr": "9,492.9726306619 | solar days of date",
-     "m4400Myr": "20,127.8229699381 | solar days of date",
-     "genesis": "23,051.5051025890 | solar days of date",
-     "p990Myr": "4,983.9262216308 | solar days of date"
+     "today": "2027-02-06 16:01:36 · Annular · γ 0.295 · certified | UT · type · γ · regime",
+     "m3000": "-3000-10-03 19:34:54 · Annular · γ 0.580 · reproducible | UT · type · γ · regime",
+     "m400Myr": "-420002768-03-17 18:58:08 · Partial · γ 1.085 · reproducible | UT · type · γ · regime",
+     "m2460Myr": "-3072754597-09-23 09:05:59 · Total · γ 0.199 · reproducible | UT · type · γ · regime",
+     "m4400Myr": "-6662400240-06-14 22:54:37 · Partial · γ 1.287 · reproducible | UT · type · γ · regime",
+     "genesis": "-6764195131-10-01 13:14:32 · Total · γ 0.589 · reproducible | UT · type · γ · regime",
+     "p990Myr": "871597408-03-04 19:39:56 · Annular · γ 0.274 · reproducible | UT · type · γ · regime"
     }
    },
-   "moon#082 3 × 223 Synodic Months": {
-    "header": "Eclipse Cycles: Exeligmos (3× Saros)",
+   "moon#082 Eclipses per year (mean elements)": {
+    "header": "Next eclipses (formula of date)",
     "static": false,
     "class": {
      "moves": true,
@@ -3396,157 +3396,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "19,755.9639301707 | solar days of date",
-     "m3000": "19,755.9681344925 | solar days of date",
-     "m400Myr": "20,358.5791585859 | solar days of date",
-     "m2460Myr": "21,086.8452703198 | solar days of date",
-     "m4400Myr": "12,233.9418298973 | solar days of date",
-     "genesis": "2,642.6122469500 | solar days of date",
-     "p990Myr": "17,562.8465377304 | solar days of date"
-    }
-   },
-   "moon#083 3 × 239 Anomalistic Months": {
-    "header": "Eclipse Cycles: Exeligmos (3× Saros)",
-    "static": false,
-    "class": {
-     "moves": true,
-     "blank": false,
-     "hoverAtJ2000": false
-    },
-    "values": {
-     "today": "19,756.6121528704 | solar days of date",
-     "m3000": "19,756.6609045261 | solar days of date",
-     "m400Myr": "20,440.0562680597 | solar days of date",
-     "m2460Myr": "21,414.0646972832 | solar days of date",
-     "m4400Myr": "12,898.2648827006 | solar days of date",
-     "genesis": "2,829.2915629360 | solar days of date",
-     "p990Myr": "17,396.5002684493 | solar days of date"
-    }
-   },
-   "moon#084 3 × 242 Draconic months": {
-    "header": "Eclipse Cycles: Exeligmos (3× Saros)",
-    "static": false,
-    "class": {
-     "moves": true,
-     "blank": false,
-     "hoverAtJ2000": false
-    },
-    "values": {
-     "today": "19,756.0722904525 | solar days of date",
-     "m3000": "19,756.0706566590 | solar days of date",
-     "m400Myr": "20,470.3366526309 | solar days of date",
-     "m2460Myr": "21,525.5117625122 | solar days of date",
-     "m4400Myr": "13,051.0060505658 | solar days of date",
-     "genesis": "2,858.4608895209 | solar days of date",
-     "p990Myr": "17,325.3023766804 | solar days of date"
-    }
-   },
-   "moon#085 3 × 19 Draconic year cycles": {
-    "header": "Eclipse Cycles: Exeligmos (3× Saros)",
-    "static": false,
-    "class": {
-     "moves": true,
-     "blank": false,
-     "hoverAtJ2000": false
-    },
-    "values": {
-     "today": "19,757.3441868259 | solar days of date",
-     "m3000": "19,757.2740226774 | solar days of date",
-     "m400Myr": "21,880.0428891498 | solar days of date",
-     "m2460Myr": "28,478.9178919856 | solar days of date",
-     "m4400Myr": "60,383.4689098142 | solar days of date",
-     "genesis": "69,154.5153077671 | solar days of date",
-     "p990Myr": "14,951.7786648925 | solar days of date"
-    }
-   },
-   "moon#086 940 Synodic Months": {
-    "header": "Eclipse Cycles: Callippic",
-    "static": false,
-    "class": {
-     "moves": true,
-     "blank": false,
-     "hoverAtJ2000": false
-    },
-    "values": {
-     "today": "27,758.7535042757 | solar days of date",
-     "m3000": "27,758.7594116935 | solar days of date",
-     "m400Myr": "28,605.4774425572 | solar days of date",
-     "m2460Myr": "29,628.7512019442 | solar days of date",
-     "m4400Myr": "17,189.6940509767 | solar days of date",
-     "genesis": "3,713.0874620823 | solar days of date",
-     "p990Myr": "24,677.2432667662 | solar days of date"
-    }
-   },
-   "moon#087 1020 Draconic months": {
-    "header": "Eclipse Cycles: Callippic",
-    "static": false,
-    "class": {
-     "moves": true,
-     "blank": false,
-     "hoverAtJ2000": false
-    },
-    "values": {
-     "today": "27,756.4652014622 | solar days of date",
-     "m3000": "27,756.4629060498 | solar days of date",
-     "m400Myr": "28,759.9771152665 | solar days of date",
-     "m2460Myr": "30,242.4545423726 | solar days of date",
-     "m4400Myr": "18,336.1242032742 | solar days of date",
-     "genesis": "4,016.0194315583 | solar days of date",
-     "p990Myr": "24,341.3339176502 | solar days of date"
-    }
-   },
-   "moon#088 1016 Sidereal Months": {
-    "header": "Eclipse Cycles: Callippic",
-    "static": false,
-    "class": {
-     "moves": true,
-     "blank": false,
-     "hoverAtJ2000": false
-    },
-    "values": {
-     "today": "27,758.8081043320 | solar days of date",
-     "m3000": "27,758.8156943840 | solar days of date",
-     "m400Myr": "28,748.5572913648 | solar days of date",
-     "m2460Myr": "30,194.4928572964 | solar days of date",
-     "m4400Myr": "18,268.3468955050 | solar days of date",
-     "genesis": "4,003.3471962617 | solar days of date",
-     "p990Myr": "24,375.1552597106 | solar days of date"
-    }
-   },
-   "moon#089 1016 Tropical Months": {
-    "header": "Eclipse Cycles: Callippic",
-    "static": false,
-    "class": {
-     "moves": true,
-     "blank": false,
-     "hoverAtJ2000": false
-    },
-    "values": {
-     "today": "27,758.7275351115 | solar days of date",
-     "m3000": "27,758.7351250289 | solar days of date",
-     "m400Myr": "28,748.4621501272 | solar days of date",
-     "m2460Myr": "30,194.3477709971 | solar days of date",
-     "m4400Myr": "18,267.9037612809 | solar days of date",
-     "genesis": "4,003.3422604640 | solar days of date",
-     "p990Myr": "24,375.1045939113 | solar days of date"
-    }
-   },
-   "moon#090 76 Solar years": {
-    "header": "Eclipse Cycles: Callippic",
-    "static": false,
-    "class": {
-     "moves": true,
-     "blank": false,
-     "hoverAtJ2000": false
-    },
-    "values": {
-     "today": "27,758.4063259337 | solar days of date",
-     "m3000": "27,758.4347252126 | solar days of date",
-     "m400Myr": "30,642.9194006485 | solar days of date",
-     "m2460Myr": "39,526.9016586042 | solar days of date",
-     "m4400Myr": "81,480.2145167741 | solar days of date",
-     "genesis": "120,759.5627415878 | solar days of date",
-     "p990Myr": "21,169.3422935609 | solar days of date"
+     "today": "2.32 lunar (1.47 umbral) · 2.31 solar (1.47 central) · 2.11 seasons/yr | ",
+     "m3000": "2.32 lunar (1.47 umbral) · 2.31 solar (1.47 central) · 2.11 seasons/yr | ",
+     "m400Myr": "2.52 lunar (1.63 umbral) · 2.51 solar (1.60 central) · 2.10 seasons/yr | ",
+     "m2460Myr": "3.30 lunar (2.26 umbral) · 3.28 solar (2.06 central) · 2.08 seasons/yr | ",
+     "m4400Myr": "19.44 lunar (16.32 umbral) · 19.42 solar (11.20 central) · 2.02 seasons/yr · approximate (Laplace-plane regime) | ",
+     "genesis": "402.25 lunar (402.25 umbral) · 402.25 solar (264.94 central) · 2.62 seasons/yr · approximate (Laplace-plane regime) | ",
+     "p990Myr": "1.93 lunar (1.17 umbral) · 1.92 solar (1.16 central) · 2.12 seasons/yr | "
     }
    },
    "sun#000 Size diameter": {

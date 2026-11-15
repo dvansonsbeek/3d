@@ -96,7 +96,9 @@ export type EclipseFinderDeps = {
 /** @param {EclipseFinderDeps} deps */
 export function createEclipseFinders(deps: EclipseFinderDeps): {
     sunLonDegAt: (jd: number) => number;
-    findLunarEclipsesInRange: (jdStart: number, jdEnd: number) => Array<{
+    findLunarEclipsesInRange: (jdStart: number, jdEnd: number, opts?: {
+        stepDays?: number;
+    }) => Array<{
         jd: number;
         jdOpposition: number;
         beta: number;

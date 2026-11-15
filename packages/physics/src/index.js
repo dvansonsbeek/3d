@@ -193,6 +193,8 @@ export { deltaTEspenakMeeusCanonSeconds } from './deltat/historical.cjs';
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from './climate/l1-orbital.cjs';
 // Phase 8.5 — eclipse geometry (single-copy: the browser had no Node twin).
 export { createEclipseFinders } from './eclipse/finders.cjs';
+// Plan 33 — the eclipse formula of date and the ONE home of the shadow geometry the finders classify with.
+export { createEclipseFormula, recurrencesOfDate, lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii, DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS } from './eclipse/formula.cjs';
 // Phase 8.6 — the published reference curves (external comparison formulas
 // and datasets, exactly as published; comparison references, never inputs).
 // (reference/published-curves MIGRATED to @essrt/reference at the 4.0.0

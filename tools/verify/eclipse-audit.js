@@ -152,6 +152,7 @@ const INPUT_FILES = [
   'packages/physics/src/moon/series-extension.cjs',
   'tools/lib/scene-graph.js',
   'packages/physics/src/eclipse/finders.cjs',
+  'packages/physics/src/eclipse/formula.cjs',   // the shadow geometry and the type rules the finders classify with (plan 33, ONE home)
   'packages/physics/src/moon/series.cjs',
   'packages/physics/src/moon/plane-of-date.cjs',
   // the ONE eccentricity law body (Sun EoC + E-factor flow through it;

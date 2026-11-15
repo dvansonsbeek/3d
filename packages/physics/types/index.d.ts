@@ -84,3 +84,4 @@ export { solarCharacteristicPower, createSolarPerturbationScales } from "./moon/
 export { SCENE_OBLIQUITY_HANDOVER_YEARS, HYBRID_BEAT_TABLE_NODE_YEARS, sceneObliquityHandoverWeight, hybridBeatMeanDeg, hybridBeatBandDeg, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from "./earth/scene-obliquity.cjs";
 export { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH } from "./deltat/moon-distance-artifact.cjs";
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from "./climate/l1-orbital.cjs";
+export { createEclipseFormula, recurrencesOfDate, lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii, DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS } from "./eclipse/formula.cjs";

@@ -2384,6 +2384,98 @@ date 82/88.5 and 53 months = 4 years at 400 Ma, 214/227.5 and 33 months =
 2 years at 2.46 Ga, 307/308 and the eclipse year itself at the edge — none of
 today's names survives a few hundred million years (plan 30 L(d)).
 
+### 1.46 The clock's grain is the eclipse instant's — the edge's eclipses are reproducible to the bridge's jitter, and a leash is in the axis's unit (plan 33, the formula)
+
+**The build.** The eclipse formula of date (`packages/physics/src/eclipse/formula.cjs`,
+doc 11's section; `createModel().eclipse.formula`) is the finders' condition
+in closed form on the arguments of date: the mean syzygy by Newton on the
+unwrapped mean elongation of the cumulative counts, the true syzygy by a
+fixed-slope walk on the series' elongation, greatest eclipse at
+t* = t₀ − β·β̇/(λ̇² + β̇²) with one parabolic refinement, γ and the type by the
+SAME functions the finders classify with (the shadow geometry moved out of
+the finders into the formula module verbatim — the fixtures, the parity gate
+and the lunar-alignment campaign's 348 recorded keys stood bit-identical), the
+civil instant through the one bridge, the recurrences as the corollary. In the
+era the formula and the finders agree event for event: 119 canon-era events in
+25 one-year windows, the greatest-eclipse instant to 0.31 s and the syzygy to
+0.30 s (the finders' bisection grain is 1 s and their refinement a 1-min
+parabola), σ to 3e-9°, every type the same.
+
+**The grain at depth.** A UT Julian Day of 1.5e11 has a 3-s ulp at 400 Ma,
+17 s at −2 Gyr, 47 s at the genesis edge (2.5e12) — doc 111 §1.37's class.
+The syzygy differs by 2 ulp at 400 Ma and 1 ulp at −2 Gyr; the greatest
+instant, the minimum of a flat function, by 12 and 4 ulp. At the edge a second
+limit stands above the grain: the bridge's Newton residual
+f = jdTT − ΔT/86400 − jdUT is a difference of three numbers of order 1e12 days
+and cannot be evaluated below ~1e-3 d, so the TT instant a UT instant maps to
+jitters by a few TT ulps, NON-monotone (measured: the longitude at t₀ ± 8 ulp
+identical and 0.4° above the longitude at t₀). On a Moon moving 397° per SI
+day that is 0.4–0.8° of elongation per step, ~3 min of syzygy instant
+(measured 8 ulp between the two methods), ~1 h of greatest eclipse (87 ulp)
+and 0.22° of σ on a 9.4°-wide umbra; a limit-grazing type is then the
+INSTANT's — the Moon's latitude moves 190°/d there — and the gate re-reads it
+at the other method's instant (11 of 101 edge events). The finders inherit the
+same jitter: the edge's eclipse instants, the registry's genesis eclipse among
+them, are reproducible to it and not beyond. The formula's walk carries the
+grain: the floor and the acceptance in ulp of elongation, the rate stencils
+widened to 64 ulp (a 1-min stencil is one ulp there), a bisection fallback
+where the walk cannot settle, and the closed form's division guarded (both
+rates read zero inside the jitter once: NaN went into the series, which asked
+the one-source sampler for a NaN year).
+
+**Three unit and seed traps on the way.** (1) The walk's slope MEASURED over
+one degree of mean elongation read 68 °/d for 397 at the edge — one degree is
+four ulp there; the slope is the analytic mean rate of date, 360/P_syn per UT
+day (the SI month over the solar day of date: 91 °/d at the genesis). (2) The
+walk's LEASH, half a month in UT days, was written as the SI month TIMES the
+solar day of date (0.1 UT day) instead of divided by it (1.97): every edge
+syzygy whose periodic correction exceeded 9° (0.09 UT d of the 8° it reaches)
+was refused — §1.36's axis-unit class once more, and the gate's first deep
+window, "14 months" in SI days, was 3.2 months of UT at the edge and fell
+between seasons (no eclipse, rightly: the Moon 24° from the ecliptic at every
+one of its syzygies); the deep windows are one eclipse season of date in UT
+days. (3) The mean-count convergence test used an absolute 1e-6° on a count of
+5e14° (0.06° per ulp): the tolerance is 16 ulp of the count — the seed only,
+the true solve runs on the wrapped series longitudes. And a `null` from one
+refused syzygy ended the "next eclipse" search (the syzygy before the domain's
+edge at the genesis landing): a refused syzygy is skipped, the next is still
+the next.
+
+**The record vs the shipped list.** Step 0's record quoted, at 2.46 Ga and
+4.0 Ga, the node pair with the SMALLEST shift (214/227.5, 229/237) where the
+shipped list's SHORTEST pairs are 103/109.5 and 43/44.5 (the tools chain and
+the model agree exactly); the gate pins the shortest and requires the record's
+pair in the list. **The amplitude gate.** The mean-syzygy correction regressed
+on sin M′ over 180 syzygies reads the longitude table's coefficient at that
+phase of D with the m-family's scales of date — 5.054° at J2000, 5.132 at
+400 Ma, 5.350 at 2.46 Ga (the table 5.054 / 5.132 / 5.350; the J2000
+amplitudes 5.054 everywhere, 6 % off at 2.46 Ga): the series' amplitudes of
+date, discriminated. At the edge the M′ advance per syzygy is 0.9° (the
+anomalistic and synodic months nearly coincide), so 180 consecutive syzygies
+span 160° of M′ and the regressor is near-singular (−317° for 6.2°): the
+sampling stride keeps ≥ 10° of M′ per sample; and the plane rotation's
+longitude share (11.8° of tilt) is not in the table prediction, so the edge
+row is a 5 % band (measured ∓3.6 % at the two syzygy phases). **The
+statistics** on the mean elements (the share of syzygies inside the limits for
+a node distance uniform over the syzygies, the eclipse year from the node's
+regression) read 2.3 lunar and 2.3 solar eclipses per year and 2.11 seasons
+today — and 402 per year at the genesis where the Moon at 6 R⊕ sits inside a
+9.4°-wide umbra: flagged approximate inside the Laplace-plane regime, where
+the node regresses about the Laplace plane and the seasons follow the
+equinoxes.
+
+**The gate** `tools/verify/eclipse-formula.js` (the ninth gate; ~15 s): the
+era windows and the four deep positions against the finders (the instants to
+1 s in the era, to 1 + 3 ulp / 2 + 25 ulp at depth, 1 + 12 / 2 + 100 ulp and
+0.3° at the edge, the types at the other instant there), today's recurrences
+exactly and the step-0 epochs pinned, the amplitude rows with the J2000
+amplitudes required to FAIL at 2.46 Ga and the edge, the regime tags and the
+statistics; fail-proven with `ESSRT_ECLIPSE_FORMULA_PLANT=1` (the finder
+instants shifted 3 s) and `=2` (the J2000 amplitudes). The browser's Moon
+panel reads the tier model's formula (`_eclipseFormulaRows`, re-solved only
+when the scene passes a found eclipse); the epoch gate reads its rows against
+the Node formula at the four deep positions, bit-identical.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -2420,7 +2512,11 @@ date equals the calendar year in the era, the Step buttons cross each former
 seam by whole years and return, and the Engine-age row at the past edge
 reads the registry's TT age — born from the owner's globe turning 106° on a
 one-year typed step at −1000, and from the first build's Step buttons
-sticking there and turning the globe 79° per 100-yr step beyond), plus
+sticking there and turning the globe 79° per 100-yr step beyond; and since
+§1.46 the eclipse-formula rows: the Moon panel's next lunar and solar eclipse,
+its shortest node recurrence and its seasons per year at the four deep
+positions ≡ the Node model's formula at the same UT instant, bit-identical —
+one formula, two runtimes), plus
 `test:perf` — the deep-time performance gate (RATIO thresholds, deep vs
 in-table cost, runner-speed independent; born from four ungated ratio
 regressions, one owner-bisected at 28×; since §1.35 the deep-edge spin read —

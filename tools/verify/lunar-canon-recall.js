@@ -52,6 +52,7 @@ const INPUT_FILES = [
   'tools/verify/lunar-canon-recall.js',
   'public/input/lunar-eclipses-nasa.json',
   'packages/physics/src/eclipse/finders.cjs',
+  'packages/physics/src/eclipse/formula.cjs',   // the shadow geometry and the type rules the finders classify with (plan 33, ONE home)
   'packages/physics/src/moon/series.cjs',
   'packages/physics/src/moon/plane-of-date.cjs',
   'packages/physics/src/moon/apparent.cjs',

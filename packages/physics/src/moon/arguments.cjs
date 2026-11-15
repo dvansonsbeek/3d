@@ -672,9 +672,43 @@ function createMoonArguments({ constants, fns, checkpoints = null }) {
     return isFrameworkNative() ? fwArgs(jdTT) : pureMeeusArgs(jdTT);
   }
 
+  /** The MEAN elongation D = L′ − L_sun UNWRAPPED (degrees, continuous and monotone in jdTT): the
+   *  syzygy count's axis of the eclipse formula (plan 33; eclipse/formula.cjs) — the k-th mean new
+   *  Moon from J2000 is D = 360k, the k-th full Moon 360k + 180°. The same three branches as
+   *  argsAt, before the wrap: the deep chains with the tapered rate anchors, the certified
+   *  polynomial skeleton on the certified Sun, the pure Meeus polynomial. Null where the deep
+   *  branch's chains are undefined AND the engine runs deep time (the caller clamps to the
+   *  navigable domain, where the chains hold).
+   *  @param {number} jdTT @returns {number | null} */
+  function meanElongationUnwrappedDeg(jdTT) {
+    if (!isFrameworkNative()) {
+      const T = (jdTT - j2000JD) / julianCenturyDays;
+      const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+      return 297.8501921 + MEEUS_ARGUMENT_RATES_DEG_PER_CY.D * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000;
+    }
+    if (isDeepTime()) {
+      const P = fwArgsDeepParts(jdTT);
+      if (P === null) return null;
+      let { Lp, Lsun } = P;
+      const AN = anchorsInit();
+      if (AN.ok) {
+        const I = iEnv(P.dy, AN.Tq);
+        Lp += AN.Lp * I;
+        Lsun += AN.Lsun * I;
+      }
+      return Lp - Lsun;
+    }
+    const A = bundle;
+    const T = (jdTT - j2000JD) / julianCenturyDays;
+    const Tc = Math.max(-100, Math.min(100, T));
+    const Tc2 = Tc * Tc, Tc3 = Tc2 * Tc, Tc4 = Tc3 * Tc;
+    const Lp = A.LP0 + A.LPR * T + A.T2_LP * Tc2 + Tc3 / 538841 - Tc4 / 65194000;
+    return Lp - sunMeanLonDegAtJdTT(jdTT);
+  }
+
   // _rateCompletion: probe hook (instruments/verification) — the (d′) state:
   // whether the completion is live, its measured ṗΔ, and the five anchors.
-  return { argsAt, fwArgs, fwArgsDeep, pureMeeusArgs, planetaryCarrier, obliquityCarrier, lpSecularCompletion, apsidalNodalSecularCompletion, bundle,
+  return { argsAt, meanElongationUnwrappedDeg, fwArgs, fwArgsDeep, pureMeeusArgs, planetaryCarrier, obliquityCarrier, lpSecularCompletion, apsidalNodalSecularCompletion, bundle,
     recordCarrierPrefixes, carrierSeatStatus,
     _rateCompletion: () => ({ rc: rateCompInit(), anchors: anchorsInit() }) };
 }
