@@ -151,7 +151,7 @@ export function createApi() {
     constantsHash: id.constantsHash,
     coefficientsHash: id.coefficientsHash,
     citation: `doi:${id.preprintDoi}`,
-    validitySpan: { minYear: -498e6, maxYear: 502e6, note: 'refused outside, never extrapolated; the deep-time chain (day length, Moon distance, clock) runs on the cited Earth–Moon distance history — Farhat et al. 2022, AstroGeo22 — to 4,429 Ma, the paleo gate tests it to 3.2 Ga, and this API serves ±500 Myr (the cited input); the hybrid obliquity (earth.obliquityDeg) is served inside the banked N-body series\' span only, ±10 Myr — null beyond, where the cited mean obliquity of date (earth.meanObliquityCitedDeg) stands' },
+    validitySpan: { minYear: -498e6, maxYear: 502e6, note: 'refused outside, never extrapolated; the deep-time chain (day length, Moon distance, clock) runs on the cited Earth–Moon distance history — Farhat et al. 2022, AstroGeo22 — to 4,429 Ma, the paleo gate tests it to 3.2 Ga, and this API serves ±500 Myr (the cited input); the hybrid obliquity (earth.obliquityDeg) is served inside the banked N-body series\' span only, ±10 Myr — null beyond, where the cited mean obliquity of date (earth.meanObliquityCitedDeg) stands; the drawn-scene obliquity (earth.sceneObliquityDeg, earth.sceneObliquityBand) is served at every epoch — the hybrid inside its domain, beyond it the cited mean carrying the hybrid\'s wobble about its beat mean: the one tilt the simulator draws, a rendering rule, not a claim' },
   });
 
   /** @param {Record<string, string>} query @returns {{ years: number[], echo: Record<string, unknown> } | { problem: {status: number, headers: Record<string, string>, body: string} }} */
@@ -299,6 +299,16 @@ export function createApi() {
         obliquityDeg: inObliquityDomain(y) ? model.earth.obliquityDeg(y) : null,
         obliquityBand: inObliquityDomain(y) ? model.earth.obliquityBandAt(y) : null,
         meanObliquityCitedDeg: model.earth.meanObliquityCitedDeg(y),
+        // PLAN 31 A2 — the ONE tilt the simulator draws (ONE home earth/scene-obliquity, doc 111
+        // §1.44): the hybrid inside its domain (bit-identical to obliquityDeg there), beyond it the
+        // cited mean of date carrying the hybrid's own wobble about its beat mean, handed over C¹
+        // across 10 Myr past the edge. Served so a reader of this API and a viewer of the scene see
+        // the same tilt at every age — a RENDERING RULE, never a claim: the deep obliquity VALUE is a
+        // band. The band's centre IS the cited mean, its min/max the hybrid's swing about it,
+        // hybridMeanDeg the hybrid's own beat mean (the Quaternary 23.2–23.4° at every age — the
+        // integration carries no tidal evolution of its mean).
+        sceneObliquityDeg: model.earth.sceneObliquityDeg(y),
+        sceneObliquityBand: model.earth.sceneObliquityBandAt(y),
         eccentricity: model.earth.eccentricity(y),
         inclinationDeg: model.earth.inclinationDeg(y),
         perihelionLongitudeDeg: model.earth.perihelionLongitudeDeg(y),
@@ -493,7 +503,9 @@ export function createApi() {
       const D2R = Math.PI / 180;
       const lon = model.moon.lonDegAtJD(jd) * D2R;
       const bet = model.moon.betaDegAtJD(jd) * D2R;
-      const eps = model.earth.obliquityDeg(model.time.yearFromJD(jd)) * D2R;
+      // the ONE tilt (plan 31 A2): ≡ the hybrid inside its ±10-Myr domain, the drawn rule beyond it,
+      // where the hybrid's tail is not a prediction — the tier's ground mapping reads the same rule
+      const eps = model.earth.sceneObliquityDeg(model.time.yearFromJD(jd)) * D2R;
       const dec = Math.asin(Math.sin(bet) * Math.cos(eps) + Math.cos(bet) * Math.sin(eps) * Math.sin(lon));
       const ra = Math.atan2(Math.sin(lon) * Math.cos(eps) - Math.tan(bet) * Math.sin(eps), Math.cos(lon));
       const gmstDeg = model.eclipse.gmstDegAtJD(jd);   // the ONE GMST (the cubic term it lacks is ≤ 93″ in this era; measured: no recorded value moves)

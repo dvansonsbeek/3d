@@ -2225,7 +2225,11 @@ The build: ONE home for each rule in the package, three twins reading it.
   0.15° at the seam: a step there would turn the drawn axis mid-jump). The
   one-source movement composes it (`oneSourceM.sceneEpsAt`; the obliquity
   beat of date moved home there), the surface serves it as
-  `earth.sceneObliquityDeg`, and the ECLIPSE TIER's besselian reads it for
+  `earth.sceneObliquityDeg`, the API's `/earth` serves it beside the hybrid
+  and the cited mean as `sceneObliquityDeg` / `sceneObliquityBand` (a
+  rendering rule, named so — a reader of the API and a viewer of the scene
+  see ONE tilt at every age; the observer tier's Moon altitude reads it too,
+  identical inside ±10 Myr), and the ECLIPSE TIER's besselian reads it for
   its ground mapping — the certified ground point sits where the drawn axis
   puts it at every epoch (§1.34's class; γ, the umbra radius and the type are
   frame-invariant and do not move). In the browser the frame's axis (the

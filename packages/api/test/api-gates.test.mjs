@@ -204,6 +204,21 @@ for (const url of SAMPLE_REQUESTS) {
   if (Math.abs(earthDevonian.meanObliquityCitedDeg - 22.227) > 0.01) failures.push(`earth meanObliquityCitedDeg@Devonian: ${earthDevonian.meanObliquityCitedDeg}`);
   const earthEdge = dataOf('/v1/earth?year=-9990000').years[0];
   if (!Number.isFinite(earthEdge.obliquityDeg)) failures.push(`earth obliquityDeg@−9,990,000 (inside the series' span) must be served: ${earthEdge.obliquityDeg}`);
+  // PLAN 31 A2 — the drawn-scene obliquity and its band are served at EVERY epoch: bit-identical to
+  // the hybrid inside its domain, beyond it the cited mean carrying the hybrid's wobble (the band's
+  // centre IS the cited mean; the hybrid's own beat mean stays the Quaternary 23.2–23.4° — no tidal
+  // evolution of its mean) — the one tilt the simulator draws, a rendering rule, not a claim.
+  for (const [label, row] of /** @type {[string, any][]} */ ([['2000', earth2000], ['−100000', earthDeep], ['−9,990,000', earthEdge]])) {
+    if (row.sceneObliquityDeg !== row.obliquityDeg) failures.push(`earth sceneObliquityDeg@${label} must equal the hybrid inside its domain: ${row.sceneObliquityDeg} vs ${row.obliquityDeg}`);
+    // obliquityBand is the live 41-sample instrument AT the year; the scene band rides the 1-Myr node table
+    // (lerped) — the same beat mean to the band's smoothness, not the same instrument
+    if (!row.sceneObliquityBand || Math.abs(row.sceneObliquityBand.centreDeg - row.obliquityBand.meanDeg) > 0.01) failures.push(`earth sceneObliquityBand@${label} must centre on the hybrid's beat mean inside its domain: ${JSON.stringify(row.sceneObliquityBand)} vs ${JSON.stringify(row.obliquityBand)}`);
+  }
+  const sb = earthDevonian.sceneObliquityBand;
+  if (!(Number.isFinite(earthDevonian.sceneObliquityDeg) && sb && sb.centreDeg === earthDevonian.meanObliquityCitedDeg
+    && sb.minDeg <= earthDevonian.sceneObliquityDeg && earthDevonian.sceneObliquityDeg <= sb.maxDeg && sb.hybridMeanDeg > 23.2 && sb.hybridMeanDeg < 23.4)) {
+    failures.push(`earth sceneObliquity@Devonian must be the cited mean carrying the hybrid's wobble: ${earthDevonian.sceneObliquityDeg}, band ${JSON.stringify(sb)}, cited ${earthDevonian.meanObliquityCitedDeg}`);
+  }
   if (!merc.accuracy || !merc.accuracy.statement) failures.push('bodies/mercury: missing accuracy statement');
   // JD input equivalence: same instant via jd= and via year= must agree.
   const viaJd = dataOf('/v1/earth?jd=2451545').years[0];
@@ -468,7 +483,7 @@ for (const url of SAMPLE_REQUESTS) {
     const subSolar = (jdUT) => {
       const jb = jdUT + apiModel.eclipse.ttBridgeSeconds / 86400;   // the joint fit's anchor (plan 14: FIT.DT_ANCHOR)
       const year = apiModel.time.yearFromJD(jb);
-      const eps = apiModel.earth.obliquityDeg(year) * D2R;
+      const eps = apiModel.earth.sceneObliquityDeg(year) * D2R;   // the ONE tilt the tier's ground mapping reads (≡ the hybrid here)
       const lam = apiModel.eclipse.sunLonDegAtJD(jb) * D2R;
       const K2 = DEFAULT_CONSTANTS.physicalConstants;
       const T = (jdUT - 2451545.0) / 36525;
