@@ -164,12 +164,7 @@ export function assembleSurface(ctx) {
        *  factors (obliquityPeriodRealizedYears below: 40,927 over the LR04 record, the climate formula's p+s₀
        *  line; La2004's own series reads 40,900 on the same window — compare realized with realized, never
        *  this instant with Laskar's long-window precession frequency 50.476). @param {number} year @returns {number} */
-      obliquityBeatYearsAtYear: (year) => {
-        const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(year));
-        const psiDot = r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r;
-        const psiDotInertial = psiDot * (certifiedAxialPrecessionJ2000Years() / oneSourceM.axialPrecessionYearsLunisolarJ2000);
-        return 1296000 / (psiDotInertial - s3ArcsecPerYr);
-      },
+      obliquityBeatYearsAtYear: oneSourceM.obliquityBeatYearsAtYear,   // ONE home: the one-source movement's (the scene rule reads it too)
       /** THE REALIZED POLE RATE OVER A WINDOW, ″/yr — see the one home above (the mean of the inertial rate of
        *  date with its three of-date factors); the rate the obliquity lines of a record spanning the window carry. */
       spinAxisInertialRateMeanArcsecPerYr,
@@ -238,6 +233,21 @@ export function assembleSurface(ctx) {
         for (let i = 0; i <= 40; i++) { const e = oneSourceM.epsAt(year + (i / 40 - 0.5) * periodYears); if (e < minDeg) minDeg = e; if (e > maxDeg) maxDeg = e; }
         return { minDeg, maxDeg, periodYears };
       },
+      /** THE OBLIQUITY A DRAWN SCENE SHOWS (plan 31 A2): the hybrid inside its domain; beyond it the cited mean of
+       *  date carrying the hybrid's wobble about its beat mean (the band), handed over C¹ across the 10 Myr past the
+       *  domain's edge — the eclipse tier's ground mapping and the simulator's axis read it (ONE home
+       *  earth/scene-obliquity; the one-source movement composes it). @param {number} year @returns {number} */
+      sceneObliquityDeg: oneSourceM.sceneEpsAt,
+      /** THE DRAWN OBLIQUITY'S BAND at a decimal year (plan 31 A2, the Genesis Analysis chart): {centreDeg, minDeg,
+       *  maxDeg, hybridMeanDeg} — the hybrid's beat band from a lazy 1-Myr node table (the band instrument once per
+       *  node), shifted onto the cited mean by the rule's weight. @param {number} year */
+      sceneObliquityBandAt: oneSourceM.sceneObliquityBandAt,
+      /** The hybrid's RAW beat band at a decimal year — {meanDeg, minDeg, maxDeg} from the 1-Myr node table (the
+       *  generator's instrument, tools/verify/obliquity-beat-table.js); `hybridBeatNodeAt(k)` the node at the year
+       *  2000 + k × 1 Myr, `hybridBeatNodeRange` [kMin, kMax] of the loaded artifact or null. @param {number} year */
+      hybridBeatBandAt: oneSourceM.hybridBeatBandAt,
+      hybridBeatNodeAt: oneSourceM.hybridBeatNodeAt,
+      hybridBeatNodeRange: oneSourceM.hybridBeatNodeRange,
       /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
       meanObliquityCitedDeg: /** @param {number} year @returns {number} */ (year) => { const e = chain.meanObliquityCitedDegAtAge(yearToTMa(year)); return e === null ? NaN : e; },
       eccentricity: eccentricityAt,

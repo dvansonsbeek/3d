@@ -31,7 +31,7 @@
  * the two carriers' coarse segment prefixes every 250 kyr, the Sun's mean-longitude table and
  * (plan 27 §8 K) the eccentricity channel's two exponents (`channel`); a deep lunar read then
  * integrates one segment at most, bit-identical to the unseeded tables. Null = compute the prefixes.
- * @typedef {{ giaEllipticityOfDate?: boolean, spinCheckpointsArtifact?: { spacingYr: number, checkpoints: ReadonlyArray<{t: number, s: number[]}> } | null, lunarCheckpointsArtifact?: { chains?: Record<string, { fwd: number[], bwd: number[] }>, carriers?: Record<string, { fwd: number[], bwd: number[] }>, sun?: { meanLongitude?: { fwd: number[], bwd: number[] } }, channel?: { exponents?: Array<{ s: number, edge: { fwd: number, bwd: number }, fwd: number[], bwd: number[] }> } } | null }} Options
+ * @typedef {{ giaEllipticityOfDate?: boolean, obliquityBeatTableArtifact?: import('../earth/scene-obliquity.cjs').HybridBeatTableArtifact | null, spinCheckpointsArtifact?: { spacingYr: number, checkpoints: ReadonlyArray<{t: number, s: number[]}> } | null, lunarCheckpointsArtifact?: { chains?: Record<string, { fwd: number[], bwd: number[] }>, carriers?: Record<string, { fwd: number[], bwd: number[] }>, sun?: { meanLongitude?: { fwd: number[], bwd: number[] } }, channel?: { exponents?: Array<{ s: number, edge: { fwd: number, bwd: number }, fwd: number[], bwd: number[] }> } } | null }} Options
  */
 
 /**
@@ -39,7 +39,7 @@
  * members actually read, so the composer's assignment is checked against each owner's surface.
  * @typedef {object} LateBindings
  * @property {() => number} certifiedAxialPrecessionJ2000Years  owner: year-day-lengths — read by deep-time-chain
- * @property {{ epsAt(year: number): number, eAt(year: number): number, periOfDateDegAt(year: number): number, precessionOfDateFactorsAt(year: number): { solarTorque: number, ellipticity: number }, axialPrecessionYearsLunisolarJ2000: number }} oneSourceM  owner: one-source-movement — read by deep-time-chain and earth-scalars
+ * @property {{ epsAt(year: number): number, sceneEpsAt(year: number): number, sceneObliquityBandAt(year: number): { centreDeg: number, minDeg: number, maxDeg: number, hybridMeanDeg: number }, obliquityBeatYearsAtYear(year: number): number, eAt(year: number): number, periOfDateDegAt(year: number): number, precessionOfDateFactorsAt(year: number): { solarTorque: number, ellipticity: number }, axialPrecessionYearsLunisolarJ2000: number }} oneSourceM  owner: one-source-movement — read by deep-time-chain and earth-scalars (sceneEpsAt: the drawn-scene obliquity, plan 31 A2)
  * @property {{ anomalisticYearSecondsAtYear(year: number): number }} yearLengthsM  owner: one-source-movement — read by year-day-lengths
  * @property {(year: number) => number} sunMeanLongitudeDegAt  owner: sun-and-eclipses — read by lunar-theory (the arguments' Sun)
  * @property {(year: number) => number} publishedAxialPrecessionYearsAtYear  owner: published-periods — read by lunar-theory (the dynamical rate of date)

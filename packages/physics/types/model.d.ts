@@ -120,6 +120,24 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
             maxDeg: number;
             periodYears: number;
         };
+        sceneObliquityDeg: (year: number) => number;
+        sceneObliquityBandAt: (year: number) => {
+            centreDeg: number;
+            minDeg: number;
+            maxDeg: number;
+            hybridMeanDeg: number;
+        };
+        hybridBeatBandAt: (year: number) => {
+            meanDeg: number;
+            minDeg: number;
+            maxDeg: number;
+        };
+        hybridBeatNodeAt: (k: number) => {
+            meanDeg: number;
+            minDeg: number;
+            maxDeg: number;
+        };
+        hybridBeatNodeRange: [number, number] | null;
         meanObliquityCitedDeg: (year: number) => number;
         eccentricity: (year: number) => number;
         inclinationDeg: (year: number) => number;

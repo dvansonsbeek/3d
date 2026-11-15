@@ -27,6 +27,27 @@
 
 const D2R = Math.PI / 180;
 
+/** Meeus's flattening-term anchor: the J2000 tilt of the Moon's mean plane from the ecliptic,
+ *  −2235 µ° sin L′ (8.05″) — the ONE anchor the series' composition, the drawn plane and the
+ *  registry's `lunarMeanPlaneTiltJ2000Arcsec` read. */
+const LUNAR_PLANE_TILT_ANCHOR_DEG = 2235e-6;
+
+/**
+ * The mean orbit plane's inclination to the ECLIPTIC of date: the free inclination i_L about the
+ * node composed with the Laplace plane's tilt θ (the pole leaning toward longitude 90°, the sign of
+ * the −2235 sin L′ term): cos i = cos i_L cos θ + sin i_L sin θ cos Ω — |i_L − θ| at Ω = 0,
+ * i_L + θ at Ω = 180° (5.1551–5.1595° over the node cycle today; 4.5–28.1° at the history's end).
+ * @param {number} freeInclDeg  i_L(t)
+ * @param {number} tiltDeg  θ(t)
+ * @param {number} nodeDeg  Ω = L′ − F of date, from the equinox line along the Laplace plane
+ * @returns {number} degrees
+ */
+function composeEclipticInclinationDeg(freeInclDeg, tiltDeg, nodeDeg) {
+  const i = freeInclDeg * D2R, t = tiltDeg * D2R, o = nodeDeg * D2R;
+  const c = Math.cos(i) * Math.cos(t) + Math.sin(i) * Math.sin(t) * Math.cos(o);
+  return Math.acos(Math.max(-1, Math.min(1, c))) / D2R;
+}
+
 /**
  * The normalised shapes the composition rides, from the regime's two readers
  * (earth/laplace-plane.cjs through the deep-time chain — which stays untouched: its
@@ -93,4 +114,4 @@ function composeEclipticOfDate(lonDeg, latDeg, tiltAnchorDeg, tiltShape) {
   return { lonDeg: lonDeg + (dl - firstOrder) / D2R, latRad, latDeg: latRad / D2R };
 }
 
-module.exports = { composeEclipticOfDate, createLunarPlaneScales };
+module.exports = { composeEclipticOfDate, createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG };

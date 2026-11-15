@@ -25,7 +25,10 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   createDeepTimeChain,
   // the lunar plane of date (plan 31 A2): the Laplace tilt's shape and the free inclination's
   // F-class scales the lunar series rides, on the chain's regime readers (ONE home moon/plane-of-date)
-  createLunarPlaneScales } from '@essrt/physics';
+  createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG,
+  // the obliquity a drawn scene shows beyond the hybrid's domain (plan 31 A2): the cited mean with the
+  // hybrid's wobble about its beat mean, handed over C¹ (ONE home earth/scene-obliquity)
+  sceneObliquityHandoverWeight, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -1618,6 +1621,27 @@ function _lunarPlaneScalesAtAge() {
   }
   return _lunarPlaneScalesM;
 }
+/** The Laplace plane's tilt from the ecliptic of date, degrees — the series' anchor × the chain's
+ *  shape (ONE home moon/plane-of-date: the plane the rendered Moon's latitude rides; 8.05″ today,
+ *  11.8° at the cited history's end); the anchor alone outside deep-time mode or the history. */
+function _moonPlaneTiltDegAtJD(jdUT) {
+  if (!DEEP_TIME_MODE_ENABLED) return LUNAR_PLANE_TILT_ANCHOR_DEG;
+  const ps = _lunarPlaneScalesAtAge()((2000 - _engineYearTT(jdUT)) / 1e6);
+  return LUNAR_PLANE_TILT_ANCHOR_DEG * (ps ? ps.tiltShape : 1);
+}
+/** The Moon's free inclination to its Laplace plane of date, degrees — the chain's derived history on
+ *  the cited distance (sin i_L ∝ a^{−1/2}; 5.16° today, 16° at the edge); the J2000 registry constant
+ *  outside deep-time mode or the history. */
+function _moonFreeInclinationDegAtJD(jdUT) {
+  if (!DEEP_TIME_MODE_ENABLED) return moonEclipticInclinationJ2000;
+  return _dtc().meanLunarFreeInclinationDegAtAge((2000 - _engineYearTT(jdUT)) / 1e6) ?? moonEclipticInclinationJ2000;
+}
+/** The mean orbit plane's inclination to the ecliptic OF DATE at the node of date (ONE home
+ *  composeEclipticInclinationDeg): |i_L − θ| … i_L + θ over the node cycle. */
+function _moonEclipticInclinationOfDateDegAtJD(jdUT) {
+  const a = _moonArgsAt(_sceneJdTT(jdUT));
+  return composeEclipticInclinationDeg(_moonFreeInclinationDegAtJD(jdUT), _moonPlaneTiltDegAtJD(jdUT), a.Lp - a.F);
+}
 
 // R2 — the α reference pin: while the deep calendar's cumulative-days table is
 // BUILT, α is held at its J2000 reference, or the table defines itself in
@@ -2201,10 +2225,12 @@ const _moonArgsM = (() => {
           eccAt: (tYr) => _deepEcc().eccAt(tYr),
           channelIntegral: _fwChannelIntegral,
           // The arguments' obliquity carrier C·∫(ε − ε₀) reads the PUBLISHED ε
-          // (the one-source hybrid via _sceneEpsTargetDeg) — one ε everywhere.
-          // Twins: the package model (oneSourceM.epsAt), scene-graph.js
-          // (_oneSourceM().epsDeg).
-          computeObliquityEarth: (y) => _sceneEpsTargetDeg(y),
+          // (the one-source HYBRID, _epsHybridSeriesAt — never the drawn-scene rule of
+          // plan 31 A2: the lunar bank is walked on this carrier, and the cited mean's
+          // 11° departure at the edge moved the −400 Myr Moon by 0.76 % of its distance
+          // when the carrier read the scene ε for one build). Twins: the package model
+          // (oneSourceM.epsAt), scene-graph.js (_oneSourceM().epsDeg).
+          computeObliquityEarth: (y) => _epsHybridSeriesAt(y),
           // Plan 09: the arguments' Sun is the ONE certified Sun — the
           // package tier model's mean longitude (unwrapped) and mean
           // perihelion of date (wrapped; the arguments wrap M) — the same
@@ -3005,7 +3031,13 @@ function tourStationValues(i) {
   // §1.30); a swing below 0.05° shows as the one number; the beat goes to the hover (the owner's review)
   const beat = band ? (band.periodYears < 1000 ? `${Math.round(band.periodYears)} years` : `${Math.round(band.periodYears / 1000)} thousand years`) : '';
   const bandNarrow = band ? band.maxDeg - band.minDeg < 0.05 : false;
-  const bandText = band ? (bandNarrow ? `${((band.minDeg + band.maxDeg) / 2).toFixed(1)}°` : `${band.minDeg.toFixed(1)}–${band.maxDeg.toFixed(1)}°`) : '';
+  // plan 31 A2: the range is centred on the CITED mean tilt of that age (the hybrid's own mean carries
+  // no tidal evolution — 23.2° at every age where the cited column reads 11.9° at the edge), the tilt
+  // the simulator draws there; the hybrid's swing is its width (the API serves both side by side)
+  const citedMean = band ? m.earth.meanObliquityCitedDeg(year) : NaN;
+  const bandHalf = band ? (band.maxDeg - band.minDeg) / 2 : 0;
+  const bandMid = band ? (Number.isFinite(citedMean) ? citedMean : (band.minDeg + band.maxDeg) / 2) : NaN;
+  const bandText = band ? (bandNarrow ? `${bandMid.toFixed(1)}°` : `${(bandMid - bandHalf).toFixed(1)}–${(bandMid + bandHalf).toFixed(1)}°`) : '';
   const rows = [
     { label: 'Solar Day', value: `${(lodS / 3600).toFixed(2)} h (${hm(lodS / 3600)})`, today: today ? '' : `today ${T0.dayHours.toFixed(2)} h`, tag: derived, hint: 'the length of a day: as the Moon moves away, the Earth\'s spin slows to pay for it — computed on the Moon\'s measured distance history' },
     { label: 'Sidereal Year', value: `${n1(tropS / lodS)} solar days`, today: today ? '' : `today ${n1(T0.yearSolarDays)}`, tag: derived, hint: 'the year measured against the stars, counted in the days of that age; the familiar 365.242 is the year of the seasons, which loses its meaning near the genesis where one wobble of the axis takes only years' },
@@ -3014,7 +3046,7 @@ function tourStationValues(i) {
     { label: 'Precession period', value: `${Math.round(precYears).toLocaleString('en-US')} yr per turn`, today: today ? '' : `today ${Math.round(T0.precYears).toLocaleString('en-US')} yr`, tag: derived, hint: 'one full wobble of the Earth\'s axis — 25,772 years today — from the pull of the Sun and the Moon on the Earth of that age' },
     obliquityDeg !== null
       ? { label: 'Axial tilt', value: `${obliquityDeg.toFixed(2)}°`, today: today ? '' : `today ${T0.obliquityDeg.toFixed(2)}°`, tag: derived, hint: 'the tilt of the Earth\'s axis against its orbit, integrated step by step inside ±10 million years of today' }
-      : { label: 'Axial tilt', value: bandText, today: `today ${T0.obliquityDeg.toFixed(2)}°`, tag: derived, hint: `the tilt of the Earth's axis against its orbit; beyond ±10 million years the model claims the range it swings over, not its value at a date${bandNarrow ? ' (here the swing is below 0.05°)' : ''}; the swing's beat is ${beat}` },
+      : { label: 'Axial tilt', value: bandText, today: `today ${T0.obliquityDeg.toFixed(2)}°`, tag: Number.isFinite(citedMean) ? 'cited' : derived, hint: `the tilt of the Earth's axis against its orbit; beyond ±10 million years the model claims the range it swings over, not its value at a date${bandNarrow ? ' (here the swing is below 0.05°)' : ''}; the swing's beat is ${beat}${Number.isFinite(citedMean) ? ` — the range is centred on the cited mean tilt of that age (Farhat et al. 2022), the tilt the simulator draws` : ''}` },
   ];
   if (ice !== null) rows.push({ label: 'Ice cover', value: `${Math.round(ice * 100)} % of the Last Glacial Maximum`, today: '', tag: today ? 'measured' : ahead ? 'forecast' : 'derived', hint: 'the model\'s own ice history: its climate formula fitted on the deep-sea sediment record (LR04)' });
   return {
@@ -4493,8 +4525,7 @@ if (typeof window !== 'undefined') {
     worldFrameProbe: () => {
       if (!_chainR) return null;
       const R = _chainR, D2R = Math.PI / 180;
-      const smp = _hybridSpinActive() ? _hybridSeriesSampleAt(_engineYearTT(o.julianDay)) : null;
-      const F = smp ? computeEarthFrameOfDate(smp) : null;
+      const F = _hybridSpinActive() ? computeEarthFrameOfDate(_sceneFrameSampleAt(_engineYearTT(o.julianDay))) : null;   // the scene's ε (plan 31 A2)
       const toW = (v) => new THREE.Vector3(R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2], R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2], R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]);
       const q = earth.rotationAxis.getWorldQuaternion(new THREE.Quaternion());
       const axisY = new THREE.Vector3(0, 1, 0).applyQuaternion(q), axisZ = new THREE.Vector3(0, 0, 1).applyQuaternion(q);
@@ -4631,8 +4662,18 @@ if (typeof window !== 'undefined') {
         ringRadiusScene: moon.a, ringExpectedScene: f.a,
         moonMeshDistScene: moon._meeusDistKm !== undefined ? moon._meeusDistKm * 100 / currentAUDistance : null,
         nodeLonDeg: lonOf(nodeDir), nodeExpectedLonDeg: wrap(f.Om / D2R),
-        incDeg: Math.acos(Math.max(-1, Math.min(1, m.dot(_MM_N)))) / D2R, incExpectedDeg: moonEclipticInclinationJ2000 };
+        // plan 31 A2: the ring's normal against the Laplace pole (= the free inclination of date) and
+        // against the ecliptic pole of date (= the composed ecliptic inclination the panel row shows)
+        incDeg: Math.acos(Math.max(-1, Math.min(1, m.dot(_MM_N)))) / D2R, incExpectedDeg: _moonFreeInclinationDegAtJD(o.julianDay),
+        eclInclMeasuredDeg: Math.acos(Math.max(-1, Math.min(1, m.dot(new THREE.Vector3(0, 1, 0).applyQuaternion(earthPerihelionPrecession1.containerObj.getWorldQuaternion(new THREE.Quaternion())).normalize())))) / D2R,
+        eclInclExpectedDeg: _moonEclipticInclinationOfDateDegAtJD(o.julianDay), tiltDeg: _moonPlaneTiltDegAtJD(o.julianDay) };
     },
+    /** PLAN 31 A2 — the Genesis Analysis chart's obliquity band at an age (Myr before J2000): the drawn centre, the beat's min/max about it, the hybrid's own beat mean. */
+    sceneObliquityBandAtAge: (tMa) => _sceneObliquityBandAtAge(tMa),
+    /** PLAN 31 A2 — whether the obliquity beat table landed (the perf rows assert the seat took: a node read without it is a walk). */
+    beatTableLoaded: () => _beatTableData !== null,
+    /** PLAN 31 A2 — the scene's obliquity rule at a JD: the drawn ε beside the hybrid's own, its beat mean, the cited mean and the hand-over weight. */
+    sceneObliquityProbe: (jd) => { const y = _engineYearTT(jd), m = _tierModelB(); return { year: y, epsSceneDeg: _sceneEpsTargetDeg(y), epsHybridDeg: _epsHybridSeriesAt(y), beatMeanDeg: _epsHybridBeatMeanDeg(y), citedMeanDeg: m.earth.meanObliquityCitedDeg(y), weight: sceneObliquityHandoverWeight(y, m.earth.obliquityHybridDomainYears), axisTiltDeg: o.obliquityEarth }; },
     // Sun-barycenter gate hook: place the marker at the current epoch and
     // return its offset from the Sun (km) beside computeSunSSBOffset's
     // magnitude — the same sum in two bases — and the path's sample count.
@@ -6849,7 +6890,7 @@ barycenterEarthAndSun.pivotObj.add(neptune.containerObj);
 // live with the other hybrid machinery below.
 const HYBRID_SPIN_REQUESTED = true;
 // Scratch vectors/quaternions for the engine placement:
-const _HTC_A = new THREE.Vector3(), _HTC_U = new THREE.Vector3();
+const _HTC_A = new THREE.Vector3(), _HTC_U = new THREE.Vector3(), _HTC_XL = new THREE.Vector3(), _HTC_NL = new THREE.Vector3();   // _HTC_XL/_HTC_NL: the Laplace plane's X̂ and pole (plan 31 A2)
 const _HTC_Q3 = new THREE.Quaternion(), _HTC_Q4 = new THREE.Quaternion();
 const _HTC_M4 = new THREE.Matrix4();
 
@@ -13308,6 +13349,7 @@ let essrtSelectedRange = 'full';
 const ESSRT_QTY_TABS = [
   { key: 'axial',      label: 'Axial Precession' },
   { key: 'obliqCycle', label: 'Obliquity period' },
+  { key: 'obliquity',  label: 'Obliquity Earth' },
   { key: 'lod',        label: 'Length of Day' },
   { key: 'year',       label: 'Length of Year' },
   { key: 'au',         label: 'AU Distance' },
@@ -13405,6 +13447,22 @@ const ESSRT_QTY_SPECS = {
     hasWu:    false,
     footnote: 'Note: Earth\'s axial tilt oscillates between approximately 22.4° and 24.5° around a mean of ~23.4° today. The cycle period (shown here — the beat of the spin axis\'s inertial rate against the dominant nodal mode) evolves with deep time, and so does the mean obliquity of date: it follows the cited Earth–Moon history (Farhat et al. 2022), lower in the deep past — 22.2° at the Devonian, 19.7° at 2.46 Ga — and the precession rate carries it.',
   },
+  obliquity: {
+    title:    'Obliquity of the Earth (axial tilt)',
+    subtitle: 'The tilt the simulator draws, from the Earth–Moon genesis to +1 Gyr. Inside ±10 Myr of today it is the model\'s own hybrid spin integration (the banked ζ series: 23.44° today, swinging 22.4–24.5° on the ~41-kyr beat). Beyond that the integration carries no tidal evolution of its mean — nothing in dŝ/dt = α(ŝ·n̂)(ŝ×n̂) moves the mean of ŝ·n̂, so its beat mean stays the Quaternary 23.2–23.4° at every age (the dashed line) — while the cited mean obliquity of date (Farhat et al. 2022, the same ocean-tide history the Moon\'s distance rides) reads 22.2° at 400 Ma, 19.7° at 2.46 Ga and 11.9° at the genesis. The API refuses the value there and serves the cited mean beside the band; the drawn tilt is that cited mean carrying the hybrid\'s own wobble about its beat mean (the shaded band: the swing the model predicts at that age), handed over smoothly across the 10 Myr past the domain\'s edge. The solid line is the band\'s centre.',
+    yLabel:   'Obliquity (°)',
+    compute:  (t_Ma) => { const b = _sceneObliquityBandAtAge(t_Ma); return b === null ? null : b.centreDeg; },
+    computeBand: (t_Ma) => { const b = _sceneObliquityBandAtAge(t_Ma); return b === null ? null : { lo: b.minDeg, hi: b.maxDeg }; },
+    compute2: (t_Ma) => { const b = _sceneObliquityBandAtAge(t_Ma); return b === null ? null : b.hybridMeanDeg; },
+    compute2AllRanges: true,
+    label2:   'the hybrid integration\'s own beat mean (no tidal evolution of the mean)',
+    bandLabel: 'the swing over one obliquity beat (the band the model claims beyond ±10 Myr)',
+    yFmt:     (v) => v.toFixed(2) + '°',
+    yMin: 0, yMax: 30,
+    hasWu:    false,
+    samples:  120,   // each point is a 1-Myr node of the beat table — a seat on the bank and a walk (20–30 ms); the curve is smooth at this count (measured: 480 points read 14–23 s)
+    footnote: 'Note: the obliquity VALUE at deep time is linearly sensitive to the precession constant (450″ per 1e-6 at 100 Ma, 2,000″ at 500 Ma — doc 111 §1.30), so beyond ~20 Myr the model claims the band\'s amplitude and period, not a value; the cited mean is Farhat et al. 2022\'s Myr-scale column, read to the history\'s end at 4.43 Ga, where the coupled spin–orbit regime of the Laplace plane rides the same mean (plan 31 A). The Moon\'s orbit is drawn on it; the eclipse tier\'s ground points sit on it. The Precambrian referees (Lantink 2022 at 2.46 Ga, Xiamaling at 1.4 Ga) constrain the precession constant, not the obliquity; the deep obliquity PERIOD is the pre-registered prediction (the Obliquity period tab).',
+  },
   au: {
     title:    'Earth-Sun Distance',
     subtitle: 'Earth\'s semi-major axis under Driver 2 (solar mass loss: a × M = const)',
@@ -13482,7 +13540,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
   const spec = ESSRT_QTY_SPECS[qtyKey];
   const range = ESSRT_RANGE_TABS.find(r => r.key === rangeKey) || ESSRT_RANGE_TABS[0];
   const t_lo = range.t_lo, t_hi = range.t_hi;
-  const N = 480;
+  const N = spec.samples ?? 480;   // a spec whose point costs a deep seat-and-walk (the obliquity band) names fewer
 
   // Title/subtitle now live OUTSIDE the SVG (HTML in modal body) so the
   // chart itself gets more vertical room and renders cleaner.
@@ -13496,7 +13554,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
   // Optional secondary curve (e.g. the composed physical axial precession next to
   // the published period — doc 99). Rendered only on the Phanerozoic view, where
   // the published anchors it reconciles are shown.
-  if (spec.compute2 && rangeKey === 'phanero') {
+  if (spec.compute2 && (rangeKey === 'phanero' || spec.compute2AllRanges)) {
     allSeries.push({
       samples: essrtComputeSeries({ ...spec, compute: spec.compute2 }, t_lo, t_hi, N),
       color: '#7dd87d',
@@ -13623,6 +13681,23 @@ function essrtRenderChart(qtyKey, rangeKey) {
     const dashAttr = s.dash ? ` stroke-dasharray="${s.dash}"` : '';
     return `<path d="${d}" fill="none" stroke="${strokeCol}" stroke-width="2"${dashAttr} opacity="1" filter="url(#essrt-glow)"/>`;
   }).join('');
+  // Optional BAND under the primary curve (plan 31 A2, the obliquity tab): spec.computeBand(t_Ma) →
+  // {lo, hi} per sample; drawn as one translucent polygon (lo forward, hi back) before the lines, broken
+  // where a sample is null, so the band the model claims reads as a ribbon about its centre.
+  let bandPath = '';
+  if (spec.computeBand) {
+    const bands = essrtComputeSeries({ ...spec, compute: (t) => { const b = spec.computeBand(t); return b ? b.lo : null; } }, t_lo, t_hi, N)
+      .map((p, i) => ({ t_cal: p.t_cal, lo: p.value, hi: (() => { const b = spec.computeBand(-allSeries[0].samples[i].t_cal); return b ? b.hi : null; })() }));
+    const runs = [];
+    let run = [];
+    for (const b of bands) { if (b.lo === null || b.hi === null) { if (run.length) runs.push(run); run = []; } else run.push(b); }
+    if (run.length) runs.push(run);
+    bandPath = runs.map((r) => {
+      const fwd = r.map((b) => `${xPos(b.t_cal).toFixed(1)} ${yPosClipped(b.lo).toFixed(1)}`).join(' L');
+      const back = r.slice().reverse().map((b) => `${xPos(b.t_cal).toFixed(1)} ${yPosClipped(b.hi).toFixed(1)}`).join(' L');
+      return `<path d="M${fwd} L${back} Z" fill="${CURVE_COLOR}" fill-opacity="0.22" stroke="none"/>`;
+    }).join('');
+  }
 
   // Subtle glow filter for the data line — gives it the premium look
   const defs = `
@@ -13709,6 +13784,18 @@ function essrtRenderChart(qtyKey, rangeKey) {
         <line x1="${margin.left + plotW - 216}" y1="${margin.top + 50}" x2="${margin.left + plotW - 204}" y2="${margin.top + 50}" stroke="${CURVE_COLOR}" stroke-width="2"/>
         <text x="${margin.left + plotW - 198}" y="${margin.top + 54}" font-size="11" fill="#e0e0e0" font-weight="500">frozen-clock counter</text>`;
     }
+  }
+
+  // the band tab's legend (plan 31 A2): the ribbon, its centre and the dashed secondary — on every range
+  if (spec.computeBand && spec.bandLabel) {
+    const lx = margin.left + 24;   // top-left: the full-range curve runs low there (12–20°) and high at the right (26° at +1 Gyr, under a right-hand legend)
+    wuLegend += `
+      <rect x="${lx}" y="${margin.top + 10}" width="12" height="8" fill="${CURVE_COLOR}" fill-opacity="0.22"/>
+      <text x="${lx + 18}" y="${margin.top + 18}" font-size="11" fill="#e0e0e0" font-weight="500">${spec.bandLabel}</text>
+      <line x1="${lx}" y1="${margin.top + 32}" x2="${lx + 12}" y2="${margin.top + 32}" stroke="${CURVE_COLOR}" stroke-width="2"/>
+      <text x="${lx + 18}" y="${margin.top + 36}" font-size="11" fill="#e0e0e0" font-weight="500">the drawn tilt — the band's centre (the cited mean of date beyond ±10 Myr)</text>${spec.compute2 && spec.label2 ? `
+      <line x1="${lx}" y1="${margin.top + 50}" x2="${lx + 12}" y2="${margin.top + 50}" stroke="#7dd87d" stroke-width="2" stroke-dasharray="6,4"/>
+      <text x="${lx + 18}" y="${margin.top + 54}" font-size="11" fill="#e0e0e0" font-weight="500">${spec.label2}</text>` : ''}`;
   }
 
   const frame = `<rect x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" fill="#0a0d11" stroke="#5a5f68" stroke-width="0.8"/>`;
@@ -13824,6 +13911,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
       ${yticks.join('')}
       ${xticks.join('')}
       ${eraMarkers}
+      ${bandPath}
       ${paths}
       ${wuOverlay}
       ${wuLegend}
@@ -15824,6 +15912,39 @@ let _oscWobbleData = null;   // {t[], oscE[], oscPomOfDateDeg[]} — decimal yea
     console.warn('earth-osculating-wobble artifact not reachable — the "osculating vs mean" categories draw the mean alone');
   })();
 }
+// PLAN 31 A2 — the obliquity beat table. data/obliquity-beat-table.json
+// (tools/verify/obliquity-beat-table.js): the hybrid's beat band — the mean, min and max of its ε
+// over one obliquity beat, the API's 41-sample instrument — at every 1-Myr node of the engine axis
+// over the navigable domain, a record the generator refuses to write unless a fresh model
+// reproduces it bit-exactly. The drawn-scene obliquity rule (the cited mean carrying this band
+// beyond ±10 Myr), the eclipse tier's ground mapping and the Obliquity Earth tab read it; without
+// it a node is computed live — a seat on the nearest bank checkpoint and a walk, 20–30 ms per
+// region (the same numbers, one wait per new node). Loaded like the banks.
+let _beatTableData = null;   // {nodeYears, kMin, kMax, nodes:[[mean, min, max], …]}
+{
+  (async () => {
+    const candidates = ['data/obliquity-beat-table.json', REPO_RAW_URL + 'data/obliquity-beat-table.json'];
+    for (const url of candidates) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const a = await res.json();
+        if (!Number.isFinite(a.nodeYears) || !Array.isArray(a.nodes) || !a.nodes.length) continue;
+        _beatTableData = { nodeYears: a.nodeYears, kMin: a.kMin, kMax: a.kMax, nodes: a.nodes };
+        // the browser's own table and the package tier model take the record on their next build
+        // (both pure in the year: a node computed before the table landed is the same number)
+        _hybridBeatTableM = null;
+        _tierUmbraModel = null;
+        _eclipseM = null;
+        _umbraTierMemo.jd = NaN;
+        positionChanged = true;
+        console.log(`obliquity beat table loaded from ${url} (${a.nodes.length} nodes every ${a.nodeYears / 1e6} Myr)`);
+        return;
+      } catch { /* try the next candidate */ }
+    }
+    console.warn('obliquity beat table not reachable — the beat band is computed per node (same numbers, one walk per new node)');
+  })();
+}
 // PLAN 24 — the spin-axis checkpoint bank. data/spin-axis-checkpoints.json
 // (tools/verify/spin-axis-bank.js): the one-source movement's RK4 spin-axis walk,
 // its exact state every 250 kyr over the cited history and +1 Gyr. With the bank
@@ -16107,7 +16228,53 @@ function _sceneEpsTargetDeg(year) {
   // coupled integration on the ζ mode tail beyond it; before the series lands
   // the hybrid runs on the deep mode table, and the samplers are rebuilt when
   // it lands (the series-load handler).
-  return _epsHybridSeriesAt(year);
+  const eps = _epsHybridSeriesAt(year);
+  if (!_hybridSpinActive()) return eps;
+  // PLAN 31 A2 — the API's rule beyond the hybrid's domain (ONE home earth/scene-obliquity):
+  // the hybrid carries no tidal evolution of its mean (23.2–23.4° at every age) where the cited
+  // mean obliquity of date reads 11.9° at the history's end, so the drawn tilt there is the
+  // CITED mean carrying the hybrid's own wobble about its beat mean (the band), handed over C¹
+  // across the 10 Myr past the domain's edge. The Laplace-plane regime the Moon's orbit is
+  // drawn on reads the same cited mean (doc 111 §1.44).
+  const m = _tierModelB();
+  const w = sceneObliquityHandoverWeight(year, m.earth.obliquityHybridDomainYears);
+  if (w === 0) return eps;
+  return composeSceneObliquityDeg(eps, _epsHybridBeatMeanDeg(year), m.earth.meanObliquityCitedDeg(year), w);
+}
+/** The hybrid's beat mean at a year (41 samples over one obliquity beat of date — the API's band
+ *  instrument) — read from the lazy 1-Myr node table of ONE home earth/scene-obliquity on the
+ *  browser's own sampler (a deep read at a new age seats on the nearest bank checkpoint and walks,
+ *  20–30 ms per region: read per frame it cost 30 ms per new year), the twin of the package model's
+ *  table (the epoch gate reads the two against each other). Pure in year. */
+let _hybridBeatTableM = null;
+function _hybridBeatTable() {
+  if (_hybridBeatTableM === null) {
+    _hybridBeatTableM = createHybridBeatTable({ epsDegAt: _epsHybridSeriesAt, beatYearsAtYear: (y) => _tierModelB().lunisolar.obliquityBeatYearsAtYear(y), nodesArtifact: _beatTableData ?? null });
+  }
+  return _hybridBeatTableM;
+}
+function _epsHybridBeatMeanDeg(year) { return _hybridBeatTable().atYear(year).meanDeg; }
+/** The scene's obliquity BAND at an age (Myr before J2000) for the Genesis Analysis chart (plan 31 A2):
+ *  the hybrid sampled over one obliquity beat of date (41 samples, the API's band instrument) — its
+ *  mean, min and max — shifted by the scene rule's weight onto the cited mean (the centre the drawn
+ *  tilt carries beyond ±10 Myr); null before the series lands. Pure in the age; memoised on the last age. */
+function _sceneObliquityBandAtAge(tMa) {
+  if (!_hybridSpinActive()) return null;
+  const year = 2000 - tMa * 1e6, m = _tierModelB();
+  return composeSceneObliquityBand(_hybridBeatTable().atYear(year), m.earth.meanObliquityCitedDeg(year), sceneObliquityHandoverWeight(year, m.earth.obliquityHybridDomainYears));
+}
+/** The Earth frame's one-source sample at a year with the SCENE's ε in the hybrid's place (the
+ *  rule above) — the sample itself inside the domain, the J2000 rest sample before the series
+ *  lands. The equinox and the orbit normal are the sample's: ε only tilts the axis in their plane. */
+const _SCENE_FRAME_SMP = { epsDeg: 0, equinoxLonJ2000Deg: 0, orbitNormalX: 0, orbitNormalY: 0 };
+function _sceneFrameSampleAt(year) {
+  if (!_hybridSpinActive()) return _CHAIN_J2000_REST_SAMPLE;
+  const smp = _hybridSeriesSampleAt(year);
+  const eps = _sceneEpsTargetDeg(year);
+  if (eps === smp.epsDeg) return smp;
+  _SCENE_FRAME_SMP.epsDeg = eps; _SCENE_FRAME_SMP.equinoxLonJ2000Deg = smp.equinoxLonJ2000Deg;
+  _SCENE_FRAME_SMP.orbitNormalX = smp.orbitNormalX; _SCENE_FRAME_SMP.orbitNormalY = smp.orbitNormalY;
+  return _SCENE_FRAME_SMP;
 }
 /** The scene's e target at a decimal year — same one-source pattern: the
  *  factory sampler (the banked z series inside ±10 Myr, e = |z|; the deep-z
@@ -16228,7 +16395,9 @@ function _vfpStellarDaySecondsOfDate(year) {
   if (sid === null) return null;
   const Y = _vfpTropicalYearDaysOfDate(year);
   const Tp = _axialPrecessionPeriodYearsAtAge((2000 - year) / 1e6);
-  return sid * (1 + stellarDayRaProjection(_sceneEpsTargetDeg(year)) / (Tp * (Y + 1)));
+  // the RA projection rides the PUBLISHED movement's ε (the hybrid — the package's stellar day is
+  // its twin), never the drawn-scene rule of plan 31 A2 (1.9e-8 s apart at the edge, a twin split)
+  return sid * (1 + stellarDayRaProjection(_epsHybridSeriesAt(year)) / (Tp * (Y + 1)));
 }
 // Marine Isotope Stage (MIS) peak ages from Lisiecki & Raymo 2005 (LR04
 // stack) — the paper annotations of the day-length panels' Quaternary
@@ -26440,7 +26609,7 @@ function _tierModelB() {
     // too) — otherwise the package model's own walk to −400 Myr is 8 M steps (~200 s)
     // beside the scene factory's seated one (measured: the perf row read 220 s).
     _tierUmbraModel = createModel(undefined, _planetSeriesData
-      ? { secularSeriesArtifact: _planetSeriesData, spinCheckpointsArtifact: _spinBankData ?? undefined,
+      ? { secularSeriesArtifact: _planetSeriesData, spinCheckpointsArtifact: _spinBankData ?? undefined, obliquityBeatTableArtifact: _beatTableData ?? undefined,
           lunarCheckpointsArtifact: _lunarBankData ?? undefined }   // plan 25: its own lunar tables seat too
       : undefined);
   }
@@ -28234,8 +28403,8 @@ function perihelionFrameBreakdown(planetKey, year) {
   // two surfaces quote different windows of one rate); the relativistic
   // supplement stays an explicit addition, never folded into the projection.
   const newton = CHAIN_ARTIFACT.windowRatesArcsecCy.newton[planetKey];                          // (a) ″/cy, sidereal, Newtonian
-  const eps = _sceneEpsTargetDeg(year) * D2R;   // Phase 3 S3b: the published ε (the hybrid)
-  const epsRate = (_sceneEpsTargetDeg(year + 50) - _sceneEpsTargetDeg(year - 50)) * 3600;  // ″/cy
+  const eps = _epsHybridSeriesAt(year) * D2R;   // Phase 3 S3b: the published ε (the hybrid — the registry twin's; never the drawn-scene rule)
+  const epsRate = (_epsHybridSeriesAt(year + 50) - _epsHybridSeriesAt(year - 50)) * 3600;  // ″/cy
   // projection excess and obliquity-rate term for the chain motion at ecliptic longitude lamDeg
   const lam = _chainPerihelionEclLonDeg(planetKey, yearToJDApprox(year)) * D2R;
   const den = Math.cos(lam) ** 2 + Math.sin(lam) ** 2 * Math.cos(eps) ** 2;
@@ -28260,7 +28429,7 @@ function eclipticLongitudeToRaDeg(lamDeg, year) {
 // was neither J2000 RA nor RA of date — ~14° of precession missing at year 1000).
 function eclipticJ2000LongitudeToRaOfDateDeg(lamJ2000Deg, jdUT) {
   const engineYear = _engineYearTT(jdUT);
-  const F = computeEarthFrameOfDate(_hybridSpinActive() ? _hybridSeriesSampleAt(engineYear) : _CHAIN_J2000_REST_SAMPLE);
+  const F = computeEarthFrameOfDate(_sceneFrameSampleAt(engineYear));   // the scene's ε beyond the hybrid's domain (plan 31 A2)
   const g = F.g, n = F.n;
   const u = [n[1] * g[2] - n[2] * g[1], n[2] * g[0] - n[0] * g[2], n[0] * g[1] - n[1] * g[0]];   // n̂ × ĝ: longitude 90° of date
   const l = lamJ2000Deg * DEG2RAD, vx = Math.cos(l), vy = Math.sin(l);
@@ -28310,7 +28479,7 @@ const planetStats = {
     null,
       {label : () => `Axial tilt`,
        value : [ { v: () => o.obliquityEarth, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). It rides the model's own N-body series inside ±10 Myr, the mode-tail beyond (ONE SOURCE — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18); before the series has loaded, the deep mode table is the fallback. The obliquity oscillates with the DERIVED beat 2π/(|ψ̇| − |s₃|) ≈ 40.6 kyr — the "Obliquity cycle (derived beat)" row in the CYCLES tab.`],
+       hover : [`Obliquity of the ecliptic — the SCENE's rendered tilt (this value IS the Sun's maximum declination at every epoch, by construction). It rides the model's own N-body series inside ±10 Myr, the mode-tail beyond (ONE SOURCE — measured 0.16″ rms vs IAU-2006 in-era, 0.04° vs La2004 at −200 kyr; doc 109 §18); before the series has loaded, the deep mode table is the fallback. The obliquity oscillates with the DERIVED beat 2π/(|ψ̇| − |s₃|) ≈ 40.6 kyr — the "Obliquity cycle (derived beat)" row in the CYCLES tab. BEYOND ±10 Myr (the hybrid's banked domain) the drawn tilt follows the API's rule (plan 31 A2): the hybrid carries no tidal evolution of its mean — 23.2° at every age — where the CITED mean obliquity of date (Farhat et al. 2022) reads 11.9° at the history's end, so the axis is drawn at the cited mean carrying the hybrid's own wobble about its beat mean (the band the model claims there), handed over smoothly across the 10 Myr past the domain's edge; the Moon's orbit is drawn on the same cited mean (the Laplace-plane regime).`],
        tpLink: true},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => _hybridSpinActive() ? o.eccentricityEarth : _chainElementsOfDate('earth', o.julianDay).e, dec:8, sep:',' },{ small: '' }],
@@ -28624,7 +28793,7 @@ const planetStats = {
      null,
       {label : () => `Obliquity (degrees)`,
        value : [ { small: ASTRO_REFERENCE.obliquityJ2000_deg },{ v: () => o.obliquityEarth, dec:12, sep:',' }],
-       hover : [`Left = ε(J2000), the IAU 2006 anchor (astro-reference). Right = the obliquity of date, the hybrid spin integration (one source on every path: the rendered axis, the Moon's conversion, the panels). Obliquity cycle: ~${fmtNum(_obliqBeatYearsAtAge(0) ?? 0, 0, ',')} years at J2000 — the beat of the axial precession against the orbit’s nodal mode`]},
+       hover : [`Left = ε(J2000), the IAU 2006 anchor (astro-reference). Right = the obliquity of date, the hybrid spin integration (one source on every path: the rendered axis, the Moon's conversion, the panels); beyond ±10 Myr the API's rule — the cited mean of date with the hybrid's wobble about its beat mean (the Earth panel's Axial tilt hover, plan 31 A2). Obliquity cycle: ~${fmtNum(_obliqBeatYearsAtAge(0) ?? 0, 0, ',')} years at J2000 — the beat of the axial precession against the orbit’s nodal mode`]},
       {label : () => `Orbital Eccentricity`,
        value : [ { small: ASTRO_REFERENCE.eccentricityJ2000 },{ v: () => o.eccentricityEarth, dec:13, sep:',' }],
        hover : [`Left = e(J2000), the observed anchor (astro-reference). Right = Earth's eccentricity of date, the model's N-body secular series (one source on every path: the scene offset, the Sun's equation of centre, the panels).`]},
@@ -28714,9 +28883,15 @@ const planetStats = {
        value : [ { v: () => moonOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
        hover : [`Eccentricity of the Moon's orbit around Earth — a registry constant (the ELP/Brown mean value), the same at every epoch: the model carries no lunar eccentricity of date. The osculating value swings 0.026–0.077 through the evection and variation terms (periods of a month to a year, inside the Meeus series), and its secular tidal change is of order 1e-9 per century — invisible on every window the Framework Verification panels show, which is why there is no Moon eccentricity panel. The eccentricity that DOES vary in the lunar chain is Earth's (the solar perturbation's modulation), verified on the Earth orbit · Eccentricity panel`],
        constant: true},
-      {label : () => `Ecliptic Inclination (i)`,
-       value : [ { v: () => moonEclipticInclinationJ2000, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`DYNAMICAL mean osculating inclination of the lunar orbit to the ecliptic (h-vector mean; osculating range ~4.98°–5.30°). The Brown/ELP theory constant 5.1453964° (sinF normalization) is the documented partner. Note: the old display composition moonTilt − Earth's inv-plane inclination ≈ 5.145° is a refuted near-identity (ε_ecl is a Cassini-state equilibrium, NOT Earth's invariable-plane inclination — misses by 2.2′)`]},
+      {label : () => `Ecliptic Inclination (i, of date)`,
+       value : [ { v: () => _moonEclipticInclinationOfDateDegAtJD(o.julianDay), dec:6, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The Moon's MEAN orbit plane against the ecliptic of date at the node of date — the free inclination i_L to the Laplace plane composed with that plane's tilt θ from the ecliptic: cos i = cos i_L cos θ + sin i_L sin θ cos Ω, swinging between |i_L − θ| and i_L + θ over the 18.6-yr node cycle (5.1551–5.1595° today — the ±8″ Meeus's latitude series carries as its "flattening of the Earth" term; 4.5–28.1° at the genesis edge). The J2000 mean ${moonEclipticInclinationJ2000}° is the DYNAMICAL h-vector mean (osculating range ~4.98°–5.30°; the Brown/ELP constant 5.1453964° is the sinF normalization). The rendered Moon's latitude rides this plane — the drawn ring, the node markers and the placed Moon share it (plan 31 A2).`]},
+      {label : () => `Free inclination to the Laplace plane (i_L)`,
+       value : [ { v: () => _moonFreeInclinationDegAtJD(o.julianDay), dec:6, sep:',' },{ small: 'degrees (°)' }],
+       hover : () => { const b = DEEP_TIME_MODE_ENABLED ? _dtc().meanLunarFreeInclinationBandDegAtAge((2000 - _engineYearTT(o.julianDay)) / 1e6) : null; return [`The lunar orbit's inclination to its own precession plane — the invariant the node cycle conserves (${moonEclipticInclinationJ2000}° today, the J2000 mean). DERIVED on the cited distance history: the secular tidal torque along the precession pole gives sin i_L ∝ a^(−1/2) (κ = 1/2, the torque model the Laplace-plane regime rests on; the κ = 1/4 twin is the band${b === null ? '' : `: ${b.toFixed(4)}° here`}) — 5.4–5.6° at 2.46 Ga, 9.1–16.2° at the genesis edge. The Moon's own tides are a stated omission; the lunar inclination problem is named open (doc 111 §1.42).`]; }},
+      {label : () => `Laplace plane tilt from the ecliptic (θ)`,
+       value : [ { v: () => _moonPlaneTiltDegAtJD(o.julianDay), dec:6, sep:',' },{ small: 'degrees (°)' }],
+       hover : [`The tilt of the Moon's mean orbit plane from the ecliptic of date, about the equinox line: the Laplace plane lies between the ecliptic (far from Earth) and Earth's equator (inside the Laplace radius, 8.4 R⊕ today, 15 R⊕ at the genesis edge). Meeus's −2235 µ° sin L′ latitude term IS this tilt at J2000 (8.05″; the model's coupled spin–orbit solve reads 8.30″ with nothing fitted), scaled by the solve's shape θ(t)/θ(0): 0.01° at 2.46 Ga, 2.0° at 4.40 Ga, 11.8° at the edge. The lunar latitude series evaluates in the Laplace frame and composes into the ecliptic by this rotation (ONE home moon/plane-of-date; doc 111 §1.43).`]},
       'null_row',
 
     {header : '—  Gravitational Influence Zones —' },
@@ -33327,8 +33502,10 @@ function _applyEngineEarthFrame(jdUT) {
   const R = _chainR;
   // one clock, one argument: the engine year (true TT, Julian — _engineYearTT);
   // the J2000 anchors until the series artifact has arrived
-  const smp = _hybridSpinActive() ? _hybridSeriesSampleAt(_engineYearTT(jdUT)) : _CHAIN_J2000_REST_SAMPLE;
-  const F = computeEarthFrameOfDate(smp);
+  const year = _engineYearTT(jdUT);
+  const smp = _hybridSpinActive() ? _hybridSeriesSampleAt(year) : _CHAIN_J2000_REST_SAMPLE;
+  // the axis takes the SCENE's ε (the API's rule beyond the hybrid's domain — _sceneEpsTargetDeg)
+  const F = computeEarthFrameOfDate(_sceneFrameSampleAt(year));
   const toW = (v, out) => out.set(
     R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
     R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2],
@@ -33345,7 +33522,19 @@ function _applyEngineEarthFrame(jdUT) {
   // quarter turn from ĝ (measured exactly 90.0000° at J2000 on the Node twin):
   // basis [X = n̂ × ĝ, Y = n̂, Z = ĝ]. Mirror: tools/lib/scene-graph.js
   // _applyEngineEarthFrame.
-  _chainSetWorldRotation(moonApsidalPrecession.containerObj, _HTC_U.crossVectors(n, g), n, g);
+  // PLAN 31 A2: the base is the LAPLACE PLANE of date — the ecliptic of date turned about the
+  // equinox line ĝ by the tilt the rendered Moon's latitude rides (ONE home moon/plane-of-date;
+  // the pole leans toward longitude 90°, the sign of Meeus's −2235 µ° sin L′): 8″ today, 11.8° at
+  // the edge — so the ring, the markers and the placed Moon share one plane (the series Moon
+  // cannot move: the override maps its direction through this stack's inverse world matrix).
+  const thL = _moonPlaneTiltDegAtJD(jdUT) * DEG2RAD, cL = Math.cos(thL), sL = Math.sin(thL);
+  _HTC_U.crossVectors(n, g);                                                   // X̂ = n̂ × ĝ, longitude 90°
+  _HTC_XL.copy(_HTC_U).multiplyScalar(cL).addScaledVector(n, -sL);
+  _HTC_NL.copy(n).multiplyScalar(cL).addScaledVector(_HTC_U, sL);
+  _chainSetWorldRotation(moonApsidalPrecession.containerObj, _HTC_XL, _HTC_NL, g);
+  // the free inclination of date about the node — the Moon def's build-time tilt (rotation.z = −i,
+  // below the nodal layer) re-posed from the chain's i_L(t): 5.16° today, 16° at the edge
+  moon.containerObj.rotation.z = -_moonFreeInclinationDegAtJD(jdUT) * DEG2RAD;
   // the Moon RING's stack layers from the lunar arguments: in the stack's
   // basis a layer angle θ carries the longitude 90° + θ, the apsidal arm
   // −a·e·X̂ points at the apogee, and the Moon def's fixed tilt puts the
@@ -33592,11 +33781,14 @@ const _MM_Q = new THREE.Quaternion(), _MM_E = new THREE.Vector3(), _MM_G = new T
 function _moonOrbitFrameOfDate(jdUT) {
   const args = _moonArgsAt(_sceneJdTT(jdUT));   // the scene's TT (bridge + curve) — the ring's and the override's clock
   const D2R = DEG2RAD;
-  const Om = (args.Lp - args.F) * D2R, w = (args.F - args.Mp) * D2R, inc = moonEclipticInclinationJ2000 * D2R;
-  earthPerihelionPrecession1.containerObj.getWorldQuaternion(_MM_Q);   // the engine's ecliptic of date (R4): x̂ the equinox, ŷ the pole
-  _MM_G.set(1, 0, 0).applyQuaternion(_MM_Q).normalize();
+  const Om = (args.Lp - args.F) * D2R, w = (args.F - args.Mp) * D2R, inc = _moonFreeInclinationDegAtJD(jdUT) * D2R;
+  // the Moon stack's base — the LAPLACE plane of date (plan 31 A2; _applyEngineEarthFrame): basis
+  // [X̂ = n̂_L × ĝ (longitude +90°), Ŷ = n̂_L the plane's pole, Ẑ = ĝ the equinox line]; the node and
+  // the free inclination are measured in THAT plane, as the series' F and Ω are
+  moonApsidalPrecession.containerObj.getWorldQuaternion(_MM_Q);
+  _MM_G.set(0, 0, 1).applyQuaternion(_MM_Q).normalize();
   _MM_N.set(0, 1, 0).applyQuaternion(_MM_Q).normalize();
-  _MM_U.crossVectors(_MM_N, _MM_G).normalize();                          // longitude +90°
+  _MM_U.set(1, 0, 0).applyQuaternion(_MM_Q).normalize();
   earth.rotationAxis.getWorldPosition(_MM_E);
   _MM_ND.copy(_MM_G).multiplyScalar(Math.cos(Om)).addScaledVector(_MM_U, Math.sin(Om));   // the ascending node's direction
   _MM_T.crossVectors(_MM_N, _MM_ND).normalize();                                          // in the ecliptic, 90° past the node
@@ -35869,7 +36061,7 @@ function updatePredictions() {
   // projection tracks this epoch's obliquity (OBLIQUITY_MEAN is the MEAN form).
   // One turn of the equinox per T_p(t) (the composed clock). The RA projection
   // reads the published ε (the hybrid via _sceneEpsTargetDeg) — measured 1e-8 s.
-  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/_axialPrecessionPeriodYearsAtAge((2000 - engineYear) / 1e6))/(_yearSolarDaysOfDate+1)*stellarDayRaProjection(_sceneEpsTargetDeg(engineYear))+o.siderealDayReal;   // ε at the engine year (R4b)
+  predictions.stellarDayReal = o.stellarDayReal = (o.siderealDayReal/_axialPrecessionPeriodYearsAtAge((2000 - engineYear) / 1e6))/(_yearSolarDaysOfDate+1)*stellarDayRaProjection(_epsHybridSeriesAt(engineYear))+o.siderealDayReal;   // the PUBLISHED ε (the hybrid, the package's twin) at the engine year (R4b) — never the drawn-scene rule
 
   //predictions.predictedDeltat = getDeltaT();
   predictions.predictedDeltatPerYear = o.predictedDeltatPerYear = getDeltaTChangePerYear();
@@ -36492,6 +36684,7 @@ function makeRealisticEarth(pd){
     const _udcAxisDir   = new THREE.Vector3();          // the shadow axis (world frame, geocentric): Sun → Moon, on to the Earth
     const _udcAxisFoot  = new THREE.Vector3();          // the axis's closest point to the Earth's centre
     const _udcTmp       = new THREE.Vector3();
+    const _udcPierce    = new THREE.Vector3();   // the rendered shadow axis's near piercing of the globe (the umbraState probe)
     const _udcYAxis     = new THREE.Vector3(0, 1, 0);   // the cap's pole
     let   _udcCapTheta  = -1;                            // the angular radius the cap was last built for
 
@@ -36520,7 +36713,11 @@ function makeRealisticEarth(pd){
           const _jdU = o.julianDay;
           if (Number.isFinite(_jdU)) {
             const lamS = _eclSunLon(_jdU) * Math.PI / 180;
-            const eps  = _sceneEpsTargetDeg(2000 + (_jdU - 2451545.0) / DAYS_PER_JULIAN_YEAR) * Math.PI / 180;   // Phase 3 S3b: the published ε
+            // the scene's ε at the ENGINE year (TT, Julian — the one axis, doc 111 §1.31): a Julian count on the
+            // UT day count read 6.8 "Gyr" at the genesis, beyond the cited history, and the composition fell back
+            // to the hybrid's 23° while the drawn axis stood at 12° — the cap's footprint sat 54° from the tier's
+            // point (doc 111 §1.44)
+            const eps  = _sceneEpsTargetDeg(_engineYearTT(_jdU)) * Math.PI / 180;
             const decS = Math.asin(Math.sin(eps) * Math.sin(lamS));
             const raS  = Math.atan2(Math.cos(eps) * Math.sin(lamS), Math.cos(lamS));
             const rS   = _udcSunGeo.length();
@@ -36801,7 +36998,22 @@ function makeRealisticEarth(pd){
         tierAtAge,
         dayMapState,
         updateUmbraDisc,
-        umbraState        : () => ({ visible: umbraDisc.visible }),   // the cap's state (the golden's full-Moon rows)
+        // the cap's state (the golden's full-Moon rows) and — plan 31 A2, doc 111 §1.44 — the two points the cap is
+        // built from, in the drawn Earth's own frame: the TIER's ground point (the painted footprint's centre) and the
+        // rendered shadow axis's near piercing of the globe (the drawn Moon's shadow); geocentric lat/lon and their
+        // separation in km — the gate reads them at the genesis, where the tier's year axis once put them 11° apart
+        umbraState        : () => {
+          const toLatLon = (/** @type {THREE.Vector3} */ w) => {
+            const l = _udcTmp.copy(w).applyQuaternion(_udcQuatInv);   // core-local: −X Greenwich, +Z 90°E, +Y north
+            const r = l.length();
+            return { lat: Math.asin(Math.max(-1, Math.min(1, l.y / r))) / DEG2RAD, lon: Math.atan2(l.z, -l.x) / DEG2RAD };
+          };
+          const md = _udcMoonGeo.dot(_udcAxisDir), disc = md * md - _udcMoonGeo.lengthSq() + radius * radius;
+          const pierce = disc >= 0 ? _udcPierce.copy(_udcMoonGeo).addScaledVector(_udcAxisDir, -md - Math.sqrt(disc)) : null;
+          const tier = _udcHit.lengthSq() > 0 ? toLatLon(_udcHit) : null, axis = pierce ? toLatLon(pierce) : null;
+          const sepKm = tier && axis ? Math.acos(Math.max(-1, Math.min(1, _udcHit.clone().normalize().dot(pierce.clone().normalize())))) * (diameters.earthDiameter / 2) : null;
+          return { visible: umbraDisc.visible, tier, axis, sepKm };
+        },
     };
 }
 

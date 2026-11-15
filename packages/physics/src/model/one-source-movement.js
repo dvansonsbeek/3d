@@ -7,13 +7,14 @@ import { createDeepOrbitalHistory } from '../earth/deep-orbital-history.cjs';
 import { ONE_FAMILY_WINDOW_YEARS, createYearLengths } from '../earth/year-lengths.cjs';
 import { DEEP_MODES_ARTIFACT } from '../moon/deep-modes-artifact.cjs';
 import { CHAIN_ARTIFACT } from '../planets/chain-artifact.js';
+import { sceneObliquityHandoverWeight, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from '../earth/scene-obliquity.cjs';
 import { NAVIGABLE_PAST_YEARS, NAVIGABLE_FUTURE_YEARS, DEEP_TIER_GRID_YEARS, deepTierWalkSpanYears } from '../time/navigable-domain.cjs';
 
 /** @param {import('./year-day-lengths.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleOneSourceMovement(ctx) {
   const {
     C, options, secularSeriesArtifact, EPOCH_PARAMS, alphaGia, certifiedAxialPrecessionJ2000Years, dayLengthSeconds,
-    deepLod, dtCycleLodCorrectionSum, meanSolarYearDays, yearToTMa,
+    deepLod, dtCycleLodCorrectionSum, meanSolarYearDays, yearToTMa, chain, s3ArcsecPerYr,
   } = ctx;
   // The cardinal INSTANTS are the crossings of the one Sun the scene renders
   // and the eclipse chain certifies (cardinal-instants.js); the cardinal
@@ -130,6 +131,14 @@ export function assembleOneSourceMovement(ctx) {
     // The anomalistic year rides THIS movement's own apsidal line (the
     // scene's perihelion) — the factory owns the construction; the planet
     // chain's secular tangent is no longer a member (year-lengths.cjs).
+    // The hybrid's beat band on a lazy 1-Myr node table (ONE home earth/scene-obliquity: a deep read at a
+    // new age seats on the nearest bank checkpoint and walks — 20–30 ms per region — so the 41-sample
+    // instrument is read once per node, never per frame). The browser's frame keeps a bit-identical twin
+    // on its own sampler (the epoch gate reads the two against each other).
+    // With the GENERATED table (data/obliquity-beat-table.json, loaded beside the banks by the API, the
+    // Node scene and the browser) every node inside the navigable domain is a record: the generator
+    // refuses unless a fresh model reproduces its nodes bit-exactly, so table and instrument are one number.
+    const beatTable = createHybridBeatTable({ epsDegAt: (y) => sampleAt(y).epsDeg, beatYearsAtYear: obliquityBeatYearsAtYear, nodesArtifact: options.obliquityBeatTableArtifact ?? null });
     const yearLengths = createYearLengths({
       sampleAt,
       massLossSiderealSecondsAtYearFn: (year) => deepLod.siderealYearSecondsAtAge(yearToTMa(year)),
@@ -152,7 +161,47 @@ export function assembleOneSourceMovement(ctx) {
        *  lunisolar rate the hybrid integrates ŝ on (deep-orbital-history D4e): the general
        *  precession anchor plus the planetary mean the ecliptic's own motion carries. */
       axialPrecessionYearsLunisolarJ2000: hist.axialPrecessionYearsLunisolarJ2000,
+      obliquityBeatYearsAtYear,
+      sceneEpsAt,
+      sceneObliquityBandAt,
+      /** The hybrid's raw beat band at a year from the node table — {meanDeg, minDeg, maxDeg}; the generator's instrument. @param {number} year */
+      hybridBeatBandAt: (year) => beatTable.atYear(year),
+      /** A node of the beat table by index k (the year 2000 + k × 1 Myr) — the generator writes these; with the artifact loaded a node inside its range is the record. @param {number} k */
+      hybridBeatNodeAt: (k) => beatTable.nodeAt(k),
+      /** [kMin, kMax] of the loaded table artifact, or null when every node is computed. */
+      hybridBeatNodeRange: beatTable.nodeRange,
     };
+    /** THE OBLIQUITY BEAT OF DATE, years — 2π/(ψ̇ᵢₙ(t) − |s₃|): the spin axis's INERTIAL rate of date (the
+     *  self-anchored lunisolar rate the hybrid integrates ŝ on) against the ecliptic's nodal mode (falsification
+     *  leg 1; 41,098 at J2000). ONE home — the published lunisolar surface, the band instrument and the scene
+     *  rule below read it. @param {number} year @returns {number} */
+    function obliquityBeatYearsAtYear(year) {
+      const r = deepLod.lunisolarPrecessionRateArcsecPerYrAtAge(yearToTMa(year));
+      const psiDot = r === null ? 1296000 / certifiedAxialPrecessionJ2000Years() : r;
+      const psiDotInertial = psiDot * (certifiedAxialPrecessionJ2000Years() / hist.axialPrecessionYearsLunisolarJ2000);
+      return 1296000 / (psiDotInertial - s3ArcsecPerYr);
+    }
+    /** THE OBLIQUITY A DRAWN SCENE SHOWS (plan 31 A2; doc 111 §1.44): the hybrid inside its banked domain; beyond
+     *  it the CITED mean obliquity of date carrying the hybrid's own wobble about its beat mean (the band — the
+     *  hybrid carries no tidal evolution of its mean, 23.2–23.4° at every age, where the cited column reads 11.9°
+     *  at the history's end), handed over C¹ across the 10 Myr past the domain's edge (ONE home
+     *  earth/scene-obliquity). The eclipse tier's ground mapping and every drawn axis read THIS; the hybrid's own
+     *  epsAt stays the published obliquity inside the domain and the lunar arguments' carrier everywhere.
+     *  @param {number} year @returns {number} */
+    function sceneEpsAt(year) {
+      const eps = sampleAt(year).epsDeg;
+      const w = sceneObliquityHandoverWeight(year, obliquityHybridDomainYears);
+      if (w === 0) return eps;
+      return composeSceneObliquityDeg(eps, beatTable.atYear(year).meanDeg, citedMeanDegAt(year), w);
+    }
+    /** The cited mean obliquity of date at a year, degrees; NaN beyond the history (the composition then keeps the hybrid). @param {number} year */
+    function citedMeanDegAt(year) { const c = chain.meanObliquityCitedDegAtAge(yearToTMa(year)); return c === null ? NaN : c; }
+    /** THE DRAWN OBLIQUITY'S BAND at a year (the Genesis Analysis chart, plan 31 A2): the hybrid's beat band from the
+     *  lazy node table, shifted onto the cited mean by the rule's weight — {centreDeg (the drawn tilt's centre), minDeg,
+     *  maxDeg, hybridMeanDeg}. @param {number} year */
+    function sceneObliquityBandAt(year) {
+      return composeSceneObliquityBand(beatTable.atYear(year), citedMeanDegAt(year), sceneObliquityHandoverWeight(year, obliquityHybridDomainYears));
+    }
   })();
   const yearLengthsM = oneSourceM.yearLengths;
   /** THE one-family tropical year of date in SI seconds: route B inside the

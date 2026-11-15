@@ -40,3 +40,18 @@ export function createLunarPlaneScales({ tiltDegAtAge, freeInclinationDegAtAge }
     sinScale: number;
     tanHalfSqScale: number;
 } | null);
+/**
+ * The mean orbit plane's inclination to the ECLIPTIC of date: the free inclination i_L about the
+ * node composed with the Laplace plane's tilt θ (the pole leaning toward longitude 90°, the sign of
+ * the −2235 sin L′ term): cos i = cos i_L cos θ + sin i_L sin θ cos Ω — |i_L − θ| at Ω = 0,
+ * i_L + θ at Ω = 180° (5.1551–5.1595° over the node cycle today; 4.5–28.1° at the history's end).
+ * @param {number} freeInclDeg  i_L(t)
+ * @param {number} tiltDeg  θ(t)
+ * @param {number} nodeDeg  Ω = L′ − F of date, from the equinox line along the Laplace plane
+ * @returns {number} degrees
+ */
+export function composeEclipticInclinationDeg(freeInclDeg: number, tiltDeg: number, nodeDeg: number): number;
+/** Meeus's flattening-term anchor: the J2000 tilt of the Moon's mean plane from the ecliptic,
+ *  −2235 µ° sin L′ (8.05″) — the ONE anchor the series' composition, the drawn plane and the
+ *  registry's `lunarMeanPlaneTiltJ2000Arcsec` read. */
+export const LUNAR_PLANE_TILT_ANCHOR_DEG: 0.002235;

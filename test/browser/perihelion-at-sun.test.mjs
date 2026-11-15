@@ -77,7 +77,7 @@ try {
   const plantDeg = PLANT === 1 ? 0 : 1;
   check('Moon ring: the perigee direction is the arguments\' ϖ = L′ − M′', !!mr && Math.abs(wrapd(mr.perigeeLonDeg - mr.perigeeExpectedLonDeg - plantDeg)) < 1e-6, mr ? `${mr.perigeeLonDeg.toFixed(7)}° vs ${mr.perigeeExpectedLonDeg.toFixed(7)}°` : 'probe returned null');
   check('Moon ring: the ascending node is the arguments\' Ω = L′ − F', !!mr && Math.abs(wrapd(mr.nodeLonDeg - mr.nodeExpectedLonDeg - plantDeg)) < 1e-6, mr ? `${mr.nodeLonDeg.toFixed(7)}° vs ${mr.nodeExpectedLonDeg.toFixed(7)}°` : '');
-  check('Moon ring: the eccentric arm is a·e and the plane tilt the registry inclination', !!mr && Math.abs(mr.offsetScene - mr.offsetExpectedScene) < 1e-9 && Math.abs(mr.incDeg - mr.incExpectedDeg) < 1e-6, mr ? `arm ${mr.offsetScene.toFixed(9)} vs ${mr.offsetExpectedScene.toFixed(9)}, inc ${mr.incDeg.toFixed(6)}° vs ${mr.incExpectedDeg}°` : '');
+  check('Moon ring: the eccentric arm is a·e and the plane tilt the free inclination of date (≡ the registry inclination at J2000)',!!mr && Math.abs(mr.offsetScene - mr.offsetExpectedScene) < 1e-9 && Math.abs(mr.incDeg - mr.incExpectedDeg) < 1e-6, mr ? `arm ${mr.offsetScene.toFixed(9)} vs ${mr.offsetExpectedScene.toFixed(9)}, inc ${mr.incDeg.toFixed(6)}° vs ${mr.incExpectedDeg}°` : '');
   check('Moon ring ≡ markers: the ring node and the node marker share one longitude', !!mr && !!mm && Math.abs(wrapd(mr.nodeLonDeg - mm.ascNode.lon)) < 1e-6, mr && mm ? `${mr.nodeLonDeg.toFixed(7)}° vs ${mm.ascNode.lon.toFixed(7)}°` : '');
 
   // The planets' POLES: each chain planet's rotation axis is

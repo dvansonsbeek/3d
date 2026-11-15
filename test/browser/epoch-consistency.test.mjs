@@ -39,8 +39,8 @@
  */
 import { createRequire } from 'node:module';
 import { openSimulator } from './harness.mjs';
-import { meanYearInDaysAtAge, meanMoonDistanceAtAge, meanAuAtAge, posFromJD, jdFromPos, navigablePosRange } from '../../tools/lib/deep-time.js';
-import { createModel, ONE_FAMILY_WINDOW_YEARS } from '@essrt/physics';
+import { meanYearInDaysAtAge, meanMoonDistanceAtAge, meanAuAtAge, posFromJD, jdFromPos, navigablePosRange, meanLunarFreeInclinationDegAtAge, meanLaplaceTiltFromEclipticDegAtAge } from '../../tools/lib/deep-time.js';
+import { createModel, ONE_FAMILY_WINDOW_YEARS, createLunarPlaneScales, LUNAR_PLANE_TILT_ANCHOR_DEG } from '@essrt/physics';
 const require = createRequire(import.meta.url);
 const { jdToDecimalYear } = require('@essrt/physics/time/calendar');
 
@@ -77,6 +77,7 @@ const TOL_WINDOW_REL = 1e-9, TOL_WINDOW_BEAT_REL = 1e-6;
 const TOL_DAY_ROWS_REL = 1e-8;   // the sidereal/stellar day rows against the package (plan 30 item B; a unit slip is 2.6e-4 at 400 Ma)
 const TOL_CP_WAIT_MS = 15000;
 const TOL_CP_YEAR_REL = 5e-3;
+const TOL_GENESIS_UMBRA_SEP_KM = 150;   // plan 31 A2: the cap's footprint (the rendered axis on the raw-curve clock) vs the tier's bridged ground point — 0.46° of longitude in the era (2024: 53 km, 1999: 39 km; ~110 s of rotation), 2° on the genesis' 5.5-h day (94 km at latitude 43°); the two defects read 6,041 km
 const TOL_STEP_DAY_REL = 2e-3;   // a "1 day" step in TT days (plan 30 item I): the captured count-year fraction read 0.8975 at the genesis; a JD at 2.5e12 has 5e-4 d of granularity
 const TOL_MOON_RATE_REL = 0.15;  // the rendered Moon's one-day rate against 360°/the sidereal month of date (plan 30 item J): the orbit's wobble is ≤ 10 %, the J2000 fallback 0.035    // a cardinal year length against the tropical year of date (plan 30 item E; the wobble ≤ 9e-4 at 4.4 Ga, a skipped year is 1.0)    // the cardinal rows of a paused landing: solved after its frame (plan 30 item D; the hold left them a minute stale)
 
@@ -131,15 +132,18 @@ const rows = await s.page.evaluate(({ EPOCHS_MA }) => {
 
 // The navigable-domain rows: the browser's scene position and Moon at deep JDs
 // (each a seated deep jump, ~10 s with the banks landed).
-const domainRows = await s.page.evaluate(({ POS_JD, MOON_JDS, SPIN_JD }) => {
+const domainRows = await s.page.evaluate(({ POS_JD, MOON_JDS, SPIN_JD, DEEP_JD }) => {
   const T = window.__test__;
-  const spinAt = (jd) => { T.jumpJD(jd); const f = T.worldFrameProbe(); return { jd: f.julianDay, earthSpinDeg: f.earthSpinDeg }; };
-  const spin = [spinAt(SPIN_JD), spinAt(POS_JD)];
+  // plan 31 A2: beside the spin, the scene's obliquity rule (the drawn ε, the hybrid's, its beat
+  // mean, the cited mean, the hand-over weight; the rendered axis against the frame) and the
+  // Moon's drawn plane (the ring's normal against the Laplace pole and the ecliptic pole)
+  const spinAt = (jd) => { T.jumpJD(jd); const f = T.worldFrameProbe(); return { jd: f.julianDay, earthSpinDeg: f.earthSpinDeg, axisPoleChord: f.axisPoleChord, eps: T.sceneObliquityProbe(jd), ring: T.moonRingProbe() }; };
+  const spin = [spinAt(SPIN_JD), spinAt(DEEP_JD), spinAt(POS_JD)];
   const scenePos = T.scenePos();
   const moon = MOON_JDS.map((jd) => ({ jd, distKm: T.moonSceneState(jd).distKm }));
   const range = T.navigablePosRange();
   return { scenePos, moon, spin, range };
-}, { POS_JD: DOMAIN_EDGE_JDS[0], MOON_JDS: MOON_DIST_JDS, SPIN_JD: SPIN_MODERN_JD });
+}, { POS_JD: DOMAIN_EDGE_JDS[0], MOON_JDS: MOON_DIST_JDS, SPIN_JD: SPIN_MODERN_JD, DEEP_JD: MOON_DIST_JDS[0] });
 // THE ONE DEEP CLOCK (doc 111 §1.36): at each UT JD the scene's position, its year of date, the
 // TT instant of that position, the Moon's ring radius and the placed Moon's distance. The ring
 // is sized by the epoch anchors, which the RENDER LOOP updates from the scene's year of date —
@@ -192,6 +196,15 @@ for (const jd of CLOCK_JDS) {
 // finder, two runtimes), read here and compared below with the registry's run of it on the Node
 // twin (`genesisFirstSolarEclipse*`, written by values:package:write).
 domainRows.genesis = await s.page.evaluate(() => window.__test__.genesisEclipse());
+// plan 31 A2 (doc 111 §1.44): at the genesis eclipse the painted umbra — the TIER's ground point — must sit
+// where the rendered shadow axis pierces the drawn globe (the cap is built from both; the tier once read its
+// obliquity at the SI-linear label year, 1.3 Gyr from the instant, and put the two 11° apart). The cap
+// updates in the render loop: land, let a frame draw, then read.
+if (domainRows.genesis) {
+  await s.page.evaluate((jd) => window.__test__.jumpJD(jd), domainRows.genesis.jd);
+  await s.page.waitForTimeout(1500);
+  domainRows.genesisUmbra = await s.page.evaluate(() => window.__test__.umbraDiscState());
+}
 // plan 27 step D: the Origin tour's station values — the browser's package model at each station's
 // engine year (pure, no jump), compared below with the Node model at the same year (one model,
 // two runtimes) and, at the Devonian, with the registry's own keys.
@@ -348,6 +361,30 @@ for (const jd of DOMAIN_EDGE_JDS) {
     console.log(`${ok ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Earth spin scene/tier GMST`
       + ` ${scene.toFixed(6)} / ${tier.toFixed(6)}°  Δ ${Number(d).toExponential(2)}°`);
   }
+  // PLAN 31 A2 — the scene's obliquity beyond the hybrid's domain (doc 111 §1.44): the hybrid
+  // itself in the era (weight 0); beyond it the CITED mean of date (≡ the Node package's) carrying
+  // the hybrid's wobble about its beat mean (weight 1 at −400 Myr and at the edge), the rendered
+  // axis built from that ε (the frame chord 0); and the Moon's drawn plane: the ring's normal
+  // against the Laplace pole ≡ the chain's free inclination of date, against the ecliptic pole ≡
+  // the composed ecliptic inclination the panel row shows (the tilt's sign and the node together),
+  // the tilt ≡ the series' anchor × the chain's shape.
+  const planeScales = createLunarPlaneScales({ tiltDegAtAge: meanLaplaceTiltFromEclipticDegAtAge, freeInclinationDegAtAge: meanLunarFreeInclinationDegAtAge });
+  for (const r of domainRows.spin) {
+    const e = r.eps, tMa = (2000 - e.year) / 1e6, era = r.jd === SPIN_MODERN_JD;
+    const citedNode = m.earth.meanObliquityCitedDeg(e.year);
+    const expected = era ? e.epsHybridDeg : citedNode + (e.epsHybridDeg - e.beatMeanDeg);
+    // the TWIN: the package model composes the same rule on its own sampler and beat table — one value
+    const twinNode = m.earth.sceneObliquityDeg(e.year), dTwin = e.epsSceneDeg - twinNode;
+    const okEps = (era ? e.weight === 0 : e.weight === 1) && Math.abs(e.epsSceneDeg - expected) <= 1e-9 && Math.abs(dTwin) <= 1e-9 && Math.abs(e.axisTiltDeg - e.epsSceneDeg) <= 1e-9 && Number.isFinite(r.axisPoleChord) && r.axisPoleChord <= 1e-9;
+    if (!okEps) fail++;
+    console.log(`${okEps ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  scene obliquity ${e.epsSceneDeg.toFixed(4)}° (hybrid ${e.epsHybridDeg.toFixed(4)}, beat mean ${e.beatMeanDeg.toFixed(4)}, cited ${Number(citedNode).toFixed(4)}, w ${e.weight})  Δ ${Number(e.epsSceneDeg - expected).toExponential(1)}°  twin Δ ${Number(dTwin).toExponential(1)}°  axis chord ${Number(r.axisPoleChord).toExponential(1)}`);
+    const g = r.ring, ps = planeScales(tMa);
+    const iLNode = meanLunarFreeInclinationDegAtAge(tMa) ?? NaN, tiltNode = LUNAR_PLANE_TILT_ANCHOR_DEG * (ps ? ps.tiltShape : NaN);
+    const okRing = !!g && Math.abs(g.incDeg - g.incExpectedDeg) <= 1e-6 && Math.abs(g.incExpectedDeg - iLNode) <= 1e-9 && Math.abs(g.eclInclMeasuredDeg - g.eclInclExpectedDeg) <= 1e-6 && Math.abs(g.tiltDeg - tiltNode) <= 1e-12
+      && g.eclInclExpectedDeg >= Math.abs(g.incExpectedDeg - g.tiltDeg) - 1e-9 && g.eclInclExpectedDeg <= g.incExpectedDeg + g.tiltDeg + 1e-9;
+    if (!okRing) fail++;
+    console.log(`${okRing ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Moon plane of date: free inclination ${g ? g.incDeg.toFixed(6) : 'NaN'}° (chain ${iLNode.toFixed(6)}), tilt ${g ? g.tiltDeg.toFixed(6) : 'NaN'}° (${tiltNode.toFixed(6)}), ecliptic inclination drawn/composed ${g ? g.eclInclMeasuredDeg.toFixed(6) : 'NaN'} / ${g ? g.eclInclExpectedDeg.toFixed(6) : 'NaN'}°`);
+  }
   // THE ONE DEEP CLOCK (doc 111 §1.36): (1) the scene's labelled year of date ≡ the civil year
   // of the TT instant the model's bridge gives (the engine's year axis, two runtimes — NOT the
   // position's tropical-year count, 2.4 Myr from it at the genesis); (2) the TT instant of the
@@ -463,7 +500,13 @@ for (const jd of DOMAIN_EDGE_JDS) {
     const dJD = g ? g.jd - regJD : NaN, dGamma = g ? g.gamma - regGamma : NaN, dUmbra = g ? Math.abs(g.umbraKm) - regUmbraKm : NaN;
     const okG = Number.isFinite(dJD) && Math.abs(dJD) <= TOL_GENESIS_JD_DAYS && Number.isFinite(dGamma) && Math.abs(dGamma) <= TOL_GENESIS_GAMMA && Number.isFinite(dUmbra) && Math.abs(dUmbra) <= TOL_GENESIS_UMBRA_KM;
     if (!okG) fail++;
-    console.log(`${okG ? '  ok ' : 'FAIL '} genesis eclipse browser/registry  JD ${g ? g.jd.toFixed(5) : 'null'} / ${regJD.toFixed(5)}  Δ ${Number(dJD).toExponential(2)} d · γ Δ ${Number(dGamma).toExponential(2)} · umbra Δ ${Number(dUmbra).toExponential(2)} km`);
+    {
+      const u = domainRows.genesisUmbra;
+      const okU = !!u && u.visible && u.tier && u.axis && Number.isFinite(u.sepKm) && u.sepKm <= TOL_GENESIS_UMBRA_SEP_KM;
+      if (!okU) fail++;
+      console.log(`${okU ? '  ok ' : 'FAIL '} genesis umbra on the drawn globe: the tier's ground point ${u && u.tier ? `${u.tier.lat.toFixed(3)}° ${u.tier.lon.toFixed(3)}°` : 'null'} vs the rendered axis's piercing ${u && u.axis ? `${u.axis.lat.toFixed(3)}° ${u.axis.lon.toFixed(3)}°` : 'null'}  sep ${u && Number.isFinite(u.sepKm) ? u.sepKm.toFixed(1) : 'NaN'} km (visible ${u ? u.visible : 'null'})`);
+    }
+    console.log(`${okG ? '  ok ' : 'FAIL '} genesis eclipse browser/registry  JD${g ? g.jd.toFixed(5) : 'null'} / ${regJD.toFixed(5)}  Δ ${Number(dJD).toExponential(2)} d · γ Δ ${Number(dGamma).toExponential(2)} · umbra Δ ${Number(dUmbra).toExponential(2)} km`);
     // plan 27 step D: the tour's stations against the Node model at the same engine year
     for (const st of domainRows.tour) {
       const y = st.year;

@@ -32,6 +32,7 @@ export function createModel(constants?: Constants, opts?: {
     secularSeriesArtifact?: any;
     giaEllipticityOfDate?: boolean;
     spinCheckpointsArtifact?: any;
+    obliquityBeatTableArtifact?: any;
     lunarCheckpointsArtifact?: any;
 }): Model;
 export type Constants = Record<string, unknown> & {
@@ -78,6 +79,7 @@ export { DEEP_MODES_ARTIFACT, DEEP_MODES_ARTIFACT_HASH } from "./moon/deep-modes
 export { createYearLengths, computeMeanTropicalYearJ2000Days, ONE_FAMILY_WINDOW_YEARS } from "./earth/year-lengths.cjs";
 export { computeSolarTorqueShare, createComposedPrecession } from "./earth/precession-composed.cjs";
 export { createLaplacePlaneRegime, testParticleTiltFromEquatorDeg } from "./earth/laplace-plane.cjs";
-export { composeEclipticOfDate, createLunarPlaneScales } from "./moon/plane-of-date.cjs";
+export { composeEclipticOfDate, createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG } from "./moon/plane-of-date.cjs";
+export { SCENE_OBLIQUITY_HANDOVER_YEARS, HYBRID_BEAT_TABLE_NODE_YEARS, sceneObliquityHandoverWeight, hybridBeatMeanDeg, hybridBeatBandDeg, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from "./earth/scene-obliquity.cjs";
 export { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH } from "./deltat/moon-distance-artifact.cjs";
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from "./climate/l1-orbital.cjs";

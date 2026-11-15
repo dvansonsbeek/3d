@@ -445,6 +445,33 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   anchor's first order before rotating. The finder was certified WITHOUT
   the tilt; it is re-certified on the composition. Derive a quoted rate
   from the shipped function (a by-hand 2.5e-7 °/yr was 2.6e-10). (§1.43)
+- **A scene draws ONE tilt** — the Moon's drawn orbit plane rides the
+  series' plane (the stack's base is the Laplace plane of date, the
+  container's tilt the free inclination of date; ONE home
+  `moon/plane-of-date` owns the anchor), and the Earth's drawn axis follows
+  the API's rule beyond the hybrid's ±10 Myr (ONE home
+  `earth/scene-obliquity`): the hybrid carries no tidal evolution of its
+  mean (23.2–23.4° at every age) where the cited mean reads 11.9° at the
+  edge, so the drawn tilt there is the CITED mean carrying the hybrid's
+  wobble about its beat mean, handed over C¹ across the 10 Myr past the
+  domain's edge (0.15° apart at the seam). The eclipse tier's ground mapping
+  reads the same rule (the certified ground point sits where the drawn axis
+  puts it); the lunar arguments' carrier, the stellar day's projection and
+  the perihelion RA rows keep the HYBRID (the carrier read the scene ε for
+  one build: the −400 Myr Moon moved 0.76 % of its distance). The besselian
+  read its of-date quantities at the SI-linear LABEL year and the umbra cap
+  rebuilt its Sun with ε at a Julian count on the UT day count — 1.3 and
+  2.3 Gyr from the genesis instant; flat quantities hid both, the cited
+  obliquity put the cap's footprint 54° from the tier's point beside the
+  Moon's real shadow (the owner's screenshot): a year axis is tested where
+  its quantities are not flat, and the gate reads the drawn geometry's two
+  points, never one of them. A deep read at a NEW age is a seat on the
+  nearest bank checkpoint and a walk (20–30 ms per region), not a lookup:
+  the rule's beat band rides a lazy 1-Myr node table in the one home, never
+  a per-frame instrument (30 ms per new year; the Obliquity Earth tab's 480
+  points 14–23 s). Three twins read each rule; the epoch gate reads
+  the drawn ε, the ring's two normals and the cap's two points against the
+  Node model at −400 Myr, the edge and the genesis eclipse. (§1.44)
 
 ---
 
@@ -530,10 +557,15 @@ checkpoint does not resume bit-exactly or the step schedule parts from a
 (`lunar-cumulative-bank.js --write`, ~2.1 h since it spans the navigable
 domain, its recorded `generatedAtWalkSeconds` — REFUSES if a segment prefix
 does not resume bit-exactly or the deep lunar longitude parts between the
-seated and the unseeded tables). `npm run regen:cascade`
+seated and the unseeded tables). and the obliquity beat table
+(`obliquity-beat-table.js --write`, ~4 min — the hybrid's beat band at every
+1-Myr node as a RECORD of the 41-sample instrument; REFUSES unless a fresh
+model reproduces a spread of nodes bit-exactly and a model loaded with the
+table reads the same drawn obliquity as one without; its check mode re-reads
+the spread, §1.44). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (15 generators, 8 gates — the
-newest, `deep-clock-axes.js`, reads the deep clock against the chain, §1.37).
+test:verify:list` the full classification (16 generators, 8 gates — the
+newest gate, `deep-clock-axes.js`, reads the deep clock against the chain, §1.37).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the

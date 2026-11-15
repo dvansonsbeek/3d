@@ -81,7 +81,7 @@ const { wrap180 } = require('../math/angles.cjs');
  * @property {(year: number) => number} obliquityDegAt - framework obliquity (deg) at calendar year
  * @property {(year: number) => number} eccentricityAt - framework Earth-orbit eccentricity at calendar year
  * @property {(year: number) => number} perihelionLongitudeDegAt - framework perihelion longitude (deg) at calendar year
- * @property {(jd: number) => number} yearFromJD - the model's own JD → calendar-year conversion
+ * @property {(jd: number) => number} yearFromJD - the ENGINE year of the UT JD (the TT Julian year from J2000 — the one axis every of-date read takes; a label year parted from it by 1.3 Gyr at the genesis)
  * @property {{ j2000JD: number, julianCenturyDays: number, earthDiameterKm: number,
  *   moonDiameterKm: number, sunDiameterKm: number, sunDistanceKm: number,
  *   earthFlatteningInverse: number, ttBridgeSeconds: number,

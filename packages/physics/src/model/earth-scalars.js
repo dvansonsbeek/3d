@@ -25,6 +25,12 @@ export function assembleEarthScalars(ctx) {
   // tier's besselian reads it here).
   /** @param {number} year @returns {number} */
   const obliquityDeg = (year) => late.oneSourceM.epsAt(year);
+  // The obliquity a DRAWN scene shows (plan 31 A2): the hybrid inside its domain, the cited mean
+  // with the hybrid's wobble beyond (the API's rule, C¹ hand-over) — the eclipse tier's ground
+  // mapping reads THIS, so the certified ground point sits where the drawn axis puts it at
+  // every epoch (doc 111 §1.34's class); the lunar arguments' carrier keeps the hybrid.
+  /** @param {number} year @returns {number} */
+  const sceneObliquityDeg = (year) => late.oneSourceM.sceneEpsAt(year);
   // ONE eccentricity for the whole model. The PUBLISHED Earth eccentricity is
   // the one-source series (|z|, the mean orbit) and the SUN reads the same
   // function — the clock-side machinery: the eclipse Sun's equation of centre,
@@ -40,6 +46,6 @@ export function assembleEarthScalars(ctx) {
   // (Earth's inclination and node of date — `inclinationDeg` /
   // `ascendingNodeDeg` — are the one-source construction in inv-plane-elements.js.)
 
-  return { earthPerihelionDeg, eccentricityAt, obliquityDeg, sunEccentricityAt, sunPerihelionDegAt };
+  return { earthPerihelionDeg, eccentricityAt, obliquityDeg, sceneObliquityDeg, sunEccentricityAt, sunPerihelionDegAt };
 }
 /** @typedef {import('./deep-time-chain.js').Ctx & ReturnType<typeof assembleEarthScalars>} Ctx */

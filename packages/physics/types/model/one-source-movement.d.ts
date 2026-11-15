@@ -44,6 +44,28 @@ export function assembleOneSourceMovement(ctx: import("./year-day-lengths.js").C
          *  lunisolar rate the hybrid integrates ŝ on (deep-orbital-history D4e): the general
          *  precession anchor plus the planetary mean the ecliptic's own motion carries. */
         axialPrecessionYearsLunisolarJ2000: number;
+        obliquityBeatYearsAtYear: (year: number) => number;
+        sceneEpsAt: (year: number) => number;
+        sceneObliquityBandAt: (year: number) => {
+            centreDeg: number;
+            minDeg: number;
+            maxDeg: number;
+            hybridMeanDeg: number;
+        };
+        /** The hybrid's raw beat band at a year from the node table — {meanDeg, minDeg, maxDeg}; the generator's instrument. @param {number} year */
+        hybridBeatBandAt: (year: number) => {
+            meanDeg: number;
+            minDeg: number;
+            maxDeg: number;
+        };
+        /** A node of the beat table by index k (the year 2000 + k × 1 Myr) — the generator writes these; with the artifact loaded a node inside its range is the record. @param {number} k */
+        hybridBeatNodeAt: (k: number) => {
+            meanDeg: number;
+            minDeg: number;
+            maxDeg: number;
+        };
+        /** [kMin, kMax] of the loaded table artifact, or null when every node is computed. */
+        hybridBeatNodeRange: [number, number] | null;
     };
     siderealDaySeconds: (year: number) => number;
     stellarDaySeconds: (year: number) => number;

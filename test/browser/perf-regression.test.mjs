@@ -114,6 +114,10 @@ try {
   // banking those cumulative sums is the open decision (plan 24 §5). The full
   // jump is printed below for the record, not gated.
   await sim.page.waitForFunction(() => window.__test__.spinBankLoaded(), null, { timeout: 60000 });
+  // plan 31 A2: the obliquity beat table must have landed too — without it the drawn-scene rule and the
+  // eclipse tier compute each 1-Myr node live (a seat and a walk, 20–30 ms), and the first headless run
+  // of the Obliquity Earth tab read 20 s with the table 404'd off the build's copy list (doc 111 §1.44)
+  await sim.page.waitForFunction(() => window.__test__.beatTableLoaded(), null, { timeout: 60000 });
   const deepSpin = await sim.page.evaluate(() => {
     const T = window.__test__;
     const t0 = performance.now(); T.earthObliquityHybridAt(-400000000 + 2000); return performance.now() - t0;

@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.15
+modelVersion: v27.16
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -236,7 +236,7 @@ realized offset.
 | Perihelion 1 (the sun plane) | ENGINE-PLACED: [ĝ, n̂, ĝ×n̂] of date, angle ϖ_Sun(t) |
 | Perihelion 2 (the offset arm) | angle −ϖ_Sun(t), arm −e(t)·100 |
 | Sun | the wheel angle that realizes the certified longitude on the offset circle |
-| Moon stack base | ENGINE-PLACED: [n̂×ĝ, n̂, ĝ] of date; the layers from the lunar arguments (Part 8) |
+| Moon stack base | ENGINE-PLACED: the LAPLACE plane of date — [n̂×ĝ, n̂, ĝ] of date turned about ĝ by the tilt the rendered Moon's latitude rides (plan 31 A2, ONE home `moon/plane-of-date`: 8″ today, 11.8° at the edge); the Moon container's tilt the free inclination of date; the layers from the lunar arguments (Part 8) |
 
 ---
 

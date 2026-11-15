@@ -719,7 +719,10 @@ function _e5Tier() {
     // PLAN 24: seated on the spin-axis checkpoint bank when present (a seat, never a value).
     let bank;
     try { bank = require('../../data/spin-axis-checkpoints.json'); } catch { bank = undefined; }
-    _e5TierM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank, lunarCheckpointsArtifact: _lunarBank() ?? undefined } : undefined);
+    // PLAN 31 A2: the obliquity beat table beside the banks (the drawn-scene rule's band as a record; absent → computed per node)
+    let beatTable;
+    try { beatTable = require('../../data/obliquity-beat-table.json'); } catch { beatTable = undefined; }
+    _e5TierM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank, lunarCheckpointsArtifact: _lunarBank() ?? undefined, obliquityBeatTableArtifact: beatTable ?? null } : undefined);
   }
   return _e5TierM;
 }
@@ -1268,6 +1271,35 @@ function _chainFrameR() { return _chainR; }
 // docs/41.
 // ═══════════════════════════════════════════════════════════════════════════
 const _FRAME = _req('@essrt/physics/earth/frame-of-date');
+// PLAN 31 A2 — the drawn plane of the Moon and the drawn obliquity of the Earth beyond the hybrid's
+// domain (mirrors of src/script.js _moonPlaneTiltDegAtJD / _moonFreeInclinationDegAtJD /
+// _sceneEpsTargetDeg; ONE home for each rule in the package).
+const _PLANE = _req('@essrt/physics/moon/plane-of-date');
+const _SCENE_EPS = _req('@essrt/physics/earth/scene-obliquity');
+/** The Laplace plane's tilt from the ecliptic of date, degrees (the series' anchor × the chain's shape). @param {number} jdUT */
+function _moonPlaneTiltDegAtJDTools(jdUT) {
+  if (!DEEP_TIME_ENABLED) return _PLANE.LUNAR_PLANE_TILT_ANCHOR_DEG;
+  const ps = _lunarPlaneScalesAtAgeTools()((2000 - _osmYearForJD(jdUT)) / 1e6);
+  return _PLANE.LUNAR_PLANE_TILT_ANCHOR_DEG * (ps ? ps.tiltShape : 1);
+}
+/** The Moon's free inclination to its Laplace plane of date, degrees (the chain's derived history). @param {number} jdUT */
+function _moonFreeInclinationDegAtJDTools(jdUT) {
+  if (!DEEP_TIME_ENABLED) return C.moonEclipticInclinationJ2000;
+  return DT.meanLunarFreeInclinationDegAtAge((2000 - _osmYearForJD(jdUT)) / 1e6) ?? C.moonEclipticInclinationJ2000;
+}
+/** The scene's ε at an engine year: the hybrid inside its domain, the cited mean with the hybrid's wobble beyond (C¹
+ *  hand-over) — the package model's own published surface (its one-source movement composes the rule on its lazy beat
+ *  table); the twin's sample is the same movement's, so the two are one value. @param {number} year @param {number} epsHybridDeg */
+function _sceneEpsTargetDegTools(year, epsHybridDeg) {
+  const m = _e5Tier();
+  if (_SCENE_EPS.sceneObliquityHandoverWeight(year, m.earth.obliquityHybridDomainYears) === 0) return epsHybridDeg;
+  return m.earth.sceneObliquityDeg(year);
+}
+/** The one-source sample with the scene's ε in the hybrid's place (the sample itself inside the domain). @param {number} year @param {any} smp */
+function _sceneFrameSampleTools(year, smp) {
+  const eps = _sceneEpsTargetDegTools(year, smp.epsDeg);
+  return eps === smp.epsDeg ? smp : { ...smp, epsDeg: eps };
+}
 function _applyEngineEarthFrame(graph, jdUT) {
   const R = _chainFrameR();
   // The sampler's time coordinate is JULIAN years from J2000 TT (t = 0 at JD
@@ -1277,8 +1309,11 @@ function _applyEngineEarthFrame(graph, jdUT) {
   // 0.0078 d/yr — fed to an ABSOLUTE equinox longitude it rotated the whole
   // frame of date by 1.417″ against the J2000 pose (measured).
   // One clock, one argument: the engine year (_osmYearForJD — R4b).
-  const smp = _oneSourceM().sampleAt(_osmYearForJD(jdUT));
-  const F = _FRAME.computeEarthFrameOfDate(smp);
+  const year = _osmYearForJD(jdUT);
+  const smp = _oneSourceM().sampleAt(year);
+  // the axis takes the SCENE's ε — the API's rule beyond the hybrid's domain (mirror of
+  // src/script.js _sceneEpsTargetDeg; ONE home @essrt/physics/earth/scene-obliquity, plan 31 A2)
+  const F = _FRAME.computeEarthFrameOfDate(_sceneFrameSampleTools(year, smp));
   const toW = (v) => [
     R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2],
     R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2],
@@ -1297,7 +1332,16 @@ function _applyEngineEarthFrame(graph, jdUT) {
   // plane read 0.5°…8.7° off the rendered series Moon on the flat J2000 base;
   // the stack's longitude zero is the scene convention's quarter turn from ĝ:
   // basis [X = n̂ × ĝ, Y = n̂, Z = ĝ]).
-  graph.moonApsidalPrec.container.worldRotOverride = [cross(n, g), n, g];
+  // PLAN 31 A2 (mirror src/script.js): the base is the LAPLACE PLANE of date — the ecliptic of
+  // date turned about the equinox line ĝ by the tilt the rendered Moon's latitude rides (ONE home
+  // moon/plane-of-date; the pole leans toward longitude 90°): 8″ today, 11.8° at the edge; and
+  // the Moon container's tilt is the chain's free inclination of date (5.16° today, 16° at the edge)
+  const thL = _moonPlaneTiltDegAtJDTools(jdUT) * d2r, cL = Math.cos(thL), sL = Math.sin(thL);
+  const X = cross(n, g);
+  const XL = [X[0] * cL - n[0] * sL, X[1] * cL - n[1] * sL, X[2] * cL - n[2] * sL];
+  const NL = [n[0] * cL + X[0] * sL, n[1] * cL + X[1] * sL, n[2] * cL + X[2] * sL];
+  graph.moonApsidalPrec.container.worldRotOverride = [XL, NL, g];
+  graph.moonNodes.container.rz = -_moonFreeInclinationDegAtJDTools(jdUT) * d2r;
   // the Moon RING's stack layers from the lunar arguments (mirror
   // src/script.js): in the stack's basis a layer angle θ carries the
   // longitude 90° + θ, the apsidal arm −a·e·X̂ points at the apogee, and the

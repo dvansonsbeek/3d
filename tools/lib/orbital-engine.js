@@ -130,7 +130,9 @@ function _cardinalPkg() {
   let bank, lunarBank;
   try { bank = require('../../data/spin-axis-checkpoints.json'); } catch { bank = undefined; }
   try { lunarBank = require('../../data/lunar-cumulative-checkpoints.json'); } catch { lunarBank = undefined; }   // plan 25
-  _cardinalPkgM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank, lunarCheckpointsArtifact: lunarBank } : undefined);
+  let beatTable;
+  try { beatTable = require('../../data/obliquity-beat-table.json'); } catch { beatTable = undefined; }   // plan 31 A2: the drawn-scene rule's band as a record
+  _cardinalPkgM = _req('@essrt/physics').createModel(undefined, artifact ? { secularSeriesArtifact: artifact, spinCheckpointsArtifact: bank, lunarCheckpointsArtifact: lunarBank, obliquityBeatTableArtifact: beatTable ?? null } : undefined);
   return _cardinalPkgM;
 }
 

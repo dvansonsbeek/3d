@@ -172,7 +172,9 @@ export { createMeanObliquityHistory } from './earth/mean-obliquity-history.cjs';
 // lunar term carries its regime factor R(t), the free inclination is derived on
 // the cited distance, the lunar node and perigee of date carry the oblateness term.
 export { createLaplacePlaneRegime, testParticleTiltFromEquatorDeg } from './earth/laplace-plane.cjs';
-export { composeEclipticOfDate, createLunarPlaneScales } from './moon/plane-of-date.cjs';
+export { composeEclipticOfDate, createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG } from './moon/plane-of-date.cjs';
+// the obliquity a drawn scene shows beyond the hybrid's domain (plan 31 A2): the cited mean with the hybrid's wobble, handed over C¹
+export { SCENE_OBLIQUITY_HANDOVER_YEARS, HYBRID_BEAT_TABLE_NODE_YEARS, sceneObliquityHandoverWeight, hybridBeatMeanDeg, hybridBeatBandDeg, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from './earth/scene-obliquity.cjs';
 // L10 — the composition front door: one law set, N body records. Thin by
 // design; engines keep their direct call sites (see planets/model.cjs).
 export { createPlanetModel } from './planets/model.cjs';
@@ -204,7 +206,7 @@ export { createEclipseFinders } from './eclipse/finders.cjs';
  * even though the body is empty.
  *
  * @param {Constants} [constants]
- * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any, giaEllipticityOfDate?: boolean, spinCheckpointsArtifact?: any, lunarCheckpointsArtifact?: any }} [opts]
+ * @param {{ laws?: { eccentricityAt?: (year: number) => number, eccentricityRateAt?: (year: number) => number, perihelionLongitudeDegAt?: (year: number) => number }, secularSeriesArtifact?: any, giaEllipticityOfDate?: boolean, spinCheckpointsArtifact?: any, obliquityBeatTableArtifact?: any, lunarCheckpointsArtifact?: any }} [opts]
  *   `laws` — research overrides for Earth's orbit laws (doc 109 §7); absent = the shipped laws, bit-identical. Not part of the hash.
  * @returns {Model}
  */

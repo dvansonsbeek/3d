@@ -210,5 +210,41 @@ check('free inclination at the edge 9–17° with its band ordered', iBand > 8 &
   console.log(`  lunar plane of date — era identity ${rmsB.toFixed(3)}″ rms (max ${mx.toFixed(3)}″), longitude ${rmsL.toExponential(1)}″; edge tilt ${(sE ? sE.tiltShape * 2235e-6 : NaN).toFixed(2)}°, sin-scale ${(sE ? sE.sinScale : NaN).toFixed(3)}`);
 }
 
+// ── plan 31 A2, the browser part's two ONE-home rules ──────────────────────────────────────
+{
+  const { composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG, createLunarPlaneScales } = require(join(ROOT, 'packages/physics/src/moon/plane-of-date.cjs'));
+  const { sceneObliquityHandoverWeight, hybridBeatMeanDeg, composeSceneObliquityDeg, SCENE_OBLIQUITY_HANDOVER_YEARS } = require(join(ROOT, 'packages/physics/src/earth/scene-obliquity.cjs'));
+  // the composed ecliptic inclination: |i_L − θ| at the node on the equinox line, i_L + θ opposite
+  const iL = 5.1573, th = LUNAR_PLANE_TILT_ANCHOR_DEG;
+  check('ecliptic inclination of date: i_L − θ at Ω = 0, i_L + θ at Ω = 180°', Math.abs(composeEclipticInclinationDeg(iL, th, 0) - (iL - th)) < 1e-12 && Math.abs(composeEclipticInclinationDeg(iL, th, 180) - (iL + th)) < 1e-12, `${composeEclipticInclinationDeg(iL, th, 0)} / ${composeEclipticInclinationDeg(iL, th, 180)}`);
+  const sE = createLunarPlaneScales({ tiltDegAtAge: DT0.meanLaplaceTiltFromEclipticDegAtAge, freeInclinationDegAtAge: DT0.meanLunarFreeInclinationDegAtAge })(EDGE_MA);
+  const iE = DT0.meanLunarFreeInclinationDegAtAge(EDGE_MA), thE = LUNAR_PLANE_TILT_ANCHOR_DEG * (sE ? sE.tiltShape : NaN);
+  check('ecliptic inclination at the edge spans 4–5° to 27–29° over the node cycle', composeEclipticInclinationDeg(iE, thE, 0) > 4 && composeEclipticInclinationDeg(iE, thE, 0) < 5 && composeEclipticInclinationDeg(iE, thE, 180) > 27 && composeEclipticInclinationDeg(iE, thE, 180) < 29, `${composeEclipticInclinationDeg(iE, thE, 0)}–${composeEclipticInclinationDeg(iE, thE, 180)}°`);
+  // the scene's obliquity hand-over: 0 inside the domain, C¹ to 1 a window past either edge
+  const dom = /** @type {[number, number]} */ ([-9994000, 10001000]);
+  const w = (/** @type {number} */ y) => sceneObliquityHandoverWeight(y, dom);
+  check('scene obliquity weight: 0 inside the domain and at its edges, 1 a window beyond, ½ at the half-window', w(2000) === 0 && w(dom[0]) === 0 && w(dom[1]) === 0 && w(dom[0] - SCENE_OBLIQUITY_HANDOVER_YEARS) === 1 && w(dom[1] + 2e7) === 1 && Math.abs(w(dom[0] - SCENE_OBLIQUITY_HANDOVER_YEARS / 2) - 0.5) < 1e-12 && sceneObliquityHandoverWeight(2000, null) === 0, `${w(dom[0] - SCENE_OBLIQUITY_HANDOVER_YEARS / 2)}`);
+  const dw = (w(dom[0] - 1) - w(dom[0] + 1)) / 2, dw1 = (w(dom[0] - SCENE_OBLIQUITY_HANDOVER_YEARS + 1) - w(dom[0] - SCENE_OBLIQUITY_HANDOVER_YEARS - 1)) / 2;
+  check('scene obliquity weight: C¹ at both ends of the window (zero slope)', Math.abs(dw) < 1e-12 && Math.abs(dw1) < 1e-12, `${dw} / ${dw1}`);
+  // the beat mean of a pure cosine wobble about 23.3° is 23.3° (41 samples over one period, endpoints inclusive: the half-weight ends cancel to 1/41 of the amplitude)
+  const bm = hybridBeatMeanDeg((/** @type {number} */ y) => 23.3 + 1.2 * Math.cos(2 * Math.PI * y / 41000), 1234, 41000);
+  check('hybrid beat mean of a cosine wobble is its centre to 1/41 of the amplitude', Math.abs(bm - 23.3) <= 1.2 / 41 + 1e-9, `${bm}`);
+  // the lazy beat table: the instrument at a node, linear between nodes, pure in the year
+  const { createHybridBeatTable, hybridBeatBandDeg, HYBRID_BEAT_TABLE_NODE_YEARS, composeSceneObliquityBand } = require(join(ROOT, 'packages/physics/src/earth/scene-obliquity.cjs'));
+  const wob = (/** @type {number} */ y) => 23.3 + 1.2 * Math.cos(2 * Math.PI * y / 41000) + 1e-7 * (y - 2000);
+  const tbl = createHybridBeatTable({ epsDegAt: wob, beatYearsAtYear: () => 41000 });
+  const y1 = 2000 + 3 * HYBRID_BEAT_TABLE_NODE_YEARS, direct = hybridBeatBandDeg(wob, y1, 41000), atNode = tbl.atYear(y1);
+  check('beat table: a node reads the 41-sample instrument bit-exactly', atNode.meanDeg === direct.meanDeg && atNode.minDeg === direct.minDeg && atNode.maxDeg === direct.maxDeg, JSON.stringify(atNode));
+  const mid = tbl.atYear(y1 + HYBRID_BEAT_TABLE_NODE_YEARS / 2), n4 = tbl.atYear(y1 + HYBRID_BEAT_TABLE_NODE_YEARS);
+  check('beat table: the midpoint is the linear mean of its two nodes; visit order does not change a node', Math.abs(mid.meanDeg - (atNode.meanDeg + n4.meanDeg) / 2) < 1e-12 && tbl.atYear(y1).meanDeg === atNode.meanDeg, `${mid.meanDeg}`);
+  // the artifact path: a node inside the record's range is the record, one outside is computed
+  const rec = { nodeYears: HYBRID_BEAT_TABLE_NODE_YEARS, kMin: 2, kMax: 3, nodes: [[1, 0, 2], [5, 4, 6]] };
+  const tblA = createHybridBeatTable({ epsDegAt: wob, beatYearsAtYear: () => 41000, nodesArtifact: rec });
+  check('beat table artifact: a node in range is the record, outside it the instrument; the range is reported', tblA.nodeAt(2).meanDeg === 1 && tblA.nodeAt(3).maxDeg === 6 && tblA.nodeAt(4).meanDeg === tbl.nodeAt(4).meanDeg && JSON.stringify(tblA.nodeRange) === '[2,3]' && tbl.nodeRange === null, JSON.stringify(tblA.atYear(2000 + 2.5 * HYBRID_BEAT_TABLE_NODE_YEARS)));
+  const cb = composeSceneObliquityBand({ meanDeg: 23.3, minDeg: 22.1, maxDeg: 24.5 }, 11.9, 1);
+  check('composed band: shifted onto the cited mean, the swing kept, the hybrid mean reported', Math.abs(cb.centreDeg - 11.9) < 1e-12 && Math.abs(cb.minDeg - 10.7) < 1e-12 && Math.abs(cb.maxDeg - 13.1) < 1e-12 && cb.hybridMeanDeg === 23.3, JSON.stringify(cb));
+  check('composed scene obliquity: the hybrid where w = 0 or the cited mean is NaN; the shifted hybrid where w = 1', composeSceneObliquityDeg(23.5, 23.3, 11.9, 0) === 23.5 && composeSceneObliquityDeg(23.5, 23.3, NaN, 1) === 23.5 && Math.abs(composeSceneObliquityDeg(23.5, 23.3, 11.9, 1) - 12.1) < 1e-12, `${composeSceneObliquityDeg(23.5, 23.3, 11.9, 1)}`);
+}
+
 if (failures.length) { console.error(`laplace-plane-regime: ${failures.length} FAILURE(S)\n  ${failures.join('\n  ')}`); process.exit(1); }
 console.log(`laplace-plane-regime: OK — R ≡ 1 at J2000 (${(1 - r10k).toExponential(1)} at 10 kyr), 1 % reach ${onePct} Ma, r_L ${(DT.meanLaplaceRadiusMetresAtAge(0) / R_E).toFixed(2)} → ${(DT.meanLaplaceRadiusMetresAtAge(EDGE_MA) / R_E).toFixed(2)} R⊕, edge clock ${Tp.toFixed(0)} yr (ecliptic form ${TpEcliptic.toFixed(2)}, solar-only ${TpSolar.toFixed(0)}, lock ${(2 * Math.PI / lock).toFixed(0)}), node ${nodeEdge.toFixed(2)} yr, free inclination ${iBand.toFixed(1)}–${iEdge.toFixed(1)}°`);

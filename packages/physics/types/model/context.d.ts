@@ -26,6 +26,7 @@ export type Laws = {
  */
 export type Options = {
     giaEllipticityOfDate?: boolean;
+    obliquityBeatTableArtifact?: import("../earth/scene-obliquity.cjs").HybridBeatTableArtifact | null;
     spinCheckpointsArtifact?: {
         spacingYr: number;
         checkpoints: ReadonlyArray<{
@@ -71,10 +72,18 @@ export type LateBindings = {
      */
     certifiedAxialPrecessionJ2000Years: () => number;
     /**
-     * owner: one-source-movement — read by deep-time-chain and earth-scalars
+     * owner: one-source-movement — read by deep-time-chain and earth-scalars (sceneEpsAt: the drawn-scene obliquity, plan 31 A2)
      */
     oneSourceM: {
         epsAt(year: number): number;
+        sceneEpsAt(year: number): number;
+        sceneObliquityBandAt(year: number): {
+            centreDeg: number;
+            minDeg: number;
+            maxDeg: number;
+            hybridMeanDeg: number;
+        };
+        obliquityBeatYearsAtYear(year: number): number;
         eAt(year: number): number;
         periOfDateDegAt(year: number): number;
         precessionOfDateFactorsAt(year: number): {

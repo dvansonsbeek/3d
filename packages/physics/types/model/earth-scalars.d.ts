@@ -8,6 +8,7 @@ export function assembleEarthScalars(ctx: import("./deep-time-chain.js").Ctx): {
     earthPerihelionDeg: (year: number) => number;
     eccentricityAt: (year: number) => number;
     obliquityDeg: (year: number) => number;
+    sceneObliquityDeg: (year: number) => number;
     sunEccentricityAt: (year: number) => number;
     sunPerihelionDegAt: (year: number) => number;
 };

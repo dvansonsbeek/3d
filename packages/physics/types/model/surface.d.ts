@@ -164,6 +164,34 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
             maxDeg: number;
             periodYears: number;
         };
+        /** THE OBLIQUITY A DRAWN SCENE SHOWS (plan 31 A2): the hybrid inside its domain; beyond it the cited mean of
+         *  date carrying the hybrid's wobble about its beat mean (the band), handed over C¹ across the 10 Myr past the
+         *  domain's edge — the eclipse tier's ground mapping and the simulator's axis read it (ONE home
+         *  earth/scene-obliquity; the one-source movement composes it). @param {number} year @returns {number} */
+        sceneObliquityDeg: (year: number) => number;
+        /** THE DRAWN OBLIQUITY'S BAND at a decimal year (plan 31 A2, the Genesis Analysis chart): {centreDeg, minDeg,
+         *  maxDeg, hybridMeanDeg} — the hybrid's beat band from a lazy 1-Myr node table (the band instrument once per
+         *  node), shifted onto the cited mean by the rule's weight. @param {number} year */
+        sceneObliquityBandAt: (year: number) => {
+            centreDeg: number;
+            minDeg: number;
+            maxDeg: number;
+            hybridMeanDeg: number;
+        };
+        /** The hybrid's RAW beat band at a decimal year — {meanDeg, minDeg, maxDeg} from the 1-Myr node table (the
+         *  generator's instrument, tools/verify/obliquity-beat-table.js); `hybridBeatNodeAt(k)` the node at the year
+         *  2000 + k × 1 Myr, `hybridBeatNodeRange` [kMin, kMax] of the loaded artifact or null. @param {number} year */
+        hybridBeatBandAt: (year: number) => {
+            meanDeg: number;
+            minDeg: number;
+            maxDeg: number;
+        };
+        hybridBeatNodeAt: (k: number) => {
+            meanDeg: number;
+            minDeg: number;
+            maxDeg: number;
+        };
+        hybridBeatNodeRange: [number, number] | null;
         /** The cited mean obliquity of date ε̄(t) (Farhat et al. 2022's column), degrees — a Myr-scale mean; NaN beyond 4,429 Ma. @param {number} year @returns {number} */
         meanObliquityCitedDeg: (year: number) => number;
         eccentricity: (year: number) => number;

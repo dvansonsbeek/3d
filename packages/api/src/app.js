@@ -120,7 +120,15 @@ export function createApi() {
     lunarCheckpointsArtifact = JSON.parse(readFileSync(
       new URL('../../../data/lunar-cumulative-checkpoints.json', import.meta.url), 'utf8'));
   } catch { /* package-only install, or the bank not yet generated */ }
-  const model = createModel(undefined, { secularSeriesArtifact, spinCheckpointsArtifact, lunarCheckpointsArtifact });
+  // PLAN 31 A2 — the obliquity beat table: the hybrid's beat band at every 1-Myr node (the
+  // drawn-scene obliquity rule and the eclipse tier's ground mapping read it as a record of the
+  // 41-sample instrument); absent, the instrument is read live — one region's walk per new node.
+  let obliquityBeatTableArtifact = null;
+  try {
+    obliquityBeatTableArtifact = JSON.parse(readFileSync(
+      new URL('../../../data/obliquity-beat-table.json', import.meta.url), 'utf8'));
+  } catch { /* package-only install, or the table not yet generated */ }
+  const model = createModel(undefined, { secularSeriesArtifact, spinCheckpointsArtifact, lunarCheckpointsArtifact, obliquityBeatTableArtifact });
   const id = model.identity;
 
   /** Derivations metadata: structural explanation per quantity (§7 "derivations"). */

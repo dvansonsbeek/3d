@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.15
+modelVersion: v27.16
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -2177,11 +2177,145 @@ Meeus's three terms (0.05–0.2″ rms, < 0.4″ max) with the longitude untouch
 to 1e-3″; fail-proven with `ESSRT_LUNAR_PLANE_PLANT=1` (the era tilt planted
 at 1.5× its anchor). The registry: `lunarMeanPlaneTiltJ2000Arcsec`,
 `lunarMeanPlaneTiltModelJ2000Arcsec`, `lunarLatitudeAmplitudeAtHadeanDeg`,
-`lunarOrbitEclipticInclinationAtHadean{Min,Max}Deg`. Open: the scene's
-drawn orbit plane and its deep obliquity (the browser part of A2), the
+`lunarOrbitEclipticInclinationAtHadean{Min,Max}Deg`. The scene's drawn
+orbit plane and its deep obliquity are §1.44. Open: the
 1962 sin Ω longitude term and the 382 sin A3 latitude term (the mean
 plane's lag behind the moving ecliptic: 0.47″/yr of ecliptic turn over the
-node's 69,600″/yr = 1.39″, Meeus's 1.375″) stay constant rows, named.
+node's 69,600″/yr = 1.39″, Meeus's 1.375″) stay constant rows, named; the
+Moon's own axial tilt in the scene keeps the J2000 Cassini composition
+(the Cassini state of date is physics the model does not carry).
+
+### 1.44 A scene draws ONE tilt — the drawn plane rides the series' plane, the drawn axis the API's rule (plan 31 A2, the browser part)
+
+Two display quantities had kept a J2000 constant after the physics behind
+them had moved. (1) The Moon's drawn orbit plane: the stack's base was the
+ecliptic of date and the Moon container's tilt the registry's 5.1573°,
+while since §1.43 the RENDERED Moon's latitude rides the Laplace plane of
+date (11.8° from the ecliptic at the edge) with the free inclination of
+date (16°) — the ring, the node markers and the placed Moon no longer
+shared a plane. (2) The Earth's drawn axis: the scene's ε target was the
+hybrid at every epoch, and the hybrid carries no tidal evolution of its
+mean — MEASURED on the A2 build, its beat mean (41 samples over one beat,
+the API's band instrument) reads 23.42° today, 23.37 at 10 Ma, 23.30 at
+400 Ma, 23.31 at 2.46 Ga, 23.19 at the history's end — where the cited mean
+obliquity of date (Farhat et al. 2022, plan 12 §8 (a)) reads 23.25, 23.23,
+22.22, 19.73 and 11.88°. The API had refused the value beyond the ζ
+series' ±10 Myr since plan 26 and served the cited mean beside the band;
+the scene still drew and printed the walk's 23.2° at the edge, 11° from the
+mean the Laplace-plane regime it draws the Moon on reads (§1.42 (ii)).
+
+The build: ONE home for each rule in the package, three twins reading it.
+
+- **The drawn plane rides the series' plane.** `moon/plane-of-date` owns
+  the tilt anchor (`LUNAR_PLANE_TILT_ANCHOR_DEG`, Meeus's 2235 µ°; the
+  series imports it) and the composed ecliptic inclination
+  cos i = cos i_L cos θ + sin i_L sin θ cos Ω. The Moon stack's base is the
+  ecliptic of date turned about the equinox line ĝ by θ(t) = anchor × the
+  chain's shape (the pole leaning toward longitude 90°, the sign of
+  −2235 sin L′: n̂_L = n̂ cos θ + (n̂×ĝ) sin θ), the Moon container's tilt the
+  chain's i_L(t); the node markers read the base's basis; the Planet Info
+  row "Ecliptic Inclination" is of date (5.1551–5.1595° over the node cycle
+  today, 4.5–28.1° at the edge) beside two new rows, the free inclination
+  (with the κ = 1/4 band) and the Laplace tilt.
+- **The drawn axis follows the API's rule.** `earth/scene-obliquity`:
+  inside the hybrid's domain the hybrid; beyond it the CITED mean carrying
+  the hybrid's own wobble about its beat mean (the band's amplitude and
+  period — the quantity the model predicts there), handed over C¹ by a
+  smoothstep across the 10 Myr past the domain's edge (the two means part by
+  0.15° at the seam: a step there would turn the drawn axis mid-jump). The
+  one-source movement composes it (`oneSourceM.sceneEpsAt`; the obliquity
+  beat of date moved home there), the surface serves it as
+  `earth.sceneObliquityDeg`, and the ECLIPSE TIER's besselian reads it for
+  its ground mapping — the certified ground point sits where the drawn axis
+  puts it at every epoch (§1.34's class; γ, the umbra radius and the type are
+  frame-invariant and do not move). In the browser the frame's axis (the
+  sample's ε replaced; the equinox and the orbit normal are the sample's),
+  the Earth panel's tilt rows, the Sun's declination on the drawn globe, the
+  RA-of-date projection of the planets' longitudes, the insolation rows and
+  the tour card's "Axial tilt" range (centred on the cited mean since) read
+  it. The Node scene twin mirrors both rules (`tools/lib/scene-graph.js`).
+- **The published movement keeps the hybrid.** Three readers are twins of
+  package quantities built on the hybrid and must not follow the drawn
+  scene: the lunar arguments' obliquity carrier C·∫(ε − ε₀) — the lunar bank
+  is walked on it, and when one build let it read the scene ε the Moon at
+  −400 Myr moved 0.76 % of its distance (the epoch gate's Moon row) —, the
+  stellar day's RA projection (the package's stellar day; 1.9e-8 s apart at
+  the edge, the "Predictions day rows vs the package" row) and the
+  perihelion RA rows' ε and ε̇ (the registry's `predictiveMachinery` twin).
+  A display rule is applied where the DRAWN geometry is read, never inside
+  a quantity another tier certifies.
+- **A tier's year axis is tested where its quantities are NOT flat.** The
+  owner's first look at the genesis showed the painted umbra beside the
+  Moon's shadow, not under it. The besselian read every of-date quantity —
+  e, ϖ, the aberration, and now the scene obliquity — at `yearFromJD`, the
+  SI-linear count year of the UT JD (time-axis.js), not the engine year of
+  the instant: 1.3 Gyr apart at the genesis (§1.31's axis, §1.35's label),
+  invisible for years because e, ϖ and the hybrid's ε are flat at depth.
+  The cited obliquity is not: on the label's age the history is undefined,
+  the composition fell back to the hybrid, and the ground point rode 23°
+  while the drawn axis stood at 12°. The SAME class sat in the browser's
+  umbra cap: it rebuilds the Sun's direction from λ_S and ε, and read ε at
+  a Julian count on the UT day count without the bridge — 6.8 "Gyr" at the
+  genesis, 2.3 Gyr beyond the history, the hybrid's 23° again — so the
+  cap's footprint (drawn from that reconstructed axis) and the tier's point
+  (the cap's geometry) parted by 54° on screen, 6,041 km, while the real
+  shadow of the drawn Moon fell elsewhere (the owner's screenshot). Both
+  read the engine year now; the cap's two points agree to 94 km at the
+  genesis — the era's own 0.46° of longitude (the raw-curve clock against
+  the bridged one, ~110 s of rotation: 53 km in 2024) on a 5.5-h day. The
+  epoch gate reads the cap's two points at the genesis (the tier's ground
+  point and the rendered axis's piercing of the globe, in the drawn Earth's
+  frame) and fails above 150 km.
+- **A deep read at a NEW age is a seat and a walk, not a lookup.** The
+  owner's next ask — the Genesis Analysis panel's "Obliquity Earth" tab, the
+  drawn tilt from the genesis to +1 Gyr with its band — rendered in 14–23 s
+  for 480 points. Measured: a hybrid read repeated at a known age costs
+  1.5 µs; at a new age it seats on the nearest bank checkpoint (250 kyr
+  apart off the dense tier) and walks there, 20–30 ms per region at 400 Ma
+  (the composed rate's steps, ~16 µs each). The rule's 41-sample beat
+  instrument read live therefore cost 30 ms per NEW year — per frame when
+  playing at depth, per besselian evaluation in the genesis finder — and
+  the chart's 480 points 480 regions. A lazy per-session table of 1-Myr
+  nodes (the instrument once per node, linear between: the beat mean moves
+  0.2° over 4 Gyr) took the per-frame cost out but still paid one region
+  per chart point — 120 points read 14 and 23 s — so the table is a
+  GENERATED artifact, `data/obliquity-beat-table.json`
+  (`tools/verify/obliquity-beat-table.js --write`: 5,430 nodes over the
+  navigable domain in 4 min, J2000 outward so the sampler's walk extends
+  contiguously, 30 ms per node), loaded beside the banks by the API, the
+  Node scene and the browser; the package's one-source movement and the
+  browser's own sampler each hold a table reading the record inside its
+  range and the instrument outside it; the tab samples 120 points. The
+  record is the instrument: the generator REFUSES unless a second fresh
+  model reproduces a spread of 20 nodes bit-exactly and a model loaded with
+  the table reads the same drawn obliquity and band as one without at
+  38 years, and its check mode re-reads the spread against the file. The
+  epoch gate reads the browser's drawn ε against `earth.sceneObliquityDeg`
+  of the Node model to 1e-9 (the twin check the earlier row — the browser
+  against its own parts — could not make). Grow lazy tables in YEARS (the
+  deep-time-scene-cost rule), never put a seat-and-walk inside a per-frame
+  read, and bank what a chart would walk. **A served artifact is on the
+  copy lists, or the browser falls back silently:** the first headless run
+  with the table "loaded" read the tab at 20 and 11 s again — the fetch had
+  404'd (the dev server and the build copy a NAMED list of `data/` files,
+  `copy:refdata:dev` and `build` in package.json) and the per-node fallback
+  computed every node; with the table served the tab renders in 2 ms on
+  both ranges and a band read costs 0.03 ms. The browser exposes
+  `beatTableLoaded()` so a gate can assert the seat took.
+
+The gate: `test:laplace-regime` gains the two rules' rows (the composed
+inclination's end values, the weight's 0/½/1 and zero slopes at both ends
+of the window, the beat mean of a cosine wobble, the composition's three
+cases); `epoch-consistency` reads the browser at the modern eclipse, at
+−400 Myr and at the domain's edge: the drawn ε ≡ the Node package's cited
+mean + the hybrid's wobble to 1e-9 with the weight 0 / 1 / 1 and the
+rendered axis' chord to the frame 0, the ring's normal against the Laplace
+pole ≡ the chain's free inclination of date to 1e-9 and against the
+ecliptic pole ≡ the composed row to 1e-6 (the tilt's sign and the node
+together), the tilt ≡ anchor × shape to 1e-12; `perihelion-at-sun` keeps its
+J2000 ring row (i_L(0) ≡ the registry constant). The surface golden
+re-records the Moon's three rows and the Earth's deep tilt rows with the
+reason.
 
 ---
 

@@ -69,6 +69,8 @@ const REQUIRED = [
   'data/spin-axis-checkpoints.json',
   // plan 25 — the lunar cumulative bank (the lunar tables' coarse segment prefixes every 250 kyr):
   'data/lunar-cumulative-checkpoints.json',
+  // plan 31 A2 — the obliquity beat table (the hybrid's beat band at every 1-Myr node; the drawn-scene rule, the eclipse tier and the Obliquity Earth tab read it as a record):
+  'data/obliquity-beat-table.json',
   // the shipped ΔT stack and the resonator amplitudes
   // (the joint fitter stamps both; a re-close is by hand — the cascade lists it):
   'data/deltaT-4flag-fit.json',

@@ -4,6 +4,7 @@
  * One slice of `assembleModel` (../model.js): receives the context the earlier slices built, returns the bindings the later ones read.
  */
 import { ONE_FAMILY_WINDOW_YEARS } from '../earth/year-lengths.cjs';
+import { DAYS_PER_JULIAN_YEAR } from '../constants/units.cjs';
 import { createBesselian } from '../eclipse/besselian.cjs';
 import { createEclipseFinders } from '../eclipse/finders.cjs';
 import { computeCarrierRatesDegPerCy, createSunPlanetaryCompletion } from '../eclipse/sun-planetary-completion.cjs';
@@ -13,8 +14,8 @@ export function assembleSunAndEclipses(ctx) {
   const {
     C, F, late, options, MASS_RATIO_EARTH_MOON, currentAUDistance, frameworkDeltaTSecondsAtJD, j2000JD,
     julianCenturyDays, meanSiderealYearDays, meanSolarYearDays, moonArgs, moonDistanceKm, moonSeries,
-    moonSiderealMonthInput, moonSynodicMonthDays, obliquityDeg, oneFamilyTropicalYearSeconds, sunEccentricityAt,
-    sunPerihelionDegAt, yearFromJD,
+    moonSiderealMonthInput, moonSynodicMonthDays, sceneObliquityDeg, oneFamilyTropicalYearSeconds, sunEccentricityAt,
+    sunPerihelionDegAt,
   } = ctx;
   // PLAN 26 pickup — the Sun's mean-longitude table seats on the lunar cumulative bank too
   // (its `sun.meanLongitude` section): the same segmented association, a seat never a value.
@@ -245,10 +246,16 @@ export function assembleSunAndEclipses(ctx) {
     // inside the besselian; the series-extension tail now lives in sceneEvalAt.
     sunAberrationDegAt: /** @param {number} year */ (year) => late.sunAberrationArcsecAt(year) / 3600,
     deltaTSecondsAt: frameworkDeltaTSecondsAtJD,   // the ONE ΔT (doc 111 §1.31), never a JD difference
-    obliquityDegAt: obliquityDeg,
+    // the DRAWN-scene obliquity (plan 31 A2): the hybrid inside its domain, the cited mean with
+    // the hybrid's wobble beyond — the ground point sits where the drawn axis puts it (§1.34's class)
+    obliquityDegAt: sceneObliquityDeg,
     eccentricityAt: sunEccentricityAt,
     perihelionLongitudeDegAt: sunPerihelionDegAt,
-    yearFromJD,
+    // THE ENGINE YEAR of the UT JD (the TT Julian year — doc 111 §1.31's one axis), never the
+    // SI-linear count year `yearFromJD` the tier read before v27.16: flat of-date quantities hid
+    // the split (1.3 Gyr at the genesis, where the cited obliquity is undefined on the label's
+    // age — the ground point landed 11° from the drawn axis; doc 111 §1.44)
+    yearFromJD: /** @param {number} jdUT */ (jdUT) => 2000 + (jdUT + frameworkDeltaTSecondsAtJD(jdUT) / 86400 - j2000JD) / DAYS_PER_JULIAN_YEAR,
     constants: {
       j2000JD,
       julianCenturyDays,

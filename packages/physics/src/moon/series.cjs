@@ -48,10 +48,9 @@
 // eclipse-location Moon were two different Moons. The truncated finder forms
 // below stay bare by certified design.
 const { moonSeriesExtensionDeg } = require('./series-extension.cjs');
-const { composeEclipticOfDate } = require('./plane-of-date.cjs');
-
-/** Meeus's flattening-term anchor: the J2000 tilt of the Moon's mean plane from the ecliptic, −2235 µ° sin L′. */
-const FLATTENING_TILT_ANCHOR_DEG = 2235e-6;
+// Meeus's flattening-term anchor (the J2000 tilt of the Moon's mean plane from the ecliptic,
+// −2235 µ° sin L′) has ONE home in the plane module — the drawn plane reads the same number.
+const { composeEclipticOfDate, LUNAR_PLANE_TILT_ANCHOR_DEG: FLATTENING_TILT_ANCHOR_DEG } = require('./plane-of-date.cjs');
 /** @typedef {{s1: number, s2: number, s3: number}} FScales — the |kF| = 1, 2, 3 multipliers */
 /** @type {FScales} */
 const F_SCALES_ERA = Object.freeze({ s1: 1, s2: 1, s3: 1 });
