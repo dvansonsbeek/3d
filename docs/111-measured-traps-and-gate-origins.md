@@ -2476,6 +2476,37 @@ panel reads the tier model's formula (`_eclipseFormulaRows`, re-solved only
 when the scene passes a found eclipse); the epoch gate reads its rows against
 the Node formula at the four deep positions, bit-identical.
 
+**The close-out (the plan's three leftovers).** (1) The plan's gate (1) in its
+own wording: the lunar canon campaign (`lunar-canon-recall.js`) now runs the
+FORMULA over the full canon span beside the finder — `eclipsesInRange` on the
+UT axis, 12,079 events in 34 s — and matches it to the canon by the same rule
+and to the finder event for event: the same recall (99.93 %, tight 99.48 %,
+type 99.54 %), 12,079 of 12,079 matched, the type agreement 100 %, the |UT
+difference| a median 0.001 s and a maximum 0.94 s (the formula's instant is
+the greatest eclipse from the series' rates, the finder's a bracketed
+minimum) — recorded under the artifact's `formula` block, a conscious
+`--write --rebaseline` for the new keys with no recorded value moving. (2) The
+API serves the formula on `/v1/moon` (`eclipseFormula` per epoch row: the
+next lunar and solar eclipse after the instant, the recurrences, the
+statistics, the regime; the `/earth` obliquity rider's pattern) and the MCP
+tool `essrt_moon` with it; `test:api` reads the next lunar eclipse at 2000
+against the finder's event (within 2 s, the same type), today's three node
+pairs, and the Devonian row's `reproducible` tag with finite statistics;
+`test:mcp` the regime and the Saros as the third node pair. (3) The lunar
+eccentricity's band (§2 item 3 of the plan: e_M is a registry constant at
+every epoch) is on the next-eclipse rows' hovers — ±2e·P_syn/2π hours OF DATE
+as a phase on the instant, ±e on the shadow's radius at the Moon. **A layout
+trap found by the owner's first screenshot of the rows:** the Planet Info
+grid sizes its value column `auto` (to the widest value visible in the tab)
+beside a `minmax(0,1fr)` label column, and the recurrence rows' ~75-character
+values are wider than the panel — so the value column took the whole width
+and the label column of EVERY row in the tab collapsed to two letters (one
+subgrid), the Moon Cycles section included; the long strings also fed the
+global column measurement at init. A prose-length value is a `wide` row: the
+label on its own line, the value wrapped beneath, spanning every column and
+kept out of the column measurement. No model number moved; the surface-rows
+golden re-recorded for the eight rows' text.
+
 ---
 
 ## 2. The browser tier's gates and their origins

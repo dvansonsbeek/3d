@@ -322,12 +322,47 @@ export function createApi() {
       if (!get()) return methodNotAllowed(method, path);
       const t = epochs(query);
       if ('problem' in t) return t.problem;
+      // PLAN 33 — the eclipse formula of date rides the Moon rows (the /earth obliquity rider's
+      // pattern): the next lunar and solar eclipse after the epoch's instant, the recurrences and
+      // the statistics on the mean elements of date, tagged by regime — 'certified' inside the
+      // canon's span (−1999…+3000), 'reproducible' beyond, where the statistics are the prediction.
+      // ONE home @essrt/physics eclipse/formula (the finders classify with the same geometry).
+      const F = model.eclipse.formula;
+      /** @param {ReturnType<typeof F.nextEclipseAfter>} e */
+      const pick = (e) => e === null ? null : {
+        k: e.k, jdUT: e.jdUT, jdTT: e.jdTT, deltaTSeconds: e.deltaTSeconds, jdSyzygyUT: e.jdSyzygyUT,
+        type: e.type, gamma: e.gamma, betaDeg: e.betaDeg, nodeDistanceDeg: e.nodeDistanceDeg,
+        moonDistanceKm: e.moonDistanceKm, sunDistanceKm: e.sunDistanceKm, regime: e.regime,
+        ...(e.magnitudeUmbral !== undefined ? { magnitudeUmbral: e.magnitudeUmbral, magnitudePenumbral: e.magnitudePenumbral } : {}),
+        ...(e.moonSunRatio !== undefined ? { moonSunRatio: e.moonSunRatio } : {}),
+      };
+      /** @param {number} y */
+      const eclipseFormulaAtYear = (y) => {
+        const jdTT = model.time.yearToJDTT(y), jdUT = model.time.yearToJDUT(y);
+        if (jdTT === null || jdUT === null || !Number.isFinite(jdTT) || !Number.isFinite(jdUT)) return null;
+        return {
+          regime: F.regimeAt(jdTT),
+          certifiedWindowYears: F.certifiedWindowYears,
+          nextLunar: pick(F.nextEclipseAfter(jdUT, 'lunar')),
+          nextSolar: pick(F.nextEclipseAfter(jdUT, 'solar')),
+          recurrences: F.recurrencesAt(jdTT),
+          statistics: F.statisticsAt(jdTT),
+        };
+      };
       const rows = t.years.map((y) => ({
         year: y,
         distanceKm: model.moon.distanceKmAtYear(y),
         siderealMonthDays: model.moon.siderealMonthDaysAtYear(y),
+        eclipseFormula: eclipseFormulaAtYear(y),
       }));
-      return envelope({ identity: id, inputEcho: { path, ...t.echo }, data: { years: rows } });
+      return envelope({
+        identity: id,
+        inputEcho: { path, ...t.echo },
+        data: {
+          years: rows,
+          note: 'eclipseFormula is the eclipse formula of date (the finders\' condition in closed form on the model\'s arguments of date; @essrt/physics eclipse/formula): nextLunar / nextSolar the first eclipse after the epoch\'s instant (jdUT on the UT axis, jdTT with the model deltaT, jdSyzygyUT the opposition/conjunction; gamma in Earth radii, signed for lunar; the lunar magnitudes, the solar Moon/Sun ratio), recurrences the primitive (months, cycles) pairs of date whose node / anomaly / Sun-longitude shift per cycle is within 1 / 3.5 / 1 degrees (today\'s names where the pair is today\'s — tritos, Saros, inex, Metonic), statistics the eclipses per year by class on the MEAN elements of date — a band, never a count of dated events (flagged approximate inside the Laplace-plane regime). regime: "certified" inside the NASA Five Millennium Canon span (-1999..3000), where the formula is gated to minutes against dated records; "reproducible" beyond, where the Moon\'s phase in its orbit is the model\'s and the statistics are the prediction.',
+        },
+      });
     }
 
     // ── /bodies ─────────────────────────────────────────────────────────────

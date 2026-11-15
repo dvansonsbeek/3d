@@ -1559,6 +1559,23 @@ a:link {
   white-space:nowrap;                  /* units never wrap */
 }
 
+/* wide row — a prose-length value (the eclipse formula's recurrence and next-eclipse
+   rows, plan 33): the key on its own line, the value wrapped beneath, spanning every
+   column. The value column is `auto` (sized to the widest value in the tab), so a value
+   wider than the panel would otherwise take the whole width and collapse the key column
+   of EVERY row in the tab; wide rows are also kept out of the column measurement. */
+.pl-row.pl-wide{
+  display:block;
+  grid-column:1/-1;
+}
+.pl-row.pl-wide .pl-key{ display:block; white-space:normal; padding-bottom:0; }
+.pl-row.pl-wide .pl-val{
+  display:block; text-align:left; white-space:normal;
+  overflow:visible; text-overflow:clip;
+  padding:1px 6px 4px 14px; line-height:1.35;
+}
+.pl-row.pl-wide .pl-alt{ display:none; }
+
 /* section header — collapsible, centered uppercase bar */
 .pl-head{
   grid-column:1/-1;

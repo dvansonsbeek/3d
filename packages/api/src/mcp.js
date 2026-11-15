@@ -75,7 +75,7 @@ const TOOLS = Object.freeze({
     covers: ['/v1/earth'],
   },
   essrt_moon: {
-    description: 'Moon distance and sidereal month at epoch(s).',
+    description: 'Moon distance and sidereal month at epoch(s), with the eclipse formula of date (eclipseFormula — the finders\' condition in closed form on the model\'s arguments of date): the next lunar and solar eclipse after the epoch (UT and TT instants, type, gamma in Earth radii), the recurrences of date (the node / anomaly / season month-count pairs; today\'s tritos, Saros, inex and Metonic where the pair is today\'s) and the eclipse statistics on the mean elements (eclipses per year by class, seasons per year — a band, never dated events), tagged by regime: certified inside the canon\'s span (−1999…+3000), reproducible beyond.',
     inputSchema: { type: 'object', properties: { ...TIME_PROPS } },
     request: (/** @type {any} */ a) => ({ method: 'GET', path: `/${API_VERSION}/moon`, query: queryOf(a) }),
     covers: ['/v1/moon'],

@@ -508,7 +508,12 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   (0.1 UT d for 1.97) refused every syzygy whose correction passed 9°, and a
   deep window of "14 months" in SI days was 3 months of UT — §1.36's class; a
   refused syzygy is skipped, never the end of a search. A record quoting the
-  pair with the smallest shift is not the shortest pair — pin both. (§1.46)
+  pair with the smallest shift is not the shortest pair — pin both. The
+  formula run over the full canon span reproduces the finder's recall and
+  matches it on every event (median 0.001 s); the API serves it on `/moon`.
+  **A prose-length Planet Info value is a `wide` row** — the grid's `auto`
+  value column beside a `minmax(0,1fr)` label column let one 75-character
+  value collapse EVERY label in the tab to two letters. (§1.46)
 
 ---
 

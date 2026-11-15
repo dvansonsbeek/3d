@@ -69,7 +69,10 @@ const toolCall = (name, args) => {
     ['essrt_earth', { year: -379998000 }, (d) => (d.years[0].obliquityDeg === null && Math.abs(d.years[0].meanObliquityCitedDeg - 22.227) < 0.01
       && Number.isFinite(d.years[0].sceneObliquityDeg) && d.years[0].sceneObliquityBand && d.years[0].sceneObliquityBand.centreDeg === d.years[0].meanObliquityCitedDeg
       ? null : `Devonian obliquity: ${d.years[0].obliquityDeg}, cited ${d.years[0].meanObliquityCitedDeg}, scene ${d.years[0].sceneObliquityDeg}, band ${JSON.stringify(d.years[0].sceneObliquityBand)}`)],
-    ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000 ? null : `moon distance: ${d.years[0].distanceKm}`)],
+    ['essrt_moon', { year: 2000 }, (d) => (Math.abs(d.years[0].distanceKm - 384400) < 1000
+      && d.years[0].eclipseFormula && d.years[0].eclipseFormula.regime === 'certified' && d.years[0].eclipseFormula.nextLunar && d.years[0].eclipseFormula.nextSolar
+      && d.years[0].eclipseFormula.recurrences && d.years[0].eclipseFormula.recurrences.node[2].synodicMonths === 223   // the Saros is today's third-shortest node pair (plan 33)
+      ? null : `moon: distance ${d.years[0].distanceKm}, formula ${JSON.stringify(d.years[0].eclipseFormula && { regime: d.years[0].eclipseFormula.regime, node: d.years[0].eclipseFormula.recurrences && d.years[0].eclipseFormula.recurrences.node.map((/** @type {any} */ r) => r.synodicMonths) })}`)],
     // the chain's secular period 1,296,000/g1
     ['essrt_bodies', { body: 'mercury' }, (d) => (Math.round(d.record.perihelionEclipticYears) === 232437 ? null : `mercury: ${d.record.perihelionEclipticYears}`)],
     ['essrt_bodies', { body: 'mercury' }, (d) => ('fibonacciD' in d.record || 'inclinationCycleAnchor' in d.record ? `device fields still served: ${Object.keys(d.record).join(',')}` : null)],

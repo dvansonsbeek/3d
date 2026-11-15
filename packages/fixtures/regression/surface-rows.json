@@ -3360,13 +3360,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "2027-02-20 23:14:36 · Penumbral · γ -1.049 · certified | UT · type · γ · regime",
-     "m3000": "-3000-09-19 17:10:53 · Partial · γ -0.788 · reproducible | UT · type · γ · regime",
-     "m400Myr": "-420002768-04-02 19:30:24 · Total · γ -0.265 · reproducible | UT · type · γ · regime",
-     "m2460Myr": "-3072754597-09-07 10:51:27 · Partial · γ 0.784 · reproducible | UT · type · γ · regime",
-     "m4400Myr": "-6662400240-06-24 17:11:29 · Partial · γ 1.136 · reproducible | UT · type · γ · regime",
-     "genesis": "-6764195131-10-03 09:54:51 · Total · γ 0.627 · reproducible | UT · type · γ · regime",
-     "p990Myr": "871597408-02-20 00:49:29 · Penumbral · γ -1.468 · reproducible | UT · type · γ · regime"
+     "today": "2027-02-20 23:14:36 UT · Penumbral · γ -1.049 · certified | ",
+     "m3000": "-3000-09-19 17:10:53 UT · Partial · γ -0.788 · reproducible | ",
+     "m400Myr": "-420002768-04-02 19:30:24 UT · Total · γ -0.265 · reproducible | ",
+     "m2460Myr": "-3072754597-09-07 10:51:27 UT · Partial · γ 0.784 · reproducible | ",
+     "m4400Myr": "-6662400240-06-24 17:11:29 UT · Partial · γ 1.136 · reproducible | ",
+     "genesis": "-6764195131-10-03 09:54:51 UT · Total · γ 0.627 · reproducible | ",
+     "p990Myr": "871597408-02-20 00:49:29 UT · Penumbral · γ -1.468 · reproducible | "
     }
    },
    "moon#081 Next solar eclipse": {
@@ -3378,13 +3378,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "2027-02-06 16:01:36 · Annular · γ 0.295 · certified | UT · type · γ · regime",
-     "m3000": "-3000-10-03 19:34:54 · Annular · γ 0.580 · reproducible | UT · type · γ · regime",
-     "m400Myr": "-420002768-03-17 18:58:08 · Partial · γ 1.085 · reproducible | UT · type · γ · regime",
-     "m2460Myr": "-3072754597-09-23 09:05:59 · Total · γ 0.199 · reproducible | UT · type · γ · regime",
-     "m4400Myr": "-6662400240-06-14 22:54:37 · Partial · γ 1.287 · reproducible | UT · type · γ · regime",
-     "genesis": "-6764195131-10-01 13:14:32 · Total · γ 0.589 · reproducible | UT · type · γ · regime",
-     "p990Myr": "871597408-03-04 19:39:56 · Annular · γ 0.274 · reproducible | UT · type · γ · regime"
+     "today": "2027-02-06 16:01:36 UT · Annular · γ 0.295 · certified | ",
+     "m3000": "-3000-10-03 19:34:54 UT · Annular · γ 0.580 · reproducible | ",
+     "m400Myr": "-420002768-03-17 18:58:08 UT · Partial · γ 1.085 · reproducible | ",
+     "m2460Myr": "-3072754597-09-23 09:05:59 UT · Total · γ 0.199 · reproducible | ",
+     "m4400Myr": "-6662400240-06-14 22:54:37 UT · Partial · γ 1.287 · reproducible | ",
+     "genesis": "-6764195131-10-01 13:14:32 UT · Total · γ 0.589 · reproducible | ",
+     "p990Myr": "871597408-03-04 19:39:56 UT · Annular · γ 0.274 · reproducible | "
     }
    },
    "moon#082 Eclipses per year (mean elements)": {

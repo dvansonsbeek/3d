@@ -26644,7 +26644,7 @@ function _tierModelB() {
 // otherwise re-solve two syzygy walks); the recurrences and the statistics when the instant moves a
 // year. The tier model is the browser's seated package model (the banks), so a deep landing's rows
 // are a seat and a short walk, never an unseated walk.
-let _eclipseFormulaMemo = { model: null, jdUT: NaN, jdTT: NaN, lunar: null, solar: null, recurrences: null, statistics: null, error: null };
+let _eclipseFormulaMemo = { model: null, jdUT: NaN, jdTT: NaN, lunar: null, solar: null, recurrences: null, statistics: null, periods: null, error: null };
 function _eclipseFormulaRows() {
   const jdUT = jdFromPos(o.pos), jdTT = jdTTFromPos(o.pos);
   const model = _tierModelB();
@@ -26656,10 +26656,10 @@ function _eclipseFormulaRows() {
   if (!pairStale && !slowStale) return M;
   try {
     if (pairStale) { M.lunar = F.nextEclipseAfter(jdUT, 'lunar'); M.solar = F.nextEclipseAfter(jdUT, 'solar'); M.jdUT = jdUT; }
-    if (slowStale) { M.recurrences = Number.isFinite(jdTT) ? F.recurrencesAt(jdTT) : null; M.statistics = Number.isFinite(jdTT) ? F.statisticsAt(jdTT) : null; M.jdTT = jdTT; }
+    if (slowStale) { M.recurrences = Number.isFinite(jdTT) ? F.recurrencesAt(jdTT) : null; M.statistics = Number.isFinite(jdTT) ? F.statisticsAt(jdTT) : null; M.periods = Number.isFinite(jdTT) ? F.periodsAt(jdTT) : null; M.jdTT = jdTT; }
     M.error = null;
   } catch (e) {
-    M.lunar = null; M.solar = null; M.recurrences = null; M.statistics = null; M.jdUT = jdUT; M.jdTT = jdTT; M.error = String(e && e.message);
+    M.lunar = null; M.solar = null; M.recurrences = null; M.statistics = null; M.periods = null; M.jdUT = jdUT; M.jdTT = jdTT; M.error = String(e && e.message);
   }
   M.model = model;
   return M;
@@ -26668,13 +26668,23 @@ function _eclipseFormulaRows() {
 function _eclipseFormulaRowText(e) {
   if (!e) return '—';
   const { date, time } = dayToDateNew(e.jdUT, 'julianday', 'julian-gregorian-calendar');
-  return `${date} ${time} · ${e.type} · γ ${e.gamma.toFixed(3)} · ${e.regime}`;
+  return `${date} ${time} UT · ${e.type} · γ ${e.gamma.toFixed(3)} · ${e.regime}`;
+}
+/** The lunar eccentricity's band on a formula instant (plan 33 §2 item 3): e_M is a registry constant at
+ *  every epoch (the early Moon's is a scenario question), so the equation of centre's phase ±2e·P_syn/2π,
+ *  in hours OF DATE on the synodic month of date, is a BAND on every syzygy instant — and ±e on the
+ *  shadow's radius at the Moon. Appended to the next-eclipse hovers; a band, never an error. */
+function _eclipseEccentricityBandText() {
+  const P = _eclipseFormulaRows().periods;
+  if (!P) return '';
+  const hours = 2 * moonOrbitalEccentricityBase * P.synodicDays * 24 / (2 * Math.PI);
+  return ` The lunar eccentricity (${moonOrbitalEccentricityBase}, a constant at every epoch — the early Moon's is a scenario the model does not carry) puts a PHASE band of ±${hours.toFixed(1)} h on the instant at this epoch (±2e·P_syn/2π on the synodic month of date) and ±${(100 * moonOrbitalEccentricityBase).toFixed(1)} % on the shadow's radius at the Moon — a band on this row, not an error.`;
 }
 /** A recurrence row's text: the month count against the second period's count, the span in solar days of date and in years of date, today's name where the pair is today's. */
 function _eclipseRecurrenceText(list, i, unit) {
   const r = list && list[i];
   if (!r) return '—';
-  return `${r.synodicMonths} months = ${r.cycles} ${unit} · ${Math.round(r.spanSolarDays).toLocaleString('en-US')} solar d · ${r.spanYears.toFixed(2)} yr · Δ ${r.shiftDegPerCycle.toFixed(2)}°/cycle${r.name ? ' · ' + r.name : ''}`;
+  return `${r.synodicMonths} months = ${r.cycles} ${unit} · ${Math.round(r.spanSolarDays).toLocaleString('en-US')} solar d · ${r.spanYears.toFixed(2)} yr · Δ ${r.shiftDegPerCycle.toFixed(2)}°/cycle${r.name ? ' · ' + r.name : ''}`;
 }
 /** The statistics row's text (mean elements of date): eclipses per year by class, the seasons per year, flagged approximate inside the Laplace-plane regime. */
 function _eclipseStatisticsText(s) {
@@ -29244,29 +29254,37 @@ const planetStats = {
     {header : '—  Eclipse recurrences of date —' },
       {label : () => `Node recurrence 1`,
        value : [ { v: () => _eclipseRecurrenceText(_eclipseFormulaRows().recurrences?.node, 0, 'node returns') },{ small: '' }],
+       wide  : true,
        hover : [`The shortest month count after which the Moon's node distance F nearly repeats at a syzygy — the shift of F per cycle within 1° (a half-integer node count closes at the OPPOSITE node). The pairs are computed from the synodic and draconic months OF DATE (the eclipse formula of date, plan 33); today they are the tritos 135/146.5, the Saros 223/242 and the inex 358/388.5 — names that are today's coincidences: at the Earth–Moon genesis the node locks near 1:1 with the month, at 400 Ma the pair is 82/88.5 (6.2 yr).`]},
       {label : () => `Node recurrence 2`,
        value : [ { v: () => _eclipseRecurrenceText(_eclipseFormulaRows().recurrences?.node, 1, 'node returns') },{ small: '' }],
+       wide  : true,
        hover : [`The second-shortest node recurrence of date (see the first row).`]},
       {label : () => `Node recurrence 3`,
        value : [ { v: () => _eclipseRecurrenceText(_eclipseFormulaRows().recurrences?.node, 2, 'node returns') },{ small: '' }],
+       wide  : true,
        hover : [`The third-shortest node recurrence of date (see the first row).`]},
       {label : () => `Anomaly recurrence (the type)`,
        value : [ { v: () => { const a = _eclipseFormulaRows().recurrences?.anomaly; const named = a ? a.filter((r) => r.name) : null; return _eclipseRecurrenceText(named && named.length ? named : a, 0, 'perigee returns'); } },{ small: '' }],
+       wide  : true,
        hover : [`The month count after which the Moon's anomaly M′ nearly repeats at a syzygy (the shift within 3.5°) — the recurrence of the TYPE (the Moon's distance): today the Saros, 223 months = 239 anomalistic months (2.8° per cycle). Of date, from the synodic and anomalistic months of date; the named pair where today's is in the list, else the shortest.`]},
       {label : () => `Season recurrence (the year)`,
        value : [ { v: () => _eclipseRecurrenceText(_eclipseFormulaRows().recurrences?.year, 0, 'years') },{ small: '' }],
+       wide  : true,
        hover : [`The shortest month count that is nearly a whole number of tropical years of date (the Sun's longitude shift per cycle within 1°) — the recurrence of the SEASON: today the Metonic cycle, 235 months = 19 years (the Callippic is four of them). At 400 Ma 53 months = 4 years, at 2.46 Ga 33 months = 2 years, at the genesis the eclipse year itself.`]},
 
     {header : '—  Next eclipses (formula of date) —' },
       {label : () => `Next lunar eclipse`,
-       value : [ { v: () => _eclipseFormulaRowText(_eclipseFormulaRows().lunar) },{ small: 'UT · type · γ · regime' }],
-       hover : [`The first lunar eclipse after the scene's instant from the eclipse FORMULA of date (plan 33: the finders' condition in closed form on the model's arguments of date — the mean syzygy from the cumulative counts, the periodic corrections with their amplitudes of date, greatest eclipse at the least distance from the shadow axis, Danjon's shadow at the Moon's distance of date). γ is the signed least distance in Earth radii. The regime tag: 'certified' inside the NASA Five Millennium Canon's span (−1999…+3000), where the formula is gated to minutes against dated records; 'reproducible' beyond, where the Moon's phase in its orbit is the model's, reproducible but not a certified prediction — there the statistics row is the prediction.`]},
+       value : [ { v: () => _eclipseFormulaRowText(_eclipseFormulaRows().lunar) },{ small: '' }],
+       wide  : true,
+       hover : () => [`The first lunar eclipse after the scene's instant from the eclipse FORMULA of date (plan 33: the finders' condition in closed form on the model's arguments of date — the mean syzygy from the cumulative counts, the periodic corrections with their amplitudes of date, greatest eclipse at the least distance from the shadow axis, Danjon's shadow at the Moon's distance of date): the instant in UT on the Date field's calendar, the type, γ (the signed least distance of the Moon's centre from the shadow axis in Earth radii) and the regime tag — 'certified' inside the NASA Five Millennium Canon's span (−1999…+3000), where the formula is gated to minutes against dated records; 'reproducible' beyond, where the Moon's phase in its orbit is the model's, reproducible but not a certified prediction — there the statistics row is the prediction.` + _eclipseEccentricityBandText()]},
       {label : () => `Next solar eclipse`,
-       value : [ { v: () => _eclipseFormulaRowText(_eclipseFormulaRows().solar) },{ small: 'UT · type · γ · regime' }],
-       hover : [`The first solar eclipse after the scene's instant from the eclipse formula of date; γ in Earth radii at greatest eclipse (minimum γ), the type by the topocentric Moon against the Sun (total/annular) or the partial limit. The regime tag as the lunar row's.`]},
+       value : [ { v: () => _eclipseFormulaRowText(_eclipseFormulaRows().solar) },{ small: '' }],
+       wide  : true,
+       hover : () => [`The first solar eclipse after the scene's instant from the eclipse formula of date: the instant in UT, the type by the topocentric Moon against the Sun (total/annular) or the partial limit, γ in Earth radii at greatest eclipse (minimum γ), and the regime tag as the lunar row's.` + _eclipseEccentricityBandText()]},
       {label : () => `Eclipses per year (mean elements)`,
        value : [ { v: () => _eclipseStatisticsText(_eclipseFormulaRows().statistics) },{ small: '' }],
+       wide  : true,
        hover : [`The statistics of eclipses at this epoch on the MEAN elements of date — what the formula predicts where it names no date: the share of syzygies within the class limits for a node distance uniform over the syzygies (the limits from Danjon's shadow at the mean Moon distance of date and the orbit's inclination to the ecliptic of date), times the synodic months per year; the eclipse seasons per year from the Sun's return to the regressing node. Inside the Laplace-plane regime (the genesis side, tilt > 1°) the node regresses about the Laplace plane and the seasons follow the equinoxes — the estimate is flagged approximate.`]},
     ],
 
@@ -32537,7 +32555,7 @@ function updateDomLabel () {
       if (!pStats) continue;
       for (let i = 0; i < pStats.length; i++) {
         const r = pStats[i];
-        if (!r || r === 'null_row' || r.header || r.viz) continue;
+        if (!r || r === 'null_row' || r.header || r.viz || r.wide) continue;   // a wide row's prose value never sizes the value column
         let rawV = ('value' in r) ? r.value : (() => {
           const pair = Object.entries(r).find(([k]) => k !== 'info');
           return pair ? pair[1] : '';
@@ -32674,6 +32692,7 @@ function updateDomLabel () {
     const isSub   = labelTxt === '';
     const subCls  = isSub ? ' pl-sub' : '';
     const hlCls   = row.highlight ? ' pl-highlight' : '';
+    const wideCls = row.wide ? ' pl-wide' : '';            // prose-length value: key on its own line, value wrapped beneath (plan 33)
 
     /* inline proportion bar */
     let barCls = '', barStyle = '';
@@ -32684,7 +32703,7 @@ function updateDomLabel () {
     }
 
     const rowHTML =
-      `<div class="pl-row ${rowCls}${subCls}${hlCls}${barCls}"${barStyle}>` +
+      `<div class="pl-row ${rowCls}${subCls}${hlCls}${wideCls}${barCls}"${barStyle}>` +
       `<span class="pl-key"${keyAttr}>${isSub ? '↳' : keyHTML}</span>` +
       `<span class="pl-val"${valAttr}>${renderVal(v1)}</span>` +
       `<span class="pl-alt"${altAttr}>${renderVal(v2)}</span>` +

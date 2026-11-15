@@ -219,6 +219,27 @@ for (const url of SAMPLE_REQUESTS) {
     && sb.minDeg <= earthDevonian.sceneObliquityDeg && earthDevonian.sceneObliquityDeg <= sb.maxDeg && sb.hybridMeanDeg > 23.2 && sb.hybridMeanDeg < 23.4)) {
     failures.push(`earth sceneObliquity@Devonian must be the cited mean carrying the hybrid's wobble: ${earthDevonian.sceneObliquityDeg}, band ${JSON.stringify(sb)}, cited ${earthDevonian.meanObliquityCitedDeg}`);
   }
+  // PLAN 33 — the eclipse formula of date rides /moon: at 2000 the next lunar eclipse IS the
+  // finder's event (the formula classifies with the finders' geometry — the same event, the
+  // instant within 2 s) and the regime 'certified'; the node recurrences are today's shortest
+  // three; at the Devonian the regime is 'reproducible' and both next eclipses and the
+  // statistics are served (finite seasons per year).
+  {
+    const m2000 = dataOf('/v1/moon?year=2000').years[0];
+    const f = m2000.eclipseFormula;
+    const jdUT2000 = /** @type {number} */ (apiModel.time.yearToJDUT(2000));
+    const finderNext = apiModel.eclipse.findLunarInRange(jdUT2000, jdUT2000 + 400).find((e) => e.jd >= jdUT2000);
+    if (!f || f.regime !== 'certified' || !f.nextLunar || !finderNext || Math.abs(f.nextLunar.jdUT - finderNext.jd) * 86400 > 2 || f.nextLunar.type !== finderNext.type) {
+      failures.push(`moon eclipseFormula@2000 next lunar must be the finder's event: ${JSON.stringify(f && f.nextLunar)} vs ${JSON.stringify(finderNext)}`);
+    }
+    const nodePairs = f && f.recurrences ? f.recurrences.node.slice(0, 3).map((/** @type {any} */ r) => `${r.synodicMonths}/${r.cycles}`) : null;
+    if (JSON.stringify(nodePairs) !== JSON.stringify(['88/95.5', '135/146.5', '223/242'])) failures.push(`moon eclipseFormula@2000 node recurrences: ${JSON.stringify(nodePairs)}`);
+    if (!f || !f.nextSolar || !f.statistics || !(f.statistics.seasonsPerYear > 1.9 && f.statistics.seasonsPerYear < 2.3)) failures.push(`moon eclipseFormula@2000 solar/statistics: ${JSON.stringify(f && { solar: f.nextSolar && f.nextSolar.type, seasons: f.statistics && f.statistics.seasonsPerYear })}`);
+    const fDev = dataOf('/v1/moon?year=-379998000').years[0].eclipseFormula;
+    if (!fDev || fDev.regime !== 'reproducible' || !fDev.nextLunar || !fDev.nextSolar || !fDev.statistics || !Number.isFinite(fDev.statistics.seasonsPerYear)) {
+      failures.push(`moon eclipseFormula@Devonian: ${JSON.stringify(fDev && { regime: fDev.regime, lunar: !!fDev.nextLunar, solar: !!fDev.nextSolar, seasons: fDev.statistics && fDev.statistics.seasonsPerYear })}`);
+    }
+  }
   if (!merc.accuracy || !merc.accuracy.statement) failures.push('bodies/mercury: missing accuracy statement');
   // JD input equivalence: same instant via jd= and via year= must agree.
   const viaJd = dataOf('/v1/earth?jd=2451545').years[0];
