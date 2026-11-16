@@ -60,6 +60,29 @@ for (const body of bodies) {
     if (buf.length !== rec.bytes) fail(tag(`${f}: ${buf.length} bytes ≠ recorded ${rec.bytes}`));
   }
 
+  // 1b. a STATIC manifest (plan 28 §A — the Milky Way dome: one map at every epoch, no tier
+  // table): its files above, its sources with a licence record, no orphans; nothing else.
+  if (manifest.static === true) {
+    if (!files || Object.keys(files).length === 0) fail(tag('a static manifest names no files'));
+    for (const [f, rec] of Object.entries(files || {})) {
+      const r = /** @type {{source?: string}} */ (rec);
+      if (!r.source || !manifest.sources || !manifest.sources[r.source]) fail(tag(`${f}: source "${r.source}" is not described in manifest.sources`));
+    }
+    for (const [k, s] of Object.entries(manifest.sources || {})) {
+      const src = /** @type {{licence?: string, credit?: string, url?: string, sha256?: string}} */ (s);
+      if (!src.licence || !src.credit || !src.url || !src.sha256) fail(tag(`source ${k} lacks a licence, a credit, a url or a sha256`));
+    }
+    const dir = rel(path.join(TEXTURES, body)) + '/';
+    const tracked = execFileSync('git', ['ls-files', dir], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+    const named = new Set(Object.keys(files || {}));
+    for (const f of tracked) {
+      if (f === rel(manifestPath)) continue;
+      if (!named.has(f)) fail(tag(`orphan: ${f} is tracked but the manifest does not name it`));
+    }
+    summary.push(`${body} static / ${Object.keys(files || {}).length} file(s)`);
+    continue;
+  }
+
   // 2. table
   if (!Array.isArray(tiers) || tiers.length < 2) { fail(tag('the tier table is missing or too short')); continue; }
   for (let i = 0; i < tiers.length; i++) {

@@ -56,6 +56,7 @@
     "import:ice-cores": "node tools/pipeline/import-ice-cores.js --write",
     "import:paleoatlas": "node tools/pipeline/build-earth-tiers.js --write",
     "build:body-tiers": "node tools/pipeline/build-body-tiers.js --write",
+    "build:sky-dome": "node tools/pipeline/build-sky-dome.js --write",
     "check:artifacts": "node tools/verify/artifact-freshness.js",
     "check:data": "node tools/verify/data-provenance.js",
     "check:surface-tiers": "node tools/verify/surface-tiers.js",

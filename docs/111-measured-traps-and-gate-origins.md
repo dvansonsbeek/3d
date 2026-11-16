@@ -2507,6 +2507,81 @@ label on its own line, the value wrapped beneath, spanning every column and
 kept out of the column measurement. No model number moved; the surface-rows
 golden re-recorded for the eight rows' text.
 
+### 1.47 A backdrop has a frame and a provenance — measure it against the catalogue it shares the sky with (plan 28 §A)
+
+**The finding.** The Milky Way dome (`public/milkyway.jpg`, 27 KB, no
+provenance record) was added to the scene with no rotation — the plan's
+guess was "its band is wherever the texture's equator fell". Measured
+through a probe hook (`__test__.skyDomeProbe`: the dome's and the star
+field's world quaternions, the texture's orientation flags) and a headless
+decode of the texture (an OffscreenCanvas in the page; the repository has no
+JPEG decoder in Node), fitting the band's great circle by a brightness-
+weighted PCA of the bright pixels' directions through three's sphere mapping
+and the bulge by the brightness maximum along the band, against the Galactic
+centre and pole placed through the star field's J2000 frame: the asset is
+NOT an all-sky panorama. It carries the Galactic-centre half of the band
+only, on a projection whose pole lies inside the band (the band reaches
+both image edges), and the anticentre half of the Milky Way is absent. As
+placed, its bulge sits 2.7° from the Galactic centre, its band plane 14° off
+on average and ~30° near the ecliptic poles (5,171 band samples at grey 18;
+the fit stable from 549 to 5,171 samples, broken only when the sample
+count collapses at grey 40 — a fit is trusted at the sample count it has).
+Rotating it could not fix it: the plan's "the texture's equator = the
+Galactic plane" presumes a Galactic-frame map, and half the sky was missing.
+
+**The fix.** The dome is ESO's 360° Milky Way panorama (eso0932a, ESO/S.
+Brunier, CC BY 4.0 — an equirectangular all-sky image in Galactic
+coordinates, the plane along the equator, the centre at the centre column),
+measured by the same probe through the same mapping before it was adopted:
+the band plane 0.66° from the image equator, the bulge's brightness maximum
+at u = 0.508 (the bulge's dust asymmetry — the published frame is used), and
+the Magellanic Clouds at the MIRRORED longitudes: the image is authored as
+seen from inside, which three's inside-sphere mapping mirrors, so the
+texture's horizontal repeat is −1. A photograph carries stars too, and at
+deep time every catalogue sprite would move away from a frozen photographed
+twin — so the dome is a DERIVED star-suppressed copy
+(`tools/pipeline/build-sky-dome.js`: at the source's own 6000 × 3000, every
+pixel clipped to its local background — a 9 × 9 median at half resolution,
+an 18-px window wider than the brightest stars' halos, plus 4 % of the
+range, by a per-pixel minimum — then σ 0.6 px, WebP q88: 0.38 MB; a resolved
+star is a peak far above its background and is flattened to it, the
+unresolved grain and the dust lanes sit within the margin and stay; the
+recipe, the source's sha256 and the licence in
+`public/textures/sky/manifest.json`, a STATIC manifest the surface-tiers
+gate accepts without a tier table; the change stated in PROVENANCE.md,
+NOTICE and the About folder as CC BY 4.0 requires), the only resolved stars
+in the scene the catalogue's. **Three looks measured on the way** (the
+owner's "it doesn't look correct and nice yet", by screenshots through a
+brightness hook — the render loop idles while paused, so a screenshot after
+a hook call shows the LAST frame until a ±1 wheel nudge wakes one): a
+median alone (9 × 9, a disk-7 opening, σ 1.5–4) removed the grain with the
+stars and left a foggy, blotchy dome; a full-resolution 9 × 9 median as the
+clip level followed Sirius's halo and left its core; at 4096 × 2048 the
+default view magnified the texture 1.6× and the grain read as noise, a σ 1
+blur turned it into smudge — the source's resolution with the slightest
+softening reads as the Milky Way. The dome's brightness is the material's
+colour (`SKY_DOME_BRIGHTNESS`, 0.05 — a LINEAR multiplier, so 0.45 read as
+only ~30 % dimmer on screen; chosen by the owner from a strip at 0.05 / 0.1
+/ 0.18 / 0.28 / 0.45: the faintest), a rendering choice, not the asset's. The frame has ONE home
+(`@essrt/physics` `sky/galactic-frame`: the IAU 1958 pole and zero of
+longitude at J2000, the Hipparcos Vol. 1 §1.5.3 values; the published pole
+and centre close to 3e-8, the triad re-orthogonalised), and the dome's
+quaternion is the stars container's world quaternion times the texture→
+Galactic basis — the texture's centre column on the Galactic centre, its
+top on the north Galactic pole — so the dome and the catalogues share one
+frame by construction. Re-measured in place: the band plane 0.65° from the
+Galactic plane, the texture's Magellanic Clouds within 4° of where the true
+Clouds fall in the SAME fitted frame (both axes and the mirror right).
+
+**The gate** (`perihelion-at-sun`'s dome rows): the dome's local +X and +Y
+through its world quaternion against the Galactic centre and pole through
+the catalogue frame, chords < 1e-9 (read 3e-16); the texture's repeat −1,
+flipY kept, the mesh unscaled; fail-proven under `ESSRT_PERI_SUN_PLANT=1`
+(the dome's quaternion turned 0.01 rad about its pole). The surface-tiers
+gate checks the derived file's hash and the source's licence record. The
+handedness check (the Clouds) is this section's recorded measurement, not a
+gate: it needs the texture's pixels.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -2675,6 +2750,15 @@ The `test:snapshot` chain also carries:
   engine places it only at the first update, after the alignment — 23.44°
   of tilt and 68.23° of equinox offset missing from the sky, invisible to
   goldens that record observables; fail-proven on that build).
+- **The Milky Way dome** sits in the Galactic frame through the catalogue
+  frame: its texture's centre column on the Galactic centre and its top on
+  the north Galactic pole (chords < 1e-9 through the stars container's
+  world quaternion and the ONE home `sky/galactic-frame`), the texture
+  mirrored for the inside view (repeat.x −1), the mesh unscaled — born from
+  §1.47's measurement of the former asset (half a band on a pole-in-band
+  projection, its bulge 2.7° and its plane 14–30° from the sky, no
+  provenance); fail-proven under `ESSRT_PERI_SUN_PLANT=1` (the dome turned
+  0.01 rad about its pole).
 - **The focused chain planet's orbit-plane grid** passes through the
   rendered Sun with its normal along the chain's orbit normal of date (born
   from the owner's "the tilt of Mercury's path floats above the Sun": the

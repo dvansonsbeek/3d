@@ -22,6 +22,7 @@
  *
  * FAIL-PROVEN: ESSRT_PERI_SUN_PLANT=1 shifts the expected distance by 1 %.
  */
+import * as THREE from 'three';
 import { openSimulator } from './harness.mjs';
 
 const PLANT = process.env.ESSRT_PERI_SUN_PLANT === '1' ? 1.01 : 1;
@@ -129,6 +130,24 @@ try {
   for (const k of ['stars', 'constellations']) {
     const f = sf && sf[k];
     check(`star field: the ${k} container sits on the J2000 equatorial frame through R (pole and equinox)`, !!f && f.poleChord < 1e-9 && f.equinoxChord < 1e-9, f ? `pole chord ${f.poleChord.toExponential(2)} (tilt ${f.poleTiltDeg.toFixed(4)}°), equinox chord ${f.equinoxChord.toExponential(2)} (offset ${f.equinoxOffsetDeg.toFixed(4)}°)` : 'probe returned null');
+  }
+  // PLAN 28 §A — the Milky Way dome sits in the Galactic frame THROUGH the catalogues' frame: its
+  // texture's centre column (local +X) on the Galactic centre and its top (local +Y) on the north
+  // Galactic pole, both placed through the stars container's world quaternion from the ONE home
+  // sky/galactic-frame; the texture mirrored for the inside view (repeat.x −1), the mesh unscaled.
+  // Born from the measurement of the former asset (doc 111 §1.47): half a band on a pole-in-band
+  // projection, its bulge 2.7° and its plane 14–30° from the sky, no provenance.
+  {
+    const sd = await sim.page.evaluate(() => window.__test__.skyDomeProbe());
+    const { galacticTriadEquatorialJ2000 } = await import('../../packages/physics/src/sky/galactic-frame.cjs');
+    const G = galacticTriadEquatorialJ2000();
+    const toLocal = (/** @type {[number, number, number]} */ v) => new THREE.Vector3(v[1], v[2], v[0]);
+    const qS = sd ? new THREE.Quaternion().fromArray(sd.starsQuaternion) : null, qK = sd ? new THREE.Quaternion().fromArray(sd.skyQuaternion) : null;
+    if (qK && PLANT !== 1) qK.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.01));   // fail-proof: the dome turned 0.01 rad about its pole
+    const centreChord = sd ? new THREE.Vector3(1, 0, 0).applyQuaternion(qK).distanceTo(toLocal(G.x).applyQuaternion(qS)) : NaN;
+    const poleChord = sd ? new THREE.Vector3(0, 1, 0).applyQuaternion(qK).distanceTo(toLocal(G.z).applyQuaternion(qS)) : NaN;
+    check('Milky Way dome: its centre column and its top sit on the Galactic centre and the north Galactic pole through the catalogue frame', !!sd && centreChord < 1e-9 && poleChord < 1e-9, sd ? `centre chord ${centreChord.toExponential(2)}, pole chord ${poleChord.toExponential(2)}` : 'probe returned null');
+    check('Milky Way dome: the texture is mirrored for the inside view (repeat.x −1), flipY kept, the mesh unscaled', !!sd && sd.textureRepeat[0] === -1 && sd.textureFlipY === true && sd.skyScale.every((/** @type {number} */ s) => s === 1), sd ? `repeat ${JSON.stringify(sd.textureRepeat)}, flipY ${sd.textureFlipY}, scale ${JSON.stringify(sd.skyScale)}, texture ${JSON.stringify(sd.textureSize)}` : '');
   }
   check('Moon nodes: on the ecliptic of date at L′ − F and L′ − F + 180°, at distance a', !!mm && Math.abs(wrapd(mm.ascNode.lon - mm.nodeLonExpectedDeg)) < 1e-6 && Math.abs(wrapd(mm.descNode.lon - mm.nodeLonExpectedDeg - 180)) < 1e-6 && Math.abs(mm.ascNode.lat) < 1e-6 && Math.abs(mm.descNode.lat) < 1e-6 && Math.abs(mm.ascNode.distAU - mm.aAU) < 1e-9, mm ? `asc λ ${mm.ascNode.lon.toFixed(4)}° β ${mm.ascNode.lat.toExponential(1)}°, desc λ ${mm.descNode.lon.toFixed(4)}°, Ω = L′ − F = ${mm.nodeLonExpectedDeg.toFixed(4)}°` : '');
   // Focusing a chain planet shows its orbit-plane grid: it must pass through

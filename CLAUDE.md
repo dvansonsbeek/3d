@@ -514,6 +514,16 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   **A prose-length Planet Info value is a `wide` row** — the grid's `auto`
   value column beside a `minmax(0,1fr)` label column let one 75-character
   value collapse EVERY label in the tab to two letters. (§1.46)
+- **A backdrop has a frame and a provenance — measure it against the
+  catalogue it shares the sky with** — the Milky Way dome was half a band on
+  a pole-in-band projection with no provenance, added with no rotation (its
+  bulge 2.7°, its plane 14–30° from the sky); the dome is now a DERIVED
+  star-suppressed copy of ESO's Galactic-frame panorama (`build-sky-dome.js`,
+  the recipe and licence in its static manifest), rotated through the SAME
+  frame the catalogues sit on (ONE home `sky/galactic-frame`), the texture
+  mirrored for the inside view — a photographed star would stay put while
+  its catalogue sprite moves; a fit is trusted at the sample count it has;
+  the handedness check is the Magellanic Clouds in one fitted frame. (§1.47)
 
 ---
 
@@ -541,7 +551,8 @@ artifacts vs their recorded input hashes — fails naming the exact regeneration
 command), `check:data` (every tracked dataset manifest-covered in
 PROVENANCE.md), `check:surface-tiers` (every surface tier table — the Earth's,
 the Moon's, Mercury's, Saturn's — ≡ its rasters' recorded hashes, contiguous
-over the navigable domain, no orphan raster), `docs:values` / `docs:tables` (the script-written numbers in
+over the navigable domain, no orphan raster; the sky dome's STATIC manifest
+≡ its derived file's hash and its source's licence record), `docs:values` / `docs:tables` (the script-written numbers in
 docs), `values:package` (the published @essrt/model-values ≡ the live
 registry, plus PLAUSIBILITY rows), `test:verify` (the model gates),
 `test:py-physics` (no Python defines model physics outside the ledger),
@@ -678,6 +689,7 @@ what actually made corrections stick here.
 | `data/deltaT-4flag-fit.json`, `data/core-mantle-resonator-stage1.json`, `public/input/climate-formula-coefficients.json`, `data/deep-time-fitted.json` | the shipped fitted artifacts, each its fitter's (the last holds the GIA τ only since plan 12) — embedded by `generate.mjs`. The ΔT pair is GOVERNED (plan 12 §1b close-out): the joint `--write` stamps an `inputs` block, `check:artifacts` fails when the physics it was fitted on moves, and `regen:cascade` lists the stale fit as a by-hand step — a re-close is a decision, never an automatic regeneration. The anchor `deltaTStart` ships INSIDE the fit artifact (`FIT.DT_ANCHOR`), never in astro-reference — a re-close no longer re-stamps the N-body node |
 | `data/astrogeo22-earth-moon.json` | the CITED Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; `npm run import:astrogeo22`) — embedded as `deltat/moon-distance-artifact.cjs`, read by `deltat/moon-distance-history.cjs` (plan 12 option A) |
 | `public/textures/earth/` | the Earth's day maps by age (plan 27 steps E, G, H): Scotese's PaleoAtlas v3 (CC BY 4.0; 21 ka–750 Ma at its own steps; `npm run import:paleoatlas` fetches, prepares and hashes), generated illustration beyond, the Pleistocene ice blended by the model's OWN ice history (the climate formula's L1 layer, a labelled forecast to +150 kyr), and the derived future tiers (the continents moved by their measured plate motions, NNR-MORVEL56, then Scotese's Pangaea Proxima scenario to +250 Myr; the biosphere's end and the moist greenhouse on that supercontinent) — ONE table `manifest.json` (each tier's `fadeMyr`, `skyTint`, the one `present: true`) read by the scene's `updateEra` and the About folder's "Earth map" row, gated by `check:surface-tiers` (`tools/pipeline/build-earth-tiers.js`). The Moon's, Mercury's, Mars's and Saturn's tables (step F: the lunar magma ocean, the maria-free crust derived from the present-day map and two mare-flooding steps, the young ray systems suppressed before their impacts; Mercury's early crust; Mars's Noachian and Hesperian seas below the MOLA shoreline contours, a contested reading; Saturn's rings hidden before 400 Ma and gone after ~+200 Myr — cited bands) live beside it under `public/textures/<body>/`, written by `npm run build:body-tiers` (`tools/pipeline/build-body-tiers.js`), read by the scene's `makeSurfaceTiers` and the About folder's "Moon & planet maps" row, the same gate |
+| `public/textures/sky/` | the Milky Way dome (plan 28 §A): ESO/S. Brunier's 360° panorama (CC BY 4.0, Galactic coordinates) with the stars removed by `npm run build:sky-dome` (`tools/pipeline/build-sky-dome.js`; the source fetched to the gitignored `data/.cache/sky/`, sha256-pinned) so the only stars in the scene are the catalogue's; a STATIC `manifest.json` (the recipe, the source, the licence), the same gate; drawn in the Galactic frame through the catalogues' J2000 frame (ONE home `@essrt/physics` `sky/galactic-frame`), the texture mirrored for the inside view |
 | `docs/` | the numbered docs (`00-readme` is the index); `40-architecture`, `99-essrt`, `110-calculation-map`, `111-measured-traps-and-gate-origins` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main

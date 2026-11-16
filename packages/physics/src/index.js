@@ -195,6 +195,8 @@ export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from
 export { createEclipseFinders } from './eclipse/finders.cjs';
 // Plan 33 — the eclipse formula of date and the ONE home of the shadow geometry the finders classify with.
 export { createEclipseFormula, recurrencesOfDate, lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii, DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS } from './eclipse/formula.cjs';
+// PLAN 28 §A — the Galactic frame at J2000 (ONE home): the Milky Way dome's frame, the catalogue stars' later
+export { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, equatorialUnitVector, galacticTriadEquatorialJ2000, equatorialToGalacticDeg } from './sky/galactic-frame.cjs';
 // Phase 8.6 — the published reference curves (external comparison formulas
 // and datasets, exactly as published; comparison references, never inputs).
 // (reference/published-curves MIGRATED to @essrt/reference at the 4.0.0

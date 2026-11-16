@@ -135,6 +135,11 @@ Data sources
     Yale Bright Star Catalog   https://github.com/brettonw/YaleBrightStarCatalog
     Solar System Scope         planet textures
                                https://www.solarsystemscope.com/textures/
+    ESO/S. Brunier             The Milky Way panorama (eso0932a), CC BY 4.0 — the
+                               sky dome's texture, resized and its stars removed by
+                               tools/pipeline/build-sky-dome.js (a derivative, stated
+                               in public/textures/sky/manifest.json and PROVENANCE.md)
+                               https://www.eso.org/public/images/eso0932a/
     ELP-2000/82B series        IMCCE public archive, ELP1..ELP36.
                                Chapront-Touzé, M. & Chapront, J. (1983) A&A 124,
                                50; revised (1988) A&A 190, 342.

@@ -32,7 +32,9 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   sceneObliquityHandoverWeight, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand,
   // the NASA Five Millennium Canon's span (−1999…+3000): ONE home eclipse/formula — the ΔT chart's era range,
   // the Espenak–Meeus validity and the lunar-canon verification windows read it (plan 33's hardcoded-values review)
-  CANON_WINDOW_YEARS } from '@essrt/physics';
+  CANON_WINDOW_YEARS,
+  // the Galactic frame at J2000 (ONE home sky/galactic-frame): the Milky Way dome's rotation (plan 28 §A)
+  galacticTriadEquatorialJ2000 } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -4676,7 +4678,10 @@ if (typeof window !== 'undefined') {
       skyScale: sky.scale.toArray(),
       textureFlipY: skyTexture.flipY, textureRepeat: skyTexture.repeat.toArray(), textureOffset: skyTexture.offset.toArray(),
       textureSize: skyTexture.image ? [skyTexture.image.width, skyTexture.image.height] : null,
+      brightness: skyMaterial.color.r,
     }),
+    /** The dome's brightness (the material's colour scale) — a tuning knob for screenshots; returns the value set. @param {number} k */
+    skyDomeBrightness: (k) => { skyMaterial.color.setScalar(k); return skyMaterial.color.r; },
     // Moon-ring gate hook: the RING's perigee and ascending
     // node of date read from the placed stack geometry — the apsidal arm's
     // offset (toward the apogee) and the Moon orbit plane's normal — in the
@@ -8792,12 +8797,27 @@ scene.add(eccentricityPathGroup);
 // CREATE MILKYWAY SKYDOME
 //*************************************************************
 const skyGeo = new THREE.SphereGeometry(100000, 25, 25);
-const skyTexture = loadTexture("public/milkyway.jpg");
+// PLAN 28 §A — the dome is the diffuse Galaxy in the GALACTIC frame: ESO/S. Brunier's 360° panorama
+// (CC BY 4.0) with the stars taken out by tools/pipeline/build-sky-dome.js, so the only stars in the
+// scene are the catalogue's (the ones that will move, plan 28 §B/C). The image is authored as seen
+// from inside; three's inside-sphere mapping mirrors it, so the horizontal repeat is −1 (measured:
+// the Magellanic Clouds read at the mirrored longitudes without it — doc 111 §1.47). Its rotation
+// into the Galactic frame is set after the catalogue alignment below; gate: perihelion-at-sun's
+// dome rows. The former public/milkyway.jpg carried HALF the band on a pole-in-band projection
+// with no provenance — its bulge 2.7° and its plane 14–30° from the sky (the same section).
+const skyTexture = loadTexture("public/textures/sky/derived/milkyway-diffuse.webp");
+skyTexture.wrapS = THREE.RepeatWrapping;
+skyTexture.repeat.x = -1;
 
 // Set correct color space for color image textures
 skyTexture.colorSpace = THREE.SRGBColorSpace; // This is the correct setting for normal color images
+// The dome's brightness is a RENDERING choice (the asset is a faithful derivative of the
+// panorama, which is processed for display and far brighter than a backdrop should be): the
+// material's colour scales it; tuned by screenshots through __test__.skyDomeBrightness.
+const SKY_DOME_BRIGHTNESS = 0.05;   // the owner's choice by screenshots (0.05 / 0.1 / 0.18 / 0.28 / 0.45): the faintest backdrop, never competing with the orbits
 const skyMaterial = new THREE.MeshBasicMaterial({
   map: skyTexture,
+  color: new THREE.Color(SKY_DOME_BRIGHTNESS, SKY_DOME_BRIGHTNESS, SKY_DOME_BRIGHTNESS),
   side: THREE.BackSide
 });
 const sky = new THREE.Mesh(skyGeo, skyMaterial);
@@ -8854,6 +8874,22 @@ sceneObjects.stars.visible = true;
 // --- Create Constellations ---
 scene.updateMatrixWorld();
 sceneObjects.constellations.applyMatrix4(earth.rotationAxis.matrixWorld);
+
+// PLAN 28 §A — the Milky Way dome sits in the Galactic frame through the SAME J2000 equatorial
+// frame the catalogues sit on (ONE home @essrt/physics sky/galactic-frame): the texture's local
+// +X (its centre column) → the Galactic centre, +Y (its top) → the north Galactic pole, +Z the
+// right-handed third axis; the stars container's world frame carries the catalogues' local
+// convention (x = α 90°, y = the pole, z = the equinox). Gate: perihelion-at-sun's dome rows.
+{
+  scene.updateMatrixWorld();
+  const G = galacticTriadEquatorialJ2000();
+  const toLocal = (/** @type {[number, number, number]} */ v) => new THREE.Vector3(v[1], v[2], v[0]);
+  const X = toLocal(G.x), Y = toLocal(G.z);
+  const Z = new THREE.Vector3().crossVectors(X, Y);
+  const q = sceneObjects.stars.getWorldQuaternion(new THREE.Quaternion());
+  sky.quaternion.copy(q.multiply(new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z))));
+  sky.updateMatrixWorld();
+}
 sceneObjects.constellations.visible = false;
 
 // --- Create Blackholes ---
@@ -21403,6 +21439,8 @@ function setupGUI() {
        + a('https://tweakpane.github.io/docs/', 'Tweakpane') + ' · '
        + a('https://www.solarsystemscope.com/textures/', 'Solar System Scope textures') + ' · '
        + a('https://github.com/brettonw/YaleBrightStarCatalog', 'Yale BSC'), true);
+    line('Milky Way dome: ' + a('https://www.eso.org/public/images/eso0932a/', 'ESO/S. Brunier')
+       + ', The Milky Way panorama (CC BY 4.0) — resized and its stars removed, so only the catalogue’s stars are drawn', true);
     line('Full attribution: ' + a('https://github.com/dvansonsbeek/3d/blob/master/NOTICE', 'NOTICE'), true);
   }
 
