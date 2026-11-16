@@ -2,6 +2,8 @@ import * as THREE        from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Pane } from 'tweakpane';
+// PLAN 28 §B/C — the sky of date: the bright-star catalogue and its linear space motion (ONE home)
+import { createSkyOfDate, SKY_CONSTANTS } from './sky-of-date.js';
 
 // Generated from public/input/astro-reference.json (+ the assembled deep-time
 // block) by `npm run constants:generate` (§2g). Never hand-edited; `npm run test:constants`
@@ -2943,6 +2945,17 @@ function domainStatusAt(pos) {
     hover: `This date lies outside the ±${DOMAIN_CERTIFIED_MYR} Myr certified range. What you see is the model's own extrapolation on cited inputs. Moon distance: the published Earth–Moon history (Farhat et al. 2022). Length of day: derived from it by angular-momentum conservation. Obliquity: a band of possible values, not one value. Precession clock: the composed lunisolar law, not calibrated against any rock record here. Earth map: ${surface}. Results are reproducible, not converged.`,
   };
 }
+/** PLAN 28 §F — the sky's clause of the Model validity hover: which regime the catalogue sky is in
+ *  at this instant (the cited astrometry propagated linearly inside ±1 Myr of the catalogue epoch;
+ *  fading out beyond; gone — no star of today's sky is in a known place — further out). */
+function skyStatusClause(pos) {
+  if (!Number.isFinite(pos)) return '';
+  const dtYears = _engineYearTT(jdFromPos(pos)) - 1991.25;
+  const lim = SKY_CONSTANTS.linearRegimeYears, fade = SKY_CONSTANTS.regimeFadeYears;
+  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 positions, parallaxes and proper motions; Gaia DR3 and Pulkovo radial velocities) propagated linearly from the catalogue epoch — every star moves with its measured space velocity, and the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). Valid within ±${(lim / 1e6).toFixed(0)} Myr of today, where the Galaxy's curvature of a star's path is invisible.`;
+  if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are fading out — beyond ±${(lim / 1e6).toFixed(0)} Myr the straight-line motion stops being the star's path (the Galactic orbit bends it), and no star of today's sky stays in a known place.`;
+  return ` Sky: no star of today's sky is drawn — beyond ±${(lim / 1e6).toFixed(0)} Myr the Galactic orbits diverge and the bright stars of today have not formed or have died; only the Milky Way's band stands (the Galactic-orbit and statistical skies are not yet built).`;
+}
 /** THE HONEST EDGE (plan 27 step B, doc 111 §1.36): a position is clamped to the navigable
  *  domain — beyond it the readers fall back to a linear count (630 solar days per year one day
  *  before the genesis, measured by the owner) and nothing is drawn. Play stops at an edge. */
@@ -4682,6 +4695,13 @@ if (typeof window !== 'undefined') {
     }),
     /** The dome's brightness (the material's colour scale) — a tuning knob for screenshots; returns the value set. @param {number} k */
     skyDomeBrightness: (k) => { skyMaterial.color.setScalar(k); return skyMaterial.color.r; },
+    // PLAN 28 §B/C — the sky of date's state and the gates' reads: a star's direction at an engine
+    // year through the SAME formula the sprites ride (pure, no memo), the catalogue record it rides on.
+    skyState: () => _skyOfDate.state(),
+    skyLoaded: () => _skyOfDate.loaded,
+    skyUpdate: (force) => _skyOfDate.updateForEpoch(jdFromPos(o.pos), force !== false),
+    starDirectionAt: (hip, year) => _skyOfDate.starDirectionAt(hip, year),
+    starRecord: (hip) => _skyOfDate.starRecord(hip),
     // Moon-ring gate hook: the RING's perigee and ascending
     // node of date read from the placed stack geometry — the apsidal arm's
     // offset (toward the apogee) and the Moon orbit plane's normal — in the
@@ -8848,8 +8868,8 @@ scene.add(sceneObjects.constellations);
 // we can add other fixed objects over here later on. e.g.
 //scene.add(sceneObjects.blackholes);
 
-// --- Create Starfield ---
-createStarfield();
+// (Plan 28 §B: the background tier is the catalogue's 6.5 < V ≤ 8.0 stars — real stars at real
+// places, drawn by the sky module — where the first build drew 100,000 random points.)
 // The star and constellation catalogs are J2000 RA/Dec: align their containers
 // ONCE to the J2000 equatorial frame through the world frame — the frame the
 // first _applyEngineEarthFrame places before the series artifact arrives (the
@@ -8946,7 +8966,8 @@ const drawOnShaderProto = new THREE.ShaderMaterial({
   uniforms: {
     uDrawProgress: { value: 0.0 },
     uTotalLength:   { value: 1.0 },
-    uColor:         { value: constellationMaterial.color.clone() }
+    uColor:         { value: constellationMaterial.color.clone() },
+    uOpacity:       { value: 1.0 }    // plan 28 §C: the constellation's recognisability × the regime fade
   },
   vertexShader: `
     attribute float lineDistance;
@@ -8960,11 +8981,12 @@ const drawOnShaderProto = new THREE.ShaderMaterial({
     uniform float uDrawProgress;
     uniform float uTotalLength;                                // ← and here
     uniform vec3  uColor;
+    uniform float uOpacity;
     varying float vLineDistance;
     void main() {
       // now we can safely compare against uTotalLength
       if ((vLineDistance / uTotalLength) > uDrawProgress) discard;
-      gl_FragColor = vec4(uColor, 1.0);
+      gl_FragColor = vec4(uColor, uOpacity);
     }
   `,
   transparent: true,
@@ -8974,6 +8996,17 @@ const drawOnShaderProto = new THREE.ShaderMaterial({
 // Array to keep track of every material instance we create,
 // so we can update their `uDrawProgress` in a single loop.
 const drawMaterials = [];
+// PLAN 28 §B/C — the sky of date (ONE home src/sky-of-date.js): the catalogue sky on the J2000-aligned
+// containers, moved with its space velocities per engine year; the gates read its state through
+// __test__.skyState / starDirectionAt.
+const _skyOfDate = createSkyOfDate({
+  THREE, CSS2DObject, fetchRepoJson,
+  starsUrl: bsc5url, constellationsUrl,
+  starsGroup: sceneObjects.stars, constellationsGroup: sceneObjects.constellations,
+  engineYearOfJd: (jdUT) => _engineYearTT(jdUT),
+  constellationMaterial, drawOnShaderProto, drawMaterials,
+  settings: () => ({ starDistance: o.starDistance || 10000, starsizeBase: o.starsizeBase || 50, namesVisible: o.starNamesVisible, layout: o.constellationLayout }),
+});
 
 // 4) Kick off constellation setup immediately
 initConstellations();
@@ -21076,7 +21109,17 @@ function openFrameworkImagesPanel() {
   // the cycles figure draws the LR04 record, the pole-star figure the catalogue: load each once and redraw the shown figure
   const redraw = (d) => { if (d && frameworkImagesPanel.classList.contains('visible')) updateFrameworkImagesPanel(frameworkImagesPanel._current); };
   if (!cfmLR04Data) loadCfmLR04Data().then(redraw);
-  if (!_fipStars) fetchRepoJson(bsc5url).then((d) => { if (Array.isArray(d)) { _fipStars = d; redraw(d); } });
+  // plan 28 §B: the catalogue is the v2 document (columnar, the names keyed by HIP) — the pole-star
+  // figure wants the NAMED stars as {N, RA, Dec, V} with RA/Dec in degrees (the v1 array carried strings)
+  if (!_fipStars) fetchRepoJson(bsc5url).then((d) => {
+    const list = Array.isArray(d) ? d : (d && d.columns && Array.isArray(d.stars)) ? (() => {
+      const ci = Object.fromEntries(d.columns.map((c, i) => [c, i]));
+      const out = [];
+      for (const r of d.stars) { const rec = d.names && d.names[r[ci.hip]]; if (rec && rec.name) out.push({ N: rec.name, RA: r[ci.raDeg], Dec: r[ci.decDeg], V: r[ci.vmag] }); }
+      return out;
+    })() : null;
+    if (list) { _fipStars = list; redraw(list); }
+  });
   // the ice-core figure: the NOAA EPICA Dome C / Vostok records and the EPICA CO₂ composite
   if (!cfmEpicaData) loadEpicaData().then(redraw);
   if (!_fipIceCores) fetchRepoJson('public/input/ice-core-data.json').then((d) => { if (d) { _fipIceCores = d; redraw(d); } });
@@ -21441,6 +21484,9 @@ function setupGUI() {
        + a('https://github.com/brettonw/YaleBrightStarCatalog', 'Yale BSC'), true);
     line('Milky Way dome: ' + a('https://www.eso.org/public/images/eso0932a/', 'ESO/S. Brunier')
        + ', The Milky Way panorama (CC BY 4.0) — resized and its stars removed, so only the catalogue’s stars are drawn', true);
+    line('Stars: ' + a('https://www.cosmos.esa.int/web/hipparcos', 'Hipparcos') + ' (ESA; van Leeuwen 2007, the new reduction, via ESA’s Gaia archive) · radial velocities '
+       + a('https://www.cosmos.esa.int/gaia', 'Gaia DR3') + ' (ESA/Gaia/DPAC, CC BY-SA 3.0 IGO) and Pulkovo (Gontcharov 2006) · names '
+       + a('https://www.iau.org/public/themes/naming_stars/', 'IAU WGSN') + ' (CC BY 4.0) · designations Yale BSC', true);
     line('Full attribution: ' + a('https://github.com/dvansonsbeek/3d/blob/master/NOTICE', 'NOTICE'), true);
   }
 
@@ -23055,15 +23101,13 @@ function setupGUI() {
 
   // ── Stars (title = toggle, expand = names checkbox) ──
   const starsFolder = makeToggleFolder(visFolder, 'Stars', sceneObjects.stars, 'visible', null,
-    'Background stars from the Hipparcos catalogue. Click to toggle.');
+    'The sky of date: the Hipparcos catalogue to V 8 (8,870 naked-eye stars with names and constellation lines; the fainter ones the background), every star moved with its measured space velocity from the catalogue epoch — within ±1 Myr of today; beyond, the catalogue sky fades out. Click to toggle.');
   addTooltip(starsFolder.addBinding(o, 'starNamesVisible', { label: 'Names' })
     .on('change', ({ value }) => {
-      sceneObjects.stars.children.forEach(child => {
-        if (child instanceof CSS2DObject) child.visible = value;
-      });
+      _skyOfDate.setNamesVisible(value);
       needsLabelUpdate = true;
     }),
-    'Show star name labels.');
+    'Show the IAU proper names (367 stars); a name fades with its constellation as the shape dissolves.');
 
   // ── Constellations (title = toggle, expand = style dropdown) ──
   const constFolder = makeToggleFolder(visFolder, 'Constellations', sceneObjects.constellations, 'visible', null,
@@ -23643,10 +23687,13 @@ function render(now) {
     // display (the civil UT date, the time, the year of date — plan 29).
     o.julianDay     = jdFromPos(o.pos);
     o.currentYear = sceneYearOfDate(o.julianDay)
+    // PLAN 28 §C: the sky of date — the catalogue stars, lines and names move with their space
+    // velocities; recomputed only when the ENGINE year moves a whole year (the module decides)
+    if (_skyOfDate.loaded && _skyOfDate.updateForEpoch(o.julianDay)) needsLabelUpdate = true;
     // plan 27 step B: the 'Domain' row — rewritten only when its text changes
     if (o._domainCtrl) {
       const d = domainStatusAt(o.pos);
-      if (d.text !== o.domainStatus) { o.domainStatus = d.text; o._domainCtrl.element.title = d.hover; o._domainCtrl.refresh(); }
+      if (d.text !== o.domainStatus) { o.domainStatus = d.text; o._domainCtrl.element.title = d.hover + skyStatusClause(o.pos); o._domainCtrl.refresh(); }
     }
     // plan 29: the 'Engine age (TT)' row — the instant in uniform time beside the Earth-count fields
     if (o._engineAgeCtrl) {
@@ -28224,116 +28271,24 @@ function addWidthToggle(gui, sizes = [350, 550]) {
   };
 }
 
+/** The constellation lines follow the layout setting (PLAN 28 §C: the strokes are keyed to the
+ *  catalogue's stars and drawn through their directions OF DATE by the sky module — this only sets
+ *  the layout; before the catalogue has loaded the setting is remembered). The curved layout's
+ *  draw-on animation runs once per layout change. */
 function initConstellations() {
-  console.log(`⏳ initConstellations() [${o.constellationLayout}] fetching…`);
-
-  fetchRepoJson(constellationsUrl)
-    .then(data => {
-      if (!data) throw new Error('Constellations load failed from every source');
-      // build raw strokes
-      const strokes = [];
-      let stroke = [];
-      data.asterismIndices.forEach(idx => {
-        if (idx !== -1) {
-          const ra  = data.rightAscension[idx];
-          const dec = data.declination   [idx];
-          if (!Number.isFinite(ra) || !Number.isFinite(dec)) return;
-          const R = o.starDistance;
-          stroke.push(new THREE.Vector3(
-            R * Math.cos(dec) * Math.sin(ra),
-            R * Math.sin(dec),
-            R * Math.cos(dec) * Math.cos(ra)
-          ));
-        } else {
-          if (stroke.length > 1) strokes.push(stroke);
-          stroke = [];
-        }
-      });
-      if (stroke.length > 1) strokes.push(stroke);
-      console.log(`  → parsed ${strokes.length} strokes`);
-
-      // clear old
-      sceneObjects.constellations.clear();
-      drawMaterials.length = 0;
-
-      if (o.constellationLayout === 'asterism') {
-        console.log('  → drawing ASTERISM segments');
-        const pts = [];
-        strokes.forEach(s => {
-          for (let i = 0; i < s.length - 1; i++) pts.push(s[i], s[i+1]);
-        });
-        if (pts.length === 0) return;
-
-        const geo = new THREE.BufferGeometry().setFromPoints(pts);
-        const distArr = new Float32Array(pts.length);
-        let acc = 0;
-        distArr[0] = 0;
-        for (let i = 1; i < pts.length; i++) {
-          acc += pts[i].distanceTo(pts[i - 1]);
-          distArr[i] = acc;
-        }
-        geo.setAttribute('lineDistance', new THREE.BufferAttribute(distArr, 1));
-        geo.computeBoundingSphere();
-
-        const mesh = new THREE.LineSegments(geo, constellationMaterial);
-        mesh.frustumCulled = false;
-        sceneObjects.constellations.add(mesh);
-
-        // single render if you’re not in a loop
-        renderer.render(scene, camera);
-        labelRenderer.render(scene, camera);
-        console.log('  → ASTERISM render complete');
-
-      } else {
-        console.log('  → drawing STELLARIUM curves');
-
-        // build curves & collect materials
-        strokes.forEach(pts => {
-          if (pts.length < 2) return;
-          const curve     = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
-          const divisions = pts.length * 5;
-          const splinePts = curve.getPoints(divisions);
-
-          const geo = new THREE.BufferGeometry().setFromPoints(splinePts);
-          const count = splinePts.length;
-          const dArr  = new Float32Array(count);
-          dArr[0] = 0;
-          let totalLen = 0;
-          for (let i = 1; i < count; i++) {
-            totalLen += splinePts[i].distanceTo(splinePts[i - 1]);
-            dArr[i] = totalLen;
-          }
-          geo.setAttribute('lineDistance', new THREE.BufferAttribute(dArr, 1));
-          geo.computeBoundingSphere();
-
-          const mat = drawOnShaderProto.clone();
-          mat.uniforms.uTotalLength.value = totalLen;
-          mat.uniforms.uColor.value       = constellationMaterial.color.clone();
-          drawMaterials.push(mat);
-
-          const line = new THREE.Line(geo, mat);
-          line.frustumCulled = false;
-          sceneObjects.constellations.add(line);
-        });
-
-        console.log(`  → created ${drawMaterials.length} curved lines`);
-
-        if (drawMaterials.length) {
-          console.log('  → starting draw-on animation');
-          const start    = performance.now();
-          const duration = 2000;
-          (function animateDraw() {
-            const t = Math.min((performance.now() - start) / duration, 1);
-            drawMaterials.forEach(m => m.uniforms.uDrawProgress.value = t);
-            renderer.render(scene, camera);
-            labelRenderer.render(scene, camera);
-            if (t < 1) requestAnimationFrame(animateDraw);
-            else console.log('  → draw-on animation complete');
-          })();
-        }
-      }
-    })
-    .catch(err => console.error('❌ initConstellations error:', err));
+  _skyOfDate.setLayout(o.constellationLayout);
+  if (o.constellationLayout !== 'asterism' && drawMaterials.length) {
+    const start = performance.now(), duration = 2000;
+    (function animateDraw() {
+      const t = Math.min((performance.now() - start) / duration, 1);
+      drawMaterials.forEach(m => { m.uniforms.uDrawProgress.value = t; });
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+      if (t < 1) requestAnimationFrame(animateDraw);
+    })();
+  } else {
+    drawMaterials.forEach(m => { m.uniforms.uDrawProgress.value = 1; });
+  }
 }
 
 // — Make sure you have these at the top of your script —
@@ -28341,129 +28296,16 @@ function initConstellations() {
 // let starSizeMaterial = null;
 // sceneObjects.stars = new THREE.Object3D();  scene.add(sceneObjects.stars);
 
+/** PLAN 28 §B/C: the catalogue sky — the bright-star catalogue (Hipparcos-2 to V 8, two tiers) and
+ *  the HIP-keyed constellation strokes, loaded and drawn by the sky module at the scene's instant,
+ *  then moved with their space velocities as the engine year moves (the 20-Hz block below). */
 function initStars() {
-  console.log('⏳ initStars(): fetching', bsc5url);
-  fetchRepoJson(bsc5url)
-    .then(data => {
-      if (!data) throw new Error('Stars load failed from every source');
-      if (!Array.isArray(data) || data.length === 0) {
-        throw new Error('Stars JSON is not an array or is empty');
-      }
-
-      // 1) Prepare flat arrays and label holders
-      const positions    = [];
-      const colors       = [];
-      const sizes        = [];
-      const labelObjects = [];
-      const tmpColor     = new THREE.Color();
-      const R            = o.starDistance    || 10000;
-      const baseSize     = o.starsizeBase    ||   50;
-
-      data.forEach((star) => {
-        // 2) Parse & validate fields
-        const ra   = raToRadians(star.RA);
-        const dec  = decToRadians(star.Dec);
-        const mag  = parseFloat(star.V);
-        const kel  = parseFloat(star.K);
-        const name = star.N;
-        if (![ra, dec, mag, kel].every(Number.isFinite) || !name) return;
-
-        // 3) Spherical → Cartesian via THREE.Spherical
-        const sph = new THREE.Spherical(
-          R,
-          Math.PI/2 - dec,  // polar angle
-          ra                 // azimuthal angle
-        );
-        const pos = new THREE.Vector3().setFromSpherical(sph);
-        // tiny jitter to avoid z-fighting
-        pos.x += (Math.random() - 0.5) * 0.001;
-        pos.y += (Math.random() - 0.5) * 0.001;
-        pos.z += (Math.random() - 0.5) * 0.001;
-
-        // 4) Collect for BufferGeometry
-        positions.push(pos.x, pos.y, pos.z);
-        tmpColor.set(colorTemperature2rgb(kel));
-        colors.push(tmpColor.r, tmpColor.g, tmpColor.b);
-        const s = mag < 1 ? 1.5 : mag < 3 ? 1.0 : mag < 5 ? 0.6 : 0.3;
-        sizes.push(s * baseSize);
-
-        // 5) Create CSS2D label inline
-        const labelDiv = document.createElement('div');
-        labelDiv.className   = 'star-label';
-        labelDiv.textContent = name;
-        // (All styling comes from your CSS .star-label rules)
-        labelDiv.style.pointerEvents = 'none';
-
-        const labelObj = new CSS2DObject(labelDiv);
-        labelObj.position.copy(pos);
-        labelObj.visible = o.starNamesVisible;
-        labelObjects.push(labelObj);
-      });
-
-      console.log(`  → kept ${positions.length/3} stars`);
-
-      // 6) Build one BufferGeometry
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position',  new THREE.Float32BufferAttribute(positions, 3));
-      geo.setAttribute('starColor', new THREE.Float32BufferAttribute(colors,    3));
-      geo.setAttribute('starSize',  new THREE.Float32BufferAttribute(sizes,     1));
-      geo.computeBoundingSphere();
-      console.log('  → boundingSphere radius =', geo.boundingSphere.radius);
-
-      // 7) Create ShaderMaterial with additive blending & alpha‐only sprite
-      const mat = new THREE.ShaderMaterial({
-        uniforms: {
-          pointTexture: { value: starTexture },
-          uScaleFactor: { value: 2500.0 },
-          fadeStart:    { value: 7500.0 },
-          fadeEnd:      { value: 30000.0 }
-        },
-        vertexShader: `
-          uniform float uScaleFactor;
-          attribute float starSize;
-          attribute vec3 starColor;
-          varying vec3 vColor;
-          varying float vDist;
-          void main() {
-            vColor = starColor;
-            vec4 mv = modelViewMatrix * vec4(position, 1.0);
-            vDist = -mv.z;
-            gl_PointSize = starSize * (uScaleFactor / max(vDist, 0.0001));
-            gl_Position  = projectionMatrix * mv;
-          }
-        `,
-        fragmentShader: `
-          uniform sampler2D pointTexture;
-          uniform float fadeStart, fadeEnd;
-          varying vec3 vColor;
-          varying float vDist;
-          void main() {
-            float a = texture2D(pointTexture, gl_PointCoord).a;
-            float f = 1.0 - smoothstep(fadeStart, fadeEnd, vDist);
-            gl_FragColor = vec4(vColor * f, a * f);
-          }
-        `,
-        blending:     THREE.AdditiveBlending,
-        depthWrite:   false,
-        transparent:  true,
-        vertexColors: true
-      });
-      // optional: expose for GUI tweaks
-
-      // 8) Create & insert the Points mesh
-      const points = new THREE.Points(geo, mat);
-      points.frustumCulled = false;
-
-      // clear any old stars & labels
-      while (sceneObjects.stars.children.length) {
-        sceneObjects.stars.remove(sceneObjects.stars.children[0]);
-      }
-      sceneObjects.stars.add(points);
-
-      // 9) Add all CSS2D labels into the same group
-      labelObjects.forEach(lo => sceneObjects.stars.add(lo));
-
-      console.log('✅ initStars: complete');
+  console.log('⏳ initStars(): the sky of date —', bsc5url);
+  _skyOfDate.load(starTexture, jdFromPos(o.pos))
+    .then((counts) => {
+      initConstellations();
+      needsLabelUpdate = true;
+      console.log(`✅ initStars: ${counts ? counts.stars : '?'} stars (${counts ? counts.nakedEye : '?'} naked-eye), ${_skyOfDate.state().constellations} constellations`);
     })
     .catch(err => console.error('❌ initStars error:', err));
 }
@@ -37550,101 +37392,7 @@ function showHideOrbits() {
   });
 }
 
-function randomPointInSphere(radius) {
-  const v = new THREE.Vector3();
-  let x, y, z, normalizationFactor;
 
-  do {
-    x = THREE.MathUtils.randFloat(-1, 1);
-    y = THREE.MathUtils.randFloat(-1, 1);
-    z = THREE.MathUtils.randFloat(-1, 1);
-    normalizationFactor = Math.sqrt(x * x + y * y + z * z);
-  } while (normalizationFactor === 0); // retry if all zero
-
-  normalizationFactor = 1 / normalizationFactor;
-
-  v.x = x * normalizationFactor * radius;
-  v.y = y * normalizationFactor * radius;
-  v.z = z * normalizationFactor * radius;
-
-  return v;
-}
-
-function createStarfield() {  
-  const geometry = new THREE.BufferGeometry();
-  const positions = [];
-  const colors = [];
-
-  for (let i = 0; i < 100000; i++) {
-    const vertex = randomPointInSphere(1000000);
-    positions.push(vertex.x, vertex.y, vertex.z);
-
-    // Generate random star temperature (Kelvin range for stars)
-    const tempK = THREE.MathUtils.randFloat(2000, 10000);
-    const color = colorTemperature2rgb(tempK);
-
-    // Convert to 0–255 RGB integers
-    const r = Math.round(color.r * 255);
-    const g = Math.round(color.g * 255);
-    const b = Math.round(color.b * 255);
-
-    const rgbValues = [r, g, b]; // Same as what match() would have given
-
-    // Normalize to 0..1 for Three.js colors
-    colors.push(parseInt(rgbValues[0]) / 255, parseInt(rgbValues[1]) / 255, parseInt(rgbValues[2]) / 255);
-  }
-
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-  const material = new THREE.PointsMaterial({
-    size: 0.05,
-    vertexColors: true // or THREE.VertexColors (deprecated in newer versions)
-  });
-
-  const particles = new THREE.Points(geometry, material);
-  scene.add(particles);
-}
-
-
-
-function colorTemperature2rgb(kelvin) {
-  let temperature = kelvin / 100.0;
-  let red, green, blue;
-
-  // Calculate red
-  if (temperature < 66.0) {
-    red = 255;
-  } else {
-    let t = temperature - 55.0;
-    red = 351.97690566805693 + 0.114206453784165 * t - 40.25366309332127 * Math.log(t);
-    red = Math.min(Math.max(red, 0), 255);
-  }
-
-  // Calculate green
-  if (temperature < 66.0) {
-    let t = temperature - 2;
-    green = -155.25485562709179 - 0.44596950469579133 * t + 104.49216199393888 * Math.log(t);
-  } else {
-    let t = temperature - 50.0;
-    green = 325.4494125711974 + 0.07943456536662342 * t - 28.0852963507957 * Math.log(t);
-  }
-  green = Math.min(Math.max(green, 0), 255);
-
-  // Calculate blue
-  if (temperature >= 66.0) {
-    blue = 255;
-  } else if (temperature <= 20.0) {
-    blue = 0;
-  } else {
-    let t = temperature - 10;
-    blue = -254.76935184120902 + 0.8274096064007395 * t + 115.67994401066147 * Math.log(t);
-    blue = Math.min(Math.max(blue, 0), 255);
-  }
-
-  // Return as THREE.Color (normalized to [0, 1] range)
-  return new THREE.Color(red / 255, green / 255, blue / 255);
-}
 
 /* -----------------------------------------------------------------
    Ecliptic longitude ➜ calendar date *with time*  (±1 s accuracy)
@@ -37731,40 +37479,6 @@ function longitudeToDateTime(lonDeg, currentYear) {
 //*************************************************************
   
 // === RA and Dec Conversions ===
-function raToRadians(raStr) {
-  if (typeof raStr !== 'string') {
-    console.warn('raToRadians expected a string but got', typeof raStr);
-    return 0;
-  }
-
-  raStr = raStr.trim().replace(/\s+/g, ''); // Remove all internal whitespace
-
-  // Match formats like: "23h20m38.2s"
-  let match1 = raStr.match(/^(\d+)h(\d+)m([\d.]+)s$/);
-  if (match1) {
-    let [ , hh, mm, ss ] = match1;
-    hh = parseFloat(hh);
-    mm = parseFloat(mm);
-    ss = parseFloat(ss);
-    const degrees = (hh + mm / 60 + ss / 3600) * 15;
-    return degrees * (Math.PI / 180);
-  }
-
-  // Match colon-separated format: "23:20:38.2"
-  let match2 = raStr.match(/^(\d+):(\d+):([\d.]+)$/);
-  if (match2) {
-    let [ , hh, mm, ss ] = match2;
-    hh = parseFloat(hh);
-    mm = parseFloat(mm);
-    ss = parseFloat(ss);
-    const degrees = (hh + mm / 60 + ss / 3600) * 15;
-    return degrees * (Math.PI / 180);
-  }
-
-  console.warn('Unrecognized RA format:', raStr);
-  return 0;
-}
-
 function radiansToRa(rad) {
   if (rad < 0) rad += 2 * Math.PI;
 
@@ -37778,42 +37492,6 @@ function radiansToRa(rad) {
     String(mm).padStart(2, '0') + 'm' +
     String(ss).padStart(2, '0') + 's'
   );
-}
-
-function decToRadians(decStr) {
-  if (typeof decStr !== 'string') {
-    console.warn('decToRadians expected a string but got', typeof decStr);
-    return 0;
-  }
-
-  decStr = decStr.trim().replace(/\s+/g, ''); // Remove all internal whitespace
-
-  // Match formats like: "+23°44′25″" or "-12°30′15.5″"
-  let match1 = decStr.match(/^(-?\+?\d+)°(\d+)′([\d.]+)″$/);
-  if (match1) {
-    let [ , deg, min, sec ] = match1;
-    deg = parseFloat(deg);
-    min = parseFloat(min);
-    sec = parseFloat(sec);
-    const sign = Math.sign(deg);
-    const absDeg = Math.abs(deg) + min / 60 + sec / 3600;
-    return sign * absDeg * (Math.PI / 180);
-  }
-
-  // Match colon-separated format: "+23:44:25.2"
-  let match2 = decStr.match(/^(-?\+?\d+):(\d+):([\d.]+)$/);
-  if (match2) {
-    let [ , deg, min, sec ] = match2;
-    deg = parseFloat(deg);
-    min = parseFloat(min);
-    sec = parseFloat(sec);
-    const sign = Math.sign(deg);
-    const absDeg = Math.abs(deg) + min / 60 + sec / 3600;
-    return sign * absDeg * (Math.PI / 180);
-  }
-
-  console.warn('Unrecognized declination format:', decStr);
-  return 0;
 }
 
 function radiansToDec(rad) {

@@ -1373,7 +1373,8 @@ function renderPoleStars(ctx) {
     return [x, y * Math.cos(e) + z * Math.sin(e), -y * Math.sin(e) + z * Math.cos(e)];
   };
   const cat = (ctx.stars() || []).map((s) => {
-    const ra = parseAngle(s.RA, true), dec = parseAngle(s.Dec, false);
+    // plan 28 §B: the v2 catalogue hands RA/Dec in degrees (numbers); the v1 extract carried strings
+    const ra = typeof s.RA === 'number' ? s.RA : parseAngle(s.RA, true), dec = typeof s.Dec === 'number' ? s.Dec : parseAngle(s.Dec, false);
     return Number.isFinite(ra) && Number.isFinite(dec) ? { name: s.N, mag: parseFloat(s.V), v: toEcl(ra, dec) } : null;
   }).filter(Boolean);
   const sep = (u, v) => deg(Math.acos(Math.max(-1, Math.min(1, u[0] * v[0] + u[1] * v[1] + u[2] * v[2]))));

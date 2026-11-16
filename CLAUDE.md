@@ -524,6 +524,20 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   mirrored for the inside view — a photographed star would stay put while
   its catalogue sprite moves; a fit is trusted at the sample count it has;
   the handedness check is the Magellanic Clouds in one fitted frame. (§1.47)
+- **A sky is a catalogue with a clock, and a referee's model is named before
+  its tolerance** — the 310 fixed sprites and the 100,000 random points are
+  ONE catalogue (Hipparcos-2 to V 8, Gaia DR3 / Pulkovo radial velocities,
+  the BSC designations, the IAU names; every source pinned by a CANONICAL
+  hash — rows sorted, header dates dropped), moved as r₀ + v·Δt in the
+  ENGINE year (ONE home `src/sky-of-date.js`), the shapes' recognisability
+  the RMS change of their PAIRWISE separations (rotation-invariant: no
+  best-fit rotation needed); the astropy referee's rigorous space motion
+  differs from the straight line by a light-time geometry on the transverse
+  path (0.4″ at 100 kyr for Sirius, 59″ for Groombridge 1830 — zero without
+  proper motion, unchanged by the radial velocity, ×10 at ×10 the distance),
+  every simple correction ENLARGED the gap, so it is pinned per star and
+  named open, never absorbed. A landing hook takes the Year of date's
+  STRING; a number lands nowhere. (§1.48)
 
 ---
 
@@ -589,7 +603,8 @@ stubbed SheetJS —, `perihelion-at-sun`, the star-field init alignment, the
 orbit-plane grid at the Sun, the Planet Info eye, the chip-click wake, the
 wobble-centre trace, and `surface-rows` — every Planet Info row of every body
 and the Predictions panel's live fields at seven epochs to the genesis edge,
-value, unit and class, plan 30's dump kept as a gate). What each row guards and the owner report it was born
+value, unit and class, plan 30's dump kept as a gate — and `sky-of-date`,
+the catalogue sky's referee, purity, fades, regime and counts, §1.48). What each row guards and the owner report it was born
 from: doc 111 §2. `npm run test:transparency` is the Phase 6 acceptance gate
 (green 84/84 since Phase B, required in CI).
 
@@ -619,10 +634,12 @@ model reproduces a spread of nodes bit-exactly and a model loaded with the
 table reads the same drawn obliquity as one without; its check mode re-reads
 the spread, §1.44). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (16 generators, 9 gates — the
-newest gate, `eclipse-formula.js`, reads the eclipse formula of date against the
-finders, today's recurrences and the amplitudes of date, §1.46; `deep-clock-axes.js`
-reads the deep clock against the chain, §1.37).
+test:verify:list` the full classification (16 generators, 10 gates — the
+newest gate, `star-catalogue.js`, reads the sky of date's inputs and the astropy
+referee record against the catalogue, §1.48; `eclipse-formula.js` reads the
+eclipse formula of date against the finders, today's recurrences and the
+amplitudes of date, §1.46; `deep-clock-axes.js` reads the deep clock against
+the chain, §1.37).
 
 **The planet-channel and era-device retirements** (plans 07, 09, 11: the
 integer laws, the ψ/K device, the combs, the K-device pose, the
@@ -690,6 +707,7 @@ what actually made corrections stick here.
 | `data/astrogeo22-earth-moon.json` | the CITED Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; `npm run import:astrogeo22`) — embedded as `deltat/moon-distance-artifact.cjs`, read by `deltat/moon-distance-history.cjs` (plan 12 option A) |
 | `public/textures/earth/` | the Earth's day maps by age (plan 27 steps E, G, H): Scotese's PaleoAtlas v3 (CC BY 4.0; 21 ka–750 Ma at its own steps; `npm run import:paleoatlas` fetches, prepares and hashes), generated illustration beyond, the Pleistocene ice blended by the model's OWN ice history (the climate formula's L1 layer, a labelled forecast to +150 kyr), and the derived future tiers (the continents moved by their measured plate motions, NNR-MORVEL56, then Scotese's Pangaea Proxima scenario to +250 Myr; the biosphere's end and the moist greenhouse on that supercontinent) — ONE table `manifest.json` (each tier's `fadeMyr`, `skyTint`, the one `present: true`) read by the scene's `updateEra` and the About folder's "Earth map" row, gated by `check:surface-tiers` (`tools/pipeline/build-earth-tiers.js`). The Moon's, Mercury's, Mars's and Saturn's tables (step F: the lunar magma ocean, the maria-free crust derived from the present-day map and two mare-flooding steps, the young ray systems suppressed before their impacts; Mercury's early crust; Mars's Noachian and Hesperian seas below the MOLA shoreline contours, a contested reading; Saturn's rings hidden before 400 Ma and gone after ~+200 Myr — cited bands) live beside it under `public/textures/<body>/`, written by `npm run build:body-tiers` (`tools/pipeline/build-body-tiers.js`), read by the scene's `makeSurfaceTiers` and the About folder's "Moon & planet maps" row, the same gate |
 | `public/textures/sky/` | the Milky Way dome (plan 28 §A): ESO/S. Brunier's 360° panorama (CC BY 4.0, Galactic coordinates) with the stars removed by `npm run build:sky-dome` (`tools/pipeline/build-sky-dome.js`; the source fetched to the gitignored `data/.cache/sky/`, sha256-pinned) so the only stars in the scene are the catalogue's; a STATIC `manifest.json` (the recipe, the source, the licence), the same gate; drawn in the Galactic frame through the catalogues' J2000 frame (ONE home `@essrt/physics` `sky/galactic-frame`), the texture mirrored for the inside view |
+| `public/input/stars.json`, `public/input/constellations.json`, `src/sky-of-date.js` | the sky of date (plan 28 §B/C): the bright-star catalogue v2 (Hipparcos-2 to V 8 at epoch J1991.25 with Gaia DR3 / Pulkovo radial velocities, the BSC designations and the IAU names — `npm run import:stars`, `tools/pipeline/import-star-catalogue.js`, the sources fetched to the gitignored `data/.cache/stars/` and pinned by canonical hash) and the HIP-keyed constellation strokes; the module moves every star as r₀ + v·Δt in the engine year, fades the lines and names by the shapes' RMS change, and switches the layer off beyond ±1 Myr. Gates: `star-catalogue.js` (the inputs, the referee record `data/star-motion-reference.json` on this catalogue) and the browser `sky-of-date` rows |
 | `docs/` | the numbered docs (`00-readme` is the index); `40-architecture`, `99-essrt`, `110-calculation-map`, `111-measured-traps-and-gate-origins` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main

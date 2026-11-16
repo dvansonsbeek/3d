@@ -132,7 +132,19 @@ GPLv3 combines with AGPL-3.0 under section 13 as above.
 Data sources
 ------------
 
-    Yale Bright Star Catalog   https://github.com/brettonw/YaleBrightStarCatalog
+    Hipparcos (ESA)            the bright-star catalogue (public/input/stars.json):
+                               Hipparcos, the New Reduction (van Leeuwen 2007) and the
+                               Hipparcos Catalogue (ESA 1997, SP-1200), as hosted by
+                               ESA's Gaia archive — free use with citation
+    ESA/Gaia/DPAC              Gaia DR3 radial velocities for the catalogue's stars
+                               (Gaia Collaboration 2023), CC BY-SA 3.0 IGO
+                               https://www.cosmos.esa.int/gaia
+    Pulkovo (Gontcharov 2006)  radial velocities where Gaia has none, VizieR III/252
+    IAU WGSN                   the IAU Catalog of Star Names, CC BY 4.0
+                               https://www.iau.org/public/themes/naming_stars/
+    Yale Bright Star Catalog   the HR numbers and Bayer/Flamsteed designations (VizieR
+                               V/50, public domain); the former 310-star extract from
+                               https://github.com/brettonw/YaleBrightStarCatalog
     Solar System Scope         planet textures
                                https://www.solarsystemscope.com/textures/
     ESO/S. Brunier             The Milky Way panorama (eso0932a), CC BY 4.0 — the
