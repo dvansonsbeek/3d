@@ -55,7 +55,7 @@ const ulpSeconds = (jd) => Math.abs(jd) * Number.EPSILON * 86400;
 const pr = (x, d) => (Number.isFinite(x) ? x.toFixed(d) : String(x));
 
 async function main() {
-  const { createModel, createSolarPerturbationScales, solarCharacteristicPower, FITTED_COEFFICIENTS, axisDistanceDeg, lunarTypeAt, solarTypeAt } = await import('../../packages/physics/src/index.js');
+  const { createModel, createSolarPerturbationScales, solarCharacteristicPower, FITTED_COEFFICIENTS, axisDistanceDeg, lunarTypeAt, solarTypeAt, CANON_WINDOW_YEARS } = await import('../../packages/physics/src/index.js');
   const DT = require('../lib/deep-time.js');
   const read = (/** @type {string} */ f) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data', f), 'utf8')); } catch { return undefined; } };
   const m = createModel(undefined, {
@@ -123,10 +123,11 @@ async function main() {
   }
 
   const ERA_TOL = { syzygyS: 1.0, greatestS: 1.0, dist: 1e-6, edgeJitter: false };
-  console.log('(1) the canon\'s era — 25 one-year windows over −1999…+3000, both kinds');
+  const W = CANON_WINDOW_YEARS;
+  console.log(`(1) the canon's era — 25 one-year windows over ${W.min}…+${W.max}, both kinds`);
   let eraEvents = 0, eraMaxGreat = 0, eraMaxSyz = 0, eraMaxDist = 0;
   for (let i = 0; i < 25; i++) {
-    const year = -1999 + (4999 * i) / 24;
+    const year = W.min + ((W.max - W.min) * i) / 24;
     const jd0 = J2000_JD + (year - 2000) * Y;
     for (const kind of /** @type {const} */ (['lunar', 'solar'])) {
       const r = compare(`era ${year.toFixed(0)}`, jd0, Y, kind, ERA_TOL, undefined);
@@ -301,8 +302,13 @@ async function main() {
   const inEra = F.nextEclipseAfter(J2000_JD, 'lunar'), inDeep = F.nextEclipseAfter(J2000_JD + (-1e6 - 2000) * Y, 'lunar');
   if (!inEra || inEra.regime !== 'certified') failures.push(`the first lunar eclipse after J2000 is tagged ${inEra && inEra.regime}, not 'certified'`);
   if (!inDeep || inDeep.regime !== 'reproducible') failures.push(`the first lunar eclipse after −1 Myr is tagged ${inDeep && inDeep.regime}, not 'reproducible'`);
+  // The certified window IS the canon's span: read the canon input's first and last entries (the ONE
+  // source), never a literal — CANON_WINDOW_YEARS is the formula's home for it, the window the tag reads.
   const w = F.certifiedWindowYears;
-  if (w.min !== -1999 || w.max !== 3000) failures.push(`the certified window is ${JSON.stringify(w)}, not the canon's −1999…+3000`);
+  const canonEntries = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/input/lunar-eclipses-nasa.json'), 'utf8')).entries;
+  const canonYear = (/** @type {string} */ d) => Number(d.match(/^(-?\d+)-/)[1]);
+  const canonSpan = { min: canonYear(canonEntries[0].date), max: canonYear(canonEntries[canonEntries.length - 1].date) };
+  if (w.min !== canonSpan.min || w.max !== canonSpan.max || w.min !== W.min || w.max !== W.max) failures.push(`the certified window is ${JSON.stringify(w)}, not the canon's ${JSON.stringify(canonSpan)}`);
   for (const [label, jdTT] of [['J2000', J2000_JD], ...deep]) {
     const s = F.statisticsAt(jdTT);
     if (!s || !Number.isFinite(s.seasonsPerYear) || !Number.isFinite(s.lunar.perYear.any) || !Number.isFinite(s.eclipseYearDays)) { failures.push(`${label}: the statistics of date are undefined`); continue; }

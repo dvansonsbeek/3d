@@ -80,7 +80,9 @@ const INPUT_FILES = [
   'public/input/climate-formula-coefficients.json',
 ];
 
-const START_YEAR = -1999, END_YEAR = 3000;
+// The canon's span: ONE home, the formula's CANON_WINDOW_YEARS (the regime tag's certified window).
+const { CANON_WINDOW_YEARS } = require('../../packages/physics/src/eclipse/formula.cjs');
+const START_YEAR = CANON_WINDOW_YEARS.min, END_YEAR = CANON_WINDOW_YEARS.max;
 const MATCH_MIN = 180, TIGHT_MIN = 15;
 const ERA_BIN_YEARS = 500;
 

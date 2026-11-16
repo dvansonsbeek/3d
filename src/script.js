@@ -29,7 +29,10 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   createSolarPerturbationScales,
   // the obliquity a drawn scene shows beyond the hybrid's domain (plan 31 A2): the cited mean with the
   // hybrid's wobble about its beat mean, handed over C¹ (ONE home earth/scene-obliquity)
-  sceneObliquityHandoverWeight, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand } from '@essrt/physics';
+  sceneObliquityHandoverWeight, createHybridBeatTable, composeSceneObliquityDeg, composeSceneObliquityBand,
+  // the NASA Five Millennium Canon's span (−1999…+3000): ONE home eclipse/formula — the ΔT chart's era range,
+  // the Espenak–Meeus validity and the lunar-canon verification windows read it (plan 33's hardcoded-values review)
+  CANON_WINDOW_YEARS } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -4664,6 +4667,16 @@ if (typeof window !== 'undefined') {
       };
       return { stars: frameOf(sceneObjects.stars), constellations: frameOf(sceneObjects.constellations) };
     },
+    // PLAN 28 §A — the Milky Way dome's frame beside the star field's: the two world quaternions and
+    // the texture's orientation flags, so a probe can read where the dome's band and bulge fall against
+    // the J2000 directions the stars sit on (the dome was added with no rotation; measure before fixing).
+    skyDomeProbe: () => ({
+      starsQuaternion: sceneObjects.stars.getWorldQuaternion(new THREE.Quaternion()).toArray(),
+      skyQuaternion: sky.getWorldQuaternion(new THREE.Quaternion()).toArray(),
+      skyScale: sky.scale.toArray(),
+      textureFlipY: skyTexture.flipY, textureRepeat: skyTexture.repeat.toArray(), textureOffset: skyTexture.offset.toArray(),
+      textureSize: skyTexture.image ? [skyTexture.image.width, skyTexture.image.height] : null,
+    }),
     // Moon-ring gate hook: the RING's perigee and ascending
     // node of date read from the placed stack geometry — the apsidal arm's
     // offset (toward the apogee) and the Moon orbit plane's normal — in the
@@ -16909,7 +16922,7 @@ const VFP_CATEGORIES = [
     // axis, hover, J2000 table, caption and export all read the tab's unit).
     tabs: [
       { key: 'recent', label: '1650 – 2050 AD', range: [1650, 2050], samples: 200 },
-      { key: 'era', label: '2000 BC – 3000 AD', range: [-1999, 3000], samples: 250 },
+      { key: 'era', label: '2000 BC – 3000 AD', range: [CANON_WINDOW_YEARS.min, CANON_WINDOW_YEARS.max], samples: 250 },
       { key: 'quaternary', label: '250,000 BC – 100,000 AD', range: [-249999, 100000], samples: 400,
         valueScale: 1 / 31556952, unit: ' yr', unitLabel: 'years', precision: 2, fmtValue: null,
         yLabel: 'years (ΔT, TT − UT1)', residualLabel: 'years', residualScale: 1 },
@@ -16929,7 +16942,7 @@ const VFP_CATEGORIES = [
     model: { name: 'This model', color: '#f0b040',
       fn: year => deltaTStart + meanDeltaTSecondsAtAge((startmodelYear - year) / 1e6) },
     references: [
-      { name: 'Espenak & Meeus (NASA Canon)', color: '#4fc3f7', fn: deltaTEspenakMeeusRaw, validYears: [-1999, 3000],
+      { name: 'Espenak & Meeus (NASA Canon)', color: '#4fc3f7', fn: deltaTEspenakMeeusRaw, validYears: [CANON_WINDOW_YEARS.min, CANON_WINDOW_YEARS.max],
         sourceUrl: 'https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html' },
       // the observational spline (the same table the ΔT stack was fit
       // against, doc 102); the JSON is app-loaded — NaN until it arrives,
@@ -17122,7 +17135,7 @@ const VFP_CATEGORIES = [
     // T² term reaches ~108° there; ±23 kyr would wrap)
     tabs: [
       { key: 'recent', label: '1000 – 2500 AD', range: [1000, 2500], samples: 300 },
-      { key: 'era', label: '2000 BC – 3000 AD', range: [-1999, 3000], samples: 250 },
+      { key: 'era', label: '2000 BC – 3000 AD', range: [CANON_WINDOW_YEARS.min, CANON_WINDOW_YEARS.max], samples: 250 },
       { key: 'quaternary', label: '5000 BC – 5000 AD', range: [-4999, 5000], samples: 400 },
       { key: 'myr', label: '10,000 BC – 10,000 AD', range: [-9999, 10000], samples: 400 },
     ],
@@ -18833,7 +18846,7 @@ function moonDraconicMonthDaysMeeus(year) { return _meeusMonthDays(_meeus47RateD
 // their drifts are fractions of a second: a shared axis would show five
 // flat lines, hence strips.
 const _vfpML_ID = 'moon-months';
-const _VFPML_VALID = [-1999, 3000];
+const _VFPML_VALID = [CANON_WINDOW_YEARS.min, CANON_WINDOW_YEARS.max];   // the canon's span, ONE home eclipse/formula
 // THE MODEL SIDE IS THE MEAN-LONGITUDE RATE, not the orbit size: the chain's
 // Kepler month on the recession distance lengthens at the tidal rate alone,
 // while Meeus's L′ rate is the OBSERVED mean longitude, whose secular term
@@ -19105,7 +19118,7 @@ function _vfpMLAfterRender(bodyEl) {
 // The Month Lengths and precession panels verify the RATES; this is
 // their integral, in arcseconds (degrees when large).
 const _vfpMA_ID = 'moon-arguments';
-const _VFPMA_VALID = [-1999, 3000];
+const _VFPMA_VALID = [CANON_WINDOW_YEARS.min, CANON_WINDOW_YEARS.max];   // the canon's span, ONE home eclipse/formula
 const _vfpMA_STRIPS = [
   { key: 'Lp', name: 'L′ — mean longitude', screen: '#5ea0ff', paper: '#1d4ed8', lin: _MEEUS47_LP, what: 'the tidal month chain with the planetary, obliquity and secular-completion carriers (its parabola is the tidal deceleration plus the planetary secular term)' },
   { key: 'D', name: 'D — mean elongation from the Sun', screen: '#4ade80', paper: '#15803d', lin: _MEEUS47_D, what: 'L′ minus the model’s mean Sun (the year-length clock)' },

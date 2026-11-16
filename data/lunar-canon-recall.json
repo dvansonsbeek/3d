@@ -127,7 +127,7 @@
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
       "public/input/climate-formula-coefficients.json": "sha256:51f152c3718c5758e949ef761d5f23a54364a7afad182efb5da3107530398749",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
-      "tools/verify/lunar-canon-recall.js": "sha256:3a9c13c5d31dbbd35f9320e9835ce7599b1919765fc6c6ce0d0ccf5861515da8"
+      "tools/verify/lunar-canon-recall.js": "sha256:4bc515b37f92a9753af7aaf8e14c213303ee889ed747ea6a00b8b13aa578ac46"
     }
   }
 }
