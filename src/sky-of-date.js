@@ -68,6 +68,7 @@ export const SKY_CONSTANTS = Object.freeze({
   lifetimeFadeFraction: 0.1,     // a star fades over the last tenth of its main-sequence lifetime (a band)
   statisticalSeedCellYears: 1e8, // plan 28 §E: the statistical sky's seed changes every 100 Myr
   sunGalacticPeriodMyr: SUN_GALACTIC_ORBIT.periodMyr,   // the dome's turn (ONE home sky/galactic-frame)
+  spriteReferencePixelRatio: 2,  // the base size is the look accepted on a ratio-2 display (50 device px = 25 CSS px); other ratios scale to the same on-screen size
   sunAbsMagV: 4.81,              // the Sun as a star: M_V (Willmer 2018, ApJS 236, 47) — seen from past the main camera's far plane
   sunBV: 0.65,                   // its colour (B−V, the same source)
 });
@@ -115,10 +116,12 @@ export function colorTemperature2rgb(kelvin) {
  * @param {any[]} deps.drawMaterials  the array the draw-on animation walks
  * @param {() => void} [deps.onPositions]  called when positions of date have landed (the labels and a paused frame need a render)
  * @param {() => Worker | null} [deps.createWorker]  the orbit worker (null: positions are computed on the main thread)
+ * @param {() => number} [deps.pixelRatio]  the renderer's pixel ratio — a sprite is sized in DEVICE pixels, so its on-screen
+ *   size follows the ratio unless the base size does: the adaptive ratio (1 ↔ 2 on the frame rate) brightened and dimmed the whole sky
  * @param {() => {starDistance: number, starsizeBase: number, namesVisible: boolean, layout: string}} deps.settings
  */
 export function createSkyOfDate(deps) {
-  const { THREE, CSS2DObject, fetchRepoJson, fetchRepoBytes, starsUrl, constellationsUrl, gaiaManifestUrl, starsGroup, constellationsGroup, engineYearOfJd, constellationMaterial, drawOnShaderProto, drawMaterials, settings, dome, galacticTurnRadAtYear, galacticTriad, onPositions, createWorker } = deps;
+  const { THREE, CSS2DObject, fetchRepoJson, fetchRepoBytes, starsUrl, constellationsUrl, gaiaManifestUrl, starsGroup, constellationsGroup, engineYearOfJd, constellationMaterial, drawOnShaderProto, drawMaterials, settings, dome, galacticTurnRadAtYear, galacticTriad, onPositions, createWorker, pixelRatio } = deps;
   const C = SKY_CONSTANTS;
   const TRIAD = galacticTriad || galacticTriadEquatorialJ2000();
   /** The dome's base pose (the Galactic alignment at J2000, handed in at creation or by setDomeBase) and its turn of date. */
@@ -151,7 +154,7 @@ export function createSkyOfDate(deps) {
     // The visibility cut: a star is drawn while its apparent magnitude OF DATE (from the Sun, the attribute's
     // distance) is within uVLimit, fading over uVFade beyond — the arriving stars brighten in, the leaving fade
     // out. The lifetime band: alpha fades over the last uLifeFade of a star's main-sequence lifetime tau at |t|.
-    uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 }, uFade: { value: 1.0 }, uSide: { value: 0.0 }, uPhaseWidth: { value: C.handoverPhaseWidth }, uVLimit: { value: C.visibleVLimit }, uVFade: { value: C.visibleVFadeWidth }, uTimeYears: { value: 0.0 }, uLifeFade: { value: C.lifetimeFadeFraction } },
+    uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase * (S.pixelRatio || 1) / C.spriteReferencePixelRatio }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 }, uFade: { value: 1.0 }, uSide: { value: 0.0 }, uPhaseWidth: { value: C.handoverPhaseWidth }, uVLimit: { value: C.visibleVLimit }, uVFade: { value: C.visibleVFadeWidth }, uTimeYears: { value: 0.0 }, uLifeFade: { value: C.lifetimeFadeFraction } },
     vertexShader: `
       uniform float uBaseSize, uUnitsPerPc, uFade, uSide, uPhaseWidth, uVLimit, uVFade, uTimeYears, uLifeFade;
       attribute float absMag;
@@ -192,6 +195,17 @@ export function createSkyOfDate(deps) {
   });
   /** Every sprite material of the sky, for the per-year uniforms. */
   const allMaterials = () => [S.matBright, S.matFaint, S.sunMat, stat.mat, G.mat].filter(Boolean);
+  /** The sprites' base size follows the renderer's pixel ratio: gl_PointSize is in DEVICE pixels, so a constant base
+   *  drew every star twice as large on screen whenever the adaptive ratio dropped from 2 to 1 (the owner: "sometimes
+   *  the stars seem brighter"). The setting is the look accepted on a ratio-2 display, so the device size is
+   *  setting × ratio / 2 (a first normalisation pinned the ratio-1 look: "too bright all the time"). Called every
+   *  frame by updateForEpoch; the uniforms move only when the ratio does. */
+  function syncPixelRatio() {
+    const r = pixelRatio ? pixelRatio() : 1;
+    if (r === S.pixelRatio) return;
+    S.pixelRatio = r;
+    for (const mat of allMaterials()) mat.uniforms.uBaseSize.value = settings().starsizeBase * r / C.spriteReferencePixelRatio;
+  }
 
   /** The local unit vector of an ICRS direction (x = cos δ sin α, y = sin δ, z = cos δ cos α). */
   const localUnit = (raDeg, decDeg) => { const cd = Math.cos(decDeg * D2R); return [cd * Math.sin(raDeg * D2R), Math.sin(decDeg * D2R), cd * Math.cos(raDeg * D2R)]; };
@@ -605,6 +619,7 @@ export function createSkyOfDate(deps) {
     /** Recompute the sky when the engine year has moved a whole year (or forced). @param {number} jdUT @param {boolean} [force] */
     updateForEpoch(jdUT, force) {
       if (!S.loaded) return false;
+      syncPixelRatio();
       const year = engineYearOfJd(jdUT);
       if (!Number.isFinite(year)) return false;
       const ref = Number.isFinite(S.requestedYear) ? S.requestedYear : S.year;
@@ -643,6 +658,7 @@ export function createSkyOfDate(deps) {
         catalogueShare: S.phase ? (() => { let k = 0; for (let i = 0; i < S.n; i++) if (handoverAlpha(i, S.regimeFade).catalogue >= 0.5) k++; return k / S.n; })() : null,
         stars: S.n, nakedEye: S.nNaked, labels: S.labels.length, strokes: S.strokes.length, constellations: S.groups.size, layout: S.layout, groups, counts: S.counts,
         worker: { present: !!W.worker, updates: W.updates, hipMs: W.hipMs, gaiaMs: W.gaiaMs },
+        pixelRatio: S.pixelRatio, baseSizeDevicePx: S.matBright ? S.matBright.uniforms.uBaseSize.value : null,
         gaia: { loaded: G.loaded, failed: G.failed, n: G.n, year: G.year, visible: gaiaVisible, counts: G.manifest ? G.manifest.counts : null },
       };
     },

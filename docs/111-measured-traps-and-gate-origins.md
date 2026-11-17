@@ -2866,6 +2866,16 @@ log-interpolated distance between its two stars, so the curve passes through
 the stars in 3-D and projects as a smooth arc from the Sun; the gate reads
 Orion's and the Big Dipper's six curves within 1.1° of their strokes'
 great-circle polylines, ending on their stars (`constellationLineProbe`).
+**A sprite is sized in DEVICE pixels** (the owner: "sometimes the stars
+seem brighter than other times, it doesn't appear stable"): the render
+loop's adaptive pixel ratio drops 2 → 1 below 30 fps and restores it above
+40, and a constant `gl_PointSize` then covers twice the screen — the whole
+sky brightened and dimmed with the frame rate (the sky pass made the
+switch more frequent). The sprites' base size now follows
+`renderer.getPixelRatio()` every frame — and the look it holds is the one
+the owner accepted, which was the ratio-2 one (a first normalisation pinned
+the ratio-1 size: "too bright all the time"): the device size is the setting
+× ratio / 2; the gate reads it, and `?dpr=` pins the ratio for an A/B look.
 
 ---
 

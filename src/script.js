@@ -9108,6 +9108,7 @@ const _skyOfDate = createSkyOfDate({
   // start, every star at the origin); a classic worker loads them through importScripts in both builds
   createWorker: () => (typeof window.Worker === 'undefined' ? null : new window.Worker(new URL('./sky-orbits-worker.js', import.meta.url))),
   onPositions: () => { needsLabelUpdate = true; },   // wakes the loop for one pass (positionChanged would re-sync the scene's date)
+  pixelRatio: () => renderer.getPixelRatio(),        // the sprites' device-pixel size follows the adaptive ratio (else the sky brightens at ratio 1)
   settings: () => ({ starDistance: o.starDistance || 10000, starsizeBase: o.starsizeBase || 50, namesVisible: o.starNamesVisible, layout: o.constellationLayout }),
 });
 

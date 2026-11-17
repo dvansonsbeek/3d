@@ -88,6 +88,10 @@ check('the handover is per star: at −55 Myr (fade 0.50) the catalogue share is
 // referee rows above hold), at 20 Myr a star 19 pc away has moved ~290 pc and the straight line is 6 % off its
 // orbit (the Node referee, star-catalogue.js); the sky's positions of date come from the orbit worker, settled.
 const orb = await sim.page.evaluate(() => { const T = window.__test__; const S = T.skyState(); const a = T.starDirectionAt(32349, 2000), b = T.starDirectionAt(32349, 20002000); return { worker: S.worker, settled: S.settled, siriusNow: a.distPc, sirius20: b.distPc, amp: a.amplitudeFraction, gaia: S.gaia }; });
+// The sprites' size follows the renderer's pixel ratio (gl_PointSize is in device pixels): the adaptive ratio's 2 → 1
+// drop had drawn every star twice as large on screen (the owner: "sometimes the stars seem brighter").
+const pr = await sim.page.evaluate(() => { const S = window.__test__.skyState(); return { ratio: S.pixelRatio, base: S.baseSizeDevicePx }; });
+check('the sprites\' base size in device pixels is the setting × the renderer\'s pixel ratio / 2 (the look accepted on a ratio-2 display)', pr.ratio > 0 && Math.abs(pr.base - 50 * pr.ratio / 2) < 1e-9, `ratio ${pr.ratio}, base ${pr.base} device px`);
 check('the orbit worker answers (positions settled, updates > 0); Sirius 2.64 pc today and 100–1000 pc at +20 Myr on its orbit (radial amplitude < 15 % of R₀)', orb.worker && orb.worker.updates > 0 && orb.settled === true && Math.abs(orb.siriusNow - 2.637) < 0.01 && orb.sirius20 > 100 && orb.sirius20 < 1000 && orb.amp < 0.15, `worker ${JSON.stringify(orb.worker)}, settled ${orb.settled}, Sirius ${orb.siriusNow.toFixed(3)} → ${orb.sirius20.toFixed(0)} pc, amp ${orb.amp.toFixed(3)}`);
 // The stars that ARRIVE (plan 28 §D): the Gaia tier loaded (its counts the manifest's), its stars drawn as they
 // brighten past V 8 — at +20 Myr thousands of them are within the cut while today most sit far and faint.
