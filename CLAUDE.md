@@ -537,7 +537,17 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   proper motion, unchanged by the radial velocity, ×10 at ×10 the distance),
   every simple correction ENLARGED the gap, so it is pinned per star and
   named open, never absorbed. A landing hook takes the Year of date's
-  STRING; a number lands nowhere. (§1.48)
+  STRING; a number lands nowhere. **Beyond ±1 Myr the catalogue hands over
+  to a statistically equivalent sky, never to black and never to today's
+  stars frozen** (each star keeps its magnitude and Galactic latitude, takes
+  a seeded longitude per 100-Myr cell — an illustration, said so); **the sky
+  is a backdrop at infinity** (one group on the camera's position, drawn
+  first without depth writes — the former random points survived a zoom-out
+  only by their 10⁶-unit radius); **the Milky Way turns with the Sun's
+  Galactic orbit** (216 Myr on McMillan 2017, ONE home `sky/galactic-frame`,
+  the phase today's direction — the one free choice, named). A pose handed
+  to a module 90 lines before its `const` is a TDZ that kills every browser
+  row. (§1.48)
 
 ---
 

@@ -66,4 +66,27 @@ function equatorialToGalacticDeg(raDeg, decDeg) {
   return { lDeg: ((l % 360) + 360) % 360, bDeg: Math.asin(Math.max(-1, Math.min(1, dot(v, T.z)))) * R2D };
 }
 
-module.exports = { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, equatorialUnitVector, galacticTriadEquatorialJ2000, equatorialToGalacticDeg };
+/**
+ * The Sun's Galactic orbit (plan 28 §E): McMillan (2017, MNRAS 465, 76) — the Sun's Galactocentric
+ * radius R₀ = 8.21 kpc and the circular speed there v₀ = 233.1 km/s; the period 2πR₀/v₀ = 216 Myr. A
+ * cited pair, the period derived. The Galactic frame co-rotates with this orbit, so against the stars
+ * and the equinox the Galaxy's band — the Milky Way dome — turns once per period about the Galactic
+ * pole, CLOCKWISE seen from the north Galactic pole (the Sun moves toward l = 90°; the direction to
+ * the centre turns toward l = 270°). The phase is fixed by today's direction: the one free choice.
+ */
+const SUN_GALACTIC_ORBIT = Object.freeze({
+  r0Kpc: 8.21, v0KmS: 233.1,
+  source: 'McMillan 2017, MNRAS 465, 76 (R₀ 8.21 kpc, v₀ 233.1 km/s)',
+  periodMyr: (2 * Math.PI * 8.21 * 3.0856775815e16) / 233.1 / (365.25 * 86400) / 1e6,   // the IAU parsec in km, the Julian year
+});
+
+/**
+ * The turn of the Galactic frame against the inertial sky since J2000, in radians about the north
+ * Galactic pole (negative: clockwise seen from the pole), at an engine year.
+ * @param {number} year
+ */
+function galacticTurnRadAtYear(year) {
+  return -2 * Math.PI * (year - 2000) / (SUN_GALACTIC_ORBIT.periodMyr * 1e6);
+}
+
+module.exports = { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, SUN_GALACTIC_ORBIT, equatorialUnitVector, galacticTriadEquatorialJ2000, equatorialToGalacticDeg, galacticTurnRadAtYear };

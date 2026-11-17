@@ -74,7 +74,23 @@ check('fades at −198 kyr: every shape gone (opacity 0 for UMa, Ori, Leo, Cas, 
 const s998 = await land('-998000 d172');
 const s1150 = await land('-1150000 d172');
 const s10m = await land('-10000000 d172');
-check('regime: linear at −998 kyr, fading at −1.15 Myr (0 < fade < 1), none at −10 Myr; the dome\'s brightness untouched', s998.regime === 'linear' && s998.fade === 1 && s1150.regime === 'fading' && s1150.fade > 0 && s1150.fade < 1 && s10m.regime === 'none' && s10m.fade === 0 && s48.dome === s10m.dome, `fade ${s998.fade} / ${s1150.fade.toFixed(3)} / ${s10m.fade}, dome ${s48.dome}`);
+check('regime: linear at −998 kyr, handover at −1.15 Myr (0 < fade < 1), statistical at −10 Myr; the dome\'s brightness untouched', s998.regime === 'linear' && s998.fade === 1 && s1150.regime === 'handover' && s1150.fade > 0 && s1150.fade < 1 && s10m.regime === 'statistical' && s10m.fade === 0 && s48.dome === s10m.dome, `fade ${s998.fade} / ${s1150.fade.toFixed(3)} / ${s10m.fade}, dome ${s48.dome}`);
+// PLAN 28 §E — the statistical sky and the dome's turn: beyond the handover the catalogue tiers are
+// off and the statistical tier is on (every star's magnitude and Galactic latitude kept, the
+// longitude a seeded draw per 100-Myr cell); the same cell reproduces the same positions, another
+// cell draws other ones; the dome turns with the Sun's orbit (the package's function); the backdrop
+// sits on the camera; the dome writes no depth and draws first.
+const { galacticTurnRadAtYear, SUN_GALACTIC_ORBIT } = await import('../../packages/physics/src/sky/galactic-frame.cjs');
+const statOf = () => sim.page.evaluate(() => { const S = window.__test__.skyState(); const P = window.__test__.skyDomeProbe(); const T = window.__test__; return { regime: S.regime, statOp: S.statisticalOpacity, cell: S.seedCell, built: S.statisticalBuilt, turn: S.galacticTurnRad, year: S.year, p: [0, 1, 2, 4000].map((i) => T.statisticalPositionAt ? T.statisticalPositionAt(i) : null), offset: P.backdropOffsetFromCamera, depthWrite: P.domeDepthWrite, order: P.domeRenderOrder, labelOpacity: S.labelOpacity }; });
+const a10m = await statOf();
+await land('-30000000 d172'); const a30m = await statOf();
+await land('-130000000 d172'); const a130m = await statOf();
+await land('-4420000000 d172'); const aGen = await statOf();
+check('statistical sky at −10 Myr: the tier on (opacity 1), the names off, the seed cell −1 and built', a10m.regime === 'statistical' && a10m.statOp === 1 && a10m.cell === -1 && a10m.built === -1 && a10m.labelOpacity === 0 && a10m.p[0] && a10m.p[0].every(Number.isFinite), JSON.stringify({ cell: a10m.cell, built: a10m.built, op: a10m.statOp, label: a10m.labelOpacity }));
+check('statistical sky: the same 100-Myr cell draws the same places (−10 vs −30 Myr), another cell other ones (−130 Myr); the genesis in cell −45', JSON.stringify(a10m.p) === JSON.stringify(a30m.p) && a30m.cell === -1 && a130m.cell === -2 && JSON.stringify(a130m.p) !== JSON.stringify(a10m.p) && aGen.cell === -45 && aGen.statOp === 1 && aGen.regime === 'statistical', `cells ${a10m.cell}/${a30m.cell}/${a130m.cell}/${aGen.cell}`);
+const expTurn = galacticTurnRadAtYear(a130m.year);
+check(`the dome turns with the Sun's Galactic orbit (period ${SUN_GALACTIC_ORBIT.periodMyr.toFixed(1)} Myr): the scene's turn at −130 Myr ≡ the package's`, Math.abs(a130m.turn - expTurn) < 1e-12 && Math.abs(expTurn) > 3 && Math.abs(aGen.turn) > 100, `${a130m.turn.toFixed(6)} vs ${expTurn.toFixed(6)} rad; the genesis ${(aGen.turn / (2 * Math.PI)).toFixed(2)} turns`);
+check('the sky is a backdrop at infinity: the group sits on the camera (offset 0), the dome writes no depth and draws first', aGen.offset === 0 && aGen.depthWrite === false && aGen.order < 0, `offset ${aGen.offset}, depthWrite ${aGen.depthWrite}, order ${aGen.order}`);
 // a landing re-read at the same year reproduces the state bit-for-bit
 const again = await land('-48000 d172');
 check('purity: a landing re-read at the same year reproduces every fade bit-for-bit', JSON.stringify(again.g) === JSON.stringify(s48.g) && again.year === s48.year, `${again.year} vs ${s48.year}`);

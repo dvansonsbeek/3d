@@ -85,4 +85,4 @@ export { SCENE_OBLIQUITY_HANDOVER_YEARS, HYBRID_BEAT_TABLE_NODE_YEARS, sceneObli
 export { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH } from "./deltat/moon-distance-artifact.cjs";
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from "./climate/l1-orbital.cjs";
 export { createEclipseFormula, recurrencesOfDate, lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii, DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS } from "./eclipse/formula.cjs";
-export { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, equatorialUnitVector, galacticTriadEquatorialJ2000, equatorialToGalacticDeg } from "./sky/galactic-frame.cjs";
+export { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, SUN_GALACTIC_ORBIT, equatorialUnitVector, galacticTriadEquatorialJ2000, equatorialToGalacticDeg, galacticTurnRadAtYear } from "./sky/galactic-frame.cjs";

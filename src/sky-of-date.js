@@ -18,9 +18,15 @@
  * With r₀ = d·p̂ (the parallax distance, or a photometric one, flagged in the catalogue) and
  * v = d·(μα* ê_α + μδ ê_δ) + v_r p̂, exact in a straight line and valid while the Galactic curvature of
  * the relative orbit is invisible — ~(t/P_epi)² ≈ 3e-5 at 1 Myr (P_epi ≈ 170 Myr): the regime's edge,
- * ±1 Myr, is set by meaning, not numerics. Beyond it the layer fades out over 0.2 Myr (regimes 2 and
- * 3 — the Galactic orbits, the lifetimes, the statistical sky — are plan 28 §D/E, not built): there no
- * star of today's sky is in a known place, and the scene says so.
+ * ±1 Myr, is set by meaning, not numerics. Beyond it the catalogue hands over, across 0.2 Myr, to the
+ * STATISTICALLY EQUIVALENT sky of plan 28 §E: every catalogue star keeps its magnitude and its Galactic
+ * latitude and takes a seeded longitude (the seed changes every 100 Myr) — the same brightnesses and
+ * the same spread about the band, no shape and no name, since no star of today's sky is in a known
+ * place there; drawn as a child of the Milky Way dome, which turns with the Sun's Galactic orbit (once
+ * per 216 Myr on McMillan 2017's R₀ and v₀, ONE home sky/galactic-frame). Regime 2 — the Galactic
+ * orbits and the lifetimes between 1 and ~100 Myr, a band — is plan 28 §D, not built. The whole sky is
+ * a backdrop at infinity: its group follows the camera's position (script.js), drawn first with no
+ * depth writes.
  *
  * Recognisability: a constellation's shape is its stars' PAIRWISE angular separations (a rotation-
  * invariant description, so no best-fit rotation is needed); the RMS change of those separations since
@@ -34,6 +40,8 @@
  */
 
 /* global document */
+import { SUN_GALACTIC_ORBIT } from '@essrt/physics';
+
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 const MAS_TO_RAD = Math.PI / 180 / 3.6e6;
 /** 1 km/s in parsecs per Julian year (the IAU parsec and the SI second). */
@@ -41,11 +49,19 @@ const KMS_TO_PC_PER_YEAR = 1.02271216505e-6;
 
 export const SKY_CONSTANTS = Object.freeze({
   linearRegimeYears: 1e6,        // regime 1: |t − t₀| ≤ 1 Myr (plan 28 §C)
-  regimeFadeYears: 2e5,          // the layer fades out between 1.0 and 1.2 Myr
+  regimeFadeYears: 2e5,          // the catalogue hands over to the statistical sky between 1.0 and 1.2 Myr
   recognisableRmsDeg: [1, 5],    // the lines and names fade between these RMS separation changes
   updateStepYears: 1,            // the sky is recomputed when the engine year moves this much
   nakedEyeV: 6.5,                // the named/lined tier; fainter stars are the background tier
+  statisticalSeedCellYears: 1e8, // plan 28 §E: the statistical sky's seed changes every 100 Myr
+  sunGalacticPeriodMyr: SUN_GALACTIC_ORBIT.periodMyr,   // the dome's turn (ONE home sky/galactic-frame)
 });
+
+/** mulberry32 — a small seeded PRNG: the statistical sky is reproducible per seed cell. @param {number} seed */
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
 
 /** Ballesteros (2012, EPL 97, 34008): the colour temperature of a black body from B−V. @param {number} bv */
 export function colourTemperatureKelvinFromBV(bv) {
@@ -89,8 +105,14 @@ function spriteSize(mag, baseSize) {
  * @param {() => {starDistance: number, starsizeBase: number, namesVisible: boolean, layout: string}} deps.settings
  */
 export function createSkyOfDate(deps) {
-  const { THREE, CSS2DObject, fetchRepoJson, starsUrl, constellationsUrl, starsGroup, constellationsGroup, engineYearOfJd, constellationMaterial, drawOnShaderProto, drawMaterials, settings } = deps;
+  const { THREE, CSS2DObject, fetchRepoJson, starsUrl, constellationsUrl, starsGroup, constellationsGroup, engineYearOfJd, constellationMaterial, drawOnShaderProto, drawMaterials, settings, dome, galacticTurnRadAtYear, galacticTriad } = deps;
   const C = SKY_CONSTANTS;
+  /** The dome's base pose (the Galactic alignment at J2000, handed in at creation or by setDomeBase) and its turn of date. */
+  const domeBase = new THREE.Quaternion();
+  let domeBaseSet = false;
+  if (deps.domeBase) { domeBase.copy(deps.domeBase); domeBaseSet = true; }
+  /** The statistical sky (plan 28 §E): a child of the dome (it turns with the band), rebuilt per seed cell. */
+  const stat = { points: null, geo: null, mat: null, seedCell: null, opacity: 0 };
 
   /** @type {{
    *  loaded: boolean, epochYear: number, n: number, nNaked: number,
@@ -189,6 +211,7 @@ export function createSkyOfDate(deps) {
     const pb = build(S.brightIdx, b), pf = build(S.faintIdx, f);
     S.matBright = b.mat; S.geoBright = b.geo; S.matFaint = f.mat; S.geoFaint = f.geo;
     pb.name = 'stars-naked-eye'; pf.name = 'stars-background';
+    pb.renderOrder = -95; pf.renderOrder = -97;   // the backdrop draws first (plan 28 §E); the sprites write no depth
     while (starsGroup.children.length) starsGroup.remove(starsGroup.children[0]);
     starsGroup.add(pb); starsGroup.add(pf);
     // the names (the IAU proper names), labels in the same group
@@ -260,8 +283,8 @@ export function createSkyOfDate(deps) {
         const dist = new Float32Array(pts.length); let acc = 0;
         for (let i = 1; i < pts.length; i++) { acc += pts[i].distanceTo(pts[i - 1]); dist[i] = acc; }
         geo.setAttribute('lineDistance', new THREE.BufferAttribute(dist, 1));
-        const mat = constellationMaterial.clone(); mat.opacity = constellationMaterial.opacity * g.opacity * S.regimeFade; mat.transparent = true;
-        const mesh = new THREE.LineSegments(geo, mat); mesh.frustumCulled = false; mesh.userData.group = g.name;
+        const mat = constellationMaterial.clone(); mat.opacity = constellationMaterial.opacity * g.opacity * S.regimeFade; mat.transparent = true; mat.depthWrite = false;
+        const mesh = new THREE.LineSegments(geo, mat); mesh.frustumCulled = false; mesh.userData.group = g.name; mesh.renderOrder = -94;
         constellationsGroup.add(mesh); S.lineObjects.push(mesh);
       }
     } else {
@@ -279,10 +302,61 @@ export function createSkyOfDate(deps) {
         const g = S.groups.get(S.strokeGroup[si]);
         if (mat.uniforms.uOpacity) mat.uniforms.uOpacity.value = (g ? g.opacity : 1) * S.regimeFade;
         drawMaterials.push(mat);
-        const line = new THREE.Line(geo, mat); line.frustumCulled = false; line.userData.group = S.strokeGroup[si];
+        const line = new THREE.Line(geo, mat); line.frustumCulled = false; line.userData.group = S.strokeGroup[si]; line.renderOrder = -94;
         constellationsGroup.add(line); S.lineObjects.push(line);
       });
     }
+  }
+
+  /** Each catalogue star's Galactic (l, b) at the epoch (radians), from the J2000 direction and the triad — the
+   *  statistical sky keeps b and V and scrambles l (plan 28 §E). Computed once after ingest. */
+  let galL = null, galB = null;
+  function computeGalactic() {
+    const T = galacticTriad;
+    galL = new Float32Array(S.n); galB = new Float32Array(S.n);
+    for (let i = 0; i < S.n; i++) {
+      // local (x, y, z) = (Y_eq, Z_eq, X_eq) → equatorial (X, Y, Z) = (z, x, y), normalised
+      const x = S.r0[3 * i], y = S.r0[3 * i + 1], z = S.r0[3 * i + 2], n = Math.hypot(x, y, z) || 1;
+      const e = [z / n, x / n, y / n];
+      const dx = e[0] * T.x[0] + e[1] * T.x[1] + e[2] * T.x[2], dy = e[0] * T.y[0] + e[1] * T.y[1] + e[2] * T.y[2], dz = e[0] * T.z[0] + e[1] * T.z[1] + e[2] * T.z[2];
+      galL[i] = Math.atan2(dy, dx); galB[i] = Math.asin(Math.max(-1, Math.min(1, dz)));
+    }
+  }
+
+  /** The statistical sky's seed cell of a year: the 100-Myr cell the year falls in, counted from J2000 (0 holds today). @param {number} year */
+  const seedCellOf = (year) => Math.floor((year - 2000) / C.statisticalSeedCellYears);
+
+  /** Build (or rebuild for a new seed cell) the statistical sky: every catalogue star's magnitude and Galactic
+   *  latitude kept, its longitude replaced by a seeded uniform draw — the same brightnesses and the same spread
+   *  about the band, no shape, no name; a child of the dome, so it turns with the band. The dome's texture frame:
+   *  +X the centre (l 0), +Y the pole, +Z = l 270 (the alignment's third axis is X × Y of the equatorial triad,
+   *  i.e. −Y_g). Drawn just inside the dome; the sprite size compensates the distance. @param {number} cell */
+  function buildStatistical(cell) {
+    if (!dome || !S.loaded || galL === null) return;
+    if (stat.seedCell === cell && stat.points) return;
+    const rnd = mulberry32(0x5A17 ^ Math.imul(cell + 7919, 2654435761));
+    const n = S.n, R = dome.geometry.parameters.radius * 0.97;
+    if (!stat.geo) {
+      stat.geo = new THREE.BufferGeometry();
+      stat.geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3 * n), 3));
+      stat.geo.setAttribute('starColor', new THREE.BufferAttribute(S.colors.slice(), 3));
+      const size = new Float32Array(n); const base = settings().starsizeBase;
+      for (let i = 0; i < n; i++) size[i] = spriteSize(S.vmag0[i], base) * (R / settings().starDistance);
+      stat.geo.setAttribute('starSize', new THREE.BufferAttribute(size, 1));
+      stat.mat = starShader(S.matBright.uniforms.pointTexture.value);
+      stat.mat.uniforms.fadeStart.value = 1e12; stat.mat.uniforms.fadeEnd.value = 2e12;   // never distance-faded: the dome's radius is its distance
+      stat.mat.uniforms.uOpacity.value = 0;
+      stat.points = new THREE.Points(stat.geo, stat.mat);
+      stat.points.frustumCulled = false; stat.points.renderOrder = -96; stat.points.name = 'stars-statistical';
+      dome.add(stat.points);
+    }
+    const p = stat.geo.getAttribute('position').array;
+    for (let i = 0; i < n; i++) {
+      const l = rnd() * 2 * Math.PI, b = galB[i], cb = Math.cos(b);
+      p[3 * i] = R * cb * Math.cos(l); p[3 * i + 1] = R * Math.sin(b); p[3 * i + 2] = -R * cb * Math.sin(l);
+    }
+    stat.geo.getAttribute('position').needsUpdate = true;
+    stat.seedCell = cell;
   }
 
   /** The positions of date: r = r₀ + v·Δt for every star, the sprites' attributes, the labels, the fades, the lines. */
@@ -291,6 +365,17 @@ export function createSkyOfDate(deps) {
     const dtClamped = Math.max(-C.linearRegimeYears, Math.min(C.linearRegimeYears, dt));
     const over = Math.abs(dt) - C.linearRegimeYears;
     S.regimeFade = over <= 0 ? 1 : Math.max(0, 1 - over / C.regimeFadeYears);
+    // plan 28 §E: the dome turns with the Sun's Galactic orbit about its pole (the texture's local +Y)
+    S.galacticTurnRad = galacticTurnRadAtYear ? galacticTurnRadAtYear(year) : 0;
+    if (dome && domeBaseSet) {
+      dome.quaternion.copy(domeBase).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), S.galacticTurnRad));
+      dome.updateMatrixWorld();
+    }
+    // the statistical sky beyond regime 1: built for the year's seed cell, cross-faded against the catalogue
+    S.seedCell = seedCellOf(year);
+    stat.opacity = 1 - S.regimeFade;
+    if (stat.opacity > 0) buildStatistical(S.seedCell);
+    if (stat.mat) stat.mat.uniforms.uOpacity.value = stat.opacity;
     const R = settings().starDistance, base = settings().starsizeBase;
     const n = S.n, pos = S.pos;
     for (let i = 0; i < n; i++) {
@@ -336,6 +421,7 @@ export function createSkyOfDate(deps) {
       ingest(stars);
       buildSprites(pointTexture);
       ingestStrokes(consts);
+      computeGalactic();
       S.loaded = true;
       api.updateForEpoch(jdUT, true);
       return S.counts;
@@ -353,13 +439,24 @@ export function createSkyOfDate(deps) {
     setLayout(layout) { S.layout = layout; if (S.loaded) buildLines(); },
     /** @param {boolean} visible */
     setNamesVisible(visible) { for (const L of S.labels) L.obj.visible = visible; },
+    /** The dome's base pose (the Galactic alignment at J2000, set by the scene once); the turn of date rides on it. @param {any} q */
+    setDomeBase(q) { domeBase.copy(q); domeBaseSet = true; if (S.loaded && Number.isFinite(S.year)) computeForYear(S.year); },
     get loaded() { return S.loaded; },
     get drawMaterials() { return drawMaterials; },
     /** The state the gates read. */
     state() {
       const groups = {}; for (const g of S.groups.values()) groups[g.name] = { rmsDeg: g.rmsDeg, opacity: g.opacity, stars: g.starIdx.length, strokes: g.strokeIdx.length };
-      return { loaded: S.loaded, epochYear: S.epochYear, year: S.year, regime: S.regimeFade >= 1 ? 'linear' : S.regimeFade > 0 ? 'fading' : 'none', regimeFade: S.regimeFade, stars: S.n, nakedEye: S.nNaked, labels: S.labels.length, strokes: S.strokes.length, constellations: S.groups.size, layout: S.layout, groups, counts: S.counts };
+      return {
+        loaded: S.loaded, epochYear: S.epochYear, year: S.year,
+        // linear: the catalogue; handover: the cross-fade into the statistical sky; statistical: the illustration (plan 28 §E)
+        regime: S.regimeFade >= 1 ? 'linear' : S.regimeFade > 0 ? 'handover' : 'statistical', regimeFade: S.regimeFade,
+        statisticalOpacity: stat.opacity, seedCell: S.seedCell, statisticalBuilt: stat.seedCell, galacticTurnRad: S.galacticTurnRad || 0,
+        labelOpacity: S.labels.length ? Number(S.labels[0].div.style.opacity) : null,
+        stars: S.n, nakedEye: S.nNaked, labels: S.labels.length, strokes: S.strokes.length, constellations: S.groups.size, layout: S.layout, groups, counts: S.counts,
+      };
     },
+    /** A statistical-sky star's dome-frame position for the gates (the seeded draw of the built cell). @param {number} i */
+    statisticalPositionAt(i) { if (!stat.geo) return null; const p = stat.geo.getAttribute('position').array; return [p[3 * i], p[3 * i + 1], p[3 * i + 2]]; },
     /**
      * A star's direction at an engine year — pure, the same formula the sprites ride (no memo): the ICRS
      * α, δ of date (degrees), the local unit vector, the apparent magnitude; null for a HIP not in the catalogue.

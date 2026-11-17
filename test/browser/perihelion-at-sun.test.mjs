@@ -143,6 +143,8 @@ try {
     const G = galacticTriadEquatorialJ2000();
     const toLocal = (/** @type {[number, number, number]} */ v) => new THREE.Vector3(v[1], v[2], v[0]);
     const qS = sd ? new THREE.Quaternion().fromArray(sd.starsQuaternion) : null, qK = sd ? new THREE.Quaternion().fromArray(sd.skyQuaternion) : null;
+    // plan 28 §E: the dome carries its turn with the Sun's Galactic orbit about its pole (local +Y) — undo it to read the alignment
+    if (qK) qK.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -(sd.galacticTurnRad || 0)));
     if (qK && PLANT !== 1) qK.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.01));   // fail-proof: the dome turned 0.01 rad about its pole
     const centreChord = sd ? new THREE.Vector3(1, 0, 0).applyQuaternion(qK).distanceTo(toLocal(G.x).applyQuaternion(qS)) : NaN;
     const poleChord = sd ? new THREE.Vector3(0, 1, 0).applyQuaternion(qK).distanceTo(toLocal(G.z).applyQuaternion(qS)) : NaN;

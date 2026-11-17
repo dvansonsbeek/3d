@@ -35,8 +35,9 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   // the NASA Five Millennium Canon's span (−1999…+3000): ONE home eclipse/formula — the ΔT chart's era range,
   // the Espenak–Meeus validity and the lunar-canon verification windows read it (plan 33's hardcoded-values review)
   CANON_WINDOW_YEARS,
-  // the Galactic frame at J2000 (ONE home sky/galactic-frame): the Milky Way dome's rotation (plan 28 §A)
-  galacticTriadEquatorialJ2000 } from '@essrt/physics';
+  // the Galactic frame at J2000 (ONE home sky/galactic-frame): the Milky Way dome's rotation (plan 28 §A),
+  // and the frame's turn with the Sun's Galactic orbit (plan 28 §E)
+  galacticTriadEquatorialJ2000, galacticTurnRadAtYear } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -2953,8 +2954,10 @@ function skyStatusClause(pos) {
   const dtYears = _engineYearTT(jdFromPos(pos)) - 1991.25;
   const lim = SKY_CONSTANTS.linearRegimeYears, fade = SKY_CONSTANTS.regimeFadeYears;
   if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 positions, parallaxes and proper motions; Gaia DR3 and Pulkovo radial velocities) propagated linearly from the catalogue epoch — every star moves with its measured space velocity, and the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). Valid within ±${(lim / 1e6).toFixed(0)} Myr of today, where the Galaxy's curvature of a star's path is invisible.`;
-  if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are fading out — beyond ±${(lim / 1e6).toFixed(0)} Myr the straight-line motion stops being the star's path (the Galactic orbit bends it), and no star of today's sky stays in a known place.`;
-  return ` Sky: no star of today's sky is drawn — beyond ±${(lim / 1e6).toFixed(0)} Myr the Galactic orbits diverge and the bright stars of today have not formed or have died; only the Milky Way's band stands (the Galactic-orbit and statistical skies are not yet built).`;
+  const turns = Math.abs(dtYears) / (SKY_CONSTANTS.sunGalacticPeriodMyr * 1e6);
+  const milky = ` The Milky Way's band turns with the Sun's Galactic orbit (once per ${SKY_CONSTANTS.sunGalacticPeriodMyr.toFixed(0)} Myr on McMillan 2017's R₀ and v₀; ${turns.toFixed(turns < 1 ? 2 : 1)} turns from today).`;
+  if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are handing over to a STATISTICALLY EQUIVALENT sky — beyond ±${(lim / 1e6).toFixed(0)} Myr the straight-line motion stops being a star's path (the Galactic orbit bends it) and no star of today's sky stays in a known place: the same brightnesses and the same spread about the Milky Way's band, the places drawn by a seed that changes every 100 Myr, no name and no constellation.` + milky;
+  return ` Sky: an ILLUSTRATION — a statistically equivalent sky: the brightnesses and the spread about the Milky Way's band are today's catalogue's, the places a seed that changes every 100 Myr; no star of today's sky is here (the bright ones of today have not formed or have died, the Galactic orbits have diverged), so no name and no constellation is drawn.` + milky;
 }
 /** THE HONEST EDGE (plan 27 step B, doc 111 §1.36): a position is clamped to the navigable
  *  domain — beyond it the readers fall back to a linear count (630 solar days per year one day
@@ -4692,6 +4695,10 @@ if (typeof window !== 'undefined') {
       textureFlipY: skyTexture.flipY, textureRepeat: skyTexture.repeat.toArray(), textureOffset: skyTexture.offset.toArray(),
       textureSize: skyTexture.image ? [skyTexture.image.width, skyTexture.image.height] : null,
       brightness: skyMaterial.color.r,
+      // plan 28 §E: the dome's turn with the Sun's Galactic orbit (radians about its pole) and the backdrop's seat on the camera
+      galacticTurnRad: _skyOfDate.state().galacticTurnRad,
+      backdropOffsetFromCamera: skyBackdrop.position.distanceTo(camera.position),
+      domeDepthWrite: skyMaterial.depthWrite, domeRenderOrder: sky.renderOrder,
     }),
     /** The dome's brightness (the material's colour scale) — a tuning knob for screenshots; returns the value set. @param {number} k */
     skyDomeBrightness: (k) => { skyMaterial.color.setScalar(k); return skyMaterial.color.r; },
@@ -4702,6 +4709,7 @@ if (typeof window !== 'undefined') {
     skyUpdate: (force) => _skyOfDate.updateForEpoch(jdFromPos(o.pos), force !== false),
     starDirectionAt: (hip, year) => _skyOfDate.starDirectionAt(hip, year),
     starRecord: (hip) => _skyOfDate.starRecord(hip),
+    statisticalPositionAt: (i) => _skyOfDate.statisticalPositionAt(i),
     // Moon-ring gate hook: the RING's perigee and ascending
     // node of date read from the placed stack geometry — the apsidal arm's
     // offset (toward the apogee) and the Moon orbit plane's normal — in the
@@ -8841,7 +8849,17 @@ const skyMaterial = new THREE.MeshBasicMaterial({
   side: THREE.BackSide
 });
 const sky = new THREE.Mesh(skyGeo, skyMaterial);
-scene.add(sky);
+// PLAN 28 §E — the sky is a BACKDROP AT INFINITY: the dome, the catalogue stars, the lines and the
+// names sit in one group that follows the camera's POSITION every frame (its rotation stays the
+// J2000 alignment the star-field gate pins), drawn first with depth writes off, so the planets and
+// orbits are always in front and the sky never vanishes at any zoom (the former 100,000 random
+// points on a 10⁶-unit sphere gave that by accident of their radius — the owner's observation).
+const skyBackdrop = new THREE.Group();
+skyBackdrop.name = 'sky-backdrop';
+skyMaterial.depthWrite = false;
+sky.renderOrder = -100;
+skyBackdrop.add(sky);
+scene.add(skyBackdrop);
 
 //*************************************************************
 // ADD STARS, CONSTELLATIONS
@@ -8862,9 +8880,9 @@ const _CHAIN_J2000_REST_SAMPLE = Object.freeze({
   periOfDateDeg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg, e: ASTRO_REFERENCE.eccentricityJ2000,
 });
 
-// Add containers to the scene
-scene.add(sceneObjects.stars);
-scene.add(sceneObjects.constellations);
+// Add containers to the scene — inside the sky backdrop (plan 28 §E): they follow the camera's position
+skyBackdrop.add(sceneObjects.stars);
+skyBackdrop.add(sceneObjects.constellations);
 // we can add other fixed objects over here later on. e.g.
 //scene.add(sceneObjects.blackholes);
 
@@ -8909,6 +8927,12 @@ sceneObjects.constellations.applyMatrix4(earth.rotationAxis.matrixWorld);
   const q = sceneObjects.stars.getWorldQuaternion(new THREE.Quaternion());
   sky.quaternion.copy(q.multiply(new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z))));
   sky.updateMatrixWorld();
+  // plan 28 §E: the alignment is a ROTATION — the containers inherited the Earth axis frame's
+  // translation too (its matrixWorld), which a backdrop centred on the camera must not carry
+  sceneObjects.stars.position.set(0, 0, 0);
+  sceneObjects.constellations.position.set(0, 0, 0);
+  // the dome's base pose is handed to the sky module at its creation below (domeBase): it turns the
+  // dome about the Galactic pole with the Sun's orbit (galacticTurnRadAtYear) on every epoch update
 }
 sceneObjects.constellations.visible = false;
 
@@ -9005,6 +9029,8 @@ const _skyOfDate = createSkyOfDate({
   starsGroup: sceneObjects.stars, constellationsGroup: sceneObjects.constellations,
   engineYearOfJd: (jdUT) => _engineYearTT(jdUT),
   constellationMaterial, drawOnShaderProto, drawMaterials,
+  // plan 28 §E: the dome turns with the Sun's Galactic orbit and carries the statistical sky beyond ±1 Myr
+  dome: sky, domeBase: sky.quaternion.clone(), galacticTurnRadAtYear, galacticTriad: galacticTriadEquatorialJ2000(),
   settings: () => ({ starDistance: o.starDistance || 10000, starsizeBase: o.starsizeBase || 50, namesVisible: o.starNamesVisible, layout: o.constellationLayout }),
 });
 
@@ -23862,7 +23888,9 @@ function render(now) {
   // 9) Cloud animation
   if (earth._updateCloudsFunc) earth._updateCloudsFunc(delta);
 
-  // 10) Draw
+  // 10) Draw — the sky backdrop follows the camera's position first (plan 28 §E: a sky at infinity)
+  skyBackdrop.position.copy(camera.position);
+  skyBackdrop.updateMatrixWorld(true);
   renderer.render(scene, camera);
   if (needsLabelUpdate) {
     // (the label layer's size follows the window in onWindowResize; setting it

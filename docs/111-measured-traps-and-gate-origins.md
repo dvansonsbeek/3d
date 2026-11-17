@@ -2681,6 +2681,38 @@ read the same year five times; and `python3 -I` (isolated mode, the rule for
 untrusted downloads) does not see the user's astropy — a script of ours runs
 without it.
 
+**§E, from the owner's three observations on the first build.** (1) "At the
+genesis I see no stars" — the layer faded to nothing beyond ±1 Myr. Keeping
+today's catalogue there would show a sky that never existed (by 100 Myr the
+bright stars of today are elsewhere or unborn), so the fade's TARGET changed,
+not the fade: the catalogue hands over, across 1.0–1.2 Myr, to plan 28 §E's
+statistically equivalent sky — every catalogue star keeps its magnitude and
+its Galactic latitude and takes a seeded longitude (mulberry32 on the 100-Myr
+cell, counted from J2000: cell −1 at −10 Myr, −45 at the genesis), the same
+brightnesses and the same spread about the band, no shape and no name; the
+hover calls it an illustration. (2) "Zooming out, the live version kept a
+layer of stars that is gone now" — the former 100,000 random points sat on a
+10⁶-unit sphere, ten times the dome's radius, so they survived the camera's
+exit from the dome by accident of their radius. The sky is now what it is, a
+backdrop at infinity: the dome, the tiers, the lines and the names in one
+group that follows the camera's POSITION every frame (its rotation stays the
+J2000 alignment the star-field rows pin — the containers' inherited
+translation from the Earth axis frame's matrixWorld is zeroed), drawn first
+(renderOrder −100 … −94) with no depth writes, so the planets and orbits are
+always in front and the sky stays at every zoom. (3) "The Milky Way stays the
+same across the whole history" — not beyond regime 1: the Galactic frame
+co-rotates with the Sun's orbit, so against the stars and the equinox the
+band turns once per 216 Myr (McMillan 2017: R₀ 8.21 kpc, v₀ 233.1 km/s —
+ONE home `sky/galactic-frame`, `SUN_GALACTIC_ORBIT`, `galacticTurnRadAtYear`),
+clockwise seen from the north Galactic pole, 20.4 turns at the genesis, the
+phase fixed by today's direction (the one free choice, named); its brightness
+stays (the Sun stays near 8 kpc and within 100 pc of the plane). The
+statistical sky is a child of the dome, so it turns with the band. The dome
+gate rows undo the turn before reading the alignment. **A TDZ at module
+init:** the alignment block handed the dome's pose to the sky module 90 lines
+before the module's `const` — "Cannot access 'jO' before initialization" in
+the bundle, every browser row dead; the pose goes in at the module's creation.
+
 ---
 
 ## 2. The browser tier's gates and their origins
@@ -2867,8 +2899,15 @@ The `test:snapshot` chain also carries:
   still readable at −48 kyr, every shape gone at −198 kyr; the regime linear
   at −998 kyr, fading at −1.15 Myr, off at −10 Myr with the dome untouched;
   the loaded counts ≡ the catalogue's `_meta` — born from the owner's "at
-  the genesis we see the same Leo as today"; fail-proven under
-  `ESSRT_SKY_PLANT=1` (the scene's reading shifted 2″).
+  the genesis we see the same Leo as today"; and since §E: the regime
+  handover at −1.15 Myr and statistical at −10 Myr, the statistical tier on
+  with the names off, the seed cell −1 at −10 and −30 Myr (the same places
+  bit-for-bit), −2 at −130 Myr (other places), −45 at the genesis, the dome's
+  turn at −130 Myr ≡ the package's `galacticTurnRadAtYear` to 1e-12 (20.4
+  turns at the genesis), the backdrop group on the camera (offset 0), the
+  dome without depth writes drawn first — born from the owner's three
+  observations on the first build; fail-proven under `ESSRT_SKY_PLANT=1`
+  (the scene's reading shifted 2″).
 - **The focused chain planet's orbit-plane grid** passes through the
   rendered Sun with its normal along the chain's orbit normal of date (born
   from the owner's "the tilt of Mercury's path floats above the Sun": the
