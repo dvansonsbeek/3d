@@ -37,7 +37,7 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   CANON_WINDOW_YEARS,
   // the Galactic frame at J2000 (ONE home sky/galactic-frame): the Milky Way dome's rotation (plan 28 §A),
   // and the frame's turn with the Sun's Galactic orbit (plan 28 §E)
-  galacticTriadEquatorialJ2000, galacticTurnRadAtYear } from '@essrt/physics';
+  galacticTriadEquatorialJ2000, galacticTurnRadAtYear, eclipticCrossings, constellationAtLongitude, setBoundaryTable, ECLIPTIC_J2000_EQUATORIAL } from '@essrt/physics';
 // K8 — the reference package: ONE-WAY imports (comparison only;
 // @essrt/reference is private-by-construction and nothing in the model
 // chain depends on it). publishedCurves migrated here from
@@ -2973,7 +2973,9 @@ function skyStatusClause(pos) {
   const lim = SKY_CONSTANTS.catalogueRegimeYears, fade = SKY_CONSTANTS.regimeFadeYears;
   if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 and Gaia DR3 positions, parallaxes, proper motions and radial velocities) carried on each star's GALACTIC ORBIT about its own guiding centre (an epicycle to second order in a cited local potential — McMillan 2017's R₀ and v₀, Bovy 2017's Oort B, the local density of McKee et al. 2015 — the Sun on its own; within ±1 Myr the orbit and a straight line agree to a fraction of a per cent), every star at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015), so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them. Stars that arrive from up to 1.5 kpc away (Gaia DR3's six-dimensional stars brighter than absolute magnitude 2 — the stars a naked-eye sky is made of; the fainter background thins with the distance in time) are drawn as they brighten past V 8 and leaving ones fade; a star outliving its main-sequence lifetime fades (a band — every star treated as mid-life, births not predicted); the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). By 20 Myr each star's measured velocity error (~1 km/s, 20 pc) makes its direction uncertain by degrees: the sky is statistically right — the real stars at roughly the right places and brightnesses — not a star chart. Valid to ±${(lim / 1e6).toFixed(0)} Myr of today.`;
   const turns = Math.abs(dtYears) / (SKY_CONSTANTS.sunGalacticPeriodMyr * 1e6);
-  const milky = ` The Milky Way's band turns with the Sun's Galactic orbit (once per ${SKY_CONSTANTS.sunGalacticPeriodMyr.toFixed(0)} Myr on McMillan 2017's R₀ and v₀; ${turns.toFixed(turns < 1 ? 2 : 1)} turns from today).`;
+  const skyNow = _skyOfDate.loaded ? _skyOfDate.state() : null;
+  const bob = skyNow && Number.isFinite(skyNow.sunHeightPc) ? ` The Sun sits ${Math.abs(skyNow.sunHeightPc).toFixed(0)} pc ${skyNow.sunHeightPc >= 0 ? 'north' : 'south'} of the Galactic plane (an oscillation of ±102 pc every 85 Myr in the same potential), so the band's midplane appears ${Math.abs(skyNow.bandShiftDeg).toFixed(1)}° ${skyNow.bandShiftDeg <= 0 ? 'south' : 'north'} — the parallax of the disc's light at 1.5 kpc, drawn as the dome's shift.` : '';
+  const milky = ` The Milky Way's band turns with the Sun's Galactic orbit (once per ${SKY_CONSTANTS.sunGalacticPeriodMyr.toFixed(0)} Myr on McMillan 2017's R₀ and v₀; ${turns.toFixed(turns < 1 ? 2 : 1)} turns from today).` + bob;
   if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are handing over to a STATISTICALLY EQUIVALENT sky — beyond ±${(lim / 1e6).toFixed(0)} Myr the smooth axisymmetric potential stops being a star's path (the spiral arms and the clouds the model leaves out take over) and no star of today's sky stays in a known place: the same brightnesses and the same spread about the Milky Way's band, the places drawn by a seed that changes every 100 Myr, no name and no constellation; each star hands over at its own moment in the window, so the sky stays full.` + milky;
   return ` Sky: an ILLUSTRATION — a statistically equivalent sky: the brightnesses and the spread about the Milky Way's band are today's catalogue's, the places a seed that changes every 100 Myr; no star of today's sky is here (the bright ones of today have not formed or have died, the Galactic orbits have diverged), so no name and no constellation is drawn.` + milky;
 }
@@ -4738,6 +4740,10 @@ if (typeof window !== 'undefined') {
     /** The constellation layout through the pane's own path ('asterism' | 'stellarium'); returns the sky's layout. @param {string} layout */
     setConstellationLayout: (layout, show) => { if (show !== undefined) sceneObjects.constellations.visible = !!show; o.constellationLayout = layout; initConstellations(); return _skyOfDate.state().layout; },
     constellationLineProbe: (group) => _skyOfDate.lineProbe(group),
+    // plan 28 §F2: the zodiac band of date — the ecliptic of date's pole and equinox (equatorial J2000 unit vectors, from the
+    // placed Earth frame) and the crossings solved on them; null crossings beyond the catalogue regime or before the table loads
+    setZodiacVisible: (v) => { zodiac.visible = !!v; forceSceneUpdate(); return zodiac.visible; },
+    zodiacBandProbe: () => { const cr = _zodiacInRegime(o.julianDay) ? _zodiacCrossingsOfDate(o.julianDay) : null; return { ready: _zodiacState.ready, year: _zodiacState.year, inRegime: _zodiacInRegime(o.julianDay), frame: _zodiacState.frame, crossings: cr, visible: zodiac.visible, drawn: zodiac.children.filter((c) => c.visible).length }; },
     starDirectionAt: (hip, year) => _skyOfDate.starDirectionAt(hip, year),
     starRecord: (hip) => _skyOfDate.starRecord(hip),
     statisticalPositionAt: (i) => _skyOfDate.statisticalPositionAt(i),
@@ -7301,63 +7307,100 @@ const plane = new THREE.GridHelper(o.starDistance * 2, 30, 0x008800, 0x000088);
 earth.pivotObj.add(plane);
 plane.visible = false;
 
-// Ecliptic constellations — the thirteen IAU constellations the ecliptic
-// crosses (the table the Planet Orbit Analysis's export uses), as a STAR-FIXED
-// band: its plane is the J2000 ecliptic and its 0° the J2000 equinox, placed
-// through the chain's frame bridge R in moveModel (world-fixed, like the
-// constellation outlines it names), so the equinox of date, the perihelion
-// marker and the solstice axis precess THROUGH it. (Was: twelve equal signs
-// on the K wheel, turned by −60° minus the device anomaly every frame — the
-// "zodiac's old behaviour", a hand-tuned orientation, not a placed one.)
-// The variable keeps its name; the toggle is "Zodiac constellations (IAU)".
-// The table: the J2000 ecliptic longitude at which the ecliptic ENTERS each
-// constellation (the IAU 1930 Delporte boundaries, B1875 lines, read at the
-// ecliptic; ~0.1°). A star-fixed naming of the sidereal direction: carried
-// with the precession of the equinox of date; the stars' own proper motions
-// are NOT applied (over 10⁵ years they displace the figures by degrees).
-// Shared with the Planet Orbit Analysis's export (its constellation band and the
-// "vernal equinox … in <constellation>" row).
-const _HI_ECLIPTIC_CONSTELLATIONS = [
-  ['Pisces', 351.57], ['Aries', 29.09], ['Taurus', 53.47], ['Gemini', 90.44], ['Cancer', 118.26],
-  ['Leo', 138.19], ['Virgo', 174.15], ['Libra', 217.80], ['Scorpius', 241.14], ['Ophiuchus', 247.64],
-  ['Sagittarius', 266.60], ['Capricornus', 299.71], ['Aquarius', 327.89],
-];
+// Ecliptic constellations — the IAU constellations the ECLIPTIC OF DATE crosses
+// (plan 28 §F2). The IAU boundaries are COORDINATE LINES of the B1875 frame
+// (Delporte 1930), read through Roman 1987's box table — ONE home
+// @essrt/physics sky/ecliptic-constellations, the table an input
+// (public/input/constellation-boundaries.json), astropy's get_constellation
+// the referee. The band is re-solved per engine year on the Earth frame of
+// date (R4: the sun-plane container's x̂ the equinox of date, ŷ the ecliptic
+// pole of date, through the star containers' J2000 alignment), its crossings
+// the longitudes from the equinox of date at which the ecliptic of date
+// ENTERS each constellation — so the band rides the ecliptic of date like the
+// signs ring while the IAU lines stay where B1875 put them among the stars;
+// a tilt of the ecliptic of date (up to ~3° against the invariable plane over
+// 70–100 kyr) moves the crossings along it, and a corner grazed adds a
+// fourteenth. (A first build held thirteen boundary LONGITUDES read on the
+// J2000 ecliptic and shifted by the precession of the equinox — exact only
+// while the ecliptic of date lay on the J2000 ecliptic.) Shown inside the
+// catalogue regime (±50 Myr); beyond, the lines name no star of this sky and
+// the band draws nothing. The stars' own proper motions are NOT applied to the
+// lines (over 10⁵ years the stars drift across them — Regulus leaves Leo's
+// box). Shared with the Planet Orbit Analysis's export (its constellation
+// band and the "vernal equinox … in <constellation>" row).
 const zodiac = new THREE.Group();
 zodiac.name = 'eclipticConstellations';
-{
-  const RZ = 250;   // scene units (2.5 AU), the former wheel's radius
-  // longitude λ in the band's local frame: +x = the equinox, +90° = local −z
-  // (the label ring's +y after its −π/2 tilt), +y = the ecliptic north pole
-  const lonDir = (lonDeg) => { const a = lonDeg * Math.PI / 180; return new THREE.Vector3(Math.cos(a), 0, -Math.sin(a)); };
+const _ZODIAC_RZ = 250;   // scene units (2.5 AU), the former wheel's radius
+/** The band's state: the boundary table loaded, the crossings of the year solved, the drawn set. */
+const _zodiacState = { ready: false, year: NaN, frame: null, crossings: null, drawnKey: '', lines: null, label: null, canvas: null, texture: null };
+// longitude λ in the band's local frame: +x = the equinox, +90° = local −z (the label ring's +y after its −π/2 tilt), +y = the ecliptic north pole
+const _zodiacLonDir = (lonDeg) => { const a = lonDeg * Math.PI / 180; return new THREE.Vector3(Math.cos(a), 0, -Math.sin(a)); };
+/** The ecliptic of date as two equatorial-J2000 unit vectors — the Earth frame's world basis (x̂ the equinox of date,
+ *  ŷ the pole — R4) taken through the star containers' world pose (aligned once to J2000: local (x, y, z) = (Y_eq, Z_eq, X_eq)). */
+function _zodiacEclipticOfDateJ2000() {
+  const q = earthPerihelionPrecession1.containerObj.getWorldQuaternion(new THREE.Quaternion());
+  const inv = sceneObjects.stars.getWorldQuaternion(new THREE.Quaternion()).invert();
+  const toEq = (v) => { const l = v.applyQuaternion(q).applyQuaternion(inv); return [l.z, l.x, l.y]; };
+  return { equinox: toEq(new THREE.Vector3(1, 0, 0)), pole: toEq(new THREE.Vector3(0, 1, 0)) };
+}
+/** The crossings for the scene's instant (memo per whole engine year; pure in the year given the frame), null before the table loads. @param {number} jdUT */
+function _zodiacCrossingsOfDate(jdUT) {
+  if (!_zodiacState.ready) return null;
+  const year = _engineYearTT(jdUT);
+  if (!Number.isFinite(year)) return null;
+  if (Number.isFinite(_zodiacState.year) && Math.abs(year - _zodiacState.year) < 1) return _zodiacState.crossings;
+  const f = _zodiacEclipticOfDateJ2000();
+  _zodiacState.frame = f; _zodiacState.year = year;
+  _zodiacState.crossings = eclipticCrossings(f.pole, f.equinox);
+  return _zodiacState.crossings;
+}
+/** True inside the catalogue regime, where the band is drawn. @param {number} jdUT */
+const _zodiacInRegime = (jdUT) => Math.abs(_engineYearTT(jdUT) - 2000) <= SKY_CONSTANTS.catalogueRegimeYears;
+/** Draw (or redraw) the band's radials, rim and names from a crossing list — when the set or a crossing moved 0.05°. */
+function _zodiacRebuild(crossings) {
+  const key = crossings.map((c) => `${c.abbr}:${c.lonDeg.toFixed(1)}`).join('|');
+  if (key === _zodiacState.drawnKey) return;
+  _zodiacState.drawnKey = key;
+  const RZ = _ZODIAC_RZ;
   const pts = [];
-  for (const [, start] of _HI_ECLIPTIC_CONSTELLATIONS) pts.push(new THREE.Vector3(0, 0, 0), lonDir(start).multiplyScalar(RZ));   // the boundary radials
-  for (let i = 0; i < 128; i++) pts.push(lonDir(360 * i / 128).multiplyScalar(RZ), lonDir(360 * (i + 1) / 128).multiplyScalar(RZ));   // the rim
-  zodiac.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x555555 })));
+  for (const c of crossings) pts.push(new THREE.Vector3(0, 0, 0), _zodiacLonDir(c.lonDeg).multiplyScalar(RZ));   // the boundary radials
+  for (let i = 0; i < 128; i++) pts.push(_zodiacLonDir(360 * i / 128).multiplyScalar(RZ), _zodiacLonDir(360 * (i + 1) / 128).multiplyScalar(RZ));   // the rim
+  if (_zodiacState.lines) { zodiac.remove(_zodiacState.lines); _zodiacState.lines.geometry.dispose(); }
+  _zodiacState.lines = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x555555 }));
+  zodiac.add(_zodiacState.lines);
   // the names, drawn on the flat picture of the annulus (RingGeometry UVs are planar; the texture's up is the geometry's +y)
-  const size = 2048, zCanvas = document.createElement('canvas');
-  zCanvas.width = zCanvas.height = size;
-  const zc = zCanvas.getContext('2d');
+  const size = 2048;
+  if (!_zodiacState.canvas) { _zodiacState.canvas = document.createElement('canvas'); _zodiacState.canvas.width = _zodiacState.canvas.height = size; }
+  const zc = _zodiacState.canvas.getContext('2d');
+  zc.clearRect(0, 0, size, size);
   zc.fillStyle = '#ffffff'; zc.textAlign = 'center'; zc.textBaseline = 'middle';
   const cxy = size / 2, rText = (size / 2) * (242.5 / RZ);
-  _HI_ECLIPTIC_CONSTELLATIONS.forEach(([name, start], i) => {
-    const next = _HI_ECLIPTIC_CONSTELLATIONS[(i + 1) % _HI_ECLIPTIC_CONSTELLATIONS.length][1];
-    const span = ((next - start) % 360 + 360) % 360, mid = start + span / 2;
+  crossings.forEach((c, i) => {
+    const next = crossings[(i + 1) % crossings.length].lonDeg;
+    const span = ((next - c.lonDeg) % 360 + 360) % 360, mid = c.lonDeg + span / 2;
     const a = mid * Math.PI / 180, x = cxy + rText * Math.cos(a), y = cxy - rText * Math.sin(a);
     zc.save(); zc.translate(x, y); zc.rotate((Math.sin(a) < 0 ? 270 - mid : 90 - mid) * Math.PI / 180);
     zc.font = `bold ${span < 12 ? 30 : 42}px Arial`;
-    zc.fillText((span < 12 ? name.slice(0, 3) : name).toUpperCase(), 0, 0);   // Scorpius' 6.5° holds its IAU abbreviation
+    zc.fillText((span < 12 ? c.abbr : c.name).toUpperCase(), 0, 0);   // a narrow span (Scorpius' 6.5°) holds its IAU abbreviation
     zc.restore();
   });
-  const zTexture = new THREE.CanvasTexture(zCanvas);
-  zTexture.anisotropy = 8;
-  zTexture.minFilter = THREE.LinearMipMapLinearFilter;
-  zTexture.magFilter = THREE.LinearFilter;
-  const zLabel = new THREE.Mesh(new THREE.RingGeometry(235, RZ, 64),
-    new THREE.MeshBasicMaterial({ map: zTexture, side: THREE.DoubleSide, transparent: true, opacity: 1, depthWrite: false }));
-  zLabel.rotation.x = -Math.PI / 2;
-  zodiac.add(zLabel);
+  if (!_zodiacState.texture) {
+    _zodiacState.texture = new THREE.CanvasTexture(_zodiacState.canvas);
+    _zodiacState.texture.anisotropy = 8;
+    _zodiacState.texture.minFilter = THREE.LinearMipMapLinearFilter;
+    _zodiacState.texture.magFilter = THREE.LinearFilter;
+    _zodiacState.label = new THREE.Mesh(new THREE.RingGeometry(235, RZ, 64),
+      new THREE.MeshBasicMaterial({ map: _zodiacState.texture, side: THREE.DoubleSide, transparent: true, opacity: 1, depthWrite: false }));
+    _zodiacState.label.rotation.x = -Math.PI / 2;
+    zodiac.add(_zodiacState.label);
+  } else _zodiacState.texture.needsUpdate = true;
 }
-scene.add(zodiac);   // world-fixed; centred on Earth and oriented from R in moveModel
+// the boundary table loads beside the catalogue; until then the band draws nothing
+fetchRepoJson('public/input/constellation-boundaries.json').then((doc) => {
+  if (!doc || !Array.isArray(doc.boxes)) { console.error('constellation-boundaries.json: not the v1 box table'); return; }
+  setBoundaryTable(doc); _zodiacState.ready = true; needsLabelUpdate = true;
+});
+scene.add(zodiac);   // centred on Earth and oriented on the ecliptic of date in moveModel
 zodiac.visible = false;
 
 // Zodiac signs — the twelve equal 30° signs of the tropical zodiac, Aries 0°
@@ -10891,18 +10934,9 @@ function computeInspectorOrbitFrame(planetKey) {
 // computed on a path of its own; the page is the standard export page.
 const _HI_PAPER = { above: '#15803d', below: '#b91c1c', ecliptic: '#2563eb', asc: '#c026d3', desc: '#0891b2', peri: '#15803d', sun: '#d97706', planet: '#0e7490', ring: '#9ca3af', text: '#374151' };
 const _HI_MONTHS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-// (_HI_ECLIPTIC_CONSTELLATIONS — the thirteen IAU constellations the ecliptic
-// crosses — is defined beside the scene's zodiac-constellations band, which
-// is built at load from the same table.)
+// (the constellation band of the export reads the scene's crossings of date —
+// _zodiacCrossingsOfDate, beside the zodiac-constellations band; plan 28 §F2)
 const _HI_CARDINALS = [['VE', 0, 'VERNAL EQUINOX'], ['SS', 90, 'SUMMER SOLSTICE'], ['AE', 180, 'AUTUMNAL EQUINOX'], ['WS', 270, 'WINTER SOLSTICE']];
-
-/** The constellation (of the thirteen) that holds a J2000 ecliptic longitude. */
-function _hiConstellationAt(lonJ2000) {
-  const lon = _hiWrap360(lonJ2000);
-  let best = null;   // the greatest entry longitude at or below lon; below Aries' 29° the band is still Pisces (it wraps through 0°)
-  for (const [n, start] of _HI_ECLIPTIC_CONSTELLATIONS) if (lon >= start && (best === null || start > best[1])) best = [n, start];
-  return best ? best[0] : _HI_ECLIPTIC_CONSTELLATIONS[0][0];
-}
 
 /** "YYYY-MM-DD HH:MM UT" (or the count form beyond the seam) for a JD (UT) — the instant's label
  *  as the Date/Time fields write it, on the one UT clock (plan 29). */
@@ -10959,7 +10993,10 @@ function inspectorRenderPaperSVG(planetKey) {
   // axes in world coordinates): where the vernal point stands among the stars
   const Rj = _chainR, gJx = Rj[0][0] * f.g.x + Rj[1][0] * f.g.y + Rj[2][0] * f.g.z, gJy = Rj[0][1] * f.g.x + Rj[1][1] * f.g.y + Rj[2][1] * f.g.z;
   const eqLonJ2000 = _hiWrap360(Math.atan2(gJy, gJx) / _hiD2R);
-  const eqConstellation = _hiConstellationAt(eqLonJ2000);
+  // the constellation the equinox of date stands in: the scene's crossings of date (plan 28 §F2 — the IAU
+  // lines on the ecliptic OF DATE), longitude 0; "—" beyond the catalogue regime or before the table loads
+  const eqCrossings = _zodiacInRegime(o.julianDay) ? _zodiacCrossingsOfDate(o.julianDay) : null;
+  const eqConstellation = eqCrossings ? constellationAtLongitude(eqCrossings, 0).name : '—';
   // projection onto the ecliptic of date: x along ĝ (the equinox), y along û₂ (longitude +90°), h along n̂
   const proj = (v) => ({ x: v.dot(f.g), y: v.dot(f.u2), h: v.dot(f.n) });
   const tmp = new THREE.Vector3();
@@ -11030,14 +11067,14 @@ function inspectorRenderPaperSVG(planetKey) {
   }
   s += `<line x1="${cx}" y1="${cy}" x2="${(cx + R * 0.34).toFixed(1)}" y2="${cy}" stroke="#6b7280" stroke-width="0.8" stroke-dasharray="3,3"/>`;
 
-  // the constellation band: the IAU boundaries at J2000 longitude λ sit at
-  // λ − λ_eq in the ecliptic of date (the precession of the equinox)
+  // the constellation band: the IAU boundaries where the ecliptic OF DATE crosses them — the scene's
+  // crossings of date, longitudes from the equinox of date (plan 28 §F2); empty beyond the catalogue regime
   const bIn = ringR + 30, bOut = ringR + 48, bMid = ringR + 39;
   s += `<circle cx="${cx}" cy="${cy}" r="${bIn.toFixed(1)}" fill="none" stroke="${C.ring}" stroke-width="0.8"/>`;
   s += `<circle cx="${cx}" cy="${cy}" r="${bOut.toFixed(1)}" fill="none" stroke="${C.ring}" stroke-width="0.8"/>`;
-  _HI_ECLIPTIC_CONSTELLATIONS.forEach(([name, start], i) => {
-    const next = _HI_ECLIPTIC_CONSTELLATIONS[(i + 1) % _HI_ECLIPTIC_CONSTELLATIONS.length][1];
-    const span = _hiWrap360(next - start), lon0 = _hiWrap360(start - eqLonJ2000), mid = _hiWrap360(lon0 + span / 2);
+  (eqCrossings || []).forEach((c, i, all) => {
+    const name = c.name, next = all[(i + 1) % all.length].lonDeg;
+    const span = _hiWrap360(next - c.lonDeg), lon0 = _hiWrap360(c.lonDeg), mid = _hiWrap360(lon0 + span / 2);
     const a0 = lon0 * _hiD2R;
     s += `<line x1="${(cx + bIn * Math.cos(a0)).toFixed(1)}" y1="${(cy - bIn * Math.sin(a0)).toFixed(1)}" x2="${(cx + bOut * Math.cos(a0)).toFixed(1)}" y2="${(cy - bOut * Math.sin(a0)).toFixed(1)}" stroke="${C.ring}" stroke-width="0.8"/>`;
     const am = mid * _hiD2R, lx = cx + bMid * Math.cos(am), ly = cy - bMid * Math.sin(am);
@@ -11530,7 +11567,7 @@ function createInspectorPanel() {
           <div><span style="color:#ffbf00">Amber</span> line and arc: Sun → planet, true anomaly ν at the Sun</div>
           <div><span style="color:#00ffff">Cyan</span> dashed arc: the chain’s mean anomaly M (an angle, drawn at the Sun beside ν)</div>
           <div><span style="color:#00ffff">Cyan</span> ring: the rendered planet</div>
-          <div style="margin-top:6px; color:#8a93a5;">Export — the orbit picture: its month ring puts each month at the Sun’s longitude on the 1st. The Gregorian calendar drifts against the seasons by about a day per 3,300 years, so away from J2000 the vernal equinox leaves March; the four cardinal ticks carry the model’s own dates for the scene year. The outer band carries the IAU constellation boundaries of J2000 with the precession of the equinox of date — a naming of the sidereal direction, not a sky view: over 10⁵ years the stars’ proper motions dissolve the figures.</div>
+          <div style="margin-top:6px; color:#8a93a5;">Export — the orbit picture: its month ring puts each month at the Sun’s longitude on the 1st. The Gregorian calendar drifts against the seasons by about a day per 3,300 years, so away from J2000 the vernal equinox leaves March; the four cardinal ticks carry the model’s own dates for the scene year. The outer band carries the IAU constellation boundaries where the ecliptic OF DATE crosses them (the 1875 coordinate lines, re-solved for the year; empty beyond ±50 million years) — a naming of the sidereal direction, not a sky view: over 10⁵ years the stars’ proper motions dissolve the figures.</div>
         </div>
       </div>
       <div class="hi-helpers">
@@ -21086,8 +21123,8 @@ function createFrameworkImagesContext(epochYear) {
     lr04: () => cfmLR04Data,
     /** The obliquity of date ε(t), degrees — the hybrid (the published ε; the scene's own target). */
     obliquityDeg: (y) => _sceneEpsTargetDeg(y),
-    /** The thirteen IAU constellations along the ecliptic: [name, entry longitude J2000 °] (the scene's band and the orbit picture's ring). */
-    eclipticConstellations: _HI_ECLIPTIC_CONSTELLATIONS,
+    /** The IAU constellations along the J2000 ecliptic: [name, entry longitude J2000 °] — the solver on the J2000 ecliptic (the precession figure's ring; [] before the table loads). */
+    get eclipticConstellations() { return _zodiacState.ready ? eclipticCrossings(ECLIPTIC_J2000_EQUATORIAL.pole, ECLIPTIC_J2000_EQUATORIAL.equinox).map((c) => [c.name, c.lonDeg]) : []; },
     /** The astronomical unit, km (IAU 2012 — the model's J2000 snapshot). */
     auKm: AU_J2000_KM,
     /** The export standard's header: the 16-px title and the legend rows (the other Tools exports' one home). */
@@ -23183,7 +23220,7 @@ function setupGUI() {
 
   // ── Zodiac constellations (title = toggle, expand = size slider) and the zodiac signs ──
   const zodiacFolder = makeToggleFolder(visFolder, 'Zodiac constellations (IAU)', zodiac, 'visible', null,
-    'The band of the thirteen IAU constellations the ecliptic crosses, at their J2000 boundaries and fixed to the stars: the equinox of date, the perihelion marker and the solstice axis precess through it. A naming of the sidereal direction, not a sky view — the stars’ own proper motions are not applied. Click to toggle.');
+    'The IAU constellations the ecliptic OF DATE crosses — thirteen today, Ophiuchus among them — on the ecliptic of date, their boundaries the coordinate lines of 1875 (Delporte 1930, read through Roman 1987’s table; astropy the referee), re-solved for every year: the equinox of date is the band’s 0°, and as the ecliptic of date tilts the crossings move along it. A naming of the sidereal direction, not a sky view — the stars drift across the lines with their proper motions (Regulus leaves Leo’s box in ~100,000 years). Drawn within ±50 million years of today, where the catalogue sky is; nothing beyond. Click to toggle.');
   makeToggleFolder(visFolder, 'Zodiac signs', zodiacSigns, 'visible', null,
     'The twelve equal 30° signs of the tropical zodiac, Aries 0° at the vernal equinox OF DATE — fixed to the seasons, not to the stars. The inner ring turns with the equinox against the star-fixed constellation band: the precession of the equinoxes as the drift between the two rings (about one sign today, one more per ~2,150 years). Click to toggle.');
   addTooltip(zodiacFolder.addBinding(o, 'zodiacSize', { label: 'Size', min: 0.01, max: 10, step: 0.1 })
@@ -34935,16 +34972,16 @@ function moveModel(pos) {
   _moonUpdateMarkers(o.julianDay);   // the Moon's perigee / line-of-nodes markers (when shown) on the placed frame
   _ssbUpdateMarker(o.julianDay);     // the Sun-barycenter marker (when shown) on the placed Sun
 
-  // the zodiac-constellations band: centred on Earth, oriented ONCE from
-  // the chain's frame bridge (the J2000 ecliptic and equinox in world axes)
-  // — star-fixed; nothing of date turns it
-  if (zodiac.visible) earth.planetObj.getWorldPosition(zodiac.position);
-  if (zodiac.visible && _chainR && !zodiac.userData.placed) {
-    const X = new THREE.Vector3(_chainR[0][0], _chainR[1][0], _chainR[2][0]);   // the J2000 equinox
-    const Y = new THREE.Vector3(_chainR[0][2], _chainR[1][2], _chainR[2][2]);   // the J2000 ecliptic pole
-    const Z = new THREE.Vector3().crossVectors(X, Y);                  // = −(longitude +90°), the band's local −z convention
-    zodiac.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X, Y, Z));
-    zodiac.userData.placed = true;
+  // the zodiac-constellations band of date (plan 28 §F2): centred on Earth, on
+  // the Earth frame's ecliptic OF DATE (R4, the same basis the signs ring
+  // rides), its crossings re-solved per engine year; nothing drawn beyond the
+  // catalogue regime
+  if (zodiac.visible) {
+    earth.planetObj.getWorldPosition(zodiac.position);
+    earthPerihelionPrecession1.containerObj.getWorldQuaternion(zodiac.quaternion);
+    const cr = _zodiacInRegime(o.julianDay) ? _zodiacCrossingsOfDate(o.julianDay) : null;
+    if (cr) _zodiacRebuild(cr);
+    for (const c of zodiac.children) c.visible = !!cr;
   }
   // the zodiac-signs ring rides the ecliptic OF DATE: the sun-plane
   // container's world basis (x̂ the equinox of date, ŷ the pole — R4)

@@ -2682,8 +2682,14 @@ the pinned value inside the published bracket — and the arriving stars'
 manifest and binary (the sha256, the size, every value finite, the
 distances within 1.5 kpc, the visible-today count recomputed from the rows,
 the colour relations' rms, the cuts ≡ the orbit home, the cached source's
-canonical hash); fail-proven with `ESSRT_STAR_CATALOGUE_PLANT=1` (one HIP
-duplicated). The browser gate
+canonical hash); since §F2 the zodiac band — Roman's table (357 boxes, 88
+constellations, its source's canonical hash), the J2000 ecliptic's thirteen
+crossings with Ophiuchus's 18.60°, and the referee record: the solver on
+the recorded ecliptic-of-date frames ≡ the recorded crossings bit for bit,
+astropy's name ≡ the solver's at all 2,520 samples, astropy's own boundary
+within 25″ of every crossing entering the same constellation (its
+geocentric frame's aberration); fail-proven with
+`ESSRT_STAR_CATALOGUE_PLANT=1` (one HIP duplicated). The browser gate
 `test/browser/sky-of-date.test.mjs` (in `test:snapshot`): the referee per
 star, purity (a direction the same in any order of asking; a landing
 re-read bit-for-bit), the fades at −48 kyr and −198 kyr by band, the regime
@@ -2876,6 +2882,57 @@ switch more frequent). The sprites' base size now follows
 the owner accepted, which was the ratio-2 one (a first normalisation pinned
 the ratio-1 size: "too bright all the time"): the device size is the setting
 × ratio / 2; the gate reads it, and `?dpr=` pins the ratio for an A/B look.
+
+**§E's vertical knob, built** (the owner picked it up): the Sun oscillates
+about the Galactic plane in the one-home potential — z = z☉ cos νt +
+(W☉/ν) sin νt, amplitude 102 pc, period 85 Myr — and the band's midplane
+seen from height z lies at −atan(z/D) for light at an effective distance D,
+a uniform latitude shift, which on an equirectangular dome is the texture's
+vertical offset: 0.79° south today (z☉ 20.8 pc north), 3.5° at −60 Myr
+(z 91 pc). D = 1.5 kpc is an illustration parameter (the optical band is the
+disc's light within one to two kiloparsecs, dust closing the view beyond);
+the Magellanic Clouds shift with the texture all the same — said so. ONE
+home `sunHeightPcAtYear` / `milkyWayLatitudeShiftDegAtYear` in
+`sky/galactic-orbits`; the gate reads z, the shift and the offset at J2000
+and −60 Myr.
+
+**§F2 — the zodiac band on the ecliptic of date.** The IAU boundaries are
+COORDINATE LINES of the B1875 equatorial frame (Delporte 1930), and Roman
+(1987, PASP 99, 695; VizieR VI/42) reduced them to 357 boxes read in order
+— the same table astropy's `get_constellation` reads. The band was thirteen
+boundary LONGITUDES read on the J2000 ecliptic and shifted by the precession
+of the equinox, exact only while the ecliptic of date lay on the J2000
+ecliptic; it is now solved per engine year on the scene's own ecliptic of
+date (R4: the placed Earth frame's equinox and pole, taken through the star
+containers' J2000 alignment into equatorial J2000) by ONE home
+`sky/ecliptic-constellations`: every point of the ecliptic of date precessed
+to B1875 (the IAU 1976 angles — 0.4″ from astropy's over 125 years, under
+the boundaries' rounding) and looked up in Roman's table, the crossings
+bisected to 1e-6°, pure in the year (1 ms). The tilted ecliptic of date
+grazes corners the J2000 one misses: fifteen crossings at −10 kyr (Cetus
+between the two halves of Pisces), sixteen at +10 kyr (Cetus, Orion between
+Taurus and Gemini), seventeen at −100 kyr and −1 Myr. The band rides the
+Earth frame of date like the signs ring; the Planet Orbit Analysis export's
+band and its "vernal equinox … in" row read the same crossings (longitude 0
+of the list); inside the catalogue regime only, nothing beyond. **The
+referee's frame, named before its tolerance:** the record
+(`data/zodiac-boundary-reference.json`, written headlessly from the built
+scene by `tools/pipeline/record-zodiac-boundaries.mjs` and completed by
+`scripts/zodiac_boundary_reference.py`) gives astropy the J2000 directions
+of every degree of the ecliptic of date at seven epochs (J2000, ±3000,
+±10 kyr, −100 kyr, −1 Myr): 2,520 of 2,520 names agree, but astropy's own
+boundaries, bisected along the same ecliptic, sit 6–21″ from the solver's in
+a sinusoid of longitude with a 20.5″ amplitude — the ANNUAL ABERRATION:
+`get_constellation` transforms its input to `PrecessedGeocentric(B1875)` at
+obstime J2000.0, a geocentric frame, and a coordinate line has no aberration.
+A first check with `separation()` read 0.00″ between that frame and
+`FK5(B1875)` because separation TRANSFORMS the other coordinate into the
+first's frame before measuring; comparing the two frames' RA and Dec
+directly read ±20.5″. So the gate pins astropy's boundary within 25″ of
+every crossing (the measured worst 20.9″) and the entered constellation
+identical, never the plan's 1e-3° against this referee; the J2000 ecliptic's
+thirteen crossings and Ophiuchus's 18.60° (18.9 days of the Sun's path) are
+pinned by value.
 
 ---
 
@@ -3085,6 +3142,11 @@ The `test:snapshot` chain also carries:
   stars move 20 million years?"; the artistic layout a sky curve (Orion's and
   the Big Dipper's curves within 6° of their strokes' great-circle polylines,
   ending on their stars — born from "no longer the proper constellation");
+  the sprites' base size ≡ the setting × the pixel ratio / 2; the zodiac
+  band of date (thirteen crossings at J2000 ≡ the referee record, Ophiuchus
+  247.645° → Sagittarius 266.244°, the band's three children drawn; fifteen
+  at −10 kyr with Cetus; nothing at −60 Myr) and the band's bob (z 20.8 pc
+  → 0.79° south today, 91 pc → 3.5° at −60 Myr, the dome texture's offset);
   fail-proven under `ESSRT_SKY_PLANT=1` (the scene's reading shifted 2″).
 - **The focused chain planet's orbit-plane grid** passes through the
   rendered Sun with its normal along the chain's orbit normal of date (born

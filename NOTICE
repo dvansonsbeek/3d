@@ -141,6 +141,9 @@ Data sources
                                six-dimensional stars within 1.5 kpc that ever reach V 8
                                within ±50 Myr) (Gaia Collaboration 2023), CC BY-SA 3.0 IGO
                                https://www.cosmos.esa.int/gaia
+    Roman 1987 (VizieR VI/42)  the IAU constellation boundaries as B1875 boxes
+                               (public/input/constellation-boundaries.json), the
+                               zodiac band of date — free use with citation
     Pulkovo (Gontcharov 2006)  radial velocities where Gaia has none, VizieR III/252
     IAU WGSN                   the IAU Catalog of Star Names, CC BY 4.0
                                https://www.iau.org/public/themes/naming_stars/

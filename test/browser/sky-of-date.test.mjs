@@ -162,6 +162,27 @@ check(`the artistic layout is a sky curve: ${nLines} Orion and Big Dipper curves
 await sim.page.evaluate(() => window.__test__.setConstellationLayout('asterism', false));
 await sim.page.waitForTimeout(500);
 
+// PLAN 28 §F2 — the zodiac band of date: the IAU boundaries (B1875 coordinate lines, Roman 1987's table) where the
+// ecliptic OF DATE crosses them, re-solved per engine year on the scene's placed Earth frame; the live scene ≡ the
+// referee record at J2000 and −10 kyr (the frame to 1e-9, the crossings bit for bit), thirteen crossings today with
+// Ophiuchus spanning 18.6°, fifteen at −10 kyr (the tilted ecliptic grazes Cetus), the band drawn inside the
+// catalogue regime and nothing at −60 Myr. And §E's band bob: the Sun 20.8 pc north today → the dome's midplane
+// 0.79° south (the texture offset carries it), 91 pc north at −60 Myr → 3.5° south.
+const ZREC = JSON.parse(readFileSync(new URL('../../data/zodiac-boundary-reference.json', import.meta.url), 'utf8'));
+const zodiacAt = async (y) => { await land(y); await sim.page.evaluate(() => window.__test__.setZodiacVisible && window.__test__.setZodiacVisible(true)); await sim.page.waitForTimeout(400); return sim.page.evaluate(() => { const P = window.__test__.zodiacBandProbe(); const S = window.__test__.skyState(); return { year: P.year, inRegime: P.inRegime, frame: P.frame, crossings: P.crossings, drawn: P.drawn, bandShift: S.bandShiftDeg, zSun: S.sunHeightPc, offsetY: S.domeTextureOffsetY }; }); };
+const zj = await zodiacAt('2000 d172'), zm10 = await zodiacAt('-10000 d172'), z60 = await zodiacAt('-60000000 d172');
+const recOf = (label) => ZREC.epochs.find((e) => e.label === label);
+const frameOff = (a, b) => Math.max(...[0, 1, 2].map((i) => Math.abs(a.pole[i] - b.pole[i])), ...[0, 1, 2].map((i) => Math.abs(a.equinox[i] - b.equinox[i])));
+// the live frame against the record: the placed Earth frame differs by ~6e-7 (0.1″) between separate runs, so the
+// crossings agree to 1e-4° with the names identical — the record's own bit-for-bit reproduction is the Node gate's row
+const sameCross = (a, b) => a.length === b.length && a.every((c, i) => c.abbr === b[i].abbr && Math.abs(c.lonDeg - b[i].lonDeg) < 1e-4);
+const oph = zj.crossings && zj.crossings.find((c) => c.abbr === 'Oph'), sgr = zj.crossings && zj.crossings.find((c) => c.abbr === 'Sgr');
+check('the zodiac band of date at J2000: thirteen crossings ≡ the referee record (frame to 1e-6, longitudes to 1e-4°), Ophiuchus 247.645° → Sagittarius 266.244° (18.6°), the band drawn (lines, names, glow)', zj.inRegime && zj.crossings && zj.crossings.length === 13 && frameOff(zj.frame, recOf('2000 d172').frame) < 1e-6 && sameCross(zj.crossings, recOf('2000 d172').crossings) && oph && sgr && Math.abs(oph.lonDeg - 247.645) < 0.002 && Math.abs(sgr.lonDeg - oph.lonDeg - 18.60) < 0.01 && zj.drawn === 3, `${zj.crossings ? zj.crossings.length : 'null'} crossings, frame off ${zj.frame ? frameOff(zj.frame, recOf('2000 d172').frame).toExponential(1) : '?'}, Oph ${oph && oph.lonDeg.toFixed(3)}, drawn ${zj.drawn}`);
+check('at −10 kyr the tilted ecliptic of date grazes Cetus: fifteen crossings ≡ the record; at −60 Myr nothing is drawn (beyond the catalogue regime)', zm10.crossings && zm10.crossings.length === 15 && zm10.crossings.some((c) => c.abbr === 'Cet') && frameOff(zm10.frame, recOf('-10000 d172').frame) < 1e-6 && sameCross(zm10.crossings, recOf('-10000 d172').crossings) && z60.inRegime === false && z60.crossings === null && z60.drawn === 0, `−10 kyr ${zm10.crossings ? zm10.crossings.length : 'null'} crossings (Cet ${zm10.crossings && zm10.crossings.some((c) => c.abbr === 'Cet')}), −60 Myr drawn ${z60.drawn}`);
+check('the band bobs with the Sun\'s height: 20.8 pc north today → the midplane 0.79° south in the dome\'s texture offset; 91 pc north at −60 Myr → 3.5° south', Math.abs(zj.zSun - 20.8) < 0.1 && Math.abs(zj.bandShift + 0.794) < 0.005 && Math.abs(zj.offsetY + zj.bandShift / 180) < 1e-12 && Math.abs(z60.zSun - 91) < 1 && Math.abs(z60.bandShift + 3.47) < 0.02, `today z ${zj.zSun.toFixed(1)} pc shift ${zj.bandShift.toFixed(3)}° offset ${zj.offsetY}; −60 Myr z ${z60.zSun.toFixed(1)} shift ${z60.bandShift.toFixed(2)}°`);
+await sim.page.evaluate(() => window.__test__.setZodiacVisible && window.__test__.setZodiacVisible(false));
+await land('2000 d172');   // back at J2000 for the counts below
+
 // 4. the counts and the layers
 const st = await sim.page.evaluate(() => window.__test__.skyState());
 const C = CAT._meta.counts;

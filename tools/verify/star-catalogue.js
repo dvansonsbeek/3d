@@ -170,6 +170,43 @@ const gman = rd('public/input/stars-gaia.json')._meta;
   if (fs.existsSync(gsrc)) { const h = canonicalSha256(fs.readFileSync(gsrc, 'utf8')); if (h !== gman.source.sha256Canonical) fail(`stars-gaia: the cached source's canonical sha256 ${h.slice(0, 12)}… ≠ the manifest's ${String(gman.source.sha256Canonical).slice(0, 12)}…`); cacheNote += ' (the Gaia source matches)'; }
 }
 
+// 8. the zodiac band of date (plan 28 §F2; ONE home packages/physics/src/sky/ecliptic-constellations.cjs): the boundary
+//    table (357 boxes, Roman's order, 88 constellations; its cached source's canonical hash), the J2000 ecliptic's
+//    thirteen crossings pinned (Ophiuchus 18.6°), and the referee record — the solver on the recorded ecliptic-of-date
+//    frames ≡ the recorded crossings bit for bit, astropy's get_constellation ≡ the solver's name at every sample, and
+//    astropy's own boundary (bisected along the same ecliptic) within 25″ of every crossing, entering the same
+//    constellation: astropy's lookup goes through a geocentric B1875 frame at obstime J2000.0 and carries the annual
+//    aberration (κ 20.5″) a coordinate line does not have — the referee's model named before its tolerance.
+const Z = require(path.join(ROOT, 'packages/physics/src/sky/ecliptic-constellations.cjs'));
+{
+  const tableRaw = fs.readFileSync(path.join(ROOT, 'public/input/constellation-boundaries.json'), 'utf8');
+  const table = JSON.parse(tableRaw);
+  Z.setBoundaryTable(table);
+  if (table.boxes.length !== 357 || table._meta.counts.constellations !== 88 || new Set(table.boxes.map((b) => b.abbr)).size !== 88) fail(`constellation-boundaries.json: ${table.boxes.length} boxes, ${new Set(table.boxes.map((b) => b.abbr)).size} constellations (Roman's 357 / 88)`);
+  const zsrc = path.join(ROOT, table._meta.source.file);
+  if (fs.existsSync(zsrc)) { const h = canonicalSha256(fs.readFileSync(zsrc, 'utf8')); if (h !== table._meta.source.sha256Canonical) fail(`constellation-boundaries: the cached source's canonical sha256 ${h.slice(0, 12)}… ≠ the table's ${String(table._meta.source.sha256Canonical).slice(0, 12)}…`); }
+  const j2000 = Z.eclipticCrossings(Z.ECLIPTIC_J2000_EQUATORIAL.pole, Z.ECLIPTIC_J2000_EQUATORIAL.equinox);
+  const oph = j2000.find((c) => c.abbr === 'Oph'), sgr = j2000.find((c) => c.abbr === 'Sgr');
+  if (j2000.length !== 13 || !oph || !sgr || Math.abs(oph.lonDeg - 247.638) > 0.01 || Math.abs(sgr.lonDeg - oph.lonDeg - 18.60) > 0.01) fail(`the J2000 ecliptic: ${j2000.length} crossings, Ophiuchus ${oph && oph.lonDeg} → Sagittarius ${sgr && sgr.lonDeg} (thirteen, Oph at 247.638° spanning 18.60°)`);
+  const rec = rd('data/zodiac-boundary-reference.json');
+  const sha = crypto.createHash('sha256').update(tableRaw).digest('hex');
+  if (rec.inputs['public/input/constellation-boundaries.json'].sha256 !== sha) fail('data/zodiac-boundary-reference.json was recorded on another boundary table — regenerate: npm run record:zodiac');
+  if (!rec.astropy || !rec.astropy.epochs || rec.astropy.epochs.length !== rec.epochs.length) fail('data/zodiac-boundary-reference.json has no astropy block — python3 scripts/zodiac_boundary_reference.py --write');
+  else rec.epochs.forEach((e, k) => {
+    const again = Z.eclipticCrossings(e.frame.pole, e.frame.equinox);
+    if (JSON.stringify(again) !== JSON.stringify(e.crossings)) fail(`${e.label}: the solver on the recorded frame differs from the recorded crossings`);
+    const A = rec.astropy.epochs[k];
+    let dis = 0; e.samples.forEach((s, i) => { if (A.samples[i] !== s.abbr) dis++; });
+    if (dis) fail(`${e.label}: astropy's constellation differs from the solver's at ${dis} of ${e.samples.length} samples`);
+    if (!A.boundaries || A.boundaries.length !== e.crossings.length) fail(`${e.label}: astropy's boundaries not recorded for every crossing`);
+    else A.boundaries.forEach((b, i) => {
+      const c = e.crossings[i];
+      if (b.abbr !== c.abbr || b.entered !== c.abbr || b.astropyLonDeg === null) fail(`${e.label}: astropy finds no boundary into ${c.abbr} near ${c.lonDeg.toFixed(4)}° (${b.entered})`);
+      else if (Math.abs(b.offsetArcsec) > 25) fail(`${e.label}: astropy's boundary into ${c.abbr} is ${b.offsetArcsec.toFixed(1)}″ from the solver's (≤ 25″: the aberration astropy's frame carries)`);
+    });
+  });
+}
+
 if (failures.length) {
   console.error(`FAIL star-catalogue: ${failures.length} problem(s)`);
   for (const f of failures) console.error('  ' + f);

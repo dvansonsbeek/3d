@@ -199,3 +199,21 @@ export function integratedStateAtYear(state0: ArrayLike<number>, epochYear: numb
  * treated as mid-life, which is the band's statement. @param {number} absMagV
  */
 export function mainSequenceLifetimeYears(absMagV: number): number;
+/**
+ * The Sun's height above the Galactic plane at an engine year (pc, north positive): the harmonic vertical motion of
+ * the model's potential from the J2000 state — z = z☉ cos νt + (W☉/ν) sin νt, amplitude √(z☉² + (W☉/ν)²) ≈ 102 pc,
+ * period 2π/ν ≈ 85 Myr (the integrator's z is this to 1e-9: the vertical equation is decoupled and linear).
+ * @param {number} year
+ */
+export function sunHeightPcAtYear(year: number): number;
+/**
+ * The Milky Way band's apparent shift in Galactic latitude from the Sun's height (degrees, the band moving toward
+ * the SOUTH when the Sun is north of the plane): the midplane seen from height z at the light's effective distance D
+ * lies at −atan(z/D) — a uniform shift for every longitude, the first order of the parallax of the disc's light. D
+ * is an ILLUSTRATION parameter: the optical band is the light of the disc within one to two kiloparsecs, dust
+ * closing the view in the plane beyond; 1.5 kpc. The Magellanic Clouds, 50 kpc away, shift with the dome's texture
+ * all the same — the illustration's limit, said so. 0.8° today (z☉ 20.8 pc), 3.9° at the extremes.
+ */
+export const MILKY_WAY_LIGHT_DISTANCE_PC: 1500;
+/** @param {number} year */
+export function milkyWayLatitudeShiftDegAtYear(year: number): number;

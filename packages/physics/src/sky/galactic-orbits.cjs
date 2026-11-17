@@ -285,6 +285,32 @@ function integratedStateAtYear(state0, epochYear, year, sched = ORBIT_INTEGRATIO
 }
 
 /**
+ * The Sun's height above the Galactic plane at an engine year (pc, north positive): the harmonic vertical motion of
+ * the model's potential from the J2000 state — z = z☉ cos νt + (W☉/ν) sin νt, amplitude √(z☉² + (W☉/ν)²) ≈ 102 pc,
+ * period 2π/ν ≈ 85 Myr (the integrator's z is this to 1e-9: the vertical equation is decoupled and linear).
+ * @param {number} year
+ */
+function sunHeightPcAtYear(year) {
+  const K = LOCAL_GALACTIC_KINEMATICS, C = localRotationCurve(), t = year - SUN_EPOCH_YEAR;
+  const w = K.sunVelocityLsrKmS.w * KMS_TO_PC_PER_YEAR;
+  return K.sunHeightPc * Math.cos(C.nuRadPerYear * t) + (w / C.nuRadPerYear) * Math.sin(C.nuRadPerYear * t);
+}
+
+/**
+ * The Milky Way band's apparent shift in Galactic latitude from the Sun's height (degrees, the band moving toward
+ * the SOUTH when the Sun is north of the plane): the midplane seen from height z at the light's effective distance D
+ * lies at −atan(z/D) — a uniform shift for every longitude, the first order of the parallax of the disc's light. D
+ * is an ILLUSTRATION parameter: the optical band is the light of the disc within one to two kiloparsecs, dust
+ * closing the view in the plane beyond; 1.5 kpc. The Magellanic Clouds, 50 kpc away, shift with the dome's texture
+ * all the same — the illustration's limit, said so. 0.8° today (z☉ 20.8 pc), 3.9° at the extremes.
+ */
+const MILKY_WAY_LIGHT_DISTANCE_PC = 1500;
+/** @param {number} year */
+function milkyWayLatitudeShiftDegAtYear(year) {
+  return -Math.atan2(sunHeightPcAtYear(year), MILKY_WAY_LIGHT_DISTANCE_PC) * 180 / Math.PI;
+}
+
+/**
  * A main-sequence lifetime from the absolute visual magnitude, as a BAND: L/L☉ = 10^((4.83 − M_V)/2.5) and
  * τ = 10 Gyr · (L/L☉)^(−2.5/3.5) (L ∝ M^3.5, τ ∝ M/L — the textbook relation, e.g. Carroll & Ostlie §13).
  * A star is drawn while |t| < τ: in the future it has not died, in the past it had been born — every star
@@ -295,4 +321,4 @@ function mainSequenceLifetimeYears(absMagV) {
   return 1e10 * L ** (-2.5 / 3.5);
 }
 
-module.exports = { LOCAL_GALACTIC_KINEMATICS, RADIAL_AMPLITUDE_MAX, SUN_EPOCH_YEAR, ORBIT_INTEGRATION, KMS_TO_PC_PER_YEAR, KMS_PER_MASYR_KPC, G_PC_KMS2_PER_MSUN, GAUSS_LEGENDRE_8, localRotationCurve, heliocentricGalacticState, orbitElements, radiusAt, galactocentricPositionAt, galactocentricPositionAtYear, heliocentricGalacticAtYear, galacticAcceleration, galactocentricState, integrateOrbitRK4, integrationSchedule, integratedStateAtYear, mainSequenceLifetimeYears };
+module.exports = { LOCAL_GALACTIC_KINEMATICS, RADIAL_AMPLITUDE_MAX, SUN_EPOCH_YEAR, ORBIT_INTEGRATION, KMS_TO_PC_PER_YEAR, KMS_PER_MASYR_KPC, G_PC_KMS2_PER_MSUN, GAUSS_LEGENDRE_8, localRotationCurve, heliocentricGalacticState, orbitElements, radiusAt, galactocentricPositionAt, galactocentricPositionAtYear, heliocentricGalacticAtYear, galacticAcceleration, galactocentricState, integrateOrbitRK4, integrationSchedule, integratedStateAtYear, mainSequenceLifetimeYears, sunHeightPcAtYear, MILKY_WAY_LIGHT_DISTANCE_PC, milkyWayLatitudeShiftDegAtYear };

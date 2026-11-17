@@ -48,7 +48,7 @@
  */
 
 /* global document, console, setTimeout, clearTimeout */
-import { SUN_GALACTIC_ORBIT, LOCAL_GALACTIC_KINEMATICS, ORBIT_INTEGRATION, orbitElements, heliocentricGalacticState, galactocentricState, integratedStateAtYear, galacticTriadEquatorialJ2000, mainSequenceLifetimeYears } from '@essrt/physics';
+import { SUN_GALACTIC_ORBIT, LOCAL_GALACTIC_KINEMATICS, ORBIT_INTEGRATION, orbitElements, heliocentricGalacticState, galactocentricState, integratedStateAtYear, galacticTriadEquatorialJ2000, mainSequenceLifetimeYears, milkyWayLatitudeShiftDegAtYear, sunHeightPcAtYear } from '@essrt/physics';
 import { fillLocalPositionsIntegrated, integratedSet, localOfGalactic } from './sky-orbit-positions.js';
 
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
@@ -583,6 +583,13 @@ export function createSkyOfDate(deps) {
       dome.quaternion.copy(domeBase).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), S.galacticTurnRad));
       dome.updateMatrixWorld();
     }
+    // the band's vertical motion (plan 28 §E's asymmetry knob, built as the parallax of the disc's light): the Sun
+    // oscillates ±102 pc about the Galactic plane every 85 Myr (ONE home sky/galactic-orbits), and the midplane seen
+    // from height z lies at −atan(z / D) — a uniform latitude shift, which on an equirectangular dome is the
+    // texture's vertical offset (image row b = 0 drawn at latitude −shift): 0.8° today, 3.9° at the extremes
+    S.sunHeightPc = sunHeightPcAtYear(year);
+    S.bandShiftDeg = milkyWayLatitudeShiftDegAtYear(year);
+    if (dome && dome.material && dome.material.map) dome.material.map.offset.y = -S.bandShiftDeg / 180;
     // the statistical sky beyond the catalogue regime: built for the year's seed cell, handed over star by star
     S.seedCell = seedCellOf(year);
     stat.opacity = 1 - S.regimeFade;   // the share of the stars that have handed over (reported; the shader works per star)
@@ -652,6 +659,7 @@ export function createSkyOfDate(deps) {
         // orbits: the catalogue on its Galactic orbits; handover: star by star into the statistical sky; statistical: the illustration (plan 28 §D/E)
         regime: S.regimeFade >= 1 ? 'orbits' : S.regimeFade > 0 ? 'handover' : 'statistical', regimeFade: S.regimeFade,
         statisticalOpacity: stat.opacity, seedCell: S.seedCell, statisticalBuilt: stat.seedCell, galacticTurnRad: S.galacticTurnRad || 0,
+        sunHeightPc: S.sunHeightPc, bandShiftDeg: S.bandShiftDeg, domeTextureOffsetY: dome && dome.material && dome.material.map ? dome.material.map.offset.y : null,
         labelOpacity: S.labels.length ? Number(S.labels[0].div.style.opacity) : null,
         sunPointAbsMag: S.sunPoint ? S.sunPoint.geometry.getAttribute('absMag').array[0] : null,
         // the share of the stars still in the catalogue at this fade (alpha ≥ 0.5) — ≈ regimeFade, one by one

@@ -581,7 +581,18 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   died and every zero-filled sprite sat at the origin (the owner saw no
   stars while every gate on the production build was green) — sprites
   start at the epoch's positions, a silent worker hands over to the main
-  thread, `disableSharedBundles` keeps the worker's bundle whole. (§1.48)
+  thread, `disableSharedBundles` keeps the worker's bundle whole. **The
+  IAU boundaries are B1875 COORDINATE LINES, solved on the ecliptic OF
+  DATE** (ONE home `sky/ecliptic-constellations`, Roman 1987's table an
+  input): thirteen longitudes shifted by the precession of the equinox
+  were exact only on the J2000 ecliptic; the tilted ecliptic of date
+  grazes Cetus by ±10 kyr and Orion by +10 kyr. **A referee's frame is
+  named before its tolerance, and `separation()` cannot see a frame term**
+  — astropy's `get_constellation` goes through a geocentric frame and
+  carries 20.5″ of annual aberration (every NAME agrees; the boundary sits
+  up to 21″ off, pinned at 25″); the first check transformed the other
+  frame first and read 0.00″ — compare the two frames' coordinates
+  directly. (§1.48)
 
 ---
 
