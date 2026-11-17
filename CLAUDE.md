@@ -547,7 +547,14 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   Galactic orbit** (216 Myr on McMillan 2017, ONE home `sky/galactic-frame`,
   the phase today's direction — the one free choice, named). A pose handed
   to a module 90 lines before its `const` is a TDZ that kills every browser
-  row. (§1.48)
+  row. **The stars sit at their MEASURED distances, in their own render
+  pass** (a sky scene with a 10¹³-unit camera on the main camera's pose —
+  a `scene.background` colour FORCES a clear and wipes a pass drawn before
+  it; the Sun is a star too once the main camera's far plane is passed; the
+  zoom-out stops at the catalogue's reach); **a distance fallback is a
+  prior on the measurement, never a photometric guess** — the main-sequence
+  placement put every distant giant within 50 pc, an orange clump the 3-D
+  view showed at once; the EDSD posterior mode keeps them far. (§1.48)
 
 ---
 

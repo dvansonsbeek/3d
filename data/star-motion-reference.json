@@ -3,7 +3,7 @@
  "generated_by": "python3 scripts/star_motion_reference.py --write",
  "inputs": {
   "public/input/stars.json": {
-   "sha256": "616147a1518d218b7cc2180034f9bb69ea25be1c72c4d1f23fe2c0341dc39e81",
+   "sha256": "0dff4c7ce4a1aaebbe6de7dbd8f8d7e3f97b441454f6fe81733c64dec10858ff",
    "epochYear": 1991.25,
    "counts": {
     "stars": 41394,
@@ -14,8 +14,8 @@
     "rvGaia": 27453,
     "rvPulkovo": 7402,
     "distParallax": 31428,
-    "distPhotometric": 9945,
-    "distDefault": 21,
+    "distPrior": 9966,
+    "distDefault": 0,
     "bsc": 8982,
     "bayerOrFlamsteed": 3009,
     "iauNamesInFile": 451,

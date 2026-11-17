@@ -47,7 +47,7 @@ for (const c of ['hip', 'raDeg', 'decDeg', 'plxMas', 'pmRaMasYr', 'pmDecMasYr', 
 if (stars._meta.version !== 2) fail(`stars.json: version ${stars._meta.version}, not 2`);
 if (stars._meta.epochYear !== 1991.25) fail(`stars.json: epochYear ${stars._meta.epochYear}, not the Hipparcos J1991.25`);
 const seen = new Set();
-let nNaked = 0, nNakedRv = 0, n45 = 0, n45Rv = 0, nGaia = 0, nPulkovo = 0, nPlx = 0, nPhot = 0, nDef = 0;
+let nNaked = 0, nNakedRv = 0, n45 = 0, n45Rv = 0, nGaia = 0, nPulkovo = 0, nPlx = 0, nPrior = 0, nDef = 0, nPriorNear = 0, dMin = Infinity, dMinHip = 0;
 const byHip = new Map();
 stars.stars.forEach((r, k) => {
   const hip = PLANT && k === 1 ? stars.stars[0][ci.hip] : r[ci.hip];
@@ -59,13 +59,20 @@ stars.stars.forEach((r, k) => {
   if (v <= V_NAKED) { nNaked++; if (rv !== null) nNakedRv++; }
   if (v <= 4.5) { n45++; if (rv !== null) n45Rv++; }
   if (r[ci.rvFlag] === 1) nGaia++; else if (r[ci.rvFlag] === 2) nPulkovo++;
-  if (r[ci.distFlag] === 0) nPlx++; else if (r[ci.distFlag] === 1) nPhot++; else nDef++;
+  if (r[ci.distFlag] === 0) nPlx++; else if (r[ci.distFlag] === 1) { nPrior++; if (r[ci.distPc] < 50) nPriorNear++; } else nDef++;
+  if (r[ci.distPc] < dMin) { dMin = r[ci.distPc]; dMinHip = hip; }
   if ((rv === null) !== (r[ci.rvFlag] === 0)) fail(`stars.json: HIP ${hip} rv ${rv} with rvFlag ${r[ci.rvFlag]}`);
 });
 const named = Object.values(stars.names).filter((n) => n.name).length;
 const C = stars._meta.counts;
-const recomputed = { stars: stars.stars.length, nakedEye: nNaked, nakedEyeWithRv: nNakedRv, brighterThan45: n45, brighterThan45WithRv: n45Rv, rvGaia: nGaia, rvPulkovo: nPulkovo, distParallax: nPlx, distPhotometric: nPhot, distDefault: nDef, named };
+const recomputed = { stars: stars.stars.length, nakedEye: nNaked, nakedEyeWithRv: nNakedRv, brighterThan45: n45, brighterThan45WithRv: n45Rv, rvGaia: nGaia, rvPulkovo: nPulkovo, distParallax: nPlx, distPrior: nPrior, distDefault: nDef, named };
 for (const [k, v] of Object.entries(recomputed)) if (C[k] !== v) fail(`stars.json: recorded counts.${k} ${C[k]} ≠ recomputed ${v}`);
+// The distances are the 3-D field's (plan 28, the stars at their measured distances): the nearest star in the
+// catalogue is α Centauri (HIP 71681/71683, 1.25–1.35 pc — Proxima is V 11, outside the V 8 cut), and the
+// distance prior keeps the far giants far: the former photometric main-sequence placement put 6,332 flagged
+// stars (mostly giants) within 50 pc, 242 inside 1 pc; under the prior 4 remain within 50 pc.
+if (dMin < 1.2 || dMin > 1.3) fail(`stars.json: the nearest star is HIP ${dMinHip} at ${dMin} pc — α Centauri at 1.25–1.3 pc is expected (a photometric distance leaked in?)`);
+if (nPriorNear > 10) fail(`stars.json: ${nPriorNear} prior-distance stars within 50 pc — the flagged distances are clumped near the Sun (the prior's mode expected, ≤ 10)`);
 for (const [k, v] of Object.entries({ stars: EXPECTED.stars, nakedEye: EXPECTED.nakedEye, named: EXPECTED.named })) if (recomputed[k] !== v) fail(`stars.json: ${k} ${recomputed[k]}, the pinned ${v}`);
 
 // 2. the strokes

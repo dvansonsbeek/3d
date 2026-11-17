@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Pane } from 'tweakpane';
 // PLAN 28 §B/C — the sky of date: the bright-star catalogue and its linear space motion (ONE home)
-import { createSkyOfDate, SKY_CONSTANTS } from './sky-of-date.js';
+import { createSkyOfDate, SKY_CONSTANTS, UNITS_PER_PC } from './sky-of-date.js';
 
 // Generated from public/input/astro-reference.json (+ the assembled deep-time
 // block) by `npm run constants:generate` (§2g). Never hand-edited; `npm run test:constants`
@@ -2953,7 +2953,7 @@ function skyStatusClause(pos) {
   if (!Number.isFinite(pos)) return '';
   const dtYears = _engineYearTT(jdFromPos(pos)) - 1991.25;
   const lim = SKY_CONSTANTS.linearRegimeYears, fade = SKY_CONSTANTS.regimeFadeYears;
-  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 positions, parallaxes and proper motions; Gaia DR3 and Pulkovo radial velocities) propagated linearly from the catalogue epoch — every star moves with its measured space velocity, and the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). Valid within ±${(lim / 1e6).toFixed(0)} Myr of today, where the Galaxy's curvature of a star's path is invisible.`;
+  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 positions, parallaxes and proper motions; Gaia DR3 and Pulkovo radial velocities) propagated linearly from the catalogue epoch — every star sits at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015) and moves with its measured space velocity, so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them; the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). Valid within ±${(lim / 1e6).toFixed(0)} Myr of today, where the Galaxy's curvature of a star's path is invisible.`;
   const turns = Math.abs(dtYears) / (SKY_CONSTANTS.sunGalacticPeriodMyr * 1e6);
   const milky = ` The Milky Way's band turns with the Sun's Galactic orbit (once per ${SKY_CONSTANTS.sunGalacticPeriodMyr.toFixed(0)} Myr on McMillan 2017's R₀ and v₀; ${turns.toFixed(turns < 1 ? 2 : 1)} turns from today).`;
   if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are handing over to a STATISTICALLY EQUIVALENT sky — beyond ±${(lim / 1e6).toFixed(0)} Myr the straight-line motion stops being a star's path (the Galactic orbit bends it) and no star of today's sky stays in a known place: the same brightnesses and the same spread about the Milky Way's band, the places drawn by a seed that changes every 100 Myr, no name and no constellation.` + milky;
@@ -4699,6 +4699,11 @@ if (typeof window !== 'undefined') {
       galacticTurnRad: _skyOfDate.state().galacticTurnRad,
       backdropOffsetFromCamera: skyBackdrop.position.distanceTo(camera.position),
       domeDepthWrite: skyMaterial.depthWrite, domeRenderOrder: sky.renderOrder,
+      // the sky pass (plan 28): its own scene and far camera; the catalogue centred on the Sun
+      skyCameraFar: skyCamera.far, skyCameraNear: skyCamera.near, skySceneHasStars: sceneObjects.stars.parent === skyScene,
+      starsOriginOffsetFromSun: sceneObjects.stars.position.distanceTo(sun.planetObj.getWorldPosition(new THREE.Vector3())),
+      cameraDistanceFromTarget: camera.position.distanceTo(controls.target),
+      cameraMaxDistance: controls.maxDistance, cameraMaxDistancePc: controls.maxDistance / UNITS_PER_PC,
     }),
     /** The dome's brightness (the material's colour scale) — a tuning knob for screenshots; returns the value set. @param {number} k */
     skyDomeBrightness: (k) => { skyMaterial.color.setScalar(k); return skyMaterial.color.r; },
@@ -4710,6 +4715,7 @@ if (typeof window !== 'undefined') {
     starDirectionAt: (hip, year) => _skyOfDate.starDirectionAt(hip, year),
     starRecord: (hip) => _skyOfDate.starRecord(hip),
     statisticalPositionAt: (i) => _skyOfDate.statisticalPositionAt(i),
+    starPositionUnits: (hip) => _skyOfDate.starPositionUnits(hip),
     // Moon-ring gate hook: the RING's perigee and ascending
     // node of date read from the placed stack geometry — the apsidal arm's
     // offset (toward the apogee) and the Moon orbit plane's normal — in the
@@ -6706,6 +6712,11 @@ const planetColorHex = {
 //*************************************************************
 const camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 0.1, 10000000);
 camera.position.set(0, 500, 0);
+// The zoom-out cap (plan 28, the stars at their measured distances): the catalogue's reach. The Hipparcos
+// stars to V 8 sit within ~2 kpc (the prior's mode puts the farthest at 5 kpc); beyond, the view would be
+// an empty ball inside a dome that is the Milky Way as seen from the SUN. ONE home for the three sites
+// that set controls.maxDistance (the former Infinity let a visitor zoom out forever and reach nothing).
+const CAMERA_MAX_DISTANCE_UNITS = 2000 * UNITS_PER_PC;
 //camera.position.set(0, 0.5, 4);
 const baseCamDistance = camera.position.length();
 
@@ -6713,7 +6724,8 @@ const baseCamDistance = camera.position.length();
 // LOAD DEFAULT SETTINGS (Three.js core setup (scene, camera, renderer))
 //*************************************************************
 const scene = new THREE.Scene();
-scene.background = new THREE.Color( o.background );
+// No scene.background: a Color background FORCES a clear inside the main pass (three's WebGLBackground), which
+// wiped the sky pass that draws first (plan 28 step 1); the renderer's clear colour carries o.background instead.
 
 // Multisampling a 2× HiDPI buffer (7 Mpx) is what the owner's GPU missed every
 // third vsync (758 long frames/min, p95 33.5 ms, the scene stepping 23 ms; AA off
@@ -6724,6 +6736,7 @@ const ANTIALIAS = URL_FLAGS.has('aa') ? URL_FLAGS.get('aa') !== '0' : getOptimiz
 const renderer = new THREE.WebGLRenderer({ antialias: ANTIALIAS });
 renderer.shadowMap.enabled = URL_FLAGS.get('shadows') !== '0';
 renderer.shadowMap.type = THREE.PCFShadowMap;
+renderer.setClearColor(new THREE.Color(o.background), 1); // the frame's one clear, before the sky pass (renderFrame)
 
 // —– setup once —–
 const labelRenderer = new CSS2DRenderer();
@@ -8859,7 +8872,36 @@ skyBackdrop.name = 'sky-backdrop';
 skyMaterial.depthWrite = false;
 sky.renderOrder = -100;
 skyBackdrop.add(sky);
-scene.add(skyBackdrop);
+// PLAN 28 (the owner's "zoom out infinitely and never reach a star"): the catalogue stars sit at
+// their MEASURED distances (1 pc = 206,265 AU = 2.06 × 10⁷ units on the scene's 1 AU = 100), centred
+// on the Sun, so zooming out passes the Oort cloud, Proxima and Sirius and shows the solar
+// neighbourhood as the 3-D cloud it is. That needs a far plane of 10¹³ units, which no single
+// depth buffer can share with the solar system's 0.1-unit near plane — so the sky is its OWN
+// scene, rendered first with its own camera (the main camera's pose, near 10, far 10¹³), the depth
+// cleared between the passes: the stars are always behind the planets, never z-fighting them.
+const skyScene = new THREE.Scene();
+const skyCamera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 10, 1e13);
+skyScene.add(skyBackdrop);
+const _sunWorldForSky = new THREE.Vector3();
+/** ONE frame: the sky pass (the dome on the camera, the catalogue on the Sun, the sky camera at the
+ *  main camera's pose), the depth cleared, then the solar system. Every render goes through here. */
+function renderFrame() {
+  skyCamera.position.copy(camera.position);
+  skyCamera.quaternion.copy(camera.quaternion);
+  if (skyCamera.fov !== camera.fov || skyCamera.aspect !== camera.aspect) { skyCamera.fov = camera.fov; skyCamera.aspect = camera.aspect; skyCamera.updateProjectionMatrix(); }
+  skyBackdrop.position.copy(camera.position);
+  if (sun && sun.planetObj) {
+    sun.planetObj.getWorldPosition(_sunWorldForSky);
+    sceneObjects.stars.position.copy(_sunWorldForSky);
+    sceneObjects.constellations.position.copy(_sunWorldForSky);
+  }
+  skyScene.updateMatrixWorld(true);
+  renderer.autoClear = false;
+  renderer.clear();
+  renderer.render(skyScene, skyCamera);
+  renderer.clearDepth();
+  renderer.render(scene, camera);
+}
 
 //*************************************************************
 // ADD STARS, CONSTELLATIONS
@@ -8880,9 +8922,10 @@ const _CHAIN_J2000_REST_SAMPLE = Object.freeze({
   periOfDateDeg: ASTRO_REFERENCE.perihelionLongitudeJ2000_deg, e: ASTRO_REFERENCE.eccentricityJ2000,
 });
 
-// Add containers to the scene — inside the sky backdrop (plan 28 §E): they follow the camera's position
-skyBackdrop.add(sceneObjects.stars);
-skyBackdrop.add(sceneObjects.constellations);
+// Add containers to the SKY scene (plan 28): the catalogue at its measured distances, centred on the Sun
+// every frame (renderFrame) — the dome alone follows the camera (a backdrop at infinity)
+skyScene.add(sceneObjects.stars);
+skyScene.add(sceneObjects.constellations);
 // we can add other fixed objects over here later on. e.g.
 //scene.add(sceneObjects.blackholes);
 
@@ -11317,7 +11360,7 @@ function focusInspectorCamera(mode) {
   }
   (H._lastTargetPos ??= new THREE.Vector3()).copy(controls.target);   // the follow starts from here
   controls.minDistance = 0;
-  controls.maxDistance = Infinity;
+  controls.maxDistance = CAMERA_MAX_DISTANCE_UNITS;
   controls.update();
   camera.near = 0.1;
   camera.updateProjectionMatrix();
@@ -23203,10 +23246,11 @@ function setupGUI() {
   // ── Distance (root level) ──
   addTooltip(visFolder.addBinding(o, 'starDistanceScaleFact', { label: 'Distance', min: 0.1, max: 2, step: 0.1 })
     .on('change', ({ value }) => {
-      scalableObjects.forEach(obj => obj.scale.setScalar(value));
+      // plan 28: the catalogue stars sit at their MEASURED distances — never scaled
+      scalableObjects.forEach(obj => { if (obj !== sceneObjects.stars && obj !== sceneObjects.constellations) obj.scale.setScalar(value); });
       needsLabelUpdate = true;
     }),
-    'Scale the distance to background objects like stars and the celestial sphere.');
+    'Scale the distance to the reference objects (the celestial sphere, the grids). The stars are at their measured distances and do not scale.');
 
   // ── Reports (observed — data exported from scene graph) ──
   const reportsFolder = gui.addFolder({ title: 'Reports', expanded: false });
@@ -23888,13 +23932,13 @@ function render(now) {
   // 9) Cloud animation
   if (earth._updateCloudsFunc) earth._updateCloudsFunc(delta);
 
-  // 10) Draw — the sky backdrop follows the camera's position first (plan 28 §E: a sky at infinity)
-  skyBackdrop.position.copy(camera.position);
-  skyBackdrop.updateMatrixWorld(true);
-  renderer.render(scene, camera);
+  // 10) Draw — the sky pass first (plan 28: the dome on the camera, the stars at their distances on
+  // the Sun, its own far camera), the depth cleared, then the solar system
+  renderFrame();
   if (needsLabelUpdate) {
     // (the label layer's size follows the window in onWindowResize; setting it
     // here on every label pass re-styled the layer 30× a second for nothing)
+    labelRenderer.render(skyScene, skyCamera);   // the star names, projected by the sky camera (the main camera's far plane would clip them)
     labelRenderer.render(scene, camera);
     needsLabelUpdate = false;
   }
@@ -28115,7 +28159,7 @@ function focusPlanet(pd, pad = 1.01) {
   if (!pd?.planetObj) {
     // user picked "Please select" → remove limits
     controls.minDistance = 0;
-    controls.maxDistance = Infinity;
+    controls.maxDistance = CAMERA_MAX_DISTANCE_UNITS;
     return;
   }
 
@@ -28132,7 +28176,7 @@ function focusPlanet(pd, pad = 1.01) {
 
   controls.target.copy(_ctrWS);
   controls.minDistance = minD;
-  controls.maxDistance = Infinity;        // generous zoom-out
+  controls.maxDistance = CAMERA_MAX_DISTANCE_UNITS;   // the catalogue's reach (ONE home, by the camera)
 
   /* — if camera is *inside* new shell → pop it to the skin — */
   _offset.subVectors(camera.position, _ctrWS);
@@ -28310,7 +28354,8 @@ function initConstellations() {
     (function animateDraw() {
       const t = Math.min((performance.now() - start) / duration, 1);
       drawMaterials.forEach(m => { m.uniforms.uDrawProgress.value = t; });
-      renderer.render(scene, camera);
+      renderFrame();
+      labelRenderer.render(skyScene, skyCamera);
       labelRenderer.render(scene, camera);
       if (t < 1) requestAnimationFrame(animateDraw);
     })();
@@ -34910,6 +34955,7 @@ function onWindowResize() {
   camera.fov    = THREE.MathUtils.radToDeg(vFovRad);
   camera.aspect = aspect;
   camera.updateProjectionMatrix();
+  skyCamera.fov = camera.fov; skyCamera.aspect = aspect; skyCamera.updateProjectionMatrix();   // the sky pass's camera (plan 28)
 
   /* ---------- renderer sizes --------- */
   renderer.setSize(width, height);

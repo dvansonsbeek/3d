@@ -91,6 +91,18 @@ check('statistical sky: the same 100-Myr cell draws the same places (−10 vs �
 const expTurn = galacticTurnRadAtYear(a130m.year);
 check(`the dome turns with the Sun's Galactic orbit (period ${SUN_GALACTIC_ORBIT.periodMyr.toFixed(1)} Myr): the scene's turn at −130 Myr ≡ the package's`, Math.abs(a130m.turn - expTurn) < 1e-12 && Math.abs(expTurn) > 3 && Math.abs(aGen.turn) > 100, `${a130m.turn.toFixed(6)} vs ${expTurn.toFixed(6)} rad; the genesis ${(aGen.turn / (2 * Math.PI)).toFixed(2)} turns`);
 check('the sky is a backdrop at infinity: the group sits on the camera (offset 0), the dome writes no depth and draws first', aGen.offset === 0 && aGen.depthWrite === false && aGen.order < 0, `offset ${aGen.offset}, depthWrite ${aGen.depthWrite}, order ${aGen.order}`);
+// The stars at their MEASURED distances (plan 28, the owner's "zoom out infinitely and never reach a
+// star"): Sirius drawn 2.637 pc from the Sun on the scene's 1 AU = 100 (1 pc = 2.06 × 10⁷ units), its
+// absolute magnitude +1.45 from V −1.44; the catalogue centred on the Sun; the sky pass's own camera
+// reaches 10¹³ units (the main camera's 10⁷ would clip Proxima).
+await land('2000 d172');
+const geo = await sim.page.evaluate(() => { const T = window.__test__; const s = T.starPositionUnits(32349); const P = T.skyDomeProbe(); return { s, far: P.skyCameraFar, near: P.skyCameraNear, inSky: P.skySceneHasStars, sunOffset: P.starsOriginOffsetFromSun }; });
+const unitsPerPc = 206264.806 * 100;
+const sirRadius = geo.s ? Math.hypot(...geo.s.units) : NaN;
+check('the stars at their measured distances: Sirius 2.637 pc from the Sun in scene units (1 pc = 2.06e7), absolute magnitude +1.45', !!geo.s && Math.abs(sirRadius / unitsPerPc - 2.637) < 0.002 && Math.abs(geo.s.absMag - 1.45) < 0.02 && geo.s.unitsPerPc === unitsPerPc, geo.s ? `${(sirRadius / unitsPerPc).toFixed(4)} pc, M ${geo.s.absMag.toFixed(3)}` : 'null');
+check('the sky pass: the catalogue in the sky scene centred on the Sun (offset < 1e-6 units), the sky camera near 10 / far 1e13', geo.inSky === true && geo.sunOffset < 1e-6 && geo.far === 1e13 && geo.near === 10, `in sky scene ${geo.inSky}, Sun offset ${geo.sunOffset}, near/far ${geo.near}/${geo.far}`);
+const far = await sim.page.evaluate(() => { const T = window.__test__; const P = T.skyDomeProbe(); const S = T.skyState(); const a = T.starPositionUnits(71681); return { capPc: P.cameraMaxDistancePc, sunM: S.sunPointAbsMag, nearestPc: a ? a.distPc : NaN }; });
+check('the Sun as a star (M_V 4.81) at the catalogue\'s origin; the zoom-out capped at the catalogue\'s reach (2,000 pc); α Cen B the nearest star (1.255 pc — the distance prior, no photometric clump)', Math.abs(far.sunM - 4.81) < 1e-5 && Math.abs(far.capPc - 2000) < 1e-9 && Math.abs(far.nearestPc - 1.255) < 0.01, `M ${far.sunM}, cap ${far.capPc} pc, α Cen B ${far.nearestPc} pc`);
 // a landing re-read at the same year reproduces the state bit-for-bit
 const again = await land('-48000 d172');
 check('purity: a landing re-read at the same year reproduces every fade bit-for-bit', JSON.stringify(again.g) === JSON.stringify(s48.g) && again.year === s48.year, `${again.year} vs ${s48.year}`);

@@ -2603,9 +2603,16 @@ designations from the Yale BSC by HD (8,982; 3,009 with a designation), the
 IAU names by HIP (367 of the WGSN's 451: the rest are exoplanet hosts or
 fainter than V 8). Positions are the sources' numbers at the catalogue epoch
 J1991.25, NOT propagated: the scene propagates. The distance is the parallax
-where σ/π ≤ 0.2 (31,428), a main-sequence photometric one from V and B−V
-otherwise (9,945, flagged — a giant lands too close), 500 pc for 21 with
-neither. Every source is pinned by a CANONICAL sha256 (the data rows, sorted,
+where σ/π ≤ 0.2 (31,428) and, where the parallax is poor or non-positive
+(9,966, flagged), the MODE of the posterior under Bailer-Jones's (2015,
+PASP 127, 994) exponentially decreasing space density prior with the star's
+OWN parallax and error (L = 1.35 kpc, Astraatmadja & Bailer-Jones 2016) —
+the first build's main-sequence photometric distance from V and B−V put every
+distant giant 10–50 pc from the Sun (6,332 flagged stars within 50 pc, 242
+inside 1 pc: an orange clump around the Sun the 3-D view showed at once);
+under the prior 4 remain within 50 pc, the median flagged star is at 600 pc
+and the nearest star in the catalogue is α Centauri B at 1.255 pc (the gate
+pins both). Every source is pinned by a CANONICAL sha256 (the data rows, sorted,
 comment and date lines dropped: a TAP result's row order and a VizieR file's
 header date are not the data) and fetched to the gitignored
 `data/.cache/stars/`. The constellation strokes are re-keyed to HIP ids
@@ -2674,8 +2681,12 @@ with `ESSRT_STAR_CATALOGUE_PLANT=1` (one HIP duplicated). The browser gate
 star, purity (a direction the same in any order of asking; a landing
 re-read bit-for-bit), the fades at −48 kyr and −198 kyr by band, the regime
 at −998 kyr / −1.15 Myr / −10 Myr with the dome untouched, the counts ≡ the
-catalogue's `_meta`; fail-proven with `ESSRT_SKY_PLANT=1` (the scene's
-reading shifted 2″). **Two harness traps:** the landing hook takes the Year
+catalogue's `_meta`, the 3-D field (Sirius 2.637 pc / M +1.45 in scene
+units, the sky pass's scene and far camera, the catalogue on the Sun, the
+Sun point's M_V, the 2,000-pc cap, α Cen B the nearest star); fail-proven
+with `ESSRT_SKY_PLANT=1` (the scene's reading shifted 2″). The catalogue gate
+pins the nearest star (1.2–1.3 pc) and at most ten prior-distance stars
+within 50 pc — the photometric clump's signature. **Two harness traps:** the landing hook takes the Year
 of date's STRING form (`'-48000 d172'`), a number lands nowhere and the smoke
 read the same year five times; and `python3 -I` (isolated mode, the rule for
 untrusted downloads) does not see the user's astropy — a script of ours runs
@@ -2712,6 +2723,33 @@ gate rows undo the turn before reading the alignment. **A TDZ at module
 init:** the alignment block handed the dome's pose to the sky module 90 lines
 before the module's `const` — "Cannot access 'jO' before initialization" in
 the bundle, every browser row dead; the pose goes in at the module's creation.
+
+**The 3-D field, from the owner's second look** ("in the live version we
+could zoom out and see the constellations from the outside; and a visitor
+could zoom out forever and still reach no other star"). The stars no longer
+sit on a sphere: every catalogue star is drawn at its measured distance
+(`UNITS_PER_PC` = 206,264.806 × 100 on the scene's 1 AU = 100 — Sirius
+5.4 × 10⁷ units from the Sun), the catalogue centred on the Sun each frame, a
+sprite's size the star's APPARENT magnitude at the camera (M + 5 log₁₀
+d_cam/10 pc, in the shader), so approaching Sirius brightens it and the
+neighbourhood is the 3-D cloud it is, the constellations seen from outside
+at 10 pc. The main camera's far plane (10⁷ units, 0.05 pc) cannot reach a
+star, so the sky is drawn in its OWN pass (`renderFrame`: a sky scene with a
+camera of near 10 / far 10¹³ on the main camera's pose, the depth cleared
+before the solar system, the name labels projected by the sky camera); the
+dome alone stays a backdrop at infinity. Three things the pass exposed. A
+`scene.background` COLOUR forces a clear inside three's main pass
+(WebGLBackground sets forceClear) — the sky pass vanished without an error;
+the renderer's clear colour carries the background now. Once the main
+scene's Sun is past its far plane the Sun must be a star too: one point at
+the catalogue's origin with M_V 4.81 and B−V 0.65 (Willmer 2018, ApJS 236,
+47), V 1.8 from Proxima. And the photometric fallback above. The zoom-out is
+capped at the catalogue's reach (2,000 pc — ONE constant for the three sites
+that had `Infinity`). Gate rows: Sirius 2.637 pc / M +1.45 in scene units,
+the sky pass's scene, camera and Sun offset, the Sun point, the cap, α Cen B
+the nearest star. The motion regimes beyond ±1 Myr (the straight line's
+path error stated to ±20 Myr, §D's epicyclic orbits and lifetimes, the
+statistical sky with seeded motion) are the next step.
 
 ---
 
@@ -2906,8 +2944,13 @@ The `test:snapshot` chain also carries:
   turn at −130 Myr ≡ the package's `galacticTurnRadAtYear` to 1e-12 (20.4
   turns at the genesis), the backdrop group on the camera (offset 0), the
   dome without depth writes drawn first — born from the owner's three
-  observations on the first build; fail-proven under `ESSRT_SKY_PLANT=1`
-  (the scene's reading shifted 2″).
+  observations on the first build; and since the 3-D field: Sirius 2.637 pc
+  from the Sun in scene units with M +1.45, the catalogue in the sky pass's
+  scene centred on the Sun (offset 0) under a camera of near 10 / far 10¹³,
+  the Sun point's M_V 4.81, the 2,000-pc zoom cap, α Cen B the nearest star
+  at 1.255 pc (the photometric clump's absence) — born from the owner's
+  second look; fail-proven under `ESSRT_SKY_PLANT=1` (the scene's reading
+  shifted 2″).
 - **The focused chain planet's orbit-plane grid** passes through the
   rendered Sun with its normal along the chain's orbit normal of date (born
   from the owner's "the tilt of Mercury's path floats above the Sun": the
