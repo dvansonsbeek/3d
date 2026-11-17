@@ -129,8 +129,11 @@ export function createSkyOfDate(deps) {
 
   // The sprite's size is the star's APPARENT magnitude at the camera: m = M + 5 log₁₀(d_cam / 10 pc) with
   // d_cam the star's distance from the camera (the stars sit at their measured distances, so approaching
-  // Sirius brightens it); the size law is the former magnitude tiers made continuous (m −1.4 → 2.0,
-  // 0 → 1.6, 2 → 1.0, 4 → 0.4, 6.5 → 0.13 of the base size, clamped).
+  // Sirius brightens it); the size law is the §E magnitude tiers made continuous AT THEIR DRAWN SIZE —
+  // the former shader attenuated its tiers (1.5 / 1.0 / 0.6 / 0.3 / 0.14 of the base) by 2500/depth,
+  // 0.5 at the centre of view on the 5,000-unit sphere, so the drawn sizes were 0.75 / 0.5 / 0.3 /
+  // 0.15 / 0.07 of the base: m −1.4 → 0.80, 0 → 0.66, 2 → 0.46, 4 → 0.26, ≥ 6 → 0.07 (the first 3-D
+  // build carried the tiers WITHOUT the attenuation — the bright stars twice too large, "too bright").
   const starShader = (pointTexture) => new THREE.ShaderMaterial({
     uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 } },
     vertexShader: `
@@ -143,7 +146,7 @@ export function createSkyOfDate(deps) {
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         float dPc = max(length(mv.xyz) / uUnitsPerPc, 1.0e-6);
         float m = absMag + 5.0 * log(dPc / 10.0) / log(10.0);
-        gl_PointSize = uBaseSize * clamp(1.6 - 0.3 * m, 0.12, 3.0);
+        gl_PointSize = uBaseSize * clamp(0.66 - 0.10 * m, 0.07, 0.80);
         gl_Position  = projectionMatrix * mv;
       }
     `,
