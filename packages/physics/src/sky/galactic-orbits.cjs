@@ -101,19 +101,68 @@ const GAUSS_LEGENDRE_8 = (() => {
   return Object.freeze({ x: Object.freeze(x), w: Object.freeze(w) });
 })();
 
+/** The speed of light, km/s (SI). */
+const SPEED_OF_LIGHT_KMS = 299792.458;
+
+/**
+ * The observed → inertial velocity factors (ERFA/SOFA `starpv`, after Stumpff 1985, A&A 144, 232). A catalogue's
+ * proper motion and radial velocity are the OBSERVED rates: the apparent angular rate is the true one divided by
+ * (1 + v_r/c) (the light-time's own rate — an approaching star's images arrive early) and the radial velocity is
+ * the Doppler one, so the inertial space velocity is the observed radial velocity × `radial` and the observed
+ * transverse velocity × `transverse`, with (βr, βt) solved by fixed point from the observed (βsr, βst):
+ *   d = 1 + βr,  w = βr² + βt²,  δ = −w / (√(1 − w) + 1),  βr ← d·βsr + δ,  βt ← d·βst;   radial = βr/βsr, transverse = d.
+ * ~1e-4 for a 30 km/s star — 25″ of Groombridge 1830's 100-kyr motion, half of astropy's former gap to the scene,
+ * the other half its light-time placement (doc 111 §1.48; the referee record carries both).
+ * @param {number} vrKmS  the observed radial velocity @param {number} vtKmS  the observed transverse speed
+ * @returns {{radial: number, transverse: number}}
+ */
+function inertialVelocityFactors(vrKmS, vtKmS) {
+  const betsr = vrKmS / SPEED_OF_LIGHT_KMS, betst = vtKmS / SPEED_OF_LIGHT_KMS;
+  let betr = betsr, bett = betst, d = 1, od = 0, odel = 0, odd = 0, oddel = 0;
+  for (let i = 0; i < 100; i++) {
+    d = 1 + betr;
+    const w = betr * betr + bett * bett;
+    const del = -w / (Math.sqrt(1 - w) + 1);
+    betr = d * betsr + del;
+    bett = d * betst;
+    if (i > 0) {
+      const dd = Math.abs(d - od), ddel = Math.abs(del - odel);
+      if (i > 1 && dd >= odd && ddel >= oddel) break;
+      odd = dd; oddel = ddel;
+    }
+    od = d; odel = del;
+  }
+  return { radial: betsr !== 0 ? betr / betsr : d, transverse: d };
+}
+
+/**
+ * A star's INERTIAL space velocity in the equatorial (ICRS) axes, km/s, from its observed astrometry — the
+ * observed vector (the radial velocity along the direction, the proper motion along the east and north tangents)
+ * with each component scaled by `inertialVelocityFactors`.
+ * @param {{raDeg: number, decDeg: number, distPc: number, pmRaMasYr: number, pmDecMasYr: number, rvKmS: number}} a
+ * @returns {{position: number[], velocityKmS: number[], observedKmS: number[]}}  the direction × distance (pc), the inertial and the observed velocities
+ */
+function inertialVelocityEquatorialKmS(a) {
+  const sa = Math.sin(a.raDeg * D2R), ca = Math.cos(a.raDeg * D2R), sd = Math.sin(a.decDeg * D2R), cd = Math.cos(a.decDeg * D2R);
+  const p = [cd * ca, cd * sa, sd], e = [-sa, ca, 0], n = [-sd * ca, -sd * sa, cd];   // the direction, its east and north tangents
+  const vt = KMS_PER_MASYR_KPC * a.distPc / 1000;   // km/s per mas/yr at this distance
+  const vtE = a.pmRaMasYr * vt, vtN = a.pmDecMasYr * vt;
+  const f = inertialVelocityFactors(a.rvKmS, Math.hypot(vtE, vtN));
+  const observedKmS = [0, 1, 2].map((k) => p[k] * a.rvKmS + e[k] * vtE + n[k] * vtN);
+  const velocityKmS = [0, 1, 2].map((k) => p[k] * a.rvKmS * f.radial + (e[k] * vtE + n[k] * vtN) * f.transverse);
+  return { position: p.map((c) => c * a.distPc), velocityKmS, observedKmS };
+}
+
 /**
  * A star's heliocentric Galactic position (pc) and velocity (km/s) from its astrometry — X toward the
  * Galactic centre, Y along the rotation (l = 90°), Z toward the north Galactic pole; U, V, W likewise
- * (Johnson & Soderblom 1987's transformation written on the one-home triad).
+ * (Johnson & Soderblom 1987's transformation written on the one-home triad), the velocity the INERTIAL one
+ * (the catalogue's observed rates through `inertialVelocityFactors`).
  * @param {{raDeg: number, decDeg: number, distPc: number, pmRaMasYr: number, pmDecMasYr: number, rvKmS: number}} a
  */
 function heliocentricGalacticState(a) {
   const T = galacticTriadEquatorialJ2000();
-  const sa = Math.sin(a.raDeg * D2R), ca = Math.cos(a.raDeg * D2R), sd = Math.sin(a.decDeg * D2R), cd = Math.cos(a.decDeg * D2R);
-  const p = [cd * ca, cd * sa, sd], e = [-sa, ca, 0], n = [-sd * ca, -sd * sa, cd];   // the direction, its east and north tangents
-  const vt = KMS_PER_MASYR_KPC * a.distPc / 1000;   // km/s per mas/yr at this distance
-  const vEq = [0, 1, 2].map((k) => p[k] * a.rvKmS + e[k] * a.pmRaMasYr * vt + n[k] * a.pmDecMasYr * vt);
-  const rEq = p.map((c) => c * a.distPc);
+  const { position: rEq, velocityKmS: vEq } = inertialVelocityEquatorialKmS(a);
   const g = (/** @type {number[]} */ v) => [v[0] * T.x[0] + v[1] * T.x[1] + v[2] * T.x[2], v[0] * T.y[0] + v[1] * T.y[1] + v[2] * T.y[2], v[0] * T.z[0] + v[1] * T.z[1] + v[2] * T.z[2]];
   const [X, Y, Z] = g(rEq), [U, V, W] = g(vEq);
   return { xPc: X, yPc: Y, zPc: Z, uKmS: U, vKmS: V, wKmS: W };
@@ -321,4 +370,4 @@ function mainSequenceLifetimeYears(absMagV) {
   return 1e10 * L ** (-2.5 / 3.5);
 }
 
-module.exports = { LOCAL_GALACTIC_KINEMATICS, RADIAL_AMPLITUDE_MAX, SUN_EPOCH_YEAR, ORBIT_INTEGRATION, KMS_TO_PC_PER_YEAR, KMS_PER_MASYR_KPC, G_PC_KMS2_PER_MSUN, GAUSS_LEGENDRE_8, localRotationCurve, heliocentricGalacticState, orbitElements, radiusAt, galactocentricPositionAt, galactocentricPositionAtYear, heliocentricGalacticAtYear, galacticAcceleration, galactocentricState, integrateOrbitRK4, integrationSchedule, integratedStateAtYear, mainSequenceLifetimeYears, sunHeightPcAtYear, MILKY_WAY_LIGHT_DISTANCE_PC, milkyWayLatitudeShiftDegAtYear };
+module.exports = { LOCAL_GALACTIC_KINEMATICS, RADIAL_AMPLITUDE_MAX, SUN_EPOCH_YEAR, ORBIT_INTEGRATION, KMS_TO_PC_PER_YEAR, KMS_PER_MASYR_KPC, G_PC_KMS2_PER_MSUN, SPEED_OF_LIGHT_KMS, GAUSS_LEGENDRE_8, localRotationCurve, inertialVelocityFactors, inertialVelocityEquatorialKmS, heliocentricGalacticState, orbitElements, radiusAt, galactocentricPositionAt, galactocentricPositionAtYear, heliocentricGalacticAtYear, galacticAcceleration, galactocentricState, integrateOrbitRK4, integrationSchedule, integratedStateAtYear, mainSequenceLifetimeYears, sunHeightPcAtYear, MILKY_WAY_LIGHT_DISTANCE_PC, milkyWayLatitudeShiftDegAtYear };

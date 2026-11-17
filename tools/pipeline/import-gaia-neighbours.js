@@ -25,9 +25,15 @@
  * each star on its orbit) and public/input/stars-gaia.json (the manifest: counts, the binary's sha256, the
  * source's canonical sha256 and query, the colour relations, the cuts). Gate: tools/verify/star-catalogue.js.
  *
+ * THE FAINT BACKGROUND (the follow-up, doc 111 §1.48): the stars fainter than M_G 2 that reach V 8 come from within
+ * 160 pc (M_G 2) to 40 pc (M_G 5); a second superset, data/.cache/stars/gaia-neighbours-faint.csv (M_G 2–5 within
+ * 1.5 kpc, pre-filtered server-side by the straight line's closest approach — tools/pipeline/fetch-gaia-neighbours.js
+ * says how), is read beside the bright one when present, so the faint background is complete to about ±20 Myr
+ * (the line's reach) and thins beyond. Each superset is recorded with its own query and canonical hash.
+ *
  * Usage: node tools/pipeline/import-gaia-neighbours.js --write [--pin]
- *   The cached source data/.cache/stars/gaia-neighbours.csv (gitignored; the chunk fetch is the recorded
- *   query) is checked against its recorded canonical sha256; --pin adopts a new hash (printed).
+ *   The cached sources (gitignored; fetched by tools/pipeline/fetch-gaia-neighbours.js --set bright|faint) are
+ *   checked against their recorded canonical sha256; --pin adopts a new hash (printed).
  */
 'use strict';
 
@@ -43,6 +49,7 @@ const WRITE = argv.includes('--write');
 if (!WRITE) { console.error('Usage: node tools/pipeline/import-gaia-neighbours.js --write [--pin]'); process.exit(1); }
 
 const CACHE = path.join(ROOT, 'data', '.cache', 'stars', 'gaia-neighbours.csv');
+const CACHE_FAINT = path.join(ROOT, 'data', '.cache', 'stars', 'gaia-neighbours-faint.csv');
 const OUT_BIN = path.join(ROOT, 'public', 'input', 'stars-gaia.bin');
 const OUT_JSON = path.join(ROOT, 'public', 'input', 'stars-gaia.json');
 const HIP_CATALOGUE = path.join(ROOT, 'public', 'input', 'stars.json');
@@ -58,7 +65,14 @@ const SOURCE = {
   title: 'Gaia DR3 (Gaia Collaboration 2023, A&A 674, A1): gaia_source within 1.5 kpc with radial velocities, brighter than M_G 2, joined to hipparcos2_best_neighbour — ESA, hosted by the Gaia archive',
   licence: 'CC BY-SA 3.0 IGO (ESA/Gaia/DPAC) — attribution required',
   url: 'https://gea.esac.esa.int/tap-server/tap/sync',
-  query: 'SELECT g.source_id, g.ra, g.dec, g.parallax, g.parallax_error, g.pmra, g.pmdec, g.radial_velocity, g.radial_velocity_error, g.phot_g_mean_mag, g.bp_rp, x.original_ext_source_id AS hip FROM gaiadr3.gaia_source AS g LEFT OUTER JOIN gaiadr3.hipparcos2_best_neighbour AS x ON x.source_id = g.source_id WHERE g.random_index BETWEEN <lo> AND <hi> AND g.parallax > 0.667 AND g.parallax_over_error > 5 AND g.radial_velocity IS NOT NULL AND g.pmra IS NOT NULL AND g.parallax < POWER(10, (12 - g.phot_g_mean_mag)/5)   — 32 chunks of random_index covering 0..1811709770, concatenated',
+  query: 'SELECT g.source_id, g.ra, g.dec, g.parallax, g.parallax_error, g.pmra, g.pmdec, g.radial_velocity, g.radial_velocity_error, g.phot_g_mean_mag, g.bp_rp, x.original_ext_source_id AS hip FROM gaiadr3.gaia_source AS g LEFT OUTER JOIN gaiadr3.hipparcos2_best_neighbour AS x ON x.source_id = g.source_id WHERE g.random_index BETWEEN <lo> AND <hi> AND g.parallax > 0.667 AND g.parallax_over_error > 5 AND g.radial_velocity IS NOT NULL AND g.pmra IS NOT NULL AND g.parallax < POWER(10, (12 - g.phot_g_mean_mag)/5)   — 64 chunks of random_index covering 0..1811709770, concatenated (tools/pipeline/fetch-gaia-neighbours.js --set bright)',
+  sha256: 'd5174950e7fd081552317e603c3a0aef8d8c7ee8d970ba36d94b11aadc1e2a1d',
+};
+const SOURCE_FAINT = {
+  title: 'Gaia DR3 (the same release): gaia_source within 1.5 kpc with radial velocities, M_G 2 to 5, pre-filtered by the straight line\'s closest approach (≤ 2 r(M) within ±30 Myr, or within 2 r(M) today; r(M) the V-8 distance with a 1-mag colour margin), joined to hipparcos2_best_neighbour — the faint background, complete to about ±20 Myr',
+  licence: 'CC BY-SA 3.0 IGO (ESA/Gaia/DPAC) — attribution required',
+  url: 'https://gea.esac.esa.int/tap-server/tap/sync',
+  query: 'tools/pipeline/fetch-gaia-neighbours.js --set faint (the WHERE clause is the script\'s SETS.faint.where; chunks on random_index, each verified against the archive\'s COUNT)',
   sha256: '0000000000000000000000000000000000000000000000000000000000000000',
 };
 
@@ -87,11 +101,17 @@ function fitClipped(pts) {
 }
 
 function main() {
-  if (!fs.existsSync(CACHE)) throw new Error(`${rel(CACHE)} is absent — fetch the 32 chunks with the recorded query first (the session's gaia-chunks script; see the header)`);
+  if (!fs.existsSync(CACHE)) throw new Error(`${rel(CACHE)} is absent — fetch it first: node tools/pipeline/fetch-gaia-neighbours.js --set bright`);
   const text = fs.readFileSync(CACHE, 'utf8');
   const sha = canonicalSha256(text);
   const first = /^0+$/.test(SOURCE.sha256) || argv.includes('--pin');
   if (!first && sha !== SOURCE.sha256) throw new Error(`${rel(CACHE)}: canonical sha256 ${sha} ≠ the recorded ${SOURCE.sha256} — the source changed; re-measure before importing (or --pin to adopt)`);
+  // the faint superset beside the bright one (absent: the bright alone, said in the manifest)
+  const haveFaint = fs.existsSync(CACHE_FAINT);
+  const textFaint = haveFaint ? fs.readFileSync(CACHE_FAINT, 'utf8') : '';
+  const shaFaint = haveFaint ? canonicalSha256(textFaint) : null;
+  if (haveFaint && !(/^0+$/.test(SOURCE_FAINT.sha256) || argv.includes('--pin')) && shaFaint !== SOURCE_FAINT.sha256) throw new Error(`${rel(CACHE_FAINT)}: canonical sha256 ${shaFaint} ≠ the recorded ${SOURCE_FAINT.sha256} — the source changed; re-measure before importing (or --pin to adopt)`);
+  if (!haveFaint) console.log(`${rel(CACHE_FAINT)} is absent — the bright superset alone (fetch it: node tools/pipeline/fetch-gaia-neighbours.js --set faint)`);
 
   // the Hipparcos catalogue: its HIP set (skipped here) and its V, B−V for the colour relations
   const hipDoc = JSON.parse(fs.readFileSync(HIP_CATALOGUE, 'utf8'));
@@ -102,6 +122,14 @@ function main() {
   const header = lines[0].split(',');
   const gi = Object.fromEntries(header.map((c, i) => [c, i]));
   for (const c of ['source_id', 'ra', 'dec', 'parallax', 'parallax_error', 'pmra', 'pmdec', 'radial_velocity', 'phot_g_mean_mag', 'bp_rp', 'hip']) if (!(c in gi)) throw new Error(`${rel(CACHE)}: column ${c} missing`);
+  const nBright = lines.filter((l, i) => i > 0 && l).length;
+  const faintStart = lines.length;   // the faint rows follow the bright ones in `lines`
+  let nFaint = 0;
+  if (haveFaint) {
+    const fl = textFaint.split('\n');
+    if (fl[0] !== lines[0]) throw new Error(`${rel(CACHE_FAINT)}: its columns differ from the bright superset's`);
+    for (let i = 1; i < fl.length; i++) if (fl[i]) { lines.push(fl[i]); nFaint++; }
+  }
 
   // pass 1: the colour relations on the matched rows
   const vg = [], bv = [];
@@ -132,7 +160,7 @@ function main() {
   };
   const sunPath = sampleOrbit(sunState);
   const kept = [];
-  let nInHip = 0, nBeyondAmplitude = 0, nNoColour = 0, nVisibleToday = 0, nNakedEyeEver = 0;
+  let nInHip = 0, nBeyondAmplitude = 0, nNoColour = 0, nVisibleToday = 0, nNakedEyeEver = 0, nKeptFaint = 0;
   const clampC = (/** @type {number} */ x) => Math.max(COLOUR_FIT_RANGE[0], Math.min(COLOUR_FIT_RANGE[1], x));
   const t0 = Date.now();
   for (let i = 1; i < lines.length; i++) {
@@ -162,10 +190,11 @@ function main() {
     if (minV > V_LIMIT + V_MARGIN) continue;
     if (vmag <= V_LIMIT) nVisibleToday++;
     if (minV <= 6.5) nNakedEyeEver++;
+    if (i >= faintStart) nKeptFaint++;
     kept.push([a.raDeg, a.decDeg, d, a.pmRaMasYr, a.pmDecMasYr, a.rvKmS, vmag, bvv]);
     if (kept.length % 50000 === 0) console.log(`  … ${i} rows read, ${kept.length} kept (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
   }
-  console.log(`kept ${kept.length} of ${nSuperset}: ${nInHip} carried by the Hipparcos catalogue, ${nNoColour} without BP−RP (${nBeyondAmplitude} beyond the closed form's radial amplitude, kept — the integrator draws them); ${nVisibleToday} visible today (V ≤ ${V_LIMIT}), ${nNakedEyeEver} ever naked-eye (V ≤ 6.5); ${((Date.now() - t0) / 1000).toFixed(0)} s`);
+  console.log(`kept ${kept.length} of ${nSuperset} (${nBright} bright + ${nFaint} faint rows; ${nKeptFaint} faint kept): ${nInHip} carried by the Hipparcos catalogue, ${nNoColour} without BP−RP (${nBeyondAmplitude} beyond the closed form's radial amplitude, kept — the integrator draws them); ${nVisibleToday} visible today (V ≤ ${V_LIMIT}), ${nNakedEyeEver} ever naked-eye (V ≤ 6.5); ${((Date.now() - t0) / 1000).toFixed(0)} s`);
 
   // write: Float32 columns, little-endian
   const n = kept.length;
@@ -176,7 +205,7 @@ function main() {
   const binSha = crypto.createHash('sha256').update(bytes).digest('hex');
   const doc = {
     _meta: {
-      _comment: 'The stars that ARRIVE — GENERATED by tools/pipeline/import-gaia-neighbours.js --write (plan 28 §D). The Gaia DR3 six-dimensional stars within 1.5 kpc brighter than M_G 2 that ever reach V 8 within ±50 Myr on their Galactic orbits (ONE home packages/physics/src/sky/galactic-orbits.cjs), the stars of the Hipparcos catalogue (stars.json) excluded. The data are in stars-gaia.bin: Float32 little-endian COLUMN-MAJOR arrays, `columns` in order, `n` rows each — the astrometry at the Gaia epoch J2016.0, NOT propagated: the scene moves each star on its orbit. V and B−V are from G and BP−RP through the cubic polynomials in `colourRelations`, fitted here on the Hipparcos-matched rows. Gate: tools/verify/star-catalogue.js.',
+      _comment: 'The stars that ARRIVE — GENERATED by tools/pipeline/import-gaia-neighbours.js --write (plan 28 §D). The Gaia DR3 six-dimensional stars within 1.5 kpc that ever reach V 8 within ±50 Myr on their Galactic orbits (ONE home packages/physics/src/sky/galactic-orbits.cjs), the stars of the Hipparcos catalogue (stars.json) excluded: the BRIGHT superset (M_G < 2, every star within 1.5 kpc) and, where `sourceFaint` is recorded, the FAINT one (M_G 2–5, pre-filtered server-side by the straight line\'s closest approach — complete to about ±20 Myr, thinning beyond; tools/pipeline/fetch-gaia-neighbours.js). The data are in stars-gaia.bin: Float32 little-endian COLUMN-MAJOR arrays, `columns` in order, `n` rows each — the astrometry at the Gaia epoch J2016.0, NOT propagated: the scene moves each star on its orbit. V and B−V are from G and BP−RP through the cubic polynomials in `colourRelations`, fitted here on the Hipparcos-matched rows. Gate: tools/verify/star-catalogue.js.',
       generated_by: 'tools/pipeline/import-gaia-neighbours.js --write',
       version: 1,
       epochYear: EPOCH_YEAR,
@@ -185,16 +214,19 @@ function main() {
       units: { raDeg: 'degrees', decDeg: 'degrees', distPc: 'parsecs (1000 / parallax; parallax/error > 5)', pmRaMasYr: 'milliarcseconds per Julian year, μα cos δ', pmDecMasYr: 'milliarcseconds per Julian year', rvKmS: 'km/s (positive receding)', vmag: 'Johnson V (from G and BP−RP)', bv: 'Johnson B−V (from BP−RP)' },
       n,
       binary: { file: 'public/input/stars-gaia.bin', sha256: binSha, bytes: bytes.length, layout: 'Float32 little-endian, column-major' },
-      cuts: { vLimit: V_LIMIT, vMargin: V_MARGIN, windowYears: WINDOW_YEARS, sampleYears: SAMPLE_YEARS, absMagGMax: 2.0, maxDistancePc: 1500, parallaxOverErrorMin: 5, colourFitRange: COLOUR_FIT_RANGE },
-      counts: { superset: nSuperset, carriedByHipparcosCatalogue: nInHip, beyondClosedFormAmplitude: nBeyondAmplitude, withoutColour: nNoColour, kept: n, visibleToday: nVisibleToday, nakedEyeEver: nNakedEyeEver },
+      cuts: { vLimit: V_LIMIT, vMargin: V_MARGIN, windowYears: WINDOW_YEARS, sampleYears: SAMPLE_YEARS, absMagGMax: 2.0, maxDistancePc: 1500, parallaxOverErrorMin: 5, colourFitRange: COLOUR_FIT_RANGE,
+        faint: haveFaint ? { absMagGRange: [2.0, 5.0], lineFilter: 'the straight line\'s closest approach ≤ 2 r(M) within |t_ca| ≤ 30 Myr, or d ≤ 2 r(M); r(M) = 10 pc × 10^((9 − M_G)/5)', completeToYears: 2e7 } : null },
+      counts: { superset: nSuperset, supersetBright: nBright, supersetFaint: nFaint, carriedByHipparcosCatalogue: nInHip, beyondClosedFormAmplitude: nBeyondAmplitude, withoutColour: nNoColour, kept: n, keptFaint: nKeptFaint, visibleToday: nVisibleToday, nakedEyeEver: nNakedEyeEver },
       colourRelations: { vMinusG: relVG, bv: relBV, form: 'c0 + c1·x + c2·x² + c3·x³, x = BP−RP clamped to colourFitRange; fitted on the Gaia rows matching a star of stars.json (V, B−V from the Hipparcos Catalogue), three passes of 3σ clipping' },
       orbitModel: 'packages/physics/src/sky/galactic-orbits.cjs — the potential\'s exact evaluator (RK4, 0.5-Myr steps, the Sun on the same schedule); the closed form\'s amplitude counted as a diagnostic',
       source: { ...SOURCE, sha256: undefined, file: 'data/.cache/stars/gaia-neighbours.csv', sha256Canonical: sha, bytes: Buffer.byteLength(text) },
+      sourceFaint: haveFaint ? { ...SOURCE_FAINT, sha256: undefined, file: 'data/.cache/stars/gaia-neighbours-faint.csv', sha256Canonical: shaFaint, bytes: Buffer.byteLength(textFaint) } : null,
     },
   };
   fs.writeFileSync(OUT_JSON, JSON.stringify(doc, null, 1) + '\n');
   console.log(`wrote ${rel(OUT_BIN)} (${bytes.length} bytes, sha256 ${binSha.slice(0, 12)}…), ${rel(OUT_JSON)}`);
-  if (SOURCE.sha256 !== sha) console.log(`  pin: sha256 '${sha}'`);
+  if (SOURCE.sha256 !== sha) console.log(`  pin (bright): sha256 '${sha}'`);
+  if (haveFaint && SOURCE_FAINT.sha256 !== shaFaint) console.log(`  pin (faint): sha256 '${shaFaint}'`);
 }
 
 try { main(); } catch (e) { console.error(e.message || e); process.exit(1); }

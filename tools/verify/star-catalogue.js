@@ -132,6 +132,20 @@ const enc = rd('data/star-encounter-reference.json');
       if (!(conv < 1e-7)) fail(`the integrator's 1-Myr steps part from 0.25-Myr steps by ${conv.toExponential(2)} of the radius at ${T / 1e6} Myr`);
     }
   }
+  // the observed → inertial velocity (ERFA starpv's factors, Stumpff 1985): the one home's inertial velocity of the
+  // five referee stars ≡ pyerfa's starpv recorded in the referee record (1e-6 km/s; the factors are ~1e-4, 0.16 km/s
+  // for Groombridge 1830 — a sign error reads 0.3 km/s); the record carries the light-time term per epoch
+  for (const [hipStr, rec] of Object.entries(ref.stars)) {
+    const r = byHip.get(Number(hipStr));
+    if (!r || !rec.inertialVelocityKmS) { fail(`referee record: HIP ${hipStr} lacks the catalogue row or inertialVelocityKmS — regenerate: python3 scripts/star_motion_reference.py --write`); continue; }
+    const v = O.inertialVelocityEquatorialKmS({ raDeg: r[ci.raDeg], decDeg: r[ci.decDeg], distPc: r[ci.distPc], pmRaMasYr: r[ci.pmRaMasYr], pmDecMasYr: r[ci.pmDecMasYr], rvKmS: r[ci.rvKmS] === null ? 0 : r[ci.rvKmS] });
+    const off = Math.max(...v.velocityKmS.map((x, k) => Math.abs(x - rec.inertialVelocityKmS[k])));
+    const corr = Math.max(...v.velocityKmS.map((x, k) => Math.abs(x - v.observedKmS[k])));
+    if (!(off <= 1e-6)) fail(`HIP ${hipStr}: the one home's inertial velocity is ${off.toExponential(2)} km/s from pyerfa's starpv`);
+    if (Number(hipStr) === 57939 && !(corr > 0.1 && corr < 0.3)) fail(`Groombridge 1830: the observed → inertial correction reads ${corr.toFixed(3)} km/s (0.1–0.3 expected)`);
+    const lt = rec.positions.find((p) => p.year === 102000);
+    if (!lt || !Number.isFinite(lt.lightTimeArcsec) || !lt.geometric) fail(`referee record: HIP ${hipStr} lacks the geometric place / light-time term at +100 kyr`);
+  }
   // Gliese 710
   const g = enc.gaiaDr3;
   const el = O.orbitElements(O.heliocentricGalacticState({ raDeg: g.raDeg, decDeg: g.decDeg, distPc: 1000 / g.parallaxMas, pmRaMasYr: g.pmRaMasYr, pmDecMasYr: g.pmDecMasYr, rvKmS: g.rvKmS }), g.epochYear);
@@ -168,6 +182,12 @@ const gman = rd('public/input/stars-gaia.json')._meta;
   if (gman.cuts.windowYears !== O.LOCAL_GALACTIC_KINEMATICS.catalogueRegimeYears || gman.cuts.sampleYears !== O.ORBIT_INTEGRATION.sampling.stepYears) fail('stars-gaia: the cuts do not match the orbit home');
   const gsrc = path.join(ROOT, gman.source.file);
   if (fs.existsSync(gsrc)) { const h = canonicalSha256(fs.readFileSync(gsrc, 'utf8')); if (h !== gman.source.sha256Canonical) fail(`stars-gaia: the cached source's canonical sha256 ${h.slice(0, 12)}… ≠ the manifest's ${String(gman.source.sha256Canonical).slice(0, 12)}…`); cacheNote += ' (the Gaia source matches)'; }
+  // the faint superset (the follow-up): recorded with its own hash and counts when it was read; its kept count is within the whole
+  if (gman.sourceFaint) {
+    const fsrc = path.join(ROOT, gman.sourceFaint.file);
+    if (fs.existsSync(fsrc)) { const h = canonicalSha256(fs.readFileSync(fsrc, 'utf8')); if (h !== gman.sourceFaint.sha256Canonical) fail(`stars-gaia: the cached faint source's canonical sha256 ${h.slice(0, 12)}… ≠ the manifest's ${String(gman.sourceFaint.sha256Canonical).slice(0, 12)}…`); cacheNote += ' (the faint source matches)'; }
+    if (!(gman.counts.supersetFaint > 0 && gman.counts.keptFaint >= 0 && gman.counts.keptFaint <= gman.counts.kept && gman.cuts.faint && gman.cuts.faint.completeToYears === 2e7)) fail('stars-gaia: the faint superset\'s counts or cuts are inconsistent');
+  }
 }
 
 // 8. the zodiac band of date (plan 28 §F2; ONE home packages/physics/src/sky/ecliptic-constellations.cjs): the boundary

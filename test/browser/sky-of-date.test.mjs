@@ -30,27 +30,35 @@ const D2R = Math.PI / 180;
 
 await sim.page.waitForFunction(() => window.__test__ && window.__test__.skyLoaded && window.__test__.skyLoaded(), null, { timeout: 120000 });
 
-// 1. the referee — per star: the plan's 1″ / 10″ where the measurement allows (Sirius, Arcturus,
-// α Cen), the rigorous model's measured light-time gap rounded up for the two fastest stars
-// (the record carries each star's tolerance; a wrong unit or sign fails by degrees)
+// 1. the referee — per star: the scene's GEOMETRIC place (the inertial velocity, where the star IS at the instant)
+// against the record's geometric place (pyerfa starpv + pvu) within the plan's 1″ / 10″ for EVERY star — the
+// residual is the tidal curvature of the Galactic orbit; and against astropy's APPARENT place (the same line placed
+// at the emission instant) within the recorded light-time term plus that tolerance: the referee's model is the
+// inertial-velocity line at the emission instant, both terms ~1e-4 of the motion with opposite signs (doc 111 §1.48).
+// A wrong unit or sign fails by degrees.
 let n = 0; const worst = [];
+const LT_TOL = REF.tolerancesArcsec.lightTimeArcsec || 0.05;
 for (const [hipStr, rec] of Object.entries(REF.stars)) {
   const hip = Number(hipStr);
-  let w10 = 0, w100 = 0;
+  let w10 = 0, w100 = 0, wApp = 0;
   for (const p of rec.positions) {
     if (p.year === 2000) continue;
     const d = await sim.page.evaluate(({ hip, y }) => window.__test__.starDirectionAt(hip, y), { hip, y: p.year });
     if (!d) { check(`referee: HIP ${hip} at ${p.year} is in the scene`, false, 'null'); continue; }
     const plant = PLANT ? 2 / 3600 : 0;
-    const dra = ((d.raDeg + plant) - p.raDeg) * Math.cos(p.decDeg * D2R) * 3600, ddec = (d.decDeg - p.decDeg) * 3600;
-    const sep = Math.hypot(dra, ddec);
+    const sepTo = (q) => { const dra = ((d.raDeg + plant) - q.raDeg) * Math.cos(q.decDeg * D2R) * 3600, ddec = (d.decDeg - q.decDeg) * 3600; return Math.hypot(dra, ddec); };
+    const sep = sepTo(p.geometric), sepApp = sepTo(p);
     n++;
     if (Math.abs(p.year - 2000) <= 10000) w10 = Math.max(w10, sep); else w100 = Math.max(w100, sep);
+    // the apparent place sits the light-time term from the geometric one: the scene's distance to it is at most the
+    // term plus the scene's own residual (the triangle inequality), and at least the term minus it
+    const tolHere = Math.abs(p.year - 2000) <= 10000 ? rec.toleranceArcsec['10kyr'] : rec.toleranceArcsec['100kyr'];
+    wApp = Math.max(wApp, Math.abs(sepApp - p.lightTimeArcsec) - Math.min(sep, tolHere) - LT_TOL);
   }
   const tol = rec.toleranceArcsec;
-  worst.push({ hip, name: rec.name || hip, w10, w100, ok: w10 <= tol['10kyr'] && w100 <= tol['100kyr'], tol });
+  worst.push({ hip, name: rec.name || hip, w10, w100, wApp, ok: w10 <= tol['10kyr'] && w100 <= tol['100kyr'] && wApp <= 0, tol, lt100: Math.max(...rec.positions.filter((p) => Math.abs(p.year - 2000) > 10000).map((p) => p.lightTimeArcsec)) });
 }
-check(`referee: ${n} star-epochs of five stars within each star's tolerance of astropy's space motion (±10 kyr / ±100 kyr)`, worst.every((w) => w.ok), worst.map((w) => `${w.name} ${w.w10.toFixed(2)}″/${w.w100.toFixed(1)}″ (≤ ${w.tol['10kyr']}/${w.tol['100kyr']})`).join(', '));
+check(`referee: ${n} star-epochs of five stars within 1″ / 10″ of the GEOMETRIC place of ERFA's space motion (±10 kyr / ±100 kyr), and the recorded light-time term from astropy's apparent place`, worst.every((w) => w.ok), worst.map((w) => `${w.name} ${w.w10.toFixed(2)}″/${w.w100.toFixed(1)}″ (≤ ${w.tol['10kyr']}/${w.tol['100kyr']}; light-time ${w.lt100.toFixed(1)}″ at 100 kyr)`).join(', '));
 
 // 2. purity
 const pur = await sim.page.evaluate(() => {
@@ -65,6 +73,8 @@ check('purity: a star\'s direction at a year is the same number in any order of 
 const land = async (/** @type {string} */ y) => {
   await sim.page.evaluate((y) => { window.__test__.enterYearOfDate(y, '00:00:00'); window.__test__.skyUpdate(true); }, y);
   await sim.page.waitForTimeout(1200);
+  // the positions of date land asynchronously (a deep return after the worker evicted its far nodes rebuilds them, ~1.5 s)
+  await sim.page.waitForFunction(() => window.__test__.skySettled(), null, { timeout: 60000 });
   return sim.page.evaluate(() => { const S = window.__test__.skyState(); const g = {}; for (const k of ['UMa', 'Ori', 'Leo', 'Cas', 'Sco']) g[k] = S.groups[k] ? { rms: S.groups[k].rmsDeg, op: S.groups[k].opacity } : null; return { year: S.year, regime: S.regime, fade: S.regimeFade, g, dome: window.__test__.skyDomeProbe().brightness }; });
 };
 const s48 = await land('-48000 d172');
@@ -93,6 +103,43 @@ const orb = await sim.page.evaluate(() => { const T = window.__test__; const S =
 const pr = await sim.page.evaluate(() => { const S = window.__test__.skyState(); return { ratio: S.pixelRatio, setting: S.starsizeBase, base: S.baseSizeDevicePx }; });
 check('the sprites\' base size in device pixels is the setting × the renderer\'s pixel ratio / 2 (the look accepted on a ratio-2 display)', pr.ratio > 0 && pr.setting > 0 && Math.abs(pr.base - pr.setting * pr.ratio / 2) < 1e-9, `ratio ${pr.ratio}, setting ${pr.setting}, base ${pr.base} device px`);
 check('the orbit worker answers (positions settled, updates > 0); Sirius 2.64 pc today and 100–1000 pc at +20 Myr on its orbit (radial amplitude < 15 % of R₀)', orb.worker && orb.worker.updates > 0 && orb.settled === true && Math.abs(orb.siriusNow - 2.637) < 0.01 && orb.sirius20 > 100 && orb.sirius20 < 1000 && orb.amp < 0.15, `worker ${JSON.stringify(orb.worker)}, settled ${orb.settled}, Sirius ${orb.siriusNow.toFixed(3)} → ${orb.sirius20.toFixed(0)} pc, amp ${orb.amp.toFixed(3)}`);
+// The node PREFETCH: after a landing the worker builds the nodes within ±2 of the current one in idle ticks (the
+// direction of travel first), so a landing one node on finds its node cached (hit), while a jump across the regime
+// still builds its chain (no hit); and a prefetched node IS the landing's node bit for bit — Sirius's drawn position
+// (the worker's Float32 buffer) ≡ the main thread's own integration from the epoch on the same schedule.
+const settle = () => sim.page.waitForFunction(() => window.__test__.skySettled(), null, { timeout: 60000 });
+await land('3000000 d172'); await settle();
+await sim.page.waitForTimeout(2500);   // the idle prefetch (four nodes of the named tier, ~60 ms each)
+const pf0 = await sim.page.evaluate(() => window.__test__.skyState().worker);
+await land('7000000 d172'); await settle();
+const pf1 = await sim.page.evaluate(() => { const T = window.__test__; const S = T.skyState(); const u = T.starPositionUnits(32349); const d = T.starDirectionAt(32349, S.year); return { worker: S.worker, year: S.year, drawn: u.units.map((v) => v / u.unitsPerPc), direct: d.local.map((v) => v * d.distPc) }; });
+const pfOff = Math.hypot(...pf1.drawn.map((v, k) => v - pf1.direct[k])) / Math.hypot(...pf1.direct);
+// (this landing follows −70 Myr and +7 Myr: a single 'deep' sampler for both directions had the future landing replace
+// the past-built one and this landing threw "outside the built range" — the deep sampler is per direction now)
+let landedBack = true;
+try { await land('-47000000 d172'); await settle(); } catch (e) { landedBack = false; console.log('  landing at −47 Myr after +7 Myr threw:', String(e && e.message || e).split('\n')[0]); }
+const pf2 = await sim.page.evaluate(() => window.__test__.skyState().worker);
+check('a deep landing after one in the other direction lands (−70 → +7 → −47 Myr: the deep sampler is per direction)', landedBack && Math.abs(pf2.nodes.hip.nodeIndex + 9) === 0, `landed ${landedBack}, node ${pf2.nodes && pf2.nodes.hip.nodeIndex}`);
+check('the node prefetch: after a landing at +3 Myr the worker has prefetched nodes; +7 Myr lands on node 1 cached (hit), −47 Myr on node −9 uncached; the drawn Sirius ≡ the main thread\'s integration (< 1e-6)', pf0.prefetched >= 2 && !!pf1.worker.nodes && pf1.worker.nodes.hip.nodeIndex === 1 && pf1.worker.nodes.hip.hit === true && !!pf2.nodes && pf2.nodes.hip.nodeIndex === -9 && pf2.nodes.hip.hit === false && pfOff < 1e-6, `prefetched ${pf0.prefetched} → ${pf1.worker.prefetched} nodes in ${pf1.worker.prefetchMs && pf1.worker.prefetchMs.toFixed(0)} ms, nodes ${JSON.stringify(pf1.worker.nodes)} / ${JSON.stringify(pf2.nodes)}, Sirius off ${pfOff.toExponential(2)}`);
+// BIRTHS: a star whose lifetime is over is replaced by the next generation of its luminosity — its statistical twin
+// drawn at a seeded place at the same latitude and distance. At J2000 nobody has been replaced; at +30 Myr every
+// star with τ ≤ 30 Myr has (1,780 of the catalogue: the brightest, M_V < −3.6), Rigel (τ 4.4 Myr) in its sixth
+// generation at another place than its generation-0 twin (the same distance), Sirius (τ 1.1 Gyr) in its own; the
+// generation and the place are pure in the year (the same after landing elsewhere and back).
+const tauOf = (M) => 1e10 * Math.pow(10 ** ((4.83 - M) / 2.5), -2.5 / 3.5);
+const cci = Object.fromEntries(CAT.columns.map((c, i) => [c, i]));
+const nDead30 = CAT.stars.filter((r) => tauOf(r[cci.vmag] - 5 * Math.log10(r[cci.distPc] / 10)) <= 3e7).length;
+await land('2000 d172'); await settle();
+const b0 = await sim.page.evaluate(() => window.__test__.skyState().births);
+await land('2000000 d172'); await settle();
+const b2 = await sim.page.evaluate(() => { const T = window.__test__; return { births: T.skyState().births, built: T.skyState().statisticalTierBuilt, rigel: T.twinGenerationAt(24436) }; });
+await land('30000000 d172'); await settle();
+const b30 = await sim.page.evaluate(() => { const T = window.__test__; return { births: T.skyState().births, built: T.skyState().statisticalTierBuilt, rigel: T.twinGenerationAt(24436), sirius: T.twinGenerationAt(32349) }; });
+await land('2000 d172'); await settle();
+await land('30000000 d172'); await settle();
+const b30b = await sim.page.evaluate(() => window.__test__.twinGenerationAt(24436));
+const rigelMoved = b2.rigel && b2.rigel.position && b30.rigel.position && Math.hypot(...b30.rigel.position.map((v, k) => v - b2.rigel.position[k])) > 1e-3 * Math.hypot(...b2.rigel.position) && Math.abs(Math.hypot(...b30.rigel.position) / Math.hypot(...b2.rigel.position) - 1) < 1e-6;
+check(`births: nobody replaced at J2000; at +30 Myr ${nDead30} stars (τ ≤ 30 Myr) replaced by their next generation; Rigel's twin in generation 6 at another place (the same distance) than at +2 Myr (generation 0), Sirius in generation 0; pure in the year`, b0 && b0.born === 0 && b2.rigel && b2.rigel.gen === 0 && b30.built === true && Math.abs(b30.births.born - nDead30) <= 3 && b30.rigel.gen === 6 && b30.sirius.gen === 0 && rigelMoved && JSON.stringify(b30b) === JSON.stringify(b30.rigel) && b30.births.shortLived === 3192, `born ${b0 && b0.born} / ${b30.births && b30.births.born} (expected ${nDead30}), Rigel gen ${b2.rigel && b2.rigel.gen} → ${b30.rigel && b30.rigel.gen} (τ ${b30.rigel && (b30.rigel.tau / 1e6).toFixed(2)} Myr), Sirius gen ${b30.sirius && b30.sirius.gen}, moved ${rigelMoved}, short-lived ${b30.births && b30.births.shortLived}`);
 // The stars that ARRIVE (plan 28 §D): the Gaia tier loaded (its counts the manifest's), its stars drawn as they
 // brighten past V 8 — at +20 Myr thousands of them are within the cut while today most sit far and faint.
 await sim.page.waitForFunction(() => window.__test__.skyGaiaLoaded() || window.__test__.skyGaiaFailed(), null, { timeout: 120000 });

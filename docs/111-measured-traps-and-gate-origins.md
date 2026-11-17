@@ -2661,13 +2661,13 @@ at ten times the distance for the same angular motion — the rigorous model's
 light-time geometry on the TRANSVERSE path. Two candidate corrections (the
 observed-span-minus-Δd/c light-time step, the Doppler factor on the
 velocities, in both signs and combinations) all ENLARGED the gap (to 96″ in
-the plan's own form), so the term is not a simple addition to the straight
-line and the straight line stays, exact in its own model; the gap is pinned
-per star in the record (Sirius, Arcturus, α Cen at 1″ / 10″; 61 Cyg 2″ /
-20″; Groombridge 3″ / 65″ — a regression pin that a wrong unit or sign fails
-by degrees, not a claim of agreement), and the term is named OPEN for the
-later regime. A referee whose own model you have not read is a number, not
-a check: name the model on both sides before setting a tolerance.
+the plan's own form), so the gap was pinned per star as a regression value
+(61 Cyg 2″ / 20″, Groombridge 3″ / 65″) and the term named open. It is
+RESOLVED in the follow-up block at the end of this section (the referee's
+model decomposed with its own library: two terms of the same size and
+opposite sign, each alone enlarging the gap). A referee whose own model you
+have not read is a number, not a check: name the model on both sides before
+setting a tolerance.
 
 **The gates.** `tools/verify/star-catalogue.js` (the tenth gate, 1 s): the v2
 columns, the epoch, every row finite, no HIP twice, the recorded counts ≡
@@ -2834,10 +2834,11 @@ synchronous stream is CUT at ~60 s on a row boundary, at a multiple of
 range. V and B−V come from G and BP−RP through cubics fitted at run time on
 the 21,090 Hipparcos-matched rows (rms 0.014 / 0.038 mag); every star is
 integrated over ±50 Myr at 0.5-Myr samples against the Sun's own orbit;
-119,410 are kept that ever reach V 8.05 (a first build selected by the
+119,412 are kept that ever reach V 8.05 (119,410 before the inertial
+velocities of the follow-up: two marginal stars flipped; a first build selected by the
 closed form with a 15 % amplitude cut and lost 411,311 of the superset — a
 third, the fast stars that arrive from farthest); 7,203 of them are within
-V 8 today (Hipparcos is incomplete past 7.3), 31,704 ever naked-eye; 3.8 MB
+V 8 today (Hipparcos is incomplete past 7.3), 31,702 ever naked-eye; 3.8 MB
 of Float32 columns, loaded after the catalogue. In the scene they brighten
 in past the shader's V 8 cut and the leaving stars fade; a star outliving
 its main-sequence lifetime fades (τ = 10 Gyr (L/L☉)^−0.714, a band: every
@@ -2933,6 +2934,95 @@ every crossing (the measured worst 20.9″) and the entered constellation
 identical, never the plan's 1e-3° against this referee; the J2000 ecliptic's
 thirteen crossings and Ophiuchus's 18.60° (18.9 days of the Sun's path) are
 pinned by value.
+
+**The follow-ups of plan 28 (the owner: "pick up the open items").**
+(i) **The light-time term, resolved — a referee's two terms can cancel, so
+decompose its model with its own library before adding a term.** ERFA's
+`starpm` (astropy's `apply_space_motion`), re-run step by step with pyerfa
+on the five referee stars, is two operations: `starpv` converts the
+catalogue's OBSERVED rates — the proper motion is the apparent angular rate,
+the radial velocity the Doppler one — to the inertial space velocity by
+Stumpff's (1985, A&A 144, 232) relativistic factors, ~v_r/c (0.16 km/s for
+Groombridge 1830); then the straight line on that velocity is placed at the
+EMISSION instant, dt + tl₁ − tl₂ (the light times before and after). Each
+term is ~1e-4 of the motion with the opposite first-order sign: Groombridge
+1830 at 100 kyr, the velocity term 96″, the light-time term 43″, the net
+52″ — which is why either one alone had enlarged the gap, and the explicit
+re-implementation reproduces astropy to 0.0000″ at every star-epoch. So the
+one home `sky/galactic-orbits` now reads the catalogue rates as observed
+rates (`inertialVelocityFactors`, the same fixed point as `starpv`; the Node
+gate holds it to pyerfa's velocity at 1e-6 km/s, measured 2e-8) and the scene
+draws the GEOMETRIC place — where a star IS at the instant, the place a
+camera flying to it needs — while the referee record carries both places and
+the light-time term between them: the scene within 1″ / 10″ of the geometric
+place for EVERY star (measured 0.03″ / 2.9″, the residual the tidal
+curvature of the Galactic orbit), and the apparent place the recorded term
+away (2.3″ Sirius, 43″ Groombridge at 100 kyr). (ii) **Births.** The
+lifetime band drew a star while |t| < τ and nothing after: at +40 Myr the
+sky had lost every star brighter than M_V −3.5 — Rigel, Deneb, Spica, the
+first-magnitude blue stars — with no successor, though a steady population
+replaces them. Now a star's statistical twin carries the star's own τ and a
+GENERATION ⌊|t|/τ⌋: once the star is dead the twin is drawn at full handover
+in every regime, born in a seeded place at the star's Galactic latitude and
+distance (one hash draw per cell, star and generation — order-independent),
+fading in over the first tenth of its life and out over the last, the place
+reseeded per generation; 3,192 of the catalogue's 41,394 stars (620
+naked-eye, the brightest of the sky) live under the 60-Myr regime, 1,780 are
+dead by +30 Myr (the gate counts them from the catalogue's own V and
+distance), Rigel (τ 4.4 Myr) is in its sixth generation there at another
+place than its generation-0 twin, Sirius (1.1 Gyr) in its own; the hover
+says so, an illustration. (iii) **The node prefetch** (the worker's idle
+time): after every answer the worker builds, one node per `setTimeout`
+tick so a `year` message interleaves, the nodes within ±2 of the current one
+in the direction of travel first, up to the regime's clamp (the init carries
+the limit — a genesis landing had integrated 880 nodes once); nodes farther
+than 6 from the current one are dropped, the epoch's never, so the memory is
+bounded (13 nodes per tier: 26 MB named, 74 MB arriving) and a dropped node
+rebuilds from its neighbour by the same steps — a prefetched node IS the
+landing's node bit for bit (the gate: Sirius's drawn position after a
+prefetched landing ≡ the main thread's own integration from the epoch,
+1.8e-8). A landing one node ahead reports `hit`; a jump across the regime
+reports a miss and builds its chain. (iv) **A lazy sampler keyed by tier is
+keyed by DIRECTION too** — found by the prefetch rows' landing sequence
+(−70 Myr, +7 Myr, −47 Myr): the browser kept ONE deep-tier sampler under
+`'deep'` while tracking the walked range per direction, so the future landing
+REPLACED the past-built sampler with one on [0, +7 Myr], the next past landing
+short of −70 Myr saw its range "already walked", read the future sampler and
+threw "outside the built range" — the landing handler died (reproducible by
+hand: a deep past jump, a deep future jump, a nearer past jump). The package
+twin rebuilds its sampler per call and never had it. One sampler per
+direction now; the gate lands the sequence. (v) **The faint background's
+completeness** — the superset of arriving stars was Gaia's M_G < 2 within
+1.5 kpc (1.15 million rows); the stars fainter than M_G 2 that reach V 8 come
+from within 160 pc (M_G 2) to 40 pc (M_G 5), and their counts within 1.5 kpc
+are 1.30 / 4.47 / 5.10 / 2.68 million per magnitude from M_G 2 to 6 — a
+plain extension is a day of the archive's 60-s streams. The straight line's
+closest approach and its time are computable in ADQL from the six-dimensional
+row, so the faint superset is pre-filtered SERVER-SIDE to the stars whose
+line passes within 2 r(M) inside ±30 Myr (r the V-8 distance with a 1-mag
+colour margin) — complete to the ±20 Myr where the line is within ~15 % of
+the orbit, the importer's integration still deciding; the fetch is a repo
+script now (`tools/pipeline/fetch-gaia-neighbours.js`, the first fetch had
+lived in a session scratchpad), each chunk verified against the archive's
+COUNT, the faint cache hashed beside the bright one. 809,928 rows pass the
+pre-filter (a fortieth of the 11 million); the archive served them at five
+minutes per 17,000-row chunk that night, so the fetch is PAUSED at chunk 9
+of 48 (the owner: "this takes too long") — the chunks are cached and
+`node tools/pipeline/fetch-gaia-neighbours.js --set faint` resumes, then
+`npm run import:gaia` reads both supersets and the manifest's `sourceFaint`
+turns the hover's sentence; until then the faint background thins with the
+distance in time, said so. Two archive traps: the
+anonymous queue refuses with 429 for hours at a time ("50 jobs"), so the
+fetch waits and retries; and the planner evaluates `LOG10(parallax)` on
+negative-parallax rows BEFORE the parallax cut ("cannot take logarithm of a
+negative number" on a `random_index` chunk while the whole-table COUNT had
+run), so a magnitude cut is written as a parallax bound and r(M) as
+10 · 10^((19 − G)/5)/plx — no logarithm in the clause. And one harness
+trap: `npm run check` run BESIDE `npm run test:browser` reported
+`scene-year-lengths.js FAIL (exit 1)` with no message — the suite runner's
+300-s timeout on a gate that takes 185 s alone, met under the browser
+tier's CPU load; the gate passed standalone (54 checks). The two tiers run
+one after the other.
 
 ---
 
@@ -3112,10 +3202,17 @@ The `test:snapshot` chain also carries:
   provenance); fail-proven under `ESSRT_PERI_SUN_PLANT=1` (the dome turned
   0.01 rad about its pole).
 - **`sky-of-date`** — the catalogue sky of plan 28 §B/C (§1.48): five
-  high-motion stars at ±10 kyr and ±100 kyr against astropy's space motion
-  on the same catalogue values, per-star tolerances (the plan's 1″ / 10″
-  where the rigorous model's light-time gap allows, the measured gap rounded
-  up where it does not); a star's direction the same in any order of asking
+  high-motion stars at ±10 kyr and ±100 kyr against ERFA's space motion on
+  the same catalogue values — within the plan's 1″ / 10″ of the GEOMETRIC
+  place for every star (measured 0.03″ / 2.9″) and the recorded light-time
+  term from astropy's apparent place (43″ for Groombridge 1830 at 100 kyr);
+  the node prefetch (a landing one node on hits its cached node, a jump
+  across the regime misses, the prefetched node ≡ the main thread's own
+  integration at 1.8e-8); a deep landing after one in the other direction
+  lands (−70 → +7 → −47 Myr: the deep sampler per direction); the births
+  (nobody replaced at J2000, 1,780 stars at +30 Myr counted from the
+  catalogue, Rigel's twin in generation 6 at another place, Sirius in
+  generation 0, pure in the year); a star's direction the same in any order of asking
   and a landing re-read bit-for-bit; the Big Dipper nearly gone and Orion
   still readable at −48 kyr, every shape gone at −198 kyr; the regime linear
   at −998 kyr, fading at −1.15 Myr, off at −10 Myr with the dome untouched;
@@ -3137,7 +3234,7 @@ The `test:snapshot` chain also carries:
   from "at 1.1 Myr the sky is more or less empty"; and since §D: the regimes
   'orbits' to ±50 Myr, 'handover' at −55 Myr, 'statistical' at −70 Myr, the
   orbit worker answering (settled, Sirius 2.64 pc today and 329 pc at
-  +20 Myr), the arriving stars loaded with the manifest's count (119,410;
+  +20 Myr), the arriving stars loaded with the manifest's count (119,412;
   7,203 within V 8 today, 19,381 at +20 Myr) — born from "can't we make the
   stars move 20 million years?"; the artistic layout a sky curve (Orion's and
   the Big Dipper's curves within 6° of their strokes' great-circle polylines,

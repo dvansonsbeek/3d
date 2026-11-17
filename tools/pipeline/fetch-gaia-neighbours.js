@@ -1,0 +1,125 @@
+#!/usr/bin/env node
+/**
+ * fetch-gaia-neighbours — the Gaia DR3 supersets the arriving stars are selected from (plan 28 §D and its
+ * follow-up, doc 111 §1.48), fetched from ESA's Gaia archive into the gitignored cache
+ * data/.cache/stars/ and read by tools/pipeline/import-gaia-neighbours.js. A repo script (the first fetch
+ * lived in a session scratchpad — a number a doc cannot reproduce from an artifact gets written by the script).
+ *
+ * Two supersets, each a CSV with the same columns:
+ *   bright  (gaia-neighbours.csv): every six-dimensional star within 1.5 kpc (parallax > 0.667 mas,
+ *           parallax/error > 5, a radial velocity) brighter than M_G 2 — the stars a naked-eye sky is made of
+ *           at any epoch; 1.15 million rows; the importer integrates every orbit over ±50 Myr.
+ *   faint   (gaia-neighbours-faint.csv): the stars of M_G 2 to 5 within 1.5 kpc (1.3 / 4.5 / 5.1 million per
+ *           magnitude — a day of the archive's streams) PRE-FILTERED SERVER-SIDE by the straight line's closest
+ *           approach, computable in ADQL from the row: d = 1000/plx, v_t = 4.740470463·μ/plx, v² = v_t² + v_r²,
+ *           d_min = d·v_t/v, t_ca = d·|v_r|/v² / (pc per km/s per year); kept where d_min ≤ 2·r(M) within
+ *           |t_ca| ≤ 30 Myr, or d ≤ 2·r(M) already, with r(M) = 10 pc · 10^((9 − M_G)/5) the V-8 distance with a
+ *           one-magnitude colour margin. The line is within ~15 % of the Galactic orbit at 20 Myr, so the faint
+ *           background is COMPLETE to about ±20 Myr and thins beyond (said in the hover); the importer's
+ *           integration still decides what is kept.
+ *
+ * The archive: the anonymous asynchronous job is capped at 60 s and the synchronous stream is CUT at ~60 s on a
+ * row boundary (a multiple of 8,192 rows) which a last-line check cannot see — so each superset is fetched in
+ * chunks keyed on random_index, every chunk verified against the archive's own COUNT for its range, and a chunk
+ * short of its count is split in two and refetched. A 429 (the anonymous queue full, 50 jobs) waits and retries.
+ *
+ * Usage: node tools/pipeline/fetch-gaia-neighbours.js --set bright|faint [--chunks N] [--count-only]
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.resolve(__dirname, '..', '..');
+const CACHE_DIR = path.join(ROOT, 'data', '.cache', 'stars');
+const TAP = 'https://gea.esac.esa.int/tap-server/tap/sync';
+const RANDOM_INDEX_MAX = 1811709771;   // gaiadr3.gaia_source: random_index 0 … 1,811,709,770
+
+const argv = process.argv.slice(2);
+const arg = (k, d) => { const i = argv.indexOf(k); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
+const SET = arg('--set', '');
+const COUNT_ONLY = argv.includes('--count-only');
+if (!['bright', 'faint'].includes(SET)) { console.error('Usage: node tools/pipeline/fetch-gaia-neighbours.js --set bright|faint [--chunks N] [--count-only]'); process.exit(1); }
+
+const COLUMNS = 'g.source_id, g.ra, g.dec, g.parallax, g.parallax_error, g.pmra, g.pmdec, g.radial_velocity, g.radial_velocity_error, g.phot_g_mean_mag, g.bp_rp, x.original_ext_source_id AS hip';
+const FROM = 'FROM gaiadr3.gaia_source AS g LEFT OUTER JOIN gaiadr3.hipparcos2_best_neighbour AS x ON x.source_id = g.source_id';
+const BASE = 'g.parallax > 0.667 AND g.parallax_over_error > 5 AND g.radial_velocity IS NOT NULL AND g.pmra IS NOT NULL';
+// No LOG10(parallax) anywhere: the archive's planner evaluates the expression on negative-parallax rows before the
+// parallax cut applies ("cannot take logarithm of a negative number" on a random_index chunk), so M_G bounds are
+// written as parallax bounds — M_G ≥ 2 ⟺ plx ≥ 10^((12 − G)/5) — and r(M) = 10 pc · 10^((9 − M_G)/5) as
+// 10 · 10^((19 − G)/5) / plx.
+const VT = '(4.740470463*SQRT(g.pmra*g.pmra + g.pmdec*g.pmdec)/g.parallax)';
+const V2 = `(POWER(${VT}, 2) + g.radial_velocity*g.radial_velocity)`;
+const R_OF_M = '(20*POWER(10, (19 - g.phot_g_mean_mag)/5)/g.parallax)';   // 2 × r(M): the margin on the V-8 distance (1 mag of colour, the orbit's curvature)
+const PC_PER_KMS_YR = 1.0227121650e-6;
+const SETS = {
+  bright: { file: 'gaia-neighbours.csv', chunks: 64, where: `${BASE} AND g.parallax < POWER(10, (12 - g.phot_g_mean_mag)/5)` },
+  faint: {
+    file: 'gaia-neighbours-faint.csv', chunks: 48,
+    where: `${BASE} AND g.parallax >= POWER(10, (12 - g.phot_g_mean_mag)/5) AND g.parallax < POWER(10, (15 - g.phot_g_mean_mag)/5) AND ( 1000/g.parallax <= ${R_OF_M} OR ( (1000/g.parallax) * ${VT} / SQRT(${V2}) <= ${R_OF_M} AND (1000/g.parallax) * ABS(g.radial_velocity) / ${V2} / ${PC_PER_KMS_YR} <= 3.0e7 ) )`,
+  },
+};
+const S = SETS[SET];
+const N_CHUNKS = Number(arg('--chunks', S.chunks));
+const OUT = path.join(CACHE_DIR, S.file);
+const TMP = path.join(CACHE_DIR, `${SET}-chunks`);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/** One synchronous TAP query (CSV text); a 429 (the anonymous queue full) waits and retries. @param {string} query */
+async function tap(query, maxrec) {
+  for (let attempt = 1; attempt <= 60; attempt++) {
+    const body = new URLSearchParams({ REQUEST: 'doQuery', LANG: 'ADQL', FORMAT: 'csv', QUERY: query });
+    if (maxrec) body.set('MAXREC', String(maxrec));
+    const res = await fetch(TAP, { method: 'POST', body, signal: AbortSignal.timeout(900000) });
+    const text = await res.text();
+    if (res.status === 429 || /maximum number of jobs/.test(text)) { console.log(`  ${new Date().toTimeString().slice(0, 8)} the archive's anonymous queue is full (429) — waiting 2 min (attempt ${attempt})`); await sleep(120000); continue; }
+    // a 408 ("Job timeout/aborted" — the archive's own budget on a slow query) or a 5xx: wait a minute and ask again
+    if (res.status === 408 || res.status >= 500) { console.log(`  ${new Date().toTimeString().slice(0, 8)} the archive answered ${res.status} — waiting 1 min (attempt ${attempt})`); await sleep(60000); continue; }
+    if (!res.ok || /<html/i.test(text)) throw new Error(`TAP ${res.status}: ${text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 600)}`);
+    return text;
+  }
+  throw new Error('the archive stayed busy for two hours');
+}
+/** The archive's COUNT for a random_index range. */
+async function countRange(lo, hi) {
+  const t = await tap(`SELECT COUNT(*) AS n ${FROM} WHERE g.random_index BETWEEN ${lo} AND ${hi} AND ${S.where}`);
+  const n = Number(t.trim().split('\n').pop());
+  if (!Number.isFinite(n)) throw new Error(`COUNT answered: ${t.slice(0, 200)}`);
+  return n;
+}
+/** Fetch one range complete: the rows must equal the COUNT, else the range is split in two. @returns {Promise<string[]>} the data lines */
+async function fetchRange(lo, hi, depth) {
+  const expected = await countRange(lo, hi);
+  if (expected === 0) return [];
+  const text = await tap(`SELECT ${COLUMNS} ${FROM} WHERE g.random_index BETWEEN ${lo} AND ${hi} AND ${S.where}`, 500000);
+  const lines = text.split('\n').filter((l) => l.length);
+  const header = lines.shift();
+  const complete = header && header.startsWith('source_id') && lines.length === expected && text.endsWith('\n') && lines[lines.length - 1].split(',').length === 12;
+  if (complete) { console.log(`  ${new Date().toTimeString().slice(0, 8)} [${lo}..${hi}]: ${lines.length} rows ≡ the archive's count`); return lines; }
+  if (depth >= 6) throw new Error(`[${lo}..${hi}]: ${lines.length} rows for the archive's ${expected} after six splits`);
+  console.log(`  [${lo}..${hi}]: ${lines.length} rows for the archive's ${expected} — the stream was cut; splitting`);
+  const mid = Math.floor((lo + hi) / 2);
+  return [...await fetchRange(lo, mid, depth + 1), ...await fetchRange(mid + 1, hi, depth + 1)];
+}
+
+async function main() {
+  fs.mkdirSync(TMP, { recursive: true });
+  if (COUNT_ONLY) { const n = await countRange(0, RANDOM_INDEX_MAX - 1); console.log(`${SET}: ${n} rows match`); return; }
+  const step = Math.ceil(RANDOM_INDEX_MAX / N_CHUNKS);
+  const all = [];
+  let header = null;
+  for (let i = 0; i < N_CHUNKS; i++) {
+    const lo = i * step, hi = Math.min(RANDOM_INDEX_MAX - 1, (i + 1) * step - 1);
+    const f = path.join(TMP, `chunk-${i}.csv`);
+    if (fs.existsSync(f)) { const t = fs.readFileSync(f, 'utf8').split('\n').filter((l) => l.length); header = header || t.shift(); all.push(...t); console.log(`  chunk ${i}: ${t.length} rows (cached)`); continue; }
+    const lines = await fetchRange(lo, hi, 0);
+    header = header || 'source_id,ra,dec,parallax,parallax_error,pmra,pmdec,radial_velocity,radial_velocity_error,phot_g_mean_mag,bp_rp,hip';
+    fs.writeFileSync(f, [header, ...lines].join('\n') + '\n');
+    all.push(...lines);
+    console.log(`${new Date().toTimeString().slice(0, 8)} chunk ${i} of ${N_CHUNKS}: ${lines.length} rows (${all.length} so far)`);
+  }
+  fs.writeFileSync(OUT, [header, ...all].join('\n') + '\n');
+  console.log(`wrote ${path.relative(ROOT, OUT)}: ${all.length} rows — now: node tools/pipeline/import-gaia-neighbours.js --write [--pin]`);
+}
+
+main().catch((e) => { console.error(e.message || e); process.exit(1); });

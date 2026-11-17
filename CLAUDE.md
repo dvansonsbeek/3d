@@ -592,7 +592,20 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   carries 20.5″ of annual aberration (every NAME agrees; the boundary sits
   up to 21″ off, pinned at 25″); the first check transformed the other
   frame first and read 0.00″ — compare the two frames' coordinates
-  directly. (§1.48)
+  directly. **A referee's two terms can cancel — decompose its model with
+  its own library before adding a term**: ERFA's space motion is the
+  inertial velocity (the catalogue's observed rates through Stumpff's
+  factors, ~v_r/c) placed at the emission instant; the two terms are the
+  same size with opposite signs (96″ and 43″ for Groombridge 1830 at
+  100 kyr, the net 52″), so either alone enlarged the gap; the one home
+  carries the factors, the scene draws the GEOMETRIC place and is held to
+  1″ / 10″ of it for every star, the light-time term recorded beside.
+  **A dead star's twin is the next generation** (born in a seeded place at
+  its latitude; 3,192 catalogue stars live under 60 Myr). **A prefetched
+  node is the landing's node bit for bit**, the cache bounded by eviction
+  that rebuilds from the neighbour. **A lazy sampler keyed by tier is keyed
+  by DIRECTION too** — one `'deep'` key let a future landing replace the
+  past sampler and the next past landing threw. (§1.48)
 
 ---
 

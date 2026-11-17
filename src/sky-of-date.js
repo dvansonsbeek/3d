@@ -15,19 +15,27 @@
  *   sky, the apparent magnitude V(t) = M + 5 log₁₀(d(t)/10 pc) in the shader.
  *
  * Inside ±1 Myr the orbit and the straight line agree to a fraction of a per cent; the referee of the era
- * (astropy's rigorous space motion, ERFA pmsafe — the gate test/browser/sky-of-date.test.mjs) differs by
- * its light-time geometry on the TRANSVERSE path (0.4″ at 100 kyr for Sirius, 54″ for Groombridge 1830),
- * pinned per star and named open (doc 111 §1.48). By 20 Myr a star's measured velocity error (~1 km/s,
- * 20 pc) makes its direction uncertain by degrees: the sky of date is statistically right, the real stars
- * at roughly the right places and brightnesses — not a star chart (the hover says so). A star is drawn
- * while V(t) ≤ 8 (the shader's cut, so the arriving stars brighten in and the leaving ones fade out) and
- * while |t| is within its main-sequence lifetime from its luminosity — a BAND: every star treated as
- * mid-life, births not predicted. The catalogue regime ends at ±50 Myr; across 50–60 Myr the catalogue
+ * (astropy's rigorous space motion, ERFA pmsafe — the gate test/browser/sky-of-date.test.mjs) is the line
+ * on the INERTIAL velocity (the catalogue's observed rates through Stumpff's factors — the one home's
+ * heliocentricGalacticState carries them) placed at the EMISSION instant, the apparent place; the scene
+ * draws the GEOMETRIC place (where a star IS at the instant — a camera can fly to it) and is held to the
+ * plan's 1″ / 10″ of the record's geometric place, the light-time term recorded beside it (doc 111 §1.48).
+ * By 20 Myr a star's measured velocity error (~1 km/s, 20 pc) makes its direction uncertain by degrees:
+ * the sky of date is statistically right, the real stars at roughly the right places and brightnesses —
+ * not a star chart (the hover says so). A star is drawn while V(t) ≤ 8 (the shader's cut, so the arriving
+ * stars brighten in and the leaving ones fade out) and while |t| is within its main-sequence lifetime from
+ * its luminosity — a BAND: every star treated as mid-life. BIRTHS: when a star's lifetime is over, its
+ * statistical twin takes its place as the next GENERATION of that luminosity (gen = ⌊|t|/τ⌋: a seeded place
+ * at the star's Galactic latitude, fading in over the first tenth of its life and out over the last, the
+ * place reseeded per generation) — the steady state of the population, an illustration said so in the
+ * hover: 3,192 of the catalogue's 41,394 stars (620 naked-eye, the brightest of the sky) live under 60 Myr.
+ * The catalogue regime ends at ±50 Myr; across 50–60 Myr the catalogue
  * hands over, STAR BY STAR (a seeded phase each; its statistical twin appears as it leaves), to the
  * STATISTICALLY EQUIVALENT sky of plan 28 §E: every catalogue star keeps its magnitude and its Galactic
- * latitude and takes a seeded longitude (the seed changes every 100 Myr) — the same brightnesses and the
- * same spread about the band, no shape and no name; drawn as a child of the Milky Way dome, which turns
- * with the Sun's Galactic orbit (once per 216 Myr, ONE home sky/galactic-frame).
+ * latitude and takes a seeded longitude (one hash draw per cell, star and generation; the cell changes every
+ * 100 Myr) — the same brightnesses and the same spread about the band, no shape and no name; drawn as a
+ * child of the Milky Way dome, which turns with the Sun's Galactic orbit (once per 216 Myr, ONE home
+ * sky/galactic-frame).
  *
  * The stars sit at their MEASURED distances (UNITS_PER_PC on the scene's 1 AU = 100), centred on the Sun
  * by the scene each frame, so zooming out passes Proxima and shows the neighbourhood as the 3-D cloud it
@@ -154,23 +162,30 @@ export function createSkyOfDate(deps) {
     // The visibility cut: a star is drawn while its apparent magnitude OF DATE (from the Sun, the attribute's
     // distance) is within uVLimit, fading over uVFade beyond — the arriving stars brighten in, the leaving fade
     // out. The lifetime band: alpha fades over the last uLifeFade of a star's main-sequence lifetime tau at |t|.
+    // BIRTHS (the statistical tier, uSide 1): a twin of generation gen ≥ 1 (gen = ⌊|t|/tau⌋, a CPU attribute) stands
+    // for the star born in the dead star's place — drawn at full handover whatever the regime, alive from gen·tau
+    // (fading in over uLifeFade·tau) to (gen+1)·tau (fading out over the same); gen 0 is the original's own twin.
     uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase * (S.pixelRatio || 1) / C.spriteReferencePixelRatio }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 }, uFade: { value: 1.0 }, uSide: { value: 0.0 }, uPhaseWidth: { value: C.handoverPhaseWidth }, uVLimit: { value: C.visibleVLimit }, uVFade: { value: C.visibleVFadeWidth }, uTimeYears: { value: 0.0 }, uLifeFade: { value: C.lifetimeFadeFraction } },
     vertexShader: `
       uniform float uBaseSize, uUnitsPerPc, uFade, uSide, uPhaseWidth, uVLimit, uVFade, uTimeYears, uLifeFade;
       attribute float absMag;
       attribute float phase;
       attribute float tau;
+      attribute float gen;
       attribute vec3 starColor;
       varying vec3 vColor;
       varying float vAlpha;
       void main() {
         vColor = starColor;
         float s = smoothstep(phase - uPhaseWidth, phase + uPhaseWidth, uFade);
-        float handover = abs(uSide - s);
+        float born = step(0.5, gen);
+        float handover = max(abs(uSide - s), uSide * born);
         float dSun = max(length(position) / uUnitsPerPc, 1.0e-6);
         float mSun = absMag + 5.0 * log(dSun / 10.0) / log(10.0);
         float visible = 1.0 - smoothstep(uVLimit, uVLimit + uVFade, mSun);
-        float alive = 1.0 - smoothstep(tau * (1.0 - uLifeFade), tau, uTimeYears);
+        float w = uLifeFade * tau, tStart = gen * tau, tEnd = (gen + 1.0) * tau;
+        float bornIn = mix(1.0, smoothstep(tStart, tStart + w, uTimeYears), born);
+        float alive = bornIn * (1.0 - smoothstep(tEnd - w, tEnd, uTimeYears));
         vAlpha = handover * visible * alive;
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         float dPc = max(length(mv.xyz) / uUnitsPerPc, 1.0e-6);
@@ -220,7 +235,7 @@ export function createSkyOfDate(deps) {
     S.n = n; S.epochYear = doc._meta.epochYear; S.counts = doc._meta.counts; S.names = doc.names || {};
     S.hip = new Int32Array(n); S.r0 = new Float64Array(3 * n); S.d0 = new Float64Array(n);
     S.raDeg = new Float64Array(n); S.decDeg = new Float64Array(n); S.pmRaMasYr = new Float64Array(n); S.pmDecMasYr = new Float64Array(n); S.rvKmS = new Float64Array(n);
-    S.vmag0 = new Float32Array(n); S.absMag = new Float32Array(n); S.tau = new Float32Array(n); S.hasRv = new Uint8Array(n); S.distFlag = new Uint8Array(n);
+    S.vmag0 = new Float32Array(n); S.absMag = new Float32Array(n); S.tau = new Float32Array(n); S.gen = new Int32Array(n); S.hasRv = new Uint8Array(n); S.distFlag = new Uint8Array(n);
     S.hipIndex = new Map();
     const colors = new Float32Array(3 * n);
     const brightIdx = [], faintIdx = [];
@@ -240,6 +255,11 @@ export function createSkyOfDate(deps) {
     }
     S.nNaked = brightIdx.length;
     S.brightIdx = Int32Array.from(brightIdx); S.faintIdx = Int32Array.from(faintIdx);
+    // the births: the shortest lifetime (the statistical tier must exist once the first star can have died) and the
+    // short-lived set — the stars that die inside the catalogue regime and its handover (the hover's count)
+    const shortLivedYears = C.catalogueRegimeYears + C.regimeFadeYears;
+    S.tauMin = Infinity; S.nShortLived = 0; S.nShortLivedNaked = 0;
+    for (let i = 0; i < n; i++) { if (S.tau[i] < S.tauMin) S.tauMin = S.tau[i]; if (S.tau[i] < shortLivedYears) { S.nShortLived++; if (S.vmag0[i] <= C.nakedEyeV) S.nShortLivedNaked++; } }
     S.pos = Float32Array.from(S.r0);   // the positions of date (pc, local frame): the epoch's until the first update lands
     W.hipSpare = new Float32Array(3 * n);
     // the Sun's state at the catalogue epoch, the same way the integrated set brings it there (one RK4 step from J2000)
@@ -271,6 +291,7 @@ export function createSkyOfDate(deps) {
     geo.setAttribute('absMag', new THREE.BufferAttribute(absMag, 1));
     geo.setAttribute('phase', new THREE.BufferAttribute(phase, 1));
     geo.setAttribute('tau', new THREE.BufferAttribute(tau, 1));
+    geo.setAttribute('gen', new THREE.BufferAttribute(new Float32Array(n), 1));   // the generation: 0 on every catalogue tier; the statistical tier's births update it
     const mat = starShader(pointTexture);
     const points = new THREE.Points(geo, mat);
     points.frustumCulled = false; points.name = name; points.renderOrder = renderOrder;
@@ -413,35 +434,61 @@ export function createSkyOfDate(deps) {
   /** The statistical sky's seed cell of a year: the 100-Myr cell the year falls in, counted from J2000 (0 holds today). @param {number} year */
   const seedCellOf = (year) => Math.floor((year - 2000) / C.statisticalSeedCellYears);
 
-  /** Build (or rebuild for a new seed cell) the statistical sky: every catalogue star's magnitude and Galactic
-   *  latitude kept, its longitude replaced by a seeded uniform draw — the same brightnesses and the same spread
-   *  about the band, no shape, no name; it turns with the band. Each star's twin carries the same handover phase,
-   *  so it appears as the star leaves; its lifetime is the Sun's (the twin stands for the sky's population). @param {number} cell */
-  function buildStatistical(cell) {
-    if (!S.loaded || galL === null) return;
-    if (stat.seedCell === cell && stat.points) return;
-    const rnd = mulberry32(0x5A17 ^ Math.imul(cell + 7919, 2654435761));
-    const n = S.n;
-    if (!stat.geo) {
-      const t = buildTier(S.matBright.uniforms.pointTexture.value, n, S.colors.slice(), S.absMag.slice(), S.phase.slice(), new Float32Array(n).fill(1e10), 'stars-statistical', -96);
-      stat.geo = t.geo; stat.mat = t.mat; stat.points = t.points;
-      stat.mat.uniforms.uSide.value = 1.0;
-      starsGroup.add(stat.points);   // in the catalogue frame, at the catalogue's distances; the Galactic turn is applied as a rotation of this object
-    }
+  /** A twin's seeded Galactic longitude (radians): ONE hash draw per (seed cell, star, generation) — the same number in
+   *  any order of asking; a new cell or a new generation draws another place. @param {number} cell @param {number} i @param {number} gen */
+  function twinLongitudeRad(cell, i, gen) {
+    const seed = (0x5A17 ^ Math.imul(cell + 7919, 2654435761) ^ Math.imul(i + 1, 0x9E3779B1) ^ Math.imul(gen + 1, 0x85EBCA6B)) >>> 0;
+    return mulberry32(seed)() * 2 * Math.PI;
+  }
+  /** Put a twin at its seeded longitude on its star's Galactic latitude and distance (the container's local frame). @param {Float32Array} p @param {number} i @param {number} cell @param {number} gen */
+  function placeTwin(p, i, cell, gen) {
     // the Galactic frame in the container's local coordinates (x = α 90°, y = the pole, z = the equinox):
     // X_g the centre, Z_g the pole, Y_g = Z_g × X_g (l = 90°)
     const T = TRIAD;
     const X = [T.x[1], T.x[2], T.x[0]], Y = [T.y[1], T.y[2], T.y[0]], Z = [T.z[1], T.z[2], T.z[0]];
-    const p = stat.geo.getAttribute('position').array;
-    for (let i = 0; i < n; i++) {
-      const l = rnd() * 2 * Math.PI, b = galB[i], cb = Math.cos(b), d = S.d0[i] * UNITS_PER_PC;
-      const gx = cb * Math.cos(l), gy = cb * Math.sin(l), gz = Math.sin(b);
-      p[3 * i] = d * (gx * X[0] + gy * Y[0] + gz * Z[0]);
-      p[3 * i + 1] = d * (gx * X[1] + gy * Y[1] + gz * Z[1]);
-      p[3 * i + 2] = d * (gx * X[2] + gy * Y[2] + gz * Z[2]);
+    const l = twinLongitudeRad(cell, i, gen), b = galB[i], cb = Math.cos(b), d = S.d0[i] * UNITS_PER_PC;
+    const gx = cb * Math.cos(l), gy = cb * Math.sin(l), gz = Math.sin(b);
+    p[3 * i] = d * (gx * X[0] + gy * Y[0] + gz * Z[0]);
+    p[3 * i + 1] = d * (gx * X[1] + gy * Y[1] + gz * Z[1]);
+    p[3 * i + 2] = d * (gx * X[2] + gy * Y[2] + gz * Z[2]);
+  }
+
+  /** Build (or rebuild for a new seed cell) the statistical sky: every catalogue star's magnitude and Galactic
+   *  latitude kept, its longitude replaced by a seeded draw — the same brightnesses and the same spread about the
+   *  band, no shape, no name; it turns with the band. Each star's twin carries the same handover phase, so it
+   *  appears as the star leaves, and the star's own lifetime: once the star is dead the twin is the next
+   *  GENERATION of its luminosity, born in a seeded place (updateGenerations). @param {number} cell */
+  function buildStatistical(cell) {
+    if (!S.loaded || galL === null) return;
+    if (stat.seedCell === cell && stat.points) return;
+    const n = S.n;
+    if (!stat.geo) {
+      const t = buildTier(S.matBright.uniforms.pointTexture.value, n, S.colors.slice(), S.absMag.slice(), S.phase.slice(), S.tau.slice(), 'stars-statistical', -96);
+      stat.geo = t.geo; stat.mat = t.mat; stat.points = t.points;
+      stat.mat.uniforms.uSide.value = 1.0;
+      starsGroup.add(stat.points);   // in the catalogue frame, at the catalogue's distances; the Galactic turn is applied as a rotation of this object
     }
+    const p = stat.geo.getAttribute('position').array;
+    for (let i = 0; i < n; i++) placeTwin(p, i, cell, S.gen[i]);
     stat.geo.getAttribute('position').needsUpdate = true;
     stat.seedCell = cell;
+  }
+
+  /** The births: each twin's generation at |t| (⌊|t|/τ⌋, 0 while its star lives); a twin whose generation moved is
+   *  re-placed by its new seed — the dead star's successor somewhere else at the same latitude. Pure in the year:
+   *  the generation and the place depend on |t| and the cell alone. @param {number} dtYears  the years from J2000 */
+  function updateGenerations(dtYears) {
+    const t = Math.abs(dtYears), n = S.n;
+    const genAttr = stat.geo ? stat.geo.getAttribute('gen') : null, p = stat.geo ? stat.geo.getAttribute('position').array : null;
+    let moved = 0, born = 0, maxGen = 0;
+    for (let i = 0; i < n; i++) {
+      const g = Math.floor(t / S.tau[i]);
+      if (g > 0) born++;
+      if (g > maxGen) maxGen = g;
+      if (g !== S.gen[i]) { S.gen[i] = g; moved++; if (genAttr) { genAttr.array[i] = g; if (p && stat.seedCell !== null) placeTwin(p, i, stat.seedCell, g); } }
+    }
+    if (moved && genAttr) { genAttr.needsUpdate = true; stat.geo.getAttribute('position').needsUpdate = true; }
+    S.births = { born, maxGen, shortLived: S.nShortLived, shortLivedNakedEye: S.nShortLivedNaked };
   }
 
   // ── the arriving stars (plan 28 §D) ─────────────────────────────────────────
@@ -478,7 +525,7 @@ export function createSkyOfDate(deps) {
       G.geo = t.geo; G.mat = t.mat; G.points = t.points;
       W.gaiaSpare = new Float32Array(3 * n);
       starsGroup.add(G.points);
-      const set = { type: 'init', set: 'gaia', n, raDeg: Float64Array.from(ra), decDeg: Float64Array.from(dec), distPc: Float64Array.from(d), pmRaMasYr: Float64Array.from(pmra), pmDecMasYr: Float64Array.from(pmde), rvKmS: Float64Array.from(rv), epochYear: G.epochYear };
+      const set = { type: 'init', set: 'gaia', n, raDeg: Float64Array.from(ra), decDeg: Float64Array.from(dec), distPc: Float64Array.from(d), pmRaMasYr: Float64Array.from(pmra), pmDecMasYr: Float64Array.from(pmde), rvKmS: Float64Array.from(rv), epochYear: G.epochYear, limitYears: C.catalogueRegimeYears + C.regimeFadeYears };
       if (W.worker) W.worker.postMessage(set, [set.raDeg.buffer, set.decDeg.buffer, set.distPc.buffer, set.pmRaMasYr.buffer, set.pmDecMasYr.buffer, set.rvKmS.buffer]);
       else G.integrated = integratedSet(set, heliocentricGalacticState, ORBIT_INTEGRATION.arriving);
       G.loaded = true;
@@ -492,7 +539,7 @@ export function createSkyOfDate(deps) {
   // ── the orbit worker ────────────────────────────────────────────────────────
   /** Start the orbit worker with the named catalogue; resolves when it reports the set ready (its bundle loads first). */
   function startWorker() {
-    const set = { type: 'init', set: 'hip', n: S.n, raDeg: Float64Array.from(S.raDeg), decDeg: Float64Array.from(S.decDeg), distPc: Float64Array.from(S.d0), pmRaMasYr: Float64Array.from(S.pmRaMasYr), pmDecMasYr: Float64Array.from(S.pmDecMasYr), rvKmS: Float64Array.from(S.rvKmS), epochYear: S.epochYear };
+    const set = { type: 'init', set: 'hip', n: S.n, raDeg: Float64Array.from(S.raDeg), decDeg: Float64Array.from(S.decDeg), distPc: Float64Array.from(S.d0), pmRaMasYr: Float64Array.from(S.pmRaMasYr), pmDecMasYr: Float64Array.from(S.pmDecMasYr), rvKmS: Float64Array.from(S.rvKmS), epochYear: S.epochYear, limitYears: C.catalogueRegimeYears + C.regimeFadeYears };
     let w = null;
     try { w = createWorker ? createWorker() : null; } catch (e) { console.error('sky orbit worker could not start —', e && e.message || e); }
     const mainThread = () => { W.worker = null; S.integrated = integratedSet({ ...set, raDeg: S.raDeg, decDeg: S.decDeg, distPc: S.d0, pmRaMasYr: S.pmRaMasYr, pmDecMasYr: S.pmDecMasYr, rvKmS: S.rvKmS }, heliocentricGalacticState); };
@@ -529,7 +576,7 @@ export function createSkyOfDate(deps) {
   }
   /** Positions have landed: swap the buffers in, fill the sprites, the fades, the labels, the lines. */
   function onPositionsMessage(m) {
-    W.busy = false; W.updates++; W.hipMs = m.hipMs; W.gaiaMs = m.gaiaMs;
+    W.busy = false; W.updates++; W.hipMs = m.hipMs; W.gaiaMs = m.gaiaMs; W.nodes = m.nodes || null; W.prefetched = m.prefetched || 0; W.prefetchMs = m.prefetchMs || 0;
     if (W.onFirst) { const f = W.onFirst; W.onFirst = null; f(); }
     if (m.hipBuf) { const old = S.pos; S.pos = m.hipBuf; W.hipSpare = old; }
     if (m.gaiaBuf) { if (m.gaiaDone) { const old = G.pos; G.pos = m.gaiaBuf; W.gaiaSpare = old; G.year = m.year; } else W.gaiaSpare = m.gaiaBuf; }
@@ -590,10 +637,12 @@ export function createSkyOfDate(deps) {
     S.sunHeightPc = sunHeightPcAtYear(year);
     S.bandShiftDeg = milkyWayLatitudeShiftDegAtYear(year);
     if (dome && dome.material && dome.material.map) dome.material.map.offset.y = -S.bandShiftDeg / 180;
-    // the statistical sky beyond the catalogue regime: built for the year's seed cell, handed over star by star
+    // the statistical sky beyond the catalogue regime: built for the year's seed cell, handed over star by star —
+    // and inside it as soon as the shortest-lived star can have died (its successor is drawn there: the births)
     S.seedCell = seedCellOf(year);
     stat.opacity = 1 - S.regimeFade;   // the share of the stars that have handed over (reported; the shader works per star)
-    if (stat.opacity > 0) buildStatistical(S.seedCell);
+    if (stat.opacity > 0 || Math.abs(dt) >= S.tauMin * (1 - C.lifetimeFadeFraction)) buildStatistical(S.seedCell);
+    updateGenerations(dt);
     if (stat.points) {   // the statistical sky turns with the band: a rotation about the Galactic pole in the container's frame
       const Z = TRIAD.z;
       stat.points.quaternion.setFromAxisAngle(new THREE.Vector3(Z[1], Z[2], Z[0]).normalize(), S.galacticTurnRad);
@@ -665,9 +714,11 @@ export function createSkyOfDate(deps) {
         // the share of the stars still in the catalogue at this fade (alpha ≥ 0.5) — ≈ regimeFade, one by one
         catalogueShare: S.phase ? (() => { let k = 0; for (let i = 0; i < S.n; i++) if (handoverAlpha(i, S.regimeFade).catalogue >= 0.5) k++; return k / S.n; })() : null,
         stars: S.n, nakedEye: S.nNaked, labels: S.labels.length, strokes: S.strokes.length, constellations: S.groups.size, layout: S.layout, groups, counts: S.counts,
-        worker: { present: !!W.worker, updates: W.updates, hipMs: W.hipMs, gaiaMs: W.gaiaMs },
+        worker: { present: !!W.worker, updates: W.updates, hipMs: W.hipMs, gaiaMs: W.gaiaMs, nodes: W.nodes || null, prefetched: W.prefetched || 0, prefetchMs: W.prefetchMs || 0 },
+        // the births: the stars whose lifetime is over at this |t| (their twins drawn as the next generation), the highest generation
+        births: S.births || null, statisticalTierBuilt: !!stat.geo,
         pixelRatio: S.pixelRatio, starsizeBase: settings().starsizeBase, baseSizeDevicePx: S.matBright ? S.matBright.uniforms.uBaseSize.value : null,
-        gaia: { loaded: G.loaded, failed: G.failed, n: G.n, year: G.year, visible: gaiaVisible, counts: G.manifest ? G.manifest.counts : null },
+        gaia: { loaded: G.loaded, failed: G.failed, n: G.n, year: G.year, visible: gaiaVisible, counts: G.manifest ? G.manifest.counts : null, faint: !!(G.manifest && G.manifest.sourceFaint), cuts: G.manifest ? G.manifest.cuts : null },
       };
     },
     /** The drawn lines of a constellation for the gates: per line object its sampled points (units, the container frame) and, for the
@@ -686,6 +737,13 @@ export function createSkyOfDate(deps) {
     },
     /** A statistical-sky star's container-frame position (units) for the gates (the seeded draw of the built cell). @param {number} i */
     statisticalPositionAt(i) { if (!stat.geo) return null; const p = stat.geo.getAttribute('position').array; return [p[3 * i], p[3 * i + 1], p[3 * i + 2]]; },
+    /** A star's twin for the gates: its generation at the current year, its lifetime, the twin's drawn position (units) and the
+     *  seeded longitude the place came from (null before the statistical tier exists). @param {number} hip */
+    twinGenerationAt(hip) {
+      const i = S.hipIndex.get(hip); if (i === undefined) return null;
+      const p = stat.geo ? stat.geo.getAttribute('position').array : null;
+      return { hip, gen: S.gen[i], tau: S.tau[i], absMag: S.absMag[i], cell: stat.seedCell, position: p ? [p[3 * i], p[3 * i + 1], p[3 * i + 2]] : null, longitudeRad: stat.seedCell === null ? null : twinLongitudeRad(stat.seedCell, i, S.gen[i]) };
+    },
     /** A star's handover alphas at the current fade (the shader's smoothstep in JS): {catalogue, statistical}, summing to 1. @param {number} hip */
     starHandoverAlpha(hip) { const i = S.hipIndex.get(hip); return i === undefined ? null : { hip, phase: S.phase[i], fade: S.regimeFade, ...handoverAlpha(i, S.regimeFade) }; },
     /** A catalogue star's drawn position (scene units in the container's frame — the Sun at the origin) and its absolute magnitude, at the current year. @param {number} hip */

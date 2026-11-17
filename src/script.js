@@ -2971,7 +2971,13 @@ function skyStatusClause(pos) {
   if (!Number.isFinite(pos)) return '';
   const dtYears = _engineYearTT(jdFromPos(pos)) - 2000;
   const lim = SKY_CONSTANTS.catalogueRegimeYears, fade = SKY_CONSTANTS.regimeFadeYears;
-  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 and Gaia DR3 positions, parallaxes, proper motions and radial velocities) carried on each star's GALACTIC ORBIT about its own guiding centre (an epicycle to second order in a cited local potential — McMillan 2017's R₀ and v₀, Bovy 2017's Oort B, the local density of McKee et al. 2015 — the Sun on its own; within ±1 Myr the orbit and a straight line agree to a fraction of a per cent), every star at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015), so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them. Stars that arrive from up to 1.5 kpc away (Gaia DR3's six-dimensional stars brighter than absolute magnitude 2 — the stars a naked-eye sky is made of; the fainter background thins with the distance in time) are drawn as they brighten past V 8 and leaving ones fade; a star outliving its main-sequence lifetime fades (a band — every star treated as mid-life, births not predicted); the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). By 20 Myr each star's measured velocity error (~1 km/s, 20 pc) makes its direction uncertain by degrees: the sky is statistically right — the real stars at roughly the right places and brightnesses — not a star chart. Valid to ±${(lim / 1e6).toFixed(0)} Myr of today.`;
+  const skyB = _skyOfDate.loaded ? _skyOfDate.state().births : null;
+  const skyBirths = skyB ? `${skyB.shortLived.toLocaleString('en-US')} of the catalogue's stars, ${skyB.shortLivedNakedEye} naked-eye ones, the brightest of the sky, live under ${((lim + fade) / 1e6).toFixed(0)} Myr; ${skyB.born.toLocaleString('en-US')} have been replaced at this date` : 'the stars brighter than absolute magnitude −3 live under 60 Myr';
+  const skyG = _skyOfDate.loaded ? _skyOfDate.state().gaia : null;
+  const skyFaint = skyG && skyG.faint
+    ? 'Gaia DR3\'s six-dimensional stars brighter than absolute magnitude 2 — the stars a naked-eye sky is made of — and, to absolute magnitude 5, the fainter background pre-selected by its straight-line approach, complete to about ±20 Myr and thinning beyond'
+    : 'Gaia DR3\'s six-dimensional stars brighter than absolute magnitude 2 — the stars a naked-eye sky is made of; the fainter background thins with the distance in time';
+  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 and Gaia DR3 positions, parallaxes, proper motions and radial velocities) carried on each star's GALACTIC ORBIT about its own guiding centre (an epicycle to second order in a cited local potential — McMillan 2017's R₀ and v₀, Bovy 2017's Oort B, the local density of McKee et al. 2015 — the Sun on its own; within ±1 Myr the orbit and a straight line agree to a fraction of a per cent), every star at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015), so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them. Stars that arrive from up to 1.5 kpc away (${skyFaint}) are drawn as they brighten past V 8 and leaving ones fade; a star outliving its main-sequence lifetime fades (a band — every star treated as mid-life) and a star of its luminosity is BORN in its place somewhere else at the same Galactic latitude (the next generation, a seeded place: the steady state of the population, an illustration — ${skyBirths}); the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). By 20 Myr each star's measured velocity error (~1 km/s, 20 pc) makes its direction uncertain by degrees: the sky is statistically right — the real stars at roughly the right places and brightnesses — not a star chart. Valid to ±${(lim / 1e6).toFixed(0)} Myr of today.`;
   const turns = Math.abs(dtYears) / (SKY_CONSTANTS.sunGalacticPeriodMyr * 1e6);
   const skyNow = _skyOfDate.loaded ? _skyOfDate.state() : null;
   const bob = skyNow && Number.isFinite(skyNow.sunHeightPc) ? ` The Sun sits ${Math.abs(skyNow.sunHeightPc).toFixed(0)} pc ${skyNow.sunHeightPc >= 0 ? 'north' : 'south'} of the Galactic plane (an oscillation of ±102 pc every 85 Myr in the same potential), so the band's midplane appears ${Math.abs(skyNow.bandShiftDeg).toFixed(1)}° ${skyNow.bandShiftDeg <= 0 ? 'south' : 'north'} — the parallax of the disc's light at 1.5 kpc, drawn as the dome's shift.` : '';
@@ -4749,6 +4755,7 @@ if (typeof window !== 'undefined') {
     statisticalPositionAt: (i) => _skyOfDate.statisticalPositionAt(i),
     starPositionUnits: (hip) => _skyOfDate.starPositionUnits(hip),
     starHandoverAlpha: (hip) => _skyOfDate.starHandoverAlpha(hip),
+    twinGenerationAt: (hip) => _skyOfDate.twinGenerationAt(hip),
     // Moon-ring gate hook: the RING's perigee and ascending
     // node of date read from the placed stack geometry — the apsidal arm's
     // offset (toward the apogee) and the Moon orbit plane's normal — in the
@@ -6400,7 +6407,7 @@ let o = {
   starDistanceScaleFact: 1.5,
   starDistance: 5000,
   starSize: 1,
-  starsizeBase: 42,   // the star sprites' base size (device px at pixel ratio 2; the sky module scales by the ratio) — the owner's pick after 50 ("a little weaker")
+  starsizeBase: 40,   // the star sprites' base size (device px at pixel ratio 2; the sky module scales by the ratio) — the owner's pick after 50, 42 and 30
   starNamesVisible: false,
   'Axis helpers': false,
   Orbits: true,
@@ -16449,11 +16456,19 @@ function _hybridSeriesSampleAt(yearIn) {
     // ran unseated from there: 0.06 s at −2.8 Gyr, 63 s at −2.9 Gyr, 130 s at the
     // position table's edge (doc 111 §1.35).
     const walkSpan = deepTierWalkSpanYears(t);
+    // ONE sampler PER DIRECTION (measured by the sky gate's prefetch rows: −70 Myr, then +30 Myr, then −47 Myr):
+    // a single 'deep' key had the future landing REPLACE the past-built sampler with one on [0, +30 Myr] while the
+    // past direction's walked range still read 70 Myr, so the next past landing short of it read the future
+    // sampler and threw "outside the built range" — the landing handler died. The factory's one shared walk
+    // makes the two samplers' nodes bit-identical.
+    const dirKey = dir < 0 ? 'deepPast' : 'deepFuture';
     if (walkSpan > _epsSeriesDeepRangeYr[dir]) {
       _epsSeriesDeepRangeYr[dir] = walkSpan;
-      _epsSeriesSamplers.set(key, _deepHistSeries().build(dir * walkSpan, 0, 5000));
+      _epsSeriesSamplers.set(dirKey, _deepHistSeries().build(dir * walkSpan, 0, 5000));
     }
-  } else if (!_epsSeriesSamplers.has(key)) {
+    return _epsSeriesSamplers.get(dirKey).at(t);
+  }
+  if (!_epsSeriesSamplers.has(key)) {
     _epsSeriesSamplers.set(key, _deepHistSeries().build(span, -span, _hybridGridStep(span)));
   }
   return _epsSeriesSamplers.get(key).at(t);

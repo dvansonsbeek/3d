@@ -58,6 +58,7 @@
     "build:body-tiers": "node tools/pipeline/build-body-tiers.js --write",
     "build:sky-dome": "node tools/pipeline/build-sky-dome.js --write",
     "import:stars": "node tools/pipeline/import-star-catalogue.js --write",
+    "fetch:gaia": "node tools/pipeline/fetch-gaia-neighbours.js --set bright && node tools/pipeline/fetch-gaia-neighbours.js --set faint",
     "import:gaia": "node tools/pipeline/import-gaia-neighbours.js --write",
     "import:boundaries": "node tools/pipeline/import-constellation-boundaries.js --write",
     "record:zodiac": "node tools/pipeline/record-zodiac-boundaries.mjs --write && python3 scripts/zodiac_boundary_reference.py --write",

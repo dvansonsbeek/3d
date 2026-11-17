@@ -68,6 +68,8 @@ export const KMS_TO_PC_PER_YEAR: 0.000001022712165;
 export const KMS_PER_MASYR_KPC: 4.740470463;
 /** G in pc (km/s)² / M☉ (IAU 2015 nominal GM☉ and the IAU parsec). */
 export const G_PC_KMS2_PER_MSUN: 0.00430091;
+/** The speed of light, km/s (SI). */
+export const SPEED_OF_LIGHT_KMS: 299792.458;
 /** 8-point Gauss–Legendre nodes and weights on [−1, 1] (Newton on the Legendre polynomial, once). Eight points
  *  reproduce the 16-point azimuth integral to 8e-7 pc over ±50 Myr at the model's largest amplitude (0.41 µs per
  *  star for 0.90 — the browser moves 450,000 orbits per update). */
@@ -88,9 +90,45 @@ export function localRotationCurve(): {
     verticalPeriodMyr: number;
 };
 /**
+ * The observed → inertial velocity factors (ERFA/SOFA `starpv`, after Stumpff 1985, A&A 144, 232). A catalogue's
+ * proper motion and radial velocity are the OBSERVED rates: the apparent angular rate is the true one divided by
+ * (1 + v_r/c) (the light-time's own rate — an approaching star's images arrive early) and the radial velocity is
+ * the Doppler one, so the inertial space velocity is the observed radial velocity × `radial` and the observed
+ * transverse velocity × `transverse`, with (βr, βt) solved by fixed point from the observed (βsr, βst):
+ *   d = 1 + βr,  w = βr² + βt²,  δ = −w / (√(1 − w) + 1),  βr ← d·βsr + δ,  βt ← d·βst;   radial = βr/βsr, transverse = d.
+ * ~1e-4 for a 30 km/s star — 25″ of Groombridge 1830's 100-kyr motion, half of astropy's former gap to the scene,
+ * the other half its light-time placement (doc 111 §1.48; the referee record carries both).
+ * @param {number} vrKmS  the observed radial velocity @param {number} vtKmS  the observed transverse speed
+ * @returns {{radial: number, transverse: number}}
+ */
+export function inertialVelocityFactors(vrKmS: number, vtKmS: number): {
+    radial: number;
+    transverse: number;
+};
+/**
+ * A star's INERTIAL space velocity in the equatorial (ICRS) axes, km/s, from its observed astrometry — the
+ * observed vector (the radial velocity along the direction, the proper motion along the east and north tangents)
+ * with each component scaled by `inertialVelocityFactors`.
+ * @param {{raDeg: number, decDeg: number, distPc: number, pmRaMasYr: number, pmDecMasYr: number, rvKmS: number}} a
+ * @returns {{position: number[], velocityKmS: number[], observedKmS: number[]}}  the direction × distance (pc), the inertial and the observed velocities
+ */
+export function inertialVelocityEquatorialKmS(a: {
+    raDeg: number;
+    decDeg: number;
+    distPc: number;
+    pmRaMasYr: number;
+    pmDecMasYr: number;
+    rvKmS: number;
+}): {
+    position: number[];
+    velocityKmS: number[];
+    observedKmS: number[];
+};
+/**
  * A star's heliocentric Galactic position (pc) and velocity (km/s) from its astrometry — X toward the
  * Galactic centre, Y along the rotation (l = 90°), Z toward the north Galactic pole; U, V, W likewise
- * (Johnson & Soderblom 1987's transformation written on the one-home triad).
+ * (Johnson & Soderblom 1987's transformation written on the one-home triad), the velocity the INERTIAL one
+ * (the catalogue's observed rates through `inertialVelocityFactors`).
  * @param {{raDeg: number, decDeg: number, distPc: number, pmRaMasYr: number, pmDecMasYr: number, rvKmS: number}} a
  */
 export function heliocentricGalacticState(a: {

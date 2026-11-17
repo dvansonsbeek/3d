@@ -91,9 +91,11 @@ function nodeState(set, nodeIndex) {
  * The integrated evaluator: fill buf (3n floats) with the local-frame heliocentric positions (pc) of every star of
  * an integrated set at an engine year, from the nearest node toward the epoch — pure in the year.
  * @param {ReturnType<typeof integratedSet>} set @param {number} year @param {Float32Array | Float64Array} buf @param {{x: number[], y: number[], z: number[]}} T
+ * @returns {{nodeIndex: number, hit: boolean, cached: number}}  the node used, whether it was already cached (a prefetch or an earlier landing), the cache size
  */
 export function fillLocalPositionsIntegrated(set, year, buf, T) {
   const sch = integrationSchedule(year, set.epochYear, set.sched);
+  const hit = set.nodes.has(sch.nodeIndex);
   const node = nodeState(set, sch.nodeIndex);
   const s = sch.remainder === 0 ? node : stepAll(node, sch.remainder, sch.steps);
   const n = set.n, qx = s[6 * n], qy = s[6 * n + 1], qz = s[6 * n + 2];
@@ -101,4 +103,41 @@ export function fillLocalPositionsIntegrated(set, year, buf, T) {
     const l = localOfGalactic(s[6 * i] - qx, s[6 * i + 1] - qy, s[6 * i + 2] - qz, T);
     buf[3 * i] = l[0]; buf[3 * i + 1] = l[1]; buf[3 * i + 2] = l[2];
   }
+  return { nodeIndex: sch.nodeIndex, hit, cached: set.nodes.size };
+}
+
+/**
+ * The node PREFETCH (plan 28 §D's follow-up): build ONE missing node within `radius` nodes of the current one, the
+ * direction of travel first (then the other side, nearest first), never beyond ±limitIndex (the regime's clamp —
+ * a node beyond it is never asked for). A node is built from its neighbour toward the epoch by the same steps a
+ * landing would take, so a prefetched node is the landing's node bit for bit (pure in the year). Returns the node
+ * built, or null when every node in the radius is cached. The worker calls this from idle ticks.
+ * @param {ReturnType<typeof integratedSet>} set @param {number} around @param {number} dir  +1 / −1 @param {number} radius @param {number} limitIndex
+ */
+export function prefetchOneNode(set, around, dir, radius, limitIndex) {
+  const d = dir >= 0 ? 1 : -1;
+  for (let k = 1; k <= radius; k++) {
+    for (const idx of [around + d * k, around - d * k]) {
+      if (Math.abs(idx) > limitIndex || set.nodes.has(idx)) continue;
+      nodeState(set, idx);
+      return idx;
+    }
+  }
+  return null;
+}
+
+/**
+ * Drop the cached nodes farther than `keep` nodes from the current one — never the epoch's (index 0), which every
+ * chain starts from. A dropped node that is asked for again rebuilds from its nearest cached neighbour toward the
+ * epoch by the same steps, bit for bit. Bounds the worker's memory (a node is 6 × 8 × (n + 1) bytes: 2 MB for the
+ * named tier, 5.7 MB for the arriving one). Returns the number dropped.
+ * @param {ReturnType<typeof integratedSet>} set @param {number} around @param {number} keep
+ */
+export function evictNodes(set, around, keep) {
+  let dropped = 0;
+  for (const idx of Array.from(set.nodes.keys())) {
+    if (idx === 0 || Math.abs(idx - around) <= keep) continue;
+    set.nodes.delete(idx); dropped++;
+  }
+  return dropped;
 }
