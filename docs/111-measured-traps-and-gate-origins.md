@@ -2675,8 +2675,15 @@ the rows, the pinned sizes, every stroke HIP in the catalogue (a stroke
 through a missing star would drop a vertex unseen), Sirius and Arcturus by
 value, the referee record generated on THIS catalogue (its sha256 — a
 catalogue change without a regenerated referee fails naming the command),
-the sources' canonical hashes against the cache where present; fail-proven
-with `ESSRT_STAR_CATALOGUE_PLANT=1` (one HIP duplicated). The browser gate
+the sources' canonical hashes against the cache where present; since §D the
+orbit model — the closed form against the exact integrator at its measured
+floor, the integrator's step convergence, Gliese 710's closest approach ≡
+the pinned value inside the published bracket — and the arriving stars'
+manifest and binary (the sha256, the size, every value finite, the
+distances within 1.5 kpc, the visible-today count recomputed from the rows,
+the colour relations' rms, the cuts ≡ the orbit home, the cached source's
+canonical hash); fail-proven with `ESSRT_STAR_CATALOGUE_PLANT=1` (one HIP
+duplicated). The browser gate
 `test/browser/sky-of-date.test.mjs` (in `test:snapshot`): the referee per
 star, purity (a direction the same in any order of asking; a landing
 re-read bit-for-bit), the fades at −48 kyr and −198 kyr by band, the regime
@@ -2761,9 +2768,82 @@ the catalogue's origin with M_V 4.81 and B−V 0.65 (Willmer 2018, ApJS 236,
 capped at the catalogue's reach (2,000 pc — ONE constant for the three sites
 that had `Infinity`). Gate rows: Sirius 2.637 pc / M +1.45 in scene units,
 the sky pass's scene, camera and Sun offset, the Sun point, the cap, α Cen B
-the nearest star. The motion regimes beyond ±1 Myr (the straight line's
-path error stated to ±20 Myr, §D's epicyclic orbits and lifetimes, the
-statistical sky with seeded motion) are the next step.
+the nearest star.
+
+**§D — the stars' Galactic orbits and the stars that arrive** (the owner:
+"can't we make the stars move 20 million years instead of 1? Are there no
+sources for a longer time?"). The sources exist: Gaia DR3's 33.8 million
+radial velocities. The limit was the model, and finding it took four
+referees. (1) Beyond 1 Myr a straight line is not a star's path: the tidal
+field and the vertical restoring force curve the relative path of two
+neighbours by a per cent of its length at 5 Myr, 15 % at 20 Myr, 40 % at
+50 Myr. (2) Hill's linearised epicycle about the LSR (Binney & Tremaine
+§3.2.3) read WORSE than the straight line at 1.3 Myr against the exact
+integration of its own potential — 0.57 pc for a star 19 pc away where the
+line was 0.035 — because the Sun's own 640-pc radial excursion (7 % of R₀)
+puts second-order terms of the guiding centre into the relative drift (a
+first attempt had also made the frame left-handed, with z toward the north
+pole; the Galaxy rotates counterclockwise about the SOUTH pole in a
+right-handed triad with x outward and y along the rotation). (3) The
+epicycle about each body's own guiding centre in polar coordinates, the
+azimuth integrated exactly on the harmonic radius (a closed form with a
+branch-corrected arctangent) and the radius carried to second order (the
+mean-radius shift ~A²/R₀, 62 pc for the Sun, and its 2κ harmonic; the
+initial conditions re-solved by fixed point) reads ≤ 1 % at 50 Myr for
+amplitudes ≤ 3 % of R₀, a few per cent at 10–14 %, and puts Gliese 710's
+closest approach at 1.295 Myr / 0.055 pc for the published 1.29 / 0.064
+(Bailer-Jones et al. 2018; de la Fuente Marcos 2022) — the straight line
+0.051. (4) But its floor is THIRD order in the amplitude: Sirius (amplitude
+10 % of R₀) 9.7″ from the exact orbit at 100 kyr where the line is 1.3″,
+and for the high-velocity stars a naked-eye catalogue holds the series
+breaks outright — Arcturus (33 % of R₀) 118° off at 10 kyr, Groombridge
+1830 (320 km/s) diverges to NaN. So the scene's evaluator is the
+POTENTIAL'S EXACT INTEGRATOR: RK4 in the inertial Galactocentric frame on
+the one potential (the power law v_c ∝ R^β with β = −0.162 from the Oort
+constants, Ω₀ from McMillan 2017's pair — the dome's — Bovy 2017's B, the
+harmonic vertical term on McKee et al. 2015's ρ₀, the Sun's velocity
+Schönrich et al. 2010, its height Bennett & Bovy 2019), on a DETERMINISTIC
+schedule so a position is pure in the year: nodes every 5 Myr from the
+catalogue epoch cached in the worker, each reached by whole 1-Myr steps, a
+year reached from its node by equal steps (the named tier: 12 ms per
+update; the arriving tier on 2-Myr steps and 10-Myr nodes: 125 ms; a
+landing that builds new nodes settles in 1.5–2.5 s). The closed form stays
+the potential's analytic check, gated against the integrator at its
+measured floor (1.13 % at 2.9 % amplitude, 11.1 % at 12.8 %, over
+±50 Myr — pinned as a regression, never as accuracy), and the amplitude is
+a diagnostic. The era referee holds at the tidal level (Sirius 1.3″ at
+100 kyr, Arcturus 7.2″, all inside the astropy tolerances).
+
+**The stars that arrive** (`tools/pipeline/import-gaia-neighbours.js`,
+`public/input/stars-gaia.bin` + `.json`): a relative speed of 20 km/s
+carries a star 400 pc in 20 Myr, so the bright sky of that epoch is made of
+stars that today sit hundreds of parsecs away, fainter than Hipparcos's
+V 8. The superset is every Gaia DR3 star within 1.5 kpc with a radial
+velocity brighter than M_G 2 (the stars a naked-eye sky is made of at any
+epoch; the fainter background thins with the distance in time, said so):
+1,154,102 rows — the anonymous asynchronous job is capped at 60 s and the
+synchronous stream is CUT at ~60 s on a row boundary, at a multiple of
+8,192 rows, which a last-line check cannot see: 64 chunks on
+`random_index`, each verified against the archive's own COUNT for its
+range. V and B−V come from G and BP−RP through cubics fitted at run time on
+the 21,090 Hipparcos-matched rows (rms 0.014 / 0.038 mag); every star is
+integrated over ±50 Myr at 0.5-Myr samples against the Sun's own orbit;
+119,410 are kept that ever reach V 8.05 (a first build selected by the
+closed form with a 15 % amplitude cut and lost 411,311 of the superset — a
+third, the fast stars that arrive from farthest); 7,203 of them are within
+V 8 today (Hipparcos is incomplete past 7.3), 31,704 ever naked-eye; 3.8 MB
+of Float32 columns, loaded after the catalogue. In the scene they brighten
+in past the shader's V 8 cut and the leaving stars fade; a star outliving
+its main-sequence lifetime fades (τ = 10 Gyr (L/L☉)^−0.714, a band: every
+star mid-life, births not predicted); the catalogue regime ends at ±50 Myr
+and the per-star handover to the statistical sky runs 50–60 Myr; an
+integration is CLAMPED there — a genesis landing had integrated 880 nodes
+of 41,000 stars, a minute of stale positions that every later gate row
+read. By 20 Myr a star's velocity error of 1 km/s is 20 pc, degrees of
+direction for a nearby star: the sky is statistically right, not a star
+chart (the hover says so). The sky reports loaded only once the worker is
+ready and the first positions are in (a landing read before that saw the
+epoch's sky and kept it as the purity row's reference).
 
 ---
 
@@ -2965,8 +3045,13 @@ The `test:snapshot` chain also carries:
   at 1.255 pc (the photometric clump's absence) — born from the owner's
   second look; and the per-star handover: at −1.1 Myr (fade 0.50) the
   catalogue share 0.48–0.52 and a star's two alphas summing to 1 — born
-  from "at 1.1 Myr the sky is more or less empty"; fail-proven under
-  `ESSRT_SKY_PLANT=1` (the scene's reading shifted 2″).
+  from "at 1.1 Myr the sky is more or less empty"; and since §D: the regimes
+  'orbits' to ±50 Myr, 'handover' at −55 Myr, 'statistical' at −70 Myr, the
+  orbit worker answering (settled, Sirius 2.64 pc today and 329 pc at
+  +20 Myr), the arriving stars loaded with the manifest's count (119,410;
+  7,203 within V 8 today, 19,381 at +20 Myr) — born from "can't we make the
+  stars move 20 million years?"; fail-proven under `ESSRT_SKY_PLANT=1` (the
+  scene's reading shifted 2″).
 - **The focused chain planet's orbit-plane grid** passes through the
   rendered Sun with its normal along the chain's orbit normal of date (born
   from the owner's "the tilt of Mercury's path floats above the Sun": the

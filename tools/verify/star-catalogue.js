@@ -107,6 +107,69 @@ if (fs.existsSync(cacheDir)) {
   cacheNote = cacheNote ? ` (cache: ${cacheNote.trim()})` : ' (every cached source matches)';
 } else cacheNote = ' (the source cache is absent — the hashes are not re-checked here)';
 
+// 6. the orbit model (plan 28 §D; ONE home packages/physics/src/sky/galactic-orbits.cjs): the closed form (the
+//    second-order epicycle) against the potential's exact integrator — the scene's evaluator — on the same potential:
+//    its MEASURED floor, 1.13 % of the relative vector over ±50 Myr at a 2.9 % radial amplitude and 11.1 % at 12.8 %
+//    (the floor is third order in the amplitude; pinned at 1.5 % / 12 % as a regression, never as accuracy); the
+//    integrator's step convergence (1-Myr vs 0.25-Myr steps); Gliese 710's closest approach ≡ the pinned model
+//    value, inside the published bracket (the physical check).
+const O = require(path.join(ROOT, 'packages/physics/src/sky/galactic-orbits.cjs'));
+const enc = rd('data/star-encounter-reference.json');
+{
+  const sunEl = O.orbitElements(null), sun0 = O.galactocentricState(null);
+  const sample = [[{ xPc: 12, yPc: -9, zPc: 8, uKmS: -12.7, vKmS: -6.66, wKmS: -1.51 }, 0.015], [{ xPc: 300, yPc: -200, zPc: 80, uKmS: 25, vKmS: -15, wKmS: 8 }, 0.12]];
+  for (const [h, tol] of sample) {
+    const el = O.orbitElements(h), s0 = O.galactocentricState(h);
+    for (const T of [-5e7, 2e7, 5e7]) {
+      const nSteps = Math.round(Math.abs(T) / O.ORBIT_INTEGRATION.named.stepYears);
+      const p = O.integrateOrbitRK4(s0, T, nSteps), q = O.integrateOrbitRK4(sun0, T, nSteps);
+      const exact = [p[0] - q[0], p[1] - q[1], p[2] - q[2]];
+      const m = O.heliocentricGalacticAtYear(el, sunEl, 2000 + T);
+      const off = Math.hypot(m[0] - exact[0], m[1] - exact[1], m[2] - exact[2]), rel = Math.hypot(...exact);
+      if (!(off / rel <= tol)) fail(`the epicycle (amplitude ${(100 * el.amplitudeFraction).toFixed(1)} % of R₀) is ${(100 * off / rel).toFixed(2)} % off the exact orbit at ${T / 1e6} Myr (≤ ${100 * tol} %)`);
+      const fine = O.integrateOrbitRK4(s0, T, 4 * nSteps);
+      const conv = Math.hypot(fine[0] - p[0], fine[1] - p[1], fine[2] - p[2]) / Math.hypot(p[0], p[1]);
+      if (!(conv < 1e-7)) fail(`the integrator's 1-Myr steps part from 0.25-Myr steps by ${conv.toExponential(2)} of the radius at ${T / 1e6} Myr`);
+    }
+  }
+  // Gliese 710
+  const g = enc.gaiaDr3;
+  const el = O.orbitElements(O.heliocentricGalacticState({ raDeg: g.raDeg, decDeg: g.decDeg, distPc: 1000 / g.parallaxMas, pmRaMasYr: g.pmRaMasYr, pmDecMasYr: g.pmDecMasYr, rvKmS: g.rvKmS }), g.epochYear);
+  let best = { d: Infinity, t: 0 };
+  for (let t = 0; t <= 3e6; t += 100) { const r = O.heliocentricGalacticAtYear(el, sunEl, g.epochYear + t); const d = Math.hypot(r[0], r[1], r[2]); if (d < best.d) best = { d, t }; }
+  const M = enc.model;
+  if (Math.abs(best.t / 1e6 - M.approachMyr) > M.tolerance.approachMyr || Math.abs(best.d - M.distancePc) > M.tolerance.distancePc) fail(`Gliese 710: the model reads ${(best.t / 1e6).toFixed(3)} Myr / ${best.d.toFixed(4)} pc, the record pins ${M.approachMyr} / ${M.distancePc}`);
+  if (best.t / 1e6 < M.physicalBracket.approachMyr[0] || best.t / 1e6 > M.physicalBracket.approachMyr[1] || best.d < M.physicalBracket.distancePc[0] || best.d > M.physicalBracket.distancePc[1]) fail(`Gliese 710: ${(best.t / 1e6).toFixed(3)} Myr / ${best.d.toFixed(4)} pc is outside the published bracket`);
+}
+
+// 7. the arriving stars (plan 28 §D): the manifest, its binary (the sha256, the size), the counts, the colour relations' rms
+const gman = rd('public/input/stars-gaia.json')._meta;
+{
+  const binPath = path.join(ROOT, gman.binary.file);
+  if (!fs.existsSync(binPath)) fail(`${gman.binary.file} is absent`);
+  else {
+    const bytes = fs.readFileSync(binPath);
+    const h = crypto.createHash('sha256').update(bytes).digest('hex');
+    if (h !== gman.binary.sha256) fail(`${gman.binary.file}: sha256 ${h.slice(0, 12)}… ≠ the manifest's ${String(gman.binary.sha256).slice(0, 12)}…`);
+    if (bytes.length !== 4 * gman.columns.length * gman.n) fail(`${gman.binary.file}: ${bytes.length} bytes for ${gman.columns.length} × ${gman.n} floats`);
+    const all = new Float32Array(bytes.buffer, bytes.byteOffset, bytes.length / 4);
+    let bad = 0; for (let i = 0; i < all.length; i++) if (!Number.isFinite(all[i])) bad++;
+    if (bad) fail(`${gman.binary.file}: ${bad} non-finite values`);
+    const n = gman.n, dCol = gman.columns.indexOf('distPc'), vCol = gman.columns.indexOf('vmag');
+    let dMin = Infinity, dMax = 0, vToday = 0;
+    for (let i = 0; i < n; i++) { const d = all[dCol * n + i]; if (d < dMin) dMin = d; if (d > dMax) dMax = d; if (all[vCol * n + i] <= gman.cuts.vLimit) vToday++; }
+    if (!(dMin > 1 && dMax <= 1500)) fail(`stars-gaia: distances ${dMin}–${dMax} pc (expected within 1.5 kpc, none inside 1 pc)`);
+    if (vToday !== gman.counts.visibleToday) fail(`stars-gaia: ${vToday} visible today from the rows, the manifest says ${gman.counts.visibleToday}`);
+  }
+  if (gman.epochYear !== 2016) fail(`stars-gaia: epochYear ${gman.epochYear}, not Gaia's J2016.0`);
+  if (gman.counts.kept !== gman.n) fail(`stars-gaia: counts.kept ${gman.counts.kept} ≠ n ${gman.n}`);
+  if (!(gman.counts.kept >= 100000 && gman.counts.kept <= 600000)) fail(`stars-gaia: ${gman.counts.kept} stars kept (100k–600k expected for V 8 within ±50 Myr)`);
+  if (!(gman.colourRelations.vMinusG.rms <= 0.02 && gman.colourRelations.bv.rms <= 0.05)) fail(`stars-gaia: the colour relations' rms ${gman.colourRelations.vMinusG.rms} / ${gman.colourRelations.bv.rms} (≤ 0.02 / 0.05)`);
+  if (gman.cuts.windowYears !== O.LOCAL_GALACTIC_KINEMATICS.catalogueRegimeYears || gman.cuts.sampleYears !== O.ORBIT_INTEGRATION.sampling.stepYears) fail('stars-gaia: the cuts do not match the orbit home');
+  const gsrc = path.join(ROOT, gman.source.file);
+  if (fs.existsSync(gsrc)) { const h = canonicalSha256(fs.readFileSync(gsrc, 'utf8')); if (h !== gman.source.sha256Canonical) fail(`stars-gaia: the cached source's canonical sha256 ${h.slice(0, 12)}… ≠ the manifest's ${String(gman.source.sha256Canonical).slice(0, 12)}…`); cacheNote += ' (the Gaia source matches)'; }
+}
+
 if (failures.length) {
   console.error(`FAIL star-catalogue: ${failures.length} problem(s)`);
   for (const f of failures) console.error('  ' + f);

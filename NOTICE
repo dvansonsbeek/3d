@@ -136,8 +136,10 @@ Data sources
                                Hipparcos, the New Reduction (van Leeuwen 2007) and the
                                Hipparcos Catalogue (ESA 1997, SP-1200), as hosted by
                                ESA's Gaia archive — free use with citation
-    ESA/Gaia/DPAC              Gaia DR3 radial velocities for the catalogue's stars
-                               (Gaia Collaboration 2023), CC BY-SA 3.0 IGO
+    ESA/Gaia/DPAC              Gaia DR3 radial velocities for the catalogue's stars, and
+                               the stars that ARRIVE (public/input/stars-gaia.bin: the
+                               six-dimensional stars within 1.5 kpc that ever reach V 8
+                               within ±50 Myr) (Gaia Collaboration 2023), CC BY-SA 3.0 IGO
                                https://www.cosmos.esa.int/gaia
     Pulkovo (Gontcharov 2006)  radial velocities where Gaia has none, VizieR III/252
     IAU WGSN                   the IAU Catalog of Star Names, CC BY 4.0

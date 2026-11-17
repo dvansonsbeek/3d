@@ -1,71 +1,78 @@
 /**
- * The sky of date — plan 28 §B/C (doc 111 §1.48).
+ * The sky of date — plan 28 §B/C/D/E (doc 111 §1.48).
  *
  * ONE home for the catalogue sky: the bright-star catalogue (public/input/stars.json v2 — Hipparcos-2
  * astrometry at the catalogue epoch, Gaia DR3 / Pulkovo radial velocities, the BSC designations, the
- * IAU names; written by tools/pipeline/import-star-catalogue.js) and the constellation strokes keyed
- * to HIP ids (public/input/constellations.json v2), drawn on the scene's star sphere and MOVED with
- * their space velocities — regime 1, the linear space motion:
+ * IAU names; written by tools/pipeline/import-star-catalogue.js), the constellation strokes keyed to
+ * HIP ids (public/input/constellations.json v2), and the stars that ARRIVE (public/input/stars-gaia.bin
+ * + .json — the Gaia DR3 six-dimensional stars within 1.5 kpc that ever reach V 8 within ±50 Myr,
+ * written by tools/pipeline/import-gaia-neighbours.js, loaded after the catalogue), every one MOVED on
+ * its Galactic orbit:
  *
- *   r(t) = r₀ + v·(t − t₀),   the direction r/|r| on the sphere,   V(t) = V₀ + 5 log₁₀(|r|/|r₀|),
+ *   the second-order epicycle about each body's own guiding centre, the Sun on its own, in a cited local
+ *   potential (ONE home @essrt/physics sky/galactic-orbits; the positions through sky-orbit-positions.js,
+ *   computed in the orbit worker sky-orbits-worker.js off the main thread) — the direction r/|r| on the
+ *   sky, the apparent magnitude V(t) = M + 5 log₁₀(d(t)/10 pc) in the shader.
  *
- * the plan's model, exact in itself. The referee (astropy's rigorous space motion, ERFA pmsafe — the
- * gate test/browser/sky-of-date.test.mjs) differs from this straight line by its light-time geometry on
- * the TRANSVERSE path: nothing for a star without proper motion, unchanged by the radial velocity,
- * ten times larger at ten times the distance for the same angular motion — 0.4″ at 100 kyr for
- * Sirius, 54″ for Groombridge 1830 (the fastest naked-eye star), measured and pinned per star in the
- * referee record, named open (doc 111 §1.48): the term belongs to a later regime, not to this one.
- * With r₀ = d·p̂ (the parallax distance, or the mode of a distance prior where the parallax is poor, flagged in the catalogue) and
- * v = d·(μα* ê_α + μδ ê_δ) + v_r p̂, exact in a straight line and valid while the Galactic curvature of
- * the relative orbit is invisible — ~(t/P_epi)² ≈ 3e-5 at 1 Myr (P_epi ≈ 170 Myr): the regime's edge,
- * ±1 Myr, is set by meaning, not numerics. Beyond it the catalogue hands over, across 0.2 Myr, to the
+ * Inside ±1 Myr the orbit and the straight line agree to a fraction of a per cent; the referee of the era
+ * (astropy's rigorous space motion, ERFA pmsafe — the gate test/browser/sky-of-date.test.mjs) differs by
+ * its light-time geometry on the TRANSVERSE path (0.4″ at 100 kyr for Sirius, 54″ for Groombridge 1830),
+ * pinned per star and named open (doc 111 §1.48). By 20 Myr a star's measured velocity error (~1 km/s,
+ * 20 pc) makes its direction uncertain by degrees: the sky of date is statistically right, the real stars
+ * at roughly the right places and brightnesses — not a star chart (the hover says so). A star is drawn
+ * while V(t) ≤ 8 (the shader's cut, so the arriving stars brighten in and the leaving ones fade out) and
+ * while |t| is within its main-sequence lifetime from its luminosity — a BAND: every star treated as
+ * mid-life, births not predicted. The catalogue regime ends at ±50 Myr; across 50–60 Myr the catalogue
+ * hands over, STAR BY STAR (a seeded phase each; its statistical twin appears as it leaves), to the
  * STATISTICALLY EQUIVALENT sky of plan 28 §E: every catalogue star keeps its magnitude and its Galactic
- * latitude and takes a seeded longitude (the seed changes every 100 Myr) — the same brightnesses and
- * the same spread about the band, no shape and no name, since no star of today's sky is in a known
- * place there; drawn as a child of the Milky Way dome, which turns with the Sun's Galactic orbit (once
- * per 216 Myr on McMillan 2017's R₀ and v₀, ONE home sky/galactic-frame). Regime 2 — the Galactic
- * orbits and the lifetimes between 1 and ~100 Myr, a band — is plan 28 §D, not built. The stars sit at
- * their MEASURED distances (UNITS_PER_PC on the scene's 1 AU = 100), centred on the Sun by the scene each
- * frame, so zooming out passes Proxima and Sirius and shows the neighbourhood as the 3-D cloud it is; a
- * sprite's size is the star's apparent magnitude at the camera. The Milky Way dome alone is a backdrop at
- * infinity (its group on the camera's position); the scene draws the sky in its own pass with a far
- * camera (script.js renderFrame), the depth cleared before the solar system.
+ * latitude and takes a seeded longitude (the seed changes every 100 Myr) — the same brightnesses and the
+ * same spread about the band, no shape and no name; drawn as a child of the Milky Way dome, which turns
+ * with the Sun's Galactic orbit (once per 216 Myr, ONE home sky/galactic-frame).
+ *
+ * The stars sit at their MEASURED distances (UNITS_PER_PC on the scene's 1 AU = 100), centred on the Sun
+ * by the scene each frame, so zooming out passes Proxima and shows the neighbourhood as the 3-D cloud it
+ * is; a sprite's size is the star's apparent magnitude at the camera. The Milky Way dome alone is a
+ * backdrop at infinity (its group on the camera's position); the scene draws the sky in its own pass with
+ * a far camera (script.js renderFrame), the depth cleared before the solar system.
  *
  * Recognisability: a constellation's shape is its stars' PAIRWISE angular separations (a rotation-
  * invariant description, so no best-fit rotation is needed); the RMS change of those separations since
  * the catalogue epoch fades its lines and its stars' names from RMS 1° (full) to 5° (gone).
  *
- * Frames: the catalogue is ICRS; the containers these objects sit in are aligned ONCE at init to the
+ * Frames: the catalogues are ICRS; the containers these objects sit in are aligned ONCE at init to the
  * J2000 equatorial frame through the world frame (the star-field rows of the perihelion-at-sun gate),
- * so a star's local coordinates are x = cos δ sin α, y = sin δ, z = cos δ cos α — the same convention
- * the former RA/Dec sprites used. Every position is pure in the ENGINE year (TT, Julian from J2000),
- * recomputed only when that year moves by a whole year (the sky moves ≤ 10″/yr).
+ * so a star's local coordinates are x = cos δ sin α, y = sin δ, z = cos δ cos α. Every position is pure
+ * in the ENGINE year (TT, Julian from J2000): the named tier is recomputed when that year moves a whole
+ * year (the sky moves ≤ 10″/yr), the arriving tier every thousand years (0.7′ at 100 pc); the worker
+ * answers asynchronously, one request in flight, the latest year winning.
  */
 
-/* global document */
-import { SUN_GALACTIC_ORBIT } from '@essrt/physics';
+/* global document, console */
+import { SUN_GALACTIC_ORBIT, LOCAL_GALACTIC_KINEMATICS, ORBIT_INTEGRATION, orbitElements, heliocentricGalacticState, galactocentricState, integratedStateAtYear, galacticTriadEquatorialJ2000, mainSequenceLifetimeYears } from '@essrt/physics';
+import { fillLocalPositionsIntegrated, integratedSet, localOfGalactic } from './sky-orbit-positions.js';
 
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
-const MAS_TO_RAD = Math.PI / 180 / 3.6e6;
-/** 1 km/s in parsecs per Julian year (the IAU parsec and the SI second). */
-const KMS_TO_PC_PER_YEAR = 1.02271216505e-6;
 /** The scene's units per parsec: 1 AU = 100 units (the scene's rule), 1 pc = 206,264.806 AU. The stars sit at their measured distances. */
 export const UNITS_PER_PC = 206264.806 * 100;
 
 export const SKY_CONSTANTS = Object.freeze({
-  linearRegimeYears: 1e6,        // regime 1: |t − t₀| ≤ 1 Myr (plan 28 §C)
-  regimeFadeYears: 2e5,          // the catalogue hands over to the statistical sky between 1.0 and 1.2 Myr
+  catalogueRegimeYears: LOCAL_GALACTIC_KINEMATICS.catalogueRegimeYears,   // the catalogue regime: |t − 2000| ≤ 50 Myr on the orbits (plan 28 §D; ONE home sky/galactic-orbits)
+  regimeFadeYears: 1e7,          // the catalogue hands over to the statistical sky between 50 and 60 Myr
   handoverPhaseWidth: 0.05,      // each star hands over at its OWN seeded moment in the window (a smoothstep this wide in the fade), so the sky stays full
   recognisableRmsDeg: [1, 5],    // the lines and names fade between these RMS separation changes
-  updateStepYears: 1,            // the sky is recomputed when the engine year moves this much
+  updateStepYears: 1,            // the named tier is recomputed when the engine year moves this much
+  gaiaUpdateStepYears: 1000,     // the arriving tier: 1 kyr (a 20 km/s star at 100 pc moves 0.7′)
   nakedEyeV: 6.5,                // the named/lined tier; fainter stars are the background tier
+  visibleVLimit: 8.0,            // a star is drawn while its apparent magnitude of date is within this (the shader's cut)
+  visibleVFadeWidth: 0.5,        // … fading out over this much beyond it
+  lifetimeFadeFraction: 0.1,     // a star fades over the last tenth of its main-sequence lifetime (a band)
   statisticalSeedCellYears: 1e8, // plan 28 §E: the statistical sky's seed changes every 100 Myr
   sunGalacticPeriodMyr: SUN_GALACTIC_ORBIT.periodMyr,   // the dome's turn (ONE home sky/galactic-frame)
   sunAbsMagV: 4.81,              // the Sun as a star: M_V (Willmer 2018, ApJS 236, 47) — seen from past the main camera's far plane
   sunBV: 0.65,                   // its colour (B−V, the same source)
 });
 
-/** mulberry32 — a small seeded PRNG: the statistical sky is reproducible per seed cell. @param {number} seed */
+/** mulberry32 — a small seeded PRNG: the statistical sky and the handover phases are reproducible per seed. @param {number} seed */
 function mulberry32(seed) {
   let a = seed >>> 0;
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -96,20 +103,24 @@ export function colorTemperature2rgb(kelvin) {
  * @param {any} deps.THREE
  * @param {any} deps.CSS2DObject
  * @param {(url: string) => Promise<any>} deps.fetchRepoJson
+ * @param {(url: string) => Promise<ArrayBuffer | null>} deps.fetchRepoBytes  a repo-relative binary (the arriving stars)
  * @param {string} deps.starsUrl
  * @param {string} deps.constellationsUrl
+ * @param {string} [deps.gaiaManifestUrl]  public/input/stars-gaia.json (absent: the sky runs on the Hipparcos catalogue alone)
  * @param {any} deps.starsGroup  the container the sprites and labels go in (aligned to the J2000 frame at init)
  * @param {any} deps.constellationsGroup  the container the lines go in
  * @param {(jdUT: number) => number} deps.engineYearOfJd  the ONE engine year (TT, Julian from J2000) of a scene instant
  * @param {any} deps.constellationMaterial  the asterism lines' LineDashedMaterial (cloned per constellation)
  * @param {any} deps.drawOnShaderProto  the curved layout's ShaderMaterial prototype (cloned per stroke; needs uOpacity)
  * @param {any[]} deps.drawMaterials  the array the draw-on animation walks
- * @param {() => void} [deps.renderOnce]
+ * @param {() => void} [deps.onPositions]  called when positions of date have landed (the labels and a paused frame need a render)
+ * @param {() => Worker | null} [deps.createWorker]  the orbit worker (null: positions are computed on the main thread)
  * @param {() => {starDistance: number, starsizeBase: number, namesVisible: boolean, layout: string}} deps.settings
  */
 export function createSkyOfDate(deps) {
-  const { THREE, CSS2DObject, fetchRepoJson, starsUrl, constellationsUrl, starsGroup, constellationsGroup, engineYearOfJd, constellationMaterial, drawOnShaderProto, drawMaterials, settings, dome, galacticTurnRadAtYear, galacticTriad } = deps;
+  const { THREE, CSS2DObject, fetchRepoJson, fetchRepoBytes, starsUrl, constellationsUrl, gaiaManifestUrl, starsGroup, constellationsGroup, engineYearOfJd, constellationMaterial, drawOnShaderProto, drawMaterials, settings, dome, galacticTurnRadAtYear, galacticTriad, onPositions, createWorker } = deps;
   const C = SKY_CONSTANTS;
+  const TRIAD = galacticTriad || galacticTriadEquatorialJ2000();
   /** The dome's base pose (the Galactic alignment at J2000, handed in at creation or by setDomeBase) and its turn of date. */
   const domeBase = new THREE.Quaternion();
   let domeBaseSet = false;
@@ -117,16 +128,12 @@ export function createSkyOfDate(deps) {
   /** The statistical sky (plan 28 §E): a child of the dome (it turns with the band), rebuilt per seed cell. */
   const stat = { points: null, geo: null, mat: null, seedCell: null, opacity: 0 };
 
-  /** @type {{
-   *  loaded: boolean, epochYear: number, n: number, nNaked: number,
-   *  hip: Int32Array, r0: Float64Array, v: Float64Array, d0: Float64Array, vmag0: Float32Array, hasRv: Uint8Array, distFlag: Uint8Array,
-   *  pos: Float32Array, sizeBright: Float32Array, sizeFaint: Float32Array, brightIdx: Int32Array, faintIdx: Int32Array,
-   *  hipIndex: Map<number, number>, names: Record<string, any>,
-   *  labels: Array<{obj: any, i: number, con: string | null}>, matBright: any, matFaint: any, geoBright: any, geoFaint: any,
-   *  strokes: Array<Array<number | {raDeg: number, decDeg: number}>>, groups: Map<string, {name: string, starIdx: number[], pairs: Int32Array, sep0: Float64Array, strokeIdx: number[], opacity: number, rmsDeg: number}>,
-   *  strokeGroup: string[], lineObjects: any[], layout: string, year: number, regimeFade: number, counts: any, textureReady: boolean,
-   * }} */
+  /** @type {any} The Hipparcos catalogue's state. */
   const S = /** @type {any} */ ({ loaded: false, epochYear: 1991.25, n: 0, nNaked: 0, labels: [], strokes: [], groups: new Map(), strokeGroup: [], lineObjects: [], layout: settings().layout || 'asterism', year: NaN, regimeFade: 1, counts: null, textureReady: false, names: {} });
+  /** @type {any} The arriving stars' state (plan 28 §D). */
+  const G = /** @type {any} */ ({ loaded: false, loading: false, failed: null, n: 0, year: NaN, manifest: null, epochYear: 2016, pos: null, absMag: null, vmag0: null, geo: null, mat: null, points: null });
+  /** The orbit worker: one request in flight, the latest year pending; the buffers ping-pong. */
+  const W = /** @type {any} */ ({ worker: null, busy: false, pending: NaN, hipSpare: null, gaiaSpare: null, hipMs: 0, gaiaMs: 0, updates: 0 });
 
   // The sprite's size is the star's APPARENT magnitude at the camera: m = M + 5 log₁₀(d_cam / 10 pc) with
   // d_cam the star's distance from the camera (the stars sit at their measured distances, so approaching
@@ -136,23 +143,32 @@ export function createSkyOfDate(deps) {
   // 0.15 / 0.07 of the base: m −1.4 → 0.80, 0 → 0.66, 2 → 0.46, 4 → 0.26, ≥ 6 → 0.07 (the first 3-D
   // build carried the tiers WITHOUT the attenuation — the bright stars twice too large, "too bright").
   const starShader = (pointTexture) => new THREE.ShaderMaterial({
-    // uFade is the regime fade (1 inside the linear regime, 0 beyond the window); uSide 0 for the catalogue
+    // uFade is the regime fade (1 inside the catalogue regime, 0 beyond the window); uSide 0 for the catalogue
     // tiers, 1 for the statistical tier. A star with handover phase p is in the catalogue while uFade > p and in
     // the statistical sky while uFade < p (a smoothstep of width uPhaseWidth between), so across the window the
     // stars hand over ONE BY ONE, each at full light — a tier-wide cross-fade had halved every star at the
     // midpoint and the faint tier sank into black ("at 1.1 Myr the sky is more or less empty").
-    uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 }, uFade: { value: 1.0 }, uSide: { value: 0.0 }, uPhaseWidth: { value: C.handoverPhaseWidth } },
+    // The visibility cut: a star is drawn while its apparent magnitude OF DATE (from the Sun, the attribute's
+    // distance) is within uVLimit, fading over uVFade beyond — the arriving stars brighten in, the leaving fade
+    // out. The lifetime band: alpha fades over the last uLifeFade of a star's main-sequence lifetime tau at |t|.
+    uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 }, uFade: { value: 1.0 }, uSide: { value: 0.0 }, uPhaseWidth: { value: C.handoverPhaseWidth }, uVLimit: { value: C.visibleVLimit }, uVFade: { value: C.visibleVFadeWidth }, uTimeYears: { value: 0.0 }, uLifeFade: { value: C.lifetimeFadeFraction } },
     vertexShader: `
-      uniform float uBaseSize, uUnitsPerPc, uFade, uSide, uPhaseWidth;
+      uniform float uBaseSize, uUnitsPerPc, uFade, uSide, uPhaseWidth, uVLimit, uVFade, uTimeYears, uLifeFade;
       attribute float absMag;
       attribute float phase;
+      attribute float tau;
       attribute vec3 starColor;
       varying vec3 vColor;
       varying float vAlpha;
       void main() {
         vColor = starColor;
         float s = smoothstep(phase - uPhaseWidth, phase + uPhaseWidth, uFade);
-        vAlpha = abs(uSide - s);
+        float handover = abs(uSide - s);
+        float dSun = max(length(position) / uUnitsPerPc, 1.0e-6);
+        float mSun = absMag + 5.0 * log(dSun / 10.0) / log(10.0);
+        float visible = 1.0 - smoothstep(uVLimit, uVLimit + uVFade, mSun);
+        float alive = 1.0 - smoothstep(tau * (1.0 - uLifeFade), tau, uTimeYears);
+        vAlpha = handover * visible * alive;
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         float dPc = max(length(mv.xyz) / uUnitsPerPc, 1.0e-6);
         float m = absMag + 5.0 * log(dPc / 10.0) / log(10.0);
@@ -174,9 +190,13 @@ export function createSkyOfDate(deps) {
     `,
     blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, vertexColors: true,
   });
+  /** Every sprite material of the sky, for the per-year uniforms. */
+  const allMaterials = () => [S.matBright, S.matFaint, S.sunMat, stat.mat, G.mat].filter(Boolean);
 
   /** The local unit vector of an ICRS direction (x = cos δ sin α, y = sin δ, z = cos δ cos α). */
   const localUnit = (raDeg, decDeg) => { const cd = Math.cos(decDeg * D2R); return [cd * Math.sin(raDeg * D2R), Math.sin(decDeg * D2R), cd * Math.cos(raDeg * D2R)]; };
+  /** The main-sequence lifetime band's attribute: a star's τ from its absolute magnitude, as Float32 (the Sun's 1e10 fits). */
+  const tauOf = (absMag) => mainSequenceLifetimeYears(absMag);
 
   /** Parse the v2 catalogue into the typed arrays. @param {any} doc */
   function ingest(doc) {
@@ -184,31 +204,32 @@ export function createSkyOfDate(deps) {
     const ci = Object.fromEntries(cols.map((c, i) => [c, i]));
     const n = rows.length;
     S.n = n; S.epochYear = doc._meta.epochYear; S.counts = doc._meta.counts; S.names = doc.names || {};
-    S.hip = new Int32Array(n); S.r0 = new Float64Array(3 * n); S.v = new Float64Array(3 * n); S.d0 = new Float64Array(n);
-    S.vmag0 = new Float32Array(n); S.absMag = new Float32Array(n); S.hasRv = new Uint8Array(n); S.distFlag = new Uint8Array(n);
+    S.hip = new Int32Array(n); S.r0 = new Float64Array(3 * n); S.d0 = new Float64Array(n);
+    S.raDeg = new Float64Array(n); S.decDeg = new Float64Array(n); S.pmRaMasYr = new Float64Array(n); S.pmDecMasYr = new Float64Array(n); S.rvKmS = new Float64Array(n);
+    S.vmag0 = new Float32Array(n); S.absMag = new Float32Array(n); S.tau = new Float32Array(n); S.hasRv = new Uint8Array(n); S.distFlag = new Uint8Array(n);
     S.hipIndex = new Map();
     const colors = new Float32Array(3 * n);
     const brightIdx = [], faintIdx = [];
     for (let i = 0; i < n; i++) {
       const r = rows[i];
-      const hip = r[ci.hip], ra = r[ci.raDeg], dec = r[ci.decDeg], pmra = r[ci.pmRaMasYr], pmde = r[ci.pmDecMasYr], rv = r[ci.rvKmS], vmag = r[ci.vmag], bv = r[ci.bv], d = r[ci.distPc];
+      const hip = r[ci.hip], ra = r[ci.raDeg], dec = r[ci.decDeg], rv = r[ci.rvKmS], vmag = r[ci.vmag], bv = r[ci.bv], d = r[ci.distPc];
       S.hip[i] = hip; S.hipIndex.set(hip, i);
-      const sa = Math.sin(ra * D2R), ca = Math.cos(ra * D2R), sd = Math.sin(dec * D2R), cd = Math.cos(dec * D2R);
-      // local axes: p̂ = (cd·sa, sd, cd·ca); ê_α (east) = (ca, 0, −sa); ê_δ (north) = (−sd·sa, cd, −sd·ca)
-      S.r0[3 * i] = d * cd * sa; S.r0[3 * i + 1] = d * sd; S.r0[3 * i + 2] = d * cd * ca;
-      const va = d * pmra * MAS_TO_RAD, vd = d * pmde * MAS_TO_RAD, vr = (rv === null ? 0 : rv) * KMS_TO_PC_PER_YEAR;
-      S.v[3 * i] = va * ca - vd * sd * sa + vr * cd * sa;
-      S.v[3 * i + 1] = vd * cd + vr * sd;
-      S.v[3 * i + 2] = -va * sa - vd * sd * ca + vr * cd * ca;
+      const u = localUnit(ra, dec);
+      S.r0[3 * i] = d * u[0]; S.r0[3 * i + 1] = d * u[1]; S.r0[3 * i + 2] = d * u[2];
+      S.raDeg[i] = ra; S.decDeg[i] = dec; S.pmRaMasYr[i] = r[ci.pmRaMasYr]; S.pmDecMasYr[i] = r[ci.pmDecMasYr]; S.rvKmS[i] = rv === null ? 0 : rv;
       S.d0[i] = d; S.vmag0[i] = vmag; S.hasRv[i] = rv === null ? 0 : 1; S.distFlag[i] = r[ci.distFlag];
       S.absMag[i] = vmag - 5 * Math.log10(d / 10);   // the absolute magnitude: the sprite's size is the apparent one at the camera
+      S.tau[i] = tauOf(S.absMag[i]);
       const rgb = colorTemperature2rgb(colourTemperatureKelvinFromBV(bv === null ? 0.6 : bv));
       colors[3 * i] = rgb[0]; colors[3 * i + 1] = rgb[1]; colors[3 * i + 2] = rgb[2];
       if (vmag <= C.nakedEyeV) brightIdx.push(i); else faintIdx.push(i);
     }
     S.nNaked = brightIdx.length;
     S.brightIdx = Int32Array.from(brightIdx); S.faintIdx = Int32Array.from(faintIdx);
-    S.pos = new Float32Array(3 * n);
+    S.pos = Float32Array.from(S.r0);   // the positions of date (pc, local frame): the epoch's until the first update lands
+    W.hipSpare = new Float32Array(3 * n);
+    // the Sun's state at the catalogue epoch, the same way the integrated set brings it there (one RK4 step from J2000)
+    S.sunStateAtEpoch = integratedSet({ n: 0, raDeg: [], decDeg: [], distPc: [], pmRaMasYr: [], pmDecMasYr: [], rvKmS: [], epochYear: S.epochYear }, heliocentricGalacticState).states0;
     S.colors = colors;
     // the handover phase: each star's own moment in the window, a seeded uniform draw kept clear of the
     // window's ends by the smoothstep's width, so every star completes its handover inside the window
@@ -225,43 +246,35 @@ export function createSkyOfDate(deps) {
     return { catalogue: s, statistical: 1 - s };
   }
 
-  /** The sprites: two Points (the naked-eye tier, the background tier) sharing the per-star position array through index-gathered geometries. */
+  /** A Points tier from per-star arrays. */
+  function buildTier(pointTexture, n, colors, absMag, phase, tau, name, renderOrder) {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3 * n), 3));
+    geo.setAttribute('starColor', new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('absMag', new THREE.BufferAttribute(absMag, 1));
+    geo.setAttribute('phase', new THREE.BufferAttribute(phase, 1));
+    geo.setAttribute('tau', new THREE.BufferAttribute(tau, 1));
+    const mat = starShader(pointTexture);
+    const points = new THREE.Points(geo, mat);
+    points.frustumCulled = false; points.name = name; points.renderOrder = renderOrder;
+    return { geo, mat, points };
+  }
+
+  /** The sprites: two Points (the naked-eye tier, the background tier) gathered from the per-star arrays by index, the Sun, the labels. */
   function buildSprites(pointTexture) {
-    const { starsizeBase } = settings();
-    const build = (idx, matRef) => {
-      const geo = new THREE.BufferGeometry();
-      const pos = new Float32Array(3 * idx.length), col = new Float32Array(3 * idx.length), absMag = new Float32Array(idx.length), phase = new Float32Array(idx.length);
-      for (let k = 0; k < idx.length; k++) { const i = idx[k]; col[3 * k] = S.colors[3 * i]; col[3 * k + 1] = S.colors[3 * i + 1]; col[3 * k + 2] = S.colors[3 * i + 2]; absMag[k] = S.absMag[i]; phase[k] = S.phase[i]; }
-      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      geo.setAttribute('starColor', new THREE.BufferAttribute(col, 3));
-      geo.setAttribute('absMag', new THREE.BufferAttribute(absMag, 1));
-      geo.setAttribute('phase', new THREE.BufferAttribute(phase, 1));
-      void starsizeBase;
-      const mat = starShader(pointTexture);
-      const points = new THREE.Points(geo, mat);
-      points.frustumCulled = false;
-      matRef.mat = mat; matRef.geo = geo; matRef.points = points;
-      return points;
-    };
-    const b = {}, f = {};
-    const pb = build(S.brightIdx, b), pf = build(S.faintIdx, f);
+    const gather = (idx, src, k) => { const out = new Float32Array(k * idx.length); for (let j = 0; j < idx.length; j++) for (let c = 0; c < k; c++) out[k * j + c] = src[k * idx[j] + c]; return out; };
+    const tier = (idx, name, order) => buildTier(pointTexture, idx.length, gather(idx, S.colors, 3), gather(idx, S.absMag, 1), gather(idx, S.phase, 1), gather(idx, S.tau, 1), name, order);
+    const b = tier(S.brightIdx, 'stars-naked-eye', -95), f = tier(S.faintIdx, 'stars-background', -97);   // the backdrop draws first (plan 28 §E); the sprites write no depth
     S.matBright = b.mat; S.geoBright = b.geo; S.matFaint = f.mat; S.geoFaint = f.geo;
-    pb.name = 'stars-naked-eye'; pf.name = 'stars-background';
-    pb.renderOrder = -95; pf.renderOrder = -97;   // the backdrop draws first (plan 28 §E); the sprites write no depth
     while (starsGroup.children.length) starsGroup.remove(starsGroup.children[0]);
-    starsGroup.add(pb); starsGroup.add(pf);
+    starsGroup.add(b.points); starsGroup.add(f.points);
     // The Sun as a star: one point at the catalogue's origin (the container is centred on the Sun) with the
     // Sun's absolute magnitude and colour, on the same shader — so a camera past the main scene's far plane
     // (0.05 pc) still sees the Sun as the star it is from there (V 1.8 at Proxima); inside the solar system
-    // the drawn Sun covers it. Always on: the Sun is the Sun in every regime.
-    const sunGeo = new THREE.BufferGeometry();
-    sunGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3));
-    sunGeo.setAttribute('starColor', new THREE.BufferAttribute(new Float32Array(colorTemperature2rgb(colourTemperatureKelvinFromBV(C.sunBV))), 3));
-    sunGeo.setAttribute('absMag', new THREE.BufferAttribute(new Float32Array([C.sunAbsMagV]), 1));
-    sunGeo.setAttribute('phase', new THREE.BufferAttribute(new Float32Array([-1]), 1));   // never hands over
-    const sunPoint = new THREE.Points(sunGeo, starShader(pointTexture));
-    sunPoint.name = 'sun-as-a-star'; sunPoint.renderOrder = -95; sunPoint.frustumCulled = false;
-    starsGroup.add(sunPoint); S.sunPoint = sunPoint;
+    // the drawn Sun covers it. Always on: the Sun is the Sun in every regime (phase −1: never hands over;
+    // the visibility cut reads its magnitude at the origin as −∞; its lifetime 1e10 years).
+    const sun = buildTier(pointTexture, 1, new Float32Array(colorTemperature2rgb(colourTemperatureKelvinFromBV(C.sunBV))), new Float32Array([C.sunAbsMagV]), new Float32Array([-1]), new Float32Array([1e10]), 'sun-as-a-star', -95);
+    starsGroup.add(sun.points); S.sunPoint = sun.points; S.sunMat = sun.mat;
     // the names (the IAU proper names), labels in the same group
     S.labels = [];
     const { namesVisible } = settings();
@@ -361,7 +374,7 @@ export function createSkyOfDate(deps) {
    *  statistical sky keeps b and V and scrambles l (plan 28 §E). Computed once after ingest. */
   let galL = null, galB = null;
   function computeGalactic() {
-    const T = galacticTriad;
+    const T = TRIAD;
     galL = new Float32Array(S.n); galB = new Float32Array(S.n);
     for (let i = 0; i < S.n; i++) {
       // local (x, y, z) = (Y_eq, Z_eq, X_eq) → equatorial (X, Y, Z) = (z, x, y), normalised
@@ -377,30 +390,22 @@ export function createSkyOfDate(deps) {
 
   /** Build (or rebuild for a new seed cell) the statistical sky: every catalogue star's magnitude and Galactic
    *  latitude kept, its longitude replaced by a seeded uniform draw — the same brightnesses and the same spread
-   *  about the band, no shape, no name; a child of the dome, so it turns with the band. The dome's texture frame:
-   *  +X the centre (l 0), +Y the pole, +Z = l 270 (the alignment's third axis is X × Y of the equatorial triad,
-   *  i.e. −Y_g). Drawn just inside the dome; the sprite size compensates the distance. @param {number} cell */
+   *  about the band, no shape, no name; it turns with the band. Each star's twin carries the same handover phase,
+   *  so it appears as the star leaves; its lifetime is the Sun's (the twin stands for the sky's population). @param {number} cell */
   function buildStatistical(cell) {
     if (!S.loaded || galL === null) return;
     if (stat.seedCell === cell && stat.points) return;
     const rnd = mulberry32(0x5A17 ^ Math.imul(cell + 7919, 2654435761));
     const n = S.n;
     if (!stat.geo) {
-      stat.geo = new THREE.BufferGeometry();
-      stat.geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3 * n), 3));
-      stat.geo.setAttribute('starColor', new THREE.BufferAttribute(S.colors.slice(), 3));
-      stat.geo.setAttribute('absMag', new THREE.BufferAttribute(S.absMag.slice(), 1));
-      stat.geo.setAttribute('phase', new THREE.BufferAttribute(S.phase.slice(), 1));   // the same phase per star: its twin appears as it leaves
-      stat.mat = starShader(S.matBright.uniforms.pointTexture.value);
+      const t = buildTier(S.matBright.uniforms.pointTexture.value, n, S.colors.slice(), S.absMag.slice(), S.phase.slice(), new Float32Array(n).fill(1e10), 'stars-statistical', -96);
+      stat.geo = t.geo; stat.mat = t.mat; stat.points = t.points;
       stat.mat.uniforms.uSide.value = 1.0;
-      stat.mat.uniforms.uFade.value = 1.0;
-      stat.points = new THREE.Points(stat.geo, stat.mat);
-      stat.points.frustumCulled = false; stat.points.renderOrder = -96; stat.points.name = 'stars-statistical';
       starsGroup.add(stat.points);   // in the catalogue frame, at the catalogue's distances; the Galactic turn is applied as a rotation of this object
     }
     // the Galactic frame in the container's local coordinates (x = α 90°, y = the pole, z = the equinox):
     // X_g the centre, Z_g the pole, Y_g = Z_g × X_g (l = 90°)
-    const T = galacticTriad;
+    const T = TRIAD;
     const X = [T.x[1], T.x[2], T.x[0]], Y = [T.y[1], T.y[2], T.y[0]], Z = [T.z[1], T.z[2], T.z[0]];
     const p = stat.geo.getAttribute('position').array;
     for (let i = 0; i < n; i++) {
@@ -414,47 +419,110 @@ export function createSkyOfDate(deps) {
     stat.seedCell = cell;
   }
 
-  /** The positions of date: r = r₀ + v·Δt for every star, the sprites' attributes, the labels, the fades, the lines. */
-  function computeForYear(year) {
-    const dt = year - S.epochYear;
-    const dtClamped = Math.max(-C.linearRegimeYears, Math.min(C.linearRegimeYears, dt));
-    const over = Math.abs(dt) - C.linearRegimeYears;
-    S.regimeFade = over <= 0 ? 1 : Math.max(0, 1 - over / C.regimeFadeYears);
-    // plan 28 §E: the dome turns with the Sun's Galactic orbit about its pole (the texture's local +Y)
-    S.galacticTurnRad = galacticTurnRadAtYear ? galacticTurnRadAtYear(year) : 0;
-    if (dome && domeBaseSet) {
-      dome.quaternion.copy(domeBase).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), S.galacticTurnRad));
-      dome.updateMatrixWorld();
+  // ── the arriving stars (plan 28 §D) ─────────────────────────────────────────
+  /** Load the Gaia tier: the manifest, the Float32 column binary, the sprites; then hand the set to the worker. */
+  async function loadGaia(pointTexture) {
+    if (!gaiaManifestUrl || G.loading || G.loaded) return;
+    G.loading = true;
+    try {
+      const man = await fetchRepoJson(gaiaManifestUrl);
+      if (!man || !man._meta || !man._meta.binary) throw new Error('stars-gaia.json: not the v1 manifest');
+      const bytes = await fetchRepoBytes(man._meta.binary.file);
+      if (!bytes) throw new Error(`${man._meta.binary.file}: unavailable`);
+      const cols = man._meta.columns, n = man._meta.n;
+      if (bytes.byteLength !== 4 * cols.length * n) throw new Error(`${man._meta.binary.file}: ${bytes.byteLength} bytes for ${cols.length} × ${n} floats`);
+      const all = new Float32Array(bytes);
+      const col = (name) => { const k = cols.indexOf(name); if (k < 0) throw new Error(`stars-gaia: column ${name} missing`); return all.subarray(k * n, (k + 1) * n); };
+      const ra = col('raDeg'), dec = col('decDeg'), d = col('distPc'), pmra = col('pmRaMasYr'), pmde = col('pmDecMasYr'), rv = col('rvKmS'), vmag = col('vmag'), bv = col('bv');
+      G.n = n; G.manifest = man._meta; G.epochYear = man._meta.epochYear;
+      G.vmag0 = Float32Array.from(vmag); G.d0 = Float32Array.from(d);
+      G.absMag = new Float32Array(n); G.tau = new Float32Array(n); G.phase = new Float32Array(n);
+      const colors = new Float32Array(3 * n);
+      const w = C.handoverPhaseWidth, rnd = mulberry32(0x6A1A);
+      for (let i = 0; i < n; i++) {
+        G.absMag[i] = vmag[i] - 5 * Math.log10(d[i] / 10);
+        G.tau[i] = tauOf(G.absMag[i]);
+        G.phase[i] = w + rnd() * (1 - 2 * w);
+        const rgb = colorTemperature2rgb(colourTemperatureKelvinFromBV(bv[i]));
+        colors[3 * i] = rgb[0]; colors[3 * i + 1] = rgb[1]; colors[3 * i + 2] = rgb[2];
+      }
+      const t = buildTier(pointTexture, n, colors, G.absMag, G.phase, G.tau, 'stars-arriving', -96);
+      G.geo = t.geo; G.mat = t.mat; G.points = t.points;
+      // the epoch's positions until the first update lands (most are invisible today: V > 8)
+      const p = G.geo.getAttribute('position').array;
+      G.pos = new Float32Array(3 * n);
+      for (let i = 0; i < n; i++) { const u = localUnit(ra[i], dec[i]); G.pos[3 * i] = d[i] * u[0]; G.pos[3 * i + 1] = d[i] * u[1]; G.pos[3 * i + 2] = d[i] * u[2]; p[3 * i] = G.pos[3 * i] * UNITS_PER_PC; p[3 * i + 1] = G.pos[3 * i + 1] * UNITS_PER_PC; p[3 * i + 2] = G.pos[3 * i + 2] * UNITS_PER_PC; }
+      G.geo.getAttribute('position').needsUpdate = true;
+      W.gaiaSpare = new Float32Array(3 * n);
+      starsGroup.add(G.points);
+      const set = { type: 'init', set: 'gaia', n, raDeg: Float64Array.from(ra), decDeg: Float64Array.from(dec), distPc: Float64Array.from(d), pmRaMasYr: Float64Array.from(pmra), pmDecMasYr: Float64Array.from(pmde), rvKmS: Float64Array.from(rv), epochYear: G.epochYear };
+      if (W.worker) W.worker.postMessage(set, [set.raDeg.buffer, set.decDeg.buffer, set.distPc.buffer, set.pmRaMasYr.buffer, set.pmDecMasYr.buffer, set.rvKmS.buffer]);
+      else G.integrated = integratedSet(set, heliocentricGalacticState, ORBIT_INTEGRATION.arriving);
+      G.loaded = true;
+      if (Number.isFinite(S.year)) requestPositions(S.year, true);
+    } catch (e) {
+      G.failed = String(e && e.message || e);
+      console.error('the arriving stars (stars-gaia) did not load —', G.failed);
+    } finally { G.loading = false; }
+  }
+
+  // ── the orbit worker ────────────────────────────────────────────────────────
+  /** Start the orbit worker with the named catalogue; resolves when it reports the set ready (its bundle loads first). */
+  function startWorker() {
+    const set = { type: 'init', set: 'hip', n: S.n, raDeg: Float64Array.from(S.raDeg), decDeg: Float64Array.from(S.decDeg), distPc: Float64Array.from(S.d0), pmRaMasYr: Float64Array.from(S.pmRaMasYr), pmDecMasYr: Float64Array.from(S.pmDecMasYr), rvKmS: Float64Array.from(S.rvKmS), epochYear: S.epochYear };
+    const w = createWorker ? createWorker() : null;
+    if (!w) { S.integrated = integratedSet(set, heliocentricGalacticState); return Promise.resolve(); }
+    W.worker = w;
+    return new Promise((resolve) => {
+      w.onmessage = (ev) => { const m = ev.data; if (m.type === 'positions') onPositionsMessage(m); else if (m.type === 'ready' && m.set === 'hip') resolve(); };
+      w.onerror = (e) => { console.error('sky orbit worker:', e.message || e); };
+      w.postMessage(set, [set.raDeg.buffer, set.decDeg.buffer, set.distPc.buffer, set.pmRaMasYr.buffer, set.pmDecMasYr.buffer, set.rvKmS.buffer]);
+    });
+  }
+  /** The year the orbits are evaluated at: clamped to the handover's end — beyond it every catalogue star is its
+   *  statistical twin, and an integration to the genesis (880 nodes of 41,000 stars) would cost a minute. */
+  const orbitYearOf = (year) => Math.max(2000 - C.catalogueRegimeYears - C.regimeFadeYears, Math.min(2000 + C.catalogueRegimeYears + C.regimeFadeYears, year));
+  /** Ask for the positions of a year: the named tier every request, the arriving tier when its year moved a step (or forced). */
+  function requestPositions(year, force) {
+    if (W.busy) { W.pending = year; return; }
+    const wantGaia = G.loaded && (force || !Number.isFinite(G.year) || Math.abs(year - G.year) >= C.gaiaUpdateStepYears);
+    if (!W.worker) {   // the main-thread fallback (no Worker): the same code, synchronously
+      fillLocalPositionsIntegrated(S.integrated, year, W.hipSpare, TRIAD);
+      if (wantGaia) fillLocalPositionsIntegrated(G.integrated, year, W.gaiaSpare, TRIAD);
+      onPositionsMessage({ year, hipBuf: W.hipSpare, gaiaBuf: wantGaia ? W.gaiaSpare : null, gaiaDone: wantGaia, hipMs: 0, gaiaMs: 0 });
+      return;
     }
-    // the statistical sky beyond regime 1: built for the year's seed cell, cross-faded against the catalogue
-    S.seedCell = seedCellOf(year);
-    stat.opacity = 1 - S.regimeFade;   // the share of the stars that have handed over (reported; the shader works per star)
-    if (stat.opacity > 0) buildStatistical(S.seedCell);
-    if (stat.mat) stat.mat.uniforms.uFade.value = S.regimeFade;
-    if (stat.points && galacticTriad) {   // the statistical sky turns with the band: a rotation about the Galactic pole in the container's frame
-      const Z = galacticTriad.z;
-      stat.points.quaternion.setFromAxisAngle(new THREE.Vector3(Z[1], Z[2], Z[0]).normalize(), S.galacticTurnRad);
-    }
-    const R = settings().starDistance, base = settings().starsizeBase;
-    const n = S.n, pos = S.pos;
-    for (let i = 0; i < n; i++) {
-      pos[3 * i] = S.r0[3 * i] + S.v[3 * i] * dtClamped;
-      pos[3 * i + 1] = S.r0[3 * i + 1] + S.v[3 * i + 1] * dtClamped;
-      pos[3 * i + 2] = S.r0[3 * i + 2] + S.v[3 * i + 2] * dtClamped;
-    }
+    W.busy = true;
+    const hipBuf = W.hipSpare, gaiaBuf = wantGaia ? W.gaiaSpare : null;
+    W.hipSpare = null; if (wantGaia) W.gaiaSpare = null;
+    const transfer = [hipBuf.buffer]; if (gaiaBuf) transfer.push(gaiaBuf.buffer);
+    W.worker.postMessage({ type: 'year', year, hipBuf, gaiaBuf }, transfer);
+  }
+  /** Positions have landed: swap the buffers in, fill the sprites, the fades, the labels, the lines. */
+  function onPositionsMessage(m) {
+    W.busy = false; W.updates++; W.hipMs = m.hipMs; W.gaiaMs = m.gaiaMs;
+    if (W.onFirst) { const f = W.onFirst; W.onFirst = null; f(); }
+    if (m.hipBuf) { const old = S.pos; S.pos = m.hipBuf; W.hipSpare = old; }
+    if (m.gaiaBuf) { if (m.gaiaDone) { const old = G.pos; G.pos = m.gaiaBuf; W.gaiaSpare = old; G.year = m.year; } else W.gaiaSpare = m.gaiaBuf; }
+    // the positions are the clamped orbit year's; the state's year is the one asked for (its regime, uniforms)
+    applyPositions(orbitYearOf(S.requestedYear) === m.year ? S.requestedYear : m.year, !!(m.gaiaBuf && m.gaiaDone));
+    if (Number.isFinite(W.pending)) { const y = W.pending; W.pending = NaN; if (y !== m.year) requestPositions(y, false); }
+  }
+  function applyPositions(year, gaiaMoved) {
+    const pos = S.pos;
     // the stars at their MEASURED distances: position (pc) × the scene's units per parsec, centred on the
-    // Sun (the container's position, set by the scene each frame); the sprite's size is the apparent
-    // magnitude at the camera, computed in the shader from absMag and the camera distance
+    // Sun (the container's position, set by the scene each frame)
     const fill = (idx, geo) => {
       const p = geo.getAttribute('position').array;
-      for (let k = 0; k < idx.length; k++) {
-        const i = idx[k];
-        p[3 * k] = pos[3 * i] * UNITS_PER_PC; p[3 * k + 1] = pos[3 * i + 1] * UNITS_PER_PC; p[3 * k + 2] = pos[3 * i + 2] * UNITS_PER_PC;
-      }
+      for (let k = 0; k < idx.length; k++) { const i = idx[k]; p[3 * k] = pos[3 * i] * UNITS_PER_PC; p[3 * k + 1] = pos[3 * i + 1] * UNITS_PER_PC; p[3 * k + 2] = pos[3 * i + 2] * UNITS_PER_PC; }
       geo.getAttribute('position').needsUpdate = true;
     };
-    void R; void base;
-    if (S.geoBright) { fill(S.brightIdx, S.geoBright); fill(S.faintIdx, S.geoFaint); S.matBright.uniforms.uFade.value = S.regimeFade; S.matFaint.uniforms.uFade.value = S.regimeFade; }
+    if (S.geoBright) { fill(S.brightIdx, S.geoBright); fill(S.faintIdx, S.geoFaint); }
+    if (gaiaMoved && G.geo) {
+      const p = G.geo.getAttribute('position').array, q = G.pos;
+      for (let k = 0; k < 3 * G.n; k++) p[k] = q[k] * UNITS_PER_PC;
+      G.geo.getAttribute('position').needsUpdate = true;
+    }
     // the fades: the RMS change of every constellation's pairwise separations
     const [lo, hi] = C.recognisableRmsDeg;
     for (const g of S.groups.values()) {
@@ -471,10 +539,37 @@ export function createSkyOfDate(deps) {
     }
     buildLines();
     S.year = year;
+    if (onPositions) onPositions();
+  }
+
+  /** The sky of date at an engine year: the regime, the dome's turn, the statistical sky, the uniforms — then the positions (asynchronously). */
+  function computeForYear(year) {
+    const dt = year - 2000;
+    const over = Math.abs(dt) - C.catalogueRegimeYears;
+    S.regimeFade = over <= 0 ? 1 : Math.max(0, 1 - over / C.regimeFadeYears);
+    S.requestedYear = year;
+    // plan 28 §E: the dome turns with the Sun's Galactic orbit about its pole (the texture's local +Y)
+    S.galacticTurnRad = galacticTurnRadAtYear ? galacticTurnRadAtYear(year) : 0;
+    if (dome && domeBaseSet) {
+      dome.quaternion.copy(domeBase).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), S.galacticTurnRad));
+      dome.updateMatrixWorld();
+    }
+    // the statistical sky beyond the catalogue regime: built for the year's seed cell, handed over star by star
+    S.seedCell = seedCellOf(year);
+    stat.opacity = 1 - S.regimeFade;   // the share of the stars that have handed over (reported; the shader works per star)
+    if (stat.opacity > 0) buildStatistical(S.seedCell);
+    if (stat.points) {   // the statistical sky turns with the band: a rotation about the Galactic pole in the container's frame
+      const Z = TRIAD.z;
+      stat.points.quaternion.setFromAxisAngle(new THREE.Vector3(Z[1], Z[2], Z[0]).normalize(), S.galacticTurnRad);
+    }
+    for (const mat of allMaterials()) { mat.uniforms.uFade.value = S.regimeFade; mat.uniforms.uTimeYears.value = Math.abs(dt); }
+    requestPositions(orbitYearOf(year), false);
   }
 
   const api = {
-    /** Load both files and build everything; resolves when the sky is drawn at the given instant. @param {any} pointTexture @param {number} jdUT */
+    /** Load the catalogue files and build everything; resolves — and reports loaded — once the orbit worker is ready and the
+     *  first positions have landed (a landing read before that would see the epoch's sky). The arriving stars load after.
+     *  @param {any} pointTexture @param {number} jdUT */
     async load(pointTexture, jdUT) {
       const [stars, consts] = await Promise.all([fetchRepoJson(starsUrl), fetchRepoJson(constellationsUrl)]);
       if (!stars || !stars.columns || !Array.isArray(stars.stars)) throw new Error('stars.json: not the v2 catalogue (columns + stars)');
@@ -483,8 +578,13 @@ export function createSkyOfDate(deps) {
       buildSprites(pointTexture);
       ingestStrokes(consts);
       computeGalactic();
+      await startWorker();
+      const first = new Promise((resolve) => { W.onFirst = resolve; });
       S.loaded = true;
       api.updateForEpoch(jdUT, true);
+      await first;
+      S.ready = true;   // what `loaded` reports: the first positions are in
+      loadGaia(pointTexture);
       return S.counts;
     },
     /** Recompute the sky when the engine year has moved a whole year (or forced). @param {number} jdUT @param {boolean} [force] */
@@ -492,7 +592,8 @@ export function createSkyOfDate(deps) {
       if (!S.loaded) return false;
       const year = engineYearOfJd(jdUT);
       if (!Number.isFinite(year)) return false;
-      if (!force && Number.isFinite(S.year) && Math.abs(year - S.year) < C.updateStepYears) return false;
+      const ref = Number.isFinite(S.requestedYear) ? S.requestedYear : S.year;
+      if (!force && Number.isFinite(ref) && Math.abs(year - ref) < C.updateStepYears) return false;
       computeForYear(year);
       return true;
     },
@@ -502,21 +603,32 @@ export function createSkyOfDate(deps) {
     setNamesVisible(visible) { for (const L of S.labels) L.obj.visible = visible; },
     /** The dome's base pose (the Galactic alignment at J2000, set by the scene once); the turn of date rides on it. @param {any} q */
     setDomeBase(q) { domeBase.copy(q); domeBaseSet = true; if (S.loaded && Number.isFinite(S.year)) computeForYear(S.year); },
-    get loaded() { return S.loaded; },
+    /** True once the catalogue is built, the worker ready and the first positions in. */
+    get loaded() { return S.ready === true; },
+    /** The arriving stars: loaded, or failed (the sky runs on the catalogue alone), or still loading. */
+    get gaiaLoaded() { return G.loaded; },
+    get gaiaFailed() { return G.failed; },
+    /** True when the positions drawn are the ones last asked for (the worker has answered). */
+    get settled() { return S.loaded && !W.busy && !Number.isFinite(W.pending) && S.year === S.requestedYear && (!G.loaded || Math.abs(G.year - orbitYearOf(S.year)) < C.gaiaUpdateStepYears); },
     get drawMaterials() { return drawMaterials; },
     /** The state the gates read. */
     state() {
       const groups = {}; for (const g of S.groups.values()) groups[g.name] = { rmsDeg: g.rmsDeg, opacity: g.opacity, stars: g.starIdx.length, strokes: g.strokeIdx.length };
+      // the arriving stars drawn now: V(t) ≤ the cut, from the positions of date (asked for, not per frame)
+      let gaiaVisible = null;
+      if (G.loaded && G.pos) { gaiaVisible = 0; for (let i = 0; i < G.n; i++) { const d = Math.hypot(G.pos[3 * i], G.pos[3 * i + 1], G.pos[3 * i + 2]); if (G.absMag[i] + 5 * Math.log10(d / 10) <= C.visibleVLimit) gaiaVisible++; } }
       return {
-        loaded: S.loaded, epochYear: S.epochYear, year: S.year,
-        // linear: the catalogue; handover: the cross-fade into the statistical sky; statistical: the illustration (plan 28 §E)
-        regime: S.regimeFade >= 1 ? 'linear' : S.regimeFade > 0 ? 'handover' : 'statistical', regimeFade: S.regimeFade,
+        loaded: S.loaded, epochYear: S.epochYear, year: S.year, requestedYear: S.requestedYear, settled: api.settled,
+        // orbits: the catalogue on its Galactic orbits; handover: star by star into the statistical sky; statistical: the illustration (plan 28 §D/E)
+        regime: S.regimeFade >= 1 ? 'orbits' : S.regimeFade > 0 ? 'handover' : 'statistical', regimeFade: S.regimeFade,
         statisticalOpacity: stat.opacity, seedCell: S.seedCell, statisticalBuilt: stat.seedCell, galacticTurnRad: S.galacticTurnRad || 0,
         labelOpacity: S.labels.length ? Number(S.labels[0].div.style.opacity) : null,
         sunPointAbsMag: S.sunPoint ? S.sunPoint.geometry.getAttribute('absMag').array[0] : null,
         // the share of the stars still in the catalogue at this fade (alpha ≥ 0.5) — ≈ regimeFade, one by one
         catalogueShare: S.phase ? (() => { let k = 0; for (let i = 0; i < S.n; i++) if (handoverAlpha(i, S.regimeFade).catalogue >= 0.5) k++; return k / S.n; })() : null,
         stars: S.n, nakedEye: S.nNaked, labels: S.labels.length, strokes: S.strokes.length, constellations: S.groups.size, layout: S.layout, groups, counts: S.counts,
+        worker: { present: !!W.worker, updates: W.updates, hipMs: W.hipMs, gaiaMs: W.gaiaMs },
+        gaia: { loaded: G.loaded, failed: G.failed, n: G.n, year: G.year, visible: gaiaVisible, counts: G.manifest ? G.manifest.counts : null },
       };
     },
     /** A statistical-sky star's container-frame position (units) for the gates (the seeded draw of the built cell). @param {number} i */
@@ -526,26 +638,36 @@ export function createSkyOfDate(deps) {
     /** A catalogue star's drawn position (scene units in the container's frame — the Sun at the origin) and its absolute magnitude, at the current year. @param {number} hip */
     starPositionUnits(hip) {
       const i = S.hipIndex.get(hip); if (i === undefined || !Number.isFinite(S.year)) return null;
-      return { hip, units: [S.pos[3 * i] * UNITS_PER_PC, S.pos[3 * i + 1] * UNITS_PER_PC, S.pos[3 * i + 2] * UNITS_PER_PC], distPc: Math.hypot(S.pos[3 * i], S.pos[3 * i + 1], S.pos[3 * i + 2]), absMag: S.absMag[i], unitsPerPc: UNITS_PER_PC };
+      return { hip, units: [S.pos[3 * i] * UNITS_PER_PC, S.pos[3 * i + 1] * UNITS_PER_PC, S.pos[3 * i + 2] * UNITS_PER_PC], distPc: Math.hypot(S.pos[3 * i], S.pos[3 * i + 1], S.pos[3 * i + 2]), absMag: S.absMag[i], tau: S.tau[i], unitsPerPc: UNITS_PER_PC };
+    },
+    /** An arriving star's drawn position (pc, local frame), its V of date and its lifetime, at the arriving tier's year. @param {number} i */
+    gaiaStarAt(i) {
+      if (!G.loaded || i < 0 || i >= G.n) return null;
+      const d = Math.hypot(G.pos[3 * i], G.pos[3 * i + 1], G.pos[3 * i + 2]);
+      return { i, year: G.year, local: [G.pos[3 * i], G.pos[3 * i + 1], G.pos[3 * i + 2]], distPc: d, vmag: G.absMag[i] + 5 * Math.log10(d / 10), vmag0: G.vmag0[i], d0: G.d0[i], absMag: G.absMag[i], tau: G.tau[i] };
     },
     /**
-     * A star's direction at an engine year — pure, the same formula the sprites ride (no memo): the ICRS
-     * α, δ of date (degrees), the local unit vector, the apparent magnitude; null for a HIP not in the catalogue.
+     * A star's direction at an engine year — pure, the same orbit the sprites ride (no memo, the main thread's own
+     * evaluation through the shared positions code): the ICRS α, δ of date (degrees), the local unit vector, the
+     * apparent magnitude; null for a HIP not in the catalogue.
      * @param {number} hip @param {number} year
      */
     starDirectionAt(hip, year) {
       const i = S.hipIndex.get(hip); if (i === undefined) return null;
-      const dt = year - S.epochYear;
-      const x = S.r0[3 * i] + S.v[3 * i] * dt, y = S.r0[3 * i + 1] + S.v[3 * i + 1] * dt, z = S.r0[3 * i + 2] + S.v[3 * i + 2] * dt;
-      const r = Math.hypot(x, y, z);
+      const h = heliocentricGalacticState({ raDeg: S.raDeg[i], decDeg: S.decDeg[i], distPc: S.d0[i], pmRaMasYr: S.pmRaMasYr[i], pmDecMasYr: S.pmDecMasYr[i], rvKmS: S.rvKmS[i] });
+      const el = orbitElements(h, S.epochYear);   // for the amplitude fraction (the epicycle's reach), not the position
+      // the named catalogue is INTEGRATED: the star and the Sun on the same schedule from the catalogue epoch
+      const st = integratedStateAtYear(galactocentricState(h, S.epochYear), S.epochYear, year);
+      const sun = integratedStateAtYear(S.sunStateAtEpoch, S.epochYear, year);
+      const [x, y, z] = localOfGalactic(st[0] - sun[0], st[1] - sun[1], st[2] - sun[2], TRIAD), r = Math.hypot(x, y, z);
       // local (x, y, z) = (Y_eq, Z_eq, X_eq): α = atan2(x, z), δ = asin(y / r)
       const raDeg = ((Math.atan2(x, z) * R2D) % 360 + 360) % 360, decDeg = Math.asin(y / r) * R2D;
-      return { hip, raDeg, decDeg, local: [x / r, y / r, z / r], distPc: r, vmag: S.vmag0[i] + 5 * Math.log10(r / S.d0[i]), hasRv: S.hasRv[i] === 1, distFlag: S.distFlag[i], name: (S.names[hip] && S.names[hip].name) || null };
+      return { hip, raDeg, decDeg, local: [x / r, y / r, z / r], distPc: r, vmag: S.vmag0[i] + 5 * Math.log10(r / S.d0[i]), hasRv: S.hasRv[i] === 1, distFlag: S.distFlag[i], amplitudeFraction: el.amplitudeFraction, name: (S.names[hip] && S.names[hip].name) || null };
     },
     /** The catalogue record of a star as loaded (for the gates' counts and the referee's inputs). @param {number} hip */
     starRecord(hip) {
       const i = S.hipIndex.get(hip); if (i === undefined) return null;
-      return { hip, r0: [S.r0[3 * i], S.r0[3 * i + 1], S.r0[3 * i + 2]], v: [S.v[3 * i], S.v[3 * i + 1], S.v[3 * i + 2]], d0: S.d0[i], vmag0: S.vmag0[i], hasRv: S.hasRv[i] === 1, distFlag: S.distFlag[i], names: S.names[hip] || null };
+      return { hip, r0: [S.r0[3 * i], S.r0[3 * i + 1], S.r0[3 * i + 2]], raDeg: S.raDeg[i], decDeg: S.decDeg[i], pmRaMasYr: S.pmRaMasYr[i], pmDecMasYr: S.pmDecMasYr[i], rvKmS: S.rvKmS[i], d0: S.d0[i], vmag0: S.vmag0[i], hasRv: S.hasRv[i] === 1, distFlag: S.distFlag[i], names: S.names[hip] || null };
     },
   };
   return api;

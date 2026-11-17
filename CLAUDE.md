@@ -559,7 +559,23 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   star** — colour × alpha both scaled drew a quarter of the light at the
   cross-fade's midpoint, and a tier-wide cross-fade halves every star
   there ("empty at 1.1 Myr"); each star hands over at its own seeded moment,
-  its twin appearing as it leaves, so the sky never thins. (§1.48)
+  its twin appearing as it leaves, so the sky never thins. **A star's path
+  beyond 1 Myr is its Galactic orbit, and a perturbation series is gated
+  against the potential's exact integrator** (plan 28 §D, ONE home
+  `sky/galactic-orbits`): Hill's epicycle about the LSR was WORSE than the
+  straight line at 1.3 Myr (the Sun's own 640-pc excursion), the epicycle
+  about each body's own guiding centre needed the azimuth exact and the
+  radius to second order, and its floor is still third order in amplitude
+  (Sirius 9.7″ at 100 kyr) while it breaks outright for the high-velocity
+  stars a naked-eye catalogue holds (Arcturus 118° at 10 kyr) — so the
+  named catalogue is INTEGRATED (RK4 on cached 5-Myr nodes, pure in the
+  year), the 400,000 arriving stars (Gaia DR3 within 1.5 kpc that ever reach
+  V 8, their amplitudes ≤ 15 % of R₀) ride the closed form, Gliese 710's
+  published encounter is the physical referee, and an integration is CLAMPED
+  at the handover's end (a genesis landing integrated 880 nodes of 41,000
+  stars — a minute of stale positions every later row read). An archive's
+  synchronous stream is cut at 60 s on a row boundary: verify a chunk
+  against the archive's own COUNT, never by its last line. (§1.48)
 
 ---
 
@@ -729,7 +745,7 @@ what actually made corrections stick here.
 | `data/astrogeo22-earth-moon.json` | the CITED Earth–Moon distance history (Farhat et al. 2022, AstroGeo22; `npm run import:astrogeo22`) — embedded as `deltat/moon-distance-artifact.cjs`, read by `deltat/moon-distance-history.cjs` (plan 12 option A) |
 | `public/textures/earth/` | the Earth's day maps by age (plan 27 steps E, G, H): Scotese's PaleoAtlas v3 (CC BY 4.0; 21 ka–750 Ma at its own steps; `npm run import:paleoatlas` fetches, prepares and hashes), generated illustration beyond, the Pleistocene ice blended by the model's OWN ice history (the climate formula's L1 layer, a labelled forecast to +150 kyr), and the derived future tiers (the continents moved by their measured plate motions, NNR-MORVEL56, then Scotese's Pangaea Proxima scenario to +250 Myr; the biosphere's end and the moist greenhouse on that supercontinent) — ONE table `manifest.json` (each tier's `fadeMyr`, `skyTint`, the one `present: true`) read by the scene's `updateEra` and the About folder's "Earth map" row, gated by `check:surface-tiers` (`tools/pipeline/build-earth-tiers.js`). The Moon's, Mercury's, Mars's and Saturn's tables (step F: the lunar magma ocean, the maria-free crust derived from the present-day map and two mare-flooding steps, the young ray systems suppressed before their impacts; Mercury's early crust; Mars's Noachian and Hesperian seas below the MOLA shoreline contours, a contested reading; Saturn's rings hidden before 400 Ma and gone after ~+200 Myr — cited bands) live beside it under `public/textures/<body>/`, written by `npm run build:body-tiers` (`tools/pipeline/build-body-tiers.js`), read by the scene's `makeSurfaceTiers` and the About folder's "Moon & planet maps" row, the same gate |
 | `public/textures/sky/` | the Milky Way dome (plan 28 §A): ESO/S. Brunier's 360° panorama (CC BY 4.0, Galactic coordinates) with the stars removed by `npm run build:sky-dome` (`tools/pipeline/build-sky-dome.js`; the source fetched to the gitignored `data/.cache/sky/`, sha256-pinned) so the only stars in the scene are the catalogue's; a STATIC `manifest.json` (the recipe, the source, the licence), the same gate; drawn in the Galactic frame through the catalogues' J2000 frame (ONE home `@essrt/physics` `sky/galactic-frame`), the texture mirrored for the inside view |
-| `public/input/stars.json`, `public/input/constellations.json`, `src/sky-of-date.js` | the sky of date (plan 28 §B/C): the bright-star catalogue v2 (Hipparcos-2 to V 8 at epoch J1991.25 with Gaia DR3 / Pulkovo radial velocities, the BSC designations and the IAU names — `npm run import:stars`, `tools/pipeline/import-star-catalogue.js`, the sources fetched to the gitignored `data/.cache/stars/` and pinned by canonical hash) and the HIP-keyed constellation strokes; the module moves every star as r₀ + v·Δt in the engine year, fades the lines and names by the shapes' RMS change, and switches the layer off beyond ±1 Myr. Gates: `star-catalogue.js` (the inputs, the referee record `data/star-motion-reference.json` on this catalogue) and the browser `sky-of-date` rows |
+| `public/input/stars.json`, `public/input/constellations.json`, `public/input/stars-gaia.bin` + `.json`, `src/sky-of-date.js`, `src/sky-orbits-worker.js`, `src/sky-orbit-positions.js`, `packages/physics/src/sky/galactic-orbits.cjs` | the sky of date (plan 28 §B/C/D): the stars' Galactic orbits (ONE home `sky/galactic-orbits`: the cited local potential, its exact RK4 integrator — the scene's evaluator, in the worker on cached 5-Myr nodes — and the closed-form epicycle as its gated check), the stars that arrive (Gaia DR3 within 1.5 kpc that ever reach V 8 within ±50 Myr, `npm run import:gaia`, the superset cached and count-verified), the bright-star catalogue v2 (Hipparcos-2 to V 8 at epoch J1991.25 with Gaia DR3 / Pulkovo radial velocities, the BSC designations and the IAU names — `npm run import:stars`, `tools/pipeline/import-star-catalogue.js`, the sources fetched to the gitignored `data/.cache/stars/` and pinned by canonical hash) and the HIP-keyed constellation strokes; the module moves every star as r₀ + v·Δt in the engine year, fades the lines and names by the shapes' RMS change, and switches the layer off beyond ±1 Myr. Gates: `star-catalogue.js` (the inputs, the referee record `data/star-motion-reference.json` on this catalogue) and the browser `sky-of-date` rows |
 | `docs/` | the numbered docs (`00-readme` is the index); `40-architecture`, `99-essrt`, `110-calculation-map`, `111-measured-traps-and-gate-origins` are cross-referenced |
 
 The simulator at 3d.holisticuniverse.com auto-deploys from every green main

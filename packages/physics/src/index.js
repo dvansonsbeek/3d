@@ -197,6 +197,8 @@ export { createEclipseFinders } from './eclipse/finders.cjs';
 export { createEclipseFormula, recurrencesOfDate, lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii, DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS } from './eclipse/formula.cjs';
 // PLAN 28 §A — the Galactic frame at J2000 (ONE home): the Milky Way dome's frame, the catalogue stars' later
 export { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, SUN_GALACTIC_ORBIT, equatorialUnitVector, galacticTriadEquatorialJ2000, equatorialToGalacticDeg, galacticTurnRadAtYear } from './sky/galactic-frame.cjs';
+// plan 28 §D — the stars' Galactic orbits relative to the Sun (the second-order epicycle about each body's own guiding centre)
+export { LOCAL_GALACTIC_KINEMATICS, RADIAL_AMPLITUDE_MAX, SUN_EPOCH_YEAR, ORBIT_INTEGRATION, KMS_PER_MASYR_KPC, localRotationCurve, heliocentricGalacticState, orbitElements, radiusAt, galactocentricPositionAt, galactocentricPositionAtYear, heliocentricGalacticAtYear, galacticAcceleration, galactocentricState, integrateOrbitRK4, integrationSchedule, integratedStateAtYear, mainSequenceLifetimeYears } from './sky/galactic-orbits.cjs';
 // Phase 8.6 — the published reference curves (external comparison formulas
 // and datasets, exactly as published; comparison references, never inputs).
 // (reference/published-curves MIGRATED to @essrt/reference at the 4.0.0

@@ -76,6 +76,23 @@ async function fetchRepoJson(repoPath) {
   console.error(`fetchRepoJson: ${repoPath} is unavailable from every source —`, lastErr);
   return null;
 }
+/** Fetch a repo-relative BINARY file (the arriving stars' Float32 columns, plan 28 §D): the local copy, then the
+ *  repository; a reply that is HTML (the dev server's index.html for an unknown path) counts as a miss.
+ *  @param {string} repoPath @returns {Promise<ArrayBuffer|null>} */
+async function fetchRepoBytes(repoPath) {
+  let lastErr = null;
+  for (const url of [repoPath, REPO_RAW_URL + repoPath]) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(`HTTP ${res.status} from ${url}`); continue; }
+      const type = res.headers.get('content-type') || '';
+      if (type.includes('text/html')) { lastErr = new Error(`${url} answered HTML, not bytes`); continue; }
+      return await res.arrayBuffer();
+    } catch (e) { lastErr = e; }
+  }
+  console.error(`fetchRepoBytes: ${repoPath} is unavailable from every source —`, lastErr);
+  return null;
+}
 
 /*
   Expanding Solar System Resonance Theory (ESSRT) — a holistic view of our universe · holisticuniverse.com
@@ -2947,16 +2964,17 @@ function domainStatusAt(pos) {
   };
 }
 /** PLAN 28 §F — the sky's clause of the Model validity hover: which regime the catalogue sky is in
- *  at this instant (the cited astrometry propagated linearly inside ±1 Myr of the catalogue epoch;
- *  fading out beyond; gone — no star of today's sky is in a known place — further out). */
+ *  at this instant (the cited astrometry on the stars' Galactic orbits inside ±50 Myr of today, the
+ *  arriving stars included; handing over star by star beyond; a statistically equivalent sky — no
+ *  star of today's sky is in a known place — further out). */
 function skyStatusClause(pos) {
   if (!Number.isFinite(pos)) return '';
-  const dtYears = _engineYearTT(jdFromPos(pos)) - 1991.25;
-  const lim = SKY_CONSTANTS.linearRegimeYears, fade = SKY_CONSTANTS.regimeFadeYears;
-  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 positions, parallaxes and proper motions; Gaia DR3 and Pulkovo radial velocities) propagated linearly from the catalogue epoch — every star sits at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015) and moves with its measured space velocity, so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them; the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). Valid within ±${(lim / 1e6).toFixed(0)} Myr of today, where the Galaxy's curvature of a star's path is invisible.`;
+  const dtYears = _engineYearTT(jdFromPos(pos)) - 2000;
+  const lim = SKY_CONSTANTS.catalogueRegimeYears, fade = SKY_CONSTANTS.regimeFadeYears;
+  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 and Gaia DR3 positions, parallaxes, proper motions and radial velocities) carried on each star's GALACTIC ORBIT about its own guiding centre (an epicycle to second order in a cited local potential — McMillan 2017's R₀ and v₀, Bovy 2017's Oort B, the local density of McKee et al. 2015 — the Sun on its own; within ±1 Myr the orbit and a straight line agree to a fraction of a per cent), every star at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015), so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them. Stars that arrive from up to 1.5 kpc away (Gaia DR3's six-dimensional stars brighter than absolute magnitude 2 — the stars a naked-eye sky is made of; the fainter background thins with the distance in time) are drawn as they brighten past V 8 and leaving ones fade; a star outliving its main-sequence lifetime fades (a band — every star treated as mid-life, births not predicted); the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). By 20 Myr each star's measured velocity error (~1 km/s, 20 pc) makes its direction uncertain by degrees: the sky is statistically right — the real stars at roughly the right places and brightnesses — not a star chart. Valid to ±${(lim / 1e6).toFixed(0)} Myr of today.`;
   const turns = Math.abs(dtYears) / (SKY_CONSTANTS.sunGalacticPeriodMyr * 1e6);
   const milky = ` The Milky Way's band turns with the Sun's Galactic orbit (once per ${SKY_CONSTANTS.sunGalacticPeriodMyr.toFixed(0)} Myr on McMillan 2017's R₀ and v₀; ${turns.toFixed(turns < 1 ? 2 : 1)} turns from today).`;
-  if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are handing over to a STATISTICALLY EQUIVALENT sky — beyond ±${(lim / 1e6).toFixed(0)} Myr the straight-line motion stops being a star's path (the Galactic orbit bends it) and no star of today's sky stays in a known place: the same brightnesses and the same spread about the Milky Way's band, the places drawn by a seed that changes every 100 Myr, no name and no constellation; each star hands over at its own moment in the window, so the sky stays full.` + milky;
+  if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are handing over to a STATISTICALLY EQUIVALENT sky — beyond ±${(lim / 1e6).toFixed(0)} Myr the smooth axisymmetric potential stops being a star's path (the spiral arms and the clouds the model leaves out take over) and no star of today's sky stays in a known place: the same brightnesses and the same spread about the Milky Way's band, the places drawn by a seed that changes every 100 Myr, no name and no constellation; each star hands over at its own moment in the window, so the sky stays full.` + milky;
   return ` Sky: an ILLUSTRATION — a statistically equivalent sky: the brightnesses and the spread about the Milky Way's band are today's catalogue's, the places a seed that changes every 100 Myr; no star of today's sky is here (the bright ones of today have not formed or have died, the Galactic orbits have diverged), so no name and no constellation is drawn.` + milky;
 }
 /** THE HONEST EDGE (plan 27 step B, doc 111 §1.36): a position is clamped to the navigable
@@ -4711,6 +4729,11 @@ if (typeof window !== 'undefined') {
     // year through the SAME formula the sprites ride (pure, no memo), the catalogue record it rides on.
     skyState: () => _skyOfDate.state(),
     skyLoaded: () => _skyOfDate.loaded,
+    // plan 28 §D: the arriving stars' tier (loaded after the catalogue), the worker's settledness, an arriving star's read
+    skyGaiaLoaded: () => _skyOfDate.gaiaLoaded,
+    skyGaiaFailed: () => _skyOfDate.gaiaFailed,
+    skySettled: () => _skyOfDate.settled,
+    gaiaStarAt: (i) => _skyOfDate.gaiaStarAt(i),
     skyUpdate: (force) => _skyOfDate.updateForEpoch(jdFromPos(o.pos), force !== false),
     starDirectionAt: (hip, year) => _skyOfDate.starDirectionAt(hip, year),
     starRecord: (hip) => _skyOfDate.starRecord(hip),
@@ -9068,13 +9091,18 @@ const drawMaterials = [];
 // containers, moved with its space velocities per engine year; the gates read its state through
 // __test__.skyState / starDirectionAt.
 const _skyOfDate = createSkyOfDate({
-  THREE, CSS2DObject, fetchRepoJson,
+  THREE, CSS2DObject, fetchRepoJson, fetchRepoBytes,
   starsUrl: bsc5url, constellationsUrl,
+  // plan 28 §D: the stars that ARRIVE (Gaia DR3 within 1.5 kpc, ever V ≤ 8 within ±50 Myr), loaded after the catalogue
+  gaiaManifestUrl: 'public/input/stars-gaia.json',
   starsGroup: sceneObjects.stars, constellationsGroup: sceneObjects.constellations,
   engineYearOfJd: (jdUT) => _engineYearTT(jdUT),
   constellationMaterial, drawOnShaderProto, drawMaterials,
-  // plan 28 §E: the dome turns with the Sun's Galactic orbit and carries the statistical sky beyond ±1 Myr
+  // plan 28 §E: the dome turns with the Sun's Galactic orbit and carries the statistical sky beyond the catalogue regime
   dome: sky, domeBase: sky.quaternion.clone(), galacticTurnRadAtYear, galacticTriad: galacticTriadEquatorialJ2000(),
+  // plan 28 §D: the orbits are computed off the main thread; when positions land the labels and a paused frame need a render
+  createWorker: () => (typeof window.Worker === 'undefined' ? null : new window.Worker(new URL('./sky-orbits-worker.js', import.meta.url), { type: 'module' })),
+  onPositions: () => { needsLabelUpdate = true; },   // wakes the loop for one pass (positionChanged would re-sync the scene's date)
   settings: () => ({ starDistance: o.starDistance || 10000, starsizeBase: o.starsizeBase || 50, namesVisible: o.starNamesVisible, layout: o.constellationLayout }),
 });
 
@@ -21555,7 +21583,7 @@ function setupGUI() {
     line('Milky Way dome: ' + a('https://www.eso.org/public/images/eso0932a/', 'ESO/S. Brunier')
        + ', The Milky Way panorama (CC BY 4.0) — resized and its stars removed, so only the catalogue’s stars are drawn', true);
     line('Stars: ' + a('https://www.cosmos.esa.int/web/hipparcos', 'Hipparcos') + ' (ESA; van Leeuwen 2007, the new reduction, via ESA’s Gaia archive) · radial velocities '
-       + a('https://www.cosmos.esa.int/gaia', 'Gaia DR3') + ' (ESA/Gaia/DPAC, CC BY-SA 3.0 IGO) and Pulkovo (Gontcharov 2006) · names '
+       + a('https://www.cosmos.esa.int/gaia', 'Gaia DR3') + ' (ESA/Gaia/DPAC, CC BY-SA 3.0 IGO; also the stars that arrive from up to 1.5 kpc, moved on their Galactic orbits) and Pulkovo (Gontcharov 2006) · names '
        + a('https://www.iau.org/public/themes/naming_stars/', 'IAU WGSN') + ' (CC BY 4.0) · designations Yale BSC', true);
     line('Full attribution: ' + a('https://github.com/dvansonsbeek/3d/blob/master/NOTICE', 'NOTICE'), true);
   }

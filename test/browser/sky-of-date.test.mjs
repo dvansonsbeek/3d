@@ -11,7 +11,7 @@
  *      landing re-read at the same year reproduces the state bit-for-bit.
  *   3. THE FADES — the recognisability of five constellations at −48 kyr (the Big Dipper nearly
  *      gone at RMS 4.6°, Orion at 2.4° still readable), everything gone at −198 kyr, the layer
- *      'linear' at −998 kyr, 'fading' at −1.15 Myr, 'none' at −10 Myr; the Milky Way dome
+ *      'orbits' to ±50 Myr, 'handover' at −55 Myr, 'statistical' at −70 Myr; the Milky Way dome
  *      untouched by the regime.
  *   4. THE COUNTS — the scene's loaded counts ≡ the catalogue file's _meta (41,394 / 8,870 / 367
  *      names / 204 strokes); the background is the catalogue's faint tier (two Points, no random field).
@@ -68,20 +68,39 @@ const land = async (/** @type {string} */ y) => {
   return sim.page.evaluate(() => { const S = window.__test__.skyState(); const g = {}; for (const k of ['UMa', 'Ori', 'Leo', 'Cas', 'Sco']) g[k] = S.groups[k] ? { rms: S.groups[k].rmsDeg, op: S.groups[k].opacity } : null; return { year: S.year, regime: S.regime, fade: S.regimeFade, g, dome: window.__test__.skyDomeProbe().brightness }; });
 };
 const s48 = await land('-48000 d172');
-check('fades at −48 kyr: the Big Dipper nearly gone (RMS 4–5.5°, opacity < 0.25), Orion still readable (RMS 1.5–3.5°, opacity 0.4–0.9)', s48.regime === 'linear' && s48.g.UMa && s48.g.UMa.rms > 4 && s48.g.UMa.rms < 5.5 && s48.g.UMa.op < 0.25 && s48.g.Ori && s48.g.Ori.rms > 1.5 && s48.g.Ori.rms < 3.5 && s48.g.Ori.op > 0.4 && s48.g.Ori.op < 0.9, JSON.stringify(s48.g));
+check('fades at −48 kyr: the Big Dipper nearly gone (RMS 4–5.5°, opacity < 0.25), Orion still readable (RMS 1.5–3.5°, opacity 0.4–0.9)', s48.regime === 'orbits' && s48.g.UMa && s48.g.UMa.rms > 4 && s48.g.UMa.rms < 5.5 && s48.g.UMa.op < 0.25 && s48.g.Ori && s48.g.Ori.rms > 1.5 && s48.g.Ori.rms < 3.5 && s48.g.Ori.op > 0.4 && s48.g.Ori.op < 0.9, JSON.stringify(s48.g));
 const s198 = await land('-198000 d172');
-check('fades at −198 kyr: every shape gone (opacity 0 for UMa, Ori, Leo, Cas, Sco)', s198.regime === 'linear' && ['UMa', 'Ori', 'Leo', 'Cas', 'Sco'].every((k) => s198.g[k] && s198.g[k].op === 0), JSON.stringify(s198.g));
+check('fades at −198 kyr: every shape gone (opacity 0 for UMa, Ori, Leo, Cas, Sco)', s198.regime === 'orbits' && ['UMa', 'Ori', 'Leo', 'Cas', 'Sco'].every((k) => s198.g[k] && s198.g[k].op === 0), JSON.stringify(s198.g));
+// PLAN 28 §D: the catalogue regime is the stars' Galactic ORBITS to ±50 Myr (ONE home sky/galactic-orbits);
+// the handover to the statistical sky is 50–60 Myr; the statistical sky beyond.
 const s998 = await land('-998000 d172');
-const s1150 = await land('-1150000 d172');
 const s10m = await land('-10000000 d172');
-check('regime: linear at −998 kyr, handover at −1.15 Myr (0 < fade < 1), statistical at −10 Myr; the dome\'s brightness untouched', s998.regime === 'linear' && s998.fade === 1 && s1150.regime === 'handover' && s1150.fade > 0 && s1150.fade < 1 && s10m.regime === 'statistical' && s10m.fade === 0 && s48.dome === s10m.dome, `fade ${s998.fade} / ${s1150.fade.toFixed(3)} / ${s10m.fade}, dome ${s48.dome}`);
+const s55m = await land('-55000000 d172');
+const s70m = await land('-70000000 d172');
+check('regime: orbits at −998 kyr and −10 Myr, handover at −55 Myr (0 < fade < 1), statistical at −70 Myr; the dome\'s brightness untouched', s998.regime === 'orbits' && s998.fade === 1 && s10m.regime === 'orbits' && s10m.fade === 1 && s55m.regime === 'handover' && s55m.fade > 0 && s55m.fade < 1 && s70m.regime === 'statistical' && s70m.fade === 0 && s48.dome === s70m.dome, `fade ${s998.fade} / ${s10m.fade} / ${s55m.fade.toFixed(3)} / ${s70m.fade}, dome ${s48.dome}`);
 // The handover is PER STAR (the owner: "at 1.1 Myr the sky is more or less empty" — a tier-wide cross-fade
-// halved every star at the midpoint): at −1.1 Myr (fade 0.5) half the stars are still in the catalogue at
-// full light and half have become their statistical twins; a star's two alphas sum to 1; the Sun never hands over.
-await land('-1098000 d172');
+// halved every star at the midpoint): at the window's midpoint (fade 0.5) half the stars are still in the
+// catalogue at full light and half have become their statistical twins; a star's two alphas sum to 1; the Sun never hands over.
+await land('-55000000 d172');
 const ho = await sim.page.evaluate(() => { const T = window.__test__; const S = T.skyState(); return { fade: S.regimeFade, share: S.catalogueShare, sirius: T.starHandoverAlpha(32349), groombridge: T.starHandoverAlpha(57939) }; });
-check('the handover is per star: at −1.1 Myr (fade 0.50) the catalogue share is 0.48–0.52, each star\'s catalogue + statistical alphas sum to 1', Math.abs(ho.fade - 0.5) < 0.01 && ho.share > 0.48 && ho.share < 0.52 && Math.abs(ho.sirius.catalogue + ho.sirius.statistical - 1) < 1e-9 && Math.abs(ho.groombridge.catalogue + ho.groombridge.statistical - 1) < 1e-9, `fade ${ho.fade.toFixed(3)}, share ${ho.share.toFixed(3)}, Sirius ${ho.sirius.catalogue.toFixed(2)}/${ho.sirius.statistical.toFixed(2)} (phase ${ho.sirius.phase.toFixed(3)})`);
-await land('-10000000 d172');   // back to −10 Myr for the statistical reads below
+check('the handover is per star: at −55 Myr (fade 0.50) the catalogue share is 0.48–0.52, each star\'s catalogue + statistical alphas sum to 1', Math.abs(ho.fade - 0.5) < 0.01 && ho.share > 0.48 && ho.share < 0.52 && Math.abs(ho.sirius.catalogue + ho.sirius.statistical - 1) < 1e-9 && Math.abs(ho.groombridge.catalogue + ho.groombridge.statistical - 1) < 1e-9, `fade ${ho.fade.toFixed(3)}, share ${ho.share.toFixed(3)}, Sirius ${ho.sirius.catalogue.toFixed(2)}/${ho.sirius.statistical.toFixed(2)} (phase ${ho.sirius.phase.toFixed(3)})`);
+// The orbits (plan 28 §D): inside ±1 Myr the orbit and the straight line agree to a fraction of a per cent (the
+// referee rows above hold), at 20 Myr a star 19 pc away has moved ~290 pc and the straight line is 6 % off its
+// orbit (the Node referee, star-catalogue.js); the sky's positions of date come from the orbit worker, settled.
+const orb = await sim.page.evaluate(() => { const T = window.__test__; const S = T.skyState(); const a = T.starDirectionAt(32349, 2000), b = T.starDirectionAt(32349, 20002000); return { worker: S.worker, settled: S.settled, siriusNow: a.distPc, sirius20: b.distPc, amp: a.amplitudeFraction, gaia: S.gaia }; });
+check('the orbit worker answers (positions settled, updates > 0); Sirius 2.64 pc today and 100–1000 pc at +20 Myr on its orbit (radial amplitude < 15 % of R₀)', orb.worker && orb.worker.updates > 0 && orb.settled === true && Math.abs(orb.siriusNow - 2.637) < 0.01 && orb.sirius20 > 100 && orb.sirius20 < 1000 && orb.amp < 0.15, `worker ${JSON.stringify(orb.worker)}, settled ${orb.settled}, Sirius ${orb.siriusNow.toFixed(3)} → ${orb.sirius20.toFixed(0)} pc, amp ${orb.amp.toFixed(3)}`);
+// The stars that ARRIVE (plan 28 §D): the Gaia tier loaded (its counts the manifest's), its stars drawn as they
+// brighten past V 8 — at +20 Myr thousands of them are within the cut while today most sit far and faint.
+await sim.page.waitForFunction(() => window.__test__.skyGaiaLoaded() || window.__test__.skyGaiaFailed(), null, { timeout: 120000 });
+const GM = JSON.parse(readFileSync(new URL('../../public/input/stars-gaia.json', import.meta.url), 'utf8'))._meta;
+await land('20000000 d172');
+await sim.page.waitForFunction(() => window.__test__.skySettled(), null, { timeout: 60000 });
+const ga = await sim.page.evaluate(() => { const S = window.__test__.skyState(); const a = window.__test__.gaiaStarAt(0); return { gaia: S.gaia, settled: S.settled, a }; });
+await land('2000 d172');
+await sim.page.waitForFunction(() => window.__test__.skySettled(), null, { timeout: 60000 });
+const g0 = await sim.page.evaluate(() => window.__test__.skyState().gaia);
+check(`the arriving stars: ${GM.n} Gaia stars loaded (the manifest's count), ${GM.counts.visibleToday} within V 8 today, more than 5,000 at +20 Myr; the tier's year follows the landing`, ga.gaia.loaded === true && ga.gaia.n === GM.n && ga.gaia.counts.kept === GM.n && Math.abs(g0.year - 2000.47) < 1 && g0.visible === GM.counts.visibleToday && ga.gaia.visible > 5000 && ga.a && Number.isFinite(ga.a.vmag), `loaded ${ga.gaia.loaded} (${ga.gaia.failed || 'ok'}), n ${ga.gaia.n}, visible today ${g0.visible}, at +20 Myr ${ga.gaia.visible} (tier year ${ga.gaia.year})`);
+await land('-70000000 d172');   // back to −70 Myr for the statistical reads below
 // PLAN 28 §E — the statistical sky and the dome's turn: beyond the handover the catalogue tiers are
 // off and the statistical tier is on (every star's magnitude and Galactic latitude kept, the
 // longitude a seeded draw per 100-Myr cell); the same cell reproduces the same positions, another
@@ -90,11 +109,11 @@ await land('-10000000 d172');   // back to −10 Myr for the statistical reads b
 const { galacticTurnRadAtYear, SUN_GALACTIC_ORBIT } = await import('../../packages/physics/src/sky/galactic-frame.cjs');
 const statOf = () => sim.page.evaluate(() => { const S = window.__test__.skyState(); const P = window.__test__.skyDomeProbe(); const T = window.__test__; return { regime: S.regime, statOp: S.statisticalOpacity, cell: S.seedCell, built: S.statisticalBuilt, turn: S.galacticTurnRad, year: S.year, p: [0, 1, 2, 4000].map((i) => T.statisticalPositionAt ? T.statisticalPositionAt(i) : null), offset: P.backdropOffsetFromCamera, depthWrite: P.domeDepthWrite, order: P.domeRenderOrder, labelOpacity: S.labelOpacity }; });
 const a10m = await statOf();
-await land('-30000000 d172'); const a30m = await statOf();
+await land('-90000000 d172'); const a30m = await statOf();
 await land('-130000000 d172'); const a130m = await statOf();
 await land('-4420000000 d172'); const aGen = await statOf();
-check('statistical sky at −10 Myr: the tier on (opacity 1), the names off, the seed cell −1 and built', a10m.regime === 'statistical' && a10m.statOp === 1 && a10m.cell === -1 && a10m.built === -1 && a10m.labelOpacity === 0 && a10m.p[0] && a10m.p[0].every(Number.isFinite), JSON.stringify({ cell: a10m.cell, built: a10m.built, op: a10m.statOp, label: a10m.labelOpacity }));
-check('statistical sky: the same 100-Myr cell draws the same places (−10 vs −30 Myr), another cell other ones (−130 Myr); the genesis in cell −45', JSON.stringify(a10m.p) === JSON.stringify(a30m.p) && a30m.cell === -1 && a130m.cell === -2 && JSON.stringify(a130m.p) !== JSON.stringify(a10m.p) && aGen.cell === -45 && aGen.statOp === 1 && aGen.regime === 'statistical', `cells ${a10m.cell}/${a30m.cell}/${a130m.cell}/${aGen.cell}`);
+check('statistical sky at −70 Myr: the tier on (opacity 1), the names off, the seed cell −1 and built', a10m.regime === 'statistical' && a10m.statOp === 1 && a10m.cell === -1 && a10m.built === -1 && a10m.labelOpacity === 0 && a10m.p[0] && a10m.p[0].every(Number.isFinite), JSON.stringify({ cell: a10m.cell, built: a10m.built, op: a10m.statOp, label: a10m.labelOpacity }));
+check('statistical sky: the same 100-Myr cell draws the same places (−70 vs −90 Myr), another cell other ones (−130 Myr); the genesis in cell −45', JSON.stringify(a10m.p) === JSON.stringify(a30m.p) && a30m.cell === -1 && a130m.cell === -2 && JSON.stringify(a130m.p) !== JSON.stringify(a10m.p) && aGen.cell === -45 && aGen.statOp === 1 && aGen.regime === 'statistical', `cells ${a10m.cell}/${a30m.cell}/${a130m.cell}/${aGen.cell}`);
 const expTurn = galacticTurnRadAtYear(a130m.year);
 check(`the dome turns with the Sun's Galactic orbit (period ${SUN_GALACTIC_ORBIT.periodMyr.toFixed(1)} Myr): the scene's turn at −130 Myr ≡ the package's`, Math.abs(a130m.turn - expTurn) < 1e-12 && Math.abs(expTurn) > 3 && Math.abs(aGen.turn) > 100, `${a130m.turn.toFixed(6)} vs ${expTurn.toFixed(6)} rad; the genesis ${(aGen.turn / (2 * Math.PI)).toFixed(2)} turns`);
 check('the sky is a backdrop at infinity: the group sits on the camera (offset 0), the dome writes no depth and draws first', aGen.offset === 0 && aGen.depthWrite === false && aGen.order < 0, `offset ${aGen.offset}, depthWrite ${aGen.depthWrite}, order ${aGen.order}`);
@@ -119,7 +138,7 @@ await land('2000 d172');
 const st = await sim.page.evaluate(() => window.__test__.skyState());
 const C = CAT._meta.counts;
 check(`counts: the scene loaded the catalogue — ${C.stars} stars, ${C.nakedEye} naked-eye, ${C.named} names, 204 strokes`, st.stars === C.stars && st.nakedEye === C.nakedEye && st.labels === C.named && st.strokes === 204 && st.constellations > 80, `${st.stars} / ${st.nakedEye} / ${st.labels} / ${st.strokes} / ${st.constellations} constellations`);
-check('the sky is at J2000 again in the linear regime (every shape at opacity 1)', st.regime === 'linear' && Object.values(st.groups).every((g) => g.opacity === 1), '');
+check('the sky is at J2000 again in the orbits regime (every shape at opacity 1)', st.regime === 'orbits' && Object.values(st.groups).every((g) => g.opacity === 1), '');
 
 console.log(fail ? `FAIL — ${fail} sky-of-date row(s)` : 'PASS — the sky of date: the referee, purity, the fades and the regime, the counts.');
 console.log(`page errors: ${sim.errors.length}`);
