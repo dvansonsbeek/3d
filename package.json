@@ -79,6 +79,9 @@
     "three": "^0.183.0",
     "tweakpane": "^4.0.5"
   },
+  "@parcel/bundler-default": {
+    "disableSharedBundles": true
+  },
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",

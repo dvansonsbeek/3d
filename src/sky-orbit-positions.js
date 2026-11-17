@@ -15,7 +15,8 @@
  * then takes the permutation. Positions in PARSECS; the scene scales by its units per parsec.
  */
 
-import { galactocentricPositionAtYear, galactocentricState, integrateOrbitRK4, integrationSchedule, ORBIT_INTEGRATION } from '@essrt/physics';
+// by file, not the package root: the orbit worker's bundle must stand alone in Parcel's dev build (see the worker)
+import { galactocentricPositionAtYear, galactocentricState, integrateOrbitRK4, integrationSchedule, ORBIT_INTEGRATION } from '../packages/physics/src/sky/galactic-orbits.cjs';
 
 /**
  * A heliocentric Galactic vector (pc) → the local frame.

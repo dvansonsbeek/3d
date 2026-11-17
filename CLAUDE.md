@@ -575,7 +575,13 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   at the handover's end (a genesis landing integrated 880 nodes of 41,000
   stars — a minute of stale positions every later row read). An archive's
   synchronous stream is cut at 60 s on a row boundary: verify a chunk
-  against the archive's own COUNT, never by its last line. (§1.48)
+  against the archive's own COUNT, never by its last line. **The dev build
+  is another bundler mode — test it too**: Parcel's dev build split the
+  worker's modules into a shared bundle the worker never loaded, the worker
+  died and every zero-filled sprite sat at the origin (the owner saw no
+  stars while every gate on the production build was green) — sprites
+  start at the epoch's positions, a silent worker hands over to the main
+  thread, `disableSharedBundles` keeps the worker's bundle whole. (§1.48)
 
 ---
 

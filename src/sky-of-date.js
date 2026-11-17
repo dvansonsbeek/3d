@@ -47,7 +47,7 @@
  * answers asynchronously, one request in flight, the latest year winning.
  */
 
-/* global document, console */
+/* global document, console, setTimeout, clearTimeout */
 import { SUN_GALACTIC_ORBIT, LOCAL_GALACTIC_KINEMATICS, ORBIT_INTEGRATION, orbitElements, heliocentricGalacticState, galactocentricState, integratedStateAtYear, galacticTriadEquatorialJ2000, mainSequenceLifetimeYears } from '@essrt/physics';
 import { fillLocalPositionsIntegrated, integratedSet, localOfGalactic } from './sky-orbit-positions.js';
 
@@ -246,10 +246,13 @@ export function createSkyOfDate(deps) {
     return { catalogue: s, statistical: 1 - s };
   }
 
-  /** A Points tier from per-star arrays. */
-  function buildTier(pointTexture, n, colors, absMag, phase, tau, name, renderOrder) {
+  /** A Points tier from per-star arrays (the positions given in pc, scaled to units — the epoch's until the first update lands,
+   *  so a worker that never answers still shows the epoch's sky, never an empty one). */
+  function buildTier(pointTexture, n, colors, absMag, phase, tau, name, renderOrder, posPc) {
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3 * n), 3));
+    const p = new Float32Array(3 * n);
+    if (posPc) for (let k = 0; k < 3 * n; k++) p[k] = posPc[k] * UNITS_PER_PC;
+    geo.setAttribute('position', new THREE.BufferAttribute(p, 3));
     geo.setAttribute('starColor', new THREE.BufferAttribute(colors, 3));
     geo.setAttribute('absMag', new THREE.BufferAttribute(absMag, 1));
     geo.setAttribute('phase', new THREE.BufferAttribute(phase, 1));
@@ -263,7 +266,7 @@ export function createSkyOfDate(deps) {
   /** The sprites: two Points (the naked-eye tier, the background tier) gathered from the per-star arrays by index, the Sun, the labels. */
   function buildSprites(pointTexture) {
     const gather = (idx, src, k) => { const out = new Float32Array(k * idx.length); for (let j = 0; j < idx.length; j++) for (let c = 0; c < k; c++) out[k * j + c] = src[k * idx[j] + c]; return out; };
-    const tier = (idx, name, order) => buildTier(pointTexture, idx.length, gather(idx, S.colors, 3), gather(idx, S.absMag, 1), gather(idx, S.phase, 1), gather(idx, S.tau, 1), name, order);
+    const tier = (idx, name, order) => buildTier(pointTexture, idx.length, gather(idx, S.colors, 3), gather(idx, S.absMag, 1), gather(idx, S.phase, 1), gather(idx, S.tau, 1), name, order, gather(idx, S.pos, 3));
     const b = tier(S.brightIdx, 'stars-naked-eye', -95), f = tier(S.faintIdx, 'stars-background', -97);   // the backdrop draws first (plan 28 §E); the sprites write no depth
     S.matBright = b.mat; S.geoBright = b.geo; S.matFaint = f.mat; S.geoFaint = f.geo;
     while (starsGroup.children.length) starsGroup.remove(starsGroup.children[0]);
@@ -446,13 +449,11 @@ export function createSkyOfDate(deps) {
         const rgb = colorTemperature2rgb(colourTemperatureKelvinFromBV(bv[i]));
         colors[3 * i] = rgb[0]; colors[3 * i + 1] = rgb[1]; colors[3 * i + 2] = rgb[2];
       }
-      const t = buildTier(pointTexture, n, colors, G.absMag, G.phase, G.tau, 'stars-arriving', -96);
-      G.geo = t.geo; G.mat = t.mat; G.points = t.points;
       // the epoch's positions until the first update lands (most are invisible today: V > 8)
-      const p = G.geo.getAttribute('position').array;
       G.pos = new Float32Array(3 * n);
-      for (let i = 0; i < n; i++) { const u = localUnit(ra[i], dec[i]); G.pos[3 * i] = d[i] * u[0]; G.pos[3 * i + 1] = d[i] * u[1]; G.pos[3 * i + 2] = d[i] * u[2]; p[3 * i] = G.pos[3 * i] * UNITS_PER_PC; p[3 * i + 1] = G.pos[3 * i + 1] * UNITS_PER_PC; p[3 * i + 2] = G.pos[3 * i + 2] * UNITS_PER_PC; }
-      G.geo.getAttribute('position').needsUpdate = true;
+      for (let i = 0; i < n; i++) { const u = localUnit(ra[i], dec[i]); G.pos[3 * i] = d[i] * u[0]; G.pos[3 * i + 1] = d[i] * u[1]; G.pos[3 * i + 2] = d[i] * u[2]; }
+      const t = buildTier(pointTexture, n, colors, G.absMag, G.phase, G.tau, 'stars-arriving', -96, G.pos);
+      G.geo = t.geo; G.mat = t.mat; G.points = t.points;
       W.gaiaSpare = new Float32Array(3 * n);
       starsGroup.add(G.points);
       const set = { type: 'init', set: 'gaia', n, raDeg: Float64Array.from(ra), decDeg: Float64Array.from(dec), distPc: Float64Array.from(d), pmRaMasYr: Float64Array.from(pmra), pmDecMasYr: Float64Array.from(pmde), rvKmS: Float64Array.from(rv), epochYear: G.epochYear };
@@ -470,12 +471,18 @@ export function createSkyOfDate(deps) {
   /** Start the orbit worker with the named catalogue; resolves when it reports the set ready (its bundle loads first). */
   function startWorker() {
     const set = { type: 'init', set: 'hip', n: S.n, raDeg: Float64Array.from(S.raDeg), decDeg: Float64Array.from(S.decDeg), distPc: Float64Array.from(S.d0), pmRaMasYr: Float64Array.from(S.pmRaMasYr), pmDecMasYr: Float64Array.from(S.pmDecMasYr), rvKmS: Float64Array.from(S.rvKmS), epochYear: S.epochYear };
-    const w = createWorker ? createWorker() : null;
-    if (!w) { S.integrated = integratedSet(set, heliocentricGalacticState); return Promise.resolve(); }
+    let w = null;
+    try { w = createWorker ? createWorker() : null; } catch (e) { console.error('sky orbit worker could not start —', e && e.message || e); }
+    const mainThread = () => { W.worker = null; S.integrated = integratedSet({ ...set, raDeg: S.raDeg, decDeg: S.decDeg, distPc: S.d0, pmRaMasYr: S.pmRaMasYr, pmDecMasYr: S.pmDecMasYr, rvKmS: S.rvKmS }, heliocentricGalacticState); };
+    if (!w) { mainThread(); return Promise.resolve(); }
     W.worker = w;
     return new Promise((resolve) => {
-      w.onmessage = (ev) => { const m = ev.data; if (m.type === 'positions') onPositionsMessage(m); else if (m.type === 'ready' && m.set === 'hip') resolve(); };
-      w.onerror = (e) => { console.error('sky orbit worker:', e.message || e); };
+      // a worker that errors or never reports ready (a bundling or serving fault) hands over to the main thread, said in the console
+      let settled = false;
+      const giveUp = (why) => { if (settled) return; settled = true; console.error(`sky orbit worker: ${why} — the orbits are computed on the main thread`); try { w.terminate(); } catch { /* gone */ } mainThread(); resolve(); };
+      const timer = setTimeout(() => giveUp('no answer within 20 s'), 20000);
+      w.onmessage = (ev) => { const m = ev.data; if (m.type === 'positions') onPositionsMessage(m); else if (m.type === 'ready' && m.set === 'hip' && !settled) { settled = true; clearTimeout(timer); resolve(); } };
+      w.onerror = (e) => { giveUp(e && e.message ? e.message : 'an error'); };
       w.postMessage(set, [set.raDeg.buffer, set.decDeg.buffer, set.distPc.buffer, set.pmRaMasYr.buffer, set.pmDecMasYr.buffer, set.rvKmS.buffer]);
     });
   }

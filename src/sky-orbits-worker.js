@@ -13,7 +13,11 @@
  */
 
 /* global self, performance */
-import { heliocentricGalacticState, galacticTriadEquatorialJ2000, ORBIT_INTEGRATION } from '@essrt/physics';
+// the two sky homes by their files, not the package root: a module worker in Parcel's DEV build cannot share the
+// page's module registry ("Cannot find module" at start — the worker died and every star sat at the origin), and
+// the package root would pull the whole model into the worker; the files are the same assets the page bundles
+import { galacticTriadEquatorialJ2000 } from '../packages/physics/src/sky/galactic-frame.cjs';
+import { heliocentricGalacticState, ORBIT_INTEGRATION } from '../packages/physics/src/sky/galactic-orbits.cjs';
 import { fillLocalPositionsIntegrated, integratedSet } from './sky-orbit-positions.js';
 
 const T = galacticTriadEquatorialJ2000();

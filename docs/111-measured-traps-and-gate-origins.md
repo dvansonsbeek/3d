@@ -2843,7 +2843,20 @@ read. By 20 Myr a star's velocity error of 1 km/s is 20 pc, degrees of
 direction for a nearby star: the sky is statistically right, not a star
 chart (the hover says so). The sky reports loaded only once the worker is
 ready and the first positions are in (a landing read before that saw the
-epoch's sky and kept it as the purity row's reference).
+epoch's sky and kept it as the purity row's reference). **The dev build is
+another bundler mode — test it too.** The owner's first look (`npm run
+dev`) showed no stars at all while every gate on the production build was
+green: Parcel's dev build (no scope hoisting) split the worker's physics
+modules into a shared bundle the worker never loaded ("Cannot find module"
+at its first line), the worker died, the sky's load never resolved and
+every sprite sat at the origin where its geometry had been zero-filled.
+Three fixes: the sprites are built at the EPOCH's positions (a dead worker
+shows the J2000 sky, never an empty one); a worker that errors or stays
+silent for 20 s hands the orbits to the main thread and says so in the
+console; and `@parcel/bundler-default` carries `disableSharedBundles`, so
+the worker's bundle stands alone in both builds (the worker is a classic
+one; measured on a `--no-scope-hoist` build served to the harness through
+`ESSRT_DIST_DIR`).
 
 ---
 

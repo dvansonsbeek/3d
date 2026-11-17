@@ -9101,7 +9101,9 @@ const _skyOfDate = createSkyOfDate({
   // plan 28 §E: the dome turns with the Sun's Galactic orbit and carries the statistical sky beyond the catalogue regime
   dome: sky, domeBase: sky.quaternion.clone(), galacticTurnRadAtYear, galacticTriad: galacticTriadEquatorialJ2000(),
   // plan 28 §D: the orbits are computed off the main thread; when positions land the labels and a paused frame need a render
-  createWorker: () => (typeof window.Worker === 'undefined' ? null : new window.Worker(new URL('./sky-orbits-worker.js', import.meta.url), { type: 'module' })),
+  // a CLASSIC worker: Parcel's dev build cannot hand a module worker the page's shared modules ("Cannot find module" at
+  // start, every star at the origin); a classic worker loads them through importScripts in both builds
+  createWorker: () => (typeof window.Worker === 'undefined' ? null : new window.Worker(new URL('./sky-orbits-worker.js', import.meta.url))),
   onPositions: () => { needsLabelUpdate = true; },   // wakes the loop for one pass (positionChanged would re-sync the scene's date)
   settings: () => ({ starDistance: o.starDistance || 10000, starsizeBase: o.starsizeBase || 50, namesVisible: o.starNamesVisible, layout: o.constellationLayout }),
 });
