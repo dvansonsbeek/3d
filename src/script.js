@@ -6394,7 +6394,7 @@ let o = {
   starDistanceScaleFact: 1.5,
   starDistance: 5000,
   starSize: 1,
-  starsizeBase: 50,
+  starsizeBase: 42,   // the star sprites' base size (device px at pixel ratio 2; the sky module scales by the ratio) — the owner's pick after 50 ("a little weaker")
   starNamesVisible: false,
   'Axis helpers': false,
   Orbits: true,
@@ -9109,7 +9109,7 @@ const _skyOfDate = createSkyOfDate({
   createWorker: () => (typeof window.Worker === 'undefined' ? null : new window.Worker(new URL('./sky-orbits-worker.js', import.meta.url))),
   onPositions: () => { needsLabelUpdate = true; },   // wakes the loop for one pass (positionChanged would re-sync the scene's date)
   pixelRatio: () => renderer.getPixelRatio(),        // the sprites' device-pixel size follows the adaptive ratio (else the sky brightens at ratio 1)
-  settings: () => ({ starDistance: o.starDistance || 10000, starsizeBase: o.starsizeBase || 50, namesVisible: o.starNamesVisible, layout: o.constellationLayout }),
+  settings: () => ({ starDistance: o.starDistance || 10000, starsizeBase: o.starsizeBase, namesVisible: o.starNamesVisible, layout: o.constellationLayout }),
 });
 
 // 4) Kick off constellation setup immediately

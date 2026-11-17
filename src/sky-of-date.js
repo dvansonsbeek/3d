@@ -658,7 +658,7 @@ export function createSkyOfDate(deps) {
         catalogueShare: S.phase ? (() => { let k = 0; for (let i = 0; i < S.n; i++) if (handoverAlpha(i, S.regimeFade).catalogue >= 0.5) k++; return k / S.n; })() : null,
         stars: S.n, nakedEye: S.nNaked, labels: S.labels.length, strokes: S.strokes.length, constellations: S.groups.size, layout: S.layout, groups, counts: S.counts,
         worker: { present: !!W.worker, updates: W.updates, hipMs: W.hipMs, gaiaMs: W.gaiaMs },
-        pixelRatio: S.pixelRatio, baseSizeDevicePx: S.matBright ? S.matBright.uniforms.uBaseSize.value : null,
+        pixelRatio: S.pixelRatio, starsizeBase: settings().starsizeBase, baseSizeDevicePx: S.matBright ? S.matBright.uniforms.uBaseSize.value : null,
         gaia: { loaded: G.loaded, failed: G.failed, n: G.n, year: G.year, visible: gaiaVisible, counts: G.manifest ? G.manifest.counts : null },
       };
     },
