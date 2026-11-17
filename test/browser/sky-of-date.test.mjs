@@ -134,6 +134,30 @@ const again = await land('-48000 d172');
 check('purity: a landing re-read at the same year reproduces every fade bit-for-bit', JSON.stringify(again.g) === JSON.stringify(s48.g) && again.year === s48.year, `${again.year} vs ${s48.year}`);
 await land('2000 d172');
 
+// The artistic (curved) layout is a SKY curve (the owner: "no longer showing the proper constellation" once the
+// stars sat at their measured distances — a spline through the 3-D positions overshot in depth and whipped across
+// the sky): every sample of Orion's and the Big Dipper's curves stays within 6° of its stroke's great-circle
+// polyline, and the curve passes through the stars; the asterism layout's segments are the stars' chords.
+const ang = (a, b) => { const na = Math.hypot(...a), nb = Math.hypot(...b); return Math.acos(Math.max(-1, Math.min(1, (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]) / (na * nb)))) * 180 / Math.PI; };
+const toArc = (p, a, b) => { // the angular distance from direction p to the great-circle arc a→b
+  const n = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], nn = Math.hypot(...n) || 1;
+  const s = Math.asin(Math.max(-1, Math.min(1, (p[0] * n[0] + p[1] * n[1] + p[2] * n[2]) / (nn * Math.hypot(...p))))) * 180 / Math.PI;
+  const inside = ang(p, a) <= ang(a, b) + 1e-9 && ang(p, b) <= ang(a, b) + 1e-9;
+  return inside ? Math.abs(s) : Math.min(ang(p, a), ang(p, b));
+};
+await sim.page.evaluate(() => window.__test__.setConstellationLayout('stellarium', true));
+await sim.page.waitForTimeout(2500);
+const curved = await sim.page.evaluate(() => ({ ori: window.__test__.constellationLineProbe('Ori'), uma: window.__test__.constellationLineProbe('UMa') }));
+let worstArc = 0, worstEnd = 0, nLines = 0;
+for (const probe of [curved.ori, curved.uma]) for (const L of probe.lines) {
+  if (!L.stars || L.stars.length < 2) continue; nLines++;
+  for (const p of L.samples) { let best = Infinity; for (let j = 0; j + 1 < L.stars.length; j++) best = Math.min(best, toArc(p, L.stars[j], L.stars[j + 1])); worstArc = Math.max(worstArc, best); }
+  worstEnd = Math.max(worstEnd, ang(L.samples[0], L.stars[0]), ang(L.samples[L.samples.length - 1], L.stars[L.stars.length - 1]));
+}
+check(`the artistic layout is a sky curve: ${nLines} Orion and Big Dipper curves within 6° of their strokes' great-circle polylines, ending on their stars`, curved.ori.layout === 'stellarium' && nLines >= 2 && worstArc < 6 && worstEnd < 0.01, `worst ${worstArc.toFixed(2)}°, ends ${worstEnd.toFixed(4)}°`);
+await sim.page.evaluate(() => window.__test__.setConstellationLayout('asterism', false));
+await sim.page.waitForTimeout(500);
+
 // 4. the counts and the layers
 const st = await sim.page.evaluate(() => window.__test__.skyState());
 const C = CAT._meta.counts;

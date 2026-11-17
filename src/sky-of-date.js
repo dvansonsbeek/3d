@@ -356,8 +356,16 @@ export function createSkyOfDate(deps) {
       S.strokes.forEach((s, si) => {
         const pts = s.map(pointOf);
         if (pts.length < 2) return;
-        const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
-        const splinePts = curve.getPoints(pts.length * 5);
+        // The artistic curve is a SKY curve: a spline through the stars' DIRECTIONS, each sample then put at the
+        // distance interpolated (in the log) between the two stars it lies between — so the curve still passes
+        // through the stars in 3-D but projects as a smooth arc from the Sun. A spline through the 3-D positions
+        // themselves, once the stars sat at their measured distances (tenfold apart along one stroke), overshot
+        // in depth and projected as long whips across the sky (the owner: "no longer the proper constellation").
+        const dirs = pts.map((p) => p.clone().normalize()), dist = pts.map((p) => p.length());
+        const curve = new THREE.CatmullRomCurve3(dirs, false, 'catmullrom', 0.5);
+        const nSeg = pts.length - 1, nPts = pts.length * 5;
+        // CatmullRomCurve3's uniform parameter puts control point k at t = k / nSeg
+        const splinePts = curve.getPoints(nPts).map((q, k) => { const u = (k / nPts) * nSeg, j = Math.min(nSeg - 1, Math.floor(u)), f = u - j; const d = Math.exp((1 - f) * Math.log(dist[j]) + f * Math.log(dist[j + 1])); return q.normalize().multiplyScalar(d); });
         const geo = new THREE.BufferGeometry().setFromPoints(splinePts);
         const dArr = new Float32Array(splinePts.length); let total = 0;
         for (let i = 1; i < splinePts.length; i++) { total += splinePts[i].distanceTo(splinePts[i - 1]); dArr[i] = total; }
@@ -367,7 +375,7 @@ export function createSkyOfDate(deps) {
         const g = S.groups.get(S.strokeGroup[si]);
         if (mat.uniforms.uOpacity) mat.uniforms.uOpacity.value = (g ? g.opacity : 1) * S.regimeFade;
         drawMaterials.push(mat);
-        const line = new THREE.Line(geo, mat); line.frustumCulled = false; line.userData.group = S.strokeGroup[si]; line.renderOrder = -94;
+        const line = new THREE.Line(geo, mat); line.frustumCulled = false; line.userData.group = S.strokeGroup[si]; line.userData.stroke = si; line.renderOrder = -94;
         constellationsGroup.add(line); S.lineObjects.push(line);
       });
     }
@@ -637,6 +645,20 @@ export function createSkyOfDate(deps) {
         worker: { present: !!W.worker, updates: W.updates, hipMs: W.hipMs, gaiaMs: W.gaiaMs },
         gaia: { loaded: G.loaded, failed: G.failed, n: G.n, year: G.year, visible: gaiaVisible, counts: G.manifest ? G.manifest.counts : null },
       };
+    },
+    /** The drawn lines of a constellation for the gates: per line object its sampled points (units, the container frame) and, for the
+     *  curved layout, the stars of its stroke — so a gate can read how far a curve strays from its stroke's great-circle polyline. @param {string} group */
+    lineProbe(group) {
+      const out = [];
+      S.lineObjects.forEach((obj, k) => {
+        if (obj.userData.group !== group) return;
+        const a = obj.geometry.getAttribute('position').array, samples = [];
+        for (let i = 0; i < a.length; i += 3) samples.push([a[i], a[i + 1], a[i + 2]]);
+        const s = obj.userData.stroke !== undefined ? S.strokes[obj.userData.stroke] : null;
+        const stars = s ? s.map((r) => typeof r === 'number' ? [S.pos[3 * r] * UNITS_PER_PC, S.pos[3 * r + 1] * UNITS_PER_PC, S.pos[3 * r + 2] * UNITS_PER_PC] : r.fixed.map((v) => v * 100 * UNITS_PER_PC)) : null;
+        out.push({ index: k, samples, stars });
+      });
+      return { layout: S.layout, lines: out };
     },
     /** A statistical-sky star's container-frame position (units) for the gates (the seeded draw of the built cell). @param {number} i */
     statisticalPositionAt(i) { if (!stat.geo) return null; const p = stat.geo.getAttribute('position').array; return [p[3 * i], p[3 * i + 1], p[3 * i + 2]]; },

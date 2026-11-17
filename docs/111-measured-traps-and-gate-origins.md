@@ -2856,7 +2856,16 @@ silent for 20 s hands the orbits to the main thread and says so in the
 console; and `@parcel/bundler-default` carries `disableSharedBundles`, so
 the worker's bundle stands alone in both builds (the worker is a classic
 one; measured on a `--no-scope-hoist` build served to the harness through
-`ESSRT_DIST_DIR`).
+`ESSRT_DIST_DIR`). **A sky curve is drawn on the sphere** (the owner: the
+artistic layout "is no longer showing the proper constellation"): the
+curved layout's Catmull-Rom spline ran through the stars' 3-D positions,
+fine while they sat on one sphere and a whip across the sky once a stroke's
+stars sat tenfold apart in distance — the spline overshot in depth. The
+spline now runs through the stars' DIRECTIONS and each sample is put at the
+log-interpolated distance between its two stars, so the curve passes through
+the stars in 3-D and projects as a smooth arc from the Sun; the gate reads
+Orion's and the Big Dipper's six curves within 1.1° of their strokes'
+great-circle polylines, ending on their stars (`constellationLineProbe`).
 
 ---
 
@@ -3063,8 +3072,10 @@ The `test:snapshot` chain also carries:
   orbit worker answering (settled, Sirius 2.64 pc today and 329 pc at
   +20 Myr), the arriving stars loaded with the manifest's count (119,410;
   7,203 within V 8 today, 19,381 at +20 Myr) — born from "can't we make the
-  stars move 20 million years?"; fail-proven under `ESSRT_SKY_PLANT=1` (the
-  scene's reading shifted 2″).
+  stars move 20 million years?"; the artistic layout a sky curve (Orion's and
+  the Big Dipper's curves within 6° of their strokes' great-circle polylines,
+  ending on their stars — born from "no longer the proper constellation");
+  fail-proven under `ESSRT_SKY_PLANT=1` (the scene's reading shifted 2″).
 - **The focused chain planet's orbit-plane grid** passes through the
   rendered Sun with its normal along the chain's orbit normal of date (born
   from the owner's "the tilt of Mercury's path floats above the Sun": the

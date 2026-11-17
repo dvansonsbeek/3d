@@ -4735,6 +4735,9 @@ if (typeof window !== 'undefined') {
     skySettled: () => _skyOfDate.settled,
     gaiaStarAt: (i) => _skyOfDate.gaiaStarAt(i),
     skyUpdate: (force) => _skyOfDate.updateForEpoch(jdFromPos(o.pos), force !== false),
+    /** The constellation layout through the pane's own path ('asterism' | 'stellarium'); returns the sky's layout. @param {string} layout */
+    setConstellationLayout: (layout, show) => { if (show !== undefined) sceneObjects.constellations.visible = !!show; o.constellationLayout = layout; initConstellations(); return _skyOfDate.state().layout; },
+    constellationLineProbe: (group) => _skyOfDate.lineProbe(group),
     starDirectionAt: (hip, year) => _skyOfDate.starDirectionAt(hip, year),
     starRecord: (hip) => _skyOfDate.starRecord(hip),
     statisticalPositionAt: (i) => _skyOfDate.statisticalPositionAt(i),
