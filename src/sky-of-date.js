@@ -55,6 +55,7 @@ export const UNITS_PER_PC = 206264.806 * 100;
 export const SKY_CONSTANTS = Object.freeze({
   linearRegimeYears: 1e6,        // regime 1: |t − t₀| ≤ 1 Myr (plan 28 §C)
   regimeFadeYears: 2e5,          // the catalogue hands over to the statistical sky between 1.0 and 1.2 Myr
+  handoverPhaseWidth: 0.05,      // each star hands over at its OWN seeded moment in the window (a smoothstep this wide in the fade), so the sky stays full
   recognisableRmsDeg: [1, 5],    // the lines and names fade between these RMS separation changes
   updateStepYears: 1,            // the sky is recomputed when the engine year moves this much
   nakedEyeV: 6.5,                // the named/lined tier; fainter stars are the background tier
@@ -135,14 +136,23 @@ export function createSkyOfDate(deps) {
   // 0.15 / 0.07 of the base: m −1.4 → 0.80, 0 → 0.66, 2 → 0.46, 4 → 0.26, ≥ 6 → 0.07 (the first 3-D
   // build carried the tiers WITHOUT the attenuation — the bright stars twice too large, "too bright").
   const starShader = (pointTexture) => new THREE.ShaderMaterial({
-    uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 } },
+    // uFade is the regime fade (1 inside the linear regime, 0 beyond the window); uSide 0 for the catalogue
+    // tiers, 1 for the statistical tier. A star with handover phase p is in the catalogue while uFade > p and in
+    // the statistical sky while uFade < p (a smoothstep of width uPhaseWidth between), so across the window the
+    // stars hand over ONE BY ONE, each at full light — a tier-wide cross-fade had halved every star at the
+    // midpoint and the faint tier sank into black ("at 1.1 Myr the sky is more or less empty").
+    uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 }, uFade: { value: 1.0 }, uSide: { value: 0.0 }, uPhaseWidth: { value: C.handoverPhaseWidth } },
     vertexShader: `
-      uniform float uBaseSize, uUnitsPerPc;
+      uniform float uBaseSize, uUnitsPerPc, uFade, uSide, uPhaseWidth;
       attribute float absMag;
+      attribute float phase;
       attribute vec3 starColor;
       varying vec3 vColor;
+      varying float vAlpha;
       void main() {
         vColor = starColor;
+        float s = smoothstep(phase - uPhaseWidth, phase + uPhaseWidth, uFade);
+        vAlpha = abs(uSide - s);
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         float dPc = max(length(mv.xyz) / uUnitsPerPc, 1.0e-6);
         float m = absMag + 5.0 * log(dPc / 10.0) / log(10.0);
@@ -154,9 +164,12 @@ export function createSkyOfDate(deps) {
       uniform sampler2D pointTexture;
       uniform float uOpacity;
       varying vec3 vColor;
+      varying float vAlpha;
       void main() {
         float a = texture2D(pointTexture, gl_PointCoord).a;
-        gl_FragColor = vec4(vColor * uOpacity, a * uOpacity);
+        // additive blending adds rgb × alpha: the opacity enters ONCE, so a star's drawn light is linear in it
+        // (squared — colour × opacity too — a half-opacity star drew a quarter of its light).
+        gl_FragColor = vec4(vColor, a * uOpacity * vAlpha);
       }
     `,
     blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, vertexColors: true,
@@ -197,6 +210,19 @@ export function createSkyOfDate(deps) {
     S.brightIdx = Int32Array.from(brightIdx); S.faintIdx = Int32Array.from(faintIdx);
     S.pos = new Float32Array(3 * n);
     S.colors = colors;
+    // the handover phase: each star's own moment in the window, a seeded uniform draw kept clear of the
+    // window's ends by the smoothstep's width, so every star completes its handover inside the window
+    const w = C.handoverPhaseWidth, rnd = mulberry32(0x9E37);
+    S.phase = new Float32Array(n);
+    for (let i = 0; i < n; i++) S.phase[i] = w + rnd() * (1 - 2 * w);
+  }
+
+  /** A star's handover alpha at a regime fade — the shader's smoothstep, in JS for the gates: {catalogue, statistical}, summing to 1. @param {number} i @param {number} fade */
+  function handoverAlpha(i, fade) {
+    const w = C.handoverPhaseWidth, p = S.phase[i];
+    const t = Math.max(0, Math.min(1, (fade - (p - w)) / (2 * w)));
+    const s = t * t * (3 - 2 * t);
+    return { catalogue: s, statistical: 1 - s };
   }
 
   /** The sprites: two Points (the naked-eye tier, the background tier) sharing the per-star position array through index-gathered geometries. */
@@ -204,11 +230,12 @@ export function createSkyOfDate(deps) {
     const { starsizeBase } = settings();
     const build = (idx, matRef) => {
       const geo = new THREE.BufferGeometry();
-      const pos = new Float32Array(3 * idx.length), col = new Float32Array(3 * idx.length), absMag = new Float32Array(idx.length);
-      for (let k = 0; k < idx.length; k++) { const i = idx[k]; col[3 * k] = S.colors[3 * i]; col[3 * k + 1] = S.colors[3 * i + 1]; col[3 * k + 2] = S.colors[3 * i + 2]; absMag[k] = S.absMag[i]; }
+      const pos = new Float32Array(3 * idx.length), col = new Float32Array(3 * idx.length), absMag = new Float32Array(idx.length), phase = new Float32Array(idx.length);
+      for (let k = 0; k < idx.length; k++) { const i = idx[k]; col[3 * k] = S.colors[3 * i]; col[3 * k + 1] = S.colors[3 * i + 1]; col[3 * k + 2] = S.colors[3 * i + 2]; absMag[k] = S.absMag[i]; phase[k] = S.phase[i]; }
       geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       geo.setAttribute('starColor', new THREE.BufferAttribute(col, 3));
       geo.setAttribute('absMag', new THREE.BufferAttribute(absMag, 1));
+      geo.setAttribute('phase', new THREE.BufferAttribute(phase, 1));
       void starsizeBase;
       const mat = starShader(pointTexture);
       const points = new THREE.Points(geo, mat);
@@ -231,6 +258,7 @@ export function createSkyOfDate(deps) {
     sunGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3));
     sunGeo.setAttribute('starColor', new THREE.BufferAttribute(new Float32Array(colorTemperature2rgb(colourTemperatureKelvinFromBV(C.sunBV))), 3));
     sunGeo.setAttribute('absMag', new THREE.BufferAttribute(new Float32Array([C.sunAbsMagV]), 1));
+    sunGeo.setAttribute('phase', new THREE.BufferAttribute(new Float32Array([-1]), 1));   // never hands over
     const sunPoint = new THREE.Points(sunGeo, starShader(pointTexture));
     sunPoint.name = 'sun-as-a-star'; sunPoint.renderOrder = -95; sunPoint.frustumCulled = false;
     starsGroup.add(sunPoint); S.sunPoint = sunPoint;
@@ -362,8 +390,10 @@ export function createSkyOfDate(deps) {
       stat.geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(3 * n), 3));
       stat.geo.setAttribute('starColor', new THREE.BufferAttribute(S.colors.slice(), 3));
       stat.geo.setAttribute('absMag', new THREE.BufferAttribute(S.absMag.slice(), 1));
+      stat.geo.setAttribute('phase', new THREE.BufferAttribute(S.phase.slice(), 1));   // the same phase per star: its twin appears as it leaves
       stat.mat = starShader(S.matBright.uniforms.pointTexture.value);
-      stat.mat.uniforms.uOpacity.value = 0;
+      stat.mat.uniforms.uSide.value = 1.0;
+      stat.mat.uniforms.uFade.value = 1.0;
       stat.points = new THREE.Points(stat.geo, stat.mat);
       stat.points.frustumCulled = false; stat.points.renderOrder = -96; stat.points.name = 'stars-statistical';
       starsGroup.add(stat.points);   // in the catalogue frame, at the catalogue's distances; the Galactic turn is applied as a rotation of this object
@@ -398,9 +428,9 @@ export function createSkyOfDate(deps) {
     }
     // the statistical sky beyond regime 1: built for the year's seed cell, cross-faded against the catalogue
     S.seedCell = seedCellOf(year);
-    stat.opacity = 1 - S.regimeFade;
+    stat.opacity = 1 - S.regimeFade;   // the share of the stars that have handed over (reported; the shader works per star)
     if (stat.opacity > 0) buildStatistical(S.seedCell);
-    if (stat.mat) stat.mat.uniforms.uOpacity.value = stat.opacity;
+    if (stat.mat) stat.mat.uniforms.uFade.value = S.regimeFade;
     if (stat.points && galacticTriad) {   // the statistical sky turns with the band: a rotation about the Galactic pole in the container's frame
       const Z = galacticTriad.z;
       stat.points.quaternion.setFromAxisAngle(new THREE.Vector3(Z[1], Z[2], Z[0]).normalize(), S.galacticTurnRad);
@@ -424,7 +454,7 @@ export function createSkyOfDate(deps) {
       geo.getAttribute('position').needsUpdate = true;
     };
     void R; void base;
-    if (S.geoBright) { fill(S.brightIdx, S.geoBright); fill(S.faintIdx, S.geoFaint); S.matBright.uniforms.uOpacity.value = S.regimeFade; S.matFaint.uniforms.uOpacity.value = S.regimeFade; }
+    if (S.geoBright) { fill(S.brightIdx, S.geoBright); fill(S.faintIdx, S.geoFaint); S.matBright.uniforms.uFade.value = S.regimeFade; S.matFaint.uniforms.uFade.value = S.regimeFade; }
     // the fades: the RMS change of every constellation's pairwise separations
     const [lo, hi] = C.recognisableRmsDeg;
     for (const g of S.groups.values()) {
@@ -484,11 +514,15 @@ export function createSkyOfDate(deps) {
         statisticalOpacity: stat.opacity, seedCell: S.seedCell, statisticalBuilt: stat.seedCell, galacticTurnRad: S.galacticTurnRad || 0,
         labelOpacity: S.labels.length ? Number(S.labels[0].div.style.opacity) : null,
         sunPointAbsMag: S.sunPoint ? S.sunPoint.geometry.getAttribute('absMag').array[0] : null,
+        // the share of the stars still in the catalogue at this fade (alpha ≥ 0.5) — ≈ regimeFade, one by one
+        catalogueShare: S.phase ? (() => { let k = 0; for (let i = 0; i < S.n; i++) if (handoverAlpha(i, S.regimeFade).catalogue >= 0.5) k++; return k / S.n; })() : null,
         stars: S.n, nakedEye: S.nNaked, labels: S.labels.length, strokes: S.strokes.length, constellations: S.groups.size, layout: S.layout, groups, counts: S.counts,
       };
     },
     /** A statistical-sky star's container-frame position (units) for the gates (the seeded draw of the built cell). @param {number} i */
     statisticalPositionAt(i) { if (!stat.geo) return null; const p = stat.geo.getAttribute('position').array; return [p[3 * i], p[3 * i + 1], p[3 * i + 2]]; },
+    /** A star's handover alphas at the current fade (the shader's smoothstep in JS): {catalogue, statistical}, summing to 1. @param {number} hip */
+    starHandoverAlpha(hip) { const i = S.hipIndex.get(hip); return i === undefined ? null : { hip, phase: S.phase[i], fade: S.regimeFade, ...handoverAlpha(i, S.regimeFade) }; },
     /** A catalogue star's drawn position (scene units in the container's frame — the Sun at the origin) and its absolute magnitude, at the current year. @param {number} hip */
     starPositionUnits(hip) {
       const i = S.hipIndex.get(hip); if (i === undefined || !Number.isFinite(S.year)) return null;

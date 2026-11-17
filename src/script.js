@@ -2956,7 +2956,7 @@ function skyStatusClause(pos) {
   if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 positions, parallaxes and proper motions; Gaia DR3 and Pulkovo radial velocities) propagated linearly from the catalogue epoch — every star sits at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015) and moves with its measured space velocity, so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them; the constellation lines and names fade as their shapes dissolve (the Big Dipper within ~100,000 years). Valid within ±${(lim / 1e6).toFixed(0)} Myr of today, where the Galaxy's curvature of a star's path is invisible.`;
   const turns = Math.abs(dtYears) / (SKY_CONSTANTS.sunGalacticPeriodMyr * 1e6);
   const milky = ` The Milky Way's band turns with the Sun's Galactic orbit (once per ${SKY_CONSTANTS.sunGalacticPeriodMyr.toFixed(0)} Myr on McMillan 2017's R₀ and v₀; ${turns.toFixed(turns < 1 ? 2 : 1)} turns from today).`;
-  if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are handing over to a STATISTICALLY EQUIVALENT sky — beyond ±${(lim / 1e6).toFixed(0)} Myr the straight-line motion stops being a star's path (the Galactic orbit bends it) and no star of today's sky stays in a known place: the same brightnesses and the same spread about the Milky Way's band, the places drawn by a seed that changes every 100 Myr, no name and no constellation.` + milky;
+  if (Math.abs(dtYears) <= lim + fade) return ` Sky: the catalogue stars are handing over to a STATISTICALLY EQUIVALENT sky — beyond ±${(lim / 1e6).toFixed(0)} Myr the straight-line motion stops being a star's path (the Galactic orbit bends it) and no star of today's sky stays in a known place: the same brightnesses and the same spread about the Milky Way's band, the places drawn by a seed that changes every 100 Myr, no name and no constellation; each star hands over at its own moment in the window, so the sky stays full.` + milky;
   return ` Sky: an ILLUSTRATION — a statistically equivalent sky: the brightnesses and the spread about the Milky Way's band are today's catalogue's, the places a seed that changes every 100 Myr; no star of today's sky is here (the bright ones of today have not formed or have died, the Galactic orbits have diverged), so no name and no constellation is drawn.` + milky;
 }
 /** THE HONEST EDGE (plan 27 step B, doc 111 §1.36): a position is clamped to the navigable
@@ -4716,6 +4716,7 @@ if (typeof window !== 'undefined') {
     starRecord: (hip) => _skyOfDate.starRecord(hip),
     statisticalPositionAt: (i) => _skyOfDate.statisticalPositionAt(i),
     starPositionUnits: (hip) => _skyOfDate.starPositionUnits(hip),
+    starHandoverAlpha: (hip) => _skyOfDate.starHandoverAlpha(hip),
     // Moon-ring gate hook: the RING's perigee and ascending
     // node of date read from the placed stack geometry — the apsidal arm's
     // offset (toward the apogee) and the Moon orbit plane's normal — in the

@@ -554,7 +554,12 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   zoom-out stops at the catalogue's reach); **a distance fallback is a
   prior on the measurement, never a photometric guess** — the main-sequence
   placement put every distant giant within 50 pc, an orange clump the 3-D
-  view showed at once; the EDSD posterior mode keeps them far. (§1.48)
+  view showed at once; the EDSD posterior mode keeps them far. **An
+  opacity enters an additive sprite's light ONCE, and a handover is per
+  star** — colour × alpha both scaled drew a quarter of the light at the
+  cross-fade's midpoint, and a tier-wide cross-fade halves every star
+  there ("empty at 1.1 Myr"); each star hands over at its own seeded moment,
+  its twin appearing as it leaves, so the sky never thins. (§1.48)
 
 ---
 

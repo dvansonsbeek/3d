@@ -2719,7 +2719,21 @@ clockwise seen from the north Galactic pole, 20.4 turns at the genesis, the
 phase fixed by today's direction (the one free choice, named); its brightness
 stays (the Sun stays near 8 kpc and within 100 pc of the plane). The
 statistical sky is a child of the dome, so it turns with the band. The dome
-gate rows undo the turn before reading the alignment. **A TDZ at module
+gate rows undo the turn before reading the alignment. **The handover is per
+star, and an opacity enters the light once** (the owner, on the second
+look: "at 1.1 Myr the sky is more or less empty"). Two causes. The sprite
+shader multiplied both the colour and the alpha by the tier's opacity under
+additive blending, so a star's drawn light went as opacity² — at the
+midpoint of the cross-fade every star drew a quarter of its light and the
+faint tier sank into black; the opacity now enters the alpha only (linear).
+And a tier-wide cross-fade still halves every star at the midpoint. So the
+handover is PER STAR: each star carries a seeded phase in the window
+(mulberry32, kept clear of the ends by the smoothstep's width 0.05) and is
+in the catalogue while the regime fade exceeds its phase, its statistical
+twin — the same phase on the same star index — appearing as it leaves; at
+every instant nearly every star is at full light and the sky never thins
+(the gate: at −1.1 Myr, fade 0.50, the catalogue share 0.502; a star's two
+alphas sum to 1; the Sun's phase −1, it never hands over). **A TDZ at module
 init:** the alignment block handed the dome's pose to the sky module 90 lines
 before the module's `const` — "Cannot access 'jO' before initialization" in
 the bundle, every browser row dead; the pose goes in at the module's creation.
@@ -2949,8 +2963,10 @@ The `test:snapshot` chain also carries:
   scene centred on the Sun (offset 0) under a camera of near 10 / far 10¹³,
   the Sun point's M_V 4.81, the 2,000-pc zoom cap, α Cen B the nearest star
   at 1.255 pc (the photometric clump's absence) — born from the owner's
-  second look; fail-proven under `ESSRT_SKY_PLANT=1` (the scene's reading
-  shifted 2″).
+  second look; and the per-star handover: at −1.1 Myr (fade 0.50) the
+  catalogue share 0.48–0.52 and a star's two alphas summing to 1 — born
+  from "at 1.1 Myr the sky is more or less empty"; fail-proven under
+  `ESSRT_SKY_PLANT=1` (the scene's reading shifted 2″).
 - **The focused chain planet's orbit-plane grid** passes through the
   rendered Sun with its normal along the chain's orbit normal of date (born
   from the owner's "the tilt of Mercury's path floats above the Sun": the

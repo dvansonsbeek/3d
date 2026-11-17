@@ -75,6 +75,13 @@ const s998 = await land('-998000 d172');
 const s1150 = await land('-1150000 d172');
 const s10m = await land('-10000000 d172');
 check('regime: linear at −998 kyr, handover at −1.15 Myr (0 < fade < 1), statistical at −10 Myr; the dome\'s brightness untouched', s998.regime === 'linear' && s998.fade === 1 && s1150.regime === 'handover' && s1150.fade > 0 && s1150.fade < 1 && s10m.regime === 'statistical' && s10m.fade === 0 && s48.dome === s10m.dome, `fade ${s998.fade} / ${s1150.fade.toFixed(3)} / ${s10m.fade}, dome ${s48.dome}`);
+// The handover is PER STAR (the owner: "at 1.1 Myr the sky is more or less empty" — a tier-wide cross-fade
+// halved every star at the midpoint): at −1.1 Myr (fade 0.5) half the stars are still in the catalogue at
+// full light and half have become their statistical twins; a star's two alphas sum to 1; the Sun never hands over.
+await land('-1098000 d172');
+const ho = await sim.page.evaluate(() => { const T = window.__test__; const S = T.skyState(); return { fade: S.regimeFade, share: S.catalogueShare, sirius: T.starHandoverAlpha(32349), groombridge: T.starHandoverAlpha(57939) }; });
+check('the handover is per star: at −1.1 Myr (fade 0.50) the catalogue share is 0.48–0.52, each star\'s catalogue + statistical alphas sum to 1', Math.abs(ho.fade - 0.5) < 0.01 && ho.share > 0.48 && ho.share < 0.52 && Math.abs(ho.sirius.catalogue + ho.sirius.statistical - 1) < 1e-9 && Math.abs(ho.groombridge.catalogue + ho.groombridge.statistical - 1) < 1e-9, `fade ${ho.fade.toFixed(3)}, share ${ho.share.toFixed(3)}, Sirius ${ho.sirius.catalogue.toFixed(2)}/${ho.sirius.statistical.toFixed(2)} (phase ${ho.sirius.phase.toFixed(3)})`);
+await land('-10000000 d172');   // back to −10 Myr for the statistical reads below
 // PLAN 28 §E — the statistical sky and the dome's turn: beyond the handover the catalogue tiers are
 // off and the statistical tier is on (every star's magnitude and Galactic latitude kept, the
 // longitude a seeded draw per 100-Myr cell); the same cell reproduces the same positions, another
