@@ -4756,6 +4756,8 @@ if (typeof window !== 'undefined') {
     // the supernova illustration: the event after/before an engine year, the jump (the date and the camera), the flashes alive, the camera's gaze
     supernovaEvent: (dir, year) => _skyOfDate.supernovaEvent(dir, year),
     jumpToSupernova: (dir) => jumpToSupernova(dir),
+    supernovaNearest: () => _skyOfDate.supernovaNearest(),
+    jumpToSupernovaNearest: () => jumpToSupernovaNearest(),
     supernovaState: () => _skyOfDate.supernovaState(),
     cameraForwardWorld: () => camera.getWorldDirection(new THREE.Vector3()).toArray(),
     engineYearOfPos: () => _engineYearTT(jdFromPos(o.pos)),
@@ -22709,6 +22711,11 @@ function setupGUI() {
   _snBtnRow.className = 'tp-nav-toolbar';
   _snBtnRow.appendChild(_mkEclBtn('‹ Jump to Prev', 'Jump to the previous (earlier) flash of the illustration and turn the camera to it.', () => _navigateSn(-1)));
   _snBtnRow.appendChild(_mkEclBtn('Jump to Next ›', 'Jump to the next (later) flash of the illustration and turn the camera to it.', () => _navigateSn(+1)));
+  _snBtnRow.appendChild(_mkEclBtn('Nearest', 'Jump to the flash nearest to Earth at its peak — a star\'s own end on its orbit (seeded successors excluded): about 79 pc at +26.7 Myr, as bright as the full Moon. The first click integrates every candidate\'s orbit to its band\'s end (a moment).', () => {
+    const ev = jumpToSupernovaNearest();
+    if (!ev) { o.snEvent = 'no flash inside the catalogue regime'; _snRefresh(null); return; }
+    _snRefresh(ev);
+  }));
   snBindings[snBindings.length - 1].element.after(_snBtnRow);
 
   // ── Secular Eigenmodes (g & s) — top-level, calculated category ──
@@ -28393,7 +28400,14 @@ function _jdUTOfEngineYear(year) {
  *  camera goes to the far side of its target from the flash's direction, at its distance). Returns the event, or
  *  null beyond the catalogue regime. @param {number} dir */
 function jumpToSupernova(dir) {
-  const ev = _skyOfDate.supernovaEvent(dir, _engineYearTT(jdFromPos(o.pos)));
+  return jumpToSupernovaEvent(_skyOfDate.supernovaEvent(dir, _engineYearTT(jdFromPos(o.pos))));
+}
+/** The flash nearest to Earth at its peak (a star's own end on its orbit; ONE place: the sky module's supernovaNearest). */
+function jumpToSupernovaNearest() {
+  return jumpToSupernovaEvent(_skyOfDate.supernovaNearest());
+}
+/** Land on a flash's peak and face it. @param {object | null} ev  a described event (null: nothing to do) */
+function jumpToSupernovaEvent(ev) {
   if (!ev) return null;
   jumpToJulianDay(_jdUTOfEngineYear(ev.peakYear));
   o.Date = sceneDateLabel(o.pos);

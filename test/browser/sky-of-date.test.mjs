@@ -165,6 +165,14 @@ check('jump to the next supernova: the landing\'s engine year ≡ the peak to a 
 const snP = await sim.page.evaluate(() => { const T = window.__test__; T.jumpToSupernova(-1); return T.jumpToSupernova(-1); });
 await settle();
 check('jump to the previous supernova twice: an earlier generation at a seeded place (gen ≥ 1), its peak before J2000, a finite direction', !!snP && snP.gen >= 1 && snP.peakYear < 2000 && snP.localUnit.every(Number.isFinite) && Math.abs(Math.hypot(...snP.localUnit) - 1) < 1e-6, `${snP && snP.name} HIP ${snP && snP.hip} gen ${snP && snP.gen} at ${snP && ((snP.peakYear - 2000) / 1e6).toFixed(3)} Myr`);
+// The NEAREST flash (the owner: "when will the closest to earth supernova be?"): among the stars' own ends (generation 0,
+// on their integrated orbits) the smallest distance at the peak — HIP 111022 at +26.7 Myr, ~79 pc, V ≈ −12.4; the jump
+// lands on it with the flash alive.
+const snN = await sim.page.evaluate(() => { const T = window.__test__; const ev = T.jumpToSupernovaNearest(); return { ev, memo: T.supernovaNearest() }; });
+await settle();
+const snNA = await sim.page.evaluate(() => { const T = window.__test__; T.skyUpdate(true); return { year: T.engineYearOfPos(), active: T.supernovaState().active }; });
+const nearFlash = snNA.active.find((a) => a.hip === snN.ev.hip && a.gen === 0);
+check('the nearest flash: HIP 111022\'s own end at +26.7 Myr, 70–90 pc, V −12 to −13; the jump lands on its peak with the flash alive; memoised', !!snN.ev && snN.ev.hip === 111022 && snN.ev.gen === 0 && Math.abs(snN.ev.peakYear - 2000 - 26.71e6) < 2e4 && snN.ev.distPc > 70 && snN.ev.distPc < 90 && snN.ev.peakVmag > -13 && snN.ev.peakVmag < -12 && Math.abs(snNA.year - snN.ev.peakYear) < 1 / 365 && !!nearFlash && snN.memo && snN.memo.hip === snN.ev.hip, `${snN.ev && `HIP ${snN.ev.hip} gen ${snN.ev.gen} at +${((snN.ev.peakYear - 2000) / 1e6).toFixed(2)} Myr, ${snN.ev.distPc.toFixed(0)} pc, V ${snN.ev.peakVmag.toFixed(1)}`}; landed ${snNA.year.toFixed(2)}, flash ${nearFlash ? 'alive' : 'none'}`);
 await land('2000 d172'); await settle();
 // The stars that ARRIVE (plan 28 §D): the Gaia tier loaded (its counts the manifest's), its stars drawn as they
 // brighten past V 8 — at +20 Myr thousands of them are within the cut while today most sit far and faint.

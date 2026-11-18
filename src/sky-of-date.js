@@ -847,6 +847,22 @@ export function createSkyOfDate(deps) {
       if (k < 0 || k >= S.snEvents.length) return null;
       return describeEvent(S.snEvents[k], k);
     },
+    /** The flash nearest to Earth at its peak among the stars' OWN ends (generation 0, on their orbits — a seeded successor's
+     *  place is statistics, not a star): every candidate's peak distance integrated once and memoised. HIP 111022 at
+     *  +26.7 Myr, 79 pc (the owner: "when will the closest to earth supernova be?"). */
+    supernovaNearest() {
+      if (!S.snEvents || !S.snEvents.length) return null;
+      if (S.snNearest === undefined) {
+        let best = null, bestD = Infinity;
+        S.snEvents.forEach((ev, k) => {
+          if (ev.gen !== 0) return;
+          const p = eventLocalPc(ev, ev.t), d = Math.hypot(p[0], p[1], p[2]);
+          if (d < bestD) { bestD = d; best = k; }
+        });
+        S.snNearest = best === null ? null : describeEvent(S.snEvents[best], best);
+      }
+      return S.snNearest;
+    },
     /** The supernova illustration's state: the candidates, the events, the flashes alive now. */
     supernovaState() { return { candidates: S.snCandidates ?? null, events: S.snEvents ? S.snEvents.length : null, active: S.snActive || [], constants: SUPERNOVA_ILLUSTRATION }; },
     /** A star's twin for the gates: its generation at the current year, its lifetime, the twin's drawn position (units) and the

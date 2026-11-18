@@ -3096,7 +3096,14 @@ lived candidate's own end — HIP 89341 at +1.16 Myr — and the one before it
 that star's earlier generation; a jump landing on the peak to a day with
 the flash alive at its peak magnitude and the camera's gaze ≥ 0.99 on it;
 two jumps back an earlier generation at a seeded place; null beyond the
-regime).
+regime). A third button, **Nearest** (the owner: "when will the closest to
+earth supernova be?"), lands on the flash nearest to Earth at its peak among
+the stars' OWN ends on their integrated orbits (a seeded successor's place
+is statistics): HIP 111022, 505 pc today, 79 pc at +26.7 Myr, V −12.4 —
+the full Moon's brightness; the named ones Alnitak (+15.3 Myr, 249 pc),
+Aladfar (+36.2, 226), Sadalsuud (+51.3, 264). Said with it: 27 Myr of
+orbit turns a 1 km/s velocity error into 27 pc, and the band dates no real
+star (Spica at 77 pc and Betelgeuse at 170 pc could go much sooner).
 
 ---
 
