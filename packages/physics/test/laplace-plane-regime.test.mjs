@@ -246,5 +246,36 @@ check('free inclination at the edge 9–17° with its band ordered', iBand > 8 &
   check('composed scene obliquity: the hybrid where w = 0 or the cited mean is NaN; the shifted hybrid where w = 1', composeSceneObliquityDeg(23.5, 23.3, 11.9, 0) === 23.5 && composeSceneObliquityDeg(23.5, 23.3, NaN, 1) === 23.5 && Math.abs(composeSceneObliquityDeg(23.5, 23.3, 11.9, 1) - 12.1) < 1e-12, `${composeSceneObliquityDeg(23.5, 23.3, 11.9, 1)}`);
 }
 
+// ── PLAN 31 B — the Moon's axial tilt of date: the Cassini state on the regime (ONE home moon/cassini-state; doc 111 §1.49) ──
+//   the anchor: the shipped obliquity at J2000 ≡ the measured composition −(i₀ + 1.5424°) exactly, the equation's own
+//   within 0.05° of it (state 2); the frozen figure holds no state 1 at the edge (the measured fact that forces the
+//   hydrostatic early figure); on the shipped reading the Moon is in state 1 at the edge with |ε| < 1.5°, the
+//   transition (state 1 vanishing) lies at 33–34.5 R⊕ between 4,100 and 4,200 Ma — Ward 1975's 34 R⊕ — with the
+//   last state-1 obliquity 20–30° and state 2 there 40–60°; state 2 at 2.46 Ga reads 7–9°, decaying to today; the
+//   band's four readings are within 2° of each other at 2.46 Ga and their transitions within 1 R⊕; pure in the age.
+{
+  const { createCassiniState, CASSINI_FIGURE } = require(join(ROOT, 'packages/physics/src/moon/cassini-state.cjs'));
+  const cs = createCassiniState({
+    constants: { gmEarthMoonM3S2: DT.EPOCH_PARAMS.gmEarthMoonM3S2 ?? (398600.435507e9 + 4902.800118e9), earthRadiusMetres: DT.EPOCH_PARAMS.earthRadiusM ?? R_E, moonInclinationJ2000Deg: DT.meanLunarFreeInclinationDegAtAge(0), moonObliquityEclipticJ2000Deg: 1.5424 },
+    fns: { moonDistanceMetresAtAge: DT.meanMoonDistanceMetresAtAge, lunarNodePeriodSecondsAtAge: DT.meanLunarNodePrecessionAtAge, freeInclinationDegAtAge: DT.meanLunarFreeInclinationDegAtAge, freeInclinationBandDegAtAge: DT.meanLunarFreeInclinationBandDegAtAge },
+  });
+  const s0 = cs.stateAtAge(0), i0 = DT.meanLunarFreeInclinationDegAtAge(0);
+  check('Cassini: the shipped obliquity at J2000 ≡ the measured composition', !!s0 && s0.state === 2 && Math.abs(s0.obliquityToOrbitDeg + (i0 + 1.5424)) < 1e-12, `${s0 && s0.obliquityToOrbitDeg}`);
+  check('Cassini: the equation\'s own J2000 state within 0.05° of the measured', !!s0 && Math.abs(s0.obliquityToOrbitEqDeg + (i0 + 1.5424)) < 0.05, `${s0 && s0.obliquityToOrbitEqDeg}`);
+  const frozenEdge = cs.rawAtAge(EDGE_MA, { hydrostaticRadiusRe: 'frozen' });
+  check('Cassini: the frozen figure holds no state 1 at the edge (the hydrostatic early figure is forced)', !!frozenEdge && frozenEdge.state1Deg === null && cs.transition({ hydrostaticRadiusRe: 'frozen' }) === null, `${frozenEdge && frozenEdge.state1Deg}`);
+  const sE = cs.stateAtAge(EDGE_MA);
+  check('Cassini: state 1 at the edge, |ε| < 1.5°', !!sE && sE.state === 1 && Math.abs(sE.obliquityToOrbitDeg) < 1.5 && sE.obliquityToOrbitDeg > 0, `${sE && sE.obliquityToOrbitDeg}`);
+  const tr = cs.transition();
+  check('Cassini: the transition at 33–34.5 R⊕, 4,100–4,200 Ma (Ward 1975: 34 R⊕), the last state-1 obliquity 20–30°, state 2 there 40–60°', !!tr && tr.aOverEarthRadii > 33 && tr.aOverEarthRadii < 34.5 && tr.ageMa > 4100 && tr.ageMa < 4200 && tr.lastState1Deg > 20 && tr.lastState1Deg < 30 && -tr.state2Deg > 40 && -tr.state2Deg < 60, JSON.stringify(tr));
+  const s246 = cs.stateAtAge(2460), s14 = cs.stateAtAge(1400);
+  check('Cassini: state 2 at 2.46 Ga reads 8.5–10.5° (measured 9.31), at 1.4 Ga 7.5–9° (8.22), both larger than today', !!s246 && s246.state === 2 && -s246.obliquityToOrbitDeg > 8.5 && -s246.obliquityToOrbitDeg < 10.5 && !!s14 && -s14.obliquityToOrbitDeg > 7.5 && -s14.obliquityToOrbitDeg < 9 && -s14.obliquityToOrbitDeg < -s246.obliquityToOrbitDeg, `${s246 && s246.obliquityToOrbitDeg} / ${s14 && s14.obliquityToOrbitDeg}`);
+  const band = cs.bandAtAge(2460);
+  const trs = [cs.transition({ kappaBand: true }), cs.transition({ hydrostaticRadiusRe: CASSINI_FIGURE.hydrostaticRadiusBandEarthRadii }), cs.transition({ kappaBand: true, hydrostaticRadiusRe: CASSINI_FIGURE.hydrostaticRadiusBandEarthRadii })];
+  check('Cassini: the band\'s four readings within 2° at 2.46 Ga and their transitions within 1 R⊕ of the shipped one', band.readings.length === 4 && band.maxObliquityToOrbitDeg - band.minObliquityToOrbitDeg < 2 && trs.every((t) => t !== null && Math.abs(t.aOverEarthRadii - tr.aOverEarthRadii) < 1), `${band.minObliquityToOrbitDeg}…${band.maxObliquityToOrbitDeg}; ${trs.map((t) => t && t.aOverEarthRadii.toFixed(2)).join(' ')}`);
+  const sA = cs.stateAtAge(3000), sB = cs.stateAtAge(100), sA2 = cs.stateAtAge(3000);
+  check('Cassini: pure in the age (the same value in any order of asking)', !!sA && !!sB && JSON.stringify(sA) === JSON.stringify(sA2), '');
+}
+
 if (failures.length) { console.error(`laplace-plane-regime: ${failures.length} FAILURE(S)\n  ${failures.join('\n  ')}`); process.exit(1); }
 console.log(`laplace-plane-regime: OK — R ≡ 1 at J2000 (${(1 - r10k).toExponential(1)} at 10 kyr), 1 % reach ${onePct} Ma, r_L ${(DT.meanLaplaceRadiusMetresAtAge(0) / R_E).toFixed(2)} → ${(DT.meanLaplaceRadiusMetresAtAge(EDGE_MA) / R_E).toFixed(2)} R⊕, edge clock ${Tp.toFixed(0)} yr (ecliptic form ${TpEcliptic.toFixed(2)}, solar-only ${TpSolar.toFixed(0)}, lock ${(2 * Math.PI / lock).toFixed(0)}), node ${nodeEdge.toFixed(2)} yr, free inclination ${iBand.toFixed(1)}–${iEdge.toFixed(1)}°`);

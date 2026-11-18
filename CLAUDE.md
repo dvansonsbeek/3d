@@ -614,6 +614,17 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   the band's instant** (ONE home `sky/supernova`: the II-P peak at the
   star's distance; the folder's jump lands on the peak and faces it; never
   a date — the band knows brightness, not age). (§1.48)
+- **The Moon's axial tilt of date is a Cassini state, not a composition —
+  and a frozen figure cannot hold the early Moon** — the scene composed the
+  J2000 state (1.54° + 5.15°) at every age; Ward's relation on the regime's
+  node rate, free inclination and mean motion of date (ONE home
+  `moon/cassini-state`) reads under 1° to the orbit in the first ~100 Myr,
+  27° at 33.5 R⊕ (4.15 Ga, Ward's 34 reproduced), a fall to ~50° in state 2,
+  6.7° only inside the last ~2.5 Gyr; today's figure frozen at every age
+  holds no low state inside 7 R⊕, so the early figure is hydrostatic (∝ a⁻³
+  inside 15 R⊕) — test a cited relation at the edge before adopting its
+  literature assumption. Anchored on the measured J2000 composition
+  (ratio 0.996), a labelled band, never a dated event. (§1.49)
 
 ---
 

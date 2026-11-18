@@ -40,8 +40,9 @@
 import { createRequire } from 'node:module';
 import { openSimulator } from './harness.mjs';
 import { meanYearInDaysAtAge, meanMoonDistanceAtAge, meanAuAtAge, posFromJD, jdFromPos, navigablePosRange, meanLunarFreeInclinationDegAtAge, meanLaplaceTiltFromEclipticDegAtAge } from '../../tools/lib/deep-time.js';
-import { createModel, ONE_FAMILY_WINDOW_YEARS, createLunarPlaneScales, LUNAR_PLANE_TILT_ANCHOR_DEG } from '@essrt/physics';
+import { createModel, ONE_FAMILY_WINDOW_YEARS, createLunarPlaneScales, LUNAR_PLANE_TILT_ANCHOR_DEG, createCassiniState } from '@essrt/physics';
 const require = createRequire(import.meta.url);
+const DTn = require('../../tools/lib/deep-time.js');   // the Node twin's readers for the Cassini state (plan 31 B)
 const { jdToDecimalYear } = require('@essrt/physics/time/calendar');
 
 // The edge JDs are the twin's OWN UT axis (doc 111 §1.36): a linear 365.25-day count overshoots
@@ -371,6 +372,11 @@ for (const jd of DOMAIN_EDGE_JDS) {
   // the composed ecliptic inclination the panel row shows (the tilt's sign and the node together),
   // the tilt ≡ the series' anchor × the chain's shape.
   const planeScales = createLunarPlaneScales({ tiltDegAtAge: meanLaplaceTiltFromEclipticDegAtAge, freeInclinationDegAtAge: meanLunarFreeInclinationDegAtAge });
+  // PLAN 31 B — the Node twin of the Moon's Cassini state of date, on tools/lib's readers (the browser builds the same on the chain's)
+  const cassiniNode = createCassiniState({
+    constants: { gmEarthMoonM3S2: DTn.EPOCH_PARAMS.gmEarthMoonM3S2, earthRadiusMetres: DTn.EPOCH_PARAMS.earthRadiusM, moonInclinationJ2000Deg: meanLunarFreeInclinationDegAtAge(0), moonObliquityEclipticJ2000Deg: 1.5424 },
+    fns: { moonDistanceMetresAtAge: DTn.meanMoonDistanceMetresAtAge, lunarNodePeriodSecondsAtAge: DTn.meanLunarNodePrecessionAtAge, freeInclinationDegAtAge: meanLunarFreeInclinationDegAtAge, freeInclinationBandDegAtAge: DTn.meanLunarFreeInclinationBandDegAtAge },
+  });
   for (const r of domainRows.spin) {
     const e = r.eps, tMa = (2000 - e.year) / 1e6, era = r.jd === SPIN_MODERN_JD;
     const citedNode = m.earth.meanObliquityCitedDeg(e.year);
@@ -386,6 +392,15 @@ for (const jd of DOMAIN_EDGE_JDS) {
       && g.eclInclExpectedDeg >= Math.abs(g.incExpectedDeg - g.tiltDeg) - 1e-9 && g.eclInclExpectedDeg <= g.incExpectedDeg + g.tiltDeg + 1e-9;
     if (!okRing) fail++;
     console.log(`${okRing ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Moon plane of date: free inclination ${g ? g.incDeg.toFixed(6) : 'NaN'}° (chain ${iLNode.toFixed(6)}), tilt ${g ? g.tiltDeg.toFixed(6) : 'NaN'}° (${tiltNode.toFixed(6)}), ecliptic inclination drawn/composed ${g ? g.eclInclMeasuredDeg.toFixed(6) : 'NaN'} / ${g ? g.eclInclExpectedDeg.toFixed(6) : 'NaN'}°`);
+    // PLAN 31 B (doc 111 §1.49): the Moon's AXIAL TILT of date — the drawn axis (the mesh's rotation.z, the obliquity
+    // to its orbit normal in the scene's signed convention) ≡ the Cassini state on the chain's regime readers (ONE
+    // home moon/cassini-state, the Node twin on tools/lib): state 2 at the era and at 2.46 Ga (|ε| 6.70° today, 7.8°
+    // at 2.46 Ga), state 1 at the edge (|ε| < 1.5°); the measured composition exact at J2000.
+    const cs = cassiniNode.stateAtAge(Math.round(tMa * 1e4) / 1e4);   // the scene evaluates at its 100-yr grain's age
+    const okTilt = !!g && !!cs && Number.isFinite(g.axialTiltDeg) && Math.abs(g.axialTiltDeg - cs.obliquityToOrbitDeg) <= 1e-9 && g.axialTiltState === cs.state
+      && (era ? Math.abs(g.axialTiltDeg + 6.6997) <= 1e-3 && cs.state === 2 : true) && (tMa > 4400 ? cs.state === 1 && Math.abs(cs.obliquityToOrbitDeg) < 1.5 : true) && (tMa > 2000 && tMa < 2500 ? cs.state === 2 && Math.abs(cs.obliquityToOrbitDeg) > 8.5 && Math.abs(cs.obliquityToOrbitDeg) < 10.5 : true);
+    if (!okTilt) fail++;
+    console.log(`${okTilt ? '  ok ' : 'FAIL '} JD ${r.jd.toFixed(0).padStart(14)}  Moon axial tilt of date: drawn ${g && Number.isFinite(g.axialTiltDeg) ? g.axialTiltDeg.toFixed(6) : 'NaN'}° (Cassini state ${g ? g.axialTiltState : '?'}), Node ${cs ? cs.obliquityToOrbitDeg.toFixed(6) : 'null'}° (state ${cs ? cs.state : '?'}, θ ${cs ? cs.thetaDeg.toFixed(3) : '?'}°, i_L ${cs ? cs.inclinationDeg.toFixed(3) : '?'}°)`);
   }
   // THE ONE DEEP CLOCK (doc 111 §1.36): (1) the scene's labelled year of date ≡ the civil year
   // of the TT instant the model's bridge gives (the engine's year axis, two runtimes — NOT the

@@ -27,7 +27,7 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   createDeepTimeChain,
   // the lunar plane of date (plan 31 A2): the Laplace tilt's shape and the free inclination's
   // F-class scales the lunar series rides, on the chain's regime readers (ONE home moon/plane-of-date)
-  createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG,
+  createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG, createCassiniState,
   createSolarPerturbationScales,
   // the obliquity a drawn scene shows beyond the hybrid's domain (plan 31 A2): the cited mean with the
   // hybrid's wobble about its beat mean, handed over C¹ (ONE home earth/scene-obliquity)
@@ -1676,6 +1676,41 @@ function _moonPlaneTiltDegAtJD(jdUT) {
 function _moonFreeInclinationDegAtJD(jdUT) {
   if (!DEEP_TIME_MODE_ENABLED) return moonEclipticInclinationJ2000;
   return _dtc().meanLunarFreeInclinationDegAtAge((2000 - _engineYearTT(jdUT)) / 1e6) ?? moonEclipticInclinationJ2000;
+}
+/** PLAN 31 B — the Moon's AXIAL TILT of date: the Cassini state on the chain's regime readers (ONE home
+ *  moon/cassini-state; the Node twin builds the same on tools/lib — the epoch gate reads the two against each
+ *  other). Built once; the J2000 value is the measured composition the Moon def carries at build time. */
+let _cassiniStateM = null;
+function _cassiniState() {
+  if (_cassiniStateM === null) {
+    const P = _dtc().EPOCH_PARAMS;
+    _cassiniStateM = createCassiniState({
+      constants: { gmEarthMoonM3S2: P.gmEarthMoonM3S2, earthRadiusMetres: P.earthRadiusM, moonInclinationJ2000Deg: moonEclipticInclinationJ2000, moonObliquityEclipticJ2000Deg: moonObliquityEclipticJ2000 },
+      fns: { moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge, lunarNodePeriodSecondsAtAge: meanLunarNodePrecessionAtAge, freeInclinationDegAtAge: _dtc().meanLunarFreeInclinationDegAtAge, freeInclinationBandDegAtAge: _dtc().meanLunarFreeInclinationBandDegAtAge },
+    });
+  }
+  return _cassiniStateM;
+}
+/** The Cassini state at a scene instant, memoised on a 100-year grain of the age (the tilt moves on Myr scales;
+ *  the state solve is ~1 ms); null outside deep-time mode or the histories. */
+let _moonTiltMemo = { key: NaN, value: null };
+function _moonAxialTiltOfDate(jdUT) {
+  if (!DEEP_TIME_MODE_ENABLED) return null;
+  const tMa = (2000 - _engineYearTT(jdUT)) / 1e6;
+  const key = Math.round(tMa * 1e4);
+  if (key === _moonTiltMemo.key) return _moonTiltMemo.value;
+  // evaluated AT the grain's age (key / 1e4), so the value is a pure function of the grain — the epoch gate's Node
+  // twin reads the same quantised age (a first form evaluated at the first instant seen in the grain: 1e-6° apart)
+  const value = _cassiniState().stateAtAge(key / 1e4);
+  _moonTiltMemo = { key, value };
+  return value;
+}
+/** The Moon's axial tilt of date in the scene's signed convention (the obliquity to its orbit normal; negative
+ *  = today's state 2, the spin axis on the far side of the Laplace pole; positive = state 1 early) — the Moon
+ *  def's J2000 composition where the state is unavailable. */
+function _moonAxialTiltDegAtJD(jdUT) {
+  const s = _moonAxialTiltOfDate(jdUT);
+  return s ? s.obliquityToOrbitDeg : moon.tilt;
 }
 /** The mean orbit plane's inclination to the ecliptic OF DATE at the node of date (ONE home
  *  composeEclipticInclinationDeg): |i_L − θ| … i_L + θ over the node cycle. */
@@ -4791,7 +4826,9 @@ if (typeof window !== 'undefined') {
         // against the ecliptic pole of date (= the composed ecliptic inclination the panel row shows)
         incDeg: Math.acos(Math.max(-1, Math.min(1, m.dot(_MM_N)))) / D2R, incExpectedDeg: _moonFreeInclinationDegAtJD(o.julianDay),
         eclInclMeasuredDeg: Math.acos(Math.max(-1, Math.min(1, m.dot(new THREE.Vector3(0, 1, 0).applyQuaternion(earthPerihelionPrecession1.containerObj.getWorldQuaternion(new THREE.Quaternion())).normalize())))) / D2R,
-        eclInclExpectedDeg: _moonEclipticInclinationOfDateDegAtJD(o.julianDay), tiltDeg: _moonPlaneTiltDegAtJD(o.julianDay) };
+        eclInclExpectedDeg: _moonEclipticInclinationOfDateDegAtJD(o.julianDay), tiltDeg: _moonPlaneTiltDegAtJD(o.julianDay),
+        // plan 31 B: the drawn AXIAL tilt (the mesh's rotation.z, signed) and the Cassini state it was posed from
+        axialTiltDeg: moon.rotationAxis ? moon.rotationAxis.rotation.z / D2R : NaN, axialTiltState: (() => { const s = _moonAxialTiltOfDate(o.julianDay); return s ? s.state : 2; })() };
     },
     /** PLAN 31 A2 — the Genesis Analysis chart's obliquity band at an age (Myr before J2000): the drawn centre, the beat's min/max about it, the hybrid's own beat mean. */
     sceneObliquityBandAtAge: (tMa) => _sceneObliquityBandAtAge(tMa),
@@ -5598,7 +5635,7 @@ const moon = {
   startPos: 0,   // the certified override places the Moon's direction and distance every frame
   speed: (Math.PI*2) * SI_TROPICAL_YEAR_DAYS / moonNodalMonth,  // draconitic (nodal-month) clock 27.2122209 d (+84.332861 rad/yr) — layer sum = tropical month by exact integer identity
   rotationSpeed: 0,
-  tilt: -(moonEclipticInclinationJ2000 + moonObliquityEclipticJ2000),  // Cassini composition in the scene's own convention (5.1573 + 1.5424 = 6.6997): rendered spin-to-ecliptic = measured 1.5424° (catalog 6.687 is the Brown-convention composition)
+  tilt: -(moonEclipticInclinationJ2000 + moonObliquityEclipticJ2000),  // Cassini composition in the scene's own convention (5.1573 + 1.5424 = 6.6997): rendered spin-to-ecliptic = measured 1.5424° (catalog 6.687 is the Brown-convention composition); the J2000 value — the axis is re-posed OF DATE every frame from the Cassini state on the regime (plan 31 B, _moonAxialTiltDegAtJD)
   orbitRadius: (moonDistance/currentAUDistance)*100,
   orbitCentera: 0,
   orbitCenterb: 0,
@@ -29113,10 +29150,17 @@ const planetStats = {
        constant: true},
       'null_row',
      null,
-      {label : () => `Axial tilt`,
-       value : [ { v: () => moonTilt, dec:6, sep:',' },{ small: 'degrees (°)' }],
-       hover : [`Catalog CONVENTION-COMPOSED tilt: Brown/ELP inclination constant 5.1454° + measured spin-to-ecliptic obliquity ε_ecl = 1.5424°. The mesh applies the same composition in the scene's own convention (dynamical i 5.1573° + ε 1.5424° = 6.6997°) so the rendered obliquity to the ecliptic equals the measured 1.5424°. ε_ecl is DERIVED to 0.30% from GRAIL/LLR J₂/C₂₂/C-MR² + the framework's own month/node/mass-ratio by full Euler integration of the rigid-body rotation (tools/explore/moon-euler-rotation.js → 1.5470°); the fixed-axis averaged balance gives 1.5551° and the libration–pole coupling accounts for 64% of that gap. Residual 16.5″ = the known unmodelled channels (elastic k₂, degree-3 gravity, two-layer core) — named, not absorbed. The Cassini physics is classical (Colombo 1966, Peale 1969); the claim is that the framework's constants reproduce it. The axis co-precesses with the node (18.6-yr period, Cassini's third law)`],
-       constant: true},
+      {label : () => `Axial tilt (of date)`,
+       value : [ { v: () => Math.abs(_moonAxialTiltDegAtJD(o.julianDay)), dec:4, sep:',' },{ small: 'degrees (°) to its orbit' }],
+       hover : () => {
+         const s = _moonAxialTiltOfDate(o.julianDay);
+         const band = s ? _cassiniState().bandAtAge(s.ageMa) : null;
+         const tr = s && s.transition;
+         const now = s
+           ? `Of date: Cassini state ${s.state} — the spin axis ${s.obliquityToLaplacePoleDeg.toFixed(3)}° from the Laplace pole on the ${s.state === 2 ? 'far side' : 'orbit normal\'s side'}, ${Math.abs(s.obliquityToOrbitDeg).toFixed(3)}° to its orbit normal (the free inclination ${s.inclinationDeg.toFixed(3)}°, the node ${s.nodePeriodYears.toFixed(2)} yr); the band's four readings (the figure hydrostatic inside 15 or 21 R⊕, the inclination's exponent 1/2 or 1/4): ${band && band.minObliquityToOrbitDeg !== null ? `${band.minObliquityToOrbitDeg.toFixed(2)}–${band.maxObliquityToOrbitDeg.toFixed(2)}°` : '—'}.${tr ? ` The transition — state 1 merging with its unstable partner, the Moon falling to state 2 at ~${Math.abs(tr.state2Deg).toFixed(0)}° — at ${tr.aOverEarthRadii.toFixed(1)} R⊕, ${tr.ageMa.toFixed(0)} Ma (Ward 1975: 34 R⊕); drawn as the equilibrium jump, the real episode a damped oscillation.` : ''}`
+           : 'The J2000 composition (outside deep-time mode or the cited history).';
+         return [`${now} DERIVED on the regime of date (plan 31 A: the node's period and the free inclination) and a CITED figure — (C−A)/C 6.3e-4, (B−A)/C 2.28e-4; hydrostatic (∝ a⁻³) inside the radius where today's figure was hydrostatic, since today's figure frozen at every age holds no low-obliquity state inside 7 R⊕ — by Peale's (1969) and Ward's (1975) Cassini-state relation on the Moon's synchronous spin: a labelled BAND, never a dated event. Anchored on the measured J2000 composition: Brown/ELP inclination 5.1454° + measured spin-to-ecliptic obliquity 1.5424° (dynamical i 5.1573° + 1.5424° = 6.6997° in the scene's convention), which the framework's constants derive to 0.30% by full Euler integration (tools/explore/moon-euler-rotation.js → 1.5470°; the residual 16.5″ the known unmodelled channels: elastic k₂, degree-3 gravity, a two-layer core). The axis co-precesses with the node (Cassini's third law).`];
+       }},
       {label : () => `Orbital Eccentricity (e)`,
        value : [ { v: () => moonOrbitalEccentricityBase, dec:6, sep:',' },{ small: '' }],
        hover : [`Eccentricity of the Moon's orbit around Earth — a registry constant (the ELP/Brown mean value), the same at every epoch: the model carries no lunar eccentricity of date. The osculating value swings 0.026–0.077 through the evection and variation terms (periods of a month to a year, inside the Meeus series), and its secular tidal change is of order 1e-9 per century — invisible on every window the Framework Verification panels show, which is why there is no Moon eccentricity panel. The eccentricity that DOES vary in the lunar chain is Earth's (the solar perturbation's modulation), verified on the Earth orbit · Eccentricity panel`],
@@ -33752,6 +33796,10 @@ function _applyEngineEarthFrame(jdUT) {
   // the free inclination of date about the node — the Moon def's build-time tilt (rotation.z = −i,
   // below the nodal layer) re-posed from the chain's i_L(t): 5.16° today, 16° at the edge
   moon.containerObj.rotation.z = -_moonFreeInclinationDegAtJD(jdUT) * DEG2RAD;
+  // PLAN 31 B: the Moon's AXIAL tilt of date — the Cassini state on the regime (ONE home moon/cassini-state), re-posed
+  // from the def's build-time J2000 composition (−6.70°: state 2) to the state of date: under a degree in the first
+  // ~100 Myr (state 1), tens of degrees around 4.1 Ga, today's inside the last ~2.5 Gyr
+  if (moon.rotationAxis) moon.rotationAxis.rotation.z = _moonAxialTiltDegAtJD(jdUT) * DEG2RAD;
   // the Moon RING's stack layers from the lunar arguments: in the stack's
   // basis a layer angle θ carries the longitude 90° + θ, the apsidal arm
   // −a·e·X̂ points at the apogee, and the Moon def's fixed tilt puts the

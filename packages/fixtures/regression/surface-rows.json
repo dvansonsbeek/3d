@@ -34,7 +34,7 @@
   ],
   "summary": {
    "rows": 768,
-   "moving": 607,
+   "moving": 608,
    "blankSomewhere": 31,
    "hoverAtJ2000OnMoving": 0
   },
@@ -1965,22 +1965,22 @@
      "p990Myr": "4,902.818490 | km³/s²"
     }
    },
-   "moon#003 Axial tilt": {
+   "moon#003 Axial tilt (of date)": {
     "header": "General Characteristics",
-    "static": true,
+    "static": false,
     "class": {
-     "moves": false,
+     "moves": true,
      "blank": false,
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6.687000 | degrees (°)",
-     "m3000": "6.687000 | degrees (°)",
-     "m400Myr": "6.687000 | degrees (°)",
-     "m2460Myr": "6.687000 | degrees (°)",
-     "m4400Myr": "6.687000 | degrees (°)",
-     "genesis": "6.687000 | degrees (°)",
-     "p990Myr": "6.687000 | degrees (°)"
+     "today": "6.6997 | degrees (°) to its orbit",
+     "m3000": "6.6995 | degrees (°) to its orbit",
+     "m400Myr": "7.1378 | degrees (°) to its orbit",
+     "m2460Myr": "9.3216 | degrees (°) to its orbit",
+     "m4400Myr": "2.6471 | degrees (°) to its orbit",
+     "genesis": "0.9804 | degrees (°) to its orbit",
+     "p990Myr": "5.9498 | degrees (°) to its orbit"
     }
    },
    "moon#004 Orbital Eccentricity (e)": {
