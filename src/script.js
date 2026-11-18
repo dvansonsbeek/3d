@@ -2977,7 +2977,7 @@ function skyStatusClause(pos) {
   const skyFaint = skyG && skyG.faint
     ? 'Gaia DR3\'s six-dimensional stars brighter than absolute magnitude 2 — the stars a naked-eye sky is made of — and, to absolute magnitude 5, the fainter background pre-selected by its straight-line approach, complete to about ±20 Myr and thinning beyond'
     : 'Gaia DR3\'s six-dimensional stars brighter than absolute magnitude 2 — the stars a naked-eye sky is made of; the fainter background thins with the distance in time';
-  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 and Gaia DR3 positions, parallaxes, proper motions and radial velocities) carried on each star's GALACTIC ORBIT about its own guiding centre (an epicycle to second order in a cited local potential — McMillan 2017's R₀ and v₀, Bovy 2017's Oort B, the local density of McKee et al. 2015 — the Sun on its own; within ±1 Myr the orbit and a straight line agree to a fraction of a per cent), every star at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015), so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them. Stars that arrive from up to 1.5 kpc away (${skyFaint}) are drawn as they brighten past V 8 and leaving ones fade; a star outliving its main-sequence lifetime fades (a band — every star treated as mid-life) and a star of its luminosity is BORN in its place somewhere else at the same Galactic latitude (the next generation, a seeded place: the steady state of the population, an illustration — ${skyBirths}); the constellation lines fade as their shapes dissolve (the Big Dipper within ~100,000 years) while a star keeps its name for as long as it is drawn. By 20 Myr each star's measured velocity error (~1 km/s, 20 pc) makes its direction uncertain by degrees: the sky is statistically right — the real stars at roughly the right places and brightnesses — not a star chart. Valid to ±${(lim / 1e6).toFixed(0)} Myr of today.`;
+  if (Math.abs(dtYears) <= lim) return ` Sky: the cited astrometry (Hipparcos-2 and Gaia DR3 positions, parallaxes, proper motions and radial velocities) carried on each star's GALACTIC ORBIT about its own guiding centre (an epicycle to second order in a cited local potential — McMillan 2017's R₀ and v₀, Bovy 2017's Oort B, the local density of McKee et al. 2015 — the Sun on its own; within ±1 Myr the orbit and a straight line agree to a fraction of a per cent), every star at its measured distance (the parallax; a distance prior's mode where the parallax is poor, Bailer-Jones 2015), so the view zooms out past Proxima to the catalogue's reach (2,000 pc) and shows the neighbourhood as the 3-D cloud it is, the Sun a star among them. Stars that arrive from up to 1.5 kpc away (${skyFaint}) are drawn as they brighten past V 8 and leaving ones fade; a star outliving its main-sequence lifetime fades (a band — every star treated as mid-life) and a star of its luminosity is BORN in its place somewhere else at the same Galactic latitude (the next generation, a seeded place: the steady state of the population, an illustration — ${skyBirths}); a star of more than about eight solar masses ends its band lifetime as a SUPERNOVA flash (the type II-P peak at its distance, a two-week rise, a hundred-day plateau, the cobalt tail — the Supernova Illustration folder jumps to them; the band's instant, never a prediction of any real star's end); the constellation lines fade as their shapes dissolve (the Big Dipper within ~100,000 years) while a star keeps its name for as long as it is drawn. By 20 Myr each star's measured velocity error (~1 km/s, 20 pc) makes its direction uncertain by degrees: the sky is statistically right — the real stars at roughly the right places and brightnesses — not a star chart. Valid to ±${(lim / 1e6).toFixed(0)} Myr of today.`;
   const turns = Math.abs(dtYears) / (SKY_CONSTANTS.sunGalacticPeriodMyr * 1e6);
   const skyNow = _skyOfDate.loaded ? _skyOfDate.state() : null;
   const bob = skyNow && Number.isFinite(skyNow.sunHeightPc) ? ` The Sun sits ${Math.abs(skyNow.sunHeightPc).toFixed(0)} pc ${skyNow.sunHeightPc >= 0 ? 'north' : 'south'} of the Galactic plane (an oscillation of ±102 pc every 85 Myr in the same potential), so the band's midplane appears ${Math.abs(skyNow.bandShiftDeg).toFixed(1)}° ${skyNow.bandShiftDeg <= 0 ? 'south' : 'north'} — the parallax of the disc's light at 1.5 kpc, drawn as the dome's shift.` : '';
@@ -4753,6 +4753,12 @@ if (typeof window !== 'undefined') {
     // placed Earth frame) and the crossings solved on them; null crossings beyond the catalogue regime or before the table loads
     setZodiacVisible: (v) => { zodiac.visible = !!v; forceSceneUpdate(); return zodiac.visible; },
     setStarNamesVisible: (v) => { o.starNamesVisible = !!v; _skyOfDate.setNamesVisible(!!v); needsLabelUpdate = true; return o.starNamesVisible; },
+    // the supernova illustration: the event after/before an engine year, the jump (the date and the camera), the flashes alive, the camera's gaze
+    supernovaEvent: (dir, year) => _skyOfDate.supernovaEvent(dir, year),
+    jumpToSupernova: (dir) => jumpToSupernova(dir),
+    supernovaState: () => _skyOfDate.supernovaState(),
+    cameraForwardWorld: () => camera.getWorldDirection(new THREE.Vector3()).toArray(),
+    engineYearOfPos: () => _engineYearTT(jdFromPos(o.pos)),
     zodiacBandProbe: () => { const cr = _zodiacInRegime(o.julianDay) ? _zodiacCrossingsOfDate(o.julianDay) : null; return { ready: _zodiacState.ready, year: _zodiacState.year, inRegime: _zodiacInRegime(o.julianDay), frame: _zodiacState.frame, crossings: cr, visible: zodiac.visible, drawn: zodiac.children.filter((c) => c.visible).length }; },
     starDirectionAt: (hip, year) => _skyOfDate.starDirectionAt(hip, year),
     starRecord: (hip) => _skyOfDate.starRecord(hip),
@@ -22661,6 +22667,50 @@ function setupGUI() {
     () => _navigateLunarEcl(-1)));
   _lunarEclLastBladeEl.after(_lunarEclBtnRow);
 
+  // ── Supernova Illustration — the lifetime band's end for the massive stars (plan 28's follow-up) ──
+  // Prev/Next lands the simulation on the band's instant for a star of ≳ 8 solar masses (ONE home
+  // @essrt/physics sky/supernova; the events from src/sky-of-date.js) and turns the camera to the flash. An
+  // ILLUSTRATION, said on every surface: the band's date is a mass–luminosity scaling, not a prediction.
+  const snFolder = gui.addFolder({ title: 'Supernova Illustration', expanded: false });
+  snFolder.element.dataset.category = 'visualization';
+  addFolderTooltip(snFolder, 'An ILLUSTRATION, not a prediction. The sky of date draws every star while it is within its main-sequence lifetime from its luminosity — a band that treats every star as mid-life — and a star of more than about eight solar masses (absolute magnitude −2.5 or brighter) ends that lifetime as a core-collapse supernova: the mean type II-P peak (−16.9, Richardson et al. 2014) at the star\'s distance, a two-week rise, a hundred-day plateau and the cobalt tail. Prev/Next jumps the simulation to the peak of the previous or next flash — the star itself at the band\'s end in the future, its successors and earlier generations at their seeded places — and turns the camera to it. No real supernova is dated by this: the band knows a star\'s brightness, not its age (Betelgeuse gets 11 Myr on it, while the real star may explode within 100,000 years). Inside the catalogue regime (±60 Myr of today) only.');
+  snFolder.element.style.setProperty('--tp-blade-label-width', '30%');
+  o.snEvent = '— (click ‹ Prev / Next › to navigate) —';
+  o.snWhen = '—';
+  o.snPeak = '—';
+  o.snDistance = '—';
+  const snBindings = [
+    snFolder.addBinding(o, 'snEvent',    { label: 'Event',    readonly: true }),
+    snFolder.addBinding(o, 'snWhen',     { label: 'When',     readonly: true }),
+    snFolder.addBinding(o, 'snPeak',     { label: 'Peak',     readonly: true }),
+    snFolder.addBinding(o, 'snDistance', { label: 'Distance', readonly: true }),
+  ];
+  const _snTitleEl = snFolder.element.querySelector('.tp-fldv_t');
+  const _snRefresh = (ev) => {
+    if (ev) {
+      const who = ev.name ? `${ev.name} (HIP ${ev.hip})` : `HIP ${ev.hip}`;
+      const which = ev.gen === 0 ? 'the star itself, at the band\'s end' : ev.peakYear >= 2000 ? `its ${ordinalWord(ev.gen)} successor (a seeded place)` : `the ${ordinalWord(ev.gen)} earlier generation (a seeded place)`;
+      const dy = ev.peakYear - 2000;
+      o.snEvent = `${who} — ${which}`;
+      o.snWhen = `${o.Date} (${dy >= 0 ? '+' : '−'}${(Math.abs(dy) / 1e6).toFixed(2)} Myr; the band's instant, not a date)`;
+      o.snPeak = `V ${ev.peakVmag.toFixed(1)} (M_V −16.9 at ${Math.round(ev.distPc).toLocaleString('en-US')} pc) — an illustration`;
+      o.snDistance = `${Math.round(ev.distPc).toLocaleString('en-US')} pc; the star's M_V ${ev.absMag.toFixed(1)}, band lifetime ${(ev.tau / 1e6).toFixed(2)} Myr`;
+      if (_snTitleEl) _snTitleEl.textContent = `Supernova Illustration · ${ev.index + 1} of ${ev.count.toLocaleString('en-US')}`;
+    }
+    snBindings.forEach(b => b.refresh());
+    snBindings[0].element.title = o.snEvent; snBindings[1].element.title = o.snWhen; snBindings[2].element.title = o.snPeak; snBindings[3].element.title = o.snDistance;
+  };
+  const _navigateSn = (dir) => {
+    const ev = jumpToSupernova(dir);
+    if (!ev) { o.snEvent = 'no flash in this direction inside the catalogue regime (±60 Myr of today)'; _snRefresh(null); return; }
+    _snRefresh(ev);
+  };
+  const _snBtnRow = document.createElement('div');
+  _snBtnRow.className = 'tp-nav-toolbar';
+  _snBtnRow.appendChild(_mkEclBtn('‹ Jump to Prev', 'Jump to the previous (earlier) flash of the illustration and turn the camera to it.', () => _navigateSn(-1)));
+  _snBtnRow.appendChild(_mkEclBtn('Jump to Next ›', 'Jump to the next (later) flash of the illustration and turn the camera to it.', () => _navigateSn(+1)));
+  snBindings[snBindings.length - 1].element.after(_snBtnRow);
+
   // ── Secular Eigenmodes (g & s) — top-level, calculated category ──
   // The system-level mode table (owner-requested): the dominant apsidal
   // g-mode and nodal s-mode each planet rides, measured from the model's
@@ -28319,6 +28369,42 @@ function jumpToEclipsePreset(idx) {
   o.Date = sceneDateLabel(o.pos);
   o.Time = posToTime(o.pos);
   if (o._rootEntry) o._rootEntry.refreshFields();
+}
+
+/** 1 → 'first', 2 → 'second', … (the supernova folder's generations). @param {number} n */
+function ordinalWord(n) {
+  const words = ['zeroth', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
+  return words[n] || `${n}th`;
+}
+/** The UT Julian Day whose engine year (TT, Julian from J2000 — _engineYearTT) is the given one: the bridge's
+ *  inverse by Newton with a unit slope (ΔT moves slowly against a year), to 1e-6 d. @param {number} year */
+function _jdUTOfEngineYear(year) {
+  let jd = j2000JD + (year - 2000) * DAYS_PER_JULIAN_YEAR;
+  for (let k = 0; k < 12; k++) {
+    const errDays = (_engineYearTT(jd) - year) * DAYS_PER_JULIAN_YEAR;
+    jd -= errDays;
+    if (Math.abs(errDays) < 1e-6) break;
+  }
+  return jd;
+}
+/** The supernova illustration's jump (the folder's Prev/Next): land the simulation on the peak of the event after
+ *  (dir > 0) or before (dir < 0) the current engine year — the band's instant for a star of ≳ 8 M☉, an
+ *  illustration, never a date — and turn the camera to face the flash (the sky is a backdrop at infinity, so the
+ *  camera goes to the far side of its target from the flash's direction, at its distance). Returns the event, or
+ *  null beyond the catalogue regime. @param {number} dir */
+function jumpToSupernova(dir) {
+  const ev = _skyOfDate.supernovaEvent(dir, _engineYearTT(jdFromPos(o.pos)));
+  if (!ev) return null;
+  jumpToJulianDay(_jdUTOfEngineYear(ev.peakYear));
+  o.Date = sceneDateLabel(o.pos);
+  o.Time = posToTime(o.pos);
+  if (o._rootEntry) o._rootEntry.refreshFields();
+  const dirWorld = new THREE.Vector3(ev.localUnit[0], ev.localUnit[1], ev.localUnit[2]).applyQuaternion(sceneObjects.stars.getWorldQuaternion(new THREE.Quaternion())).normalize();
+  const dist = camera.position.distanceTo(controls.target);
+  camera.position.copy(controls.target).addScaledVector(dirWorld, -dist);
+  controls.update();
+  needsLabelUpdate = true;
+  return ev;
 }
 
 /** The umbra and penumbra radii on the fundamental plane at a solar eclipse's UT JD, from the

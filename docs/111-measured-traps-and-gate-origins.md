@@ -3063,7 +3063,40 @@ gate reads at least 300 of the 367 names showing at +2 Myr with Orion's
 lines gone (measured 335; 103 at +30 Myr, the fast stars gone and the
 short-lived replaced), none at −70 Myr. A first row read 103 and failed
 because it was placed after the +30 Myr landing — a gate row reads the
-state of the landing it names.
+state of the landing it names. (viii) **The supernova illustration** (the
+owner, on the two named stars the band ends by +2 Myr, Almaaz and Polis:
+"did we then end them with a supernova?" — and "a menu item like the
+eclipses, jump to prev / next, made clear it will not be on this date
+exactly"). The band's end for a star of ≳ 8 M☉ is a core-collapse
+supernova, not a fade: ONE home `sky/supernova` carries the candidate rule
+(M_V ≤ −2.5 — 8 M☉ on L ∝ M^3.5 is M_V −3.1, the band's grain a magnitude;
+3,819 of the catalogue's stars, 70 of them named), the band's instants (the
+star itself at +τ, generation 0; its successors at +(g+1)τ; the earlier
+generations' deaths at −gτ — the steady state: 15,974 events within
+±60 Myr, Rigel's 13 + 13) and the flash: the mean type II-P peak M_V −16.9
+(Richardson et al. 2014, AJ 147, 118), a two-week rise linear in flux, a
+hundred-day plateau, the ⁵⁶Co tail at 0.98 mag per 100 d — V −9.5 at
+Rigel's 300 pc, −5.1 at Almaaz's 2.3 kpc, within V 8 for ~1,880 d at
+300 pc. The sky draws the flashes of the day on their own tier (a point per
+alive event, its absolute magnitude the flash's, so the shader's apparent
+magnitude and V-8 cut do the rest; the sprite-size law continued to 2.0 of
+the base on a base three times the stars' — the owner's "a few magnitudes
+above the brightest star"; updated on every call, since a flash lives
+weeks and the sprites' step is a year). The folder beside the eclipses
+jumps to the previous or next flash: the event's engine year to a UT
+Julian Day by the bridge's Newton inverse (`_jdUTOfEngineYear`, a unit
+slope, 1e-6 d), the landing through the eclipse jump's own path, the camera
+to the far side of its target from the flash (the sky is a backdrop at
+infinity) — and says on every surface that the instant is the band's, not
+a date: the band knows a star's brightness, not its age (Betelgeuse gets
+11 Myr on it; the real star may explode within 100,000 years). Gates: the
+Node rows (the rule, Rigel's instants, the light curve's shape, the
+magnitudes), the browser rows (the first event after J2000 the shortest-
+lived candidate's own end — HIP 89341 at +1.16 Myr — and the one before it
+that star's earlier generation; a jump landing on the peak to a day with
+the flash alive at its peak magnitude and the camera's gaze ≥ 0.99 on it;
+two jumps back an earlier generation at a seeded place; null beyond the
+regime).
 
 ---
 
@@ -3260,7 +3293,12 @@ The `test:snapshot` chain also carries:
   pass on — born from "the labels when we zoom into earth are no longer
   available"); the names kept while the stars are drawn (at least 300 of
   the 367 at +2 Myr with Orion's lines gone — born from "the star names
-  should be there"); a star's direction the same in any order of asking
+  should be there"); the supernova illustration (3,819 candidates, the
+  first event after J2000 HIP 89341's own end at +1.16 Myr and the last
+  before it its earlier generation; a jump landing on the peak to a day,
+  the flash alive at its peak magnitude, the camera's gaze ≥ 0.99; two
+  jumps back a seeded earlier generation; null beyond the regime — born
+  from "did we then end them with a supernova?"); a star's direction the same in any order of asking
   and a landing re-read bit-for-bit; the Big Dipper nearly gone and Orion
   still readable at −48 kyr, every shape gone at −198 kyr; the regime linear
   at −998 kyr, fading at −1.15 Myr, off at −10 Myr with the dome untouched;

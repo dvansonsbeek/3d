@@ -57,7 +57,7 @@
  */
 
 /* global document, console, setTimeout, clearTimeout */
-import { SUN_GALACTIC_ORBIT, LOCAL_GALACTIC_KINEMATICS, ORBIT_INTEGRATION, orbitElements, heliocentricGalacticState, galactocentricState, integratedStateAtYear, galacticTriadEquatorialJ2000, mainSequenceLifetimeYears, milkyWayLatitudeShiftDegAtYear, sunHeightPcAtYear } from '@essrt/physics';
+import { SUN_GALACTIC_ORBIT, LOCAL_GALACTIC_KINEMATICS, ORBIT_INTEGRATION, orbitElements, heliocentricGalacticState, galactocentricState, integratedStateAtYear, galacticTriadEquatorialJ2000, mainSequenceLifetimeYears, milkyWayLatitudeShiftDegAtYear, sunHeightPcAtYear, SUPERNOVA_ILLUSTRATION, isSupernovaCandidate, supernovaMagnitudeOffsetDays, supernovaApparentMagnitude, supernovaInstantsYears } from '@essrt/physics';
 import { fillLocalPositionsIntegrated, integratedSet, localOfGalactic } from './sky-orbit-positions.js';
 
 const D2R = Math.PI / 180, R2D = 180 / Math.PI;
@@ -80,6 +80,9 @@ export const SKY_CONSTANTS = Object.freeze({
   spriteReferencePixelRatio: 2,  // the base size is the look accepted on a ratio-2 display (50 device px = 25 CSS px); other ratios scale to the same on-screen size
   sunAbsMagV: 4.81,              // the Sun as a star: M_V (Willmer 2018, ApJS 236, 47) — seen from past the main camera's far plane
   sunBV: 0.65,                   // its colour (B−V, the same source)
+  supernovaCapacity: 8,          // the flashes drawn at once (the events are ~8 kyr apart on average; a jump lands on one)
+  supernovaSizeMax: 2.0,         // the flash's sprite-size law continues to this (the stars cap at 0.80 — Sirius's size)
+  supernovaBaseScale: 3,         // … on a base three times the stars', so the flash stands out at the owner's "a few magnitudes above the brightest star"
 });
 
 /** mulberry32 — a small seeded PRNG: the statistical sky and the handover phases are reproducible per seed. @param {number} seed */
@@ -166,9 +169,9 @@ export function createSkyOfDate(deps) {
     // BIRTHS (the statistical tier, uSide 1): a twin of generation gen ≥ 1 (gen = ⌊|t|/tau⌋, a CPU attribute) stands
     // for the star born in the dead star's place — drawn at full handover whatever the regime, alive from gen·tau
     // (fading in over uLifeFade·tau) to (gen+1)·tau (fading out over the same); gen 0 is the original's own twin.
-    uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase * (S.pixelRatio || 1) / C.spriteReferencePixelRatio }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 }, uFade: { value: 1.0 }, uSide: { value: 0.0 }, uPhaseWidth: { value: C.handoverPhaseWidth }, uVLimit: { value: C.visibleVLimit }, uVFade: { value: C.visibleVFadeWidth }, uTimeYears: { value: 0.0 }, uLifeFade: { value: C.lifetimeFadeFraction } },
+    uniforms: { pointTexture: { value: pointTexture }, uBaseSize: { value: settings().starsizeBase * (S.pixelRatio || 1) / C.spriteReferencePixelRatio }, uUnitsPerPc: { value: UNITS_PER_PC }, uOpacity: { value: 1.0 }, uFade: { value: 1.0 }, uSide: { value: 0.0 }, uPhaseWidth: { value: C.handoverPhaseWidth }, uVLimit: { value: C.visibleVLimit }, uVFade: { value: C.visibleVFadeWidth }, uTimeYears: { value: 0.0 }, uLifeFade: { value: C.lifetimeFadeFraction }, uSizeMax: { value: 0.80 } },
     vertexShader: `
-      uniform float uBaseSize, uUnitsPerPc, uFade, uSide, uPhaseWidth, uVLimit, uVFade, uTimeYears, uLifeFade;
+      uniform float uBaseSize, uUnitsPerPc, uFade, uSide, uPhaseWidth, uVLimit, uVFade, uTimeYears, uLifeFade, uSizeMax;
       attribute float absMag;
       attribute float phase;
       attribute float tau;
@@ -191,7 +194,7 @@ export function createSkyOfDate(deps) {
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         float dPc = max(length(mv.xyz) / uUnitsPerPc, 1.0e-6);
         float m = absMag + 5.0 * log(dPc / 10.0) / log(10.0);
-        gl_PointSize = uBaseSize * clamp(0.66 - 0.10 * m, 0.07, 0.80);
+        gl_PointSize = uBaseSize * clamp(0.66 - 0.10 * m, 0.07, uSizeMax);
         gl_Position  = projectionMatrix * mv;
       }
     `,
@@ -210,7 +213,7 @@ export function createSkyOfDate(deps) {
     blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, vertexColors: true,
   });
   /** Every sprite material of the sky, for the per-year uniforms. */
-  const allMaterials = () => [S.matBright, S.matFaint, S.sunMat, stat.mat, G.mat].filter(Boolean);
+  const allMaterials = () => [S.matBright, S.matFaint, S.sunMat, S.snMat, stat.mat, G.mat].filter(Boolean);
   /** The sprites' base size follows the renderer's pixel ratio: gl_PointSize is in DEVICE pixels, so a constant base
    *  drew every star twice as large on screen whenever the adaptive ratio dropped from 2 to 1 (the owner: "sometimes
    *  the stars seem brighter"). The setting is the look accepted on a ratio-2 display, so the device size is
@@ -220,7 +223,7 @@ export function createSkyOfDate(deps) {
     const r = pixelRatio ? pixelRatio() : 1;
     if (r === S.pixelRatio) return;
     S.pixelRatio = r;
-    for (const mat of allMaterials()) mat.uniforms.uBaseSize.value = settings().starsizeBase * r / C.spriteReferencePixelRatio;
+    for (const mat of allMaterials()) mat.uniforms.uBaseSize.value = settings().starsizeBase * r / C.spriteReferencePixelRatio * (mat.userData.baseScale || 1);
   }
 
   /** The local unit vector of an ICRS direction (x = cos δ sin α, y = sin δ, z = cos δ cos α). */
@@ -261,6 +264,7 @@ export function createSkyOfDate(deps) {
     const shortLivedYears = C.catalogueRegimeYears + C.regimeFadeYears;
     S.tauMin = Infinity; S.nShortLived = 0; S.nShortLivedNaked = 0;
     for (let i = 0; i < n; i++) { if (S.tau[i] < S.tauMin) S.tauMin = S.tau[i]; if (S.tau[i] < shortLivedYears) { S.nShortLived++; if (S.vmag0[i] <= C.nakedEyeV) S.nShortLivedNaked++; } }
+    buildSupernovaEvents(shortLivedYears);
     S.pos = Float32Array.from(S.r0);   // the positions of date (pc, local frame): the epoch's until the first update lands
     W.hipSpare = new Float32Array(3 * n);
     // the Sun's state at the catalogue epoch, the same way the integrated set brings it there (one RK4 step from J2000)
@@ -316,6 +320,15 @@ export function createSkyOfDate(deps) {
     // the visibility cut reads its magnitude at the origin as −∞; its lifetime 1e10 years).
     const sun = buildTier(pointTexture, 1, new Float32Array(colorTemperature2rgb(colourTemperatureKelvinFromBV(C.sunBV))), new Float32Array([C.sunAbsMagV]), new Float32Array([-1]), new Float32Array([1e10]), 'sun-as-a-star', -95);
     starsGroup.add(sun.points); S.sunPoint = sun.points; S.sunMat = sun.mat;
+    // The supernova tier (the follow-up; ONE home sky/supernova): a point per active flash, its absMag the flash's of the
+    // day, so the shader's apparent magnitude and its V-8 cut do the rest; the size law continued past the stars' cap
+    // on a base three times theirs, so a flash stands out; phase −1 (never hands over), tau 1e10, gen 0; absMag 99
+    // (invisible) while the slot is idle.
+    const snN = C.supernovaCapacity, snColors = new Float32Array(3 * snN);
+    for (let k = 0; k < snN; k++) { snColors[3 * k] = 0.85; snColors[3 * k + 1] = 0.92; snColors[3 * k + 2] = 1.0; }
+    const sn = buildTier(pointTexture, snN, snColors, new Float32Array(snN).fill(99), new Float32Array(snN).fill(-1), new Float32Array(snN).fill(1e10), 'stars-supernovae', -95);
+    sn.mat.userData.baseScale = C.supernovaBaseScale; sn.mat.uniforms.uBaseSize.value *= C.supernovaBaseScale; sn.mat.uniforms.uSizeMax.value = C.supernovaSizeMax;
+    starsGroup.add(sn.points); S.snPoints = sn.points; S.snGeo = sn.geo; S.snMat = sn.mat;
     // the names (the IAU proper names), labels in the same group
     S.labels = [];
     const { namesVisible } = settings();
@@ -443,17 +456,89 @@ export function createSkyOfDate(deps) {
     const seed = (0x5A17 ^ Math.imul(cell + 7919, 2654435761) ^ Math.imul(i + 1, 0x9E3779B1) ^ Math.imul(gen + 1, 0x85EBCA6B)) >>> 0;
     return mulberry32(seed)() * 2 * Math.PI;
   }
-  /** Put a twin at its seeded longitude on its star's Galactic latitude and distance (the container's local frame). @param {Float32Array} p @param {number} i @param {number} cell @param {number} gen */
-  function placeTwin(p, i, cell, gen) {
+  /** A twin's position (scene units, the container's local frame, before the Galactic turn): its seeded longitude on its
+   *  star's Galactic latitude and distance. @param {number} i @param {number} cell @param {number} gen @returns {[number, number, number]} */
+  function twinPositionUnits(i, cell, gen) {
     // the Galactic frame in the container's local coordinates (x = α 90°, y = the pole, z = the equinox):
     // X_g the centre, Z_g the pole, Y_g = Z_g × X_g (l = 90°)
     const T = TRIAD;
     const X = [T.x[1], T.x[2], T.x[0]], Y = [T.y[1], T.y[2], T.y[0]], Z = [T.z[1], T.z[2], T.z[0]];
     const l = twinLongitudeRad(cell, i, gen), b = galB[i], cb = Math.cos(b), d = S.d0[i] * UNITS_PER_PC;
     const gx = cb * Math.cos(l), gy = cb * Math.sin(l), gz = Math.sin(b);
-    p[3 * i] = d * (gx * X[0] + gy * Y[0] + gz * Z[0]);
-    p[3 * i + 1] = d * (gx * X[1] + gy * Y[1] + gz * Z[1]);
-    p[3 * i + 2] = d * (gx * X[2] + gy * Y[2] + gz * Z[2]);
+    return [d * (gx * X[0] + gy * Y[0] + gz * Z[0]), d * (gx * X[1] + gy * Y[1] + gz * Z[1]), d * (gx * X[2] + gy * Y[2] + gz * Z[2])];
+  }
+  /** Put a twin at its seeded place. @param {Float32Array} p @param {number} i @param {number} cell @param {number} gen */
+  function placeTwin(p, i, cell, gen) {
+    const u = twinPositionUnits(i, cell, gen);
+    p[3 * i] = u[0]; p[3 * i + 1] = u[1]; p[3 * i + 2] = u[2];
+  }
+
+  // ── the supernova illustration (the follow-up; ONE home sky/supernova) ───────────────────────────────────────────
+  /** The events: every candidate's band instants within the regime and its handover, sorted by engine year — the star
+   *  itself at +τ (generation 0), its successors at +(g+1)τ, the earlier generations' deaths at −gτ. @param {number} windowYears */
+  function buildSupernovaEvents(windowYears) {
+    const ev = []; let cand = 0;
+    for (let i = 0; i < S.n; i++) {
+      if (!isSupernovaCandidate(S.absMag[i])) continue;
+      cand++;
+      for (const e of supernovaInstantsYears(S.tau[i], windowYears)) ev.push({ t: 2000 + e.tYears, i, gen: e.gen });
+    }
+    ev.sort((a, b) => a.t - b.t);
+    S.snEvents = ev; S.snCandidates = cand; S.snActive = [];
+  }
+  /** The first event index with t > year (binary search). @param {number} year */
+  function snIndexAfter(year) {
+    const ev = S.snEvents; let lo = 0, hi = ev.length;
+    while (lo < hi) { const mid = (lo + hi) >> 1; if (ev[mid].t > year) hi = mid; else lo = mid + 1; }
+    return lo;
+  }
+  /** A catalogue star's local position (pc) at a year — the drawn one at the drawn year, else its own integration
+   *  (the same orbit the sprites ride). @param {number} i @param {number} year @returns {[number, number, number]} */
+  function starLocalPcAtYear(i, year) {
+    if (Number.isFinite(S.year) && Math.abs(year - S.year) < 1) return [S.pos[3 * i], S.pos[3 * i + 1], S.pos[3 * i + 2]];
+    const h = heliocentricGalacticState({ raDeg: S.raDeg[i], decDeg: S.decDeg[i], distPc: S.d0[i], pmRaMasYr: S.pmRaMasYr[i], pmDecMasYr: S.pmDecMasYr[i], rvKmS: S.rvKmS[i] });
+    const st = integratedStateAtYear(galactocentricState(h, S.epochYear), S.epochYear, year);
+    const sun = integratedStateAtYear(S.sunStateAtEpoch, S.epochYear, year);
+    return localOfGalactic(st[0] - sun[0], st[1] - sun[1], st[2] - sun[2], TRIAD);
+  }
+  /** An event's place (pc, the container's local frame) at a year: the star itself on its orbit for generation 0, a
+   *  successor at its seeded place turned with the band (the twin tier's own rotation) for the rest. @param {{t: number, i: number, gen: number}} ev @param {number} year @returns {[number, number, number]} */
+  function eventLocalPc(ev, year) {
+    if (ev.gen === 0) return starLocalPcAtYear(ev.i, year);
+    const u = twinPositionUnits(ev.i, seedCellOf(year), ev.gen);
+    const Z = TRIAD.z, v = new THREE.Vector3(u[0], u[1], u[2]).applyQuaternion(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(Z[1], Z[2], Z[0]).normalize(), galacticTurnRadAtYear ? galacticTurnRadAtYear(year) : 0));
+    return [v.x / UNITS_PER_PC, v.y / UNITS_PER_PC, v.z / UNITS_PER_PC];
+  }
+  /** An event described for the panel and the gates. @param {{t: number, i: number, gen: number}} ev @param {number} index */
+  function describeEvent(ev, index) {
+    const p = eventLocalPc(ev, ev.t), d = Math.hypot(p[0], p[1], p[2]) || 1e-6;
+    const hip = S.hip[ev.i];
+    return { index, count: S.snEvents.length, hip, name: (S.names[hip] && S.names[hip].name) || null, gen: ev.gen, peakYear: ev.t, tau: S.tau[ev.i], absMag: S.absMag[ev.i], distPc: d, peakVmag: supernovaApparentMagnitude(d, 0), localUnit: [p[0] / d, p[1] / d, p[2] / d] };
+  }
+  /** The flashes of the day: the events whose light curve is alive at the year fill the supernova tier (every
+   *  updateForEpoch call — a flash lives weeks, the sprites' year step is a year). @param {number} year */
+  function updateSupernovae(year) {
+    if (!S.snGeo || !S.snEvents) return;
+    const S_ = SUPERNOVA_ILLUSTRATION, cap = C.supernovaCapacity;
+    const pos = S.snGeo.getAttribute('position'), mag = S.snGeo.getAttribute('absMag');
+    const active = [];
+    // the rise starts riseDays before the peak; the longest tail within the cut is ~6 yr (a flash at 100 pc)
+    const lo = snIndexAfter(year - 8), hi = snIndexAfter(year + S_.riseDays / 365.25 + 1e-6);
+    for (let k = lo; k < hi && active.length < cap; k++) {
+      const ev = S.snEvents[k], days = (year - ev.t) * 365.25;
+      const off = supernovaMagnitudeOffsetDays(days);
+      if (!Number.isFinite(off)) continue;
+      const p = eventLocalPc(ev, year), d = Math.hypot(p[0], p[1], p[2]) || 1e-6;
+      const vmag = supernovaApparentMagnitude(d, days);
+      if (vmag > C.visibleVLimit + C.visibleVFadeWidth) continue;
+      const j = active.length;
+      pos.array[3 * j] = p[0] * UNITS_PER_PC; pos.array[3 * j + 1] = p[1] * UNITS_PER_PC; pos.array[3 * j + 2] = p[2] * UNITS_PER_PC;
+      mag.array[j] = S_.peakAbsMagV + off;
+      active.push({ ...describeEvent(ev, k), daysFromPeak: days, vmag });
+    }
+    for (let j = active.length; j < cap; j++) { pos.array[3 * j] = 0; pos.array[3 * j + 1] = 0; pos.array[3 * j + 2] = 0; mag.array[j] = 99; }
+    pos.needsUpdate = true; mag.needsUpdate = true;
+    S.snActive = active;
   }
 
   /** Build (or rebuild for a new seed cell) the statistical sky: every catalogue star's magnitude and Galactic
@@ -693,6 +778,7 @@ export function createSkyOfDate(deps) {
       syncPixelRatio();
       const year = engineYearOfJd(jdUT);
       if (!Number.isFinite(year)) return false;
+      updateSupernovae(year);   // every call: a flash lives weeks
       const ref = Number.isFinite(S.requestedYear) ? S.requestedYear : S.year;
       if (!force && Number.isFinite(ref) && Math.abs(year - ref) < C.updateStepYears) return false;
       computeForYear(year);
@@ -733,6 +819,7 @@ export function createSkyOfDate(deps) {
         worker: { present: !!W.worker, updates: W.updates, hipMs: W.hipMs, gaiaMs: W.gaiaMs, nodes: W.nodes || null, prefetched: W.prefetched || 0, prefetchMs: W.prefetchMs || 0 },
         // the births: the stars whose lifetime is over at this |t| (their twins drawn as the next generation), the highest generation
         births: S.births || null, statisticalTierBuilt: !!stat.geo,
+        supernova: { candidates: S.snCandidates ?? null, events: S.snEvents ? S.snEvents.length : null, active: S.snActive || [] },
         pixelRatio: S.pixelRatio, starsizeBase: settings().starsizeBase, baseSizeDevicePx: S.matBright ? S.matBright.uniforms.uBaseSize.value : null,
         gaia: { loaded: G.loaded, failed: G.failed, n: G.n, year: G.year, visible: gaiaVisible, counts: G.manifest ? G.manifest.counts : null, faint: !!(G.manifest && G.manifest.sourceFaint), cuts: G.manifest ? G.manifest.cuts : null },
       };
@@ -753,6 +840,15 @@ export function createSkyOfDate(deps) {
     },
     /** A statistical-sky star's container-frame position (units) for the gates (the seeded draw of the built cell). @param {number} i */
     statisticalPositionAt(i) { if (!stat.geo) return null; const p = stat.geo.getAttribute('position').array; return [p[3 * i], p[3 * i + 1], p[3 * i + 2]]; },
+    /** The supernova event after (dir > 0) or before (dir < 0) an engine year — null beyond the regime's events. @param {number} dir @param {number} year */
+    supernovaEvent(dir, year) {
+      if (!S.snEvents || !S.snEvents.length) return null;
+      const k = dir > 0 ? snIndexAfter(year + 1e-6) : snIndexAfter(year - 1e-6) - 1;
+      if (k < 0 || k >= S.snEvents.length) return null;
+      return describeEvent(S.snEvents[k], k);
+    },
+    /** The supernova illustration's state: the candidates, the events, the flashes alive now. */
+    supernovaState() { return { candidates: S.snCandidates ?? null, events: S.snEvents ? S.snEvents.length : null, active: S.snActive || [], constants: SUPERNOVA_ILLUSTRATION }; },
     /** A star's twin for the gates: its generation at the current year, its lifetime, the twin's drawn position (units) and the
      *  seeded longitude the place came from (null before the statistical tier exists). @param {number} hip */
     twinGenerationAt(hip) {

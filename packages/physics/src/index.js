@@ -201,6 +201,8 @@ export { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, SUN_GALACTIC_
 export { CONSTELLATION_NAMES, ECLIPTIC_J2000_EQUATORIAL, JD_B1875, precessionMatrixJ2000To, setBoundaryTable, constellationName, constellationAtB1875, constellationOfVectorJ2000, constellationAtJ2000, eclipticFrame, eclipticPointJ2000, raDecOfVector, eclipticCrossings, constellationAtLongitude } from './sky/ecliptic-constellations.cjs';
 // plan 28 §D — the stars' Galactic orbits relative to the Sun (the second-order epicycle about each body's own guiding centre)
 export { LOCAL_GALACTIC_KINEMATICS, RADIAL_AMPLITUDE_MAX, SUN_EPOCH_YEAR, ORBIT_INTEGRATION, KMS_PER_MASYR_KPC, localRotationCurve, heliocentricGalacticState, orbitElements, radiusAt, galactocentricPositionAt, galactocentricPositionAtYear, heliocentricGalacticAtYear, galacticAcceleration, galactocentricState, integrateOrbitRK4, integrationSchedule, integratedStateAtYear, mainSequenceLifetimeYears, sunHeightPcAtYear, MILKY_WAY_LIGHT_DISTANCE_PC, milkyWayLatitudeShiftDegAtYear } from './sky/galactic-orbits.cjs';
+// plan 28's follow-up — the supernova ILLUSTRATION: the lifetime band's end for the massive stars (the instants, the light curve, the magnitudes)
+export { SUPERNOVA_ILLUSTRATION, isSupernovaCandidate, supernovaMagnitudeOffsetDays, supernovaApparentMagnitude, supernovaVisibleDays, supernovaInstantsYears } from './sky/supernova.cjs';
 // Phase 8.6 — the published reference curves (external comparison formulas
 // and datasets, exactly as published; comparison references, never inputs).
 // (reference/published-curves MIGRATED to @essrt/reference at the 4.0.0

@@ -146,6 +146,24 @@ const enc = rd('data/star-encounter-reference.json');
     const lt = rec.positions.find((p) => p.year === 102000);
     if (!lt || !Number.isFinite(lt.lightTimeArcsec) || !lt.geometric) fail(`referee record: HIP ${hipStr} lacks the geometric place / light-time term at +100 kyr`);
   }
+  // the supernova illustration (ONE home sky/supernova): the candidate rule (≈ 8 M☉ at M_V −2.5), the band's instants
+  // (Rigel: τ 4.36 Myr → 13 future + 13 past within ±60 Myr, the first +4.36 Myr the star itself (gen 0), the first
+  // past −4.36 Myr gen 1, sorted), the light curve (∞ before the rise, −2.5 log 0.5 half-way up, 0 on the plateau,
+  // 0.98 mag per 100 d on the tail) and the magnitudes (the II-P peak −16.9 at 300 pc: V −9.5; ~1,880 d within V 8)
+  const SN = require(path.join(ROOT, 'packages/physics/src/sky/supernova.cjs'));
+  {
+    if (!(SN.isSupernovaCandidate(-2.5) && !SN.isSupernovaCandidate(-2.4) && SN.SUPERNOVA_ILLUSTRATION.peakAbsMagV === -16.9)) fail('supernova: the candidate rule or the cited peak moved');
+    const rigel = byHip.get(24436);
+    const mRigel = rigel[ci.vmag] - 5 * Math.log10(rigel[ci.distPc] / 10), tauRigel = O.mainSequenceLifetimeYears(mRigel);
+    if (!(SN.isSupernovaCandidate(mRigel) && Math.abs(tauRigel / 1e6 - 4.36) < 0.05)) fail(`supernova: Rigel reads M_V ${mRigel.toFixed(2)}, τ ${(tauRigel / 1e6).toFixed(2)} Myr (a candidate at τ 4.36 expected)`);
+    const inst = SN.supernovaInstantsYears(tauRigel, 6e7);
+    const fut = inst.filter((e) => e.tYears > 0), past = inst.filter((e) => e.tYears < 0);
+    const sorted = inst.every((e, k) => k === 0 || e.tYears > inst[k - 1].tYears);
+    if (!(fut.length === 13 && past.length === 13 && sorted && fut[0].gen === 0 && Math.abs(fut[0].tYears - tauRigel) < 1 && past[past.length - 1].gen === 1 && Math.abs(past[past.length - 1].tYears + tauRigel) < 1 && fut[1].gen === 1 && Math.abs(fut[1].tYears - 2 * tauRigel) < 1)) fail(`supernova: Rigel's instants read ${fut.length} future / ${past.length} past (13 / 13 expected, +τ gen 0 first, −τ gen 1 last in the past)`);
+    const off = SN.supernovaMagnitudeOffsetDays;
+    if (!(off(-16) === Infinity && Math.abs(off(-7.5) + 2.5 * Math.log10(0.5)) < 1e-9 && off(0) === 0 && off(90) === 0 && Math.abs(off(190) - 0.98) < 1e-9)) fail('supernova: the light curve\'s shape moved');
+    if (!(Math.abs(SN.supernovaApparentMagnitude(300, 0) + 9.515) < 0.01 && Math.abs(SN.supernovaVisibleDays(300, 8) - 1877) < 5 && SN.supernovaVisibleDays(1e6, 8) === 0)) fail(`supernova: the magnitudes read ${SN.supernovaApparentMagnitude(300, 0).toFixed(3)} at 300 pc, ${SN.supernovaVisibleDays(300, 8).toFixed(0)} d within V 8`);
+  }
   // Gliese 710
   const g = enc.gaiaDr3;
   const el = O.orbitElements(O.heliocentricGalacticState({ raDeg: g.raDeg, decDeg: g.decDeg, distPc: 1000 / g.parallaxMas, pmRaMasYr: g.pmRaMasYr, pmDecMasYr: g.pmDecMasYr, rvKmS: g.rvKmS }), g.epochYear);
