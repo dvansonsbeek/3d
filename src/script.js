@@ -4,7 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import { Pane } from 'tweakpane';
 // PLAN 28 §B/C — the sky of date: the bright-star catalogue and its linear space motion (ONE home)
 import { createSkyOfDate, SKY_CONSTANTS, UNITS_PER_PC } from './sky-of-date.js';
-import { createMoonOriginChapter, ORIGIN_CHAPTER_PHASES } from './moon-origin-chapter.js';   // plan 31 B+C: the Moon's origin chapter (the tour's first station)
+import { createMoonOriginChapter, ORIGIN_CHAPTER_PHASES, ORIGIN_CHAPTER } from './moon-origin-chapter.js';   // plan 31 B+C: the Moon's origin chapter (the tour's first station)
 
 // Generated from public/input/astro-reference.json (+ the assembled deep-time
 // block) by `npm run constants:generate` (§2g). Never hand-edited; `npm run test:constants`
@@ -3183,12 +3183,12 @@ function tourStationValues(i) {
  *  labelled scenario), the sequence's standing (illustrated). */
 function _tourChapterRows() {
   const er = _earlyRecession(), s3 = er.stateAt(er.scenario.rocheZoneEarthRadii), h = er.handover();
-  const n0 = (/** @type {number} */ x) => Math.round(x).toLocaleString('en-US');
+  const n2 = (/** @type {number} */ x) => Number(x.toPrecision(2)).toLocaleString('en-US');   // a scenario with a 16-fold band: two figures
   return [
     { label: 'Day at 3 R⊕', value: `${s3.dayHours.toFixed(2)} h`, today: '', tag: 'derived', hint: 'the Earth\'s day when the Moon had just gathered at the Roche zone — the model\'s constant-angular-momentum chain at 3 Earth radii' },
     { label: 'Month at 3 R⊕', value: `${s3.monthHours.toFixed(1)} h (${s3.monthDays.toFixed(2)} days)`, today: '', tag: 'derived', hint: 'the Moon\'s orbital period at 3 Earth radii' },
     { label: 'Moon in the sky at 3 R⊕', value: `${s3.moonDiameterDeg.toFixed(1)}° across`, today: '', tag: 'derived', hint: 'the Moon\'s apparent diameter from the Earth at 3 Earth radii — twenty times today\'s' },
-    { label: 'Roche zone → first sample', value: h ? `~${n0(h.years)} yr (band ${n0(h.bandYears[1])}–${n0(h.bandYears[0])})` : '—', today: '', tag: 'scenario', hint: 'the time from 3 Earth radii to the cited history\'s first sample on the law its first segment expresses (da/dt ∝ a^(−11/2); the shipped 3-sample window, the band the 1- and 10-sample windows) — the input\'s own extrapolation, not a measurement' },
+    { label: 'Roche zone → first sample', value: h ? `~${n2(h.years)} yr (band ${n2(h.bandYears[1])}–${n2(h.bandYears[0])})` : '—', today: '', tag: 'scenario', hint: 'the time from 3 Earth radii to the cited history\'s first sample on the law its first segment expresses (da/dt ∝ a^(−11/2); the shipped 3-sample window, the band the 1- and 10-sample windows) — the input\'s own extrapolation, not a measurement' },
     { label: 'The sequence', value: `${ORIGIN_CHAPTER_PHASES.length} phases, after Canup 2004`, today: '', tag: 'illustrated', hint: 'a keyframed sketch whose times and extents are the published simulations\' — not a computation of the impact' },
   ];
 }
@@ -3364,17 +3364,35 @@ function _originChapterStop() {
     _originHidden = null; positionChanged = true;
   }
 }
-/** Frame the chapter: 14 Earth radii out (the disk reaches 5, Theia starts 12 out), above the Moon's orbit plane
- *  of date with the Sun over the camera's shoulder — the scene is moved to the landing first (tourFrameEarth ran). */
+/** Frame the chapter: 16 Earth radii out (the disk reaches 5, Theia starts 4 out, the hand-over is at 6.2), above
+ *  the Moon's orbit plane of date with the Sun over the camera's shoulder — the scene is moved to the landing first
+ *  (tourFrameEarth ran). THE STAGE: the focus follow keeps the Earth at the screen's centre every frame, the card
+ *  sits lower left and the panel right, so the free screen is the upper half and the bottom centre; the plume's and
+ *  the Moon's azimuth in the chapter's own frame is yawed about the orbit normal to project straight UP — Theia then
+ *  falls in from the bottom and the hand-over Moon ends at the top (the first build cut the plume at the bottom edge
+ *  and hid the hand-over Moon under the panel — the headless screenshots, doc 111 §1.49). */
 function _originFrame() {
-  if (!earth?.planetObj || !sun?.planetObj) return;
+  if (!earth?.planetObj || !sun?.planetObj || !_originChapter) return;
   const ctr = earth.planetObj.getWorldPosition(new THREE.Vector3());
   const sunW = sun.planetObj.getWorldPosition(new THREE.Vector3());
   const R = earth.planetObj.geometry.parameters.radius * earth.planetObj.getWorldScale(new THREE.Vector3()).x;
-  const up = new THREE.Vector3(0, 1, 0).applyQuaternion(moon.containerObj.getWorldQuaternion(new THREE.Quaternion()));
+  const frameQ = moon.containerObj.getWorldQuaternion(new THREE.Quaternion());
+  const up = new THREE.Vector3(0, 1, 0).applyQuaternion(frameQ);
   const dir = sunW.clone().sub(ctr).normalize().multiplyScalar(0.7).addScaledVector(up, 0.75).normalize();
-  camera.position.copy(ctr).add(dir.multiplyScalar(R * 14));
+  camera.position.copy(ctr).add(dir.multiplyScalar(R * 16));
   controls.target.copy(ctr); controls.update();
+  camera.updateMatrixWorld(true);
+  const az = ORIGIN_CHAPTER.stageAzimuthRad, e0 = ctr.clone().project(camera);
+  let bestYaw = 0, bestScore = -Infinity;
+  for (let i = 0; i < 72; i++) {   // a yaw θ about the group's Y maps its azimuth a to a − θ
+    const yaw = i * Math.PI / 36;
+    const local = new THREE.Vector3(Math.cos(az - yaw), 0, Math.sin(az - yaw)).applyQuaternion(frameQ);
+    const p = ctr.clone().addScaledVector(local, 3 * R).project(camera);
+    const sx = p.x - e0.x, sy = p.y - e0.y, n = Math.hypot(sx, sy) || 1;
+    const score = (sy - 0.2 * Math.abs(sx)) / n;
+    if (score > bestScore) { bestScore = score; bestYaw = yaw; }
+  }
+  _originChapter.setYaw(bestYaw);
   positionChanged = true; needsLabelUpdate = true;
 }
 /** The render loop, at the end of every frame: advance the chapter's scenario clock and its objects while it runs
@@ -4220,6 +4238,9 @@ if (typeof window !== 'undefined') {
     originChapterCardClock: () => { const el = _tour.el && _tour.el.querySelector('.origin-tour-clock-label'); return el ? el.textContent : null; },
     originChapterRows: () => _tourChapterRows().map((r) => `${r.label}: ${r.value} [${r.tag}]`),
     originChapterSceneMoon: () => ({ moon: !!(moon.planetObj && moon.planetObj.visible), orbit: !!(moon.orbitLineObj && moon.orbitLineObj.visible), hidden: _originHidden !== null }),
+    // the approach parabola (Theia's centre at a time before contact, in R) and the stage (the action's NDC offset from the Earth)
+    originChapterTheiaAt: (tSeconds) => (_originChapter ? _originChapter.theiaCentreAt(tSeconds) : null),
+    originChapterStage: () => { if (!_originChapter || !earth?.planetObj) return null; const c = _originChapter.state(); const ctr = earth.planetObj.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(true); const e0 = ctr.clone().project(camera); const R = earth.planetObj.geometry.parameters.radius * earth.planetObj.getWorldScale(new THREE.Vector3()).x; const q = moon.containerObj.getWorldQuaternion(new THREE.Quaternion()); const yaw = c.yaw; const local = new THREE.Vector3(Math.cos(ORIGIN_CHAPTER.stageAzimuthRad - yaw), 0, Math.sin(ORIGIN_CHAPTER.stageAzimuthRad - yaw)).applyQuaternion(q); const p = ctr.clone().addScaledVector(local, 3 * R).project(camera); return { earthNdc: [e0.x, e0.y], actionNdc: [p.x, p.y], yaw, cameraDistanceR: camera.position.distanceTo(ctr) / R }; },
     // the scenario's hand-off numbers on the browser's chain (the epoch gate reads them against the Node twin)
     originChapterHandover: () => { const er = _earlyRecession(), h = er.handover(), s3 = er.stateAt(er.scenario.rocheZoneEarthRadii); return h ? { aOverEarthRadii: h.aOverEarthRadii, years: h.years, bandYears: h.bandYears, lawFactorShipped: h.lawFactorShipped, dayHoursAt3: s3.dayHours, monthHoursAt3: s3.monthHours } : null; },
     // PLAN 30 step 0 — THE INSTRUMENT: every published row at the CURRENT position, as the panels

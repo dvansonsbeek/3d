@@ -461,7 +461,11 @@ await s.page.waitForFunction(() => { const c = window.__test__.originChapterStat
 await s.page.waitForTimeout(300);
 Object.assign(measured, await s.page.evaluate(() => {
   const T = window.__test__, c = T.originChapterState(), m = T.originChapterSceneMoon();
-  return { 'tour.chapter.phase0': c.phase, 'tour.chapter.theia': c.theiaVisible, 'tour.chapter.debris': c.debrisVisible, 'tour.chapter.particles': c.particles, 'tour.chapter.sceneMoonHidden': m.hidden && !m.moon && !m.orbit, 'tour.chapter.clock0': c.clock.endsWith('before contact'), 'tour.chapter.cardClock': T.originChapterCardClock() === c.clock, 'tour.chapter.phases': T.originChapterPhases().map((p) => p.key).join(','), 'tour.chapter.dateUnmoved': T.clockFields().date };
+  // the approach parabola (Theia 3.8 R out at 40 min before contact, at the contact radius at contact) and the stage
+  // (the plume's azimuth projects up the screen, the Earth centred by the focus follow)
+  const th0 = T.originChapterTheiaAt(-2400), thc = T.originChapterTheiaAt(0), st = T.originChapterStage();
+  return { 'tour.chapter.phase0': c.phase, 'tour.chapter.theia': c.theiaVisible, 'tour.chapter.debris': c.debrisVisible, 'tour.chapter.particles': c.particles, 'tour.chapter.sceneMoonHidden': m.hidden && !m.moon && !m.orbit, 'tour.chapter.clock0': c.clock.endsWith('before contact'), 'tour.chapter.cardClock': T.originChapterCardClock() === c.clock, 'tour.chapter.phases': T.originChapterPhases().map((p) => p.key).join(','), 'tour.chapter.dateUnmoved': T.clockFields().date,
+    'tour.chapter.theiaStartRe': th0.r.toFixed(3), 'tour.chapter.theiaContactRe': thc.r.toFixed(3), 'tour.chapter.theiaContactOnX': Math.abs(thc.z) < 1e-9 && thc.x > 0, 'tour.chapter.stageUp': st.actionNdc[1] - st.earthNdc[1] > 0.2 && Math.abs(st.actionNdc[0] - st.earthNdc[0]) < 0.15, 'tour.chapter.cameraDistanceR': st.cameraDistanceR.toFixed(1) };
 }));
 // (the tour is held paused over the skip: at the last phase's end the chapter's own tick hands the tour over)
 await s.page.evaluate(() => { window.__test__.tourPause(); window.__test__.originChapterSkipTo('recession', true); });

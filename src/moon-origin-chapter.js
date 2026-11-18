@@ -24,21 +24,23 @@
 
 /** The keyframes: scenario time in seconds from the contact (t1 null = open: the recession runs to the hand-over); the screen seconds each phase takes. */
 export const ORIGIN_CHAPTER_PHASES = Object.freeze([
-  { key: 'approach', t0: -2 * 3600, t1: 0, screenSeconds: 8, label: 'Theia approaches', source: 'Canup 2004: a Mars-class impactor (~0.1 M⊕), an oblique impact (~45°) near the escape velocity (~9–11 km/s)' },
+  { key: 'approach', t0: -40 * 60, t1: 0, screenSeconds: 6, label: 'Theia approaches', source: 'Canup 2004: a Mars-class impactor (~0.1 M⊕), an oblique impact (~45°) near the escape velocity (~9–11 km/s) — which means Theia shared the Earth\'s orbit closely: a companion grown at the Earth\'s L4/L5 point (Belbruno & Gott 2005) or a neighbour from the same feeding zone (Mastrobuono-Battisti et al. 2015); its origin is not settled. The path drawn is the exact parabola of a body falling in from rest at infinity, the 45° contact its pericentre choice' },
   { key: 'contact', t0: 0, t1: 3 * 3600, screenSeconds: 14, label: 'contact and shear — the first hours', source: 'Canup 2004 (the SPH runs, t = 0 … 3 h): the impactor shears, its iron sinks to the Earth, its mantle is flung outward' },
   { key: 'plume', t0: 3 * 3600, t1: 24 * 3600, screenSeconds: 14, label: 'the debris in orbit within a day', source: 'Canup 2004: from the first contact to the debris in orbit, about 24 h' },
   { key: 'disk', t0: 24 * 3600, t1: 30 * 86400, screenSeconds: 12, label: 'a disk of about two lunar masses settles inside ~5 R⊕', source: 'Ida, Canup & Stewart 1997: the protolunar disk inside ~5 R⊕, most of it inside the Roche zone' },
   { key: 'accretion', t0: 30 * 86400, t1: 365.25 * 86400, screenSeconds: 14, label: 'the Moon accretes outside the Roche zone', source: 'Ida, Canup & Stewart 1997; Kokubo, Ida & Makino 2000: the bulk within a month to a year at ~3 R⊕ (the fluid Roche limit ~2.9 R⊕), ~10² yr to finish' },
-  { key: 'recession', t0: 365.25 * 86400, t1: null, screenSeconds: 20, label: 'the early recession to the cited history\'s first sample', source: 'the input\'s own extrapolation: da/dt ∝ a^(−11/2) with the factor read off the history\'s first segment (plan 31 B) — a labelled scenario, the band from the window' },
+  { key: 'recession', t0: 100 * 365.25 * 86400, t1: null, screenSeconds: 20, label: 'the early recession to the cited history\'s first sample', source: 'the input\'s own extrapolation: da/dt ∝ a^(−11/2) with the factor read off the history\'s first segment (plan 31 B) — a labelled scenario, the band from the window; from year 100, when the accretion has finished' },
 ]);
 export const ORIGIN_CHAPTER = Object.freeze({
   theiaRadiusEarthRadii: 0.53,            // Mars-class (R_Mars / R⊕)
+  theiaMassEarths: 0.1,
   moonRadiusEarthRadii: 0.2727,
   impactAngleDeg: 45,
-  approachSpeedEarthRadiiPerHour: 6.2,    // ~11 km/s
+  gmEarthRadiiCubedPerHourSquared: 19.98, // GM⊕ in R⊕³ h⁻² (3.986e14 m³ s⁻², R⊕ 6.371e6 m): the approach parabola's scale
   diskInnerEarthRadii: 1.4, diskOuterEarthRadii: 5.0, rocheEarthRadii: 2.9,
   accretionRadiusEarthRadii: 3.0,         // the scenario's first station (moon/early-recession's Roche zone)
   particles: 3000,
+  stageAzimuthRad: 2.5,                   // the plume's and the Moon's azimuth in the chapter frame: the tour yaws the chapter so it points UP the screen (Theia then falls in from the bottom, the receding Moon ends at the top — the card sits lower left, the panel right)
   tag: 'illustrated',
   after: 'illustrated after Canup 2004 (the impact), Ida, Canup & Stewart 1997 (the disk) and Kokubo, Ida & Makino 2000 (the accretion) — the times and extents are the cited runs\', the particle positions a sketch',
   alternatives: 'the fast-spinning Earth (Ćuk & Stewart 2012) and the synestia (Lock et al. 2018) need an evection-resonance drain of angular momentum the model\'s conservation chain does not carry — named, not drawn',
@@ -69,13 +71,31 @@ const smooth = (/** @type {number} */ u) => { const x = Math.max(0, Math.min(1, 
 export function createMoonOriginChapter(deps) {
   const { THREE, parent, earthWorldPosition, frameQuaternion, earthDrawnRadius, loadTexture, theiaTextureUrl, pointTexture, recession, onEnd } = deps;
   const C = ORIGIN_CHAPTER, N = C.particles;
-  const S = /** @type {any} */ ({ active: false, ended: false, built: false, phaseIndex: 0, phaseU: 0, screenT: 0, scenarioSeconds: 0, group: null, theia: null, moon: null, points: null, pos: null, prevPos: null, seeds: null, handover: null, moonAngle: 0, moonDistanceRe: null, theiaCentre: null });
+  const S = /** @type {any} */ ({ active: false, ended: false, built: false, phaseIndex: 0, phaseU: 0, screenT: 0, scenarioSeconds: 0, group: null, theia: null, moon: null, points: null, pos: null, prevPos: null, seeds: null, handover: null, moonAngle: 0, moonDistanceRe: null, theiaCentre: null, yaw: 0 });
 
   // ── the sketch's geometry (units of R, the Earth's drawn radius — the group's scale) ──
   const ang = C.impactAngleDeg * Math.PI / 180;
   const contactCentre = new THREE.Vector3(1 + C.theiaRadiusEarthRadii, 0, 0);      // Theia touching the Earth at +X
   const travel = new THREE.Vector3(-Math.cos(ang), 0, Math.sin(ang)).normalize();   // its velocity direction at contact, 45° to the surface normal, in the plane
   const contactAz = Math.atan2(contactCentre.z, contactCentre.x);
+  // Theia's approach: a body falling in from REST AT INFINITY (v_imp ≈ v_esc, the canonical impact's premise — so
+  // Theia's heliocentric orbit was nearly the Earth's) moves on a parabola; its velocity at the contact radius r_c
+  // makes the impact angle with the surface normal when the pericentre is q = r_c sin²(angle) (inside the Earth:
+  // it hits). The time along the parabola is Barker's equation, t = T₀ (D + D³/3), D = tan(ν/2), T₀ = √(2q³/GM);
+  // the contact is at ν = −90° (D = 1) on the incoming branch, so it sits T₀·4/3 before the pericentre it never
+  // reaches. Frame: pericentre direction +Z, the contact point +X, the velocity at contact (−X + Z)/√2 = `travel`.
+  const gmPair = C.gmEarthRadiiCubedPerHourSquared * (1 + C.theiaMassEarths);
+  const rContact = contactCentre.length();
+  const qPeri = rContact * Math.sin(ang) ** 2;
+  const barkerT0Hours = Math.sqrt(2 * qPeri ** 3 / gmPair);
+  /** Theia's centre at a scenario time ≤ 0 (seconds before contact), in R. @param {number} tSeconds */
+  function theiaCentreAt(tSeconds) {
+    const M = (barkerT0Hours * 4 / 3 + Math.max(0, -tSeconds) / 3600) / barkerT0Hours;   // (time before pericentre) / T₀
+    let D = Math.cbrt(3 * M);
+    for (let i = 0; i < 25; i++) { const f = D + D * D * D / 3 - M; D -= f / (1 + D * D); }
+    const nu = -2 * Math.atan(D), r = 2 * qPeri / (1 + Math.cos(nu));
+    return new THREE.Vector3(-r * Math.sin(nu), 0, r * Math.cos(nu));
+  }
 
   function build() {
     if (S.built) return;
@@ -126,7 +146,7 @@ export function createMoonOriginChapter(deps) {
     if (key === 'accretion') {  // outside the Roche zone: onto the Moon at 3 R; inside: spiralling in
       const r0 = C.diskInnerEarthRadii + (C.diskOuterEarthRadii - C.diskInnerEarthRadii) * Math.sqrt(s1), a0 = az0 + 1.5;
       if (r0 >= C.rocheEarthRadii) {
-        const A = C.accretionRadiusEarthRadii, mx = A * Math.cos(S.moonAngle), mz = A * Math.sin(S.moonAngle), f = smooth(Math.min(1, u * 1.2 + s3 * 0.1));
+        const A = C.accretionRadiusEarthRadii, mx = A * Math.cos(S.moonAngle), mz = A * Math.sin(S.moonAngle), f = smooth(Math.min(1, u * 1.2 + s3 * 0.1));   // S.moonAngle is set before the debris loop
         out[0] = r0 * Math.cos(a0 + u * 2) * (1 - f) + mx * f; out[1] = h * 0.12 * (1 - f); out[2] = r0 * Math.sin(a0 + u * 2) * (1 - f) + mz * f; return;
       }
       const f = smooth(u), r = r0 * (1 - f) + 1.0 * f;
@@ -148,7 +168,10 @@ export function createMoonOriginChapter(deps) {
   /** The phase's progress → scenario seconds (linear; logarithmic in years over the recession). @param {number} k @param {number} u */
   function scenarioSeconds(k, u) {
     const p = ORIGIN_CHAPTER_PHASES[k];
-    if (p.t1 === null) { const yEnd = S.handover ? S.handover.years : 1e5; return Math.exp(u * Math.log(yEnd)) * SEC_PER_YR; }
+    if (p.t1 === null) {   // log-time from the phase's first year to the hand-over
+      const y0 = p.t0 / SEC_PER_YR, yEnd = Math.max(y0 * 1.001, S.handover ? S.handover.years : 1e5);
+      return Math.exp(Math.log(y0) + u * (Math.log(yEnd) - Math.log(y0))) * SEC_PER_YR;
+    }
     return p.t0 + u * (p.t1 - p.t0);
   }
 
@@ -157,11 +180,12 @@ export function createMoonOriginChapter(deps) {
     const R = earthDrawnRadius();
     S.group.position.copy(earthWorldPosition());
     S.group.quaternion.copy(frameQuaternion());
+    S.group.rotateY(S.yaw);   // the stage's yaw about the orbit normal (the tour chooses it for the free screen)
     S.group.scale.setScalar(R);
     // a point size is in SCENE units and ignores the group's scale (gl_PointSize = size · H/2 / depth): the first
     // build's 0.06 was 14 Earth radii per sprite, ~360 px on a 720-px canvas, 3,000 of them additive — the GPU fill
-    // the owner saw; 0.2 R is 5–8 px at the chapter's 14-R framing (measured, doc 111 §1.49)
-    S.points.material.size = 0.2 * R;
+    // the owner saw; 0.25 R is 5–8 px at the chapter's 16-R framing (measured, doc 111 §1.49)
+    S.points.material.size = 0.25 * R;
   }
 
   /** Pose the frame's objects inside phase k at progress u. @param {number} k @param {number} u */
@@ -169,27 +193,29 @@ export function createMoonOriginChapter(deps) {
     const key = ORIGIN_CHAPTER_PHASES[k].key;
     S.scenarioSeconds = scenarioSeconds(k, u);
     const t = S.scenarioSeconds;
-    if (key === 'approach') {   // Theia on its line, upstream of the contact point by speed × time
-      S.theiaCentre = contactCentre.clone().addScaledVector(travel, C.approachSpeedEarthRadiiPerHour * (t / 3600));
+    if (key === 'approach') {   // Theia on the parabola of infall from rest at infinity
+      S.theiaCentre = theiaCentreAt(t);
       S.theia.visible = true; S.theia.position.copy(S.theiaCentre); S.theia.scale.setScalar(1);
     } else if (key === 'contact') {   // deforming and sinking into the Earth
       S.theiaCentre = contactCentre.clone().addScaledVector(travel, 0.9 * smooth(u));
       S.theia.visible = true; S.theia.position.copy(S.theiaCentre); S.theia.scale.setScalar(1 - 0.75 * smooth(u));
     } else S.theia.visible = false;
-    if (key === 'accretion') {
+    if (key === 'accretion') {   // the Moon's azimuth is a function of the phase's progress: two turns, ending on the stage azimuth
       const A = C.accretionRadiusEarthRadii;
-      S.moon.visible = true; S.moonAngle += 0.02; S.moonDistanceRe = A;
+      S.moon.visible = true; S.moonAngle = C.stageAzimuthRad + 4 * Math.PI * u; S.moonDistanceRe = A;
       S.moon.scale.setScalar(Math.max(0.01, C.moonRadiusEarthRadii * (0.2 + 0.8 * smooth(u))));
       S.moon.position.set(A * Math.cos(S.moonAngle), 0, A * Math.sin(S.moonAngle));
+      S.moon.rotation.y = -S.moonAngle;   // one face to the Earth: locked by construction, as the card says
     } else if (key === 'recession') {
       const a = recession.distanceReAtYears(t / SEC_PER_YR) ?? C.accretionRadiusEarthRadii;
-      S.moonDistanceRe = a; S.moonAngle += Math.min(0.06, 0.6 / Math.pow(a, 1.5));
+      S.moonDistanceRe = a; S.moonAngle = C.stageAzimuthRad + 6 * Math.PI * u;   // three turns, ending on the stage azimuth: the hand-over Moon in the free screen
       S.moon.visible = true; S.moon.scale.setScalar(C.moonRadiusEarthRadii); S.moon.position.set(a * Math.cos(S.moonAngle), 0, a * Math.sin(S.moonAngle));
+      S.moon.rotation.y = -S.moonAngle;
     } else { S.moon.visible = false; S.moonDistanceRe = null; }
     const showDebris = key !== 'recession';
     S.points.visible = showDebris;
-    if (showDebris) {   // the debris: from the previous phase's end toward this phase's target
-      const out = [0, 0, 0], f = key === 'approach' ? 1 : smooth(Math.min(1, u * 1.6));
+    if (showDebris) {   // the debris: from the previous phase's end toward this phase's target, settled in the phase's first third
+      const out = [0, 0, 0], f = key === 'approach' ? 1 : smooth(Math.min(1, u * 3));
       for (let i = 0; i < N; i++) {
         target(i, key, u, out);
         S.pos[3 * i] = S.prevPos[3 * i] * (1 - f) + out[0] * f; S.pos[3 * i + 1] = S.prevPos[3 * i + 1] * (1 - f) + out[1] * f; S.pos[3 * i + 2] = S.prevPos[3 * i + 2] * (1 - f) + out[2] * f;
@@ -202,12 +228,12 @@ export function createMoonOriginChapter(deps) {
   function enterPhase(k) {
     if (S.built && S.pos) S.prevPos.set(S.pos);
     S.phaseIndex = k; S.phaseU = 0; S.screenT = 0;
-    if (ORIGIN_CHAPTER_PHASES[k].key === 'accretion') S.moonAngle = contactAz + 2.3;
   }
 
   const esc = (/** @type {string} */ s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const row = (/** @type {string} */ l, /** @type {string} */ v, /** @type {string} */ tag, /** @type {string} */ hint) => `<div class="origin-tour-row" title="${esc(hint)}"><span class="origin-tour-label">${l}</span><span class="origin-tour-value">${v}</span><span class="origin-tour-tag origin-tour-tag-${tag}">${tag}</span></div>`;
   const n0 = (/** @type {number} */ x) => Math.round(x).toLocaleString('en-US');
+  const n2 = (/** @type {number} */ x) => Number(x.toPrecision(2)).toLocaleString('en-US');   // a scenario with a 16-fold band is quoted to two figures
 
   /** The card's body for a phase: the clock, the phase, its source, the hand-off rows, the tag. @param {number} k */
   function cardHtml(k) {
@@ -221,7 +247,7 @@ export function createMoonOriginChapter(deps) {
         + row('Month', `${st.monthHours.toFixed(1)} h (${st.monthDays.toFixed(2)} days)`, 'derived', 'the Moon\'s orbital period at this distance')
         + row('Moon in the sky', `${st.moonDiameterDeg.toFixed(1)}° across`, 'derived', 'the Moon\'s apparent diameter from the Earth')
         + row('Tidal lock', `within ~${st.lockYears < 1 ? '1' : n0(st.lockYears)} yr`, 'cited', 'Peale 1977: the lock time scales as a⁶ — within a century at 6 R⊕')
-        + (h ? row('Hand-over', `${h.aOverEarthRadii.toFixed(2)} R⊕ after ${n0(h.years)} yr (band ${n0(h.bandYears[1])}–${n0(h.bandYears[0])})`, 'scenario', 'the cited history\'s first sample, where the simulator\'s own history begins; the input\'s band at that sample already reaches the Roche zone') : '')
+        + (h ? row('Hand-over', `${h.aOverEarthRadii.toFixed(2)} R⊕ after ~${n2(h.years)} yr (band ${n2(h.bandYears[1])}–${n2(h.bandYears[0])})`, 'scenario', 'the cited history\'s first sample, where the simulator\'s own history begins; the input\'s band at that sample already reaches the Roche zone') : '')
         + `</div>`;
     } else if (p.key === 'accretion') {
       const st = recession.stateAt(C.accretionRadiusEarthRadii);
@@ -229,7 +255,7 @@ export function createMoonOriginChapter(deps) {
     }
     return `<div class="origin-tour-clock"><span class="origin-tour-clock-label">${esc(clockLabel(S.scenarioSeconds))}</span><span class="origin-tour-clock-phase">${esc(p.label)}</span></div>`
       + `<div class="origin-tour-note">${esc(p.source)}</div>${rows}`
-      + `<div class="origin-tour-says"><span class="origin-tour-tag origin-tour-tag-illustrated">${C.tag}</span> ${esc(C.after)}. ${esc(C.alternatives)}. The simulator's clock stays at the genesis edge; this chapter runs on its own scenario clock.</div>`;
+      + `<div class="origin-tour-says"><span class="origin-tour-tag origin-tour-tag-illustrated">${C.tag}</span> ${esc(C.after)}. ${esc(C.alternatives)}. The simulator's clock stays at the genesis edge, so the Earth's own spin is not shown; this chapter runs on its own scenario clock.</div>`;
   }
 
   return {
@@ -267,11 +293,16 @@ export function createMoonOriginChapter(deps) {
       place(); render(k, S.phaseU); return true;
     },
     place,
+    /** The stage's yaw about the orbit normal (the tour chooses it so the action side has the free screen). @param {number} rad */
+    setYaw(rad) { S.yaw = rad; place(); },
+    get stageAzimuthRad() { return C.stageAzimuthRad; },
+    /** Theia's centre on the approach parabola at a time before contact — the gate's instrument. @param {number} tSeconds */
+    theiaCentreAt: (tSeconds) => { const v = theiaCentreAt(tSeconds); return { x: v.x, z: v.z, r: v.length() }; },
     /** The card's body for the current state — built on demand (the tour rebuilds it at ~10 Hz, not per frame). */
     cardHtml: () => cardHtml(S.phaseIndex),
     state() {
       const p = ORIGIN_CHAPTER_PHASES[S.phaseIndex];
-      return { active: S.active, ended: S.ended, phase: p.key, phaseIndex: S.phaseIndex, phaseU: S.phaseU, scenarioSeconds: S.scenarioSeconds, clock: clockLabel(S.scenarioSeconds), theiaVisible: !!(S.theia && S.theia.visible), moonVisible: !!(S.moon && S.moon.visible), moonDistanceRe: S.moonDistanceRe, debrisVisible: !!(S.points && S.points.visible), particles: N, handover: S.handover, groupScale: S.group ? S.group.scale.x : null, groupVisible: !!(S.group && S.group.visible) };
+      return { active: S.active, ended: S.ended, phase: p.key, phaseIndex: S.phaseIndex, phaseU: S.phaseU, scenarioSeconds: S.scenarioSeconds, clock: clockLabel(S.scenarioSeconds), theiaVisible: !!(S.theia && S.theia.visible), theiaRadiusRe: S.theiaCentre ? S.theiaCentre.length() : null, moonVisible: !!(S.moon && S.moon.visible), moonDistanceRe: S.moonDistanceRe, debrisVisible: !!(S.points && S.points.visible), particles: N, handover: S.handover, groupScale: S.group ? S.group.scale.x : null, groupVisible: !!(S.group && S.group.visible), yaw: S.yaw };
     },
   };
 }

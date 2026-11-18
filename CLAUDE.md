@@ -640,7 +640,12 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   reader holds the tour paused. **A point size is in scene units and
   ignores the group's scale** — 0.06 was 14 Earth radii per sprite, 3,000
   of them additive (the owner's "a lot of performance"); size in R, wake
-  the idle loop by the chapter's own condition, not the label flag. (§1.49)
+  the idle loop by the chapter's own condition, not the label flag. **A
+  stage is reviewed by headless screenshots of every phase** — the focus
+  follow re-centres the Earth every frame, so the chapter's one staging
+  parameter is its yaw about the orbit normal; Theia's approach is the
+  exact parabola of infall from rest (v_imp ≈ v_esc is why Theia shares
+  the Earth's orbit), checked by hand at the contact point. (§1.49)
 
 ---
 
