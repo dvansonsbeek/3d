@@ -69,7 +69,7 @@ const smooth = (/** @type {number} */ u) => { const x = Math.max(0, Math.min(1, 
 export function createMoonOriginChapter(deps) {
   const { THREE, parent, earthWorldPosition, frameQuaternion, earthDrawnRadius, loadTexture, theiaTextureUrl, pointTexture, recession, onEnd } = deps;
   const C = ORIGIN_CHAPTER, N = C.particles;
-  const S = /** @type {any} */ ({ active: false, ended: false, built: false, phaseIndex: 0, phaseU: 0, screenT: 0, scenarioSeconds: 0, group: null, theia: null, moon: null, points: null, pos: null, prevPos: null, seeds: null, handover: null, moonAngle: 0, moonDistanceRe: null, theiaCentre: null, card: '' });
+  const S = /** @type {any} */ ({ active: false, ended: false, built: false, phaseIndex: 0, phaseU: 0, screenT: 0, scenarioSeconds: 0, group: null, theia: null, moon: null, points: null, pos: null, prevPos: null, seeds: null, handover: null, moonAngle: 0, moonDistanceRe: null, theiaCentre: null });
 
   // ── the sketch's geometry (units of R, the Earth's drawn radius — the group's scale) ──
   const ang = C.impactAngleDeg * Math.PI / 180;
@@ -154,9 +154,14 @@ export function createMoonOriginChapter(deps) {
 
   function place() {
     if (!S.built) return;
+    const R = earthDrawnRadius();
     S.group.position.copy(earthWorldPosition());
     S.group.quaternion.copy(frameQuaternion());
-    S.group.scale.setScalar(earthDrawnRadius());
+    S.group.scale.setScalar(R);
+    // a point size is in SCENE units and ignores the group's scale (gl_PointSize = size · H/2 / depth): the first
+    // build's 0.06 was 14 Earth radii per sprite, ~360 px on a 720-px canvas, 3,000 of them additive — the GPU fill
+    // the owner saw; 0.2 R is 5–8 px at the chapter's 14-R framing (measured, doc 111 §1.49)
+    S.points.material.size = 0.2 * R;
   }
 
   /** Pose the frame's objects inside phase k at progress u. @param {number} k @param {number} u */
@@ -192,7 +197,6 @@ export function createMoonOriginChapter(deps) {
       S.points.geometry.getAttribute('position').needsUpdate = true;
       S.points.material.opacity = key === 'accretion' ? 0.85 * (1 - 0.9 * smooth(u)) : 0.85;
     }
-    S.card = cardHtml(k);
   }
 
   function enterPhase(k) {
@@ -263,7 +267,8 @@ export function createMoonOriginChapter(deps) {
       place(); render(k, S.phaseU); return true;
     },
     place,
-    cardHtml: () => S.card,
+    /** The card's body for the current state — built on demand (the tour rebuilds it at ~10 Hz, not per frame). */
+    cardHtml: () => cardHtml(S.phaseIndex),
     state() {
       const p = ORIGIN_CHAPTER_PHASES[S.phaseIndex];
       return { active: S.active, ended: S.ended, phase: p.key, phaseIndex: S.phaseIndex, phaseU: S.phaseU, scenarioSeconds: S.scenarioSeconds, clock: clockLabel(S.scenarioSeconds), theiaVisible: !!(S.theia && S.theia.visible), moonVisible: !!(S.moon && S.moon.visible), moonDistanceRe: S.moonDistanceRe, debrisVisible: !!(S.points && S.points.visible), particles: N, handover: S.handover, groupScale: S.group ? S.group.scale.x : null, groupVisible: !!(S.group && S.group.visible) };

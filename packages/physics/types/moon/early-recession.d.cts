@@ -9,21 +9,22 @@ declare const SCENARIO: Readonly<{
 }>;
 /**
  * @param {object} deps
- * @param {{ earthRadiusMetres: number, gmEarthMoonM3S2: number, moonMassKg: number, earthMassKg: number, totalAngularMomentumKgM2S: number, earthMomentOfInertiaKgM2: number, moonEccentricityFactor?: number }} deps.constants
- * @param {{ moonDistanceMetresAtAge: (tMa: number) => number | null }} deps.fns  the cited history's reader of date
+ * @param {{ earthRadiusMetres: number, gmEarthMoonM3S2: number, moonMassKg: number, earthMassKg?: number, totalAngularMomentumKgM2S: number, earthMomentOfInertiaKgM2: number, moonEccentricityFactor?: number }} deps.constants  (earthMassKg accepted, unused: the chain's form carries the Moon's mass alone)
+ * @param {{ moonDistanceMetresAtAge: (tMa: number) => number | null, earthMomentOfInertiaKgM2AtAge?: (tMa: number) => number }} deps.fns  the cited history's reader of date; the chain's moment of inertia of date (read at the edge age — the scenario has no age of its own; the J2000 constant otherwise, 2.8e-7 of the day apart)
  */
-export function createEarlyRecession({ constants: K, fns }: {
+export function createEarlyRecession({ constants: K0, fns }: {
     constants: {
         earthRadiusMetres: number;
         gmEarthMoonM3S2: number;
         moonMassKg: number;
-        earthMassKg: number;
+        earthMassKg?: number;
         totalAngularMomentumKgM2S: number;
         earthMomentOfInertiaKgM2: number;
         moonEccentricityFactor?: number;
     };
     fns: {
         moonDistanceMetresAtAge: (tMa: number) => number | null;
+        earthMomentOfInertiaKgM2AtAge?: (tMa: number) => number;
     };
 }): {
     scenario: Readonly<{

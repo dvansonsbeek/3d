@@ -284,11 +284,13 @@ check('free inclination at the edge 9–17° with its band ordered', iBand > 8 &
 {
   const { createEarlyRecession } = require(join(ROOT, 'packages/physics/src/moon/early-recession.cjs'));
   const P = DT.EPOCH_PARAMS;
-  const er = createEarlyRecession({ constants: { earthRadiusMetres: P.earthRadiusM, gmEarthMoonM3S2: P.gmEarthMoonM3S2, moonMassKg: P.moonMassKg, earthMassKg: P.earthMassKg, totalAngularMomentumKgM2S: P.totalAngularMomentumKgM2S, earthMomentOfInertiaKgM2: DT.iEarthAtAge(0), moonEccentricityFactor: P.moonEccentricityFactor }, fns: { moonDistanceMetresAtAge: DT.meanMoonDistanceMetresAtAge } });
+  const er = createEarlyRecession({ constants: { earthRadiusMetres: P.earthRadiusM, gmEarthMoonM3S2: P.gmEarthMoonM3S2, moonMassKg: P.moonMassKg, earthMassKg: P.earthMassKg, totalAngularMomentumKgM2S: P.totalAngularMomentumKgM2S, earthMomentOfInertiaKgM2: DT.iEarthAtAge(0), moonEccentricityFactor: P.moonEccentricityFactor }, fns: { moonDistanceMetresAtAge: DT.meanMoonDistanceMetresAtAge, earthMomentOfInertiaKgM2AtAge: DT.iEarthAtAge } });
   const h = er.handover();
   check('early recession: the hand-over is the domain\'s edge distance (6.1–6.3 R⊕) reached in 5e4–2e5 yr on the 3-sample window, the band ordered (10-sample shortest, 1-sample longest)', !!h && h.aOverEarthRadii > 6.1 && h.aOverEarthRadii < 6.3 && h.years > 5e4 && h.years < 2e5 && h.bandYears[1] < h.years && h.years < h.bandYears[0] && h.bandYears[1] > 1e4 && h.bandYears[0] < 5e5, JSON.stringify(h));
   const s3 = er.stateAt(3), s6 = er.stateAt(h ? h.aOverEarthRadii : 6.18);
   check('early recession: the hand-off state at 3 R⊕ — a 4.9–5.1-h day, a 7.2–7.4-h month, the Moon 10–11° across, locked within ~2 yr; at the first sample a 5.4–5.7-h day', Math.abs(s3.dayHours - 5.01) < 0.1 && Math.abs(s3.monthHours - 7.27) < 0.1 && s3.moonDiameterDeg > 10 && s3.moonDiameterDeg < 11 && s3.lockYears > 1 && s3.lockYears < 2 && s6.dayHours > 5.4 && s6.dayHours < 5.7, `${s3.dayHours} h / ${s3.monthHours} h / ${s3.moonDiameterDeg}° / ${s3.lockYears} yr; first sample ${s6.dayHours} h`);
+  const lodEdgeH = DT.meanLodSecondsAtAge(er.edgeMa) / 3600;
+  check('early recession: the hand-over day ≡ the chain\'s own LOD at the edge (one form, two homes; 1e-9)', Math.abs(s6.dayHours - lodEdgeH) / lodEdgeH < 1e-9, `${s6.dayHours} vs ${lodEdgeH} h`);
   const back = h ? er.distanceReAtYears(h.years) : null;
   check('early recession: the law\'s inverse closes (the distance at the hand-over time ≡ the hand-over distance to 1e-9)', back !== null && !!h && Math.abs(back - h.aOverEarthRadii) < 1e-9 && er.distanceReAtYears(0) === er.scenario.rocheZoneEarthRadii, `${back} vs ${h && h.aOverEarthRadii}`);
 }

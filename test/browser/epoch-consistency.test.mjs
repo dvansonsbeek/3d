@@ -554,7 +554,7 @@ for (const jd of DOMAIN_EDGE_JDS) {
     }
     {
       // plan 31 B+C: the chapter's hand-off ≡ the Node twin of the early recession scenario (one home, two runtimes)
-      const erNode = createEarlyRecession({ constants: { earthRadiusMetres: DTn.EPOCH_PARAMS.earthRadiusM, gmEarthMoonM3S2: DTn.EPOCH_PARAMS.gmEarthMoonM3S2, moonMassKg: DTn.EPOCH_PARAMS.moonMassKg, earthMassKg: DTn.EPOCH_PARAMS.earthMassKg, totalAngularMomentumKgM2S: DTn.EPOCH_PARAMS.totalAngularMomentumKgM2S, earthMomentOfInertiaKgM2: DTn.iEarthAtAge(0), moonEccentricityFactor: DTn.EPOCH_PARAMS.moonEccentricityFactor }, fns: { moonDistanceMetresAtAge: DTn.meanMoonDistanceMetresAtAge } });
+      const erNode = createEarlyRecession({ constants: { earthRadiusMetres: DTn.EPOCH_PARAMS.earthRadiusM, gmEarthMoonM3S2: DTn.EPOCH_PARAMS.gmEarthMoonM3S2, moonMassKg: DTn.EPOCH_PARAMS.moonMassKg, earthMassKg: DTn.EPOCH_PARAMS.earthMassKg, totalAngularMomentumKgM2S: DTn.EPOCH_PARAMS.totalAngularMomentumKgM2S, earthMomentOfInertiaKgM2: DTn.iEarthAtAge(0), moonEccentricityFactor: DTn.EPOCH_PARAMS.moonEccentricityFactor }, fns: { moonDistanceMetresAtAge: DTn.meanMoonDistanceMetresAtAge, earthMomentOfInertiaKgM2AtAge: DTn.iEarthAtAge } });
       const hN = erNode.handover(), s3N = erNode.stateAt(erNode.scenario.rocheZoneEarthRadii), hB = domainRows.chapterHandover;
       const rel = (/** @type {number} */ a, /** @type {number} */ b) => Math.abs(a - b) / Math.abs(b);
       const ds = hB && hN ? [rel(hB.aOverEarthRadii, hN.aOverEarthRadii), rel(hB.years, hN.years), rel(hB.bandYears[0], hN.bandYears[0]), rel(hB.bandYears[1], hN.bandYears[1]), rel(hB.dayHoursAt3, s3N.dayHours), rel(hB.monthHoursAt3, s3N.monthHours)] : [NaN];

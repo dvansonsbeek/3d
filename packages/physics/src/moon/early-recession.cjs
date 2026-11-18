@@ -32,11 +32,12 @@ const SCENARIO = Object.freeze({
 
 /**
  * @param {object} deps
- * @param {{ earthRadiusMetres: number, gmEarthMoonM3S2: number, moonMassKg: number, earthMassKg: number, totalAngularMomentumKgM2S: number, earthMomentOfInertiaKgM2: number, moonEccentricityFactor?: number }} deps.constants
- * @param {{ moonDistanceMetresAtAge: (tMa: number) => number | null }} deps.fns  the cited history's reader of date
+ * @param {{ earthRadiusMetres: number, gmEarthMoonM3S2: number, moonMassKg: number, earthMassKg?: number, totalAngularMomentumKgM2S: number, earthMomentOfInertiaKgM2: number, moonEccentricityFactor?: number }} deps.constants  (earthMassKg accepted, unused: the chain's form carries the Moon's mass alone)
+ * @param {{ moonDistanceMetresAtAge: (tMa: number) => number | null, earthMomentOfInertiaKgM2AtAge?: (tMa: number) => number }} deps.fns  the cited history's reader of date; the chain's moment of inertia of date (read at the edge age — the scenario has no age of its own; the J2000 constant otherwise, 2.8e-7 of the day apart)
  */
-function createEarlyRecession({ constants: K, fns }) {
+function createEarlyRecession({ constants: K0, fns }) {
   const edgeMa = NAVIGABLE_PAST_YEARS / 1e6;
+  const K = fns.earthMomentOfInertiaKgM2AtAge ? { ...K0, earthMomentOfInertiaKgM2: fns.earthMomentOfInertiaKgM2AtAge(edgeMa) } : K0;
   const R = K.earthRadiusMetres;
   const aRe = (/** @type {number} */ tMa) => { const a = fns.moonDistanceMetresAtAge(tMa); return a === null ? null : a / R; };
 
@@ -64,13 +65,15 @@ function createEarlyRecession({ constants: K, fns }) {
     const a = aRe(edgeMa);
     return a === null ? null : { aOverEarthRadii: a, years: yearsFromRoche(a), bandYears: SCENARIO.windowSamplesBand.map((m) => yearsFromRoche(a, m)), lawFactorShipped: lawFactor(SCENARIO.windowSamplesShipped), lawFactorBand: SCENARIO.windowSamplesBand.map(lawFactor) };
   }
-  /** The hand-off state at a distance by the constant-L chain: the day, the month, the Moon's apparent size, the lock time. @param {number} aOverEarthRadii */
+  /** The hand-off state at a distance by the constant-L chain: the day, the month, the Moon's apparent size, the lock time.
+   *  The day is the SAME operations as the chain's published LOD (layer0 lodSecondsCore: the orbit's angular momentum
+   *  as the Moon's mass × √(GM a) × the eccentricity factor, the Earth's moment of inertia injected) — a first form
+   *  with the reduced mass read 5.485 h at the hand-over where the next station's card reads the chain's 5.510; the
+   *  regime gate holds the hand-over day ≡ the chain's LOD at the edge. @param {number} aOverEarthRadii */
   function stateAt(aOverEarthRadii) {
     const a = aOverEarthRadii * R;
-    const mu = K.earthMassKg * K.moonMassKg / (K.earthMassKg + K.moonMassKg);
-    const lOrbit = mu * Math.sqrt(K.gmEarthMoonM3S2 * a) * (K.moonEccentricityFactor ?? 1);
-    const omega = (K.totalAngularMomentumKgM2S - lOrbit) / K.earthMomentOfInertiaKgM2;
-    const dayHours = (2 * Math.PI / omega) / 3600;
+    const lOrbit = K.moonMassKg * Math.sqrt(K.gmEarthMoonM3S2 * a) * (K.moonEccentricityFactor ?? 1);
+    const dayHours = ((2 * Math.PI * K.earthMomentOfInertiaKgM2) / (K.totalAngularMomentumKgM2S - lOrbit)) / 3600;
     const monthHours = (2 * Math.PI / Math.sqrt(K.gmEarthMoonM3S2 / (a * a * a))) / 3600;
     return {
       aOverEarthRadii, dayHours, monthHours, monthDays: monthHours / dayHours,

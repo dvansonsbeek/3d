@@ -1701,7 +1701,7 @@ function _earlyRecession() {
     const P = _dtc().EPOCH_PARAMS;
     _earlyRecessionM = createEarlyRecession({
       constants: { earthRadiusMetres: P.earthRadiusM, gmEarthMoonM3S2: P.gmEarthMoonM3S2, moonMassKg: P.moonMassKg, earthMassKg: P.earthMassKg, totalAngularMomentumKgM2S: P.totalAngularMomentumKgM2S, earthMomentOfInertiaKgM2: _dtc().iEarthAtAge(0), moonEccentricityFactor: P.moonEccentricityFactor },
-      fns: { moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge },
+      fns: { moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge, earthMomentOfInertiaKgM2AtAge: _dtc().iEarthAtAge },
     });
   }
   return _earlyRecessionM;
@@ -3377,15 +3377,24 @@ function _originFrame() {
   controls.target.copy(ctr); controls.update();
   positionChanged = true; needsLabelUpdate = true;
 }
-/** The render loop, at the end of every frame: advance the chapter's scenario clock, its objects and its card
- *  while it runs (the tour's Pause holds it). The loop idles when nothing moves; the chapter is its own motion,
- *  so it asks for the next frame through the label flag (no forced scene update — the scene stands still). */
+/** The render loop, at the end of every frame: advance the chapter's scenario clock and its objects while it runs
+ *  (the tour's Pause holds it; the loop's active condition carries the chapter, no forced scene update — the scene
+ *  stands still), and rebuild the card's body at ~10 Hz (a clock in hours and minutes needs no more; the card
+ *  follows the chapter's state even while paused — a skip while paused re-poses the chapter). */
+let _originChapterCardMs = 0;
 function originChapterTick(deltaSeconds) {
   if (!_originChapter || !_originChapter.active) return;
-  if (!_tour.paused) { _originChapter.tick(deltaSeconds); needsLabelUpdate = true; }
-  // the card follows the chapter's state even while paused (a skip while paused re-poses the chapter)
+  if (!_tour.paused) _originChapter.tick(deltaSeconds);
+  const now = performance.now();
+  if (now - _originChapterCardMs < 100) return;
+  _originChapterCardMs = now;
+  _originChapterRefreshCard();
+}
+/** Rewrite the card's chapter body when it changed (the tick at 10 Hz; a skip at once — a paused tour does not
+ *  wake the loop, so the skip's re-pose would otherwise wait for the next wake). */
+function _originChapterRefreshCard() {
   const el = _tour.el && _tour.el.querySelector('.origin-tour-chapter');
-  if (el) { const h = _originChapter.cardHtml(); if (h !== _originChapterHtml) { el.innerHTML = h; _originChapterHtml = h; } }
+  if (el && _originChapter) { const h = _originChapter.cardHtml(); if (h !== _originChapterHtml) { el.innerHTML = h; _originChapterHtml = h; } }
 }
 if (typeof document !== 'undefined') document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && _tour.active) tourStop(); });
 
@@ -4206,7 +4215,7 @@ if (typeof window !== 'undefined') {
     tourState: () => ({ active: _tour.active, paused: _tour.paused, index: _tour.index, started: _tour.started, armed: !_tour.pendingArm && _tour.timer !== 0, visible: !!(_tour.el && _tour.el.classList.contains('visible')), landing: !!(_tour.el && _tour.el.querySelector('.origin-tour-landing')), title: _tour.el ? (_tour.el.querySelector('.origin-tour-title') || {}).textContent : null }),
     // plan 31 B+C: the origin chapter — its state (phase, scenario clock, the drawn objects), a skip to a phase, the card's clock text
     originChapterState: () => (_originChapter ? _originChapter.state() : null),
-    originChapterSkipTo: (key, atEnd) => (_originChapter && _originChapter.active ? _originChapter.skipTo(key, atEnd === true) : false),
+    originChapterSkipTo: (key, atEnd) => { const ok = _originChapter && _originChapter.active ? _originChapter.skipTo(key, atEnd === true) : false; if (ok) { _originChapterRefreshCard(); needsLabelUpdate = true; } return ok; },
     originChapterPhases: () => ORIGIN_CHAPTER_PHASES.map((p) => ({ key: p.key, t0: p.t0, t1: p.t1, screenSeconds: p.screenSeconds })),
     originChapterCardClock: () => { const el = _tour.el && _tour.el.querySelector('.origin-tour-clock-label'); return el ? el.textContent : null; },
     originChapterRows: () => _tourChapterRows().map((r) => `${r.label}: ${r.value} [${r.tag}]`),
@@ -23995,7 +24004,9 @@ function render(now) {
   // ★ 3) IDLE CHECK — skip everything when nothing changed → ~0% CPU
   // Wake triggers: o.Run, cameraMoved, positionChanged (GUI/resize/drag),
   //                needsLabelUpdate (camera zoom/orbit events)
-  const active = o.Run || cameraMoved || positionChanged || needsLabelUpdate;
+  // (plan 31 B+C: the origin chapter is its own motion while it runs — it wakes the loop by this condition, not by
+  // the label flag, which would also run the CSS2D label pass over both scenes every frame)
+  const active = o.Run || cameraMoved || positionChanged || needsLabelUpdate || (_originChapter !== null && _originChapter.active && !_tour.paused);
   _wake.frames++;
   if (!active) return;
   _wake.active++;
