@@ -137,7 +137,10 @@ for (const m of toRun) {
   let out = '';
   let rc = 0;
   try {
-    out = execFileSync(process.execPath, [V(m.n)], { encoding: 'utf8', timeout: 300_000 });
+    // a hang guard, not a budget: scene-year-lengths.js alone measured 185 s (2026-11-16) and 290 s (2026-11-18,
+    // idle 16-core box, the Node scene path unchanged between) — a 300-s cap turned a passing gate into a
+    // message-less FAIL (doc 111 §1.49); the cause of the drift is unmeasured and named open there
+    out = execFileSync(process.execPath, [V(m.n)], { encoding: 'utf8', timeout: 600_000 });
   } catch (e) {
     out = `${e.stdout ?? ''}${e.stderr ?? ''}`;
     rc = e.status ?? 1;

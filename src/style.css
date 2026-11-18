@@ -453,6 +453,13 @@ canvas {
 .origin-tour-title { font-size: 15px; font-weight: 600; }
 .origin-tour-age { margin-left: auto; font-size: 11px; color: hsla(45, 80%, 78%, 1); white-space: nowrap; }
 .origin-tour-note { color: hsla(210, 10%, 86%, 1); margin-bottom: 3px; }
+/* plan 31 C — the origin chapter's scenario clock and phase line, and its tags */
+.origin-tour-clock { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 4px; }
+.origin-tour-clock-label { font-family: "IBM Plex Mono", Menlo, Consolas, monospace; font-size: 12px; color: hsla(45, 80%, 78%, 1); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.origin-tour-clock-phase { font-size: 12.5px; font-weight: 600; color: hsla(0, 0%, 96%, 1); }
+.origin-tour-tag-illustrated { border-color: hsla(20, 70%, 60%, 0.7); color: hsla(20, 80%, 76%, 1); }
+.origin-tour-tag-scenario { border-color: hsla(20, 70%, 60%, 0.7); color: hsla(20, 80%, 76%, 1); }
+.origin-tour-chapter { min-height: 96px; }
 .origin-tour-tag-forecast { border-color: hsla(280, 50%, 60%, 0.7); color: hsla(280, 60%, 78%, 1); }
 .origin-tour-btn:disabled { opacity: 0.4; cursor: default; }
 .origin-tour-rows { display: flex; flex-direction: column; gap: 3px; }

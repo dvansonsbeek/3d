@@ -624,7 +624,19 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   holds no low state inside 7 R⊕, so the early figure is hydrostatic (∝ a⁻³
   inside 15 R⊕) — test a cited relation at the edge before adopting its
   literature assumption. Anchored on the measured J2000 composition
-  (ratio 0.996), a labelled band, never a dated event. (§1.49)
+  (ratio 0.996), a labelled band, never a dated event. **The Moon's origin
+  is a tour chapter on its own scenario clock, never a computation** — a
+  keyframed sequence whose times and extents are the cited runs' (Canup
+  2004; Ida, Canup & Stewart 1997; Kokubo, Ida & Makino 2000), the particle
+  positions a seeded sketch said so on the card, ONE home
+  `src/moon-origin-chapter.js`; the simulator's instant stays on the
+  genesis edge (the UT axis is gated unmoved), the scene's Moon hidden
+  while the chapter draws its own; the only derived content is the
+  hand-off, ONE home `moon/early-recession` (the input's own law read off
+  its first segment inside the domain: the Roche zone to the first sample
+  in ~1e5 yr, a 16-fold band; a 4.9-h day at 3 R⊕ by the constant-L
+  chain), browser ≡ Node to 1e-9. A skip to a phase's end hands the tour
+  over on the next tick — a reader holds the tour paused. (§1.49)
 
 ---
 

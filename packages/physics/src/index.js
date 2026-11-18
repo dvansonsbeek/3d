@@ -201,6 +201,8 @@ export { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, SUN_GALACTIC_
 export { CONSTELLATION_NAMES, ECLIPTIC_J2000_EQUATORIAL, JD_B1875, precessionMatrixJ2000To, setBoundaryTable, constellationName, constellationAtB1875, constellationOfVectorJ2000, constellationAtJ2000, eclipticFrame, eclipticPointJ2000, raDecOfVector, eclipticCrossings, constellationAtLongitude } from './sky/ecliptic-constellations.cjs';
 // plan 28 §D — the stars' Galactic orbits relative to the Sun (the second-order epicycle about each body's own guiding centre)
 export { LOCAL_GALACTIC_KINEMATICS, RADIAL_AMPLITUDE_MAX, SUN_EPOCH_YEAR, ORBIT_INTEGRATION, KMS_PER_MASYR_KPC, localRotationCurve, heliocentricGalacticState, orbitElements, radiusAt, galactocentricPositionAt, galactocentricPositionAtYear, heliocentricGalacticAtYear, galacticAcceleration, galactocentricState, integrateOrbitRK4, integrationSchedule, integratedStateAtYear, mainSequenceLifetimeYears, sunHeightPcAtYear, MILKY_WAY_LIGHT_DISTANCE_PC, milkyWayLatitudeShiftDegAtYear } from './sky/galactic-orbits.cjs';
+// plan 31 B — the early recession, Roche zone → the cited history's first sample: a LABELLED SCENARIO (ONE home moon/early-recession)
+export { EARLY_RECESSION_SCENARIO, createEarlyRecession } from './moon/early-recession.cjs';
 // plan 31 B — the Moon's axial tilt of date: the Cassini state on the regime of date (ONE home moon/cassini-state)
 export { CASSINI_FIGURE, figureAtDistance, cassiniEquationRoots, classifyCassiniStates, createCassiniState } from './moon/cassini-state.cjs';
 // plan 28's follow-up — the supernova ILLUSTRATION: the lifetime band's end for the massive stars (the instants, the light curve, the magnitudes)

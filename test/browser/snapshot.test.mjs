@@ -442,19 +442,39 @@ Object.assign(measured, await s.page.evaluate(() => {
 Object.assign(measured, await s.page.evaluate(() => {
   const T = window.__test__, v = {};
   const ages = T.tourStations();
-  for (let i = 0; i < ages.length; i++) { const r = T.tourStationValues(i); v[`tour.station@${ages[i]}Ma`] = r ? `${r.title} | ${r.rows.map((x) => `${x.label}: ${x.value} [${x.tag}]`).join(' | ')}` : null; }
+  // plan 31 B+C: the chapter station shares the genesis's age — keyed apart; its rows are the scenario's hand-off
+  for (let i = 0; i < ages.length; i++) { const r = T.tourStationValues(i); v[r && r.chapter ? `tour.chapter@${ages[i]}Ma` : `tour.station@${ages[i]}Ma`] = r ? `${r.title} | ${r.rows.map((x) => `${x.label}: ${x.value} [${x.tag}]`).join(' | ')}` : null; }
   return v;
 }));
 // the jump follows the card on the next tick (the landing line paints first); the start lands on
-// the genesis, one next moves exactly one station (the 4,415-Ma one), Pause keeps the card, × closes
+// the genesis edge (station 1 is the origin CHAPTER, plan 31 B+C, on the same landing), one next
+// moves exactly one station (the genesis), Pause keeps the card, × closes
 await s.page.evaluate(() => window.__test__.tourStart());
 await s.page.waitForFunction(() => { const st = window.__test__.tourState(); return st.visible && !st.landing; }, null, { timeout: 60000 });
 await s.page.waitForTimeout(500);
 Object.assign(measured, await s.page.evaluate(() => { const T = window.__test__; const st = T.tourState(); return { 'tour.start.index': st.index, 'tour.start.visible': st.visible, 'tour.start.title': st.title, 'tour.start.date': T.clockFields().date, 'tour.start.yearOfDate': T.clockFields().yearOfDate, 'tour.start.onEdge': T.clockFields().pos === T.navigablePosRange().posMin }; }));
+// plan 31 B+C: the chapter runs on its own scenario clock on the genesis landing — the first phase
+// draws Theia, the scene's Moon is hidden, the UT axis does not move; skipped to the recession's end
+// the chapter's Moon stands at the hand-over distance (the cited history's first sample) with the
+// hand-off rows on the card; the next station restores the scene's Moon
+await s.page.waitForFunction(() => { const c = window.__test__.originChapterState(); return !!(c && c.active && c.groupVisible); }, null, { timeout: 20000 });
+await s.page.waitForTimeout(300);
+Object.assign(measured, await s.page.evaluate(() => {
+  const T = window.__test__, c = T.originChapterState(), m = T.originChapterSceneMoon();
+  return { 'tour.chapter.phase0': c.phase, 'tour.chapter.theia': c.theiaVisible, 'tour.chapter.debris': c.debrisVisible, 'tour.chapter.particles': c.particles, 'tour.chapter.sceneMoonHidden': m.hidden && !m.moon && !m.orbit, 'tour.chapter.clock0': c.clock.endsWith('before contact'), 'tour.chapter.cardClock': T.originChapterCardClock() === c.clock, 'tour.chapter.phases': T.originChapterPhases().map((p) => p.key).join(','), 'tour.chapter.dateUnmoved': T.clockFields().date };
+}));
+// (the tour is held paused over the skip: at the last phase's end the chapter's own tick hands the tour over)
+await s.page.evaluate(() => { window.__test__.tourPause(); window.__test__.originChapterSkipTo('recession', true); });
+await s.page.waitForTimeout(400);
+Object.assign(measured, await s.page.evaluate(() => {
+  const T = window.__test__, c = T.originChapterState();
+  return { 'tour.chapter.recession.moon': c.moonVisible, 'tour.chapter.recession.theia': c.theiaVisible, 'tour.chapter.recession.distanceRe': c.moonDistanceRe !== null ? c.moonDistanceRe.toFixed(2) : null, 'tour.chapter.recession.handoverRe': c.handover ? c.handover.aOverEarthRadii.toFixed(2) : null, 'tour.chapter.recession.handoverYears': c.handover ? Math.round(c.handover.years) : null, 'tour.chapter.recession.clock': c.clock, 'tour.chapter.recession.dateUnmoved': T.clockFields().date, 'tour.chapter.recession.cardHasHandover': /Hand-over/.test(document.querySelector('.origin-tour-chapter').textContent) };
+}));
 await s.page.evaluate(() => window.__test__.tourNext());
 await s.page.waitForFunction(() => { const st = window.__test__.tourState(); return st.index === 1 && st.visible && !st.landing; }, null, { timeout: 60000 });
+await s.page.evaluate(() => window.__test__.tourPause());   // resume: the genesis station's own hold, as before the chapter
 await s.page.waitForTimeout(500);
-Object.assign(measured, await s.page.evaluate(() => { const T = window.__test__; const st = T.tourState(); return { 'tour.next.index': st.index, 'tour.next.title': st.title, 'tour.next.date': T.clockFields().date }; }));
+Object.assign(measured, await s.page.evaluate(() => { const T = window.__test__; const st = T.tourState(); const c = T.originChapterState(), m = T.originChapterSceneMoon(); return { 'tour.next.index': st.index, 'tour.next.title': st.title, 'tour.next.date': T.clockFields().date, 'tour.next.chapterStopped': !c.active && !m.hidden && m.moon }; }));
 await s.page.evaluate(() => window.__test__.tourPause());
 Object.assign(measured, await s.page.evaluate(() => { const st = window.__test__.tourState(); return { 'tour.pause.paused': st.paused, 'tour.pause.visible': st.visible, 'tour.pause.armed': st.armed }; }));
 await s.page.evaluate(() => window.__test__.tourStop());

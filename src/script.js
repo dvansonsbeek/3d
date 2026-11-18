@@ -4,6 +4,7 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import { Pane } from 'tweakpane';
 // PLAN 28 §B/C — the sky of date: the bright-star catalogue and its linear space motion (ONE home)
 import { createSkyOfDate, SKY_CONSTANTS, UNITS_PER_PC } from './sky-of-date.js';
+import { createMoonOriginChapter, ORIGIN_CHAPTER_PHASES } from './moon-origin-chapter.js';   // plan 31 B+C: the Moon's origin chapter (the tour's first station)
 
 // Generated from public/input/astro-reference.json (+ the assembled deep-time
 // block) by `npm run constants:generate` (§2g). Never hand-edited; `npm run test:constants`
@@ -27,7 +28,7 @@ import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, 
   createDeepTimeChain,
   // the lunar plane of date (plan 31 A2): the Laplace tilt's shape and the free inclination's
   // F-class scales the lunar series rides, on the chain's regime readers (ONE home moon/plane-of-date)
-  createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG, createCassiniState,
+  createLunarPlaneScales, composeEclipticInclinationDeg, LUNAR_PLANE_TILT_ANCHOR_DEG, createCassiniState, createEarlyRecession,
   createSolarPerturbationScales,
   // the obliquity a drawn scene shows beyond the hybrid's domain (plan 31 A2): the cited mean with the
   // hybrid's wobble about its beat mean, handed over C¹ (ONE home earth/scene-obliquity)
@@ -1691,6 +1692,20 @@ function _cassiniState() {
   }
   return _cassiniStateM;
 }
+/** PLAN 31 B — the early recession, Roche zone → the cited history's first sample: a LABELLED SCENARIO on the
+ *  chain's own readers (ONE home moon/early-recession; the Node gate builds the same on tools/lib's). The origin
+ *  chapter's hand-off rows read it; nothing in the navigable domain does. Built once. */
+let _earlyRecessionM = null;
+function _earlyRecession() {
+  if (_earlyRecessionM === null) {
+    const P = _dtc().EPOCH_PARAMS;
+    _earlyRecessionM = createEarlyRecession({
+      constants: { earthRadiusMetres: P.earthRadiusM, gmEarthMoonM3S2: P.gmEarthMoonM3S2, moonMassKg: P.moonMassKg, earthMassKg: P.earthMassKg, totalAngularMomentumKgM2S: P.totalAngularMomentumKgM2S, earthMomentOfInertiaKgM2: _dtc().iEarthAtAge(0), moonEccentricityFactor: P.moonEccentricityFactor },
+      fns: { moonDistanceMetresAtAge: meanMoonDistanceMetresAtAge },
+    });
+  }
+  return _earlyRecessionM;
+}
 /** The Cassini state at a scene instant, memoised on a 100-year grain of the age (the tilt moves on Myr scales;
  *  the state solve is ~1 ms); null outside deep-time mode or the histories. */
 let _moonTiltMemo = { key: NaN, value: null };
@@ -3072,8 +3087,12 @@ const TOUR_HOLD_MS = 12000;
 // Every card has the same shape: the title, the age, ONE sentence on what the scene shows, ONE
 // on what the model or the source says (the owner's review, 2026-11-05), the value rows, and the
 // rock anchor where one exists. Ages ahead of today are negative.
-/** @type {{ ageMa: number, title: string, scene: string, says: string, anchor?: string, anchorAction?: 'genesis' }[]} */
+/** @type {{ ageMa: number, title: string, scene: string, says: string, anchor?: string, anchorAction?: 'genesis', chapter?: boolean }[]} */
 const TOUR_STATIONS = [
+  // plan 31 B+C: the ILLUSTRATED chapter before the genesis — the same landing (the simulator's instant stays on the
+  // edge), the scene's Moon hidden while the chapter draws Theia, the debris, the disk, the accreting Moon and the
+  // early recession on its own scenario clock (ONE home src/moon-origin-chapter.js); it hands over to the next station
+  { ageMa: 4428.985, chapter: true, title: 'The Moon\'s origin', scene: 'A Mars-sized body strikes the young Earth; within a day the debris is in orbit, within a year the Moon has gathered outside the Roche zone, and the early recession carries it to where the measured history begins.', says: 'An ILLUSTRATION after the published simulations (Canup 2004; Ida, Canup & Stewart 1997; Kokubo, Ida & Makino 2000): the times and extents are theirs, the picture is a sketch, and nothing in it is computed by the model except the hand-off — the day, the month and the Moon\'s size when the cited history takes over. The chapter runs on its own clock; the simulator\'s stays at the genesis.' },
   { ageMa: 4428.985, title: 'The Earth–Moon genesis', scene: 'A magma ocean under a forming steam atmosphere; the Moon at six Earth radii, five degrees across.', says: 'The oldest point the Moon\'s measured distance history reaches (Farhat et al. 2022); the simulator goes no further back. One age, three counts: 4.43 billion years in uniform time, about 4.43 billion orbits, about 2.47 trillion turns of the Earth.', anchor: 'The first solar eclipse the Moon ever cast follows two and a half of those short days later — about thirteen hours of ours.', anchorAction: 'genesis' },
   { ageMa: 4415, title: 'The first oceans', scene: 'The steam rains out onto the new crust under a thinning cloud of steam.', says: 'An illustration following Zahnle 2007 and Sleep 2001; the Jack Hills zircons, the oldest crystals on Earth, record liquid water by 4,400 million years ago (Wilde 2001).' },
   { ageMa: 4200, title: 'The Hadean ocean world', scene: 'A global ocean with volcanic islands under an oxygen-free sky.', says: 'The short day and the close Moon go together: as the Moon moves away, the Earth\'s spin slows to pay for it — computed on the Moon\'s measured distance history.' },
@@ -3150,11 +3169,28 @@ function tourStationValues(i) {
       : { label: 'Axial tilt', value: bandText, today: `today ${T0.obliquityDeg.toFixed(2)}°`, tag: Number.isFinite(citedMean) ? 'cited' : derived, hint: `the tilt of the Earth's axis against its orbit; beyond ±10 million years the model claims the range it swings over, not its value at a date${bandNarrow ? ' (here the swing is below 0.05°)' : ''}; the swing's beat is ${beat}${Number.isFinite(citedMean) ? ` — the range is centred on the cited mean tilt of that age (Farhat et al. 2022), the tilt the simulator draws` : ''}` },
   ];
   if (ice !== null) rows.push({ label: 'Ice cover', value: `${Math.round(ice * 100)} % of the Last Glacial Maximum`, today: '', tag: today ? 'measured' : ahead ? 'forecast' : 'derived', hint: 'the model\'s own ice history: its climate formula fitted on the deep-sea sediment record (LR04)' });
+  // plan 31 B+C: the chapter station's rows are the scenario's hand-off (ONE home moon/early-recession) — the
+  // physics values above stay the edge's (the epoch gate reads them against the Node model at the same year)
+  const chapterRows = st.chapter ? _tourChapterRows() : null;
   return {
-    ageMa: st.ageMa, title: st.title, scene: st.scene, says: st.says, anchor: st.anchor || null, anchorAction: st.anchorAction || null, year,
+    ageMa: st.ageMa, title: st.title, scene: st.scene, says: st.says, anchor: st.anchor || null, anchorAction: st.anchorAction || null, year, chapter: st.chapter === true,
     dayHours: lodS / 3600, yearSolarDays: tropS / lodS, moonKm, moonDiamDeg, precYears,
-    obliquityDeg, band, ice, rows,
+    obliquityDeg, band, ice, rows: chapterRows || rows,
   };
+}
+/** The chapter station's rows: the early recession's hand-off numbers — the Roche zone's state by the constant-L
+ *  chain (derived), the Roche-zone-to-first-sample time with its window band (the input's own extrapolation, a
+ *  labelled scenario), the sequence's standing (illustrated). */
+function _tourChapterRows() {
+  const er = _earlyRecession(), s3 = er.stateAt(er.scenario.rocheZoneEarthRadii), h = er.handover();
+  const n0 = (/** @type {number} */ x) => Math.round(x).toLocaleString('en-US');
+  return [
+    { label: 'Day at 3 R⊕', value: `${s3.dayHours.toFixed(2)} h`, today: '', tag: 'derived', hint: 'the Earth\'s day when the Moon had just gathered at the Roche zone — the model\'s constant-angular-momentum chain at 3 Earth radii' },
+    { label: 'Month at 3 R⊕', value: `${s3.monthHours.toFixed(1)} h (${s3.monthDays.toFixed(2)} days)`, today: '', tag: 'derived', hint: 'the Moon\'s orbital period at 3 Earth radii' },
+    { label: 'Moon in the sky at 3 R⊕', value: `${s3.moonDiameterDeg.toFixed(1)}° across`, today: '', tag: 'derived', hint: 'the Moon\'s apparent diameter from the Earth at 3 Earth radii — twenty times today\'s' },
+    { label: 'Roche zone → first sample', value: h ? `~${n0(h.years)} yr (band ${n0(h.bandYears[1])}–${n0(h.bandYears[0])})` : '—', today: '', tag: 'scenario', hint: 'the time from 3 Earth radii to the cited history\'s first sample on the law its first segment expresses (da/dt ∝ a^(−11/2); the shipped 3-sample window, the band the 1- and 10-sample windows) — the input\'s own extrapolation, not a measurement' },
+    { label: 'The sequence', value: `${ORIGIN_CHAPTER_PHASES.length} phases, after Canup 2004`, today: '', tag: 'illustrated', hint: 'a keyframed sketch whose times and extents are the published simulations\' — not a computation of the impact' },
+  ];
 }
 /** The age line of a station. @param {number} ageMa */
 function _tourAgeText(ageMa) {
@@ -3178,6 +3214,11 @@ function _tourRenderCard(i, v, landing = false) {
   const head = `<button type="button" class="origin-tour-close" data-tour="close" title="Close the tour">×</button><div class="origin-tour-head"><span class="origin-tour-step">${i + 1} / ${TOUR_STATIONS.length}</span><span class="origin-tour-title">${esc(st.title)}</span><span class="origin-tour-age">${_tourAgeText(st.ageMa)}</span></div>`;
   const body = landing || !v
     ? `<div class="origin-tour-landing">Landing${i === 0 || _tour.started === 1 ? ' — the first deep jump prepares the deep-time tables and can take up to half a minute' : ''} …</div>`
+    : st.chapter
+      // plan 31 B+C: the chapter's body is the chapter's own (its scenario clock, phase, source and hand-off rows,
+      // rewritten by originChapterTick as the phases run); the station's two sentences stand above it
+      ? `<div class="origin-tour-note">${esc(v.scene)}</div><div class="origin-tour-says">${esc(v.says)}</div><div class="origin-tour-chapter">${_originChapter ? _originChapter.cardHtml() : ''}</div>`
+        + `<div class="origin-tour-legend">illustrated: a sketch after the cited simulations · scenario: the input's own extrapolation · derived: computed by the model · cited: a published input — hover a row for its source</div>`
     : `<div class="origin-tour-note">${esc(v.scene)}</div><div class="origin-tour-says">${esc(v.says)}</div>`
       + `<div class="origin-tour-rows">${v.rows.map((r) => `<div class="origin-tour-row" title="${esc(r.hint)}${r.today ? ` — ${esc(r.today)}` : ''}"><span class="origin-tour-label">${esc(r.label)}</span><span class="origin-tour-value">${esc(r.value)}</span><span class="origin-tour-tag origin-tour-tag-${r.tag}">${r.tag}</span></div>`).join('')}</div>`
       + (v.anchor ? `<div class="origin-tour-anchor">${esc(v.anchor)}${v.anchorAction === 'genesis' ? ' <button type="button" class="origin-tour-btn origin-tour-btn-small" data-tour="genesis" title="Jump to the first solar eclipse of the cited history — the finder walks the months of date from the edge (about 40 s the first time); the tour pauses">Jump to it</button>' : ''}</div>` : '')
@@ -3209,6 +3250,7 @@ function tourGoto(i) {
   clearTimeout(_tour.timer);
   _tour.active = true; _tour.index = i; _tour.pendingArm = false;
   o.Run = false;
+  _originChapterStop();   // plan 31 B+C: leaving the chapter station restores the scene's Moon
   _tourRenderCard(i, null, true);
   setTimeout(() => {
     if (!_tour.active || _tour.index !== i) return;
@@ -3223,10 +3265,11 @@ function tourGoto(i) {
     switchToPlanet('Earth');   // always: the default focus IS the Earth, from the far start view — the tour frames it
     tourFrameEarth();
     const v = tourStationValues(i);
+    if (st.chapter) _originChapterStart();   // plan 31 B+C: the chapter runs on its own clock; its end advances the tour (no hold)
     _tourRenderCard(i, v);
     positionChanged = true;
     // the hold is armed by the render loop on the station's first RESPONSIVE frame (tourArmPending)
-    _tour.pendingArm = !_tour.paused && i + 1 < TOUR_STATIONS.length;
+    _tour.pendingArm = !_tour.paused && !st.chapter && i + 1 < TOUR_STATIONS.length;
   }, 30);
 }
 /** Pause / resume the auto-advance; the card stays. */
@@ -3234,7 +3277,7 @@ function tourPauseToggle() {
   _tour.paused = !_tour.paused;
   clearTimeout(_tour.timer); _tour.timer = 0;
   _tourProgress(_tour.paused ? 'freeze' : 'reset');
-  if (!_tour.paused) _tour.pendingArm = _tour.index + 1 < TOUR_STATIONS.length;
+  if (!_tour.paused) _tour.pendingArm = _tour.index + 1 < TOUR_STATIONS.length && !(TOUR_STATIONS[_tour.index] && TOUR_STATIONS[_tour.index].chapter);   // the chapter advances by its own end
   const b = _tour.el && _tour.el.querySelector('button[data-tour="pause"]');
   if (b) b.textContent = _tour.paused ? 'Resume' : 'Pause';
 }
@@ -3271,6 +3314,7 @@ function tourPauseAtEnd() { clearTimeout(_tour.timer); _tour.timer = 0; _tour.pe
 function tourStop() {
   clearTimeout(_tour.timer); _tour.timer = 0;
   _tour.active = false; _tour.index = -1; _tour.pendingArm = false; _tour.paused = false;
+  _originChapterStop();
   if (_tour.el) _tour.el.classList.remove('visible');
 }
 /** The "Origin" button: from the genesis to the edge of the domain. */
@@ -3278,6 +3322,70 @@ function startOriginTour() {
   _tour.started++;
   _tour.paused = false;
   tourGoto(0);
+}
+// ── PLAN 31 B+C: THE MOON'S ORIGIN CHAPTER — the illustrated sequence before the Genesis station, on its own
+// scenario clock (ONE home src/moon-origin-chapter.js: the keyframes, the clock, the card; the hand-off numbers
+// from the package's moon/early-recession through _earlyRecession()). The simulator's instant stays at the genesis
+// edge — the Date/Time fields never move (the gate reads the UT axis before and after the chapter) — and the
+// scene's own Moon, its orbit line and its trace are hidden while the chapter draws its own, restored on leaving.
+const ORIGIN_THEIA_TEXTURE = 'public/textures/earth/generated/genesis.webp';   // the magma-ocean map, the same kind as the Hadean Earth's
+const _ORIGIN_V = new THREE.Vector3(), _ORIGIN_Q = new THREE.Quaternion(), _ORIGIN_S = new THREE.Vector3();
+let _originChapter = null, _originChapterHtml = '', _originHidden = null;
+function _originChapterObj() {
+  if (_originChapter === null) {
+    _originChapter = createMoonOriginChapter({
+      THREE, parent: scene,
+      earthWorldPosition: () => earth.planetObj.getWorldPosition(_ORIGIN_V),
+      frameQuaternion: () => moon.containerObj.getWorldQuaternion(_ORIGIN_Q),   // the Moon's orbit plane of date: the container's local Y is its normal
+      earthDrawnRadius: () => earth.planetObj.geometry.parameters.radius * earth.planetObj.getWorldScale(_ORIGIN_S).x,
+      loadTexture, theiaTextureUrl: ORIGIN_THEIA_TEXTURE, pointTexture: starTexture,
+      recession: _earlyRecession(),
+      onEnd: () => { if (_tour.active && !_tour.paused) tourNext(); },
+    });
+  }
+  return _originChapter;
+}
+function _originChapterStart() {
+  const ch = _originChapterObj();
+  if (_originHidden === null) _originHidden = { moon: moon.planetObj ? moon.planetObj.visible : true, orbit: moon.orbitLineObj ? moon.orbitLineObj.visible : false, trace: moon.traceLine ? moon.traceLine.visible : false };
+  if (moon.planetObj) moon.planetObj.visible = false;
+  if (moon.orbitLineObj) moon.orbitLineObj.visible = false;
+  if (moon.traceLine) moon.traceLine.visible = false;
+  _originChapterHtml = '';
+  ch.start();
+  _originFrame();
+}
+function _originChapterStop() {
+  if (_originChapter && _originChapter.active) _originChapter.stop();
+  if (_originHidden) {
+    if (moon.planetObj) moon.planetObj.visible = _originHidden.moon;
+    if (moon.orbitLineObj) moon.orbitLineObj.visible = _originHidden.orbit;
+    if (moon.traceLine) moon.traceLine.visible = _originHidden.trace;
+    _originHidden = null; positionChanged = true;
+  }
+}
+/** Frame the chapter: 14 Earth radii out (the disk reaches 5, Theia starts 12 out), above the Moon's orbit plane
+ *  of date with the Sun over the camera's shoulder — the scene is moved to the landing first (tourFrameEarth ran). */
+function _originFrame() {
+  if (!earth?.planetObj || !sun?.planetObj) return;
+  const ctr = earth.planetObj.getWorldPosition(new THREE.Vector3());
+  const sunW = sun.planetObj.getWorldPosition(new THREE.Vector3());
+  const R = earth.planetObj.geometry.parameters.radius * earth.planetObj.getWorldScale(new THREE.Vector3()).x;
+  const up = new THREE.Vector3(0, 1, 0).applyQuaternion(moon.containerObj.getWorldQuaternion(new THREE.Quaternion()));
+  const dir = sunW.clone().sub(ctr).normalize().multiplyScalar(0.7).addScaledVector(up, 0.75).normalize();
+  camera.position.copy(ctr).add(dir.multiplyScalar(R * 14));
+  controls.target.copy(ctr); controls.update();
+  positionChanged = true; needsLabelUpdate = true;
+}
+/** The render loop, at the end of every frame: advance the chapter's scenario clock, its objects and its card
+ *  while it runs (the tour's Pause holds it). The loop idles when nothing moves; the chapter is its own motion,
+ *  so it asks for the next frame through the label flag (no forced scene update — the scene stands still). */
+function originChapterTick(deltaSeconds) {
+  if (!_originChapter || !_originChapter.active) return;
+  if (!_tour.paused) { _originChapter.tick(deltaSeconds); needsLabelUpdate = true; }
+  // the card follows the chapter's state even while paused (a skip while paused re-poses the chapter)
+  const el = _tour.el && _tour.el.querySelector('.origin-tour-chapter');
+  if (el) { const h = _originChapter.cardHtml(); if (h !== _originChapterHtml) { el.innerHTML = h; _originChapterHtml = h; } }
 }
 if (typeof document !== 'undefined') document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && _tour.active) tourStop(); });
 
@@ -4096,6 +4204,15 @@ if (typeof window !== 'undefined') {
     tourGoto: (i) => tourGoto(i),
     tourStop: () => tourStop(),
     tourState: () => ({ active: _tour.active, paused: _tour.paused, index: _tour.index, started: _tour.started, armed: !_tour.pendingArm && _tour.timer !== 0, visible: !!(_tour.el && _tour.el.classList.contains('visible')), landing: !!(_tour.el && _tour.el.querySelector('.origin-tour-landing')), title: _tour.el ? (_tour.el.querySelector('.origin-tour-title') || {}).textContent : null }),
+    // plan 31 B+C: the origin chapter — its state (phase, scenario clock, the drawn objects), a skip to a phase, the card's clock text
+    originChapterState: () => (_originChapter ? _originChapter.state() : null),
+    originChapterSkipTo: (key, atEnd) => (_originChapter && _originChapter.active ? _originChapter.skipTo(key, atEnd === true) : false),
+    originChapterPhases: () => ORIGIN_CHAPTER_PHASES.map((p) => ({ key: p.key, t0: p.t0, t1: p.t1, screenSeconds: p.screenSeconds })),
+    originChapterCardClock: () => { const el = _tour.el && _tour.el.querySelector('.origin-tour-clock-label'); return el ? el.textContent : null; },
+    originChapterRows: () => _tourChapterRows().map((r) => `${r.label}: ${r.value} [${r.tag}]`),
+    originChapterSceneMoon: () => ({ moon: !!(moon.planetObj && moon.planetObj.visible), orbit: !!(moon.orbitLineObj && moon.orbitLineObj.visible), hidden: _originHidden !== null }),
+    // the scenario's hand-off numbers on the browser's chain (the epoch gate reads them against the Node twin)
+    originChapterHandover: () => { const er = _earlyRecession(), h = er.handover(), s3 = er.stateAt(er.scenario.rocheZoneEarthRadii); return h ? { aOverEarthRadii: h.aOverEarthRadii, years: h.years, bandYears: h.bandYears, lawFactorShipped: h.lawFactorShipped, dayHoursAt3: s3.dayHours, monthHoursAt3: s3.monthHours } : null; },
     // PLAN 30 step 0 — THE INSTRUMENT: every published row at the CURRENT position, as the panels
     // render it. (a) a body's Planet Info rows — label, the rendered value and unit (the renderer's
     // own `renderVal`, tags stripped), the hover, static or not; (b) every tweakpane binding — its
@@ -23675,7 +23792,7 @@ function setupGUI() {
   // plan 27 step D: the Origin tour \u2014 the stations from the Earth\u2013Moon genesis to the edge of the
   // domain (the owner: under Tools \u203a Analysis, beside the genesis analysis)
   addTooltip(analysisFolder.addButton({ title: 'Origin Tour' }).on('click', () => startOriginTour()),
-    `A scripted tour in ${TOUR_STATIONS.length} stations from the Earth\u2013Moon genesis (4,429 Ma) through today to the edge of the domain (+1,000 Myr): each a jump with the camera on the Earth and a card with the day, the year, the Moon, the precession clock and the obliquity of date, every number read live from the model with its provenance tag. The FIRST jump builds the deep tables and can take up to half a minute. Next / Back / Pause on the card, \u00d7 closes it; Escape closes.`);
+    `A scripted tour in ${TOUR_STATIONS.length} stations: first the Moon\u2019s origin as an ILLUSTRATED chapter on its own clock (the impact, the disk, the accretion and the early recession after the published simulations \u2014 a sketch, said so on the card; the simulator\u2019s clock stays at the genesis), then from the Earth\u2013Moon genesis (4,429 Ma) through today to the edge of the domain (+1,000 Myr): each a jump with the camera on the Earth and a card with the day, the year, the Moon, the precession clock and the obliquity of date, every number read live from the model with its provenance tag. The FIRST jump builds the deep tables and can take up to half a minute. Next / Back / Pause on the card, \u00d7 closes it; Escape closes.`);
   addTooltip(analysisFolder.addButton({ title: 'Earth\u2013Moon Genesis Analysis' }).on('click', () => openEssrtPanel()),
     'The model\u2019s own evolution from Earth\u2013Moon genesis (\u22124.43 Gyr, the end of the cited Earth\u2013Moon distance history) to +1 Gyr: the day length, the lunisolar precession period, the obliquity beat, the AU, the Moon\u2019s distance and the planets\u2019 orbital parameters, with the Wu et al. 2024 cyclostratigraphy anchors on the Phanerozoic 650 Ma window.');
   addTooltip(analysisFolder.addButton({ title: 'Earth Climate Analysis' }).on('click', () => openClimateFormulaPanel()),
@@ -24182,6 +24299,7 @@ function render(now) {
     needsLabelUpdate = false;
   }
   tourArmPending(performance.now() - _frameT0);   // plan 27 step D: the hold counts from the first responsive frame of the station
+  originChapterTick(delta);                        // plan 31 B+C: the Moon's origin chapter advances on its own scenario clock while it runs
 
   // 11) First-frame: recalculate after renderer establishes correct scene state
   if (_needsInitialSceneUpdate) {
