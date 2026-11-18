@@ -4730,6 +4730,9 @@ if (typeof window !== 'undefined') {
       starsOriginOffsetFromSun: sceneObjects.stars.position.distanceTo(sun.planetObj.getWorldPosition(new THREE.Vector3())),
       cameraDistanceFromTarget: camera.position.distanceTo(controls.target),
       cameraMaxDistance: controls.maxDistance, cameraMaxDistancePc: controls.maxDistance / UNITS_PER_PC,
+      // the label layer after the last label pass: the star names (the sky scene) and the solar system's labels (the main
+      // scene) must BOTH be in it — one pass over both scenes (two render calls had the first consume the flag)
+      labelLayer: (() => { const els = Array.from(labelRenderer.domElement.children); const star = els.filter((e) => e.classList.contains('star-label')).length; const html = els.map((e) => e.innerHTML).join('\n'); return { total: els.length, starNames: star, mainScene: els.length - star, wobbleCentre: html.includes('Precession Center'), perihelion: html.includes('Earth Perihelion') }; })(),
     }),
     /** The dome's brightness (the material's colour scale) — a tuning knob for screenshots; returns the value set. @param {number} k */
     skyDomeBrightness: (k) => { skyMaterial.color.setScalar(k); return skyMaterial.color.r; },
@@ -4749,6 +4752,7 @@ if (typeof window !== 'undefined') {
     // plan 28 §F2: the zodiac band of date — the ecliptic of date's pole and equinox (equatorial J2000 unit vectors, from the
     // placed Earth frame) and the crossings solved on them; null crossings beyond the catalogue regime or before the table loads
     setZodiacVisible: (v) => { zodiac.visible = !!v; forceSceneUpdate(); return zodiac.visible; },
+    setStarNamesVisible: (v) => { o.starNamesVisible = !!v; _skyOfDate.setNamesVisible(!!v); needsLabelUpdate = true; return o.starNamesVisible; },
     zodiacBandProbe: () => { const cr = _zodiacInRegime(o.julianDay) ? _zodiacCrossingsOfDate(o.julianDay) : null; return { ready: _zodiacState.ready, year: _zodiacState.year, inRegime: _zodiacInRegime(o.julianDay), frame: _zodiacState.frame, crossings: cr, visible: zodiac.visible, drawn: zodiac.children.filter((c) => c.visible).length }; },
     starDirectionAt: (hip, year) => _skyOfDate.starDirectionAt(hip, year),
     starRecord: (hip) => _skyOfDate.starRecord(hip),
@@ -6815,61 +6819,67 @@ document.body.appendChild(labelRenderer.domElement);
     zIndex:        '0'
   });
 
-  labelRenderer.render = (scene, camera) => {
+  /** ONE label pass over several (scene, camera) pairs — the sky scene's star names under the sky camera (the
+   *  main camera's far plane would clip them) and the solar system's labels under the main camera: ONE flag
+   *  check, ONE clear of the layer, then each scene traversed with its own camera. Two separate render calls
+   *  per frame had the first consume needsLabelUpdate (the second returned at once) and each call wiped the
+   *  other's labels: every main-scene label — the wobble centre, the perihelion of Earth, the planet names —
+   *  vanished from the realism pass (391a6268) on, while the star names survived (the owner: "the labels when
+   *  we zoom into earth are no longer available"). @param {Array<[any, any]>} passes */
+  labelRenderer.renderPasses = (passes) => {
     if (!needsLabelUpdate) return;
     needsLabelUpdate = false;
-
-    // console.groupCollapsed('[Label Debug] render start');
-    // console.log('starNamesVisible =', o.starNamesVisible);
 
     // 1) Sync size
     const w = window.innerWidth, h = window.innerHeight;
     labelRenderer.setSize(w, h);
 
-    // 2) Clear out any old labels
+    // 2) Clear out any old labels — once per frame, never per pass
     while (dom.firstChild) dom.removeChild(dom.firstChild);
 
-    // 3) Update matrices
-    scene.updateMatrixWorld();
-    camera.updateMatrixWorld();
-    camera.updateProjectionMatrix();
+    for (const [scene, camera] of passes) {
+      // 3) Update matrices
+      scene.updateMatrixWorld();
+      camera.updateMatrixWorld();
+      camera.updateProjectionMatrix();
 
-    // 4) Compute scale
-    const rawScale   = baseCamDistance / camera.position.length();
-    const scaled     = Math.pow(rawScale, zoomFactor);
-    const finalScale = Math.min(maxScale, Math.max(minScale, scaled));
-    // console.log('Computed label scale:', finalScale.toFixed(3));
+      // 4) Compute scale
+      const rawScale   = baseCamDistance / camera.position.length();
+      const scaled     = Math.pow(rawScale, zoomFactor);
+      const finalScale = Math.min(maxScale, Math.max(minScale, scaled));
 
-    // 5) Traverse and append only those labels that are both visible
-    //    and in front of the camera
+      // 5) Traverse and append only those labels that are both visible
+      //    and in front of the camera
+      scene.traverse(obj => {
+        if (!(obj instanceof CSS2DObject)) return;
 
-    scene.traverse(obj => {
-    if (!(obj instanceof CSS2DObject)) return;
+        // skip labels you’ve explicitly hidden
+        if (!obj.visible) return;
 
-    // skip labels you’ve explicitly hidden
-    if (!obj.visible) return;
+        //  a) get its world‐position
+        worldV.setFromMatrixPosition(obj.matrixWorld);
+        //  b) transform into camera‐space
+        camV.copy(worldV).applyMatrix4(camera.matrixWorldInverse);
+        //  c) cull if it’s behind (camera looks down –Z in three.js)
+        if (camV.z > 0) return;
 
-    //  a) get its world‐position
-    worldV.setFromMatrixPosition(obj.matrixWorld);
-    //  b) transform into camera‐space
-    camV.copy(worldV).applyMatrix4(camera.matrixWorldInverse);
-    //  c) cull if it’s behind (camera looks down –Z in three.js)
-    if (camV.z > 0) return;
+        // project to NDC then to screen
+        projV.copy(worldV).project(camera);
+        const x = (projV.x * 0.5 + 0.5) * w;
+        const y = (-projV.y * 0.5 + 0.5) * h;
 
-    // project to NDC then to screen
-    projV.copy(worldV).project(camera);
-    const x = (projV.x * 0.5 + 0.5) * w;
-    const y = (-projV.y * 0.5 + 0.5) * h;
+        // position & show
+        const el = obj.element;
+        el.style.transform =
+        `translate(-50%,-50%) translate(${x}px,${y}px) scale(${finalScale})`;
+        el.style.display   = '';
 
-    // position & show
-    const el = obj.element;
-    el.style.transform = 
-    `translate(-50%,-50%) translate(${x}px,${y}px) scale(${finalScale})`;
-    el.style.display   = '';
-
-    dom.appendChild(el);
-    });
+        dom.appendChild(el);
+      });
+    }
   };
+  /** The one-pair form (kept for callers with a single scene). */
+  labelRenderer.render = (scene, camera) => labelRenderer.renderPasses([[scene, camera]]);
 })(labelRenderer, baseCamDistance);
 
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -24025,8 +24035,8 @@ function render(now) {
   if (needsLabelUpdate) {
     // (the label layer's size follows the window in onWindowResize; setting it
     // here on every label pass re-styled the layer 30× a second for nothing)
-    labelRenderer.render(skyScene, skyCamera);   // the star names, projected by the sky camera (the main camera's far plane would clip them)
-    labelRenderer.render(scene, camera);
+    // one pass over both scenes: the star names under the sky camera, the solar system's labels under the main one
+    labelRenderer.renderPasses([[skyScene, skyCamera], [scene, camera]]);
     needsLabelUpdate = false;
   }
   tourArmPending(performance.now() - _frameT0);   // plan 27 step D: the hold counts from the first responsive frame of the station
@@ -28442,8 +28452,7 @@ function initConstellations() {
       const t = Math.min((performance.now() - start) / duration, 1);
       drawMaterials.forEach(m => { m.uniforms.uDrawProgress.value = t; });
       renderFrame();
-      labelRenderer.render(skyScene, skyCamera);
-      labelRenderer.render(scene, camera);
+      labelRenderer.renderPasses([[skyScene, skyCamera], [scene, camera]]);
       if (t < 1) requestAnimationFrame(animateDraw);
     })();
   } else {

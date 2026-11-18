@@ -3022,7 +3022,20 @@ trap: `npm run check` run BESIDE `npm run test:browser` reported
 `scene-year-lengths.js FAIL (exit 1)` with no message — the suite runner's
 300-s timeout on a gate that takes 185 s alone, met under the browser
 tier's CPU load; the gate passed standalone (54 checks). The two tiers run
-one after the other.
+one after the other. (vi) **A renderer with a one-shot flag and a clearing
+step cannot be called twice per frame** (the owner: "the labels when we zoom
+into earth are no longer available"): the label layer's custom render
+returns unless `needsLabelUpdate` is set, clears the flag, WIPES the layer
+and places one scene's labels — and the realism pass had the frame call it
+twice, the sky scene under the sky camera first, the main scene second. The
+first call consumed the flag, the second returned at once: every main-scene
+label — the wobble centre, the perihelion of Earth, the planet names, the
+inclination labels — vanished from 391a6268 on while the star names stayed,
+and no row counted the main scene's labels. One pass over both
+(scene, camera) pairs now (`renderPasses`: one flag check, one clear, each
+scene traversed under its own camera); the gate reads the layer after a
+frame — a star name and the main scene's labels, the wobble centre and the
+perihelion among them, together.
 
 ---
 
@@ -3212,7 +3225,12 @@ The `test:snapshot` chain also carries:
   lands (−70 → +7 → −47 Myr: the deep sampler per direction); the births
   (nobody replaced at J2000, 1,780 stars at +30 Myr counted from the
   catalogue, Rigel's twin in generation 6 at another place, Sirius in
-  generation 0, pure in the year); a star's direction the same in any order of asking
+  generation 0, pure in the year); the label layer after one frame holding
+  BOTH scenes' labels — a star name and the main scene's, the wobble centre
+  and the perihelion of Earth among them (two render calls per frame had the
+  first consume the one-shot flag: every planet label gone from the realism
+  pass on — born from "the labels when we zoom into earth are no longer
+  available"); a star's direction the same in any order of asking
   and a landing re-read bit-for-bit; the Big Dipper nearly gone and Orion
   still readable at −48 kyr, every shape gone at −198 kyr; the regime linear
   at −998 kyr, fading at −1.15 Myr, off at −10 Myr with the dome untouched;

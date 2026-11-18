@@ -178,6 +178,15 @@ const unitsPerPc = 206264.806 * 100;
 const sirRadius = geo.s ? Math.hypot(...geo.s.units) : NaN;
 check('the stars at their measured distances: Sirius 2.637 pc from the Sun in scene units (1 pc = 2.06e7), absolute magnitude +1.45', !!geo.s && Math.abs(sirRadius / unitsPerPc - 2.637) < 0.002 && Math.abs(geo.s.absMag - 1.45) < 0.02 && geo.s.unitsPerPc === unitsPerPc, geo.s ? `${(sirRadius / unitsPerPc).toFixed(4)} pc, M ${geo.s.absMag.toFixed(3)}` : 'null');
 check('the sky pass: the catalogue in the sky scene centred on the Sun (offset < 1e-6 units), the sky camera near 10 / far 1e13', geo.inSky === true && geo.sunOffset < 1e-6 && geo.far === 1e13 && geo.near === 10, `in sky scene ${geo.inSky}, Sun offset ${geo.sunOffset}, near/far ${geo.near}/${geo.far}`);
+// The label layer holds BOTH scenes' labels after one frame: the star names (the sky scene under the sky camera) and the
+// solar system's (the main scene under the main camera — the wobble centre and the perihelion of Earth among them). Two
+// render calls per frame had the first consume the one-shot flag and wipe the layer: every main-scene label vanished
+// from the realism pass on (the owner: "the labels when we zoom into earth are no longer available").
+await sim.page.evaluate(() => { window.__test__.setStarNamesVisible(true); window.__test__.skyUpdate(true); });   // the names are off by default
+await sim.page.waitForTimeout(600);
+const lab = await sim.page.evaluate(() => window.__test__.skyDomeProbe().labelLayer);
+await sim.page.evaluate(() => { window.__test__.setStarNamesVisible(false); });
+check('the label layer carries both scenes after one frame: star names and the main scene\'s labels, the wobble centre and the perihelion of Earth among them', lab.starNames > 0 && lab.mainScene > 0 && lab.wobbleCentre === true && lab.perihelion === true, JSON.stringify(lab));
 const far = await sim.page.evaluate(() => { const T = window.__test__; const P = T.skyDomeProbe(); const S = T.skyState(); const a = T.starPositionUnits(71681); return { capPc: P.cameraMaxDistancePc, sunM: S.sunPointAbsMag, nearestPc: a ? a.distPc : NaN }; });
 check('the Sun as a star (M_V 4.81) at the catalogue\'s origin; the zoom-out capped at the catalogue\'s reach (2,000 pc); α Cen B the nearest star (1.255 pc — the distance prior, no photometric clump)', Math.abs(far.sunM - 4.81) < 1e-5 && Math.abs(far.capPc - 2000) < 1e-9 && Math.abs(far.nearestPc - 1.255) < 0.01, `M ${far.sunM}, cap ${far.capPc} pc, α Cen B ${far.nearestPc} pc`);
 // a landing re-read at the same year reproduces the state bit-for-bit

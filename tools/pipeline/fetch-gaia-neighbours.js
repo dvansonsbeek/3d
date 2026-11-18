@@ -73,8 +73,10 @@ async function tap(query, maxrec) {
     const res = await fetch(TAP, { method: 'POST', body, signal: AbortSignal.timeout(900000) });
     const text = await res.text();
     if (res.status === 429 || /maximum number of jobs/.test(text)) { console.log(`  ${new Date().toTimeString().slice(0, 8)} the archive's anonymous queue is full (429) — waiting 2 min (attempt ${attempt})`); await sleep(120000); continue; }
-    // a 408 ("Job timeout/aborted" — the archive's own budget on a slow query) or a 5xx: wait a minute and ask again
-    if (res.status === 408 || res.status >= 500) { console.log(`  ${new Date().toTimeString().slice(0, 8)} the archive answered ${res.status} — waiting 1 min (attempt ${attempt})`); await sleep(60000); continue; }
+    // a 408 ("Job timeout/aborted" — the archive's own budget on a slow query): once more after a minute, then the
+    // caller SPLITS the range (a smaller scan fits the budget); a 5xx waits a minute and asks again
+    if (res.status === 408) { if (attempt >= 2) { const e = new Error('TAP 408: the archive aborted the query (its time budget)'); e.code = 408; throw e; } console.log(`  ${new Date().toTimeString().slice(0, 8)} the archive answered 408 — once more in 1 min`); await sleep(60000); continue; }
+    if (res.status >= 500) { console.log(`  ${new Date().toTimeString().slice(0, 8)} the archive answered ${res.status} — waiting 1 min (attempt ${attempt})`); await sleep(60000); continue; }
     if (!res.ok || /<html/i.test(text)) throw new Error(`TAP ${res.status}: ${text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 600)}`);
     return text;
   }
@@ -89,17 +91,24 @@ async function countRange(lo, hi) {
 }
 /** Fetch one range complete: the rows must equal the COUNT, else the range is split in two. @returns {Promise<string[]>} the data lines */
 async function fetchRange(lo, hi, depth) {
-  const expected = await countRange(lo, hi);
-  if (expected === 0) return [];
-  const text = await tap(`SELECT ${COLUMNS} ${FROM} WHERE g.random_index BETWEEN ${lo} AND ${hi} AND ${S.where}`, 500000);
+  const split = async () => { const mid = Math.floor((lo + hi) / 2); return [...await fetchRange(lo, mid, depth + 1), ...await fetchRange(mid + 1, hi, depth + 1)]; };
+  let expected, text;
+  try {
+    expected = await countRange(lo, hi);
+    if (expected === 0) return [];
+    text = await tap(`SELECT ${COLUMNS} ${FROM} WHERE g.random_index BETWEEN ${lo} AND ${hi} AND ${S.where}`, 500000);
+  } catch (e) {
+    // the archive's time budget (408): a smaller range scans faster — split, up to 1/256 of a chunk
+    if (e && e.code === 408 && depth < 8) { console.log(`  [${lo}..${hi}]: the archive's budget — splitting`); return split(); }
+    throw e;
+  }
   const lines = text.split('\n').filter((l) => l.length);
   const header = lines.shift();
   const complete = header && header.startsWith('source_id') && lines.length === expected && text.endsWith('\n') && lines[lines.length - 1].split(',').length === 12;
   if (complete) { console.log(`  ${new Date().toTimeString().slice(0, 8)} [${lo}..${hi}]: ${lines.length} rows ≡ the archive's count`); return lines; }
-  if (depth >= 6) throw new Error(`[${lo}..${hi}]: ${lines.length} rows for the archive's ${expected} after six splits`);
+  if (depth >= 8) throw new Error(`[${lo}..${hi}]: ${lines.length} rows for the archive's ${expected} after eight splits`);
   console.log(`  [${lo}..${hi}]: ${lines.length} rows for the archive's ${expected} — the stream was cut; splitting`);
-  const mid = Math.floor((lo + hi) / 2);
-  return [...await fetchRange(lo, mid, depth + 1), ...await fetchRange(mid + 1, hi, depth + 1)];
+  return split();
 }
 
 async function main() {

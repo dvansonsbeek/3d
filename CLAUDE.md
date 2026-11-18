@@ -605,7 +605,10 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   node is the landing's node bit for bit**, the cache bounded by eviction
   that rebuilds from the neighbour. **A lazy sampler keyed by tier is keyed
   by DIRECTION too** — one `'deep'` key let a future landing replace the
-  past sampler and the next past landing threw. (§1.48)
+  past sampler and the next past landing threw. **A renderer with a one-shot
+  flag and a clearing step is called ONCE per frame, over every scene** — a
+  second label call per frame found the flag consumed: every planet label
+  gone, the star names kept. (§1.48)
 
 ---
 
