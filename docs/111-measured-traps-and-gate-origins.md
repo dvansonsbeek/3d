@@ -2834,12 +2834,15 @@ synchronous stream is CUT at ~60 s on a row boundary, at a multiple of
 range. V and B−V come from G and BP−RP through cubics fitted at run time on
 the 21,090 Hipparcos-matched rows (rms 0.014 / 0.038 mag); every star is
 integrated over ±50 Myr at 0.5-Myr samples against the Sun's own orbit;
-119,412 are kept that ever reach V 8.05 (119,410 before the inertial
-velocities of the follow-up: two marginal stars flipped; a first build selected by the
+213,979 are kept that ever reach V 8.05 — 119,024 of the bright superset and
+94,955 of the faint one (the follow-up below; 119,410 bright before the
+inertial velocities and the colour relations refitted on both supersets'
+27,203 matched rows: a few hundred marginal stars flipped; a first build selected by the
 closed form with a 15 % amplitude cut and lost 411,311 of the superset — a
-third, the fast stars that arrive from farthest); 7,203 of them are within
-V 8 today (Hipparcos is incomplete past 7.3), 31,702 ever naked-eye; 3.8 MB
-of Float32 columns, loaded after the catalogue. In the scene they brighten
+third, the fast stars that arrive from farthest); 8,925 of them are within
+V 8 today (Hipparcos is incomplete past 7.3 — the faint superset supplies
+the rest), 53,283 ever naked-eye; 6.8 MB of Float32 columns, loaded after
+the catalogue. In the scene they brighten
 in past the shader's V 8 cut and the leaving stars fade; a star outliving
 its main-sequence lifetime fades (τ = 10 Gyr (L/L☉)^−0.714, a band: every
 star mid-life, births not predicted); the catalogue regime ends at ±50 Myr
@@ -3006,12 +3009,12 @@ script now (`tools/pipeline/fetch-gaia-neighbours.js`, the first fetch had
 lived in a session scratchpad), each chunk verified against the archive's
 COUNT, the faint cache hashed beside the bright one. 809,928 rows pass the
 pre-filter (a fortieth of the 11 million); the archive served them at five
-minutes per 17,000-row chunk that night, so the fetch is PAUSED at chunk 9
-of 48 (the owner: "this takes too long") — the chunks are cached and
-`node tools/pipeline/fetch-gaia-neighbours.js --set faint` resumes, then
-`npm run import:gaia` reads both supersets and the manifest's `sourceFaint`
-turns the hover's sentence; until then the faint background thins with the
-distance in time, said so. Two archive traps: the
+minutes per 17,000-row chunk that night (the owner paused the fetch at 11
+verified chunks) and the owner's registered account fetched them as one
+asynchronous job the next day (below). The importer reads both supersets:
+213,979 stars kept, 94,955 of them faint, 8,925 within V 8 today for the
+Hipparcos-only 7,203 — the faint background COMPLETE to ~±20 Myr, said in
+the hover through the manifest's `sourceFaint`. Two archive traps: the
 anonymous queue refuses with 429 for hours at a time ("50 jobs"), so the
 fetch waits and retries; and the planner evaluates `LOG10(parallax)` on
 negative-parallax rows BEFORE the parallax cut ("cannot take logarithm of a
@@ -3024,7 +3027,12 @@ every cut chunk of a run — 562,783 rows for the archive's 809,928 — so any
 stream of at least a grain is verified against the range's COUNT and the
 whole set against the archive's total before the file is written; a query
 cost a minute whatever its size that morning (the archive's latency, not the
-scan), so four chunks run in flight. And one harness
+scan), so four chunks run in flight — and by late morning the archive
+aborted nearly every query, so the owner's registered account takes the
+whole superset as ONE asynchronous job instead (`--async --user`: the job
+submitted, its phase polled, its result checked against a COUNT job; the
+password asked for in the terminal without echo, never in the repo or a
+transcript; the protocol proven on the anonymous COUNT job, 34 s). And one harness
 trap: `npm run check` run BESIDE `npm run test:browser` reported
 `scene-year-lengths.js FAIL (exit 1)` with no message — the suite runner's
 300-s timeout on a gate that takes 185 s alone, met under the browser
@@ -3259,8 +3267,8 @@ The `test:snapshot` chain also carries:
   from "at 1.1 Myr the sky is more or less empty"; and since §D: the regimes
   'orbits' to ±50 Myr, 'handover' at −55 Myr, 'statistical' at −70 Myr, the
   orbit worker answering (settled, Sirius 2.64 pc today and 329 pc at
-  +20 Myr), the arriving stars loaded with the manifest's count (119,412;
-  7,203 within V 8 today, 19,381 at +20 Myr) — born from "can't we make the
+  +20 Myr), the arriving stars loaded with the manifest's count (213,979 with
+  the faint superset; 8,925 within V 8 today, 23,888 at +20 Myr) — born from "can't we make the
   stars move 20 million years?"; the artistic layout a sky curve (Orion's and
   the Big Dipper's curves within 6° of their strokes' great-circle polylines,
   ending on their stars — born from "no longer the proper constellation");

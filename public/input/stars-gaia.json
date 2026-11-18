@@ -25,11 +25,11 @@
    "vmag": "Johnson V (from G and BP−RP)",
    "bv": "Johnson B−V (from BP−RP)"
   },
-  "n": 119412,
+  "n": 213979,
   "binary": {
    "file": "public/input/stars-gaia.bin",
-   "sha256": "456b88eb125b1c26cc51337b1f7551cd449010ebdb39e89cff44bbc7125be42a",
-   "bytes": 3821184,
+   "sha256": "09035e4887901d8e57e859eabe064a93a0e8ffd5017fd0a59a86442716635c67",
+   "bytes": 6847328,
    "layout": "Float32 little-endian, column-major"
   },
   "cuts": {
@@ -44,40 +44,47 @@
     -0.6,
     3.5
    ],
-   "faint": null
+   "faint": {
+    "absMagGRange": [
+     2,
+     5
+    ],
+    "lineFilter": "the straight line's closest approach ≤ 2 r(M) within |t_ca| ≤ 30 Myr, or d ≤ 2 r(M); r(M) = 10 pc × 10^((9 − M_G)/5)",
+    "completeToYears": 20000000
+   }
   },
   "counts": {
-   "superset": 1154102,
+   "superset": 1964030,
    "supersetBright": 1154102,
-   "supersetFaint": 0,
-   "carriedByHipparcosCatalogue": 21135,
-   "beyondClosedFormAmplitude": 411304,
+   "supersetFaint": 809928,
+   "carriedByHipparcosCatalogue": 27257,
+   "beyondClosedFormAmplitude": 726908,
    "withoutColour": 0,
-   "kept": 119412,
-   "keptFaint": 0,
-   "visibleToday": 7203,
-   "nakedEyeEver": 31702
+   "kept": 213979,
+   "keptFaint": 94955,
+   "visibleToday": 8925,
+   "nakedEyeEver": 53283
   },
   "colourRelations": {
    "vMinusG": {
     "coefficients": [
-     0.015419,
-     -0.039581,
-     0.256259,
-     -0.028884
+     0.015568,
+     -0.001802,
+     0.21604,
+     -0.018995
     ],
-    "rms": 0.0143,
-    "n": 20096
+    "rms": 0.0155,
+    "n": 25976
    },
    "bv": {
     "coefficients": [
-     -0.004112,
-     0.580259,
-     0.44241,
-     -0.159738
+     -0.000026,
+     0.554308,
+     0.465926,
+     -0.165025
     ],
-    "rms": 0.0377,
-    "n": 20116
+    "rms": 0.034,
+    "n": 25999
    },
    "form": "c0 + c1·x + c2·x² + c3·x³, x = BP−RP clamped to colourFitRange; fitted on the Gaia rows matching a star of stars.json (V, B−V from the Hipparcos Catalogue), three passes of 3σ clipping"
   },
@@ -86,11 +93,19 @@
    "title": "Gaia DR3 (Gaia Collaboration 2023, A&A 674, A1): gaia_source within 1.5 kpc with radial velocities, brighter than M_G 2, joined to hipparcos2_best_neighbour — ESA, hosted by the Gaia archive",
    "licence": "CC BY-SA 3.0 IGO (ESA/Gaia/DPAC) — attribution required",
    "url": "https://gea.esac.esa.int/tap-server/tap/sync",
-   "query": "SELECT g.source_id, g.ra, g.dec, g.parallax, g.parallax_error, g.pmra, g.pmdec, g.radial_velocity, g.radial_velocity_error, g.phot_g_mean_mag, g.bp_rp, x.original_ext_source_id AS hip FROM gaiadr3.gaia_source AS g LEFT OUTER JOIN gaiadr3.hipparcos2_best_neighbour AS x ON x.source_id = g.source_id WHERE g.random_index BETWEEN <lo> AND <hi> AND g.parallax > 0.667 AND g.parallax_over_error > 5 AND g.radial_velocity IS NOT NULL AND g.pmra IS NOT NULL AND g.parallax < POWER(10, (12 - g.phot_g_mean_mag)/5)   — 32 chunks of random_index covering 0..1811709770, concatenated",
+   "query": "SELECT g.source_id, g.ra, g.dec, g.parallax, g.parallax_error, g.pmra, g.pmdec, g.radial_velocity, g.radial_velocity_error, g.phot_g_mean_mag, g.bp_rp, x.original_ext_source_id AS hip FROM gaiadr3.gaia_source AS g LEFT OUTER JOIN gaiadr3.hipparcos2_best_neighbour AS x ON x.source_id = g.source_id WHERE g.random_index BETWEEN <lo> AND <hi> AND g.parallax > 0.667 AND g.parallax_over_error > 5 AND g.radial_velocity IS NOT NULL AND g.pmra IS NOT NULL AND g.parallax < POWER(10, (12 - g.phot_g_mean_mag)/5)   — 64 chunks of random_index covering 0..1811709770, concatenated (tools/pipeline/fetch-gaia-neighbours.js --set bright)",
    "file": "data/.cache/stars/gaia-neighbours.csv",
    "sha256Canonical": "d5174950e7fd081552317e603c3a0aef8d8c7ee8d970ba36d94b11aadc1e2a1d",
    "bytes": 193645900
   },
-  "sourceFaint": null
+  "sourceFaint": {
+   "title": "Gaia DR3 (the same release): gaia_source within 1.5 kpc with radial velocities, M_G 2 to 5, pre-filtered by the straight line's closest approach (≤ 2 r(M) within ±30 Myr, or within 2 r(M) today; r(M) the V-8 distance with a 1-mag colour margin), joined to hipparcos2_best_neighbour — the faint background, complete to about ±20 Myr",
+   "licence": "CC BY-SA 3.0 IGO (ESA/Gaia/DPAC) — attribution required",
+   "url": "https://gea.esac.esa.int/tap-server/tap/sync",
+   "query": "tools/pipeline/fetch-gaia-neighbours.js --set faint (the WHERE clause is the script's SETS.faint.where): one asynchronous job as a registered archive user (--async --user), its rows ≡ the archive's COUNT; or anonymously in chunks on random_index, each verified against the COUNT",
+   "file": "data/.cache/stars/gaia-neighbours-faint.csv",
+   "sha256Canonical": "aca49ae0eff63c11ac76d506622ca80838eab91141bac14fffb72d74e7c1a23c",
+   "bytes": 135436424
+  }
  }
 }

@@ -72,8 +72,8 @@ const SOURCE_FAINT = {
   title: 'Gaia DR3 (the same release): gaia_source within 1.5 kpc with radial velocities, M_G 2 to 5, pre-filtered by the straight line\'s closest approach (≤ 2 r(M) within ±30 Myr, or within 2 r(M) today; r(M) the V-8 distance with a 1-mag colour margin), joined to hipparcos2_best_neighbour — the faint background, complete to about ±20 Myr',
   licence: 'CC BY-SA 3.0 IGO (ESA/Gaia/DPAC) — attribution required',
   url: 'https://gea.esac.esa.int/tap-server/tap/sync',
-  query: 'tools/pipeline/fetch-gaia-neighbours.js --set faint (the WHERE clause is the script\'s SETS.faint.where; chunks on random_index, each verified against the archive\'s COUNT)',
-  sha256: '0000000000000000000000000000000000000000000000000000000000000000',
+  query: 'tools/pipeline/fetch-gaia-neighbours.js --set faint (the WHERE clause is the script\'s SETS.faint.where): one asynchronous job as a registered archive user (--async --user), its rows ≡ the archive\'s COUNT; or anonymously in chunks on random_index, each verified against the COUNT',
+  sha256: 'aca49ae0eff63c11ac76d506622ca80838eab91141bac14fffb72d74e7c1a23c',
 };
 
 const rel = (/** @type {string} */ p) => path.relative(ROOT, p).split(path.sep).join('/');

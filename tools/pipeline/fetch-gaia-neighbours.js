@@ -26,7 +26,15 @@
  * split in two and refetched; a 408 (the archive's own time budget) splits the range too. Up to PARALLEL chunks
  * are in flight at once (the anonymous queue allows 50 jobs; a 429 — the queue full — waits and retries).
  *
+ * THE ASYNCHRONOUS PATH (--async): a registered archive user's asynchronous job has the quotas the anonymous one
+ * lacks, so the whole superset is ONE job — the query submitted to tap/async, its phase polled, its result
+ * downloaded, the row count checked against a COUNT job — no chunks, no cuts. The credentials never enter the
+ * repo: --user names the account (or GAIA_USER), the password is read from GAIA_PASSWORD or asked for in the
+ * terminal without echo; the owner runs this command. Without a user the async path runs anonymously (the archive's
+ * 60-s cap applies — enough for a COUNT, the protocol's test).
+ *
  * Usage: node tools/pipeline/fetch-gaia-neighbours.js --set bright|faint [--chunks N] [--parallel P] [--count-only]
+ *        node tools/pipeline/fetch-gaia-neighbours.js --set faint --async --user <archive username>
  */
 'use strict';
 
@@ -42,7 +50,10 @@ const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf(k); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
 const SET = arg('--set', '');
 const COUNT_ONLY = argv.includes('--count-only');
-if (!['bright', 'faint'].includes(SET)) { console.error('Usage: node tools/pipeline/fetch-gaia-neighbours.js --set bright|faint [--chunks N] [--count-only]'); process.exit(1); }
+const ASYNC = argv.includes('--async');
+const USER = arg('--user', process.env.GAIA_USER || '');
+if (!['bright', 'faint'].includes(SET)) { console.error('Usage: node tools/pipeline/fetch-gaia-neighbours.js --set bright|faint [--chunks N] [--parallel P] [--count-only] [--async [--user NAME]]'); process.exit(1); }
+const TAP_BASE = 'https://gea.esac.esa.int/tap-server';
 
 const COLUMNS = 'g.source_id, g.ra, g.dec, g.parallax, g.parallax_error, g.pmra, g.pmdec, g.radial_velocity, g.radial_velocity_error, g.phot_g_mean_mag, g.bp_rp, x.original_ext_source_id AS hip';
 const FROM = 'FROM gaiadr3.gaia_source AS g LEFT OUTER JOIN gaiadr3.hipparcos2_best_neighbour AS x ON x.source_id = g.source_id';
@@ -121,8 +132,67 @@ async function fetchRange(lo, hi, depth) {
   return split();
 }
 
+// ── the asynchronous path ──────────────────────────────────────────────────────────────────────────────────────────
+/** Ask for a secret in the terminal without echo. @param {string} prompt */
+function askHidden(prompt) {
+  return new Promise((resolve, reject) => {
+    if (!process.stdin.isTTY) { reject(new Error('no terminal to ask the password in — set GAIA_PASSWORD')); return; }
+    const readline = require('readline');
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true });
+    const write = rl._writeToOutput.bind(rl);
+    rl._writeToOutput = (s) => { if (s.includes(prompt)) write(prompt); };   // the prompt shows, the keystrokes do not
+    rl.question(prompt, (answer) => { rl.close(); process.stdout.write('\n'); resolve(answer); });
+  });
+}
+/** Log in to the archive; returns the session cookie header. @param {string} user @param {string} password */
+async function loginGaia(user, password) {
+  const res = await fetch(`${TAP_BASE}/login`, { method: 'POST', body: new URLSearchParams({ username: user, password }), redirect: 'manual' });
+  const cookies = typeof res.headers.getSetCookie === 'function' ? res.headers.getSetCookie() : [res.headers.get('set-cookie')].filter(Boolean);
+  const cookie = cookies.map((c) => c.split(';')[0]).join('; ');
+  if (!(res.status === 200 || res.status === 302 || res.status === 303) || !cookie) throw new Error(`the archive refused the login (${res.status}) — the username or the password`);
+  return cookie;
+}
+/** One asynchronous job: submitted, polled to completion, its result returned as text. @param {string} query @param {string | null} cookie */
+async function asyncJob(query, cookie, maxrec = 20000000) {
+  const headers = cookie ? { Cookie: cookie } : {};
+  const res = await fetch(`${TAP_BASE}/tap/async`, { method: 'POST', headers, body: new URLSearchParams({ REQUEST: 'doQuery', LANG: 'ADQL', FORMAT: 'csv', PHASE: 'RUN', MAXREC: String(maxrec), QUERY: query }), redirect: 'manual' });
+  const loc = res.headers.get('location');
+  if (!loc) throw new Error(`the archive created no job (${res.status}): ${(await res.text()).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 300)}`);
+  const jobUrl = loc.startsWith('http') ? loc : new URL(loc, TAP_BASE).href;
+  console.log(`  ${new Date().toTimeString().slice(0, 8)} job ${jobUrl.split('/').pop()} submitted`);
+  for (let i = 0; ; i++) {
+    await sleep(i < 12 ? 5000 : 30000);
+    const phase = (await (await fetch(`${jobUrl}/phase`, { headers })).text()).trim();
+    if (phase === 'COMPLETED') break;
+    if (phase === 'ERROR' || phase === 'ABORTED') { const err = await (await fetch(`${jobUrl}/error`, { headers })).text(); throw new Error(`the job ended in ${phase}: ${err.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 400)}`); }
+    if (i % 6 === 5) console.log(`  ${new Date().toTimeString().slice(0, 8)} job ${phase}`);
+  }
+  const out = await fetch(`${jobUrl}/results/result`, { headers });
+  if (!out.ok) throw new Error(`the job's result could not be read (${out.status})`);
+  return out.text();
+}
+/** The whole superset in one asynchronous job (a registered user's quotas), its rows checked against a COUNT job. */
+async function fetchAsync() {
+  let cookie = null;
+  if (USER) { const password = process.env.GAIA_PASSWORD || await askHidden(`the archive password for ${USER}: `); cookie = await loginGaia(USER, password); console.log(`  logged in as ${USER}`); }
+  else console.log('  no --user: the anonymous asynchronous job (the archive\'s 60-s cap)');
+  const countText = await asyncJob(`SELECT COUNT(*) AS n ${FROM} WHERE ${S.where}`, cookie, 10);
+  const total = Number(countText.trim().split('\n').pop());
+  if (!Number.isFinite(total)) throw new Error(`the COUNT job answered: ${countText.slice(0, 200)}`);
+  console.log(`  the archive counts ${total} rows for the ${SET} superset`);
+  if (COUNT_ONLY) return;
+  const text = await asyncJob(`SELECT ${COLUMNS} ${FROM} WHERE ${S.where}`, cookie);
+  const lines = text.split('\n').filter((l) => l.length);
+  const header = lines.shift();
+  if (!header || !header.startsWith('source_id')) throw new Error(`the job's result is not the CSV expected: ${String(header).slice(0, 100)}`);
+  if (lines.length !== total) throw new Error(`${lines.length} rows for the archive's ${total} — the job's output was cut (MAXREC or the quota)`);
+  fs.writeFileSync(OUT, [header, ...lines].join('\n') + '\n');
+  console.log(`wrote ${path.relative(ROOT, OUT)}: ${lines.length} rows ≡ the archive's total — now: node tools/pipeline/import-gaia-neighbours.js --write [--pin]`);
+}
+
 async function main() {
   fs.mkdirSync(TMP, { recursive: true });
+  if (ASYNC) return fetchAsync();
   if (COUNT_ONLY) { const n = await countRange(0, RANDOM_INDEX_MAX - 1); console.log(`${SET}: ${n} rows match`); return; }
   const step = Math.ceil(RANDOM_INDEX_MAX / N_CHUNKS);
   const header = 'source_id,ra,dec,parallax,parallax_error,pmra,pmdec,radial_velocity,radial_velocity_error,phot_g_mean_mag,bp_rp,hip';
