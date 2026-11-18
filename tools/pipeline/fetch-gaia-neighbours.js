@@ -20,10 +20,13 @@
  *
  * The archive: the anonymous asynchronous job is capped at 60 s and the synchronous stream is CUT at ~60 s on a
  * row boundary (a multiple of 8,192 rows) which a last-line check cannot see — so each superset is fetched in
- * chunks keyed on random_index, every chunk verified against the archive's own COUNT for its range, and a chunk
- * short of its count is split in two and refetched. A 429 (the anonymous queue full, 50 jobs) waits and retries.
+ * chunks keyed on random_index, a chunk whose row count IS a multiple of 8,192 verified against the archive's own
+ * COUNT for its range (any other count with a complete last row is complete — the COUNT per range had doubled the
+ * queries on a morning the archive took a minute per query whatever the size), and a chunk short of its count is
+ * split in two and refetched; a 408 (the archive's own time budget) splits the range too. Up to PARALLEL chunks
+ * are in flight at once (the anonymous queue allows 50 jobs; a 429 — the queue full — waits and retries).
  *
- * Usage: node tools/pipeline/fetch-gaia-neighbours.js --set bright|faint [--chunks N] [--count-only]
+ * Usage: node tools/pipeline/fetch-gaia-neighbours.js --set bright|faint [--chunks N] [--parallel P] [--count-only]
  */
 'use strict';
 
@@ -61,6 +64,8 @@ const SETS = {
 };
 const S = SETS[SET];
 const N_CHUNKS = Number(arg('--chunks', S.chunks));
+const PARALLEL = Math.max(1, Number(arg('--parallel', 4)));
+const CUT_GRAIN = 8192;   // the synchronous stream is cut at a multiple of this many rows
 const OUT = path.join(CACHE_DIR, S.file);
 const TMP = path.join(CACHE_DIR, `${SET}-chunks`);
 
@@ -89,14 +94,18 @@ async function countRange(lo, hi) {
   if (!Number.isFinite(n)) throw new Error(`COUNT answered: ${t.slice(0, 200)}`);
   return n;
 }
-/** Fetch one range complete: the rows must equal the COUNT, else the range is split in two. @returns {Promise<string[]>} the data lines */
+/** Fetch one range complete: a well-formed stream whose row count is not a multiple of the cut grain is complete; a
+ *  count that is one is verified against the archive's COUNT; a short or cut range is split in two. @returns {Promise<string[]>} the data lines */
 async function fetchRange(lo, hi, depth) {
   const split = async () => { const mid = Math.floor((lo + hi) / 2); return [...await fetchRange(lo, mid, depth + 1), ...await fetchRange(mid + 1, hi, depth + 1)]; };
-  let expected, text;
+  let text, expected = null;
   try {
-    expected = await countRange(lo, hi);
-    if (expected === 0) return [];
     text = await tap(`SELECT ${COLUMNS} ${FROM} WHERE g.random_index BETWEEN ${lo} AND ${hi} AND ${S.where}`, 500000);
+    const n = text.split('\n').filter((l) => l.length).length - 1;
+    // a stream shorter than the cut grain cannot have been cut; any longer one is verified against the COUNT (a cut
+    // stream ends with 8,192·k + 1 rows — 8,193 and 16,385 in the logs; a first rule tested k·8,192 and accepted every
+    // cut chunk of a run: 562,783 rows for the archive's 809,928)
+    if (n >= CUT_GRAIN) expected = await countRange(lo, hi);
   } catch (e) {
     // the archive's time budget (408): a smaller range scans faster — split, up to 1/256 of a chunk
     if (e && e.code === 408 && depth < 8) { console.log(`  [${lo}..${hi}]: the archive's budget — splitting`); return split(); }
@@ -104,10 +113,11 @@ async function fetchRange(lo, hi, depth) {
   }
   const lines = text.split('\n').filter((l) => l.length);
   const header = lines.shift();
-  const complete = header && header.startsWith('source_id') && lines.length === expected && text.endsWith('\n') && lines[lines.length - 1].split(',').length === 12;
-  if (complete) { console.log(`  ${new Date().toTimeString().slice(0, 8)} [${lo}..${hi}]: ${lines.length} rows ≡ the archive's count`); return lines; }
-  if (depth >= 8) throw new Error(`[${lo}..${hi}]: ${lines.length} rows for the archive's ${expected} after eight splits`);
-  console.log(`  [${lo}..${hi}]: ${lines.length} rows for the archive's ${expected} — the stream was cut; splitting`);
+  const wellFormed = header && header.startsWith('source_id') && text.endsWith('\n') && (lines.length === 0 || lines[lines.length - 1].split(',').length === 12);
+  const complete = wellFormed && (expected === null ? true : lines.length === expected);
+  if (complete) { console.log(`  ${new Date().toTimeString().slice(0, 8)} [${lo}..${hi}]: ${lines.length} rows${expected === null ? '' : ' ≡ the archive\'s count'}`); return lines; }
+  if (depth >= 8) throw new Error(`[${lo}..${hi}]: ${lines.length} rows${expected === null ? ', malformed' : ` for the archive's ${expected}`} after eight splits`);
+  console.log(`  [${lo}..${hi}]: ${lines.length} rows${expected === null ? ', malformed' : ` for the archive's ${expected}`} — the stream was cut; splitting`);
   return split();
 }
 
@@ -115,20 +125,32 @@ async function main() {
   fs.mkdirSync(TMP, { recursive: true });
   if (COUNT_ONLY) { const n = await countRange(0, RANDOM_INDEX_MAX - 1); console.log(`${SET}: ${n} rows match`); return; }
   const step = Math.ceil(RANDOM_INDEX_MAX / N_CHUNKS);
-  const all = [];
-  let header = null;
+  const header = 'source_id,ra,dec,parallax,parallax_error,pmra,pmdec,radial_velocity,radial_velocity_error,phot_g_mean_mag,bp_rp,hip';
+  /** @type {string[][]} */ const perChunk = new Array(N_CHUNKS);
+  const todo = [];
   for (let i = 0; i < N_CHUNKS; i++) {
-    const lo = i * step, hi = Math.min(RANDOM_INDEX_MAX - 1, (i + 1) * step - 1);
     const f = path.join(TMP, `chunk-${i}.csv`);
-    if (fs.existsSync(f)) { const t = fs.readFileSync(f, 'utf8').split('\n').filter((l) => l.length); header = header || t.shift(); all.push(...t); console.log(`  chunk ${i}: ${t.length} rows (cached)`); continue; }
-    const lines = await fetchRange(lo, hi, 0);
-    header = header || 'source_id,ra,dec,parallax,parallax_error,pmra,pmdec,radial_velocity,radial_velocity_error,phot_g_mean_mag,bp_rp,hip';
-    fs.writeFileSync(f, [header, ...lines].join('\n') + '\n');
-    all.push(...lines);
-    console.log(`${new Date().toTimeString().slice(0, 8)} chunk ${i} of ${N_CHUNKS}: ${lines.length} rows (${all.length} so far)`);
+    if (fs.existsSync(f)) { const t = fs.readFileSync(f, 'utf8').split('\n').filter((l) => l.length); t.shift(); perChunk[i] = t; console.log(`  chunk ${i}: ${t.length} rows (cached)`); } else todo.push(i);
   }
+  let done = N_CHUNKS - todo.length;
+  // PARALLEL chunks in flight: each worker takes the next chunk index; a chunk is written to the cache as soon as it lands
+  const worker = async () => {
+    for (;;) {
+      const i = todo.shift(); if (i === undefined) return;
+      const lo = i * step, hi = Math.min(RANDOM_INDEX_MAX - 1, (i + 1) * step - 1);
+      const lines = await fetchRange(lo, hi, 0);
+      fs.writeFileSync(path.join(TMP, `chunk-${i}.csv`), [header, ...lines].join('\n') + '\n');
+      perChunk[i] = lines; done++;
+      console.log(`${new Date().toTimeString().slice(0, 8)} chunk ${i} of ${N_CHUNKS}: ${lines.length} rows (${done} chunks done)`);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(PARALLEL, todo.length) }, worker));
+  const all = perChunk.flat();
+  // the whole set against the archive's own total — a chunk accepted short would show here
+  const total = await countRange(0, RANDOM_INDEX_MAX - 1);
+  if (all.length !== total) throw new Error(`${all.length} rows fetched for the archive's ${total} — a chunk is short; delete the cached chunks of this run (${TMP}) and refetch`);
   fs.writeFileSync(OUT, [header, ...all].join('\n') + '\n');
-  console.log(`wrote ${path.relative(ROOT, OUT)}: ${all.length} rows — now: node tools/pipeline/import-gaia-neighbours.js --write [--pin]`);
+  console.log(`wrote ${path.relative(ROOT, OUT)}: ${all.length} rows ≡ the archive's total — now: node tools/pipeline/import-gaia-neighbours.js --write [--pin]`);
 }
 
 main().catch((e) => { console.error(e.message || e); process.exit(1); });

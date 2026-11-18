@@ -3017,7 +3017,14 @@ fetch waits and retries; and the planner evaluates `LOG10(parallax)` on
 negative-parallax rows BEFORE the parallax cut ("cannot take logarithm of a
 negative number" on a `random_index` chunk while the whole-table COUNT had
 run), so a magnitude cut is written as a parallax bound and r(M) as
-10 · 10^((19 − G)/5)/plx — no logarithm in the clause. And one harness
+10 · 10^((19 − G)/5)/plx — no logarithm in the clause. A cut stream ends
+with 8,192·k + 1 rows (8,193 and 16,385 in the logs), not a multiple of
+8,192: a completeness rule written from memory as "a multiple" accepted
+every cut chunk of a run — 562,783 rows for the archive's 809,928 — so any
+stream of at least a grain is verified against the range's COUNT and the
+whole set against the archive's total before the file is written; a query
+cost a minute whatever its size that morning (the archive's latency, not the
+scan), so four chunks run in flight. And one harness
 trap: `npm run check` run BESIDE `npm run test:browser` reported
 `scene-year-lengths.js FAIL (exit 1)` with no message — the suite runner's
 300-s timeout on a gate that takes 185 s alone, met under the browser
