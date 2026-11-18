@@ -133,6 +133,12 @@ await land('2000 d172'); await settle();
 const b0 = await sim.page.evaluate(() => window.__test__.skyState().births);
 await land('2000000 d172'); await settle();
 const b2 = await sim.page.evaluate(() => { const T = window.__test__; return { births: T.skyState().births, built: T.skyState().statisticalTierBuilt, rigel: T.twinGenerationAt(24436) }; });
+// A star keeps its NAME while it is drawn (the owner, at +2 Myr: "only the constellations are not needed, the names
+// should be there"): at +2 Myr the shapes have long dissolved (the lines faded out) but most of the 367 named stars
+// still carry their name (measured 335; at +30 Myr 103, the fast stars having left and the short-lived replaced); the
+// names fade only with the catalogue (−70 Myr: 0, the statistical row below).
+const nm2 = await sim.page.evaluate(() => { const S = window.__test__.skyState(); return { names: S.namesShowing, labels: S.labels, ori: S.groups.Ori && S.groups.Ori.opacity }; });
+check('the star names stay while the stars are drawn: at +2 Myr at least 300 of the 367 named stars show their name while Orion\'s lines have faded out', nm2.names >= 300 && nm2.labels === 367 && nm2.ori === 0, `names showing ${nm2.names} of ${nm2.labels}, Orion's lines ${nm2.ori}`);
 await land('30000000 d172'); await settle();
 const b30 = await sim.page.evaluate(() => { const T = window.__test__; return { births: T.skyState().births, built: T.skyState().statisticalTierBuilt, rigel: T.twinGenerationAt(24436), sirius: T.twinGenerationAt(32349) }; });
 await land('2000 d172'); await settle();

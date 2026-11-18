@@ -45,7 +45,8 @@
  *
  * Recognisability: a constellation's shape is its stars' PAIRWISE angular separations (a rotation-
  * invariant description, so no best-fit rotation is needed); the RMS change of those separations since
- * the catalogue epoch fades its lines and its stars' names from RMS 1° (full) to 5° (gone).
+ * the catalogue epoch fades its LINES from RMS 1° (full) to 5° (gone). A star keeps its NAME for as long
+ * as it is drawn — the label's opacity is the star's own alpha (handover, V-8 visibility, lifetime).
  *
  * Frames: the catalogues are ICRS; the containers these objects sit in are aligned ONCE at init to the
  * J2000 equatorial frame through the world frame (the star-field rows of the perihelion-at-sun gate),
@@ -272,6 +273,8 @@ export function createSkyOfDate(deps) {
     for (let i = 0; i < n; i++) S.phase[i] = w + rnd() * (1 - 2 * w);
   }
 
+  /** GLSL's smoothstep in JS (the labels follow the sprites' law). @param {number} e0 @param {number} e1 @param {number} x */
+  const smoothstep = (e0, e1, x) => { const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
   /** A star's handover alpha at a regime fade — the shader's smoothstep, in JS for the gates: {catalogue, statistical}, summing to 1. @param {number} i @param {number} fade */
   function handoverAlpha(i, fade) {
     const w = C.handoverPhaseWidth, p = S.phase[i];
@@ -607,12 +610,24 @@ export function createSkyOfDate(deps) {
       g.rmsDeg = m ? Math.sqrt(sum / m) * R2D : 0;
       g.opacity = g.rmsDeg <= lo ? 1 : g.rmsDeg >= hi ? 0 : 1 - (g.rmsDeg - lo) / (hi - lo);
     }
+    // A star keeps its NAME for as long as it is drawn (the owner, at +2 Myr: "the star names should be there"): the
+    // label's opacity is the star's own drawn alpha — its handover share at this fade, its V-8 visibility of date,
+    // its lifetime — the shader's law in JS; the constellation's recognisability fades the LINES only (a name belongs
+    // to the star, a shape to the chance alignment). Beyond the handover the names are gone with the catalogue.
+    const tAbs = Math.abs(year - 2000), vFade = C.visibleVFadeWidth, lifeFade = C.lifetimeFadeFraction;
+    let namesShowing = 0;
     for (const L of S.labels) {
       const i = L.i;
       L.obj.position.set(pos[3 * i] * UNITS_PER_PC, pos[3 * i + 1] * UNITS_PER_PC, pos[3 * i + 2] * UNITS_PER_PC);
-      const g = L.con ? S.groups.get(L.con) : null;
-      L.div.style.opacity = String(((g ? g.opacity : 1) * S.regimeFade).toFixed(3));
+      const d = Math.hypot(pos[3 * i], pos[3 * i + 1], pos[3 * i + 2]) || 1e-6;
+      const mSun = S.absMag[i] + 5 * Math.log10(d / 10);
+      const visible = 1 - smoothstep(C.visibleVLimit, C.visibleVLimit + vFade, mSun);
+      const alive = 1 - smoothstep(S.tau[i] * (1 - lifeFade), S.tau[i], tAbs);
+      const alpha = handoverAlpha(i, S.regimeFade).catalogue * visible * alive;
+      L.div.style.opacity = String(alpha.toFixed(3));
+      if (alpha >= 0.5) namesShowing++;
     }
+    S.namesShowing = namesShowing;
     buildLines();
     S.year = year;
     if (onPositions) onPositions();
@@ -710,6 +725,7 @@ export function createSkyOfDate(deps) {
         statisticalOpacity: stat.opacity, seedCell: S.seedCell, statisticalBuilt: stat.seedCell, galacticTurnRad: S.galacticTurnRad || 0,
         sunHeightPc: S.sunHeightPc, bandShiftDeg: S.bandShiftDeg, domeTextureOffsetY: dome && dome.material && dome.material.map ? dome.material.map.offset.y : null,
         labelOpacity: S.labels.length ? Number(S.labels[0].div.style.opacity) : null,
+        namesShowing: S.namesShowing ?? null,   // the named stars drawn with their name (alpha ≥ 0.5) at this year
         sunPointAbsMag: S.sunPoint ? S.sunPoint.geometry.getAttribute('absMag').array[0] : null,
         // the share of the stars still in the catalogue at this fade (alpha ≥ 0.5) — ≈ regimeFade, one by one
         catalogueShare: S.phase ? (() => { let k = 0; for (let i = 0; i < S.n; i++) if (handoverAlpha(i, S.regimeFade).catalogue >= 0.5) k++; return k / S.n; })() : null,

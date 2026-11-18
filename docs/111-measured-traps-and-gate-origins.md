@@ -2636,8 +2636,9 @@ and the Model validity hover says what is and is not drawn (§F): regimes 2
 and 3 are plan 28 §D/E, not built. **Recognisability** is the RMS change of a
 constellation's PAIRWISE separations (a rotation-invariant description of the
 figure, so no best-fit rotation is needed — the plan's "after the best-fit
-rotation" by another route), its lines and its stars' names fading from
-RMS 1° to 5°; the strokes are grouped by the majority constellation of their
+rotation" by another route), its lines fading from RMS 1° to 5° (its stars'
+names too, until the follow-up (vii) below: a star keeps its name while it
+is drawn); the strokes are grouped by the majority constellation of their
 stars (81 groups). Measured: at −48 kyr the Big Dipper reads 4.6° (opacity
 0.11), Orion 2.4° (0.66), Leo 2.2°, Cassiopeia 3.3°, Scorpius 1.7°; at
 −198 kyr every shape is gone (7–16°); at −998 kyr the regime is still linear
@@ -3050,7 +3051,19 @@ and no row counted the main scene's labels. One pass over both
 (scene, camera) pairs now (`renderPasses`: one flag check, one clear, each
 scene traversed under its own camera); the gate reads the layer after a
 frame — a star name and the main scene's labels, the wobble centre and the
-perihelion among them, together.
+perihelion among them, together. (vii) **A name belongs to the star, a
+shape to the chance alignment** (the owner, at +2 Myr: "only the
+constellations are not needed at that timescale, but the star names should
+be there"): the names had faded with their constellation's recognisability,
+so beyond ~200 kyr only the stars outside any figure kept theirs. A label's
+opacity is now the star's own drawn alpha — its handover share, its V-8
+visibility of date, its lifetime (the shader's law in JS) — so a star keeps
+its name for as long as it is drawn and loses it with the catalogue; the
+gate reads at least 300 of the 367 names showing at +2 Myr with Orion's
+lines gone (measured 335; 103 at +30 Myr, the fast stars gone and the
+short-lived replaced), none at −70 Myr. A first row read 103 and failed
+because it was placed after the +30 Myr landing — a gate row reads the
+state of the landing it names.
 
 ---
 
@@ -3245,7 +3258,9 @@ The `test:snapshot` chain also carries:
   and the perihelion of Earth among them (two render calls per frame had the
   first consume the one-shot flag: every planet label gone from the realism
   pass on — born from "the labels when we zoom into earth are no longer
-  available"); a star's direction the same in any order of asking
+  available"); the names kept while the stars are drawn (at least 300 of
+  the 367 at +2 Myr with Orion's lines gone — born from "the star names
+  should be there"); a star's direction the same in any order of asking
   and a landing re-read bit-for-bit; the Big Dipper nearly gone and Orion
   still readable at −48 kyr, every shape gone at −198 kyr; the regime linear
   at −998 kyr, fading at −1.15 Myr, off at −10 Myr with the dome untouched;
