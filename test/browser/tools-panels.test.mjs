@@ -63,6 +63,37 @@ try {
     check(`${name}: three quick clicks leave ONE panel, visible`, r.found && r.rapid && r.rapid.count === 1 && r.rapid.visible === 1, r.found ? JSON.stringify(r.rapid) : '');
     check(`${name}: closes again`, r.found && r.closed && r.closed.count === 1 && r.closed.visible === 0, r.found ? JSON.stringify(r.closed) : '');
   }
+  // ── PLAN 31 B: the Obliquity Moon tab of the Genesis Analysis panel renders, and reads the Cassini state ──
+  // Every quantity tab of the panel renders without a page error (the chart's SVG with a curve); the Moon tab's
+  // chart carries its title and its band legend, and its data (the Cassini state of date, ONE home
+  // moon/cassini-state) reads state 1 under 1.5° at the edge, a transition inside 4,100–4,200 Ma with the obliquity
+  // above 40° just after it, 8.5–10.5° at 2.46 Ga and 6.70° today — the band's two states inside the 30-Myr window
+  // between its readings' transitions.
+  const essrtErrorsBefore = sim.errors.length;
+  const tabs = await sim.page.evaluate(async () => {
+    const wait = (ms) => new Promise((res) => setTimeout(res, ms));
+    const btn = [...document.querySelectorAll('#gui .tp-btnv_b')].find((x) => x.textContent.trim() === 'Earth–Moon Genesis Analysis');
+    btn.click(); await wait(1500);
+    const out = [];
+    for (const b of [...document.querySelectorAll('#essrtPanel .cfm-tab[data-qty]')]) {
+      b.click(); await wait(b.dataset.qty === 'moonObliquity' || b.dataset.qty === 'obliquity' ? 4000 : 1200);
+      const svg = document.querySelector('#essrtPanel svg');
+      const panelText = (document.querySelector('#essrtPanel') || {}).textContent || '';   // the title is the panel's heading, the legend the SVG's text
+      out.push({ key: b.dataset.qty, hasSvg: !!svg, paths: svg ? svg.querySelectorAll('path').length : 0, titleOk: b.dataset.qty !== 'moonObliquity' || /Obliquity of the Moon/.test(panelText), bandLegend: /hydrostatic inside 15 or 21/.test(panelText), windowShaded: !!svg && !!svg.querySelector('rect[data-window]') && /non-equilibrium episode/.test(panelText) });
+    }
+    const T = window.__test__;
+    const at = (t) => T.moonObliquityAtAge(t);
+    const data = { edge: at(4428.98), t4180: at(4180), t4100: at(4100), t2460: at(2460), today: at(0) };
+    const c = document.querySelector('#essrtPanel .cfm-close'); if (c) c.click();
+    return { out, data };
+  });
+  const essrtErrs = sim.errors.slice(essrtErrorsBefore);
+  const moonTab = tabs.out.find((t) => t.key === 'moonObliquity');
+  check(`every Genesis Analysis tab renders a chart (${tabs.out.length} tabs, no page error)`, tabs.out.length >= 8 && tabs.out.every((t) => t.hasSvg && t.paths > 0) && essrtErrs.length === 0, tabs.out.map((t) => `${t.key}:${t.paths}`).join(' ') + (essrtErrs.length ? ' · ' + essrtErrs[0] : ''));
+  const d = tabs.data, abs = (s) => (s && s.shipped ? Math.abs(s.shipped.obliquityToOrbitDeg) : NaN);
+  check('the Obliquity Moon tab: its title and band legend drawn; state 1 under 1.5° at the edge, 15–25° at 4,180 Ma, above 40° at 4,100 Ma (state 2), 8.5–10.5° at 2.46 Ga, 6.70° today; the band spans both states at 4,140 Ma',
+    !!moonTab && moonTab.titleOk && moonTab.bandLegend && moonTab.windowShaded && d.edge.shipped.state === 1 && abs(d.edge) < 1.5 && d.t4180.shipped.state === 1 && abs(d.t4180) > 15 && abs(d.t4180) < 25 && d.t4100.shipped.state === 2 && abs(d.t4100) > 40 && abs(d.t2460) > 8.5 && abs(d.t2460) < 10.5 && Math.abs(abs(d.today) - 6.6997) < 1e-3 && d.t4100.max - d.t4100.min > 0,
+    `edge ${abs(d.edge).toFixed(2)}° (state ${d.edge.shipped && d.edge.shipped.state}), 4180 Ma ${abs(d.t4180).toFixed(1)}°, 4100 Ma ${abs(d.t4100).toFixed(1)}° (band ${d.t4100.min && d.t4100.min.toFixed(1)}–${d.t4100.max && d.t4100.max.toFixed(1)}), 2.46 Ga ${abs(d.t2460).toFixed(2)}°, today ${abs(d.today).toFixed(4)}°`);
   // ── Every Framework-Verification category renders without throwing ────────
   // Measured (plan 20): the Anomalistic Year category's only reference curve
   // called a function deleted at plan 18 — a ReferenceError on open that the

@@ -4792,6 +4792,9 @@ if (typeof window !== 'undefined') {
     supernovaEvent: (dir, year) => _skyOfDate.supernovaEvent(dir, year),
     jumpToSupernova: (dir) => jumpToSupernova(dir),
     supernovaNearest: () => _skyOfDate.supernovaNearest(),
+    // plan 31 B: the Moon's Cassini state and its band at an age (Myr before J2000) — the Obliquity Moon tab's data
+    moonObliquityAtAge: (tMa) => { const b = _cassiniState().bandAtAge(tMa); return { shipped: b.shipped, min: b.minObliquityToOrbitDeg, max: b.maxObliquityToOrbitDeg }; },
+    essrtSelectTab: (key) => { const b = document.querySelector(`#essrtPanel .cfm-tab[data-qty="${key}"]`); if (b) b.click(); return !!b; },
     jumpToSupernovaNearest: () => jumpToSupernovaNearest(),
     supernovaState: () => _skyOfDate.supernovaState(),
     cameraForwardWorld: () => camera.getWorldDirection(new THREE.Vector3()).toArray(),
@@ -13656,6 +13659,7 @@ const ESSRT_QTY_TABS = [
   { key: 'axial',      label: 'Axial Precession' },
   { key: 'obliqCycle', label: 'Obliquity period' },
   { key: 'obliquity',  label: 'Obliquity Earth' },
+  { key: 'moonObliquity', label: 'Obliquity Moon' },
   { key: 'lod',        label: 'Length of Day' },
   { key: 'year',       label: 'Length of Year' },
   { key: 'au',         label: 'AU Distance' },
@@ -13763,11 +13767,39 @@ const ESSRT_QTY_SPECS = {
     compute2AllRanges: true,
     label2:   'the hybrid integration\'s own beat mean (no tidal evolution of the mean)',
     bandLabel: 'the swing over one obliquity beat (the band the model claims beyond ±10 Myr)',
+    centreLabel: 'the drawn tilt — the band\'s centre (the cited mean of date beyond ±10 Myr)',
     yFmt:     (v) => v.toFixed(2) + '°',
     yMin: 0, yMax: 30,
     hasWu:    false,
     samples:  120,   // each point is a 1-Myr node of the beat table — a seat on the bank and a walk (20–30 ms); the curve is smooth at this count (measured: 480 points read 14–23 s)
     footnote: 'Note: the obliquity VALUE at deep time is linearly sensitive to the precession constant (450″ per 1e-6 at 100 Ma, 2,000″ at 500 Ma — doc 111 §1.30), so beyond ~20 Myr the model claims the band\'s amplitude and period, not a value; the cited mean is Farhat et al. 2022\'s Myr-scale column, read to the history\'s end at 4.43 Ga, where the coupled spin–orbit regime of the Laplace plane rides the same mean (plan 31 A). The Moon\'s orbit is drawn on it; the eclipse tier\'s ground points sit on it. The Precambrian referees (Lantink 2022 at 2.46 Ga, Xiamaling at 1.4 Ga) constrain the precession constant, not the obliquity; the deep obliquity PERIOD is the pre-registered prediction (the Obliquity period tab).',
+  },
+  moonObliquity: {
+    title:    'Obliquity of the Moon (axial tilt of date)',
+    subtitle: 'The tilt the simulator draws on the Moon — the Cassini state of date on the regime the model carries (plan 31 B; doc 111 §1.49): Peale\'s and Ward\'s relation on the node\'s period of date, the free inclination to the Laplace plane and the mean motion from the cited distance, with the Moon\'s figure a cited input — today\'s moment differences hydrostatic (∝ a⁻³) inside 15 R⊕, since today\'s figure frozen at every age holds no low-obliquity state inside 7 R⊕. The solid line is the spin axis\'s obliquity to its ORBIT normal (6.70° today: the 5.15° inclination plus 1.54° beyond the ecliptic pole); the dashed line its tilt to the Laplace pole (1.54° today). Read from the genesis forward: the Moon starts in Cassini state 1, within a degree of its orbit normal; the obliquity grows as the orbit recedes to 27° at 33.5 R⊕ (4.15 Ga), where state 1 merges with its unstable partner and vanishes — Ward\'s (1975) 34 R⊕, reproduced on the cited history — and the Moon falls to state 2 near 50°, which decays with the recession to today\'s value. The jump is the equilibrium picture of a non-equilibrium episode (a damped oscillation); the band is the figure\'s two readings (hydrostatic inside 15 or 21 R⊕) and the inclination\'s two exponents (1/2, 1/4): their transitions lie 30 Myr apart, so inside that window the band spans both states.',
+    yLabel:   'Obliquity (°)',
+    compute:  (t_Ma) => { const s = _cassiniState().stateAtAge(t_Ma); return s === null ? null : Math.abs(s.obliquityToOrbitDeg); },
+    computeBand: (t_Ma) => { const b = _cassiniState().bandAtAge(t_Ma); return b.minObliquityToOrbitDeg === null ? null : { lo: b.minObliquityToOrbitDeg, hi: b.maxObliquityToOrbitDeg }; },
+    compute2: (t_Ma) => { const s = _cassiniState().stateAtAge(t_Ma); return s === null ? null : s.obliquityToLaplacePoleDeg; },
+    compute2AllRanges: true,
+    label2:   'the spin axis\'s tilt to the Laplace pole (1.54° to the ecliptic today)',
+    bandLabel: 'the band: the figure hydrostatic inside 15 or 21 R⊕ × the inclination\'s exponent 1/2 or 1/4',
+    centreLabel: 'the drawn tilt — the obliquity to the orbit normal on the shipped reading (15 R⊕, exponent 1/2)',
+    // the transition window: the band's earliest and latest transition ages (state 1 vanishing under each reading)
+    // — Ward's non-equilibrium episode, which the equilibrium curves draw as a jump
+    shadeWindows: () => {
+      const cs = _cassiniState(), F = cs.figure;
+      const trs = [cs.transition(), cs.transition({ kappaBand: true }), cs.transition({ hydrostaticRadiusRe: F.hydrostaticRadiusBandEarthRadii }), cs.transition({ kappaBand: true, hydrostaticRadiusRe: F.hydrostaticRadiusBandEarthRadii })].filter(Boolean);
+      if (!trs.length) return [];
+      const ages = trs.map((t) => t.ageMa);
+      return [{ t_lo_cal: -Math.max(...ages), t_hi_cal: -Math.min(...ages), label: 'the transition: Ward\'s non-equilibrium episode (a damped oscillation), drawn as the equilibrium jump', color: '#ff9a3c' }];
+    },
+    yFmt:     (v) => v.toFixed(2) + '°',
+    yMin: 0, yMax: 60,
+    yRangeOverrides: { phanero: { yMin: 0, yMax: 10 } },
+    hasWu:    false,
+    samples:  240,   // each point is one Cassini solve per reading (~1 ms × 5); the transition's edge is resolved at this count (measured: the full range in ~1.5 s)
+    footnote: 'Note: DERIVED on the regime of date and a cited figure — (C−A)/C 6.3e-4 (Yoder 1995), (B−A)/C 2.28e-4 (Williams et al. 2014) — by Peale\'s (1969) and Ward\'s (1975) Cassini-state relation, anchored on the measured J2000 composition (the equation\'s own value is 0.4 % off it: the figure\'s rounding and the known unmodelled channels). A labelled band, never a dated event: the transition\'s age is the band\'s (4.12–4.15 Ga), and Ward\'s episode is a damped oscillation the equilibrium picture draws as a jump. The Moon\'s orbit plane itself, the Laplace plane of date and the free inclination to it are plan 31 A\'s (the Moon Distance tab\'s history drives all of it).',
   },
   au: {
     title:    'Earth-Sun Distance',
@@ -14042,6 +14074,14 @@ function essrtRenderChart(qtyKey, rangeKey) {
   }
   // Step 2: render in left-to-right order so the SVG paint sequence is natural
   const sortedByX = [...visibleEras].sort((a, b) => a.x - b.x);
+  // Shaded windows (plan 31 B, the Obliquity Moon tab): a spec's shadeWindows() → [{t_lo_cal, t_hi_cal, label, color}],
+  // drawn as a translucent band over the plot with its label at the top — the transition's window on the Moon tab
+  const windowMarks = (spec.shadeWindows ? spec.shadeWindows() : []).filter((w) => w.t_hi_cal >= t_lo && w.t_lo_cal <= t_hi).map((w) => {
+    const x0 = xPos(Math.max(w.t_lo_cal, t_lo)), x1 = xPos(Math.min(w.t_hi_cal, t_hi)), col = w.color || '#ff9a3c';
+    const xl = Math.max(x0, margin.left + 60);
+    return `<rect data-window="1" x="${Math.min(x0, x1)}" y="${margin.top}" width="${Math.max(2, Math.abs(x1 - x0))}" height="${plotH}" fill="${col}" fill-opacity="0.18" stroke="${col}" stroke-opacity="0.6" stroke-width="0.8"/>` +
+      `<text x="${xl + 6}" y="${margin.top + plotH - 10}" font-size="10" fill="${col}" font-weight="500">${w.label}</text>`;
+  }).join('');
   const eraMarkers = sortedByX.map(({ m, x }) => {
     const isJ2000 = m.t_cal === 0;
     const isGen   = isGenesis(m);
@@ -14099,7 +14139,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
       <rect x="${lx}" y="${margin.top + 10}" width="12" height="8" fill="${CURVE_COLOR}" fill-opacity="0.22"/>
       <text x="${lx + 18}" y="${margin.top + 18}" font-size="11" fill="#e0e0e0" font-weight="500">${spec.bandLabel}</text>
       <line x1="${lx}" y1="${margin.top + 32}" x2="${lx + 12}" y2="${margin.top + 32}" stroke="${CURVE_COLOR}" stroke-width="2"/>
-      <text x="${lx + 18}" y="${margin.top + 36}" font-size="11" fill="#e0e0e0" font-weight="500">the drawn tilt — the band's centre (the cited mean of date beyond ±10 Myr)</text>${spec.compute2 && spec.label2 ? `
+      <text x="${lx + 18}" y="${margin.top + 36}" font-size="11" fill="#e0e0e0" font-weight="500">${spec.centreLabel || 'the drawn curve — the band\'s centre'}</text>${spec.compute2 && spec.label2 ? `
       <line x1="${lx}" y1="${margin.top + 50}" x2="${lx + 12}" y2="${margin.top + 50}" stroke="#7dd87d" stroke-width="2" stroke-dasharray="6,4"/>
       <text x="${lx + 18}" y="${margin.top + 54}" font-size="11" fill="#e0e0e0" font-weight="500">${spec.label2}</text>` : ''}`;
   }
@@ -14217,6 +14257,7 @@ function essrtRenderChart(qtyKey, rangeKey) {
       ${yticks.join('')}
       ${xticks.join('')}
       ${eraMarkers}
+      ${windowMarks}
       ${bandPath}
       ${paths}
       ${wuOverlay}
@@ -14356,6 +14397,12 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
     labelXsP.push(e.x);
   }
   const sortedByXP = [...visibleErasP].sort((a, b) => a.x - b.x);
+  // the spec's shaded windows (the Moon tab's transition), as on the panel chart
+  const windowMarks = (spec.shadeWindows ? spec.shadeWindows() : []).filter((w) => w.t_hi_cal >= t_lo && w.t_lo_cal <= t_hi).map((w) => {
+    const x0 = xPos(Math.max(w.t_lo_cal, t_lo)), x1 = xPos(Math.min(w.t_hi_cal, t_hi)), col = w.color || '#b04545';
+    return `<rect data-window="1" x="${Math.min(x0, x1)}" y="${margin.top}" width="${Math.max(2, Math.abs(x1 - x0))}" height="${plotH}" fill="${col}" fill-opacity="0.15" stroke="${col}" stroke-opacity="0.6" stroke-width="0.8"/>` +
+      `<text x="${Math.max(x0, margin.left + 60) + 6}" y="${margin.top + plotH - 10}" font-size="10" fill="${col}" font-weight="500">${w.label}</text>`;
+  }).join('');
   const eraMarkers = sortedByXP.map(({ m, x }) => {
     const isJ2000 = m.t_cal === 0;
     const isGen   = isGenesisP(m);
@@ -14421,6 +14468,7 @@ function essrtRenderPaperChart(qtyKey, rangeKey) {
     ${yticks.join('')}
     ${xticks.join('')}
     ${eraMarkers}
+    ${windowMarks}
     ${dataPath}
     ${wuOverlay}
     ${yAxisLabel}
