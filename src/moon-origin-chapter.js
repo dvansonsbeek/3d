@@ -10,7 +10,7 @@
  * Makino 2000: the bulk outside the Roche zone within a month to a year) and the recession (the input's own
  * extrapolation, the package's moon/early-recession). The particle POSITIONS inside each phase are a sketch,
  * parametric and seeded, said so on every card: "illustrated after Canup 2004". The scenario is the one the model's
- * own conservation chain reaches without new physics (a 5.0-h day at 3 R⊕ on the constant Earth–Moon angular
+ * own conservation chain reaches without new physics (a 5.1-h day at 3.8 R⊕ on the constant Earth–Moon angular
  * momentum); the fast-spinning-Earth and synestia scenarios are NAMED on the card as the ones that need an evection
  * drain the chain does not carry.
  *
@@ -28,7 +28,7 @@ export const ORIGIN_CHAPTER_PHASES = Object.freeze([
   { key: 'contact', t0: 0, t1: 3 * 3600, screenSeconds: 14, label: 'contact and shear — the first hours', source: 'Canup 2004 (the SPH runs, t = 0 … 3 h): the impactor shears, its iron sinks to the Earth, its mantle is flung outward' },
   { key: 'plume', t0: 3 * 3600, t1: 24 * 3600, screenSeconds: 14, label: 'the debris in orbit within a day', source: 'Canup 2004: from the first contact to the debris in orbit, about 24 h' },
   { key: 'disk', t0: 24 * 3600, t1: 30 * 86400, screenSeconds: 12, label: 'a disk of about two lunar masses settles inside ~5 R⊕', source: 'Ida, Canup & Stewart 1997: the protolunar disk inside ~5 R⊕, most of it inside the Roche zone' },
-  { key: 'accretion', t0: 30 * 86400, t1: 365.25 * 86400, screenSeconds: 14, label: 'the Moon accretes outside the Roche zone', source: 'Ida, Canup & Stewart 1997; Kokubo, Ida & Makino 2000: the bulk within a month to a year at ~3 R⊕ (the fluid Roche limit ~2.9 R⊕), ~10² yr to finish' },
+  { key: 'accretion', t0: 30 * 86400, t1: 365.25 * 86400, screenSeconds: 14, label: 'the Moon accretes outside the Roche zone', source: 'Ida, Canup & Stewart 1997; Kokubo, Ida & Makino 2000: the bulk within a month to a year at ~3.8 R⊕ — 1.2–1.4 Roche radii, the fluid Roche limit being ~2.9 R⊕ — and ~10² yr to finish' },
   { key: 'recession', t0: 100 * 365.25 * 86400, t1: null, screenSeconds: 20, label: 'the early recession to the cited history\'s first sample', source: 'the input\'s own extrapolation: da/dt ∝ a^(−11/2) with the factor read off the history\'s first segment (plan 31 B) — a labelled scenario, the band from the window; from year 100, when the accretion has finished' },
 ]);
 export const ORIGIN_CHAPTER = Object.freeze({
@@ -38,7 +38,7 @@ export const ORIGIN_CHAPTER = Object.freeze({
   impactAngleDeg: 45,
   gmEarthRadiiCubedPerHourSquared: 19.98, // GM⊕ in R⊕³ h⁻² (3.986e14 m³ s⁻², R⊕ 6.371e6 m): the approach parabola's scale
   diskInnerEarthRadii: 1.4, diskOuterEarthRadii: 5.0, rocheEarthRadii: 2.9,
-  accretionRadiusEarthRadii: 3.0,         // the scenario's first station (moon/early-recession's Roche zone)
+  accretionRadiusEarthRadii: 3.8,         // the scenario's first station (moon/early-recession's firstStationEarthRadii: the cited accretion distance, 1.2–1.4 Roche radii)
   particles: 3000,
   stageAzimuthRad: 2.5,                   // the plume's and the Moon's azimuth in the chapter frame: the tour yaws the chapter so it points UP the screen (Theia then falls in from the bottom, the receding Moon ends at the top — the card sits lower left, the panel right)
   tag: 'illustrated',
@@ -143,7 +143,7 @@ export function createMoonOriginChapter(deps) {
       const r = C.diskInnerEarthRadii + (C.diskOuterEarthRadii - C.diskInnerEarthRadii) * Math.sqrt(s1), a = az0 + u * 1.5;
       out[0] = r * Math.cos(a); out[1] = h * 0.12; out[2] = r * Math.sin(a); return;
     }
-    if (key === 'accretion') {  // outside the Roche zone: onto the Moon at 3 R; inside: spiralling in
+    if (key === 'accretion') {  // outside the Roche zone: onto the Moon at the first station (3.8 R); inside: spiralling in
       const r0 = C.diskInnerEarthRadii + (C.diskOuterEarthRadii - C.diskInnerEarthRadii) * Math.sqrt(s1), a0 = az0 + 1.5;
       if (r0 >= C.rocheEarthRadii) {
         const A = C.accretionRadiusEarthRadii, mx = A * Math.cos(S.moonAngle), mz = A * Math.sin(S.moonAngle), f = smooth(Math.min(1, u * 1.2 + s3 * 0.1));   // S.moonAngle is set before the debris loop
@@ -251,7 +251,7 @@ export function createMoonOriginChapter(deps) {
         + `</div>`;
     } else if (p.key === 'accretion') {
       const st = recession.stateAt(C.accretionRadiusEarthRadii);
-      rows = `<div class="origin-tour-rows">${row('At 3 R⊕', `day ${st.dayHours.toFixed(1)} h · month ${st.monthHours.toFixed(1)} h · the Moon ${st.moonDiameterDeg.toFixed(0)}° across`, 'derived', 'the model\'s constant-angular-momentum chain at 3 R⊕: the one derived number of the chapter')}</div>`;
+      rows = `<div class="origin-tour-rows">${row(`At ${C.accretionRadiusEarthRadii} R⊕`, `day ${st.dayHours.toFixed(1)} h · month ${st.monthHours.toFixed(1)} h · the Moon ${st.moonDiameterDeg.toFixed(0)}° across`, 'derived', `the model's constant-angular-momentum chain at ${C.accretionRadiusEarthRadii} R⊕: the one derived number of the chapter`)}</div>`;
     }
     return `<div class="origin-tour-clock"><span class="origin-tour-clock-label">${esc(clockLabel(S.scenarioSeconds))}</span><span class="origin-tour-clock-phase">${esc(p.label)}</span></div>`
       + `<div class="origin-tour-note">${esc(p.source)}</div>${rows}`

@@ -3182,13 +3182,13 @@ function tourStationValues(i) {
  *  chain (derived), the Roche-zone-to-first-sample time with its window band (the input's own extrapolation, a
  *  labelled scenario), the sequence's standing (illustrated). */
 function _tourChapterRows() {
-  const er = _earlyRecession(), s3 = er.stateAt(er.scenario.rocheZoneEarthRadii), h = er.handover();
+  const er = _earlyRecession(), A = er.scenario.firstStationEarthRadii, s3 = er.stateAt(A), h = er.handover();
   const n2 = (/** @type {number} */ x) => Number(x.toPrecision(2)).toLocaleString('en-US');   // a scenario with a 16-fold band: two figures
   return [
-    { label: 'Day at 3 R⊕', value: `${s3.dayHours.toFixed(2)} h`, today: '', tag: 'derived', hint: 'the Earth\'s day when the Moon had just gathered at the Roche zone — the model\'s constant-angular-momentum chain at 3 Earth radii' },
-    { label: 'Month at 3 R⊕', value: `${s3.monthHours.toFixed(1)} h (${s3.monthDays.toFixed(2)} days)`, today: '', tag: 'derived', hint: 'the Moon\'s orbital period at 3 Earth radii' },
-    { label: 'Moon in the sky at 3 R⊕', value: `${s3.moonDiameterDeg.toFixed(1)}° across`, today: '', tag: 'derived', hint: 'the Moon\'s apparent diameter from the Earth at 3 Earth radii — twenty times today\'s' },
-    { label: 'Roche zone → first sample', value: h ? `~${n2(h.years)} yr (band ${n2(h.bandYears[1])}–${n2(h.bandYears[0])})` : '—', today: '', tag: 'scenario', hint: 'the time from 3 Earth radii to the cited history\'s first sample on the law its first segment expresses (da/dt ∝ a^(−11/2); the shipped 3-sample window, the band the 1- and 10-sample windows) — the input\'s own extrapolation, not a measurement' },
+    { label: `Day at ${A} R⊕`, value: `${s3.dayHours.toFixed(2)} h`, today: '', tag: 'derived', hint: `the Earth's day when the Moon had just gathered at ${A} Earth radii (where the cited accretion runs assemble it: 1.2–1.4 Roche radii) — the model's constant-angular-momentum chain there` },
+    { label: `Month at ${A} R⊕`, value: `${s3.monthHours.toFixed(1)} h (${s3.monthDays.toFixed(2)} days)`, today: '', tag: 'derived', hint: `the Moon's orbital period at ${A} Earth radii` },
+    { label: `Moon in the sky at ${A} R⊕`, value: `${s3.moonDiameterDeg.toFixed(1)}° across`, today: '', tag: 'derived', hint: `the Moon's apparent diameter from the Earth at ${A} Earth radii — sixteen times today's` },
+    { label: 'First station → first sample', value: h ? `~${n2(h.years)} yr (band ${n2(h.bandYears[1])}–${n2(h.bandYears[0])})` : '—', today: '', tag: 'scenario', hint: `the time from ${A} Earth radii to the cited history's first sample on the law its first segment expresses (da/dt ∝ a^(−11/2); the shipped 3-sample window, the band the 1- and 10-sample windows) — the input's own extrapolation, not a measurement` },
     { label: 'The sequence', value: `${ORIGIN_CHAPTER_PHASES.length} phases, after Canup 2004`, today: '', tag: 'illustrated', hint: 'a keyframed sketch whose times and extents are the published simulations\' — not a computation of the impact' },
   ];
 }
@@ -4242,7 +4242,7 @@ if (typeof window !== 'undefined') {
     originChapterTheiaAt: (tSeconds) => (_originChapter ? _originChapter.theiaCentreAt(tSeconds) : null),
     originChapterStage: () => { if (!_originChapter || !earth?.planetObj) return null; const c = _originChapter.state(); const ctr = earth.planetObj.getWorldPosition(new THREE.Vector3()); camera.updateMatrixWorld(true); const e0 = ctr.clone().project(camera); const R = earth.planetObj.geometry.parameters.radius * earth.planetObj.getWorldScale(new THREE.Vector3()).x; const q = moon.containerObj.getWorldQuaternion(new THREE.Quaternion()); const yaw = c.yaw; const local = new THREE.Vector3(Math.cos(ORIGIN_CHAPTER.stageAzimuthRad - yaw), 0, Math.sin(ORIGIN_CHAPTER.stageAzimuthRad - yaw)).applyQuaternion(q); const p = ctr.clone().addScaledVector(local, 3 * R).project(camera); return { earthNdc: [e0.x, e0.y], actionNdc: [p.x, p.y], yaw, cameraDistanceR: camera.position.distanceTo(ctr) / R }; },
     // the scenario's hand-off numbers on the browser's chain (the epoch gate reads them against the Node twin)
-    originChapterHandover: () => { const er = _earlyRecession(), h = er.handover(), s3 = er.stateAt(er.scenario.rocheZoneEarthRadii); return h ? { aOverEarthRadii: h.aOverEarthRadii, years: h.years, bandYears: h.bandYears, lawFactorShipped: h.lawFactorShipped, dayHoursAt3: s3.dayHours, monthHoursAt3: s3.monthHours } : null; },
+    originChapterHandover: () => { const er = _earlyRecession(), h = er.handover(), s3 = er.stateAt(er.scenario.firstStationEarthRadii); return h ? { aOverEarthRadii: h.aOverEarthRadii, years: h.years, bandYears: h.bandYears, lawFactorShipped: h.lawFactorShipped, dayHoursAt3: s3.dayHours, monthHoursAt3: s3.monthHours } : null; },
     // PLAN 30 step 0 — THE INSTRUMENT: every published row at the CURRENT position, as the panels
     // render it. (a) a body's Planet Info rows — label, the rendered value and unit (the renderer's
     // own `renderVal`, tags stripped), the hover, static or not; (b) every tweakpane binding — its

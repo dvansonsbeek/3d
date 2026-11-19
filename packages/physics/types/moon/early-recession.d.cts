@@ -1,5 +1,6 @@
 declare const SCENARIO: Readonly<{
-    rocheZoneEarthRadii: 3;
+    firstStationEarthRadii: 3.8;
+    rocheLimitEarthRadii: 2.9;
     lawExponent: 5.5;
     windowSamplesShipped: 3;
     windowSamplesBand: number[];
@@ -28,7 +29,8 @@ export function createEarlyRecession({ constants: K0, fns }: {
     };
 }): {
     scenario: Readonly<{
-        rocheZoneEarthRadii: 3;
+        firstStationEarthRadii: 3.8;
+        rocheLimitEarthRadii: 2.9;
         lawExponent: 5.5;
         windowSamplesShipped: 3;
         windowSamplesBand: number[];

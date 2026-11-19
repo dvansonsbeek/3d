@@ -278,21 +278,22 @@ check('free inclination at the edge 9–17° with its band ordered', iBand > 8 &
 }
 
 // ── PLAN 31 B — the early recession scenario (ONE home moon/early-recession): the law's factor off the history's first
-//    segment inside the domain, the Roche-zone-to-first-sample time (the shipped 3-sample window ~1e5 yr, the band's
-//    1- and 10-sample windows wider and narrower), the hand-off state by the constant-L chain (a 5.0-h day at 3 R⊕,
-//    a 7.3-h month, the Moon ~10° across) and the law's inverse closing on itself.
+//    segment inside the domain, the first-station-to-first-sample time (from 3.8 R⊕, the cited accretion distance;
+//    the shipped 3-sample window ~1e5 yr, the band's 1- and 10-sample windows wider and narrower), the hand-off
+//    state by the constant-L chain (a 5.1-h day at 3.8 R⊕, a 10.4-h month, the Moon ~8° across) and the law's
+//    inverse closing on itself.
 {
   const { createEarlyRecession } = require(join(ROOT, 'packages/physics/src/moon/early-recession.cjs'));
   const P = DT.EPOCH_PARAMS;
   const er = createEarlyRecession({ constants: { earthRadiusMetres: P.earthRadiusM, gmEarthMoonM3S2: P.gmEarthMoonM3S2, moonMassKg: P.moonMassKg, earthMassKg: P.earthMassKg, totalAngularMomentumKgM2S: P.totalAngularMomentumKgM2S, earthMomentOfInertiaKgM2: DT.iEarthAtAge(0), moonEccentricityFactor: P.moonEccentricityFactor }, fns: { moonDistanceMetresAtAge: DT.meanMoonDistanceMetresAtAge, earthMomentOfInertiaKgM2AtAge: DT.iEarthAtAge } });
   const h = er.handover();
   check('early recession: the hand-over is the domain\'s edge distance (6.1–6.3 R⊕) reached in 5e4–2e5 yr on the 3-sample window, the band ordered (10-sample shortest, 1-sample longest)', !!h && h.aOverEarthRadii > 6.1 && h.aOverEarthRadii < 6.3 && h.years > 5e4 && h.years < 2e5 && h.bandYears[1] < h.years && h.years < h.bandYears[0] && h.bandYears[1] > 1e4 && h.bandYears[0] < 5e5, JSON.stringify(h));
-  const s3 = er.stateAt(3), s6 = er.stateAt(h ? h.aOverEarthRadii : 6.18);
-  check('early recession: the hand-off state at 3 R⊕ — a 4.9–5.1-h day, a 7.2–7.4-h month, the Moon 10–11° across, locked within ~2 yr; at the first sample a 5.4–5.7-h day', Math.abs(s3.dayHours - 5.01) < 0.1 && Math.abs(s3.monthHours - 7.27) < 0.1 && s3.moonDiameterDeg > 10 && s3.moonDiameterDeg < 11 && s3.lockYears > 1 && s3.lockYears < 2 && s6.dayHours > 5.4 && s6.dayHours < 5.7, `${s3.dayHours} h / ${s3.monthHours} h / ${s3.moonDiameterDeg}° / ${s3.lockYears} yr; first sample ${s6.dayHours} h`);
+  const s3 = er.stateAt(er.scenario.firstStationEarthRadii), s6 = er.stateAt(h ? h.aOverEarthRadii : 6.18);
+  check('early recession: the first station is 3.8 R⊕ (the cited accretion distance, 1.2–1.4 Roche radii of 2.9) and its hand-off state — a 5.0–5.2-h day, a 10.3–10.5-h month, the Moon 8–8.5° across, locked within 6–7 yr; at the first sample a 5.4–5.7-h day', er.scenario.firstStationEarthRadii === 3.8 && er.scenario.firstStationEarthRadii / er.scenario.rocheLimitEarthRadii > 1.2 && er.scenario.firstStationEarthRadii / er.scenario.rocheLimitEarthRadii < 1.4 && Math.abs(s3.dayHours - 5.10) < 0.1 && Math.abs(s3.monthHours - 10.37) < 0.1 && s3.moonDiameterDeg > 8 && s3.moonDiameterDeg < 8.5 && s3.lockYears > 6 && s3.lockYears < 7 && s6.dayHours > 5.4 && s6.dayHours < 5.7, `${s3.dayHours} h / ${s3.monthHours} h / ${s3.moonDiameterDeg}° / ${s3.lockYears} yr; first sample ${s6.dayHours} h`);
   const lodEdgeH = DT.meanLodSecondsAtAge(er.edgeMa) / 3600;
   check('early recession: the hand-over day ≡ the chain\'s own LOD at the edge (one form, two homes; 1e-9)', Math.abs(s6.dayHours - lodEdgeH) / lodEdgeH < 1e-9, `${s6.dayHours} vs ${lodEdgeH} h`);
   const back = h ? er.distanceReAtYears(h.years) : null;
-  check('early recession: the law\'s inverse closes (the distance at the hand-over time ≡ the hand-over distance to 1e-9)', back !== null && !!h && Math.abs(back - h.aOverEarthRadii) < 1e-9 && er.distanceReAtYears(0) === er.scenario.rocheZoneEarthRadii, `${back} vs ${h && h.aOverEarthRadii}`);
+  check('early recession: the law\'s inverse closes (the distance at the hand-over time ≡ the hand-over distance to 1e-9)', back !== null && !!h && Math.abs(back - h.aOverEarthRadii) < 1e-9 && Math.abs(er.distanceReAtYears(0) - er.scenario.firstStationEarthRadii) < 1e-12, `${back} vs ${h && h.aOverEarthRadii}; at 0 yr ${er.distanceReAtYears(0)}`);   // a^6.5 → a: a floating round trip (3.0 closed exactly, 3.8 to one ulp)
 }
 
 if (failures.length) { console.error(`laplace-plane-regime: ${failures.length} FAILURE(S)\n  ${failures.join('\n  ')}`); process.exit(1); }

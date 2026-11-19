@@ -6,12 +6,13 @@
  * The cited Earth–Moon distance history (Farhat et al. 2022) begins at 6.18 R⊕, its own band's lower edge at the
  * Roche zone (3 R⊕). Continued INWARD on the law its first segment expresses — da/dt = K a^{−11/2}, the constant-
  * dissipation form (Darwin; Zahnle et al. 2015) with K READ OFF the history's first segment (§0's integration
- * principle: one input, extrapolated by its own slope, no foreign Q) — the Roche-zone-to-first-sample time is a
+ * principle: one input, extrapolated by its own slope, no foreign Q) — from the FIRST STATION, 3.8 R⊕, where the
+ * cited accretion runs assemble the Moon (1.2–1.4 Roche radii), the time to the first sample is a
  * number the input implies, and a BAND: the slope over the last 1 / 3 / 10 samples spreads 16-fold (the history's
  * start is not a constant-Q segment), 3.0e5 / 1.1e5 / 1.9e4 yr (plan31b-early-recession-measure.cjs). The owner's
  * decision (2026-11-18): the 3-sample window ships, 1 and 10 are the band; the scenario is TOUR-ONLY on its own
  * clock — the navigable domain stays the cited history. The input's early dissipation is 2–5× today's (its own
- * fact, stated); the hand-off state is the model's constant-L chain: a 5.0-h day at 3 R⊕.
+ * fact, stated); the hand-off state is the model's constant-L chain: a 5.1-h day at 3.8 R⊕ (5.0 h at the Roche limit).
  *
  * Inside the navigable domain the reader of date stops 15 kyr short of the history's first sample (the integrators'
  * margin), so the window is read on the samples INSIDE the domain: ages edge, edge − 1, edge − 3, edge − 10 Ma.
@@ -21,7 +22,8 @@ const { NAVIGABLE_PAST_YEARS } = require('../time/navigable-domain.cjs');
 
 const SEC_PER_JULIAN_YR = 365.25 * 86400;
 const SCENARIO = Object.freeze({
-  rocheZoneEarthRadii: 3.0,        // the fluid Roche limit (~2.9 R⊕), the disk's outer edge — the scenario's first station
+  firstStationEarthRadii: 3.8,     // where the cited accretion runs assemble the Moon: 1.2–1.4 Roche radii (Ida, Canup & Stewart 1997; Kokubo, Ida & Makino 2000) — the scenario's first station (the owner's decision, 2026-11-19; a first build sat at 3.0, the Roche limit itself)
+  rocheLimitEarthRadii: 2.9,       // the fluid Roche limit for the Moon's density — the disk's outer edge, inside which nothing accretes
   lawExponent: 5.5,                // da/dt ∝ a^{−11/2}
   windowSamplesShipped: 3,         // the owner's choice; 1 and 10 the band
   windowSamplesBand: [1, 10],
@@ -48,17 +50,17 @@ function createEarlyRecession({ constants: K0, fns }) {
     const slope = (a1 - a0) / m, aMid = 0.5 * (a0 + a1);
     return slope * Math.pow(aMid, SCENARIO.lawExponent);
   }
-  /** Years from the Roche zone to a distance (R⊕) on the law with the window's factor. @param {number} aTargetRe @param {number} [m] */
+  /** Years from the first station to a distance (R⊕) on the law with the window's factor. @param {number} aTargetRe @param {number} [m] */
   function yearsFromRoche(aTargetRe, m = SCENARIO.windowSamplesShipped) {
     const k = lawFactor(m); if (k === null || !(k > 0)) return null;
     const p = SCENARIO.lawExponent + 1;
-    return (Math.pow(aTargetRe, p) - Math.pow(SCENARIO.rocheZoneEarthRadii, p)) / (p * k) * 1e6;
+    return (Math.pow(aTargetRe, p) - Math.pow(SCENARIO.firstStationEarthRadii, p)) / (p * k) * 1e6;
   }
-  /** The distance (R⊕) at a time (years) after the Roche zone on the law. @param {number} years @param {number} [m] */
+  /** The distance (R⊕) at a time (years) after the first station on the law. @param {number} years @param {number} [m] */
   function distanceReAtYears(years, m = SCENARIO.windowSamplesShipped) {
     const k = lawFactor(m); if (k === null || !(k > 0)) return null;
     const p = SCENARIO.lawExponent + 1;
-    return Math.pow(Math.pow(SCENARIO.rocheZoneEarthRadii, p) + p * k * (years / 1e6), 1 / p);
+    return Math.pow(Math.pow(SCENARIO.firstStationEarthRadii, p) + p * k * (years / 1e6), 1 / p);
   }
   /** The first sample the scenario hands over to: the domain's edge distance (R⊕) and the time to it under the shipped window and the band. */
   function handover() {

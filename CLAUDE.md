@@ -634,8 +634,10 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   while the chapter draws its own; the only derived content is the
   hand-off, ONE home `moon/early-recession` (the input's own law read off
   its first segment inside the domain: the Roche zone to the first sample
-  in ~1e5 yr, a 16-fold band; a 5.0-h day at 3 R⊕ by the chain's OWN LOD
-  form, the hand-over day ≡ the chain's at the edge), browser ≡ Node to
+  in ~1e5 yr, a 16-fold band; a 5.1-h day at the first station, 3.8 R⊕ —
+  the CITED accretion distance, 1.2–1.4 Roche radii, never the Roche limit
+  itself — by the chain's OWN LOD form, the hand-over day ≡ the chain's at
+  the edge), browser ≡ Node to
   1e-9. A skip to a phase's end hands the tour over on the next tick — a
   reader holds the tour paused. **A point size is in scene units and
   ignores the group's scale** — 0.06 was 14 Earth radii per sprite, 3,000
