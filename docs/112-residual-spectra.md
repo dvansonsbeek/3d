@@ -85,8 +85,8 @@ the series at its own cadence; the floor the AR(1) p < 0.01 level of normalised 
 | 2-J | as 2b, the shipped Jose pair subtracted | 274 | -720.0 … 2,010 yr | 79.7 s | 0.991 | 0.942 | 0 | 910.0 yr | 64.7 | 0.65 | no | a span-scale family (3.00 cycles) |
 | 2-J′ | the stack RE-FITTED on the spline with all four cycles (the check) | 274 | -720.0 … 2,010 yr | 15.9 s | 0.937 | 0.676 | 0 | 532.7 yr | 16.8 | 0.82 | yes | a span-scale family (5.13 cycles) |
 | 2-J′ | the stack RE-FITTED with Bond + Hallstatt only (free of the Jose fit) | 274 | -720.0 … 2,010 yr | 64.9 s | 0.994 | 0.949 | 0 | 949.6 yr | 64.8 | 0.56 | no | a span-scale family (2.88 cycles) |
-| 3 | the 45 paleo anchors − the chain (relative) | 45 | -3,200 … 0.000 Myr | 0.0137 relative | 0.055 | 0.915 | 0 | 116.4 Myr | 0.0192 | 0.28 | yes | (unnamed — see the probes) |
-| 3 | the anchors inside 600 Ma | 25 | -600.0 … 0.000 Myr | 0.0135 relative | 0.002 | 0.909 | 0 | 800.0 Myr | 0.0205 | 0.31 | no | a span-scale family (0.75 cycles) |
+| 3 | the 45 paleo anchors − the chain (relative) | 45 | -3,200 … 0.000 Myr | 0.00725 relative | 0.120 | 0.907 | 0 | 116.9 Myr | 0.00826 | 0.23 | yes | (unnamed — see the probes) |
+| 3 | the anchors inside 600 Ma | 25 | -600.0 … 0.000 Myr | 0.00674 relative | 0.000 | 0.793 | 0 | 85.71 Myr | 0.00963 | 0.48 | no | (unnamed — see the probes) |
 | 4 | LR04 − the climate formula, post-MPT window | 801 | -1,000 … 0.000 kyr | 0.205 ‰ | 0.875 | 0.245 | 0 | 72.73 kyr | 0.137 | 0.93 | yes | obliquity p+s6 (53.6) − climate-internal harmonic (g₂−g₅)/2 (202.8) |
 | 4 | LR04 − the formula, iNHG–MPT window | 731 | -2,700 … -1,000 kyr | 0.166 ‰ | 0.738 | 0.130 | 0 | 73.12 kyr | 0.0812 | 0.92 | yes | obliquity p+ζ7 (41.6) − eccentricity z6−g5 (96.8) |
 | 4 | LR04 − the formula, pre-iNHG window | 585 | -5,320 … -2,700 kyr | 0.113 ‰ | 0.629 | 0.118 | 1 | 2,096 kyr | 0.0609 | 1.29 | yes | a span-scale family (1.25 cycles) |
@@ -462,6 +462,9 @@ gate's own predictors, the eleven rows published as ranges entering at their mid
 periodic stands (a 45-point floor sits near the whole variance). The Moon-distance rows read 7–9 %
 inside the smoothed history at 300, 400 and 500 Ma and one percent outside it at 650 Ma: an
 interval with edges — the Pangaea dissipation episode — not a period. Hypothesis 3 is confirmed.
+(Plan 34 re-read those three rows at their source: they carried a ~5 R⊕ transcription error, and
+against Wu's published curve the model sits inside every band — the "interval" was the error's
+edges; what remains is a ~0.3 R⊕ timing difference at 250–325 Ma. Doc 111 §1.50.)
 
 ## 10. The decision
 

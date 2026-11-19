@@ -157,7 +157,7 @@ The Phanerozoic window, both clocks against the published inferences (written by
 | 650 | **70.25** | 59.34 | Wu 2024: 67.64 ± 0.3 | 3.9 % | -12.3 % | 25.15 | 26.56 |
 | 500 | **62.11** | 55.95 | Berger, Loutre & Laskar 1992: 61 (theory) | 1.8 % | -8.3 % | 29.88 | 29 (their obliquity main period) |
 
-The composed clock sits within 3 % of every published Phanerozoic precession constant and reads 2–3 % LOW across 300–500 Ma (the Pangea window, where Wu's Moon-distance anchors are closer than the shipped recession polynomial — the documented Pangea offset); the retired spin-only clock reads 9–13 % low there. Beats via 1,296,000/(ψ̇ − |s₃|), |s₃| = 18.85 ″/yr. Wu's constants carry the astronomical model of their inversion; Berger 1992 is theory — neither is a measurement, and the table is labelled accordingly.
+The composed clock sits within 3 % of every published Phanerozoic precession constant and reads 2–4 % LOW at 300 and 500 Ma (the Pangea window, where the record times the supercontinent-era acceleration ~50 Myr later than the cited history — a third of an Earth radius over 250–325 Ma, two thirds of the shortfall; plan 34 §2.1); the retired spin-only clock reads 9–13 % low there. Beats via 1,296,000/(ψ̇ − |s₃|), |s₃| = 18.85 ″/yr. Wu's constants carry the astronomical model of their inversion; Berger 1992 is theory — neither is a measurement, and the table is labelled accordingly.
 <!-- /generated:doc99-phanerozoic-comparison -->
 
 The rock-derived inferences side with the COMPOSITION: a few per cent at
@@ -868,28 +868,26 @@ Wu, Malinverno, et al. 2024 ("A 650-Myr history of Earth's axial precession freq
 | 0 | LOD 24.00 hr, Moon 60.27 R⊕ | <!--v:anchorWuLod0Pred-->24.00<!--/v--> hr, <!--v:anchorWuMoon0Pred-->60.32<!--/v--> R⊕ | exact (anchor) |
 | 100 | LOD 23.5–23.8 hr, Moon 59–60 R⊕ | <!--v:anchorWuLod100Pred-->23.43<!--/v--> hr, <!--v:anchorWuMoon100Pred-->59.73<!--/v--> R⊕ | within range ✓ |
 | 200 | LOD 23.6–23.8 hr, Moon 58–59 R⊕ | <!--v:anchorWuLod200Pred-->22.92<!--/v--> hr, <!--v:anchorWuMoon200Pred-->59.17<!--/v--> R⊕ | LOD short by 0.8 hr ⚠ |
-| 300 | LOD 22.5–23.0 hr, Moon 53–55 R⊕ | <!--v:anchorWuLod300Pred-->22.44<!--/v--> hr, <!--v:anchorWuMoon300Pred-->58.63<!--/v--> R⊕ | LOD OK; Moon far by ~4 R⊕ ⚠ |
-| 400 | LOD 21.5–22.0 hr, Moon 52–53 R⊕ | <!--v:anchorWuLod400Pred-->21.74<!--/v--> hr, <!--v:anchorWuMoon400Pred-->57.81<!--/v--> R⊕ | LOD OK; Moon far by ~5 R⊕ ⚠ |
-| 500 | LOD 20.9–21.5 hr, Moon 53–54 R⊕ | <!--v:anchorWuLod500Pred-->21.57<!--/v--> hr, <!--v:anchorWuMoon500Pred-->57.60<!--/v--> R⊕ | LOD OK; Moon far by ~4 R⊕ ⚠ |
+| 300 | LOD 22.5–23.0 hr, Moon 58.3–58.9 R⊕ | <!--v:anchorWuLod300Pred-->22.44<!--/v--> hr, <!--v:anchorWuMoon300Pred-->58.63<!--/v--> R⊕ | within range ✓ |
+| 400 | LOD 21.5–22.0 hr, Moon 57.4–58.0 R⊕ | <!--v:anchorWuLod400Pred-->21.74<!--/v--> hr, <!--v:anchorWuMoon400Pred-->57.81<!--/v--> R⊕ | within range ✓ |
+| 500 | LOD 20.9–21.5 hr, Moon 57.1–57.9 R⊕ | <!--v:anchorWuLod500Pred-->21.57<!--/v--> hr, <!--v:anchorWuMoon500Pred-->57.60<!--/v--> R⊕ | within range ✓ |
 | **650** | **LOD 20.94 hr, Moon 56.73 R⊕** | **<!--v:anchorWuLod650Pred-->20.34<!--/v--> hr, <!--v:anchorWuMoon650Pred-->56.00<!--/v--> R⊕** | **LOD <!--v:anchorWuLod650DeltaPct-->−2.86<!--/v--> % (documented band), Moon within 1.3 %** |
 
 **The 650 Ma endpoint agrees to ~1–3 % between two completely independent methods** — Wu's Bayesian inversion of 34 cyclostratigraphic records vs angular-momentum conservation on Farhat 2022's ocean-model history (nothing fitted to Wu). The LOD gap at 650 Ma is the cited history reading a lower pre-Snowball dissipation than Wu's inversion, the same disagreement the Williams 620 Ma row shows; it is a band, not an adjustment.
 
-#### The Pangea high-tidal-dissipation interval (the mid-range mismatch)
+#### The Pangea high-tidal-dissipation interval (a timing difference of a third of an Earth radius)
 
 Wu et al.'s key finding is that **lunar recession was non-uniform** over the Phanerozoic. Their cyclostratigraphy-inferred rates are:
 
 | Interval | Lunar recession rate (cm/yr) |
 |:---|:---:|
 | 540–325 Ma (Cambrian–Carboniferous) | 2.17 ± 0.15 |
-| **325–200 Ma (Permian–Triassic, Pangea era)** | **7.00 ± 0.52** (peak dissipation) |
-| 200 Ma–Present (Late Jurassic onward) | 3.29 ± 0.13 (≈ modern 3.82) |
+| **300–200 Ma (Permian–Triassic, Pangea era)** | **7.00 ± 0.52** (peak dissipation) |
+| 150 Ma–Present (Late Jurassic onward) | 3.29 ± 0.13 (≈ modern 3.83) |
 
-The 300–200 Ma peak gives ~4 R⊕ extra Moon-Earth approach during the Pangea-era ocean-tidal-resonance interval. The cited history (Farhat 2022's globally-smoothed ocean model) **does not carry this regime-dependent variation at Wu's timing** — Farhat's own acceleration sits ~50 Myr earlier (below). The mid-range (300–500 Ma) Moon-distance deviation in the table above is precisely this Pangea overshoot, and the model adds no term to absorb it.
+Integrated from today, those rates put the Moon about 2 R⊕ closer at 300 Ma and 3 R⊕ closer at 500 Ma — the same approach the cited history carries (1.7 and 2.7 R⊕), and Wu's own Fig. 2A reads 58.6 ± 0.3 R⊕ at 300 Ma, 57.7 ± 0.3 at 400 and 57.5 ± 0.4 at 500, every one of which the model sits inside (the table above). What the record and the cited history disagree about is the TIMING of the Pangea-era acceleration: Wu's curve drops from ≈ 58.9 R⊕ at 250 Ma to ≈ 58.0 at 325 (the 7 cm/yr century), while Farhat 2022's ocean model makes the same drop ~50 Myr earlier and steeper — Wu et al. note this themselves. Over 250–325 Ma the two histories part by ~0.3 R⊕; the model reads the cited history and adds no term to move it. The composed precession clock, read against Wu's precession constants, is 2–4 % low at 300 and 500 Ma; on the record's own rates two thirds of that closes (plan 34 §2.1, `tools/explore/plan34-dissipation-history-measure.cjs`), which is the size of the timing difference, not a missing regime.
 
-This is **a real physical effect** (driven by continental shelf configuration and bathymetry during supercontinental assembly). Wu et al. note that even Farhat 2022's full ocean-tidal numerical model shows a similar acceleration, but shifted **~50 Myr earlier** than the cyclostratigraphy data places it.
-
-For the model: this is an honest limitation of reading one globally averaged ocean-tide history. The Phanerozoic-averaged behaviour is captured; the regime-dependent supercontinent-era acceleration is not.
+The three Moon-distance rows above carried 53–55 / 52–53 / 53–54 R⊕ from the Phase 19 dossier until plan 34 re-read them at the source — a transcription error of ~5 R⊕ that had put Wu's Moon closer at 300–500 Ma than their own 56.73 R⊕ at 650 Ma, and on which a "Pangea overshoot" of ~4 R⊕ had been documented as a band (doc 111 §1.50). The model did not move; the referee's numbers were set to what the referee printed.
 
 ### Physical axial precession at deep time — why a spin-only scaling misses
 
@@ -953,8 +951,9 @@ The observed values, sources and per-anchor tolerances live in
 `tools/verify/paleo-anchors.js` (gate class) recomputes every prediction in
 these tables live from the engine on each `npm run check` and fails on drift
 — **including an unexplained improvement of a documented deviation** (the
-Williams 620 Ma miss and the Wu Pangea-interval rows are asserted as bands,
-not skipped).
+Williams 620 Ma miss and the Wu 200-Ma and 650-Ma rows are asserted as bands,
+not skipped; the former Pangea-interval bands were a transcription error, re-read
+at the source in plan 34 — doc 111 §1.50).
 
 **The derived day count sits within ±1.4 % of every direct Phanerozoic paleontological measurement** (65–500 Ma; the flagship Wells 380 Ma row <!--v:anchorWellsFlagship380DeltaPct-->+0.71<!--/v--> %) with NO free parameter: the Moon distance history is the cited input (Farhat 2022, plan 12 option A), the day length is conservation on it, the day count is tropical_year_s(t)/LOD(t) on that chain, and nothing is fitted to the Wells/Williams data. The documented deviations (Williams 620 Ma, the Wu Pangea interval, three Wells rows and the Mesoproterozoic precession rows of Zhou 2024) are bands in `data/paleo-validation-anchors.json`, each with its cause named.
 

@@ -243,7 +243,7 @@ function blockPhanerozoicComparison() {
   const b = BERGER_1992_500MA, pc = psiDot(b.ageMa), ps = spinOnly(b.ageMa);
   rows.push(`| ${b.ageMa} | **${f(pc, 2)}** | ${f(ps, 2)} | Berger, Loutre & Laskar 1992: ${b.kArcsecPerYr} (theory) | ${f(100 * (pc / b.kArcsecPerYr - 1), 1)} % | ${f(100 * (ps / b.kArcsecPerYr - 1), 1)} % | ${f(beatKyr(b.ageMa), 2)} | ${b.obliquityKyr} (their obliquity main period) |`);
   rows.push('');
-  rows.push(`The composed clock sits within 3 % of every published Phanerozoic precession constant and reads 2–3 % LOW across 300–500 Ma (the Pangea window, where Wu's Moon-distance anchors are closer than the shipped recession polynomial — the documented Pangea offset); the retired spin-only clock reads 9–13 % low there. Beats via 1,296,000/(ψ̇ − |s₃|), |s₃| = ${f(s3, 2)} ″/yr. Wu's constants carry the astronomical model of their inversion; Berger 1992 is theory — neither is a measurement, and the table is labelled accordingly.`);
+  rows.push(`The composed clock sits within 3 % of every published Phanerozoic precession constant and reads 2–4 % LOW at 300 and 500 Ma (the Pangea window, where the record times the supercontinent-era acceleration ~50 Myr later than the cited history — a third of an Earth radius over 250–325 Ma, two thirds of the shortfall; plan 34 §2.1); the retired spin-only clock reads 9–13 % low there. Beats via 1,296,000/(ψ̇ − |s₃|), |s₃| = ${f(s3, 2)} ″/yr. Wu's constants carry the astronomical model of their inversion; Berger 1992 is theory — neither is a measurement, and the table is labelled accordingly.`);
   return rows.join('\n');
 }
 

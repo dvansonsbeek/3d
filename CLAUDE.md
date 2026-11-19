@@ -648,6 +648,17 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   parameter is its yaw about the orbit normal; Theia's approach is the
   exact parabola of infall from rest (v_imp ≈ v_esc is why Theia shares
   the Earth's orbit), checked by hand at the contact point. (§1.49)
+- **A documented band is re-read at its SOURCE before it is explained** —
+  the paleo gate's 7–9 % "Pangaea interval" was a ~5 R⊕ transcription error
+  in three Wu 2024 Moon-distance rows (entered 2026-08-14), explained in
+  three docs and on the website for three months while the rows' own LOD
+  companions, tied to them by angular-momentum conservation, had been
+  right all along; against the paper's published curve the model sits
+  inside every band. The leg-2 rule protects the model from tuning, not
+  the dossier from a typo: correct the referee's numbers, keep the
+  predictions unmoved, say so; check conservation-tied rows against each
+  other when entering them; a figure-read value names its reading
+  precision. (§1.50)
 
 ---
 
