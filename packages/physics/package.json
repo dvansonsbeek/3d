@@ -1,6 +1,6 @@
 {
   "name": "@essrt/physics",
-  "version": "26.18.0",
+  "version": "26.19.0",
   "description": "ESSRT (Expanding Solar System Resonance Theory) physics core — pure, injectable-constants, no I/O, no globals, no DOM. The complete model incl. fitted coefficients; every published version immutably ships one recorded model identity.",
   "essrt": {
     "modelVersion": "v27.17",
@@ -54,6 +54,8 @@
     "./moon/series-extension": { "types": "./types/moon/series-extension.d.cts", "default": "./src/moon/series-extension.cjs" },
     "./moon/plane-of-date": { "types": "./types/moon/plane-of-date.d.cts", "default": "./src/moon/plane-of-date.cjs" },
     "./moon/solar-perturbation-scales": { "types": "./types/moon/solar-perturbation-scales.d.cts", "default": "./src/moon/solar-perturbation-scales.cjs" },
+    "./moon/cassini-state": { "types": "./types/moon/cassini-state.d.cts", "default": "./src/moon/cassini-state.cjs" },
+    "./moon/early-recession": { "types": "./types/moon/early-recession.d.cts", "default": "./src/moon/early-recession.cjs" },
     "./earth/scene-obliquity": { "types": "./types/earth/scene-obliquity.d.cts", "default": "./src/earth/scene-obliquity.cjs" },
     "./moon/apparent": { "types": "./types/moon/apparent.d.cts", "default": "./src/moon/apparent.cjs" },
     "./planets/geometry": { "types": "./types/planets/geometry.d.cts", "default": "./src/planets/geometry.cjs" },

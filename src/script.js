@@ -4941,6 +4941,8 @@ if (typeof window !== 'undefined') {
     supernovaNearest: () => _skyOfDate.supernovaNearest(),
     // plan 31 B: the Moon's Cassini state and its band at an age (Myr before J2000) — the Obliquity Moon tab's data
     moonObliquityAtAge: (tMa) => { const b = _cassiniState().bandAtAge(tMa); return { shipped: b.shipped, min: b.minObliquityToOrbitDeg, max: b.maxObliquityToOrbitDeg }; },
+    // the Incl. Moon tab's data at an age: the free inclination (and its κ = 1/4 twin), the drawn Laplace tilt, the ecliptic inclination's node-cycle range
+    moonInclinationAtAge: (tMa) => { const spec = ESSRT_QTY_SPECS.moonInclination; const band = spec.computeBand(tMa); return { freeDeg: spec.compute(tMa), freeBandDeg: _dtc().meanLunarFreeInclinationBandDegAtAge(tMa), tiltDeg: spec.compute2(tMa), eclipticMinDeg: band ? band.lo : null, eclipticMaxDeg: band ? band.hi : null }; },
     essrtSelectTab: (key) => { const b = document.querySelector(`#essrtPanel .cfm-tab[data-qty="${key}"]`); if (b) b.click(); return !!b; },
     jumpToSupernovaNearest: () => jumpToSupernovaNearest(),
     supernovaState: () => _skyOfDate.supernovaState(),
@@ -13807,6 +13809,7 @@ const ESSRT_QTY_TABS = [
   { key: 'obliqCycle', label: 'Obliquity period' },
   { key: 'obliquity',  label: 'Obliquity Earth' },
   { key: 'moonObliquity', label: 'Obliquity Moon' },
+  { key: 'moonInclination', label: 'Incl. Moon' },   // plan 31 A's inclination family as a history (the owner, 2026-11-19)
   { key: 'lod',        label: 'Length of Day' },
   { key: 'year',       label: 'Length of Year' },
   { key: 'au',         label: 'AU Distance' },
@@ -13946,7 +13949,30 @@ const ESSRT_QTY_SPECS = {
     yRangeOverrides: { phanero: { yMin: 0, yMax: 10 } },
     hasWu:    false,
     samples:  240,   // each point is one Cassini solve per reading (~1 ms × 5); the transition's edge is resolved at this count (measured: the full range in ~1.5 s)
-    footnote: 'Note: DERIVED on the regime of date and a cited figure — (C−A)/C 6.3e-4 (Yoder 1995), (B−A)/C 2.28e-4 (Williams et al. 2014) — by Peale\'s (1969) and Ward\'s (1975) Cassini-state relation, anchored on the measured J2000 composition (the equation\'s own value is 0.4 % off it: the figure\'s rounding and the known unmodelled channels). A labelled band, never a dated event: the transition\'s age is the band\'s (4.12–4.15 Ga), and Ward\'s episode is a damped oscillation the equilibrium picture draws as a jump. The Moon\'s orbit plane itself, the Laplace plane of date and the free inclination to it are plan 31 A\'s (the Moon Distance tab\'s history drives all of it).',
+    footnote: 'Note: DERIVED on the regime of date and a cited figure — (C−A)/C 6.3e-4 (Yoder 1995), (B−A)/C 2.28e-4 (Williams et al. 2014) — by Peale\'s (1969) and Ward\'s (1975) Cassini-state relation, anchored on the measured J2000 composition (the equation\'s own value is 0.4 % off it: the figure\'s rounding and the known unmodelled channels). A labelled band, never a dated event: the transition\'s age is the band\'s (4.12–4.15 Ga), and Ward\'s episode is a damped oscillation the equilibrium picture draws as a jump. The Moon\'s orbit plane itself, the Laplace plane of date and the free inclination to it are plan 31 A\'s (the Moon Distance tab\'s history drives all of it; the Incl. Moon tab draws them).',
+  },
+  // PLAN 31 A's inclination family as a history (the owner, 2026-11-19: "add the ecliptic inclination values"): the
+  // three angles the Planet Info rows show at one instant — the free inclination to the Laplace plane (ONE home
+  // earth/laplace-plane through the chain's reader), the Laplace plane's tilt the simulator DRAWS (the series' anchor
+  // × the chain's shape, ONE home moon/plane-of-date) and the inclination to the ecliptic, which is not one number
+  // but swings over each node cycle between |i_L − θ| and i_L + θ (the band).
+  moonInclination: {
+    title:    'Inclination of the Moon\'s orbit (of date)',
+    subtitle: 'The three angles of the Moon\'s orbit plane the simulator draws, from the Earth–Moon genesis to +1 Gyr (plan 31 A; doc 111 §1.42–§1.44). The solid line is the FREE inclination i_L to the Laplace plane — derived on the cited distance history (sin i_L ∝ a^(−1/2), the exponent 1/2 shipped; 1/4 is the band\'s other reading, 9.1° for 16.3° at the genesis): 5.16° today, 5.6° at 2.46 Ga, 16° at the genesis. The dashed line is the Laplace plane\'s own tilt θ from the ecliptic — 8″ today (Meeus\'s "flattening" term), 11.5° at the genesis, where the Moon\'s orbit precesses about the Earth\'s equator rather than the ecliptic pole. The band is the inclination to the ECLIPTIC over one node cycle: the two angles compose as cos i = cos i_L cos θ + sin i_L sin θ cos Ω, so it swings between |i_L − θ| and i_L + θ — 5.155–5.160° today, 4.8–27.7° at the genesis. The inclination problem (why i_L is 5° today and not ~0°) is named open; the derivation is a stated choice.',
+    yLabel:   'Inclination (°)',
+    compute:  (t_Ma) => _dtc().meanLunarFreeInclinationDegAtAge(t_Ma),
+    compute2: (t_Ma) => { const ps = _lunarPlaneScalesAtAge()(t_Ma); return ps ? LUNAR_PLANE_TILT_ANCHOR_DEG * ps.tiltShape : null; },
+    compute2AllRanges: true,
+    computeBand: (t_Ma) => { const i = _dtc().meanLunarFreeInclinationDegAtAge(t_Ma), ps = _lunarPlaneScalesAtAge()(t_Ma); if (i === null || !ps) return null; const th = LUNAR_PLANE_TILT_ANCHOR_DEG * ps.tiltShape; return { lo: composeEclipticInclinationDeg(i, th, 0), hi: composeEclipticInclinationDeg(i, th, 180) }; },
+    label2:   'the Laplace plane\'s tilt from the ecliptic, as drawn (8″ today, 11.5° at the genesis)',
+    bandLabel: 'the inclination to the ECLIPTIC over one node cycle: |i_L − θ| to i_L + θ',
+    centreLabel: 'the free inclination i_L to the Laplace plane (derived on the cited distance, exponent 1/2)',
+    yFmt:     (v) => v.toFixed(2) + '°',
+    yMin: 0, yMax: 30,
+    yRangeOverrides: { phanero: { yMin: 0, yMax: 8 } },
+    hasWu:    false,
+    samples:  240,
+    footnote: 'Note: DERIVED on the cited distance history (Farhat et al. 2022) through the Laplace-plane regime (plan 31 A): the free inclination\'s scaling is a stated choice (the κ = 1/2 exponent, with 1/4 as the band\'s twin — the Planet Info rows carry both), the Laplace tilt is the coupled spin–orbit solve\'s shape on Meeus\'s J2000 anchor (the Horizons referee prefers the anchor by 0.003″), and the ecliptic inclination\'s swing is the composition the drawn orbit rides every frame. The Moon\'s axial tilt (the Obliquity Moon tab) is the Cassini state on these same angles and the node\'s period of date.',
   },
   au: {
     title:    'Earth-Sun Distance',

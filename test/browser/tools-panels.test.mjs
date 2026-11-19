@@ -84,12 +84,29 @@ try {
     const T = window.__test__;
     const at = (t) => T.moonObliquityAtAge(t);
     const data = { edge: at(4428.98), t4180: at(4180), t4100: at(4100), t2460: at(2460), today: at(0) };
+    // the Incl. Moon tab's data (plan 31 A's inclination family): the free inclination, its κ = 1/4 twin, the drawn Laplace tilt, the ecliptic range
+    const inc = (t) => T.moonInclinationAtAge(t);
+    const incl = { today: inc(0), t2460: inc(2460), edge: inc(4428.98), titleOk: /Inclination of the Moon/.test([...document.querySelectorAll('#essrtPanel .cfm-tab[data-qty]')].find((x) => x.dataset.qty === 'moonInclination') ? (() => { const b = [...document.querySelectorAll('#essrtPanel .cfm-tab[data-qty]')].find((x) => x.dataset.qty === 'moonInclination'); b.click(); return ''; })() : '') };
+    await wait(1500);
+    incl.panelText = (document.querySelector('#essrtPanel') || {}).textContent || '';
     const c = document.querySelector('#essrtPanel .cfm-close'); if (c) c.click();
-    return { out, data };
+    return { out, data, incl };
   });
   const essrtErrs = sim.errors.slice(essrtErrorsBefore);
   const moonTab = tabs.out.find((t) => t.key === 'moonObliquity');
-  check(`every Genesis Analysis tab renders a chart (${tabs.out.length} tabs, no page error)`, tabs.out.length >= 8 && tabs.out.every((t) => t.hasSvg && t.paths > 0) && essrtErrs.length === 0, tabs.out.map((t) => `${t.key}:${t.paths}`).join(' ') + (essrtErrs.length ? ' · ' + essrtErrs[0] : ''));
+  check(`every Genesis Analysis tab renders a chart (${tabs.out.length} tabs, no page error)`, tabs.out.length >= 9 && tabs.out.every((t) => t.hasSvg && t.paths > 0) && essrtErrs.length === 0, tabs.out.map((t) => `${t.key}:${t.paths}`).join(' ') + (essrtErrs.length ? ' · ' + essrtErrs[0] : ''));
+  {
+    // the Incl. Moon tab: its title and legends drawn; the free inclination 5.16° today and 16.0–16.5° at the edge
+    // (the κ = 1/4 twin 9.0–9.3°), the drawn Laplace tilt under 0.003° today and 11–12° at the edge, the ecliptic
+    // inclination's node-cycle range 5.15–5.17° today and 4.5–5 … 27–28° at the edge (the Planet Info rows' range)
+    const I = tabs.incl, t0 = I.today, te = I.edge, t2 = I.t2460;
+    const ok = /Inclination of the Moon/.test(I.panelText) && /node cycle/.test(I.panelText)
+      && Math.abs(t0.freeDeg - 5.157) < 0.01 && t0.tiltDeg < 0.003 && t0.eclipticMinDeg > 5.15 && t0.eclipticMaxDeg < 5.17 && t0.eclipticMaxDeg > t0.eclipticMinDeg
+      && t2.freeDeg > 5.5 && t2.freeDeg < 5.8
+      && te.freeDeg > 16 && te.freeDeg < 16.5 && te.freeBandDeg > 9 && te.freeBandDeg < 9.3 && te.tiltDeg > 11 && te.tiltDeg < 12 && te.eclipticMinDeg > 4.5 && te.eclipticMinDeg < 5 && te.eclipticMaxDeg > 27 && te.eclipticMaxDeg < 28;
+    check('the Incl. Moon tab: title and legends drawn; the free inclination 5.16° today / 16.3° at the edge (κ ¼ 9.1°), the drawn Laplace tilt 8″ today / 11.5° at the edge, the ecliptic range 5.155–5.160° today / 4.8–27.7° at the edge', ok,
+      `today ${t0.freeDeg && t0.freeDeg.toFixed(3)}° · tilt ${t0.tiltDeg && t0.tiltDeg.toFixed(4)}° · ecl ${t0.eclipticMinDeg && t0.eclipticMinDeg.toFixed(3)}–${t0.eclipticMaxDeg && t0.eclipticMaxDeg.toFixed(3)}; 2.46 Ga ${t2.freeDeg && t2.freeDeg.toFixed(2)}°; edge ${te.freeDeg && te.freeDeg.toFixed(2)}° (κ¼ ${te.freeBandDeg && te.freeBandDeg.toFixed(2)}) · tilt ${te.tiltDeg && te.tiltDeg.toFixed(2)}° · ecl ${te.eclipticMinDeg && te.eclipticMinDeg.toFixed(2)}–${te.eclipticMaxDeg && te.eclipticMaxDeg.toFixed(2)}`);
+  }
   const d = tabs.data, abs = (s) => (s && s.shipped ? Math.abs(s.shipped.obliquityToOrbitDeg) : NaN);
   check('the Obliquity Moon tab: its title and band legend drawn; state 1 under 1.5° at the edge, 15–25° at 4,180 Ma, above 40° at 4,100 Ma (state 2), 8.5–10.5° at 2.46 Ga, 6.70° today; the band spans both states at 4,140 Ma',
     !!moonTab && moonTab.titleOk && moonTab.bandLegend && moonTab.windowShaded && d.edge.shipped.state === 1 && abs(d.edge) < 1.5 && d.t4180.shipped.state === 1 && abs(d.t4180) > 15 && abs(d.t4180) < 25 && d.t4100.shipped.state === 2 && abs(d.t4100) > 40 && abs(d.t2460) > 8.5 && abs(d.t2460) < 10.5 && Math.abs(abs(d.today) - 6.6997) < 1e-3 && d.t4100.max - d.t4100.min > 0,
