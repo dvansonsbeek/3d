@@ -338,7 +338,7 @@ export function createApi() {
       };
       /** @param {number} y */
       const eclipseFormulaAtYear = (y) => {
-        const jdTT = model.time.yearToJDTT(y), jdUT = model.time.yearToJDUT(y);
+        const jdTT = model.time.positionYearToJDTT(y), jdUT = model.time.positionYearToJDUT(y);
         if (jdTT === null || jdUT === null || !Number.isFinite(jdTT) || !Number.isFinite(jdUT)) return null;
         return {
           regime: F.regimeAt(jdTT),

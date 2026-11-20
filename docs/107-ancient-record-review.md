@@ -1,6 +1,6 @@
 ---
 docVersion: 1.0
-modelVersion: v27.18
+modelVersion: v27.19
 coefficients: sha256:617134ba66522681
 status: current
 ---
@@ -29,7 +29,7 @@ measured partial phase in digits. A record of a deep partial can sit
 1,500 km from the computed centerline and still be *exactly correct*.
 
 The review therefore re-tests what each record **claims**, with the
-20.3g location tier (`model.eclipse.solarLocalCircumstances` — IAU GMST
+20.3g location tier (`model.eclipse.solarLocalCircumstances` — the GMST of date (the mean Sun's, doc 111 §1.51)
 + standard frame mapping, independent of the browser scene): for each
 event, every solar eclipse in the dating-uncertainty window is evaluated
 at the documented site (with a day-side pre-filter), candidates with

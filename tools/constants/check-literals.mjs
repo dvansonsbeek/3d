@@ -262,10 +262,13 @@ const NOT_IN_SCRIPT = {
     + 'registry (obliqChapront* keys) for the Model-vs-literature tables; the browser '
     + 'never quotes them',
   'astro.knownValues': 'validation targets for the model-values registry (no runtime reader)',
-  'astro.physicalConstants.gmstMeanSiderealT0Deg': 'the GMST polynomial has ONE home, eclipse/besselian.cjs computeGmstDeg; '
-    + 'script.js reads createModel().eclipse.gmstDegAtJD (the five diagnostics that carried inline copies, two with a cubic term).',
-  'astro.physicalConstants.gmstMeanSiderealRateDegPerDay': 'see gmstMeanSiderealT0Deg — the ONE GMST.',
-  'astro.physicalConstants.gmstMeanSiderealT2Deg': 'see gmstMeanSiderealT0Deg — the ONE GMST.',
+  'astro.physicalConstants.gmstMeanSiderealT0Deg': 'the GMST has ONE home, eclipse/besselian.cjs computeGmstDeg — Newcomb\'s definition on the '
+    + 'model\'s own mean Sun since doc 111 §1.51, T₀ its one measured anchor; script.js reads createModel().eclipse.gmstDegAtJD '
+    + '(the five diagnostics that carried inline copies, two with a cubic term).',
+  'astro.physicalConstants.gmstMeanSiderealRateDegPerDay': 'the retired IAU 1982 polynomial\'s rate — read by nothing in the model; '
+    + 'the REFEREE input of tools/verify/gmst-of-date.js (§1.51), which bounds the shipped angle\'s convention gap against it.',
+  'astro.physicalConstants.gmstMeanSiderealT2Deg': 'the retired polynomial\'s T² (1.39656″/cy², the one polynomial that had been left in deep time) — '
+    + 'the gate\'s referee input, see gmstMeanSiderealRateDegPerDay.',
   'astro.moonMeeus.elpW1T2Decomposition_arcsecPerCy2': 'ELP W1 T^2 budget — analysis only, tools/explore/v4-kpl-budget.js',
   'astro.cardinalPointAnchors': 'the observed USNO 2000 cardinal instants (UTC, minute precision) — reference data, '
     + 'no runtime reader (the cardinal instants are createModel().cardinal); quoted by the pipeline verifier\'s '

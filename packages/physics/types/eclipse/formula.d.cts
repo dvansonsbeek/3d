@@ -72,10 +72,6 @@ export type EclipseFormulaDeps = {
         min: number;
         max: number;
     };
-    /**
-     * - the engine year of a TT instant, the deep calendar's exact inverse of its TT table (phase/deep-calendar); the linear Julian form stands in where absent or null
-     */
-    jdTTToYear?: ((jdTT: number) => number | null) | undefined;
     constants: EclipseConstants;
     /**
      * - the certified window in engine years (default: the canon's)
@@ -195,7 +191,6 @@ export type Recurrence = {
  * @property {() => number} getSunDistanceKm - live (epoch-mutable), the finders' own
  * @property {(jdTT: number) => (PeriodsOfDate & { moonDistanceKm: number, inclinationDeg: number, laplaceTiltDeg: number }) | null} periodsOfDateAt - the chain's periods of date, the mean Moon distance, the orbit's inclination to the ecliptic of date and the Laplace plane's tilt from the ecliptic (the regime's marker); null beyond the histories
  * @property {() => {min: number, max: number}} jdTTDomain - the navigable domain's TT edges (the Newton seed is clamped inside it)
- * @property {(jdTT: number) => number | null} [jdTTToYear] - the engine year of a TT instant, the deep calendar's exact inverse of its TT table (phase/deep-calendar); the linear Julian form stands in where absent or null
  * @property {EclipseConstants} constants
  * @property {{min: number, max: number}} [certifiedWindowYears] - the certified window in engine years (default: the canon's)
  */

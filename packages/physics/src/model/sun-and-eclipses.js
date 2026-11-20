@@ -81,9 +81,8 @@ export function assembleSunAndEclipses(ctx) {
       const dT = deepCalendar.deltaTSecondsAtJdTT(jdTT);
       return dT !== null && Number.isFinite(dT) ? jdTT - dT / SECONDS_PER_DAY : jdTT - frameworkDeltaTSecondsAtJD(jdTT) / SECONDS_PER_DAY;
     },
-    // the engine year of a TT instant, the deep calendar's exact inverse of its TT table (ONE home) —
-    // the formula's regime read; it falls back to the linear Julian form where the table is absent
-    jdTTToYear: /** @param {number} jdTT */ (jdTT) => deepCalendar.jdTTToYear(jdTT),
+    // (the formula's engine year is the TT Julian year of the instant — v27.19 took the deep calendar's
+    //  `jdTTToYear` out of its deps: that is the position-COUNT year, 25 kyr from the TT year at 400 Ma, §1.51)
     meanElongationUnwrappedDegAt: /** @param {number} jdTT */ (jdTT) => moonArgs.meanElongationUnwrappedDeg(jdTT),
     argsAt: /** @param {number} jdTT */ (jdTT) => moonArgs.argsAt(jdTT),
     getSunDistanceKm: () => currentAUDistance,
@@ -186,6 +185,11 @@ export function assembleSunAndEclipses(ctx) {
     moonElongationDegAtT: /** @param {number} T */ (T) => moonArgs.argsAt(j2000JD + T * julianCenturyDays).D,
     embWobbleArcsecAtT,
   });
+  /** THE ENGINE YEAR of a UT JD — the TT Julian year of the instant (doc 111 §1.31's one axis: jdUT + ΔT/86400 → Julian
+   *  years from J2000), never the position-COUNT year the deep calendar's `jdUTToYear` returns (0.055 % apart, 2.4 Myr at
+   *  the edge — §1.51). The besselian's of-date reads and the GMST take it; published as `time.engineYearFromJDUT`.
+   *  @param {number} jdUT @returns {number} */
+  const engineYearFromJDUT = (jdUT) => 2000 + (jdUT + frameworkDeltaTSecondsAtJD(jdUT) / SECONDS_PER_DAY - j2000JD) / DAYS_PER_JULIAN_YEAR;
   const besselian = createBesselian({
     moonFullAtDaysTT: /** @param {number} dDaysTT */ (dDaysTT) => {
       const ev = moonSeries.sceneEvalAt(dDaysTT);
@@ -207,7 +211,10 @@ export function assembleSunAndEclipses(ctx) {
     // SI-linear count year `yearFromJD` the tier read before v27.16: flat of-date quantities hid
     // the split (1.3 Gyr at the genesis, where the cited obliquity is undefined on the label's
     // age — the ground point landed 11° from the drawn axis; doc 111 §1.44)
-    yearFromJD: /** @param {number} jdUT */ (jdUT) => 2000 + (jdUT + frameworkDeltaTSecondsAtJD(jdUT) / SECONDS_PER_DAY - j2000JD) / DAYS_PER_JULIAN_YEAR,
+    yearFromJD: engineYearFromJDUT,
+    // THE ONE GMST is Newcomb's definition on the model's own mean Sun (doc 111 §1.51): the
+    // tropical mean-longitude table of date, the slice before this one
+    sunMeanLongitudeDegAt,
     constants: {
       j2000JD,
       julianCenturyDays,
@@ -217,13 +224,13 @@ export function assembleSunAndEclipses(ctx) {
       sunDistanceKm: currentAUDistance,
       earthFlatteningInverse: C.physicalConstants.earthFlatteningInverseWGS84,
       ttBridgeSeconds: F.DT_ANCHOR.deltaTStartSeconds,
+      // the IAU J2000 sidereal time — the GMST's one measured anchor; the polynomial's rate and T²
+      // (gmstMeanSiderealRateDegPerDay, gmstMeanSiderealT2Deg) are the gate's referee inputs now
       gmstMeanSiderealT0Deg: C.physicalConstants.gmstMeanSiderealT0Deg,
-      gmstMeanSiderealRateDegPerDay: C.physicalConstants.gmstMeanSiderealRateDegPerDay,
-      gmstMeanSiderealT2Deg: C.physicalConstants.gmstMeanSiderealT2Deg,
       speedOfLightKmS: C.physicalConstants.speedOfLight,
     },
   });
 
-  return { besselian, eclipseFinders, eclipseFormula, sunPlanetaryCompletionDeg };
+  return { besselian, eclipseFinders, eclipseFormula, sunPlanetaryCompletionDeg, engineYearFromJDUT };
 }
 /** @typedef {import('./sun-mean-longitude.js').Ctx & ReturnType<typeof assembleSunAndEclipses>} Ctx */

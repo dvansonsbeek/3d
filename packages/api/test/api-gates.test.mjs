@@ -227,7 +227,7 @@ for (const url of SAMPLE_REQUESTS) {
   {
     const m2000 = dataOf('/v1/moon?year=2000').years[0];
     const f = m2000.eclipseFormula;
-    const jdUT2000 = /** @type {number} */ (apiModel.time.yearToJDUT(2000));
+    const jdUT2000 = /** @type {number} */ (apiModel.time.positionYearToJDUT(2000));
     const finderNext = apiModel.eclipse.findLunarInRange(jdUT2000, jdUT2000 + 400).find((e) => e.jd >= jdUT2000);
     if (!f || f.regime !== 'certified' || !f.nextLunar || !finderNext || Math.abs(f.nextLunar.jdUT - finderNext.jd) * 86400 > 2 || f.nextLunar.type !== finderNext.type) {
       failures.push(`moon eclipseFormula@2000 next lunar must be the finder's event: ${JSON.stringify(f && f.nextLunar)} vs ${JSON.stringify(finderNext)}`);
@@ -516,10 +516,8 @@ for (const url of SAMPLE_REQUESTS) {
       const year = apiModel.time.yearFromJD(jb);
       const eps = apiModel.earth.sceneObliquityDeg(year) * D2R;   // the ONE tilt the tier's ground mapping reads (≡ the hybrid here)
       const lam = apiModel.eclipse.sunLonDegAtJD(jb) * D2R;
-      const K2 = DEFAULT_CONSTANTS.physicalConstants;
-      const T = (jdUT - 2451545.0) / 36525;
-      const gmst = ((K2.gmstMeanSiderealT0Deg + K2.gmstMeanSiderealRateDegPerDay * (jdUT - 2451545.0)
-        + K2.gmstMeanSiderealT2Deg * T * T) % 360 + 360) % 360;
+      // the ONE GMST (doc 111 §1.51) — this check carried its own copy of the retired IAU 1982 polynomial
+      const gmst = apiModel.eclipse.gmstDegAtJD(jdUT);
       const ra = Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam)) / D2R;
       return { ssLat: Math.asin(Math.sin(lam) * Math.sin(eps)) / D2R, ssLon: ((ra - gmst + 540) % 360) - 180 };
     };

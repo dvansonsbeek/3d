@@ -13,7 +13,7 @@ export function assembleSurface(ctx) {
     MASS_RATIO_EARTH_MOON, M_SUN, PLANET_KEYS, PUBLISHED_PLANET_RECORDS, anomalisticYearDays, ascendingNodeDeg,
     besselian, cardinalCrossingJdUT, cardinalCrossingNearJdUT, cardinalTargetDeg, certifiedAxialPrecessionJ2000Years,
     chain, dayLengthSeconds, deepCalendar, deepLod, deltaTSeconds, earthMoiFactorAtAge, earthPerihelionDeg, eccentricityAt,
-    eclipseFinders, eclipseFormula, evalClimateL1, frameworkDeltaTSecondsAtJD, inclinationDeg, j2000JD, jdFromYear, jdTTFromUT,
+    eclipseFinders, eclipseFormula, engineYearFromJDUT, evalClimateL1, frameworkDeltaTSecondsAtJD, inclinationDeg, j2000JD, jdFromYear, jdTTFromUT,
     julianCenturyDays, lodRealSeconds, meanLengthOfDay, meanSiderealYearDays, moonDistanceCorrected, moonDistanceKm,
     moonDistanceKmAtYearOrNaN, moonOrbitalShift, moonSeries, moonSiderealMonth, moonSiderealMonthDaysAt,
     moonSynodicMonthDays, moonAxialTilt, oneSourceM, recordLunarCumulativeBank, recordSunCumulativeBank, lunarSeatStatus, sunSeatStatus, planetAscNodeDeg, planetEccentricity, planetInclinationDeg, planetPerihelionDeg,
@@ -27,13 +27,27 @@ export function assembleSurface(ctx) {
       yearFromJD,
       jdFromYear,
       siTropicalYearDays,
-      // PLAN 27 (doc 111 §1.36) — the ONE deep clock: a position (tropical years of date from
-      // the scene epoch, year = startmodelYear + pos) ↔ its UT Julian Day (solar days of date,
-      // the day the UT clock counts) and ↔ its TT instant (SI days); the navigable range is the
-      // solar-day table's finite extent. The two scene twins' position tables read THESE.
+      /** THE ENGINE YEAR of a UT JD — the TT Julian year of the instant (jdUT + ΔT/86400, Julian years from J2000):
+       *  the one axis every of-date read takes (doc 111 §1.31; the besselian's and the GMST's own). NOT the position
+       *  year below — 0.055 % apart, 25 kyr at 400 Ma, 2.4 Myr at the edge (§1.38, §1.51). @param {number} jdUT @returns {number} */
+      engineYearFromJDUT,
+      // PLAN 27 (doc 111 §1.36) — the ONE deep clock: a POSITION (tropical years of date from
+      // the scene epoch, year = startmodelYear + pos — the scene's position axis, NOT the engine year)
+      // ↔ its UT Julian Day (solar days of date, the day the UT clock counts) and ↔ its TT instant
+      // (SI days); the navigable range is the solar-day table's finite extent. The two scene twins'
+      // position tables read THESE. Named for their axis since v27.19 (§1.51: the eclipse formula had
+      // read `jdTTToYear` as the engine year); the four former names stay as deprecated aliases.
+      positionYearToJDUT: deepCalendar.yearToJDUT,
+      jdUTToPositionYear: deepCalendar.jdUTToYear,
+      positionYearToJDTT: deepCalendar.yearToJDTT,
+      jdTTToPositionYear: deepCalendar.jdTTToYear,
+      /** @deprecated the position-COUNT year, not the engine year — use jdUTToPositionYear (or engineYearFromJDUT for the instant's year) */
       yearToJDUT: deepCalendar.yearToJDUT,
+      /** @deprecated see positionYearToJDUT */
       jdUTToYear: deepCalendar.jdUTToYear,
+      /** @deprecated see positionYearToJDTT */
       yearToJDTT: deepCalendar.yearToJDTT,
+      /** @deprecated see jdTTToPositionYear */
       jdTTToYear: deepCalendar.jdTTToYear,
       navigableYearRange: deepCalendar.navigableYearRange,
     }),

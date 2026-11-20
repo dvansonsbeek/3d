@@ -661,6 +661,23 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   precision. A referee's rows have ONE home too: the Genesis panel's own
   copy drew the error for a day after the gate's rows were corrected (grep
   for the literal, §1.18) — the panel twin is pinned by `test:literals`. (§1.50)
+- **The sidereal angle is the hour angle of the clock's own mean Sun** — the
+  tier's GMST was the IAU 1982 polynomial (T₀ + rate·d + 1.39656″·T² on a
+  J2000-frozen rate: 270° mod 360 at −1 Myr, the last polynomial in deep
+  time); it is Newcomb's definition on the model's own Sun table now,
+  T₀ + 360°·d + [L(t) − L₀] at the engine year of the UT instant, because the
+  UT axis counts solar days of date (the mean Sun on the meridian at UT
+  noon at every age), its rate the published sidereal day of date. The
+  frame referee is Guinot's NON-ROTATING ORIGIN transported on the model's
+  frames of date (0.1″ of the IAU 2006 polynomial over the audit window,
+  nothing fitted) — never ζ_A + z_A, whose T³ is the CIO locator. The era
+  moves by a named CONVENTION gap (the mean Sun at the TT instant vs the
+  IAU's UT1 argument, L̇·ΔT, plus 0.3″·T²: 25 s at −135, 2.4 min at −3000),
+  below the ΔT record's resolution; gate `gmst-of-date.js`. **A year accessor
+  carries its axis in its name**: the surface's `jdUTToYear` was the
+  position-COUNT year, and the eclipse formula had read it as the engine
+  year (25 kyr off at 400 Ma) — `time.engineYearFromJDUT` is the instant's
+  year, `jdUTToPositionYear` the position's. (§1.51)
 
 ---
 
@@ -757,8 +774,12 @@ model reproduces a spread of nodes bit-exactly and a model loaded with the
 table reads the same drawn obliquity as one without; its check mode re-reads
 the spread, §1.44). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (16 generators, 10 gates — the
-newest gate, `star-catalogue.js`, reads the sky of date's inputs and the astropy
+test:verify:list` the full classification (16 generators, 11 gates — the
+newest gate, `gmst-of-date.js`, reads the sidereal angle of date against its
+three referees: the non-rotating origin on the model's frames vs IAU 2006, the
+shipped angle vs the retired 1982 polynomial within its stated convention gap,
+the rate vs the published sidereal day of date to the edge, §1.51;
+`star-catalogue.js` reads the sky of date's inputs and the astropy
 referee record against the catalogue, §1.48; `eclipse-formula.js` reads the
 eclipse formula of date against the finders, today's recurrences and the
 amplitudes of date, §1.46; `deep-clock-axes.js` reads the deep clock against

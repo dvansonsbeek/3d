@@ -56,8 +56,8 @@ async function main() {
   console.log('  age (yr, + = past)   UT day / LOD − 1   tol      count year / tropical year − 1   tol');
   for (const a of ages) {
     const y = 2000.5 - a, edge = a === edgeAge;
-    const tt = [y - H_YEARS, y, y + H_YEARS].map((q) => m.time.yearToJDTT(q));
-    const ut = [y - H_YEARS, y + H_YEARS].map((q) => m.time.yearToJDUT(q));
+    const tt = [y - H_YEARS, y, y + H_YEARS].map((q) => m.time.positionYearToJDTT(q));
+    const ut = [y - H_YEARS, y + H_YEARS].map((q) => m.time.positionYearToJDUT(q));
     if (tt.some((v) => v === null) || ut.some((v) => v === null)) { failures.push(`${a}: the clock is undefined at this position`); continue; }
     const E = 2000 + (/** @type {number} */ (tt[1]) - J2000_JD) / 365.25;   // the engine year of the instant
     const lod = m.epoch.lodRealSecondsAtYear(E), tropDays = m.epoch.tropicalYearSecondsAtYear(E) / 86400;

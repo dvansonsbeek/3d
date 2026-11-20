@@ -139,12 +139,12 @@ async function main() {
   console.log('(2) the four deep positions — the finder scanning with the month of date');
   const rng = m.time.navigableYearRange();
   const edgeYear = 2000.5 + (rng.yearMin - 2000.5) + 10000;   // 10 kyr inside the genesis edge, on the position axis
-  const edgeJdTT = m.time.yearToJDTT(edgeYear);
+  const edgeJdTT = m.time.positionYearToJDTT(edgeYear);
   /** @type {Array<[string, number]>} */
   const deep = [['−1 Myr', J2000_JD + (-1e6 - 2000) * Y], ['−400 Myr', J2000_JD + (-400e6 - 2000) * Y], ['−2 Gyr', J2000_JD + (-2000e6 - 2000) * Y]];
   if (edgeJdTT !== null) deep.push(['the edge + 10 kyr', edgeJdTT]);
   /** TT → UT through the model's ONE bridge (the position axis in between): never the UT reader on a TT value. @param {number} jdTT */
-  const jdUTOfTT = (jdTT) => { const y = m.time.jdTTToYear(jdTT); const u = y === null ? null : m.time.yearToJDUT(y); return u === null ? jdTT - m.eclipse.deltaTSecondsAtJD(jdTT) / 86400 : u; };
+  const jdUTOfTT = (jdTT) => { const y = m.time.jdTTToPositionYear(jdTT); const u = y === null ? null : m.time.positionYearToJDUT(y); return u === null ? jdTT - m.eclipse.deltaTSecondsAtJD(jdTT) / 86400 : u; };
   for (const [label, jdTT] of deep) {
     const jdUT = jdUTOfTT(jdTT);
     const P = F.periodsAt(jdTT), S = F.statisticsAt(jdTT);

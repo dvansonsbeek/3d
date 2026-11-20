@@ -4,9 +4,21 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
         yearFromJD: (jd: number) => number;
         jdFromYear: (year: number) => number;
         siTropicalYearDays: number;
+        /** THE ENGINE YEAR of a UT JD — the TT Julian year of the instant (jdUT + ΔT/86400, Julian years from J2000):
+         *  the one axis every of-date read takes (doc 111 §1.31; the besselian's and the GMST's own). NOT the position
+         *  year below — 0.055 % apart, 25 kyr at 400 Ma, 2.4 Myr at the edge (§1.38, §1.51). @param {number} jdUT @returns {number} */
+        engineYearFromJDUT: (jdUT: number) => number;
+        positionYearToJDUT: (year: number) => (number | null);
+        jdUTToPositionYear: (jdUT: number) => (number | null);
+        positionYearToJDTT: (year: number) => (number | null);
+        jdTTToPositionYear: (jd: number) => (number | null);
+        /** @deprecated the position-COUNT year, not the engine year — use jdUTToPositionYear (or engineYearFromJDUT for the instant's year) */
         yearToJDUT: (year: number) => (number | null);
+        /** @deprecated see positionYearToJDUT */
         jdUTToYear: (jdUT: number) => (number | null);
+        /** @deprecated see positionYearToJDTT */
         yearToJDTT: (year: number) => (number | null);
+        /** @deprecated see jdTTToPositionYear */
         jdTTToYear: (jd: number) => (number | null);
         navigableYearRange: () => {
             yearMin: number;

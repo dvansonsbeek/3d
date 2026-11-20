@@ -18,6 +18,11 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         yearFromJD: (jd: number) => number;
         jdFromYear: (year: number) => number;
         siTropicalYearDays: number;
+        engineYearFromJDUT: (jdUT: number) => number;
+        positionYearToJDUT: (year: number) => (number | null);
+        jdUTToPositionYear: (jdUT: number) => (number | null);
+        positionYearToJDTT: (year: number) => (number | null);
+        jdTTToPositionYear: (jd: number) => (number | null);
         yearToJDUT: (year: number) => (number | null);
         jdUTToYear: (jdUT: number) => (number | null);
         yearToJDTT: (year: number) => (number | null);

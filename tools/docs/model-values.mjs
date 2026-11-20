@@ -2917,9 +2917,9 @@ export const VALUES = {
     const rawMoonKm = (tMa) => dtl().meanMoonDistanceAtAge(tMa);
     const genesisMa = () => astro.knownValues.moonGenesisAgeGa * 1000;
     /** The eclipse formula's statistics at J2000 on the seated package model (memoised). @returns {any} */
-    const eclipseStatsJ2000 = (() => { /** @type {any} */ let s; return () => { if (!s) { const m = physModel(); s = m.eclipse.formula.statisticsAt(/** @type {number} */ (m.time.yearToJDTT(2000))); if (!s) throw new Error('eclipse statistics at J2000: null'); } return s; }; })();
+    const eclipseStatsJ2000 = (() => { /** @type {any} */ let s; return () => { if (!s) { const m = physModel(); s = m.eclipse.formula.statisticsAt(/** @type {number} */ (m.time.positionYearToJDTT(2000))); if (!s) throw new Error('eclipse statistics at J2000: null'); } return s; }; })();
     /** The node family's recurrence the formula names Saros today (ONE home: TODAYS_RECURRENCE_NAMES). @returns {any} */
-    const eclipseSaros = (() => { /** @type {any} */ let r; return () => { if (!r) { const m = physModel(); const rec = m.eclipse.formula.recurrencesAt(/** @type {number} */ (m.time.yearToJDTT(2000))); r = rec && rec.node.find((/** @type {any} */ x) => /saros/i.test(String(x.name || ''))); if (!r) throw new Error('the Saros is not among the node recurrences at J2000'); } return r; }; })();
+    const eclipseSaros = (() => { /** @type {any} */ let r; return () => { if (!r) { const m = physModel(); const rec = m.eclipse.formula.recurrencesAt(/** @type {number} */ (m.time.positionYearToJDTT(2000))); r = rec && rec.node.find((/** @type {any} */ x) => /saros/i.test(String(x.name || ''))); if (!r) throw new Error('the Saros is not among the node recurrences at J2000'); } return r; }; })();
     /** The early recession scenario on tools/lib's readers (the Node gates' instrument; the browser builds the same on the chain's). @returns {any} */
     const earlyRecession = (() => { /** @type {any} */ let er; return () => { if (!er) { const d = dtl(), P = d.EPOCH_PARAMS; const { createEarlyRecession } = require(join(ROOT, 'packages', 'physics', 'src', 'moon', 'early-recession.cjs')); er = createEarlyRecession({ constants: { earthRadiusMetres: P.earthRadiusM, gmEarthMoonM3S2: P.gmEarthMoonM3S2, moonMassKg: P.moonMassKg, earthMassKg: P.earthMassKg, totalAngularMomentumKgM2S: P.totalAngularMomentumKgM2S, earthMomentOfInertiaKgM2: d.iEarthAtAge(0), moonEccentricityFactor: P.moonEccentricityFactor }, fns: { moonDistanceMetresAtAge: d.meanMoonDistanceMetresAtAge, earthMomentOfInertiaKgM2AtAge: d.iEarthAtAge } }); } return er; }; })();
     const lockLodSeconds = () => {
@@ -2934,7 +2934,7 @@ export const VALUES = {
       return () => {
         if (ev) return ev;
         const m = physModel();
-        const jdEdge = m.time.yearToJDUT(m.time.navigableYearRange().yearMin);
+        const jdEdge = m.time.positionYearToJDUT(m.time.navigableYearRange().yearMin);
         const found = m.eclipse.firstSolarEclipseAfterJD(jdEdge, { maxDays: 2000 });
         if (!found) throw new Error('genesisFirstSolarEclipse: no solar eclipse within 2,000 days of the navigable edge');
         ev = { ...found, jdEdge, kind: found.ground ? (found.umbraKm < 0 ? 'total' : 'annular') : 'partial' };
@@ -3069,10 +3069,10 @@ export const VALUES = {
       // tropical years of date), and in solar days (the UT clock's turns of the Earth). The fourth key
       // is what a 365.25-day calendar would print for that day count — a day count in disguise, 53 %
       // over the TT age, written here once so no surface derives it as an age.
-      genesisEdgeAgeTTGyr: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.yearToJDTT(m.time.navigableYearRange().yearMin)) / 365.25 / 1e9; }, render: (v) => Number(v).toFixed(3), unit: 'Gyr (TT, Julian years)', note: 'the past edge of the navigable domain before the scene epoch, in uniform time' },
+      genesisEdgeAgeTTGyr: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.positionYearToJDTT(m.time.navigableYearRange().yearMin)) / 365.25 / 1e9; }, render: (v) => Number(v).toFixed(3), unit: 'Gyr (TT, Julian years)', note: 'the past edge of the navigable domain before the scene epoch, in uniform time' },
       genesisEdgeOrbitsG: { get: () => (C.startmodelYear - physModel().time.navigableYearRange().yearMin) / 1e9, render: (v) => Number(v).toFixed(3), unit: 'billion orbits (tropical years of date)', note: 'the position count: one per circuit of the Sun — 0.06 % more than the Julian years, the last years before the genesis being 328 SI days long' },
-      genesisEdgeSolarDaysT: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.yearToJDUT(m.time.navigableYearRange().yearMin)) / 1e12; }, render: (v) => Number(v).toFixed(3), unit: 'trillion solar days', note: 'the UT clock: turns of the Earth since the edge (the day was 5.5 h there)' },
-      genesisEdgeUtCalendarYearsG: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.yearToJDUT(m.time.navigableYearRange().yearMin)) / 365.25 / 1e9; }, render: (v) => Number(v).toFixed(2), unit: 'billion "years" of 365.25 days', note: 'the day count divided by today\'s days per year — NOT an age: a civil calendar on the UT count prints this, 53 % over the TT age' },
+      genesisEdgeSolarDaysT: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.positionYearToJDUT(m.time.navigableYearRange().yearMin)) / 1e12; }, render: (v) => Number(v).toFixed(3), unit: 'trillion solar days', note: 'the UT clock: turns of the Earth since the edge (the day was 5.5 h there)' },
+      genesisEdgeUtCalendarYearsG: { get: () => { const m = physModel(); return (C.startmodelJD - m.time.positionYearToJDUT(m.time.navigableYearRange().yearMin)) / 365.25 / 1e9; }, render: (v) => Number(v).toFixed(2), unit: 'billion "years" of 365.25 days', note: 'the day count divided by today\'s days per year — NOT an age: a civil calendar on the UT count prints this, 53 % over the TT age' },
       solarMassLossFracPerYr: { get: () => P().solarMassLossFracPerYear, render: (v) => fmtSci(v, 1), unit: '/yr' },
       solarSystemShrinkDevonianPpm: { get: () => P().solarMassLossFracPerYear * 380e6 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },
       solarSystemShrinkHadeanPpm: { get: () => P().solarMassLossFracPerYear * astro.knownValues.patternEarthAgeGyr * 1e9 * 1e6, render: (v) => String(Math.round(v)), unit: 'ppm' },

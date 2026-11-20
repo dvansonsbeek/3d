@@ -278,7 +278,6 @@ function recurrencesOfDate(P, opts) {
  * @property {() => number} getSunDistanceKm - live (epoch-mutable), the finders' own
  * @property {(jdTT: number) => (PeriodsOfDate & { moonDistanceKm: number, inclinationDeg: number, laplaceTiltDeg: number }) | null} periodsOfDateAt - the chain's periods of date, the mean Moon distance, the orbit's inclination to the ecliptic of date and the Laplace plane's tilt from the ecliptic (the regime's marker); null beyond the histories
  * @property {() => {min: number, max: number}} jdTTDomain - the navigable domain's TT edges (the Newton seed is clamped inside it)
- * @property {(jdTT: number) => number | null} [jdTTToYear] - the engine year of a TT instant, the deep calendar's exact inverse of its TT table (phase/deep-calendar); the linear Julian form stands in where absent or null
  * @property {EclipseConstants} constants
  * @property {{min: number, max: number}} [certifiedWindowYears] - the certified window in engine years (default: the canon's)
  */
@@ -333,13 +332,12 @@ function createEclipseFormula(deps) {
 
   /** @param {EclipseKind} kind @returns {number} the elongation at the syzygy, degrees */
   const offsetOf = (kind) => (kind === 'lunar' ? 180 : 0);
-  /** The engine year of a TT instant (Julian years from J2000 — doc 111 §1.31's one axis): the deep
-   *  calendar's exact inverse of its TT table where a caller passes it (ONE home, phase/deep-calendar
-   *  jdTTToYear), the linear Julian form where it is absent or answers null. @param {number} jdTT */
-  const engineYearOf = (jdTT) => {
-    const y = deps.jdTTToYear ? deps.jdTTToYear(jdTT) : null;
-    return y !== null && y !== undefined && Number.isFinite(y) ? y : 2000 + (jdTT - K.j2000JD) / (K.julianCenturyDays / 100);
-  };
+  /** The engine year of a TT instant — the TT Julian year from J2000 (doc 111 §1.31's one axis), the
+   *  linear form by definition. Until v27.19 this read the deep calendar's `jdTTToYear`, which is the
+   *  position-COUNT year (tropical years of date — the scene's position axis), 0.055 % from the TT year:
+   *  25 kyr at 400 Ma, 2.6 Myr at the genesis — the of-date amplitudes, regime tags and shadow radii
+   *  were read on the wrong axis while the finders read the right one (doc 111 §1.51). @param {number} jdTT */
+  const engineYearOf = (jdTT) => 2000 + (jdTT - K.j2000JD) / (K.julianCenturyDays / 100);
   /** @param {number} jdUT */
   const jdTTFromUT = (jdUT) => jdUT + deps.deltaTSecondsAt(jdUT) / SECONDS_PER_DAY;
   /** @param {number} jdTT @returns {'certified' | 'reproducible'} */

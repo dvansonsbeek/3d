@@ -144,5 +144,6 @@ export function assembleSunAndEclipses(ctx: import("./sun-mean-longitude.js").Ct
         };
     };
     sunPlanetaryCompletionDeg: (T: number) => number;
+    engineYearFromJDUT: (jdUT: number) => number;
 };
 export type Ctx = import("./sun-mean-longitude.js").Ctx & ReturnType<typeof assembleSunAndEclipses>;
