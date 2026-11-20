@@ -16,7 +16,7 @@ export function assembleSurface(ctx) {
     eclipseFinders, eclipseFormula, evalClimateL1, frameworkDeltaTSecondsAtJD, inclinationDeg, j2000JD, jdFromYear, jdTTFromUT,
     julianCenturyDays, lodRealSeconds, meanLengthOfDay, meanSiderealYearDays, moonDistanceCorrected, moonDistanceKm,
     moonDistanceKmAtYearOrNaN, moonOrbitalShift, moonSeries, moonSiderealMonth, moonSiderealMonthDaysAt,
-    moonSynodicMonthDays, oneSourceM, recordLunarCumulativeBank, recordSunCumulativeBank, lunarSeatStatus, sunSeatStatus, planetAscNodeDeg, planetEccentricity, planetInclinationDeg, planetPerihelionDeg,
+    moonSynodicMonthDays, moonAxialTilt, oneSourceM, recordLunarCumulativeBank, recordSunCumulativeBank, lunarSeatStatus, sunSeatStatus, planetAscNodeDeg, planetEccentricity, planetInclinationDeg, planetPerihelionDeg,
     planetSpin, publishedAxialPrecessionYearsAtYear, publishedTropicalYearSecondsAtYear, s3ArcsecPerYr,
     siTropicalYearDays, siderealDaySeconds, siderealYearDays, spinAxisInertialRateMeanArcsecPerYr, stellarDaySeconds,
     sunApparentLonDegAtJdUT, sunEccentricityAt, sunL0Deg, sunMeanLongitudeDegAt, sunPerihelionDegAt,
@@ -300,6 +300,29 @@ export function assembleSurface(ctx) {
       distanceKmAtYear: /** @param {number} year @returns {number} */ (year) => moonDistanceKmAtYearOrNaN(year),
       siderealMonthDaysAtYear: moonSiderealMonthDaysAt,
       synodicMonthDays: moonSynodicMonthDays,
+      // PLAN 31 B — the Moon's axial tilt OF DATE: the Cassini state on the regime of date (ONE home
+      // moon/cassini-state; the browser poses the Moon's axis from the same). The obliquity to the orbit
+      // normal (signed: negative = today's state 2, positive = state 1 early), the tilt to the Laplace
+      // pole, the occupied state, and the band of the figure's two readings × the inclination's two
+      // exponents; null beyond the cited history. A labelled band, never a dated event.
+      axialTiltAtYear: /** @param {number} year */ (year) => {
+        const tMa = yearToTMa(year);
+        const s = moonAxialTilt.stateAtAge(tMa);
+        if (s === null) return null;
+        const b = moonAxialTilt.bandAtAge(tMa);
+        return {
+          obliquityToOrbitDeg: s.obliquityToOrbitDeg, obliquityToLaplacePoleDeg: s.obliquityToLaplacePoleDeg, state: s.state,
+          moonDistanceRE: s.aOverEarthRadii,
+          band: { minDeg: b.minObliquityToOrbitDeg, maxDeg: b.maxObliquityToOrbitDeg },
+        };
+      },
+      /** The Cassini transition (state 1 vanishing) on the shipped reading and the band's spread — a band, never a date. */
+      axialTiltTransition: () => {
+        const cs = moonAxialTilt, F = cs.figure;
+        const shipped = cs.transition();
+        const all = [shipped, cs.transition({ kappaBand: true }), cs.transition({ hydrostaticRadiusRe: F.hydrostaticRadiusBandEarthRadii }), cs.transition({ kappaBand: true, hydrostaticRadiusRe: F.hydrostaticRadiusBandEarthRadii })].flatMap((t) => (t ? [t] : []));
+        return shipped === null ? null : { ageMa: shipped.ageMa, moonDistanceRE: shipped.aOverEarthRadii, lastState1Deg: shipped.lastState1Deg, state2Deg: shipped.state2Deg, bandAgeMa: { earliest: Math.max(...all.map((t) => t.ageMa)), latest: Math.min(...all.map((t) => t.ageMa)) } };
+      },
       // The perigee/node eccentricity sensitivities (plan 23): the Meeus-effective
       // pair the record fixes and the PHYSICAL pair the runtime derives from it
       // (moon/ecc-sensitivities.cjs, the ONE home) — the registry's source.

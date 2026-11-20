@@ -196,6 +196,26 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         distanceKmAtYear: (year: number) => number;
         siderealMonthDaysAtYear: (year: number) => number;
         synodicMonthDays: number;
+        axialTiltAtYear: (year: number) => {
+            obliquityToOrbitDeg: number;
+            obliquityToLaplacePoleDeg: number;
+            state: number;
+            moonDistanceRE: number;
+            band: {
+                minDeg: number | null;
+                maxDeg: number | null;
+            };
+        } | null;
+        axialTiltTransition: () => {
+            ageMa: number;
+            moonDistanceRE: number;
+            lastState1Deg: number;
+            state2Deg: number;
+            bandAgeMa: {
+                earliest: number;
+                latest: number;
+            };
+        } | null;
         eccSensitivities: Readonly<{
             perigeeEffective: number;
             nodeEffective: number;

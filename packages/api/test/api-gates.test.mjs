@@ -235,10 +235,20 @@ for (const url of SAMPLE_REQUESTS) {
     const nodePairs = f && f.recurrences ? f.recurrences.node.slice(0, 3).map((/** @type {any} */ r) => `${r.synodicMonths}/${r.cycles}`) : null;
     if (JSON.stringify(nodePairs) !== JSON.stringify(['88/95.5', '135/146.5', '223/242'])) failures.push(`moon eclipseFormula@2000 node recurrences: ${JSON.stringify(nodePairs)}`);
     if (!f || !f.nextSolar || !f.statistics || !(f.statistics.seasonsPerYear > 1.9 && f.statistics.seasonsPerYear < 2.3)) failures.push(`moon eclipseFormula@2000 solar/statistics: ${JSON.stringify(f && { solar: f.nextSolar && f.nextSolar.type, seasons: f.statistics && f.statistics.seasonsPerYear })}`);
-    const fDev = dataOf('/v1/moon?year=-379998000').years[0].eclipseFormula;
+    const rowDev = dataOf('/v1/moon?year=-379998000').years[0];
+    const fDev = rowDev.eclipseFormula;
     if (!fDev || fDev.regime !== 'reproducible' || !fDev.nextLunar || !fDev.nextSolar || !fDev.statistics || !Number.isFinite(fDev.statistics.seasonsPerYear)) {
       failures.push(`moon eclipseFormula@Devonian: ${JSON.stringify(fDev && { regime: fDev.regime, lunar: !!fDev.nextLunar, solar: !!fDev.nextSolar, seasons: fDev.statistics && fDev.statistics.seasonsPerYear })}`);
     }
+    // PLAN 31 B (the plan-34 cascade): the Moon's axial tilt of date rides /moon — today's state 2 at the measured
+    // composition (6.70° to the orbit, the band's edges on it), state 2 at the Devonian and at the API's deepest
+    // validated year (−498 Myr) with a band that widens into the past; the state-1 edge is beyond the API's
+    // validity span and is the epoch gate's and the registry's row (doc 111 §1.49)
+    const t2000 = m2000.axialTiltOfDate, tDev = rowDev.axialTiltOfDate;
+    const tDeep = dataOf('/v1/moon?year=-498000000').years[0].axialTiltOfDate;
+    if (!t2000 || t2000.state !== 2 || Math.abs(Math.abs(t2000.obliquityToOrbitDeg) - 6.6997) > 1e-3 || !t2000.band || t2000.band.maxDeg < 6.69 || t2000.band.minDeg > 6.71) failures.push(`moon axialTiltOfDate@2000: ${JSON.stringify(t2000)}`);
+    if (!tDev || tDev.state !== 2 || Math.abs(tDev.obliquityToOrbitDeg) < 6.5 || Math.abs(tDev.obliquityToOrbitDeg) > 8.5) failures.push(`moon axialTiltOfDate@Devonian: ${JSON.stringify(tDev)}`);
+    if (!tDeep || tDeep.state !== 2 || Math.abs(tDeep.obliquityToOrbitDeg) < 6.6 || Math.abs(tDeep.obliquityToOrbitDeg) > 9 || !(tDeep.band.maxDeg - tDeep.band.minDeg > t2000.band.maxDeg - t2000.band.minDeg)) failures.push(`moon axialTiltOfDate@-498 Myr: ${JSON.stringify(tDeep)}`);
   }
   if (!merc.accuracy || !merc.accuracy.statement) failures.push('bodies/mercury: missing accuracy statement');
   // JD input equivalence: same instant via jd= and via year= must agree.

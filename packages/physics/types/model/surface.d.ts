@@ -251,6 +251,27 @@ export function assembleSurface(ctx: import("./cardinal-instants.js").Ctx): Read
         distanceKmAtYear: (year: number) => number;
         siderealMonthDaysAtYear: (year: number) => number;
         synodicMonthDays: number;
+        axialTiltAtYear: (year: number) => {
+            obliquityToOrbitDeg: number;
+            obliquityToLaplacePoleDeg: number;
+            state: number;
+            moonDistanceRE: number;
+            band: {
+                minDeg: number | null;
+                maxDeg: number | null;
+            };
+        } | null;
+        /** The Cassini transition (state 1 vanishing) on the shipped reading and the band's spread — a band, never a date. */
+        axialTiltTransition: () => {
+            ageMa: number;
+            moonDistanceRE: number;
+            lastState1Deg: number;
+            state2Deg: number;
+            bandAgeMa: {
+                earliest: number;
+                latest: number;
+            };
+        } | null;
         eccSensitivities: Readonly<{
             perigeeEffective: number;
             nodeEffective: number;

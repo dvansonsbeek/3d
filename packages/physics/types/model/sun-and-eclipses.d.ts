@@ -1,5 +1,5 @@
-/** @param {import('./lunar-theory.js').Ctx} ctx @returns the bindings the later slices read */
-export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
+/** @param {import('./sun-mean-longitude.js').Ctx} ctx @returns the bindings the later slices read */
+export function assembleSunAndEclipses(ctx: import("./sun-mean-longitude.js").Ctx): {
     besselian: {
         umbraGroundAt: (jdUT: number) => {
             latDeg: number;
@@ -143,48 +143,6 @@ export function assembleSunAndEclipses(ctx: import("./lunar-theory.js").Ctx): {
             max: number;
         };
     };
-    sunL0Deg: any;
-    sunMeanLongitudeDegAt: ((year: number) => number) & {
-        recordSunCumulativeBank: (limitYears: number | {
-            past: number;
-            future: number;
-        }) => {
-            fwd: number[];
-            bwd: number[];
-        };
-        sunSeatStatus: () => {
-            fwd: {
-                banked: number;
-                edge: number;
-                bankEdge: number | null;
-            };
-            bwd: {
-                banked: number;
-                edge: number;
-                bankEdge: number | null;
-            };
-        };
-    };
     sunPlanetaryCompletionDeg: (T: number) => number;
-    sunTropicalRateDegPerCy: number;
-    recordSunCumulativeBank: (limitYears: number | {
-        past: number;
-        future: number;
-    }) => {
-        fwd: number[];
-        bwd: number[];
-    };
-    sunSeatStatus: () => {
-        fwd: {
-            banked: number;
-            edge: number;
-            bankEdge: number | null;
-        };
-        bwd: {
-            banked: number;
-            edge: number;
-            bankEdge: number | null;
-        };
-    };
 };
-export type Ctx = import("./lunar-theory.js").Ctx & ReturnType<typeof assembleSunAndEclipses>;
+export type Ctx = import("./sun-mean-longitude.js").Ctx & ReturnType<typeof assembleSunAndEclipses>;

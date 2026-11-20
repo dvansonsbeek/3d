@@ -189,5 +189,83 @@ export function assembleLunarTheory(ctx: import("./time-axis.js").Ctx): {
             };
         }[];
     };
+    moonAxialTilt: {
+        stateAtAge: (tMa: number, reading?: CassiniReading) => {
+            ageMa: number;
+            aOverEarthRadii: number;
+            state: number;
+            thetaDeg: number;
+            inclinationDeg: number;
+            obliquityToOrbitEqDeg: number;
+            obliquityToOrbitDeg: number;
+            obliquityToLaplacePoleDeg: number;
+            anchorScale: number;
+            transition: {
+                aOverEarthRadii: number;
+                ageMa: number;
+                lastState1Deg: number;
+                state2Deg: number;
+            } | null;
+            nodePeriodYears: number;
+        } | null;
+        bandAtAge: (tMa: number) => {
+            shipped: {
+                ageMa: number;
+                aOverEarthRadii: number;
+                state: number;
+                thetaDeg: number;
+                inclinationDeg: number;
+                obliquityToOrbitEqDeg: number;
+                obliquityToOrbitDeg: number;
+                obliquityToLaplacePoleDeg: number;
+                anchorScale: number;
+                transition: {
+                    aOverEarthRadii: number;
+                    ageMa: number;
+                    lastState1Deg: number;
+                    state2Deg: number;
+                } | null;
+                nodePeriodYears: number;
+            } | null;
+            readings: {
+                name: string;
+                state: {
+                    ageMa: number;
+                    aOverEarthRadii: number;
+                    state: number;
+                    thetaDeg: number;
+                    inclinationDeg: number;
+                    obliquityToOrbitEqDeg: number;
+                    obliquityToOrbitDeg: number;
+                    obliquityToLaplacePoleDeg: number;
+                    anchorScale: number;
+                    transition: {
+                        aOverEarthRadii: number;
+                        ageMa: number;
+                        lastState1Deg: number;
+                        state2Deg: number;
+                    } | null;
+                    nodePeriodYears: number;
+                } | null;
+            }[];
+            minObliquityToOrbitDeg: number | null;
+            maxObliquityToOrbitDeg: number | null;
+        };
+        transition: (reading?: CassiniReading) => {
+            aOverEarthRadii: number;
+            ageMa: number;
+            lastState1Deg: number;
+            state2Deg: number;
+        } | null;
+        rawAtAge: (tMa: number, reading?: CassiniReading) => CassiniRaw | null;
+        figure: Readonly<{
+            cMinusAOverC: 0.00063;
+            bMinusAOverC: 0.000228;
+            hydrostaticRadiusEarthRadii: 15;
+            hydrostaticRadiusBandEarthRadii: 21;
+            sources: "Peale 1969 (AJ 74, 483); Ward 1975 (Science 189, 377); Yoder 1995; Williams et al. 2001, 2014; Ćuk, Hamilton & Stewart 2021 (PSJ 2, 221)";
+        }>;
+        edgeMa: number;
+    };
 };
 export type Ctx = import("./time-axis.js").Ctx & ReturnType<typeof assembleLunarTheory>;

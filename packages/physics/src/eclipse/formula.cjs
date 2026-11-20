@@ -40,6 +40,8 @@
 
 'use strict';
 
+const { SECONDS_PER_DAY } = require('../constants/units.cjs');
+
 /** Danjon's rule — the Earth's radius enlarged by 1/85 (an opaque atmospheric layer of ~75 km),
  *  the convention of the NASA Five Millennium Canon the lunar finder is gated on. Chauvenet's 1/50
  *  (Meeus Ch. 54's ×1.02 on the radii) shipped until the plan-32 follow-up (doc 111 §1.41 b). */
@@ -51,18 +53,26 @@ const DANJON_EARTH_RADIUS_FACTOR = 1 + 1 / 85;
  *  model's, reproducible, not certified. */
 const CANON_WINDOW_YEARS = Object.freeze({ min: -1999, max: 3000 });
 
+/** The recurrence search's defaults — the tolerances that select today's named cycles (the saros
+ *  family under the node's 1°, the anomaly's 3.5°, the year's 1°; the search to 1,200 synodic months,
+ *  six kept per family). ONE home: the API's note and the browser's hovers read these, never a copy. */
+const RECURRENCE_DEFAULTS = Object.freeze({ maxSynodicMonths: 1200, keep: 6, nodeTolDeg: 1.0, anomalyTolDeg: 3.5, yearTolDeg: 1.0 });
+
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
 
 /**
- * @typedef {{ rEarthMetres: number, moonDiameterKm: number, sunDiameterKm: number, j2000JD: number, julianCenturyDays: number }} EclipseConstants
+ * @typedef {{ rEarthMetres: number, moonDiameterKm: number, sunDiameterKm: number }} ShadowConstants
+ *   the bodies' sizes the shadow geometry needs (the finders pass these alone to the geometry helpers)
+ * @typedef {ShadowConstants & { j2000JD: number, julianCenturyDays: number, synodicMonthDaysJ2000: number }} EclipseConstants
+ *   synodicMonthDaysJ2000 the registry's synodic month (SI days) — the mean rate's fallback where the chain gives no period of date
  */
 
 /**
  * The lunar shadow's angular geometry at the Moon's distance — Danjon's enlarged umbra and
  * penumbra and the three class limits on the Moon's angular distance σ from the shadow axis.
  * The finders' `_shadowGeometry`, verbatim (bit-identical doubles).
- * @param {number} moonDistanceKm @param {number} sunDistanceKm @param {EclipseConstants} K
+ * @param {number} moonDistanceKm @param {number} sunDistanceKm @param {ShadowConstants} K
  * @returns {{moonR: number, umbraR: number, penumR: number, totalMax: number, partialMax: number, penumMax: number}} degrees
  */
 function lunarShadowGeometry(moonDistanceKm, sunDistanceKm, K) {
@@ -103,7 +113,7 @@ function lunarTypeAt(sigmaDeg, G) {
 /**
  * The solar geometry at conjunction (Meeus Ch. 54's geocentric form with the topocentric Moon):
  * the finders' `_solarGeometry`, verbatim.
- * @param {number} moonDistanceKm @param {number} sunDistanceKm @param {EclipseConstants} K
+ * @param {number} moonDistanceKm @param {number} sunDistanceKm @param {ShadowConstants} K
  * @returns {{moonAppR_geo: number, moonAppR_topo: number, parallax: number, sunAppR: number, partialLim: number, centralLim: number, isTotal: boolean}} degrees
  */
 function solarShadowGeometry(moonDistanceKm, sunDistanceKm, K) {
@@ -217,9 +227,9 @@ const TODAYS_RECURRENCE_NAMES = Object.freeze({
  * @returns {{node: Recurrence[], anomaly: Recurrence[], year: Recurrence[]}}
  */
 function recurrencesOfDate(P, opts) {
-  const maxN = (opts && opts.maxSynodicMonths) || 1200;
-  const keep = (opts && opts.keep) || 6;
-  const tol = { node: (opts && opts.nodeTolDeg) || 1.0, anomaly: (opts && opts.anomalyTolDeg) || 3.5, year: (opts && opts.yearTolDeg) || 1.0 };
+  const maxN = (opts && opts.maxSynodicMonths) || RECURRENCE_DEFAULTS.maxSynodicMonths;
+  const keep = (opts && opts.keep) || RECURRENCE_DEFAULTS.keep;
+  const tol = { node: (opts && opts.nodeTolDeg) || RECURRENCE_DEFAULTS.nodeTolDeg, anomaly: (opts && opts.anomalyTolDeg) || RECURRENCE_DEFAULTS.anomalyTolDeg, year: (opts && opts.yearTolDeg) || RECURRENCE_DEFAULTS.yearTolDeg };
   /** @type {Array<['node' | 'anomaly' | 'year', number, boolean]>} */
   const families = [['node', P.draconicDays, true], ['anomaly', P.anomalisticDays, false], ['year', P.tropicalYearDays, false]];
   /** @type {{node: Recurrence[], anomaly: Recurrence[], year: Recurrence[]}} */
@@ -268,6 +278,7 @@ function recurrencesOfDate(P, opts) {
  * @property {() => number} getSunDistanceKm - live (epoch-mutable), the finders' own
  * @property {(jdTT: number) => (PeriodsOfDate & { moonDistanceKm: number, inclinationDeg: number, laplaceTiltDeg: number }) | null} periodsOfDateAt - the chain's periods of date, the mean Moon distance, the orbit's inclination to the ecliptic of date and the Laplace plane's tilt from the ecliptic (the regime's marker); null beyond the histories
  * @property {() => {min: number, max: number}} jdTTDomain - the navigable domain's TT edges (the Newton seed is clamped inside it)
+ * @property {(jdTT: number) => number | null} [jdTTToYear] - the engine year of a TT instant, the deep calendar's exact inverse of its TT table (phase/deep-calendar); the linear Julian form stands in where absent or null
  * @property {EclipseConstants} constants
  * @property {{min: number, max: number}} [certifiedWindowYears] - the certified window in engine years (default: the canon's)
  */
@@ -303,14 +314,34 @@ function createEclipseFormula(deps) {
   const K = deps.constants;
   const R_EARTH_KM = K.rEarthMetres / 1000;
   const WINDOW = deps.certifiedWindowYears || CANON_WINDOW_YEARS;
-  const MIN_DAYS = 1 / 1440;
+  /** THE SOLVER'S TUNING in ONE block (the hardcoded-values review of plan 31's close-out) — every
+   *  value a measurement of doc 111 §1.46 (the clock's grain at depth, the series' noise floor, the
+   *  leash in the axis's unit); the values are the certified ones, unchanged. */
+  const SOLVER = Object.freeze({
+    minStencilDays: 1 / 1440,       // the rates' central-difference stencil: ±1 min in UT days, or stencilUlps of the Julian Day where the axis's grain is coarser
+    stencilUlps: 64,
+    meanTolFloorDeg: 1e-6,          // the mean syzygy's acceptance on the unwrapped count: this floor, or 16 ulp of the target (1e12° at 400 Ma, 5e14° at the genesis)
+    meanNewtonIterations: 24,
+    residualFloorDeg: 2e-7,         // the series' elongation noise floor — the ΔT bridge's Newton terminates at 1e-9 d, 1e-7° at 13 °/d; a secant below it reads a random slope
+    newtonIterations: 40,
+    bracketWidenings: 12,           // the bisection fallback at the clock's grain: widen the bracket this many times, then bisect
+    bisectionIterations: 80,
+    residualLimitDeg: 1e-4,         // a residual above it (0.5 s today) plus 32 ulp of elongation is a failed solve, never an answer
+    residualLimitUlps: 32,
+  });
+  const MIN_DAYS = SOLVER.minStencilDays;
 
   /** @param {EclipseKind} kind @returns {number} the elongation at the syzygy, degrees */
   const offsetOf = (kind) => (kind === 'lunar' ? 180 : 0);
-  /** The engine year of a TT instant (Julian years from J2000 — doc 111 §1.31's one axis). @param {number} jdTT */
-  const engineYearOf = (jdTT) => 2000 + (jdTT - K.j2000JD) / (K.julianCenturyDays / 100);
+  /** The engine year of a TT instant (Julian years from J2000 — doc 111 §1.31's one axis): the deep
+   *  calendar's exact inverse of its TT table where a caller passes it (ONE home, phase/deep-calendar
+   *  jdTTToYear), the linear Julian form where it is absent or answers null. @param {number} jdTT */
+  const engineYearOf = (jdTT) => {
+    const y = deps.jdTTToYear ? deps.jdTTToYear(jdTT) : null;
+    return y !== null && y !== undefined && Number.isFinite(y) ? y : 2000 + (jdTT - K.j2000JD) / (K.julianCenturyDays / 100);
+  };
   /** @param {number} jdUT */
-  const jdTTFromUT = (jdUT) => jdUT + deps.deltaTSecondsAt(jdUT) / 86400;
+  const jdTTFromUT = (jdUT) => jdUT + deps.deltaTSecondsAt(jdUT) / SECONDS_PER_DAY;
   /** @param {number} jdTT @returns {'certified' | 'reproducible'} */
   const regimeAtTT = (jdTT) => {
     const y = engineYearOf(jdTT);
@@ -348,15 +379,15 @@ function createEclipseFormula(deps) {
     // The unwrapped count's RESOLUTION: 1e12° at 400 Ma, 5e14° at the genesis (0.06° per ulp — a
     // few minutes of mean instant there). It is the SEED of the true solve, which runs on the
     // series' wrapped longitudes; the count itself (k) stays exact to 1e-4 at the edge.
-    const tol = Math.max(1e-6, 16 * Number.EPSILON * Math.abs(target));
+    const tol = Math.max(SOLVER.meanTolFloorDeg, 16 * Number.EPSILON * Math.abs(target));
     let m = meanD(Number.isFinite(jdTTSeed) ? /** @type {number} */ (jdTTSeed) : K.j2000JD);
     if (m === null) return null;
-    for (let it = 0; it < 24; it++) {
+    for (let it = 0; it < SOLVER.meanNewtonIterations; it++) {
       const diff = target - m.D;
       if (Math.abs(diff) <= tol) break;
       // the mean rate of date, 360° per synodic month (the count integrates the chain's own months)
       const P = deps.periodsOfDateAt(m.jd);
-      const rate = P ? 360 / P.synodicDays : 360 / 29.530588853;
+      const rate = P ? 360 / P.synodicDays : 360 / K.synodicMonthDaysJ2000;
       const next = meanD(m.jd + diff / rate);
       if (next === null) return null;
       if (next.jd === m.jd) return null;   // the clamp held the step at the domain's edge: the target lies beyond it
@@ -374,7 +405,7 @@ function createEclipseFormula(deps) {
    *  terminates at 1e-9 d (phase/deep-calendar), 1e-7° at 13 °/d — so a solve on it stops there
    *  (0.7 ms today, 0.02 ms at the genesis), never at the double's own floor: a secant whose two
    *  points both sit in the noise reads a random slope and leaves (measured: NaN after 40 steps). */
-  const RESIDUAL_FLOOR_DEG = 2e-7;
+  const RESIDUAL_FLOOR_DEG = SOLVER.residualFloorDeg;
 
   /**
    * The TRUE syzygy: the series' elongation brought to the offset by a fixed-slope Newton walk from
@@ -394,7 +425,7 @@ function createEclipseFormula(deps) {
     // genesis, where the Moon moves 397° per SI day and 91° per UT day). Measured over one degree of
     // mean elongation on the series instead, the slope read 68 for 397 at the genesis edge: a Julian
     // Day of 2.5e12 has a 47-s ulp and one degree is four of them (doc 111 §1.37's grain).
-    const slope = P ? (360 / P.synodicDays) * P.solarDayDays : 360 / 29.530588853;
+    const slope = P ? (360 / P.synodicDays) * P.solarDayDays : 360 / K.synodicMonthDaysJ2000;
     let x = mean.jdUT, f = elongationResidual(x, off);
     // The Julian Day's own GRAIN at depth: 1.5e-5 d at 400 Ma, 1.2e-4 d (10 s) at −2 Gyr, 5.5e-4 d
     // (47 s) at the genesis on the UT axis — the walk cannot settle below it, nor can the finders'
@@ -405,7 +436,7 @@ function createEclipseFormula(deps) {
     // walk past it has left its syzygy — the periodic correction there reaches 8° of the 91°-per-UT-day
     // elongation, a tenth of a UT day
     const leash = P ? P.synodicDays / P.solarDayDays / 2 : 15;
-    for (let it = 0; it < 40; it++) {
+    for (let it = 0; it < SOLVER.newtonIterations; it++) {
       const step = f / slope;
       x -= step;
       if (Math.abs(x - mean.jdUT) > leash) return null;
@@ -419,10 +450,10 @@ function createEclipseFormula(deps) {
       // crossing it lands on is the one the finders land on, within the jitter.
       let lo = x, hi = x, flo = f, fhi = f;
       const span = Math.max(4 * Math.abs(f) / slope, 4 * grainDays);
-      for (let it = 0; it < 12 && flo * fhi > 0; it++) { lo -= span; hi += span; flo = elongationResidual(lo, off); fhi = elongationResidual(hi, off); }
+      for (let it = 0; it < SOLVER.bracketWidenings && flo * fhi > 0; it++) { lo -= span; hi += span; flo = elongationResidual(lo, off); fhi = elongationResidual(hi, off); }
       if (flo * fhi > 0 || Math.abs(hi - mean.jdUT) > leash) return null;
       if (flo > 0) { [lo, hi] = [hi, lo]; }   // lo is the negative side
-      for (let it = 0; it < 80 && Math.abs(hi - lo) > grainDays; it++) {
+      for (let it = 0; it < SOLVER.bisectionIterations && Math.abs(hi - lo) > grainDays; it++) {
         const mid = 0.5 * (lo + hi), fm = elongationResidual(mid, off);
         if (fm < 0) lo = mid; else hi = mid;
       }
@@ -433,7 +464,7 @@ function createEclipseFormula(deps) {
     // 1e12-day numbers, cannot be evaluated below ~1e-3 d at the genesis edge, so the TT instant of
     // a UT instant jitters by a few TT ulps there — 0.4° of lunar longitude, ~3 min of syzygy (the
     // finders inherit the same jitter; the edge's eclipse instants are reproducible to it, not beyond).
-    if (!Number.isFinite(x) || Math.abs(f) > 1e-4 + 32 * slope * grainDays) return null;
+    if (!Number.isFinite(x) || Math.abs(f) > SOLVER.residualLimitDeg + SOLVER.residualLimitUlps * slope * grainDays) return null;
     return { k, jdMeanTT: mean.jdTT, jdMeanUT: mean.jdUT, jdTT: jdTTFromUT(x), jdUT: x };
   }
 
@@ -451,7 +482,7 @@ function createEclipseFormula(deps) {
     // the rates at the syzygy: central differences over ±1 min in UT days — or ±64 ulp of the Julian
     // Day where the axis's grain is coarser (47 s per ulp at the genesis: a 1-min stencil is one ulp,
     // and the bridge's jitter there is a few ulps of TT — the stencil must span many of them)
-    const H = Math.max(MIN_DAYS, 64 * Math.abs(t0) * Number.EPSILON);
+    const H = Math.max(MIN_DAYS, SOLVER.stencilUlps * Math.abs(t0) * Number.EPSILON);
     const lonDot = (elongationResidual(t0 + H, off) - elongationResidual(t0 - H, off)) / (2 * H);
     const beta0 = deps.moonBetaDegAt(t0);
     const betaDot = (deps.moonBetaDegAt(t0 + H) - deps.moonBetaDegAt(t0 - H)) / (2 * H);
@@ -487,7 +518,7 @@ function createEclipseFormula(deps) {
     const nodeDistanceDeg = Math.min(Ff, 180 - Ff);
     const base = {
       k, kind, jdSyzygyTT: s.jdTT, jdSyzygyUT: s.jdUT, jdTT, jdUT: jdG,
-      deltaTSeconds: (jdTT - jdG) * 86400,
+      deltaTSeconds: (jdTT - jdG) * SECONDS_PER_DAY,
       betaDeg, moonDistanceKm, sunDistanceKm,
       argsDeg: { D: args.D, M: args.M, Mp: args.Mp, F: args.F },
       nodeDistanceDeg,
@@ -630,5 +661,5 @@ function createEclipseFormula(deps) {
 module.exports = {
   createEclipseFormula, recurrencesOfDate,
   lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii, wrap180,
-  DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS, TODAYS_RECURRENCE_NAMES,
+  DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS, TODAYS_RECURRENCE_NAMES, RECURRENCE_DEFAULTS,
 };

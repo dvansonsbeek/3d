@@ -34,7 +34,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { ROOT, buildInputsBlock, modelSourceFiles } = require('../lib/artifact-inputs');
+const { ROOT, buildInputsBlock, modelSourceFilesExcluding } = require('../lib/artifact-inputs');
 
 const OUT = path.join(ROOT, 'data', 'lunar-cumulative-checkpoints.json');
 const WRITE = process.argv.includes('--write');
@@ -67,7 +67,12 @@ const INPUT_FILES = [
   'data/spin-axis-checkpoints.json',
   'public/input/astro-reference.json',
   'public/input/climate-formula-coefficients.json',
-  ...modelSourceFiles(),
+  // the model's slices MINUS the three whose outputs the bank never reads (plan 33's close-out rider,
+  // built in the plan-34 cascade): the eclipse tier, the cardinal instants and the published surface —
+  // the chain counts, the carriers, the channel prefixes and the Sun's mean-longitude table are all
+  // assembled before them (model.js's order; the Sun table is its own slice, sun-mean-longitude.js).
+  // The plain run below is the referee: the narrowed set must reproduce the recorded bank bit-exactly.
+  ...modelSourceFilesExcluding(['sun-and-eclipses.js', 'cardinal-instants.js', 'surface.js']),
 ];
 
 const same = (/** @type {number[]} */ a, /** @type {number[]} */ b) => a.length === b.length && a.every((v, i) => v === b[i]);

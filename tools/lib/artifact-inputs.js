@@ -51,4 +51,20 @@ function modelSourceFiles() {
   return ['packages/physics/src/model.js', ...slices.map((f) => `${dir}/${f}`)];
 }
 
-module.exports = { ROOT, hashFile, buildInputsBlock, modelSourceFiles };
+/**
+ * The model's source files MINUS the named slices — for a generator whose recorded tables never read
+ * them (the lunar cumulative bank: its chain counts, carriers, channel prefixes and the Sun's mean-
+ * longitude table are assembled before the eclipse tier, the cardinal instants and the published
+ * surface; plan 33's close-out rider, built in the plan-34 cascade). A slice that is NOT named stays
+ * an input by default, so a new slice is hashed until someone proves the generator never reads it; a
+ * named slice is refused if it does not exist (a renamed file would silently widen the set).
+ * @param {string[]} excludedSlices file names inside packages/physics/src/model/
+ * @returns {string[]} repo-relative paths
+ */
+function modelSourceFilesExcluding(excludedSlices) {
+  const dir = 'packages/physics/src/model';
+  for (const f of excludedSlices) if (!fs.existsSync(path.join(ROOT, dir, f))) throw new Error(`modelSourceFilesExcluding: ${dir}/${f} does not exist`);
+  return modelSourceFiles().filter((p) => !excludedSlices.some((f) => p === `${dir}/${f}`));
+}
+
+module.exports = { ROOT, hashFile, buildInputsBlock, modelSourceFiles, modelSourceFilesExcluding };

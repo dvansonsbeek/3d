@@ -40,6 +40,7 @@ import { assemblePlanetElementsOfDate } from './model/planet-elements-of-date.js
 import { assembleInvPlaneElements } from './model/inv-plane-elements.js';
 import { assembleTimeAxis } from './model/time-axis.js';
 import { assembleLunarTheory } from './model/lunar-theory.js';
+import { assembleSunMeanLongitude } from './model/sun-mean-longitude.js';
 import { assembleSunAndEclipses } from './model/sun-and-eclipses.js';
 import { assemblePublishedPeriods } from './model/published-periods.js';
 import { assembleCardinalInstants } from './model/cardinal-instants.js';
@@ -81,8 +82,11 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const c11 = Object.assign(c10, assembleInvPlaneElements(c10));
   const c12 = Object.assign(c11, assembleTimeAxis(c11));
   const c13 = Object.assign(c12, assembleLunarTheory(c12));
-  const c14 = Object.assign(c13, assembleSunAndEclipses(c13));
-  late.sunMeanLongitudeDegAt = c14.sunMeanLongitudeDegAt;
+  // the Sun's mean-longitude table is its own slice before the eclipse tier: the lunar bank hashes it
+  // and not the eclipse slice (tools/lib/artifact-inputs.js modelSourceFilesExcluding)
+  const c13b = Object.assign(c13, assembleSunMeanLongitude(c13));
+  late.sunMeanLongitudeDegAt = c13b.sunMeanLongitudeDegAt;
+  const c14 = Object.assign(c13b, assembleSunAndEclipses(c13b));
   const c15 = Object.assign(c14, assemblePublishedPeriods(c14));
   late.publishedAxialPrecessionYearsAtYear = c15.publishedAxialPrecessionYearsAtYear;
   late.publishedSiderealYearSecondsAtYear = c15.publishedSiderealYearSecondsAtYear;

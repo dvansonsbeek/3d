@@ -1,9 +1,18 @@
-export type EclipseConstants = {
+/**
+ * the bodies' sizes the shadow geometry needs (the finders pass these alone to the geometry helpers)
+ */
+export type ShadowConstants = {
     rEarthMetres: number;
     moonDiameterKm: number;
     sunDiameterKm: number;
+};
+/**
+ * synodicMonthDaysJ2000 the registry's synodic month (SI days) — the mean rate's fallback where the chain gives no period of date
+ */
+export type EclipseConstants = ShadowConstants & {
     j2000JD: number;
     julianCenturyDays: number;
+    synodicMonthDaysJ2000: number;
 };
 export type EclipseFormulaDeps = {
     /**
@@ -63,6 +72,10 @@ export type EclipseFormulaDeps = {
         min: number;
         max: number;
     };
+    /**
+     * - the engine year of a TT instant, the deep calendar's exact inverse of its TT table (phase/deep-calendar); the linear Julian form stands in where absent or null
+     */
+    jdTTToYear?: ((jdTT: number) => number | null) | undefined;
     constants: EclipseConstants;
     /**
      * - the certified window in engine years (default: the canon's)
@@ -182,6 +195,7 @@ export type Recurrence = {
  * @property {() => number} getSunDistanceKm - live (epoch-mutable), the finders' own
  * @property {(jdTT: number) => (PeriodsOfDate & { moonDistanceKm: number, inclinationDeg: number, laplaceTiltDeg: number }) | null} periodsOfDateAt - the chain's periods of date, the mean Moon distance, the orbit's inclination to the ecliptic of date and the Laplace plane's tilt from the ecliptic (the regime's marker); null beyond the histories
  * @property {() => {min: number, max: number}} jdTTDomain - the navigable domain's TT edges (the Newton seed is clamped inside it)
+ * @property {(jdTT: number) => number | null} [jdTTToYear] - the engine year of a TT instant, the deep calendar's exact inverse of its TT table (phase/deep-calendar); the linear Julian form stands in where absent or null
  * @property {EclipseConstants} constants
  * @property {{min: number, max: number}} [certifiedWindowYears] - the certified window in engine years (default: the canon's)
  */
@@ -324,16 +338,19 @@ export function recurrencesOfDate(P: PeriodsOfDate, opts?: {
     year: Recurrence[];
 };
 /**
- * @typedef {{ rEarthMetres: number, moonDiameterKm: number, sunDiameterKm: number, j2000JD: number, julianCenturyDays: number }} EclipseConstants
+ * @typedef {{ rEarthMetres: number, moonDiameterKm: number, sunDiameterKm: number }} ShadowConstants
+ *   the bodies' sizes the shadow geometry needs (the finders pass these alone to the geometry helpers)
+ * @typedef {ShadowConstants & { j2000JD: number, julianCenturyDays: number, synodicMonthDaysJ2000: number }} EclipseConstants
+ *   synodicMonthDaysJ2000 the registry's synodic month (SI days) — the mean rate's fallback where the chain gives no period of date
  */
 /**
  * The lunar shadow's angular geometry at the Moon's distance — Danjon's enlarged umbra and
  * penumbra and the three class limits on the Moon's angular distance σ from the shadow axis.
  * The finders' `_shadowGeometry`, verbatim (bit-identical doubles).
- * @param {number} moonDistanceKm @param {number} sunDistanceKm @param {EclipseConstants} K
+ * @param {number} moonDistanceKm @param {number} sunDistanceKm @param {ShadowConstants} K
  * @returns {{moonR: number, umbraR: number, penumR: number, totalMax: number, partialMax: number, penumMax: number}} degrees
  */
-export function lunarShadowGeometry(moonDistanceKm: number, sunDistanceKm: number, K: EclipseConstants): {
+export function lunarShadowGeometry(moonDistanceKm: number, sunDistanceKm: number, K: ShadowConstants): {
     moonR: number;
     umbraR: number;
     penumR: number;
@@ -354,10 +371,10 @@ export function lunarTypeAt(sigmaDeg: number, G: ReturnType<typeof lunarShadowGe
 /**
  * The solar geometry at conjunction (Meeus Ch. 54's geocentric form with the topocentric Moon):
  * the finders' `_solarGeometry`, verbatim.
- * @param {number} moonDistanceKm @param {number} sunDistanceKm @param {EclipseConstants} K
+ * @param {number} moonDistanceKm @param {number} sunDistanceKm @param {ShadowConstants} K
  * @returns {{moonAppR_geo: number, moonAppR_topo: number, parallax: number, sunAppR: number, partialLim: number, centralLim: number, isTotal: boolean}} degrees
  */
-export function solarShadowGeometry(moonDistanceKm: number, sunDistanceKm: number, K: EclipseConstants): {
+export function solarShadowGeometry(moonDistanceKm: number, sunDistanceKm: number, K: ShadowConstants): {
     moonAppR_geo: number;
     moonAppR_topo: number;
     parallax: number;
@@ -431,4 +448,14 @@ export const TODAYS_RECURRENCE_NAMES: Readonly<{
         '235/19': "Metonic";
         '940/76': "Callippic";
     }>;
+}>;
+/** The recurrence search's defaults — the tolerances that select today's named cycles (the saros
+ *  family under the node's 1°, the anomaly's 3.5°, the year's 1°; the search to 1,200 synodic months,
+ *  six kept per family). ONE home: the API's note and the browser's hovers read these, never a copy. */
+export const RECURRENCE_DEFAULTS: Readonly<{
+    maxSynodicMonths: 1200;
+    keep: 6;
+    nodeTolDeg: 1;
+    anomalyTolDeg: 3.5;
+    yearTolDeg: 1;
 }>;

@@ -14,7 +14,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { URL } from 'node:url';
-import { createModel, DEFAULT_CONSTANTS, FITTED_COEFFICIENTS, CANON_WINDOW_YEARS } from '../../physics/src/index.js';
+import { createModel, DEFAULT_CONSTANTS, FITTED_COEFFICIENTS, CANON_WINDOW_YEARS, RECURRENCE_DEFAULTS } from '../../physics/src/index.js';
 // Comparison curves from @essrt/reference (one-way: the api's
 // cross-validation endpoints COMPARE against them, nothing more;
 // migrated from @essrt/physics at its 4.0.0 major).
@@ -353,6 +353,9 @@ export function createApi() {
         year: y,
         distanceKm: model.moon.distanceKmAtYear(y),
         siderealMonthDays: model.moon.siderealMonthDaysAtYear(y),
+        // PLAN 31 B — the Moon's axial tilt of date: the Cassini state on the regime of date with its band
+        // and its occupied state (ONE home @essrt/physics moon/cassini-state); null beyond the cited history
+        axialTiltOfDate: model.moon.axialTiltAtYear(y),
         eclipseFormula: eclipseFormulaAtYear(y),
       }));
       return envelope({
@@ -360,7 +363,7 @@ export function createApi() {
         inputEcho: { path, ...t.echo },
         data: {
           years: rows,
-          note: 'eclipseFormula is the eclipse formula of date (the finders\' condition in closed form on the model\'s arguments of date; @essrt/physics eclipse/formula): nextLunar / nextSolar the first eclipse after the epoch\'s instant (jdUT on the UT axis, jdTT with the model deltaT, jdSyzygyUT the opposition/conjunction; gamma in Earth radii, signed for lunar; the lunar magnitudes, the solar Moon/Sun ratio), recurrences the primitive (months, cycles) pairs of date whose node / anomaly / Sun-longitude shift per cycle is within 1 / 3.5 / 1 degrees (today\'s names where the pair is today\'s — tritos, Saros, inex, Metonic), statistics the eclipses per year by class on the MEAN elements of date — a band, never a count of dated events (flagged approximate inside the Laplace-plane regime). regime: "certified" inside the NASA Five Millennium Canon span (' + CANON_WINDOW_YEARS.min + '..' + CANON_WINDOW_YEARS.max + '), where the formula is gated to minutes against dated records; "reproducible" beyond, where the Moon\'s phase in its orbit is the model\'s and the statistics are the prediction.',
+          note: 'eclipseFormula is the eclipse formula of date (the finders\' condition in closed form on the model\'s arguments of date; @essrt/physics eclipse/formula): nextLunar / nextSolar the first eclipse after the epoch\'s instant (jdUT on the UT axis, jdTT with the model deltaT, jdSyzygyUT the opposition/conjunction; gamma in Earth radii, signed for lunar; the lunar magnitudes, the solar Moon/Sun ratio), recurrences the primitive (months, cycles) pairs of date whose node / anomaly / Sun-longitude shift per cycle is within ' + RECURRENCE_DEFAULTS.nodeTolDeg + ' / ' + RECURRENCE_DEFAULTS.anomalyTolDeg + ' / ' + RECURRENCE_DEFAULTS.yearTolDeg + ' degrees, searched to ' + RECURRENCE_DEFAULTS.maxSynodicMonths + ' synodic months (today\'s names where the pair is today\'s — tritos, Saros, inex, Metonic), statistics the eclipses per year by class on the MEAN elements of date — a band, never a count of dated events (flagged approximate inside the Laplace-plane regime); axialTiltOfDate the Moon\'s Cassini state of date (the obliquity to its orbit normal, signed — negative today\'s state 2 —, the tilt to the Laplace pole, the occupied state, the band of the figure\'s and the inclination\'s readings; a labelled band, never a dated event). regime: "certified" inside the NASA Five Millennium Canon span (' + CANON_WINDOW_YEARS.min + '..' + CANON_WINDOW_YEARS.max + '), where the formula is gated to minutes against dated records; "reproducible" beyond, where the Moon\'s phase in its orbit is the model\'s and the statistics are the prediction.',
         },
       });
     }

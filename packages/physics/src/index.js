@@ -194,7 +194,7 @@ export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from
 // Phase 8.5 — eclipse geometry (single-copy: the browser had no Node twin).
 export { createEclipseFinders } from './eclipse/finders.cjs';
 // Plan 33 — the eclipse formula of date and the ONE home of the shadow geometry the finders classify with.
-export { createEclipseFormula, recurrencesOfDate, lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii, DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS } from './eclipse/formula.cjs';
+export { createEclipseFormula, recurrencesOfDate, lunarShadowGeometry, lunarTypeAt, solarShadowGeometry, solarTypeAt, axisDistanceDeg, gammaEarthRadii, DANJON_EARTH_RADIUS_FACTOR, CANON_WINDOW_YEARS, RECURRENCE_DEFAULTS, TODAYS_RECURRENCE_NAMES } from './eclipse/formula.cjs';
 // PLAN 28 §A — the Galactic frame at J2000 (ONE home): the Milky Way dome's frame, the catalogue stars' later
 export { GALACTIC_NORTH_POLE_J2000_DEG, GALACTIC_CENTRE_J2000_DEG, SUN_GALACTIC_ORBIT, equatorialUnitVector, galacticTriadEquatorialJ2000, equatorialToGalacticDeg, galacticTurnRadAtYear } from './sky/galactic-frame.cjs';
 // plan 28 §F2 — the constellations the ecliptic of date crosses (Roman 1987's B1875 box lookup on the IAU boundaries)

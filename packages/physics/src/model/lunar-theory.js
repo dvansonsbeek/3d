@@ -10,6 +10,7 @@ import { createDeepCalendar } from '../phase/deep-calendar.cjs';
 import { createMoonSeries } from '../moon/series.cjs';
 import { createLunarPlaneScales } from '../moon/plane-of-date.cjs';
 import { createSolarPerturbationScales } from '../moon/solar-perturbation-scales.cjs';
+import { createCassiniState } from '../moon/cassini-state.cjs';
 import { driver2PeriodSecondsAtAge } from '../planets/orbit-chain.cjs';
 
 /** @param {import('./time-axis.js').Ctx} ctx @returns the bindings the later slices read */
@@ -311,6 +312,19 @@ export function assembleLunarTheory(ctx) {
 
   /** THE SEAT DIAGNOSTIC (plan 25/26): every named lunar table's seat in this runtime. */
   const lunarSeatStatus = () => ({ chains: chainCycles.seatStatus(), carriers: moonArgs.carrierSeatStatus(), channel: deepEcc.seatStatus(channelExponents) });
-  return { deepCalendar, frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays, recordLunarCumulativeBank, lunarSeatStatus };
+  // PLAN 31 B (the plan-34 cascade's rider): the Moon's AXIAL TILT OF DATE — the Cassini state on the regime the
+  // chain carries (ONE home moon/cassini-state; the browser and the Node gates build the same on their readers),
+  // published through the surface (moon.axialTiltAtYear) and the API's /moon rows; the registry's Cassini keys.
+  const moonAxialTilt = createCassiniState({
+    constants: {
+      gmEarthMoonM3S2: EPOCH_PARAMS.gmEarthMoonM3S2, earthRadiusMetres: EPOCH_PARAMS.earthRadiusM,
+      moonInclinationJ2000Deg: C.moonReference.moonEclipticInclinationJ2000, moonObliquityEclipticJ2000Deg: C.moonReference.moonObliquityEclipticJ2000,
+    },
+    fns: {
+      moonDistanceMetresAtAge, lunarNodePeriodSecondsAtAge: chain.meanLunarNodePrecessionAtAge,
+      freeInclinationDegAtAge: chain.meanLunarFreeInclinationDegAtAge, freeInclinationBandDegAtAge: chain.meanLunarFreeInclinationBandDegAtAge,
+    },
+  });
+  return { deepCalendar, frameworkDeltaTSecondsAtJD, j2000JD, jdTTFromUT, julianCenturyDays, moonArgs, moonSeries, moonSynodicMonthDays, recordLunarCumulativeBank, lunarSeatStatus, moonAxialTilt };
 }
 /** @typedef {import('./time-axis.js').Ctx & ReturnType<typeof assembleLunarTheory>} Ctx */

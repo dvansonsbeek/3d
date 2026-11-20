@@ -16,8 +16,9 @@ const ORDER = [
   ['assembleYearDayLengths', 'year-day-lengths'], ['assembleOneSourceMovement', 'one-source-movement'], ['assembleMoonEpoch', 'moon-epoch'],
   ['assembleDeltaT', 'delta-t'], ['assemblePlanetRecords', 'planet-records'], ['assemblePlanetSpinChannel', 'planet-spin-channel'],
   ['assemblePlanetElementsOfDate', 'planet-elements-of-date'], ['assembleInvPlaneElements', 'inv-plane-elements'], ['assembleTimeAxis', 'time-axis'],
-  ['assembleLunarTheory', 'lunar-theory'], ['assembleSunAndEclipses', 'sun-and-eclipses'], ['assemblePublishedPeriods', 'published-periods'], ['assembleCardinalInstants', 'cardinal-instants'],
+  ['assembleLunarTheory', 'lunar-theory'], ['assembleSunMeanLongitude', 'sun-mean-longitude'], ['assembleSunAndEclipses', 'sun-and-eclipses'], ['assemblePublishedPeriods', 'published-periods'], ['assembleCardinalInstants', 'cardinal-instants'],
 ];
+// (the composer's order, model.js — the parity test carries the same list; a slice added there is added here)
 
 let _ctx = null;
 /** The composer's context after every slice — the shipped constants, the shipped fitted set, the banks seated. */
@@ -36,7 +37,7 @@ export async function composedContext() {
     c = Object.assign(c, slice(c));
     if (fn === 'assembleYearDayLengths') late.certifiedAxialPrecessionJ2000Years = c.certifiedAxialPrecessionJ2000Years;
     if (fn === 'assembleOneSourceMovement') { late.oneSourceM = c.oneSourceM; late.yearLengthsM = c.yearLengthsM; }
-    if (fn === 'assembleSunAndEclipses') late.sunMeanLongitudeDegAt = c.sunMeanLongitudeDegAt;
+    if (fn === 'assembleSunMeanLongitude') late.sunMeanLongitudeDegAt = c.sunMeanLongitudeDegAt;
     if (fn === 'assemblePublishedPeriods') { late.publishedAxialPrecessionYearsAtYear = c.publishedAxialPrecessionYearsAtYear; late.publishedSiderealYearSecondsAtYear = c.publishedSiderealYearSecondsAtYear; }
     if (fn === 'assembleCardinalInstants') late.sunAberrationArcsecAt = c.sunAberrationArcsecAt;
   }
