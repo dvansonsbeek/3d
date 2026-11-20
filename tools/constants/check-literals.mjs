@@ -499,10 +499,44 @@ for (const p of retiredHits) {
   console.log('    the file is a retired input (doc 109 §23); its quantities live in astro-reference.json, the fit artifacts under data/ and the physics package.');
 }
 
-const bad = divergent.length + missing.length + stillLiteral.length + masked.length + retiredHits.length;
+// ── the panel's twin of the paleo anchors (doc 111 §1.50) ────────────────────
+// The Earth–Moon Genesis Analysis panel overlays Wu et al. 2024's rows from its
+// own WU_ANCHORS table in script.js; the gate's rows live in
+// data/paleo-validation-anchors.json. Plan 34 corrected the gate's three Moon
+// rows (a ~5 R⊕ transcription error) and the panel's copy kept the old values
+// until the owner read them off the chart the next day — §1.18's class. Each
+// panel value is pinned to its row's midpoint, each sigma to the row's ±2σ
+// half-width (a scalar row carries Wu's own stated sigma, not checked here).
+// Fail-proven: ESSRT_LITERALS_PLANT=2 plants 1 R⊕ on the panel's 400 Ma Moon row.
+const wuRows = readData('paleo-validation-anchors.json').anchors.filter((a) => a.source === 'wu2024');
+const wuTable = SCRIPT.match(/const WU_ANCHORS = \[([\s\S]*?)\n\];/)?.[1] ?? '';
+const wuPanel = [...wuTable.matchAll(
+  /t_Ma:\s*(\d+),\s*lod_hr:\s*([\d.]+),\s*moon_er:\s*([\d.]+),[^\n]*?lod_sigma:\s*([\d.]+),\s*moon_sigma:\s*([\d.]+)/g,
+)].map((m) => ({ ageMa: +m[1], lod_hr: +m[2], moon_er: +m[3], lod_sigma: +m[4], moon_sigma: +m[5] }));
+const r3 = (x) => Math.round(x * 1000) / 1000;
+const wuMid = (a) => (a.observedRange ? r3((a.observedRange[0] + a.observedRange[1]) / 2) : a.observed);
+const wuHalf = (a) => (a.observedRange ? r3((a.observedRange[1] - a.observedRange[0]) / 2) : null);
+const wuHits = [];
+if (wuPanel.length !== 7) wuHits.push(`WU_ANCHORS parsed as ${wuPanel.length} rows, expected 7 (0–650 Ma)`);
+for (const [quantity, vKey, sKey] of [['lodHr', 'lod_hr', 'lod_sigma'], ['moonDistanceRE', 'moon_er', 'moon_sigma']]) {
+  for (const a of wuRows.filter((r) => r.quantity === quantity)) {
+    const p = wuPanel.find((r) => r.ageMa === a.ageMa);
+    if (!p) { wuHits.push(`${a.id}: no WU_ANCHORS row at ${a.ageMa} Ma`); continue; }
+    const v = p[vKey] + (process.env.ESSRT_LITERALS_PLANT === '2' && a.id === 'wu-moon-400' ? 1 : 0);
+    if (Math.abs(v - wuMid(a)) > 0.0051) wuHits.push(`${a.id}: WU_ANCHORS ${vKey} ${v} ≠ the row's midpoint ${wuMid(a)}`);
+    const h = wuHalf(a);
+    if (h !== null && Math.abs(p[sKey] - h) > 0.0051) wuHits.push(`${a.id}: WU_ANCHORS ${sKey} ${p[sKey]} ≠ the row's ±2σ half-width ${h}`);
+  }
+}
+for (const h of wuHits) {
+  console.log(`\n  PANEL TWIN DIVERGES  ${h}`);
+  console.log('    src/script.js WU_ANCHORS is the Genesis Analysis panel\'s copy of data/paleo-validation-anchors.json — set it to the row (doc 111 §1.50).');
+}
+
+const bad = divergent.length + missing.length + stillLiteral.length + masked.length + retiredHits.length + wuHits.length;
 console.log(`\n${'='.repeat(78)}`);
 if (bad) {
-  console.log(`FAIL — ${divergent.length} divergent, ${missing.length} missing, ${stillLiteral.length} falsely migrated, ${retiredHits.length} retired input(s) returned.`);
+  console.log(`FAIL — ${divergent.length} divergent, ${missing.length} missing, ${stillLiteral.length} falsely migrated, ${retiredHits.length} retired input(s) returned, ${wuHits.length} panel-twin row(s) diverging.`);
   process.exit(1);
 }
 console.log('PASS — every duplicated JSON value agrees with script.js.');

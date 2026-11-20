@@ -13826,15 +13826,21 @@ const ESSRT_RANGE_TABS = [
   { key: 'phanero', t_lo:  -650, t_hi:    0, label: 'Phanerozoic (650 Ma)' },
 ];
 
-// Wu et al. 2024 (sciadv.ado2412) cyclostratigraphy anchor points.
-// All values are paper midpoint estimates; rough ranges from Table 1 / Figures.
+// Wu et al. 2024 (sciadv.ado2412) cyclostratigraphy anchor points — the
+// Genesis Analysis panel's twin of the gate's rows in
+// data/paleo-validation-anchors.json (`wu-lod-*` / `wu-moon-*`): each value is
+// that row's midpoint, each sigma its ±2σ half-width (a scalar row carries Wu's
+// stated sigma), pinned by test:literals since this copy kept the Moon rows'
+// ~5 R⊕ transcription error after the gate's copy was corrected (doc 111
+// §1.50). The precession column is Wu's inferred precession constants (doc 99
+// §Physical axial precession at deep time), which have no gate row.
 const WU_ANCHORS = [
   { t_Ma: 0,   lod_hr: 24.00,  moon_er: 60.27, axial_arcsec_yr: 51.25, lod_sigma: 0,    moon_sigma: 0,    axial_sigma: 0 },
   { t_Ma: 100, lod_hr: 23.65,  moon_er: 59.50, axial_arcsec_yr: 53.0,  lod_sigma: 0.15, moon_sigma: 0.5,  axial_sigma: 1.0 },
   { t_Ma: 200, lod_hr: 23.70,  moon_er: 58.50, axial_arcsec_yr: 54.36, lod_sigma: 0.10, moon_sigma: 0.5,  axial_sigma: 1.0 },
-  { t_Ma: 300, lod_hr: 22.75,  moon_er: 54.00, axial_arcsec_yr: 59.5,  lod_sigma: 0.25, moon_sigma: 1.0,  axial_sigma: 0.5 },
-  { t_Ma: 400, lod_hr: 21.75,  moon_er: 52.50, axial_arcsec_yr: 61.5,  lod_sigma: 0.25, moon_sigma: 0.5,  axial_sigma: 0.5 },
-  { t_Ma: 500, lod_hr: 21.20,  moon_er: 53.50, axial_arcsec_yr: 64.5,  lod_sigma: 0.30, moon_sigma: 0.5,  axial_sigma: 0.5 },
+  { t_Ma: 300, lod_hr: 22.75,  moon_er: 58.60, axial_arcsec_yr: 59.5,  lod_sigma: 0.25, moon_sigma: 0.3,  axial_sigma: 0.5 },
+  { t_Ma: 400, lod_hr: 21.75,  moon_er: 57.70, axial_arcsec_yr: 61.5,  lod_sigma: 0.25, moon_sigma: 0.3,  axial_sigma: 0.5 },
+  { t_Ma: 500, lod_hr: 21.20,  moon_er: 57.50, axial_arcsec_yr: 64.5,  lod_sigma: 0.30, moon_sigma: 0.4,  axial_sigma: 0.5 },
   { t_Ma: 650, lod_hr: 20.94,  moon_er: 56.73, axial_arcsec_yr: 67.64, lod_sigma: 0.10, moon_sigma: 0.30, axial_sigma: 0.30 },
 ];
 
@@ -13851,7 +13857,7 @@ const ESSRT_QTY_SPECS = {
     hasWu:    true,
     wuKey:    'lod_hr',
     wuConvert:(v) => v,
-    footnote: 'Note: the small mid-Phanerozoic offset below the Wu et al. 2024 anchors (largest ~0.8 hr at 200 Ma) is the documented Pangea high-tidal-dissipation interval — Wu\'s key finding is that lunar recession ran non-uniformly (~7.0 cm/yr in the supercontinent era vs ~2.2 before it), which the calibrated smooth 0–1000 Ma branch deliberately averages over. The deviation is recorded and gated as documented bands (docs/99 §Pangea interval).',
+    footnote: 'Note: the derived day sits inside or within 0.3 hr of every Wu et al. 2024 anchor except 200 Ma, where it reads 0.8 hr short of their 23.7 hr — the one documented deviation, gated as a band (docs/99 §Pangea interval: the record and the cited Farhat 2022 history differ in the timing of the Pangea-era recession acceleration, not in a missing regime). The 650 Ma endpoint reads 2.9 % short of Wu\'s 20.94 hr, documented (plan 12 option A). Nothing is fitted to these anchors.',
   },
   year: {
     title:    'Length of Year (sidereal, days at epoch)',
@@ -13881,7 +13887,7 @@ const ESSRT_QTY_SPECS = {
     hasWu:    true,
     wuKey:    'lod_hr',
     wuConvert:(lod_hr) => _EPOCH_SEEDS_J2000.meansiderealyearlengthinSeconds / (lod_hr * 3600),   // the curve's year (sidereal), not the tropical
-    footnote: 'Note: the Wu et al. 2024 points here are derived from their LOD anchors, so the same documented Pangea-interval offset applies as on the Length-of-Day tab (docs/99 §Pangea interval).',
+    footnote: 'Note: the Wu et al. 2024 points here are derived from their LOD anchors, so the Length-of-Day tab\'s one documented deviation (200 Ma, 0.8 hr) carries over as ~13 days/yr (docs/99 §Pangea interval).',
   },
   axial: {
     title:    'Mean Lunisolar Precession Period T_p(t)',
@@ -13998,7 +14004,7 @@ const ESSRT_QTY_SPECS = {
     wuKey:    'moon_er',
     // ER → km: R_EARTH_M is metres; ER × R_EARTH_M = metres; ÷1000 = km
     wuConvert:(er) => (er * R_EARTH_M) / 1000,
-    footnote: 'Note: the 300–500 Ma Wu et al. 2024 distance anchors sit ~4–5 Earth radii below the curve — the documented Pangea high-tidal-dissipation interval. Wu\'s key finding is that recession ran non-uniformly (~7.0 cm/yr during supercontinent assembly, 325–200 Ma, vs ~2.2 cm/yr before it); the calibrated smooth 0–1000 Ma branch deliberately averages over this regime, and the deviation is recorded and gated as documented bands (docs/99 §Pangea interval). The endpoints agree: 650 Ma within 2%, J2000 exact.',
+    footnote: 'Note: the cited history sits inside every Wu et al. 2024 distance band at 300–500 Ma (their Fig. 2A, ±2σ) and at 100 Ma, 0.2 Earth radii above the band at 200 Ma; the 650 Ma endpoint reads 1.3 % short of their 56.73 Earth radii and J2000 is exact. What the record and the cited history disagree about is the timing of the Pangea-era acceleration — Wu\'s 7.0 cm/yr over 300–200 Ma against 2.2 before it — about 0.3 Earth radii over 250–325 Ma (docs/99 §Pangea interval). Nothing is fitted to these anchors.',
   },
 };
 

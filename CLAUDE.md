@@ -658,7 +658,9 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   the dossier from a typo: correct the referee's numbers, keep the
   predictions unmoved, say so; check conservation-tied rows against each
   other when entering them; a figure-read value names its reading
-  precision. (§1.50)
+  precision. A referee's rows have ONE home too: the Genesis panel's own
+  copy drew the error for a day after the gate's rows were corrected (grep
+  for the literal, §1.18) — the panel twin is pinned by `test:literals`. (§1.50)
 
 ---
 
