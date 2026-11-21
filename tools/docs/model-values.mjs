@@ -1479,7 +1479,6 @@ export const VALUES = {
         const WU_DAYS = { 100: 370.65, 200: 369.87, 300: 385.31, 400: 403.03, 500: 413.48, 650: 418.62 };
         const wuDelta = (t) => (dtl().meanYearInDaysAtAge(t) / WU_DAYS[t] - 1) * 100;
         const wuDeltas = () => Object.keys(WU_DAYS).map((t) => wuDelta(Number(t)));
-        const spell = { 100: 'OneZeroZero', 200: 'TwoZeroZero', 300: 'ThreeZeroZero', 400: 'FourZeroZero', 500: 'FiveZeroZero', 650: 'SixFiveZero' };
         const signedPct = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`;
         const signed2 = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`;
         const lineKyr = (label) => { const l = rd('data/l1-line-audit-results.json').metadata.lines.find((x) => x.label.replace(/\s+/g, '') === label); if (!l) throw new Error(`data/l1-line-audit-results.json has no line '${label}'`); return l.period_kyr; };
@@ -1495,7 +1494,8 @@ export const VALUES = {
         const ice = () => phys.DEFAULT_CONSTANTS.deepTime.iceInventory;
         const wuKeys = {};
         for (const t of Object.keys(WU_DAYS)) {
-          wuKeys[`daysPerYearWuDeltaAt${spell[t]}MaPct`] = { get: () => wuDelta(Number(t)), render: signedPct, unit: '%', note: `the model's day count at ${t} Ma against Wu et al. 2024's ${WU_DAYS[t]} d/yr (their TimeOptB inversion, cited)` };
+          // the registry's digit form (daysPerYearAt200Ma); the TeX generator spells the digits
+          wuKeys[`daysPerYearWuDeltaAt${t}MaPct`] = { get: () => wuDelta(Number(t)), render: signedPct, unit: '%', note: `the model's day count at ${t} Ma against Wu et al. 2024's ${WU_DAYS[t]} d/yr (their TimeOptB inversion, cited)` };
         }
         return {
           ...wuKeys,
@@ -1530,6 +1530,15 @@ export const VALUES = {
           dLodDtSecularMinLastDeglacialLabel: { get: () => eraLabel(scanMin(0, 0.03, (d) => d.net_L2).tMa), render: (v) => String(v), note: 'the epoch of that minimum' },
           dLodDtNetMinLastDeglacialMsCy: { get: () => scanMin(0, 0.03, (d) => d.net_L4).v, render: signed2, unit: 'ms/cy', note: 'the full Layer-4 rate\'s minimum over the last 30 kyr (the deepest negative excursion)' },
           dLodDtNetMinLastDeglacialLabel: { get: () => eraLabel(scanMin(0, 0.03, (d) => d.net_L4).tMa), render: (v) => String(v), note: 'the epoch of that minimum' },
+          ...(() => {
+            /** the sub-zero episodes of the full Layer-4 rate over the last 25 kyr, 100-yr scan: {fractionPct, first, last} */
+            const subZero = () => { let n = 0, tot = 0, first = null, last = null; for (let t = 0; t <= 0.025 + 1e-12; t += 1e-4) { tot++; if (dtl().dLodDtDecompositionAtAge(t).net_L4 < 0) { n++; if (first === null) first = t; last = t; } } return { fractionPct: 100 * n / tot, first, last }; };
+            return {
+              dLodDtNetSubZeroFractionLastGlacialPct: { get: () => subZero().fractionPct, render: (v) => String(Math.round(v)), unit: '%', note: 'the share of the last 25 kyr in which the full Layer-4 rate is negative (the day transiently shortening), 100-yr scan' },
+              dLodDtNetSubZeroYoungestLabel: { get: () => eraLabel(subZero().first), render: (v) => String(v), note: 'the youngest sub-zero epoch of the full rate in the last 25 kyr' },
+              dLodDtNetSubZeroOldestLabel: { get: () => eraLabel(subZero().last), render: (v) => String(v), note: 'the oldest sub-zero epoch of the full rate in the last 25 kyr' },
+            };
+          })(),
           bondIrdVariancePct: { get: () => rd('data/lod-climate-correlation-summary.json').bondIrdPearsonR ** 2 * 100, render: (v) => String(Math.round(v)), unit: '%', note: 'the Bond IRD correlation squared — the share of variance it accounts for (the recorded campaign\'s r)' },
           giaGreenlandSeaLevelM: { get: () => ice().greenlandSeaLevelM, render: (v) => String(v), unit: 'm', note: 'the cited ice inventory: Greenland\'s sea-level equivalent' },
           giaPresentIceSeaLevelM: { get: () => ice().presentIceSeaLevelM, render: (v) => String(v), unit: 'm', note: 'the cited ice inventory: all present ice' },
