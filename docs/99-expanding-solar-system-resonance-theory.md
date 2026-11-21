@@ -658,11 +658,15 @@ in for the solar tide by design, and this paragraph is where that is said.
 That campaign has since been priced against the deep record and closed
 (`tools/explore/solar-tide-paleo-test.mjs`, print-only): a solar tide OF DATE
 in the deep day length (the solar/lunar torque ratio r₀·(a/a₀)⁶, the past day
-shorter) puts 6 of the 29 day-length and day-count anchors outside their
-expectations at the pair's 5.6 % (the flagship Wells 380 row at +1.23 % against
-its 0.3–1.1 % band, Williams 620 at +8.1 %, Wu 650 at −3.7 %), 19 at today's
-dissipation budget's ~17 % and 22 at the 27 % La2004's spin history carries
-(doc 112 §8), where the lunar-only chain has none outside; the cited history's
+shorter) puts <!--v:solarTideAnchorsOutsideAtJ2000Pair-->6<!--/v--> of the
+<!--v:paleoDayAnchorsCount-->29<!--/v--> day-length and day-count anchors outside their
+expectations at the pair's <!--v:solarTideShareJ2000PairPct-->5.6<!--/v--> % (the flagship Wells 380 row at +1.23 % against
+its 0.3–1.1 % band, Williams 620 at +8.1 %, Wu 650 at −3.7 %), <!--v:solarTideAnchorsOutsideAtDissipation-->19<!--/v--> at today's
+dissipation budget's ~<!--v:solarTideShareDissipationPct-->17<!--/v--> % and <!--v:solarTideAnchorsOutsideAtLa2004-->22<!--/v--> at the <!--v:solarTideShareLa2004Pct-->27<!--/v--> % La2004's spin history carries
+(doc 112 §8), where the lunar-only chain has none outside — no anchor leaves its
+expectation below <!--v:netNonLunarBrakingBoundPct-->1.5<!--/v--> % of the lunar transfer (the Wells 405 Ma
+count, at ±0.5 %, is the binding row; the registry's `solarTide*` keys read ONE home,
+`tools/lib/solar-tide-paleo.js`); the cited history's
 own day-length column (Farhat et al. 2022, `astrogeo22` `columns.lodHours`)
 sits 0.05 h ABOVE the lunar-only day at 400 Ma and 0.14 h at 2.46 Ga, a longer
 past day, so that spin history carries no net solar braking either. The record

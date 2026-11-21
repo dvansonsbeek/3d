@@ -28,6 +28,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
+import { SOLAR_TIDE_SHARES, createSolarTidePaleoReader } from '../lib/solar-tide-paleo.js';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
@@ -1442,6 +1443,30 @@ export const VALUES = {
           ...keysFor('Nabonidus556', '-556 May 19 Total'),
           ...keysFor('Nineveh762', '-762 Jun 15 Total'),
           ...keysFor('Thales584', '-584 May 28 Total'),
+        };
+      })(),
+      // The record's bound on the net non-lunar tidal braking (doc 99 §"The J₂ → α conversion factor"; ONE home
+      // tools/lib/solar-tide-paleo.js, the explore script's reader too): the day-length and day-count anchors of
+      // data/paleo-validation-anchors.json re-read with a solar tide OF DATE in the deep LOD (the solar/lunar torque
+      // ratio r₀·(a/a₀)⁶, the past day shorter), through the gate's own expectation types. The deep LOD is the lunar
+      // angular-momentum transfer alone — a solar tide brakes the Earth without moving the Moon — and the record is
+      // what bounds the net non-lunar share. Computed LIVE on the seated model (the paleo-anchors gate's recipes).
+      ...(() => {
+        /** @type {ReturnType<typeof createSolarTidePaleoReader> | undefined} */ let r;
+        const reader = () => { if (!r) r = createSolarTidePaleoReader(physModel(), rd('data/paleo-validation-anchors.json')); return r; };
+        const pct = (v) => Number(v).toFixed(1);
+        return {
+          paleoDayAnchorsCount: { get: () => reader().anchorCount, render: (v) => String(v), note: 'the day-length (lodHr) and day-count (daysPerYear) anchors of data/paleo-validation-anchors.json — the rows the solar-tide reading re-reads' },
+          solarTideShareJ2000PairPct: { get: () => SOLAR_TIDE_SHARES.j2000Pair * 100, render: pct, unit: '%', note: 'the J2000 LOD budget\'s physical pair: the degree-2 identity\'s 1.5 plus a net solar tide of this share of the lunar transfer (doc 99 §"dLOD/dt decomposition at J2000")' },
+          solarTideShareDissipationPct: { get: () => SOLAR_TIDE_SHARES.dissipationBudget * 100, render: (v) => String(Math.round(v)), unit: '%', note: 'today\'s tidal dissipation budget: the solar constituents\' share of the braking torque (~0.5–0.6 TW of ~3.7 TW) — a stated order of magnitude' },
+          solarTideShareEqualLagsPct: { get: () => SOLAR_TIDE_SHARES.equalLags * 100, render: pct, unit: '%', note: 'the equal-lag solar/lunar tidal torque ratio (M_S/M_M)²·(a_M/a_S)⁶ on the DE440-class masses' },
+          solarTideShareLa2004Pct: { get: () => SOLAR_TIDE_SHARES.la2004Measured * 100, render: (v) => String(Math.round(v)), unit: '%', note: 'La2004\'s spin history as measured over the last 10 Myr — its precession-rate excess over the composed law regressed on the law\'s spin share (tools/explore/la2004-precession-attribution.mjs; doc 112 §8)' },
+          solarTideAnchorsOutsideShipped: { get: () => reader().readAt(0).filter((x) => !x.shipped.ok).length, render: (v) => String(v), note: 'the anchors outside their expectation on the shipped lunar-only chain (the paleo-anchors gate holds this at 0)' },
+          solarTideAnchorsOutsideAtJ2000Pair: { get: () => reader().outsideAt(SOLAR_TIDE_SHARES.j2000Pair), render: (v) => String(v), note: 'the anchors a solar tide of date at the J2000 pair\'s share would put outside their expectations' },
+          solarTideAnchorsOutsideAtDissipation: { get: () => reader().outsideAt(SOLAR_TIDE_SHARES.dissipationBudget), render: (v) => String(v), note: 'the anchors outside at the dissipation budget\'s share' },
+          solarTideAnchorsOutsideAtEqualLags: { get: () => reader().outsideAt(SOLAR_TIDE_SHARES.equalLags), render: (v) => String(v), note: 'the anchors outside at the equal-lag share' },
+          solarTideAnchorsOutsideAtLa2004: { get: () => reader().outsideAt(SOLAR_TIDE_SHARES.la2004Measured), render: (v) => String(v), note: 'the anchors outside at the share La2004\'s spin history carries' },
+          netNonLunarBrakingBoundPct: { get: () => reader().boundShare() * 100, render: pct, unit: '%', note: 'the largest solar-tide share (0.1 % steps) at which no anchor leaves its expectation — the record\'s bound on the net non-lunar tidal braking over the Phanerozoic, as a share of the lunar transfer; the Wells 405 Ma count (±0.5 %) is the binding row' },
         };
       })(),
       // NASA centerline instrument — DERIVED live from the generated
