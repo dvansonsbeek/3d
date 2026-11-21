@@ -380,6 +380,8 @@ function runAudit26() {
   const counts = { confirmed: 0, offPeak: 0, regional: 0, dtSignal: 0,
     dtAndOffPeak: 0, dtAndRegional: 0, dtAndGeo: 0, geographic: 0, noSite: 0 };
   let babylon = null;
+  /** @type {{label: string, site: string, verdict: string, gapAtDateKm: number|null, gapAtModelKm: number|null, bestGapKm: number, bestDeltaUT: string}[]} */
+  const presets = [];
 
   for (const preset of ECLIPSE_PRESETS) {
     let site = SITES.get(preset.jd);
@@ -434,6 +436,15 @@ function runAudit26() {
 
     console.log(`    ${preset.label.padEnd(22)} ${site.name.padEnd(26)} bestGap ${bestGap.toFixed(0).padStart(6)} km  bestDt ${fmtDt(bestDt * 24 * 60).padStart(6)}  ${verdict}`);
 
+    // the per-preset record (the paper's and the registry's per-event rows — formerly typed from the console):
+    // the umbra's distance from the site at the documented date, at the model's own instant, and the ±4h scan's best
+    presets.push({
+      label: preset.label, site: site.name, verdict,
+      gapAtDateKm: gap0 === null ? null : Math.round(gap0),
+      gapAtModelKm: gapMdl === null ? null : Math.round(gapMdl),
+      bestGapKm: Math.round(bestGap),
+      bestDeltaUT: fmtDt(bestDt * 24 * 60),
+    });
     if (preset.jd === BABYLON_JD) {
       babylon = {
         bestGapKm: Math.round(bestGap),
@@ -442,7 +453,7 @@ function runAudit26() {
       };
     }
   }
-  return { counts, babylon };
+  return { counts, babylon, presets };
 }
 
 console.log('\n  audit-26 (±4h scan at 30-s steps, ~25k umbra evaluations — 1-3 min)...');
@@ -501,6 +512,9 @@ const audit26Section = (audit26Diverged && !REBASELINE) ? prev.audit26 : {
   regional: a.regional,
   dtRegional: a.dtAndRegional,
   geographic: a.geographic,
+  // the per-preset rows (the paper's and the registry's per-event distances; the reproduction check is on the
+  // counts and the babylon135 section — a row's distance moves with the physics and re-records with --write)
+  presets: audit.presets,
 };
 const babylon135Section = (babylonDiverged && !REBASELINE) ? prev.babylon135 : {
   _description:
@@ -552,13 +566,11 @@ function sunGeomAt(jd, latDeg, lonDeg) {
   // U1: tier-side normalization (the api-gate convention) — the tier's own
   // sun, obliquity and GMST constants; metric NORMALIZATION only, not part
   // of the model chain.
-  const K2 = TIER.constants.physicalConstants;
   const jb = jd + TIER.eclipse.ttBridgeSeconds / 86400;   // the joint fit's anchor (plan 14: FIT.DT_ANCHOR)
   const year = TIER.time.yearFromJD(jb);
   const eps = TIER.earth.obliquityDeg(year) * D2R;
   const lam = TIER.eclipse.sunLonDegAtJD(jb) * D2R;
-  const T = (jd - 2451545.0) / 36525;
-  const gmst = TIER.eclipse.gmstDegAtJD(jd);   // the ONE GMST (bit-identical to the former inline copy)
+  const gmst = TIER.eclipse.gmstDegAtJD(jd);   // the ONE GMST (the mean Sun's since doc 111 §1.51; the polynomial's constants and T left with it)
   const ra = Math.atan2(Math.sin(lam) * Math.cos(eps), Math.cos(lam));
   const dec = Math.asin(Math.sin(lam) * Math.sin(eps));
   const H = ((gmst + lonDeg) * D2R) - ra;

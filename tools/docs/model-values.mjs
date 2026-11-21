@@ -1425,6 +1425,25 @@ export const VALUES = {
       babylon135BestDeltaUT: { get: () => b135.bestDeltaUT, render: (v) => String(v) },
       babylon135FrameworkUT: { get: () => b135.frameworkUT, render: (v) => String(v) },
       babylon135DocumentedUT: { get: () => b135.documentedUT, render: (v) => String(v) },
+      // The ancient first-hand rows of the 26-event audit, per preset — recorded by the generator since the paper
+      // had typed them from the console (the four read 9 / 104 / 174 / 211 km for a state the audit no longer
+      // reproduces). Each carries the ±4h scan's closest approach of the umbra to the site at the CONVENTIONAL
+      // documented date (bestGapKm, the verdict's own quantity, the babylon135 keys' twin), the distance at the
+      // documented instant itself (gapAtDateKm) and the scan's ΔUT.
+      ...(() => {
+        const row = (label) => { const p = (a26.presets || []).find((x) => x.label === label); if (!p) throw new Error(`eclipse-audit-summary.json audit26.presets has no row '${label}' — regenerate: node tools/verify/eclipse-audit.js --write`); return p; };
+        const keysFor = (name, label) => ({
+          [`solarAudit${name}BestGapKm`]: { get: () => row(label).bestGapKm, render: (v) => String(v), unit: 'km', note: `the ±4h scan's closest approach of the umbra to the site, ${label} at the conventional documented date — recorded by the audit` },
+          [`solarAudit${name}AtDateKm`]: { get: () => row(label).gapAtDateKm, render: (v) => String(v), unit: 'km', note: `the umbra's distance from the site at the documented instant itself, ${label}` },
+          [`solarAudit${name}BestDeltaUT`]: { get: () => row(label).bestDeltaUT, render: (v) => String(v), note: `the scan's ΔUT of the closest approach, ${label}` },
+        });
+        return {
+          ...keysFor('LuState708', '-708 Jul 17 Total'),
+          ...keysFor('Nabonidus556', '-556 May 19 Total'),
+          ...keysFor('Nineveh762', '-762 Jun 15 Total'),
+          ...keysFor('Thales584', '-584 May 28 Total'),
+        };
+      })(),
       // NASA centerline instrument — DERIVED live from the generated
       // eclipse-audit artifact's per-point shadow-plane residuals, so a
       // regenerated audit run moves these automatically (no hand-typed copy).

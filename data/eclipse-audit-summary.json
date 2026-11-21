@@ -23,7 +23,243 @@
     "offPeak": 14,
     "regional": 5,
     "dtRegional": 0,
-    "geographic": 5
+    "geographic": 5,
+    "presets": [
+      {
+        "label": "2026 Aug 12 Total",
+        "site": "Burgos–central path",
+        "verdict": "offPeak",
+        "gapAtDateKm": 2827,
+        "gapAtModelKm": 2811,
+        "bestGapKm": 33,
+        "bestDeltaUT": "+0h42"
+      },
+      {
+        "label": "2024 Apr 8 Total",
+        "site": "Dallas–central path",
+        "verdict": "offPeak",
+        "gapAtDateKm": 1104,
+        "gapAtModelKm": 1020,
+        "bestGapKm": 45,
+        "bestDeltaUT": "+0h25"
+      },
+      {
+        "label": "2017 Aug 21 Total",
+        "site": "Carbondale, IL",
+        "verdict": "confirmed",
+        "gapAtDateKm": 148,
+        "gapAtModelKm": 225,
+        "bestGapKm": 14,
+        "bestDeltaUT": "-0h04"
+      },
+      {
+        "label": "1999 Aug 11 Total",
+        "site": "Constanța, Romania",
+        "verdict": "offPeak",
+        "gapAtDateKm": 371,
+        "gapAtModelKm": 302,
+        "bestGapKm": 65,
+        "bestDeltaUT": "+0h09"
+      },
+      {
+        "label": "1973 Jun 30 Total",
+        "site": "Niger (Agadez)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 304,
+        "gapAtModelKm": 272,
+        "bestGapKm": 124,
+        "bestDeltaUT": "+0h07"
+      },
+      {
+        "label": "1919 May 29 Total",
+        "site": "Príncipe (Eddington)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 2685,
+        "gapAtModelKm": 2633,
+        "bestGapKm": 29,
+        "bestDeltaUT": "+1h07"
+      },
+      {
+        "label": "1715 May 3 Total",
+        "site": "London (Halley)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 1604,
+        "gapAtModelKm": 1507,
+        "bestGapKm": 86,
+        "bestDeltaUT": "-0h32"
+      },
+      {
+        "label": "1654 Aug 12 Total",
+        "site": "London (European total)",
+        "verdict": "regional",
+        "gapAtDateKm": 3196,
+        "gapAtModelKm": 3441,
+        "bestGapKm": 641,
+        "bestDeltaUT": "-1h02"
+      },
+      {
+        "label": "1239 Jun 3 Total",
+        "site": "Tuscany (Cerchiari)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 994,
+        "gapAtModelKm": 1142,
+        "bestGapKm": 12,
+        "bestDeltaUT": "+0h23"
+      },
+      {
+        "label": "1185 May 1 Total",
+        "site": "Russia (Igor’s Tale)",
+        "verdict": "regional",
+        "gapAtDateKm": 5044,
+        "gapAtModelKm": 5278,
+        "bestGapKm": 884,
+        "bestDeltaUT": "+1h14"
+      },
+      {
+        "label": "1133 Aug 2 Total",
+        "site": "England (Henry I)",
+        "verdict": "regional",
+        "gapAtDateKm": 1300,
+        "gapAtModelKm": 1558,
+        "bestGapKm": 310,
+        "bestDeltaUT": "-0h26"
+      },
+      {
+        "label": "1004 Jan 24 Hybrid",
+        "site": "Cairo record (Ibn Yunus)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 6631,
+        "gapAtModelKm": 6624,
+        "bestGapKm": 71,
+        "bestDeltaUT": "+1h43"
+      },
+      {
+        "label": "993 Aug 20 Total",
+        "site": "Cairo record (Ibn Yunus)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 3150,
+        "gapAtModelKm": 3164,
+        "bestGapKm": 243,
+        "bestDeltaUT": "-1h11"
+      },
+      {
+        "label": "985 Jul 20 Total",
+        "site": "Cairo record (Said)",
+        "verdict": "geographic",
+        "gapAtDateKm": 5511,
+        "gapAtModelKm": 5348,
+        "bestGapKm": 3289,
+        "bestDeltaUT": "+1h44"
+      },
+      {
+        "label": "979 May 28 Annular",
+        "site": "Cairo record (Said)",
+        "verdict": "geographic",
+        "gapAtDateKm": 7313,
+        "gapAtModelKm": 7503,
+        "bestGapKm": 2465,
+        "bestDeltaUT": "+1h21"
+      },
+      {
+        "label": "978 Jun 8 Annular",
+        "site": "Cairo record (Said)",
+        "verdict": "geographic",
+        "gapAtDateKm": 3867,
+        "gapAtModelKm": 3748,
+        "bestGapKm": 1777,
+        "bestDeltaUT": "+1h32"
+      },
+      {
+        "label": "977 Dec 13 Total",
+        "site": "Cairo record (Ibn Yunus)",
+        "verdict": "geographic",
+        "gapAtDateKm": 3702,
+        "gapAtModelKm": 3895,
+        "bestGapKm": 1575,
+        "bestDeltaUT": "-1h13"
+      },
+      {
+        "label": "71 Mar 20 Hybrid",
+        "site": "Aegean (Plutarch)",
+        "verdict": "confirmed",
+        "gapAtDateKm": 226,
+        "gapAtModelKm": 475,
+        "bestGapKm": 56,
+        "bestDeltaUT": "+0h05"
+      },
+      {
+        "label": "-135 Apr 15 Total",
+        "site": "Babylon",
+        "verdict": "offPeak",
+        "gapAtDateKm": 2458,
+        "gapAtModelKm": 2126,
+        "bestGapKm": 113,
+        "bestDeltaUT": "-0h50"
+      },
+      {
+        "label": "-309 Aug 15 Total",
+        "site": "Babylon (Antigonus)",
+        "verdict": "regional",
+        "gapAtDateKm": 2054,
+        "gapAtModelKm": 2011,
+        "bestGapKm": 807,
+        "bestDeltaUT": "-0h46"
+      },
+      {
+        "label": "-430 Aug 3 Annular",
+        "site": "Athens (Thucydides)",
+        "verdict": "regional",
+        "gapAtDateKm": 4167,
+        "gapAtModelKm": 3439,
+        "bestGapKm": 798,
+        "bestDeltaUT": "+1h05"
+      },
+      {
+        "label": "-556 May 19 Total",
+        "site": "Babylon (Nabonidus)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 6076,
+        "gapAtModelKm": 5721,
+        "bestGapKm": 154,
+        "bestDeltaUT": "+1h47"
+      },
+      {
+        "label": "-584 May 28 Total",
+        "site": "Anatolia (Thales/Halys)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 6537,
+        "gapAtModelKm": 6706,
+        "bestGapKm": 213,
+        "bestDeltaUT": "+1h31"
+      },
+      {
+        "label": "-647 Apr 6 Total",
+        "site": "Babylon (early diary)",
+        "verdict": "geographic",
+        "gapAtDateKm": 1615,
+        "gapAtModelKm": 1576,
+        "bestGapKm": 1567,
+        "bestDeltaUT": "+0h08"
+      },
+      {
+        "label": "-708 Jul 17 Total",
+        "site": "Lu State (Chinese)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 3216,
+        "gapAtModelKm": 2867,
+        "bestGapKm": 84,
+        "bestDeltaUT": "+1h06"
+      },
+      {
+        "label": "-762 Jun 15 Total",
+        "site": "Nineveh (Bur-Sagale)",
+        "verdict": "offPeak",
+        "gapAtDateKm": 929,
+        "gapAtModelKm": 1102,
+        "bestGapKm": 142,
+        "bestDeltaUT": "-0h23"
+      }
+    ]
   },
   "babylon135": {
     "_description": "-135 April 15 Babylonian solar eclipse case study (docs/103) — a geographic-boundary event: framework UT within 16 min of the documented UT (NOT a deltaT-signal event; the residual is umbra-centerline geography). GENERATED by tools/verify/eclipse-audit.js --write — the audit-26 scan row for the Babylon preset. Adopted via --rebaseline after the scene-umbra Node twin was proven metre-faithful at the Babylonian epochs (ancient fixture probes + the UT->TT convention fix): the previously recorded 1232 km / -1h45 was measured under the pre-IAU-2006-refit anchors and is superseded by the current joint-world values.",
@@ -467,7 +703,7 @@
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",
       "public/input/solar-eclipses-stephenson-2016.json": "sha256:5356d24641c27b456fb27ac2c3b6dfab1538dd9fa8e609d7abb5bb9132f18794",
       "tools/lib/scene-graph.js": "sha256:dc0c0bf08d384b2ddef4698fd9d7636a1628b62c14ce14c89d639172f1906730",
-      "tools/verify/eclipse-audit.js": "sha256:34fd76f494605b588a7cc7aff555e98e0c597dac1c2b7bc9bae36eba447a2b11"
+      "tools/verify/eclipse-audit.js": "sha256:ce897d559696d048f262507ce7c4192d3f778c8f80cf215e4a96ff0723c775db"
     }
   }
 }
