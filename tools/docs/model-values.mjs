@@ -1469,6 +1469,78 @@ export const VALUES = {
           netNonLunarBrakingBoundPct: { get: () => reader().boundShare() * 100, render: pct, unit: '%', note: 'the largest solar-tide share (0.1 % steps) at which no anchor leaves its expectation — the record\'s bound on the net non-lunar tidal braking over the Phanerozoic, as a share of the lunar transfer; the Wells 405 Ma count (±0.5 %) is the binding row' },
         };
       })(),
+      // ── the paper's typed model numbers, as keys (the paper review's pass 2) ──────────────────────────────
+      // Every number here had been typed into the paper from a console or an earlier state; each now reads the
+      // artifact or the model that produces it. The statistics of retired explore runs (the null tests, the
+      // bispectrum, the Tycho comparison) stay typed in the paper, named as the recorded run's.
+      ...(() => {
+        const PRb = () => { const b = Object.values(physModel()).find((o) => o && typeof o === 'object' && typeof o.torqueTermAtYear === 'function'); if (!b) throw new Error('the precession block was not found on the model surface'); return b; };
+        /** Wu et al. 2024 (sciadv.ado2412) day counts per year, their TimeOptB inversion at the century marks — citation values */
+        const WU_DAYS = { 100: 370.65, 200: 369.87, 300: 385.31, 400: 403.03, 500: 413.48, 650: 418.62 };
+        const wuDelta = (t) => (dtl().meanYearInDaysAtAge(t) / WU_DAYS[t] - 1) * 100;
+        const wuDeltas = () => Object.keys(WU_DAYS).map((t) => wuDelta(Number(t)));
+        const spell = { 100: 'OneZeroZero', 200: 'TwoZeroZero', 300: 'ThreeZeroZero', 400: 'FourZeroZero', 500: 'FiveZeroZero', 650: 'SixFiveZero' };
+        const signedPct = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`;
+        const signed2 = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`;
+        const lineKyr = (label) => { const l = rd('data/l1-line-audit-results.json').metadata.lines.find((x) => x.label.replace(/\s+/g, '') === label); if (!l) throw new Error(`data/l1-line-audit-results.json has no line '${label}'`); return l.period_kyr; };
+        const res = () => { const j = rd('data/core-mantle-resonator-stage1.json'); return j.variants[j.selected_variant]; };
+        const fit = () => rd('data/deltaT-4flag-fit.json');
+        const stagesRms = () => { const m = fit().fit_metrics; return { bond: m.stage_a_bond_solo.rms_post, bh: m.stage_b_bond_hallstatt_joint.rms_post, bhj5: m.stage_c_bond_hallstatt_jose5.rms_post, all: m.stage_d_bond_hallstatt_jose5_jose4.rms_post }; };
+        const planetAKm = (p) => Math.pow(astro.planetOrbitalElements[p].orbitalPeriodInputDays / C.meanSiderealYearDays, 2 / 3) * C.currentAUDistance;
+        const shrinkDevonian = () => dtl().EPOCH_PARAMS.solarMassLossFracPerYear * 380e6;
+        /** the minimum of one decomposition field over an age window, 100-yr steps: {v, tMa} */
+        const scanMin = (fromMa, toMa, pick) => { let best = null; for (let t = fromMa; t <= toMa + 1e-12; t += 1e-4) { const v = pick(dtl().dLodDtDecompositionAtAge(t)); if (best === null || v < best.v) best = { v, tMa: t }; } return best; };
+        const yearLabel = (y) => { const a = Math.abs(Math.round(y)); const s = a >= 10000 ? thousands(a) : String(a); return y < 0 ? `${s} BC` : `${s} AD`; };
+        const eraLabel = (tMa) => yearLabel(2000 - tMa * 1e6);
+        const ice = () => phys.DEFAULT_CONSTANTS.deepTime.iceInventory;
+        const wuKeys = {};
+        for (const t of Object.keys(WU_DAYS)) {
+          wuKeys[`daysPerYearWuDeltaAt${spell[t]}MaPct`] = { get: () => wuDelta(Number(t)), render: signedPct, unit: '%', note: `the model's day count at ${t} Ma against Wu et al. 2024's ${WU_DAYS[t]} d/yr (their TimeOptB inversion, cited)` };
+        }
+        return {
+          ...wuKeys,
+          daysPerYearWuDeltaMinPct: { get: () => Math.min(...wuDeltas()), render: signedPct, unit: '%', note: 'the smallest (most negative) deviation of the model\'s day count from Wu et al. 2024\'s six century-mark counts' },
+          daysPerYearWuDeltaMaxPct: { get: () => Math.max(...wuDeltas()), render: signedPct, unit: '%', note: 'the largest deviation from Wu et al. 2024\'s six counts' },
+          daysPerYearWuDeltaMeanAbsPct: { get: () => wuDeltas().reduce((s, v) => s + Math.abs(v), 0) / wuDeltas().length, render: (v) => Number(v).toFixed(1), unit: '%', note: 'the mean absolute deviation over the six Wu et al. 2024 counts' },
+          lOneLineGFourGFiveKyr: { get: () => lineKyr('eccentricityg4−g5'), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: 'the L1 eccentricity line g₄ − g₅ (the recorded line audit, data/l1-line-audit-results.json)' },
+          lOneLineGThreeGFiveKyr: { get: () => lineKyr('eccentricityg3−g5'), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: 'the L1 eccentricity line g₃ − g₅' },
+          lOneLineGThreeGOneKyr: { get: () => lineKyr('eccentricityg3−g1'), render: (v) => Number(v).toFixed(1), unit: 'kyr', note: 'the L1 eccentricity line g₃ − g₁' },
+          resonatorTZeroYr: { get: () => res().T0_yr, render: (v) => thousands(v), unit: 'yr', note: 'the Core-mantle swing\'s eigenperiod T₀ (the selected variant of data/core-mantle-resonator-stage1.json)' },
+          resonatorQ: { get: () => res().Q, render: (v) => Number(v).toFixed(1), note: 'the Core-mantle swing\'s quality factor' },
+          resonatorPeakAmplitudeSeconds: { get: () => res().peak_amp_s, render: (v) => thousands(v), unit: 's', note: 'the episode\'s peak ΔT amplitude' },
+          resonatorExcitationLabel: { get: () => yearLabel(res().t_exc), render: (v) => String(v), note: 'the episode\'s excitation epoch (the first kick)' },
+          resonatorTerminationLabel: { get: () => yearLabel(res().kicks[res().kicks.length - 1]), render: (v) => String(v), note: 'the episode\'s termination epoch (the last kick)' },
+          dtStackBondHallstattToneYr: { get: () => { const b = fit().shipped_coefficients.bond.period_yr, h = fit().shipped_coefficients.hallstatt.period_yr; return 1 / (1 / b - 1 / h); }, render: (v) => thousands(v), unit: 'yr', note: 'the Bond–Hallstatt difference tone 1/(1/T_B − 1/T_H) the swing is driven at' },
+          dtStackLadderRmsBondOnlySeconds: { get: () => stagesRms().bond, render: (v) => Number(v).toFixed(1), unit: 's', note: 'the joint ΔT fit\'s ladder: post-fit RMS with Bond alone (fit_metrics.stage_a)' },
+          dtStackLadderRmsBondHallstattSeconds: { get: () => stagesRms().bh, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with Bond and Hallstatt (stage_b)' },
+          dtStackLadderRmsThreeSeconds: { get: () => stagesRms().bhj5, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with Bond, Hallstatt and Jose5 (stage_c)' },
+          dtStackLadderRmsAllFourSeconds: { get: () => stagesRms().all, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with all four harmonics (stage_d)' },
+          mercuryDistanceJ2000Km: { get: () => planetAKm('mercury'), render: (v) => thousands(v), unit: 'km', note: 'Mercury\'s semi-major axis from its J2000 period by Kepler\'s law on the IAU AU' },
+          mercuryDistanceDevonianKm: { get: () => planetAKm('mercury') * (1 - shrinkDevonian()), render: (v) => thousands(v), unit: 'km', note: 'the same at the Devonian under Driver 2 (a·M☉ constant)' },
+          jupiterDistanceJ2000Km: { get: () => planetAKm('jupiter'), render: (v) => thousands(v), unit: 'km', note: 'Jupiter\'s semi-major axis from its J2000 period' },
+          jupiterDistanceDevonianKm: { get: () => planetAKm('jupiter') * (1 - shrinkDevonian()), render: (v) => thousands(v), unit: 'km', note: 'the same at the Devonian' },
+          neptuneDistanceJ2000Km: { get: () => planetAKm('neptune'), render: (v) => thousands(v), unit: 'km', note: 'Neptune\'s semi-major axis from its J2000 period' },
+          neptuneDistanceDevonianKm: { get: () => planetAKm('neptune') * (1 - shrinkDevonian()), render: (v) => thousands(v), unit: 'km', note: 'the same at the Devonian' },
+          earthPrecSolarShareTwoFourSixZeroMaPct: { get: () => PRb().solarShareJ2000 / PRb().torqueTermAtYear(2000 - 2.46e9) * 100, render: (v) => String(Math.round(v)), unit: '%', note: 'the solar share of the precession torque at 2.46 Ga — f_S over the composed law\'s torque term of date' },
+          dLodDtGiaMinLastDeglacialMsCy: { get: () => scanMin(0, 0.03, (d) => d.gia).v, render: signed2, unit: 'ms/cy', note: 'the GIA channel\'s rate minimum over the last 30 kyr (100-yr scan of the decomposition)' },
+          dLodDtGiaMinLastDeglacialLabel: { get: () => eraLabel(scanMin(0, 0.03, (d) => d.gia).tMa), render: (v) => String(v), note: 'the epoch of that minimum' },
+          dLodDtGiaMinPenultimateDeglacialMsCy: { get: () => scanMin(0.10, 0.15, (d) => d.gia).v, render: signed2, unit: 'ms/cy', note: 'the GIA channel\'s rate minimum over 100–150 ka (the penultimate deglaciation)' },
+          dLodDtGiaMinPenultimateDeglacialLabel: { get: () => eraLabel(scanMin(0.10, 0.15, (d) => d.gia).tMa), render: (v) => String(v), note: 'the epoch of that minimum' },
+          dLodDtSecularMinLastDeglacialMsCy: { get: () => scanMin(0, 0.03, (d) => d.net_L2).v, render: signed2, unit: 'ms/cy', note: 'the Tidal + GIA baseline\'s minimum over the last 30 kyr' },
+          dLodDtSecularMinLastDeglacialLabel: { get: () => eraLabel(scanMin(0, 0.03, (d) => d.net_L2).tMa), render: (v) => String(v), note: 'the epoch of that minimum' },
+          dLodDtNetMinLastDeglacialMsCy: { get: () => scanMin(0, 0.03, (d) => d.net_L4).v, render: signed2, unit: 'ms/cy', note: 'the full Layer-4 rate\'s minimum over the last 30 kyr (the deepest negative excursion)' },
+          dLodDtNetMinLastDeglacialLabel: { get: () => eraLabel(scanMin(0, 0.03, (d) => d.net_L4).tMa), render: (v) => String(v), note: 'the epoch of that minimum' },
+          bondIrdVariancePct: { get: () => rd('data/lod-climate-correlation-summary.json').bondIrdPearsonR ** 2 * 100, render: (v) => String(Math.round(v)), unit: '%', note: 'the Bond IRD correlation squared — the share of variance it accounts for (the recorded campaign\'s r)' },
+          giaGreenlandSeaLevelM: { get: () => ice().greenlandSeaLevelM, render: (v) => String(v), unit: 'm', note: 'the cited ice inventory: Greenland\'s sea-level equivalent' },
+          giaPresentIceSeaLevelM: { get: () => ice().presentIceSeaLevelM, render: (v) => String(v), unit: 'm', note: 'the cited ice inventory: all present ice' },
+          giaLgmSeaLevelDropM: { get: () => ice().lgmSeaLevelDropM, render: (v) => String(v), unit: 'm', note: 'the cited LGM-to-present sea-level cycle' },
+          giaNhGlaciationOnsetMa: { get: () => ice().nhGlaciationOnsetMa, render: (v) => Number(v).toFixed(2), unit: 'Ma', note: 'the Northern-Hemisphere glaciation onset the ice baseline is stepped at' },
+          giaNhGlaciationWidthMyr: { get: () => ice().nhGlaciationWidthMyr, render: (v) => Number(v).toFixed(2), unit: 'Myr', note: 'its transition width' },
+          giaEotMa: { get: () => ice().eotMa, render: (v) => Number(v).toFixed(1), unit: 'Ma', note: 'the Eocene–Oligocene transition the Antarctic baseline is stepped at' },
+          giaEotWidthMyr: { get: () => ice().eotWidthMyr, render: (v) => Number(v).toFixed(1), unit: 'Myr', note: 'its transition width' },
+          jTwoIceFreeRatioMinusOne: { get: () => PRb().ellipticityRatioOfDateAtYear(2000 - 40e6) - 1, render: (v) => fmtSci(v, 1), note: 'J₂/J₂₀ − 1 before the Antarctic glaciation (read at −40 Myr): the ice-free baseline the GIA channel and the precession of date share' },
+        };
+      })(),
       // NASA centerline instrument — DERIVED live from the generated
       // eclipse-audit artifact's per-point shadow-plane residuals, so a
       // regenerated audit run moves these automatically (no hand-typed copy).
