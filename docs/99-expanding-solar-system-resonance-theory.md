@@ -655,6 +655,23 @@ at J2000, and not its split. Moving to the physical pair is therefore a
 Layer-2 recalibration campaign (the recession budget is closed, so several
 paleo anchors would move), not a numeric correction; the shipped factor stands
 in for the solar tide by design, and this paragraph is where that is said.
+That campaign has since been priced against the deep record and closed
+(`tools/explore/solar-tide-paleo-test.mjs`, print-only): a solar tide OF DATE
+in the deep day length (the solar/lunar torque ratio r₀·(a/a₀)⁶, the past day
+shorter) puts 6 of the 29 day-length and day-count anchors outside their
+expectations at the pair's 5.6 % (the flagship Wells 380 row at +1.23 % against
+its 0.3–1.1 % band, Williams 620 at +8.1 %, Wu 650 at −3.7 %), 19 at today's
+dissipation budget's ~17 % and 22 at the 27 % La2004's spin history carries
+(doc 112 §8), where the lunar-only chain has none outside; the cited history's
+own day-length column (Farhat et al. 2022, `astrogeo22` `columns.lodHours`)
+sits 0.05 h ABOVE the lunar-only day at 400 Ma and 0.14 h at 2.46 Ga, a longer
+past day, so that spin history carries no net solar braking either. The record
+bounds the NET non-lunar braking over the Phanerozoic to a few per cent of the
+lunar transfer: the solar tide the real Earth has is compensated over
+geological time by something the chain does not name (a secular decrease of
+the moment of inertia is the candidate), and the effective pair at J2000
+encodes the same net. The lunar-only chain is what the data support; it is
+kept as a bound, never a term.
 
 The IERS observed rate is the physical Earth-rotation slowdown, integrating tidal + GIA + minor terms (mantle-core coupling ~ ±0.2 ms/century, hydrology ~ ±0.05 ms/century). The model matches to within 1% using **only two literature-anchored parameters** (LLR α₁ and Cox & Chao dJ₂/dt with the Peltier ICE-6G factor-2.0 J₂→α conversion) — no fitting to the observed rate.
 
@@ -1575,7 +1592,7 @@ dα/dt  =  dJ₂/dt / 2.0  =  (−2.7 × 10⁻¹¹) / 2.0  =  −1.35 × 10⁻¹
 
 This value sits at the mid-range of the Peltier ICE-6G LOD-coupling estimates (factors 1.5-2.5 depending on mantle viscosity assumptions) and yields model dLOD/dt at J2000 = 1.77 ms/century, matching IERS observation of 1.75 ms/century within 1%.
 
-**The 2.0 is an EFFECTIVE factor, and the model says so.** The degree-2 identity below gives 1.5; the standard budget pairs that 1.5 with a net solar tide of about 5.6 % of the lunar transfer, and the two together carry the same ≈ 1.77 ms/cy. Measured with the LOD-budget scan (an explore script, since deleted; its result is recorded here) against the eclipse record: 1.5 alone is rejected (the joint ΔT fit's full-window RMS 28.75 → 353.7 s), the physical pair fits slightly better than the effective 2.0 (Espenak 12.47 s, full 25.03 s) — the record fixes the SUM of the GIA and solar-tide channels, not the split between them. The model ships the effective factor because adopting the pair is a recalibration campaign, not a constant swap: the recession history is a closed budget, so six of the paleo anchors leave tolerance and Layer 2, the GIA τ and the dLOD/dt and LOD–climate artifacts move with it. The factor cancels in the precession adoption, so nothing on the clock side depends on this choice.
+**The 2.0 is an EFFECTIVE factor, and the model says so.** The degree-2 identity below gives 1.5; the standard budget pairs that 1.5 with a net solar tide of about 5.6 % of the lunar transfer, and the two together carry the same ≈ 1.77 ms/cy. Measured with the LOD-budget scan (an explore script, since deleted; its result is recorded here) against the eclipse record: 1.5 alone is rejected (the joint ΔT fit's full-window RMS 28.75 → 353.7 s), the physical pair fits slightly better than the effective 2.0 (Espenak 12.47 s, full 25.03 s) — the record fixes the SUM of the GIA and solar-tide channels, not the split between them. The model ships the effective factor because adopting the pair is a recalibration campaign, not a constant swap: the recession history is a closed budget, so six of the paleo anchors leave tolerance and Layer 2, the GIA τ and the dLOD/dt and LOD–climate artifacts move with it — and the campaign is closed, not merely parked: priced against the deep record with a solar tide of date (`tools/explore/solar-tide-paleo-test.mjs`), the pair's 5.6 % already puts six of the 29 day-length and day-count anchors outside their expectations and any physically sized share (17–27 %) puts nineteen or more outside, while the lunar-only chain has none (the §"dLOD/dt decomposition" paragraph above carries the rows). The factor cancels in the precession adoption, so nothing on the clock side depends on this choice.
 
 The idealized axisymmetric point-mass derivation gives factor 1.5:
 ```
