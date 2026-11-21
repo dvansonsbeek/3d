@@ -2,7 +2,10 @@
 // (tools/docs/export-genesis-pictures.mjs) for the rate-decomposition figures the paper and the site carry.
 //
 //   npm run build
-//   node tools/docs/export-dlod-pictures.mjs [out=<dir>] [ranges=deep,glacial] [tag=<prefix>]
+//   node tools/docs/export-dlod-pictures.mjs [out=<dir>] [ranges=deep,glacial] [layers=proxyLR04,...] [tag=<prefix>]
+//
+// `layers=` switches the named layer toggles ON before the export (the panel's data-lcr-layer keys: bands, bondCurve,
+// resonator, proxy = GISP2, proxyLR04 = the LR04 stack); the paper's 200,000-BC figure carries LR04.
 //
 // Opens the BUILT bundle in headless Chromium (test/browser/harness.mjs), opens Tools → Earth dLOD/dt Analysis,
 // selects each range tab by its label and clicks Export, saving the modal's PNG — the export renderer's own
@@ -24,6 +27,7 @@ const SITE = process.env.ESSRT_SITE_DIR;
 const OUT = arg('out', SITE ? join(SITE, 'public', 'img') : 'exports');
 const TAG = arg('tag', '');
 const RANGES = arg('ranges', 'deep,glacial').split(',');
+const LAYERS = arg('layers', '').split(',').filter(Boolean);
 mkdirSync(OUT, { recursive: true });
 
 const sim = await openSimulator();
@@ -35,6 +39,15 @@ try {
     if (!btn) throw new Error('Earth dLOD/dt Analysis button not found');
     btn.click(); await new Promise((r) => setTimeout(r, 3000));
   });
+  if (LAYERS.length) {
+    await sim.page.evaluate(async (layers) => {
+      for (const key of layers) {
+        const box = document.querySelector(`input[data-lcr-layer="${key}"]`) || document.querySelector(`[data-lcr-layer="${key}"] input`);
+        if (!box) throw new Error(`no layer toggle '${key}'`);
+        if (!box.checked) { box.click(); await new Promise((r) => setTimeout(r, 800)); }
+      }
+    }, LAYERS);
+  }
   for (const range of RANGES) {
     const label = LABELS[range];
     if (!label) throw new Error(`unknown range '${range}' — one of ${Object.keys(LABELS).join(', ')}`);
