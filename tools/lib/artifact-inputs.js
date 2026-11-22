@@ -67,17 +67,63 @@ function hashSource(relPath) {
   return hashSourceText(path.extname(relPath), text) || hashFile(relPath);
 }
 
-/** The fingerprint a NEW stamp records: tokens for a JavaScript source, bytes for everything else. */
+/** A JSON artifact that carries its own `inputs` stamp is fingerprinted by its CONTENT minus the stamp (a stamp of a
+ *  stamp: hashed by bytes, an upstream artifact regenerated with identical content re-staled everything downstream
+ *  through its re-written stamp — the governed ΔT fit pair read stale at the stamp migration because the climate
+ *  coefficients' stamp had moved, and an ordinary cascade re-ran the banks on identical content) and minus the
+ *  record-only keys a generator writes about its own run, which no consumer reads (checked: only the writers name
+ *  them). A JSON file without a stamp (a cited input, a registry) keeps the byte hash. The text is the parsed
+ *  object's canonical JSON.stringify, so formatting cannot move it while any value or key can. */
+const RECORD_ONLY_KEYS = ['runtime_sec', 'generatedAtWalkSeconds'];
+const RECORD_ONLY_PARENTS = ['meta', 'metadata'];
+
+/** The canonical content text of a stamped JSON artifact, or null where the text is not one. */
+function jsonContentText(text) {
+  let j;
+  try { j = JSON.parse(text); } catch { return null; }
+  if (!j || typeof j !== 'object' || Array.isArray(j) || !j.inputs) return null;
+  const c = { ...j };
+  delete c.inputs;
+  for (const k of RECORD_ONLY_KEYS) delete c[k];
+  for (const parent of RECORD_ONLY_PARENTS) {
+    if (c[parent] && typeof c[parent] === 'object' && !Array.isArray(c[parent])) {
+      c[parent] = { ...c[parent] };
+      for (const k of RECORD_ONLY_KEYS) delete c[parent][k];
+    }
+  }
+  return JSON.stringify(c);
+}
+
+/** sha256 of a stamped JSON text's content, `sha256-json:<hex>`; null where the text is not a stamped artifact. */
+function hashJsonText(text) {
+  const content = jsonContentText(text);
+  if (content === null) return null;
+  return 'sha256-json:' + crypto.createHash('sha256').update(content).digest('hex');
+}
+
+/** The content fingerprint of a repo-relative JSON file (the byte hash where it carries no stamp). */
+function hashJson(relPath) {
+  if (process.env.ESSRT_ARTIFACT_INPUTS_PLANT === '1') return hashFile(relPath);   // the gate's plant: bytes again
+  const text = fs.readFileSync(path.join(ROOT, relPath), 'utf8');
+  return hashJsonText(text) || hashFile(relPath);
+}
+
+/** The fingerprint a NEW stamp records: tokens for a JavaScript source, the content for a stamped JSON artifact,
+ *  bytes for everything else. */
 function fingerprint(relPath) {
-  return SOURCE_EXT.has(path.extname(relPath)) ? hashSource(relPath) : hashFile(relPath);
+  const ext = path.extname(relPath);
+  if (SOURCE_EXT.has(ext)) return hashSource(relPath);
+  if (ext === '.json') return hashJson(relPath);
+  return hashFile(relPath);
 }
 
 /** Does the file still match a RECORDED fingerprint? Compared in the convention the record carries, so a byte-hash
- *  stamp written before the token convention stays verifiable and migrates at the artifact's next write (the
- *  Python twin stamps bytes only). Throws where the file is absent, like hashFile. */
+ *  stamp written before the token or the content convention stays verifiable and migrates at the artifact's next
+ *  write (the Python twin stamps bytes only). Throws where the file is absent, like hashFile. */
 function matchesRecorded(relPath, recorded) {
   if (typeof recorded !== 'string') return false;
   if (recorded.startsWith('sha256-tokens:')) return hashSource(relPath) === recorded;
+  if (recorded.startsWith('sha256-json:')) return hashJson(relPath) === recorded;
   return hashFile(relPath) === recorded;
 }
 
@@ -118,4 +164,4 @@ function modelSourceFilesExcluding(excludedSlices) {
   return modelSourceFiles().filter((p) => !excludedSlices.some((f) => p === `${dir}/${f}`));
 }
 
-module.exports = { ROOT, hashFile, hashSource, hashSourceText, fingerprint, matchesRecorded, buildInputsBlock, modelSourceFiles, modelSourceFilesExcluding };
+module.exports = { ROOT, hashFile, hashSource, hashSourceText, hashJson, hashJsonText, fingerprint, matchesRecorded, buildInputsBlock, modelSourceFiles, modelSourceFilesExcluding };

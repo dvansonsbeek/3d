@@ -162,11 +162,34 @@ console.log(`\nthen (by hand — each is a judgement, not a regeneration):
   npm run fit:6a2 && npm run check:csv-smoke   if the engine's frame of date moved`);
 
 if (!RUN) process.exit(0);
+
+/** Is the node stale NOW, at its turn? The plan is the transitive closure of the stale set, but an upstream that
+ *  regenerated with identical content leaves this node's record verifying (the content fingerprint of a stamped JSON
+ *  artifact, the token fingerprint of a source — tools/lib/artifact-inputs.js), so a node planned only because an
+ *  input "regenerates" is re-read before it runs and skipped when every recorded input still matches. A node that was
+ *  stale at planning, or any node under --all, runs regardless. The constants nodes re-run the generator's check mode.
+ *  @param {Node} n */
+function staleNow(n) {
+  if (n.cmd === 'npm run constants:generate') return spawnSync('node', ['tools/constants/generate.mjs'], { cwd: ROOT, encoding: 'utf8' }).status !== 0;
+  const rel = n.produces[0];
+  if (!rel || !rel.endsWith('.json')) return true;
+  let j;
+  try { j = JSON.parse(readFileSync(join(ROOT, rel), 'utf8')); } catch { return true; }
+  const files = j && j.inputs && j.inputs.files;
+  if (!files) return true;
+  for (const [p, h] of Object.entries(files)) {
+    if (!existsSync(join(ROOT, p))) { if (!isGitIgnored(p)) return true; continue; }
+    if (!matchesRecorded(p, h)) return true;
+  }
+  return false;
+}
+
 let prevCmd = '';
 for (const id of order) {
   const n = /** @type {Node} */ (nodes.get(id));
   if (n.manual) { console.log(`\n▶ SKIP (manual): ${n.cmd}`); continue; }
   if (n.cmd === prevCmd) continue;   // the two constants nodes adjacent: one run suffices
+  if (!ALL && !n.stale.length && !staleNow(n)) { console.log(`\n▶ FRESH at its turn (every recorded input still verifies — its upstream regenerated identical content): ${n.cmd}`); continue; }
   prevCmd = n.cmd;
   console.log(`\n▶ ${n.cmd}`);
   const t0 = Date.now();

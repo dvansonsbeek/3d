@@ -4,11 +4,7 @@
     "code:packages/physics/src/earth/deep-orbital-history.cjs": {
       "comb / lattice": 1
     },
-    "code:packages/physics/src/planets/keplerian-chain.cjs": {
-      "plan-step label": 1
-    },
     "code:tools/verify/deep-secular-modes.js": {
-      "H-divisor label": 1,
       "comb / lattice": 7
     },
     "code:tools/verify/nbody-secular.js": {

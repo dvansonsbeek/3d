@@ -1,8 +1,10 @@
 // The artifact fingerprint's contract (tools/lib/artifact-inputs.js; doc 111 §1.36 "the price of a comment"):
 // a JavaScript source is fingerprinted by its TOKENS — a comment or whitespace edit leaves the fingerprint
-// unchanged, any token edit (a literal, an identifier, an operator) moves it — while a data file keeps its byte
-// hash, and a RECORDED fingerprint is verified in the convention it carries (bytes or tokens), so the stamps
-// written before the token convention stay verifiable and migrate at their next write.
+// unchanged, any token edit (a literal, an identifier, an operator) moves it — a stamped JSON artifact is
+// fingerprinted by its CONTENT minus its own `inputs` stamp and the record-only timing keys (a stamp of a stamp
+// re-staled identical content downstream), a data file without a stamp keeps its byte hash, and a RECORDED
+// fingerprint is verified in the convention it carries (bytes, tokens or content), so the stamps written before
+// either convention stay verifiable and migrate at their next write.
 //
 // Plant: ESSRT_ARTIFACT_INPUTS_PLANT=1 makes the source fingerprint the byte hash again — this test then FAILS
 // on the comment edit (the gate is shown to see what it names).
@@ -41,6 +43,37 @@ check('a recorded byte hash of a source is still verified by bytes', AI.matchesR
 check('a recorded token hash of a source is verified by tokens', AI.matchesRecorded(srcRel, AI.hashSource(srcRel)) === true);
 check('a wrong record of either convention is refused', AI.matchesRecorded(srcRel, 'sha256:' + '0'.repeat(64)) === false && AI.matchesRecorded(srcRel, 'sha256-tokens:' + '0'.repeat(64)) === false);
 check('a missing file throws (the gate reports it by name)', (() => { try { AI.matchesRecorded('tools/lib/does-not-exist.js', 'sha256:x'); return false; } catch { return true; } })());
+
+// A stamped JSON artifact is fingerprinted by its CONTENT minus its own `inputs` stamp and minus the record-only
+// timing keys (a stamp of a stamp: the governed fit pair read stale at the migration because an upstream's stamp
+// moved with its content identical); a JSON file without a stamp keeps the byte hash.
+const art = '{\n  "value": 1.5,\n  "meta": { "note": "n", "generatedAtWalkSeconds": 249.6 },\n  "runtime_sec": 2.3,\n  "inputs": { "generator": "node x --write", "files": { "a.js": "sha256:aa" } }\n}\n';
+const stampTwin = art.replace('"sha256:aa"', '"sha256-tokens:bb"').replace(/\n {2}/g, '\n      ');
+const timingTwin = art.replace('249.6', '12.0').replace('2.3', '9.9');
+const valueTwin = art.replace('"value": 1.5', '"value": 1.6');
+const keyTwin = art.replace('"note": "n"', '"note": "m"');
+const hj = AI.hashJsonText;
+check('a stamped JSON text carries the content convention', typeof hj(art) === 'string' && hj(art).startsWith('sha256-json:'), String(hj(art)).slice(0, 22));
+check('a stamp edit and a re-formatting leave the content fingerprint unchanged', hj(art) === hj(stampTwin));
+check('the record-only timing keys leave it unchanged', hj(art) === hj(timingTwin));
+check('a value edit moves it', hj(art) !== hj(valueTwin));
+check('any other key edit moves it', hj(art) !== hj(keyTwin));
+check('a JSON text without a stamp yields null (the bytes then stand)', hj('{"value": 1}') === null && hj('[1,2]') === null && hj('not json') === null);
+const jsonRel = 'data/deltaT-4flag-fit.json';
+check('a stamped repository artifact is fingerprinted by content', plant || AI.fingerprint(jsonRel).startsWith('sha256-json:'), AI.fingerprint(jsonRel).slice(0, 22));
+check('a recorded byte hash of a JSON artifact is still verified by bytes', AI.matchesRecorded(jsonRel, AI.hashFile(jsonRel)) === true);
+check('a recorded content hash of a JSON artifact is verified by content', AI.matchesRecorded(jsonRel, AI.hashJson(jsonRel)) === true);
+check('a wrong content record is refused', AI.matchesRecorded(jsonRel, 'sha256-json:' + '0'.repeat(64)) === false);
+// The plant on a real file: with ESSRT_ARTIFACT_INPUTS_PLANT=1 the JSON fingerprint is the byte hash — a stamp edit
+// then changes what a downstream generator would record.
+const tmpJsonRel = 'test/.artifact-inputs-plant-probe.json';
+try {
+  fs.writeFileSync(path.join(AI.ROOT, tmpJsonRel), art);
+  const before = AI.fingerprint(tmpJsonRel);
+  fs.writeFileSync(path.join(AI.ROOT, tmpJsonRel), stampTwin);
+  const after = AI.fingerprint(tmpJsonRel);
+  check('a stamp edit of a repository artifact leaves its content fingerprint unchanged', before === after, `${before.slice(0, 20)} vs ${after.slice(0, 20)}`);
+} finally { try { fs.unlinkSync(path.join(AI.ROOT, tmpJsonRel)); } catch { /* absent */ } }
 
 // The comment-insensitivity on a real file: a copy with an extra comment line, in the OS temp dir, hashed as text.
 const text = fs.readFileSync(path.join(AI.ROOT, srcRel), 'utf8');

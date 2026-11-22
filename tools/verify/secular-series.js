@@ -49,7 +49,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { ROOT, buildInputsBlock } = require('../lib/artifact-inputs');
+const { ROOT, buildInputsBlock, modelSourceFiles } = require('../lib/artifact-inputs');
 const C = require('../lib/constants.js');
 
 const WRITE = process.argv.includes('--write');
@@ -862,6 +862,16 @@ const artifact = {
     'packages/physics/src/earth/laplace-plane.cjs',
     'tools/lib/deep-time.js',
     'data/nbody-deep-secular-modes.json',
+    // The verdict's hybrid walk runs on createModel() — the torque period of
+    // date, the solar share and the GIA channel's J₂ ratio of date — so the
+    // model's sources, its constants embed and the climate coefficients are
+    // inputs too (measured at the stamp migration: with every input above
+    // unchanged, the fork rows had moved 1e-6° and the ±500 Myr band edges
+    // 0.0023° since the previous write; the series VALUES bit-identical).
+    ...modelSourceFiles(),
+    'packages/physics/src/constants/generated.js',
+    'packages/physics/src/constants/coefficients.js',
+    'public/input/climate-formula-coefficients.json',
     // plan 07 (measured): the D5 handover boundaries run on the chain
     // EVALUATOR and the governed chain artifact (skeleton + era affine). They
     // were not inputs, so the evaluator's affine bound would have moved the

@@ -63,18 +63,10 @@ const astro = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/input/astro-ref
 const OUT = 'data/nbody-secular-frequencies.json';
 const PLANETS = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'];
 const ARCSEC_PER_RAD = 648000 / Math.PI;
-// Laskar, J. et al. (2004), A&A 428, 261–285, Table 3 — external REFERENCE
-// values (another theory's integration, not observations); labels only.
-// La2004's main secular frequencies (″/yr) as TABULATED in Laskar et al.
-// (2011), A&A 532, A89, Table 6 (La2004 beside La2010a). LABELS and sanity
-// thresholds only — never inputs. The former set here (g2 7.4555, g1 5.5965,
-// s3 −18.8506, …) had no traceable source (its s3 equalled the engine's own
-// to four decimals) and was replaced 2026-10 with the publication's digits
-// (verified against the table; deep-secular-modes.js already carried them).
-const LASKAR2004 = {
-  g: { g1: 5.59, g2: 7.452, g3: 17.368, g4: 17.916, g5: 4.257452, g6: 28.2450, g7: 3.087951, g8: 0.673021 },
-  s: { s1: -5.59, s2: -7.05, s3: -18.850, s4: -17.755, s6: -26.347855, s7: -2.9925259, s8: -0.691736 },
-};
+// La2004's main secular frequencies (″/yr), Laskar et al. (2011) Table 6 — external REFERENCE values
+// (another theory's integration, not observations): LABELS and sanity thresholds only, never inputs.
+// ONE home, shared with deep-secular-modes.js and the NAFF extractor.
+const { LASKAR2004_SECULAR_FREQUENCIES_ARCSEC_PER_YR: LASKAR2004 } = require(path.join(ROOT, 'tools', 'lib', 'laskar-2004-secular-frequencies.js'));
 
 /** Derived instantaneous 1PN apsidal supplement (″/cy) — shared constants only. */
 function relativisticSupplementArcsecCy(planet) {

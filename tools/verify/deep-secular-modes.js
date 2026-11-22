@@ -50,10 +50,10 @@
  * ASSERTIONS UNDER --write (registered in the plan's Stage-B record):
  *   - dump meta must match the registered run (wh / dt 2 / 1PN / ±10 Myr);
  *   - conservation |ΔE/E| ≤ 1e-7 (symplectic bound);
- *   - Earth's leading z-mode within 0.01 ″/yr of La2004 g5 (4.2575) — the
+ *   - Earth's leading z-mode within 0.01 ″/yr of La2004 g5 (4.257452) — the
  *     frame/seed sanity line;
  *   - the strongest Earth e-beat period inside the REGISTERED T5c window
- *     395–415 kyr (the criterion the single H/3 line cannot meet).
+ *     395–415 kyr (the criterion a single-line reading cannot meet).
  *
  * MEASURED CONTEXT banked with the verdict (doc 109 §17): g5 matches La2004
  * to 0.0001 ″/yr. The point-mass run (EMB merged, no asteroids — the
@@ -94,8 +94,9 @@ const NAFF_TERMS = 18;
 const NAFF_ZETA_TERMS = 16;
 const NAFF_ZETA_TERMS_ERA = 8;   // the era-tier ζ table is its OWN extraction
 const RAD2AS = (180 / Math.PI) * 3600;
-// Laskar 2004 Table 3 reference values — THEORY labels, never inputs.
-const LA2004 = { g5: 4.2575, g2: 7.452 };
+// La2004 reference values (Laskar et al. 2011 Table 6) — THEORY labels and sanity thresholds, never inputs; ONE home.
+const { LASKAR2004_SECULAR_FREQUENCIES_ARCSEC_PER_YR: LA2004_TABLE } = require(path.join(ROOT, 'tools', 'lib', 'laskar-2004-secular-frequencies.js'));
+const LA2004 = { g5: LA2004_TABLE.g.g5, g2: LA2004_TABLE.g.g2 };
 const ROCK_METRONOME_KYR = 405.6;   // the rock-record long-eccentricity period (plan 04 leg)
 // The point-mass twin's g2 (the pre-lunar 20-Myr dump, EMB merged, no
 // asteroids; naff-frequencies.mjs terms=6) — a RECORD for the verdict note,

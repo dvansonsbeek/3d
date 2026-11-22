@@ -84,8 +84,12 @@ running generator to save a pass (doc 111 §1.24); after ANY fitter write the
 constants embed comes before the records (doc 111 §1.19). A JavaScript source
 in an `inputs` stamp is fingerprinted by its TOKENS (`tools/lib/artifact-inputs.js`
 on acorn; gate `test:artifact-inputs`): a comment or whitespace edit moves no
-stamp, any literal does; a byte-hash stamp written before the token form stays
-valid and migrates at the artifact's next write (doc 111 §1.36).
+stamp, any literal does; a stamped JSON artifact is fingerprinted by its
+CONTENT minus its own stamp and the record-only timing keys (`sha256-json:` —
+a stamp of a stamp re-staled every downstream node on identical content, and
+the cascade now skips a transitively planned node whose record still verifies
+at its turn); a byte-hash stamp written before either form stays valid and
+migrates at the artifact's next write (doc 111 §1.36).
 
 ---
 

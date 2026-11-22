@@ -55,8 +55,10 @@ const NTERMS = parseInt(KV.terms || '6', 10);
 const D = JSON.parse(readFileSync(FILE, 'utf8'));
 const t = Float64Array.from(D.t);                                  // years from J2000
 const N = t.length, span = t[N - 1] - t[0];
-const D2R = Math.PI / 180;   // (plan 09 step 7e: the retired lattice's "nearest 8H/N" column is gone from the tables)
-const LASKAR = { g: { g1: 5.5965, g2: 7.4555, g3: 17.3711, g4: 17.9159, g5: 4.2575, g6: 28.2455, g7: 3.0876, g8: 0.6730 }, s: { s1: -5.6197, s2: -7.0797, s3: -18.8506, s4: -17.7553, s6: -26.3475, s7: -2.9927, s8: -0.6919 } };
+const D2R = Math.PI / 180;
+// The "nearest Laskar" column: La2004's frequencies as tabulated in Laskar et al. (2011) Table 6 — labels only, ONE home
+// shared with nbody-secular.js and deep-secular-modes.js (the former table here had no traceable source).
+const { LASKAR2004_SECULAR_FREQUENCIES_ARCSEC_PER_YR: LASKAR } = createRequire(ROOT + 'package.json')(ROOT + 'tools/lib/laskar-2004-secular-frequencies.js');
 
 // Hann window, normalised inner product ⟨z, e^{iωt}⟩ over the window
 const win = new Float64Array(N); let wsum = 0;

@@ -1276,7 +1276,26 @@ byte-hash stamps written before stay valid and migrate at each artifact's
 next write (the next cascade migrates them all); the Python twin stamps
 bytes only. Gate `test:artifact-inputs` — its plant
 `ESSRT_ARTIFACT_INPUTS_PLANT=1` makes the source fingerprint the byte hash
-again and the comment-edit row fails.
+again and the comment-edit row fails. The migration cascade itself (29 nodes,
+7 h, every artifact's content byte-identical minus its stamp) measured the
+second half of the trap, **a stamp of a stamp**: a JSON artifact was hashed by
+its bytes INCLUDING its own `inputs` block, so an upstream regenerated with
+identical content re-staled every downstream node through its re-written
+stamp — the governed ΔT fit pair read stale because the climate coefficients'
+stamp had moved with their content identical (the pair's two entries were
+migrated by hand after the content check; a re-close is a coefficient move,
+§1.23), and an ordinary cascade re-ran both banks on identical content for the
+same reason. Resolved the same way: a stamped JSON artifact is fingerprinted
+by its CONTENT minus the stamp and minus the two record-only timing keys no
+consumer reads (`sha256-json:`; a JSON input without a stamp keeps the byte
+hash), and `regen-cascade --run` re-reads a transitively planned node's record
+at its turn and skips it when every input still verifies (the planner's
+closure had listed both banks behind a constants node that regenerated
+byte-identical). The same cascade found the N-body series' VERDICT stale
+unseen — its hybrid walk runs on `createModel()` but declared four physics
+files (the fork rows 1e-6°, the ±500 Myr band edges 0.0023° off their record;
+the series values bit-identical) — the §1.16 class, the model's sources now
+declared.
 
 **A bank's limit is measured from the anchor, and a segment keeps the cells
 before the first undefined one.** The three banked tables — the five chain
