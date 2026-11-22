@@ -19,10 +19,10 @@
   "inputs": {
     "generator": "node tools/verify/cassini-results.js --write",
     "files": {
-      "tools/explore/cassini-moontilt.js": "sha256:3aaf090948cbf6b6f6f76be294c2b5532b10cd8f67d45eea46d682ca79b7065a",
-      "tools/explore/moon-euler-rotation.js": "sha256:6f7d2017c8c7aefa5631baf4ede2c2a2f34121c39fa575118c6c12c6c91c9011",
-      "tools/lib/elp2000-82b.js": "sha256:42ee6e842104b52cca1c4b61a5dd2b7d0d77bcd68ebf0b0992883d641c7a4257",
-      "tools/verify/cassini-results.js": "sha256:05bd6512a7b0867576ae617a69ca9601941e06b94f4a298e2617c9fccd09784b"
+      "tools/explore/cassini-moontilt.js": "sha256-tokens:6a4aa65e7eb8fad2a131ea20a80d7b6142263c0d0290b7ae57ec2e3ab85ffe30",
+      "tools/explore/moon-euler-rotation.js": "sha256-tokens:f82d9c1f62d0139278bf281b1f1742aadb4438dfbec5c7188613c515eab795bd",
+      "tools/lib/elp2000-82b.js": "sha256-tokens:3591e70ec2ce7a2266225fb271d56abae25b69b55e7da3a409480c8831c77065",
+      "tools/verify/cassini-results.js": "sha256-tokens:11ae31f04f9109ed0db19ccf98b14b0ddeae479318314fd5bc8fcb26b8ca3236"
     }
   }
 }

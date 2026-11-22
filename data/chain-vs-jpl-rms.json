@@ -339,10 +339,10 @@
     "generator": "node tools/verify/measure-rms-by-epoch.js --write",
     "files": {
       "data/jpl-cache.json": "sha256:221582af7d1e956fd20e58a2b32f2c956a6d1ec1f8d17d3f24c7730a269205d1",
-      "packages/physics/src/planets/chain-artifact.js": "sha256:1b9ced3f83258d9db9a59c5d6a1f5017b94408874ad2fbb2fbb7f22c18df5571",
-      "packages/physics/src/planets/keplerian-chain.cjs": "sha256:8a0ca8debaf6eea263bd40f631bc5bdd7041307c37c3cd5e5844dd6b62e624c7",
-      "tools/lib/scene-graph.js": "sha256:dc0c0bf08d384b2ddef4698fd9d7636a1628b62c14ce14c89d639172f1906730",
-      "tools/verify/measure-rms-by-epoch.js": "sha256:ebbc40b17ea88f029125bd17bdffc52a44e84707858a288b6a6ad6d27f4b05d1"
+      "packages/physics/src/planets/chain-artifact.js": "sha256-tokens:6be6afbc3fd2fcaf987d23ea6d467bf5f84a0289aa8625590c0a432e4ee45f41",
+      "packages/physics/src/planets/keplerian-chain.cjs": "sha256-tokens:452c07a901b784415811ac020713cdcc68cde9f5049a0571a7349c4e66b72442",
+      "tools/lib/scene-graph.js": "sha256-tokens:8da4763e9c27ff0f931bcd20f8ab51486198222ba54f4a4ccb6ac0aa27c2e4a0",
+      "tools/verify/measure-rms-by-epoch.js": "sha256-tokens:1505372d5eba8c55cbd9259c158dbdfa50d39b4d029f72dc2ad3153d34685394"
     }
   }
 }

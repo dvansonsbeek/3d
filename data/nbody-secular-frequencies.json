@@ -906,16 +906,16 @@
  "inputs": {
   "generator": "node tools/verify/nbody-secular.js --write",
   "files": {
-   "packages/physics/src/planets/keplerian-chain.cjs": "sha256:8a0ca8debaf6eea263bd40f631bc5bdd7041307c37c3cd5e5844dd6b62e624c7",
+   "packages/physics/src/planets/keplerian-chain.cjs": "sha256-tokens:452c07a901b784415811ac020713cdcc68cde9f5049a0571a7349c4e66b72442",
    "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
-   "tools/explore/j2000-state.mjs": "sha256:a0a87301e21a02399ab7b8ed16d9b7930a485c49d1b2bbafa9dfc552f552600d",
-   "tools/explore/k45-residual-naff.mjs": "sha256:228eb4874adca9171d61c1697ffbbaac3ce82891476a34762bf882840ccae406",
-   "tools/explore/k45e-amplitude-solve.mjs": "sha256:8682a7ebd72bd98b60019b1c097f1791ec6e5ecea97d1798b929ce46b4ae1837",
-   "tools/explore/lattice-long-window-test.mjs": "sha256:20f4ca076624aab9bdd1898f48890fe60c77ef2d6f7a792de47b713769f059d5",
-   "tools/explore/naff-frequencies.mjs": "sha256:3d2eac569010adcbae57ee987f834c259dec689b6802d623b71c03c80c089496",
-   "tools/explore/nbody-wh.mjs": "sha256:b33813d3a1655e44a23964ac267f34863fb92af6bfbf6fe5886517bc649257a2",
-   "tools/lib/keplerian-chain.js": "sha256:620299515d5520bb3a03fba5affafc7a036fb151fca3457a5194e8771cc97fb8",
-   "tools/verify/nbody-secular.js": "sha256:afc5e8575ed35c553ed8f0ea4ead1f7b81b13b9812b46970796a9e4d5b4535ca"
+   "tools/explore/j2000-state.mjs": "sha256-tokens:e81bfcb5d4748762160e2724c9a6092ab92437c08b9f0f90bf75ce9200bace77",
+   "tools/explore/k45-residual-naff.mjs": "sha256-tokens:d51a6b16492475e48b74f029a5176e492e249e1a11fd87e55a777b70cb54b9a2",
+   "tools/explore/k45e-amplitude-solve.mjs": "sha256-tokens:35e79c96c161d9e3d408d69a7d45c1a1da99564eae6b375992df53d32c4e5b93",
+   "tools/explore/lattice-long-window-test.mjs": "sha256-tokens:6b84f464f3cda8a3bade2306293d05f0cfa7a9a23c9a2c51b8cb603475d2298e",
+   "tools/explore/naff-frequencies.mjs": "sha256-tokens:7a2b70b2282f7fc6a75ecc5c2ddb5ce0088bf132df8260bc405bedc00bbba8da",
+   "tools/explore/nbody-wh.mjs": "sha256-tokens:ac555e857e2553870716ebf687b17371de86a5ca5400ea8a670b7f89158dd618",
+   "tools/lib/keplerian-chain.js": "sha256-tokens:5f4e72488a9a3293e1ffa42eeb8f5fb936d2a9f1f55a8dcd7cdeea028c1989ad",
+   "tools/verify/nbody-secular.js": "sha256-tokens:f2c66be637905948bc91586d38668b03a3cae24f6ab7e0df5c4d1ea1d139caa8"
   }
  },
  "periodicTerms": {
