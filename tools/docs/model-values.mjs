@@ -3382,6 +3382,36 @@ export const VALUES = {
         o.canonR2Stitched = { get: () => cc().meta.stitched_lr04_r2, render: f2, note: 'three-regime stitched canonical fit evaluated over the full LR04 record (export_climate_formula_browser.py)' };
         o.canonR2CenCo2pip = { get: () => cf().cenco2pip_evaluation.r2_l1_l2_l3, render: f4, note: 'canonical formula on CenCO2PIP CO₂ (0–66 Ma)' };
         o.canonL5FloorPostMpt = { get: () => 100 * (1 - cf().regime_fits['post-mpt'].r2_l1_l2_l3), render: (v) => String(Math.round(v)), unit: '%', note: 'post-MPT L5 stochastic floor, 1 − R²' };
+        // The forward figure's markers (15_LR04_Forward.png — the Earth Climate Analysis panel's future tab): the
+        // glacial maxima and interglacial peaks of the formula carried 250 kyr past 2000 AD, under the rule the
+        // figure draws them with — ONE home packages/physics/src/climate/forward-extrema.cjs (doc 111 §1.52: two
+        // lists over one curve on two selection rules drifted apart in the prose). The prose cites THESE keys; the
+        // figure's labels round the grid's half-kyr the same way (Math.round).
+        const fwd = (() => { /** @type {any} */ let m; return () => { if (!m) { const { computeClimateForwardExtrema } = require(join(ROOT, 'packages', 'physics', 'src', 'climate', 'forward-extrema.cjs')); m = computeClimateForwardExtrema(cc()); } return m; }; })();
+        const kyr = (v) => String(Math.round(v));
+        const kyrList = (/** @type {Array<{kyrFromNow: number}>} */ ms) => { const s = ms.map((p) => kyr(p.kyrFromNow)); return s.length > 1 ? s.slice(0, -1).join(', ') + ' and ' + s[s.length - 1] : (s[0] || '—'); };
+        const strongest = () => fwd().glacials.reduce((/** @type {any} */ a, /** @type {any} */ p) => (p.permil > a.permil ? p : a));
+        const warmest = () => fwd().interglacials.reduce((/** @type {any} */ a, /** @type {any} */ p) => (p.permil < a.permil ? p : a));
+        o.climateForwardWindowKyr = { get: () => -fwd().rule.windowKyrBP[0], render: kyr, unit: 'kyr', note: 'the forward figure\'s reach past 2000 AD (its window is symmetric: as far back)' };
+        o.climateForwardGridKyr = { get: () => fwd().gridKyr, render: (v) => Number(v).toFixed(1), unit: 'kyr', note: 'the forward figure\'s sample spacing (1,000 samples across the window)' };
+        o.climateForwardEdgeMarginKyr = { get: () => fwd().edgeMarginKyr, render: kyr, unit: 'kyr', note: 'the neighbourhood a marker must dominate on each side — so the last stretch of the window before its edge carries no marker' };
+        o.climateForwardProminencePermil = { get: () => fwd().rule.prominencePermil, render: (v) => Number(v).toFixed(1), unit: '‰', note: 'the least δ¹⁸O excursion against its neighbourhood for a marker' };
+        o.climateForwardGlacialThresholdPermil = { get: () => fwd().rule.glacialMinPermil, render: (v) => Number(v).toFixed(1), unit: '‰', note: 'a glacial marker\'s least δ¹⁸O (mid- to full-glacial; LR04\'s glacials read 4.8–5.3)' };
+        o.climateForwardInterglacialThresholdPermil = { get: () => fwd().rule.interglacialMaxPermil, render: (v) => Number(v).toFixed(1), unit: '‰', note: 'an interglacial marker\'s greatest δ¹⁸O (the Holocene ≈ 3.2)' };
+        o.climateForwardGlacialCount = { get: () => fwd().glacials.length, render: String, note: 'glacial maxima the forward figure marks' };
+        o.climateForwardInterglacialCount = { get: () => fwd().interglacials.length, render: String, note: 'interglacial peaks the forward figure marks' };
+        o.climateForwardGlacialKyrList = { get: () => kyrList(fwd().glacials), render: String, unit: 'kyr', note: 'the marked glacial maxima, kyr after 2000 AD, in order' };
+        o.climateForwardInterglacialKyrList = { get: () => kyrList(fwd().interglacials), render: String, unit: 'kyr', note: 'the marked interglacial peaks, kyr after 2000 AD, in order' };
+        o.climateForwardNextGlacialKyr = { get: () => fwd().glacials[0].kyrFromNow, render: kyr, unit: 'kyr', note: 'the first marked glacial maximum after 2000 AD' };
+        o.climateForwardNextGlacialPermil = { get: () => fwd().glacials[0].permil, render: f2, unit: '‰', note: 'δ¹⁸O at the first marked glacial maximum' };
+        o.climateForwardNextInterglacialKyr = { get: () => fwd().interglacials[0].kyrFromNow, render: kyr, unit: 'kyr', note: 'the first marked interglacial peak after 2000 AD' };
+        o.climateForwardNextInterglacialPermil = { get: () => fwd().interglacials[0].permil, render: f2, unit: '‰', note: 'δ¹⁸O at the first marked interglacial peak' };
+        o.climateForwardStrongestGlacialKyr = { get: () => strongest().kyrFromNow, render: kyr, unit: 'kyr', note: 'the marked glacial maximum with the highest δ¹⁸O in the forward window' };
+        o.climateForwardStrongestGlacialPermil = { get: () => strongest().permil, render: f2, unit: '‰', note: 'δ¹⁸O at the strongest marked glacial maximum' };
+        o.climateForwardWarmestInterglacialKyr = { get: () => warmest().kyrFromNow, render: kyr, unit: 'kyr', note: 'the marked interglacial peak with the lowest δ¹⁸O in the forward window' };
+        o.climateForwardWarmestInterglacialPermil = { get: () => warmest().permil, render: f2, unit: '‰', note: 'δ¹⁸O at the warmest marked interglacial peak' };
+        o.climateForwardCurveMinimumKyr = { get: () => fwd().curveMinimum.kyrFromNow, render: kyr, unit: 'kyr', note: 'where the forward curve itself is lowest (warmest) inside the window — inside the edge margin, so it carries no marker' };
+        o.climateForwardCurveMinimumPermil = { get: () => fwd().curveMinimum.permil, render: f2, unit: '‰', note: 'δ¹⁸O at the forward curve\'s own minimum' };
         // The lunar finder's completeness over the NASA Five Millennium Canon (data/lunar-canon-recall.json,
         // tools/verify/lunar-canon-recall.js): −1999…+3000, UT axis, ±3 h and same type = matched; the former
         // console-test L-4, promoted in the third maintenance round.

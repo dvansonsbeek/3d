@@ -13,7 +13,7 @@ import { createMoonOriginChapter, ORIGIN_CHAPTER_PHASES, ORIGIN_CHAPTER } from '
 //
 // Generated at build time, not fetched at runtime — the model parameters are
 // read at module scope below, and Phase 15 requires offline === hosted.
-import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createDeepCalendar, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, MOON_DISTANCE_ARTIFACT, deltaTEspenakMeeusCanonSeconds, computeSolarTorqueShare, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
+import { computeObliquityJ2000Deg, computeSecularShape, DEFAULT_CONSTANTS as K, REFERENCE_DATA as R, FITTED_COEFFICIENTS as FIT, CONSTANTS_HASH, COEFFICIENTS_HASH, MODEL_VERSION, PREPRINT_DOI, createDeepCalendar, DEEP_MODES_ARTIFACT, createDeepOrbitalHistory, createYearLengths, computeMeanTropicalYearJ2000Days, createChainCycleIntegrator, createMoonArguments, createMoonSeries, createMoonApparent, derivePlanetGeometry, scaffoldOrbitInputs, planetOrbitChain as _POC, MOON_DISTANCE_ARTIFACT, deltaTEspenakMeeusCanonSeconds, computeSolarTorqueShare, evalClimateFormulaProxyUnits, computeClimateForwardExtrema, createEclipseFinders, createModel, buildPlanetChainsFromArtifactData, computePlanetElementsAtYear as kcComputePlanetElementsAtYear, computeHeliocentricEclipticFromElements as kcComputeHeliocentricEclipticFromElements, computeEquatorNodeOriginSFrameDeg, convertNodeSFrameToEquatorOriginDeg, createSecularSeriesOverride, CHAIN_ARTIFACT, ANCHOR_EPOCH_YEAR as KC_ANCHOR_EPOCH_YEAR, ANCHOR_EPOCH_JD as KC_ANCHOR_EPOCH_JD, computeEarthFrameOfDate, solveWheelAngleForLongitude, computeSceneWorldFrameJ2000, SCENE_EQUINOX_VIEW_AZIMUTH_DEG,
   // the one-home helpers (time/calendar, math/angles, earth/mass-chain, constants/units)
   calendarToJD, jdToCalendar, jdToDecimalYear, dayFractionToHMS,
   DEG2RAD, RAD2DEG, wrap360, wrap180,
@@ -12736,61 +12736,35 @@ async function loadCenco2pipData() {
   return cfmCenco2pipData;
 }
 
-/** Evaluate climate formula in original-proxy units at age t (kyr BP).
+/** Evaluate climate formula in original-proxy units at age t (kyr BP) —
+ * ONE home `@essrt/physics` climate/forward-extrema (doc 111 §1.52): the
+ * same evaluator draws the curves here and computes the forward figure's
+ * markers for the registry's `climateForward*` keys.
  * Each layer line shows the formula with that layer ON TOP OF the
- * regime-adjusted baseline (baseline + L3 step terms), so the line
- * follows the L3 step structure and the user can see the layer's
- * unique wiggles overlaid on the regime story:
+ * regime-adjusted baseline (baseline + L3 step terms):
  *   layer='l1'  → baseline + L1 + L3   (orbital wiggles on regime baseline)
  *   layer='all' → baseline + L1 + L2 + L3   (= Total; L2 is empty in the shipped file)
  * L3 is included in every line because it defines the per-period climate
- * regime — without it, layer lines float on the smooth linear trend and
- * fail to track the visible step structure in the data. */
+ * regime — without it, layer lines float on the smooth linear trend. */
 function cfmEvalRaw(t_kyr_BP, regimeKey, layer) {
-  const r = CLIMATE_FORMULA_COEFFS.regimes[regimeKey];
-  if (!r) return NaN;
-  let C = r.intercept;
-  if (layer === 'l1' || layer === 'all') {
-    for (const c of r.L1) {
-      const omega = 2 * Math.PI / c.period_kyr;
-      C += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
-    }
-  }
-  if (layer === 'all') {
-    for (const c of r.L2) {
-      const omega = 2 * Math.PI / c.p_kyr;
-      C += c.a * Math.cos(omega * t_kyr_BP) + c.b * Math.sin(omega * t_kyr_BP);
-    }
-  }
-  // L3 step terms are included on EVERY layer line (defines regime baseline)
-  for (const s of r.L3) {
-    if (t_kyr_BP >= s.t_kyr) C += s.beta;
-  }
-  const d = r.denormalization;
-  return C * d.y_std + d.y_mean + d.trend_slope * t_kyr_BP + d.trend_intercept;
+  return evalClimateFormulaProxyUnits(CLIMATE_FORMULA_COEFFS, t_kyr_BP, regimeKey, layer);
 }
 
-/** Find local maxima or minima in [t, vals] arrays.
- *  type: 'max' (glacial) or 'min' (interglacial); prominence in proxy units.
- *  halfWidth = sample radius for peak detection AND baseline computation;
- *    pick large enough that half-cycle peaks (~10 kyr each side) are flat
- *    enough to register as extrema. Default 8 works for short-window views
- *    where dtGrid is sub-kyr; tune up (e.g. 32) for cycle-scale searches. */
-function cfmFindExtrema(t, vals, type, prominence, halfWidth = 8) {
-  const out = [];
-  for (let i = halfWidth; i < vals.length - halfWidth; i++) {
-    const v = vals[i];
-    let isExtremum = true;
-    for (let j = 1; j <= halfWidth; j++) {
-      if (type === 'max' && (vals[i - j] >= v || vals[i + j] >= v)) { isExtremum = false; break; }
-      if (type === 'min' && (vals[i - j] <= v || vals[i + j] <= v)) { isExtremum = false; break; }
-    }
-    if (!isExtremum) continue;
-    const localOpposite = (vals[i - halfWidth] + vals[i + halfWidth]) / 2;
-    if (Math.abs(v - localOpposite) < prominence) continue;
-    out.push({ t: t[i], v });
+/** Row per label so neighbouring marker labels never overlap (doc 111
+ *  §1.52: "Interglacial 119 kyr" and "145 kyr" sat 47 px apart under a
+ *  ~100-px label): labels centred on xs[i] and labelW wide, each takes the
+ *  first row whose last label ends before it starts; rows grow away from
+ *  the plot edge the caller anchors them on. */
+function cfmLabelRows(xs, labelW) {
+  const order = xs.map((_, i) => i).sort((a, b) => xs[a] - xs[b]);
+  const rows = new Array(xs.length).fill(0), rowLastX = [];
+  for (const i of order) {
+    let r = 0;
+    while (r < rowLastX.length && xs[i] - rowLastX[r] < labelW) r++;
+    rows[i] = r;
+    rowLastX[r] = xs[i];
   }
-  return out;
+  return rows;
 }
 
 /** Render the multi-layer climate-formula overlay chart for a chosen tab.
@@ -13078,56 +13052,50 @@ function cfmRenderChart(tabKey) {
     }
   }
 
-  // Forward-projection markers (future tab only) — derived from the
-  // currently-fit formula at render time. Glacial = δ¹⁸O peak (cold,
+  // Forward-projection markers (future tab only) — the ONE list the figure,
+  // the registry's `climateForward*` keys and the prose share (doc 111
+  // §1.52): `computeClimateForwardExtrema` carries the rule (the post-MPT
+  // regime on the figure's own grid, ±32 samples, prominence ≥ 0.3 ‰,
+  // glacial ≥ 4.5 ‰, interglacial ≤ 3.7 ‰). Glacial = δ¹⁸O peak (cold,
   // labeled near the bottom of the plot — matches inverted y-axis);
-  // interglacial = δ¹⁸O trough (warm, labeled near the top).
-  // Two filters: (1) local-prominence ≥ 0.3 ‰ to drop tiny ripples;
-  // (2) absolute δ¹⁸O thresholds to keep only physically meaningful
-  // events — glacial ≥ 4.5 ‰ (mid-glacial to full-glacial range),
-  // interglacial ≤ 3.7 ‰ (true interglacial; Holocene ≈ 3.2).
-  // Calibrated against LR04 ranges: glacial 4.8-5.3, mid-cycle 4.0-4.5,
-  // interglacial 3.0-3.5.
+  // interglacial = δ¹⁸O trough (warm, labeled near the top). Labels of one
+  // kind stagger into rows (cfmLabelRows) so neighbours stay readable.
   let futureMarkers = '';
+  let futureNextMarkers = null;
   if (tabKey === 'future') {
-    const GLACIAL_D18O      = 4.5;
-    const INTERGLACIAL_D18O = 3.7;
-    const fT_future = [], fV_future = [];
-    for (let i = 0; i < fT.length; i++) {
-      if (fT[i] < 0) { fT_future.push(fT[i]); fV_future.push(totalV[i]); }
-    }
-    // halfWidth=32 ≈ 20 kyr at this grid (dtGrid 0.625): wide enough to
-    // resolve 100-kyr glacial-cycle peaks (which are locally flat).
-    const glacials      = cfmFindExtrema(fT_future, fV_future, 'max', 0.3, 32)
-                           .filter(p => p.v >= GLACIAL_D18O);
-    const interglacials = cfmFindExtrema(fT_future, fV_future, 'min', 0.3, 32)
-                           .filter(p => p.v <= INTERGLACIAL_D18O);
+    const fwd = computeClimateForwardExtrema(CLIMATE_FORMULA_COEFFS);
+    const adYearOf = (m) => Math.round((2000 + m.kyrFromNow * 1000) / 500) * 500;
+    futureNextMarkers = { glacialAD: adYearOf(fwd.glacials[0]), interglacialAD: adYearOf(fwd.interglacials[0]) };
     const plotBot = margin.top + plotH;
-    for (const ev of [...glacials, ...interglacials]) {
-      if (ev.t < xmin || ev.t > xmax) continue;
-      const isGlacial = glacials.includes(ev);
-      const xe = sx(ev.t);
-      const adYear = Math.round((2000 + (-ev.t) * 1000) / 500) * 500;
-      const color = isGlacial ? '#8cb4ff' : '#ffb87a';
-      const lbl1 = `${isGlacial ? 'Glacial' : 'Interglacial'} ~${adYear.toLocaleString('en-US')} AD`;
-      const lbl2 = `δ¹⁸O ${ev.v.toFixed(2)}‰`;
-      if (isGlacial) {
-        // Bottom of plot (where high δ¹⁸O sits on the inverted axis)
-        futureMarkers += `<line x1="${xe.toFixed(1)}" y1="${(plotBot - 8).toFixed(1)}" x2="${xe.toFixed(1)}" y2="${plotBot.toFixed(1)}" stroke="${color}" stroke-width="0.7" opacity="0.8"/>` +
-                          `<text x="${xe.toFixed(1)}" y="${(plotBot - 14).toFixed(1)}" text-anchor="middle" font-size="8" font-family="Inter,system-ui,sans-serif" fill="${color}">${lbl1}</text>` +
-                          `<text x="${xe.toFixed(1)}" y="${(plotBot - 4).toFixed(1)}" text-anchor="middle" font-size="7" font-family="Inter,system-ui,sans-serif" fill="${color}" opacity="0.75">${lbl2}</text>`;
-      } else {
-        // Top of plot (where low δ¹⁸O = warm sits)
-        futureMarkers += `<line x1="${xe.toFixed(1)}" y1="${margin.top.toFixed(1)}" x2="${xe.toFixed(1)}" y2="${(margin.top + 8).toFixed(1)}" stroke="${color}" stroke-width="0.7" opacity="0.8"/>` +
-                          `<text x="${xe.toFixed(1)}" y="${(margin.top + 18).toFixed(1)}" text-anchor="middle" font-size="8" font-family="Inter,system-ui,sans-serif" fill="${color}">${lbl1}</text>` +
-                          `<text x="${xe.toFixed(1)}" y="${(margin.top + 28).toFixed(1)}" text-anchor="middle" font-size="7" font-family="Inter,system-ui,sans-serif" fill="${color}" opacity="0.75">${lbl2}</text>`;
-      }
+    const LABEL_W = 110, ROW_STEP = 22;   // two 8/7-px text lines per marker
+    for (const [kind, markers] of [['glacial', fwd.glacials], ['interglacial', fwd.interglacials]]) {
+      const shown = markers.filter(m => -m.kyrFromNow >= xmin && -m.kyrFromNow <= xmax);
+      const rows = cfmLabelRows(shown.map(m => sx(-m.kyrFromNow)), LABEL_W);
+      shown.forEach((m, i) => {
+        const isGlacial = kind === 'glacial';
+        const xe = sx(-m.kyrFromNow);
+        const color = isGlacial ? '#8cb4ff' : '#ffb87a';
+        const lbl1 = `${isGlacial ? 'Glacial' : 'Interglacial'} ~${adYearOf(m).toLocaleString('en-US')} AD`;
+        const lbl2 = `δ¹⁸O ${m.permil.toFixed(2)}‰`;
+        const off = rows[i] * ROW_STEP;
+        if (isGlacial) {
+          // Bottom of plot (where high δ¹⁸O sits on the inverted axis); rows step upward
+          futureMarkers += `<line x1="${xe.toFixed(1)}" y1="${(plotBot - 8 - off).toFixed(1)}" x2="${xe.toFixed(1)}" y2="${plotBot.toFixed(1)}" stroke="${color}" stroke-width="0.7" opacity="0.8"/>` +
+                            `<text x="${xe.toFixed(1)}" y="${(plotBot - 14 - off).toFixed(1)}" text-anchor="middle" font-size="8" font-family="Inter,system-ui,sans-serif" fill="${color}">${lbl1}</text>` +
+                            `<text x="${xe.toFixed(1)}" y="${(plotBot - 4 - off).toFixed(1)}" text-anchor="middle" font-size="7" font-family="Inter,system-ui,sans-serif" fill="${color}" opacity="0.75">${lbl2}</text>`;
+        } else {
+          // Top of plot (where low δ¹⁸O = warm sits); rows step downward
+          futureMarkers += `<line x1="${xe.toFixed(1)}" y1="${margin.top.toFixed(1)}" x2="${xe.toFixed(1)}" y2="${(margin.top + 8 + off).toFixed(1)}" stroke="${color}" stroke-width="0.7" opacity="0.8"/>` +
+                            `<text x="${xe.toFixed(1)}" y="${(margin.top + 18 + off).toFixed(1)}" text-anchor="middle" font-size="8" font-family="Inter,system-ui,sans-serif" fill="${color}">${lbl1}</text>` +
+                            `<text x="${xe.toFixed(1)}" y="${(margin.top + 28 + off).toFixed(1)}" text-anchor="middle" font-size="7" font-family="Inter,system-ui,sans-serif" fill="${color}" opacity="0.75">${lbl2}</text>`;
+        }
+      });
     }
   }
 
   // Future-projection note (future tab only)
   const futureNote = showFuture
-    ? `<div class="cfm-future-note"><b>Orbital-only projection.</b> Natural orbital + carbon-cycle + boundary terms only; no anthropogenic CO₂ forcing. Glacial / interglacial markers auto-detected from the curve.<br/>Under natural forcing the curve shows glacial inception by ~30,000 AD (next strong glacial peak at ~60,500 AD). Whether anthropogenic CO₂ alters this depends on CO₂'s causal role in glacial cycles — itself contested. If CO₂ drives temperature (<a href="https://www.nature.com/articles/nature16494" target="_blank" rel="noopener">Ganopolski et al. 2016</a>), present cumulative emissions delay inception by ~50,000 yr (high-emission scenarios ~100,000 yr). If CO₂ lags as a feedback (ice-core record, <a href="https://www.science.org/doi/10.1126/science.1078758" target="_blank" rel="noopener">Caillon et al. 2003</a>), the orbital projection largely holds. Honest scope: post-MPT regime continues.</div>`
+    ? `<div class="cfm-future-note"><b>Orbital-only projection.</b> Natural orbital + carbon-cycle + boundary terms only; no anthropogenic CO₂ forcing. Glacial / interglacial markers auto-detected from the curve.<br/>Under natural forcing the next marked interglacial peak falls at ~${futureNextMarkers.interglacialAD.toLocaleString('en-US')} AD and the next glacial maximum at ~${futureNextMarkers.glacialAD.toLocaleString('en-US')} AD. Whether anthropogenic CO₂ alters this depends on CO₂'s causal role in glacial cycles — itself contested. If CO₂ drives temperature (<a href="https://www.nature.com/articles/nature16494" target="_blank" rel="noopener">Ganopolski et al. 2016</a>), present cumulative emissions delay inception by ~50,000 yr (high-emission scenarios ~100,000 yr). If CO₂ lags as a feedback (ice-core record, <a href="https://www.science.org/doi/10.1126/science.1078758" target="_blank" rel="noopener">Caillon et al. 2003</a>), the orbital projection largely holds. Honest scope: post-MPT regime continues.</div>`
     : '';
 
   // R² breakdown table. Tabs that use a stitched fit (full / postMPText /
@@ -13555,31 +13523,32 @@ function cfmRenderPaperChart(tabKey, opts) {
     }
   }
 
-  // Forward projection markers (future tab only)
+  // Forward projection markers (future tab only) — the ONE list (doc 111
+  // §1.52; the registry's `climateForward*` keys cite the same markers);
+  // labels of one kind stagger into rows so neighbours stay readable.
   let futureMarkers = '';
   if (tabKey === 'future') {
-    const GLACIAL_D18O = 4.5, INTERGLACIAL_D18O = 3.7;
-    const fT_future = [], fV_future = [];
-    for (let i = 0; i < fT.length; i++) {
-      if (fT[i] < 0) { fT_future.push(fT[i]); fV_future.push(totalV[i]); }
-    }
-    const glacials      = cfmFindExtrema(fT_future, fV_future, 'max', 0.3, 32).filter(p => p.v >= GLACIAL_D18O);
-    const interglacials = cfmFindExtrema(fT_future, fV_future, 'min', 0.3, 32).filter(p => p.v <= INTERGLACIAL_D18O);
+    const fwd = computeClimateForwardExtrema(CLIMATE_FORMULA_COEFFS);
     const plotBot = H - PAD.b;
-    for (const ev of [...glacials, ...interglacials]) {
-      if (ev.t < xmin || ev.t > xmax) continue;
-      const isG = glacials.includes(ev);
-      const xe = sx(ev.t).toFixed(1);
-      const kyr = (-ev.t).toFixed(0);
-      const color = isG ? colors.glacial : colors.inter;
-      const lbl1 = `${isG ? 'Glacial' : 'Interglacial'} ${kyr} kyr`;
-      if (isG) {
-        futureMarkers += `<line x1="${xe}" y1="${plotBot - 10}" x2="${xe}" y2="${plotBot}" stroke="${color}" stroke-width="0.8"/>` +
-                         `<text x="${xe}" y="${plotBot - 14}" text-anchor="middle" font-size="9" font-family="Inter,Helvetica,Arial,sans-serif" fill="${color}" font-weight="600">${lbl1}</text>`;
-      } else {
-        futureMarkers += `<line x1="${xe}" y1="${PAD.t}" x2="${xe}" y2="${PAD.t + 10}" stroke="${color}" stroke-width="0.8"/>` +
-                         `<text x="${xe}" y="${PAD.t + 22}" text-anchor="middle" font-size="9" font-family="Inter,Helvetica,Arial,sans-serif" fill="${color}" font-weight="600">${lbl1}</text>`;
-      }
+    const LABEL_W = 100, ROW_STEP = 11;   // one 9-px bold text line per marker
+    for (const [kind, markers] of [['glacial', fwd.glacials], ['interglacial', fwd.interglacials]]) {
+      const shown = markers.filter(m => -m.kyrFromNow >= xmin && -m.kyrFromNow <= xmax);
+      const rows = cfmLabelRows(shown.map(m => sx(-m.kyrFromNow)), LABEL_W);
+      shown.forEach((m, i) => {
+        const isG = kind === 'glacial';
+        const xe = sx(-m.kyrFromNow).toFixed(1);
+        const kyr = m.kyrFromNow.toFixed(0);
+        const color = isG ? colors.glacial : colors.inter;
+        const lbl1 = `${isG ? 'Glacial' : 'Interglacial'} ${kyr} kyr`;
+        const off = rows[i] * ROW_STEP;
+        if (isG) {
+          futureMarkers += `<line x1="${xe}" y1="${plotBot - 10 - off}" x2="${xe}" y2="${plotBot}" stroke="${color}" stroke-width="0.8"/>` +
+                           `<text x="${xe}" y="${plotBot - 14 - off}" text-anchor="middle" font-size="9" font-family="Inter,Helvetica,Arial,sans-serif" fill="${color}" font-weight="600">${lbl1}</text>`;
+        } else {
+          futureMarkers += `<line x1="${xe}" y1="${PAD.t}" x2="${xe}" y2="${PAD.t + 10 + off}" stroke="${color}" stroke-width="0.8"/>` +
+                           `<text x="${xe}" y="${PAD.t + 22 + off}" text-anchor="middle" font-size="9" font-family="Inter,Helvetica,Arial,sans-serif" fill="${color}" font-weight="600">${lbl1}</text>`;
+        }
+      });
     }
   }
 

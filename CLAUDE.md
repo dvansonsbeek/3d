@@ -686,6 +686,15 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   position-COUNT year, and the eclipse formula had read it as the engine
   year (25 kyr off at 400 Ma) — `time.engineYearFromJDUT` is the instant's
   year, `jdUTToPositionYear` the position's. (§1.51)
+- **Two lists over one curve drift apart — a figure's markers are the ONE
+  list, keyed, and a finder's edge margin is published beside it** — the
+  forward figure's dates were quoted from a hand list on another selection
+  rule (62 vs 58.5 kyr; two superlatives with no marker within 16 kyr), its
+  labels collided at 47 px under a 100-px label, and the finder's ±16-kyr
+  margin leaves the window's deepest trough (237 kyr, 1.71 ‰) unmarked while
+  the prose called a marked one "the warmest"; ONE home
+  `climate/forward-extrema`, the `climateForward*` keys, the labels on a row
+  stagger, gate `test:climate-forward`. (§1.52)
 
 ---
 

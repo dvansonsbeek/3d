@@ -191,6 +191,8 @@ export { createMoonDistanceHistory } from './deltat/moon-distance-history.cjs';
 export { MOON_DISTANCE_ARTIFACT, MOON_DISTANCE_ARTIFACT_HASH } from './deltat/moon-distance-artifact.cjs';
 export { deltaTEspenakMeeusCanonSeconds } from './deltat/historical.cjs';
 export { evalClimateL1OrbitalPermil, laggedL1Terms, createAlphaGiaChannel } from './climate/l1-orbital.cjs';
+// The forward figure's markers — ONE home of the formula evaluator, the extrema finder and the marker rule (doc 111 §1.52).
+export { CLIMATE_FORWARD_MARKER_RULE, evalClimateFormulaProxyUnits, findExtrema, computeClimateForwardExtrema } from './climate/forward-extrema.cjs';
 // Phase 8.5 — eclipse geometry (single-copy: the browser had no Node twin).
 export { createEclipseFinders } from './eclipse/finders.cjs';
 // Plan 33 — the eclipse formula of date and the ONE home of the shadow geometry the finders classify with.
