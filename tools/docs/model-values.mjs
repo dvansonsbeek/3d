@@ -194,6 +194,7 @@ const chainInclStats = (() => {
 // The package model on the SERIES tier (the API's construction), built lazily
 // on the first key that reads it (the spin-channel keys).
 const phys = await import('@essrt/physics');
+const { scaffoldOrbitInputs } = (await import('@essrt/physics/planets/geometry')).default;   // the planets' sidereal periods (ONE home)
 const physModel = (() => {
   /** @type {any} */ let m;
   return () => {
@@ -685,12 +686,13 @@ export const VALUES = {
     out.evolvingClockPreferredDeltaPMaxLr04 = { get: () => clk().verdict.preferred_dp_lr04_max, render: (v) => (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(2), unit: '″/yr', note: 'largest preferred δp over the four LR04 windows' };
     // Fit-methodology diagnostics on the shipped lines (scripts/fit_methodology_diagnostics.py, doc 92 §9.5)
     const fdg = () => rd('data/fit-methodology-diagnostics.json');
-    const g3 = (v) => Number(v).toPrecision(3);
     const f3s = (v) => Number(v).toFixed(3);
     out.fitDiagLineCount = { get: () => fdg().metadata.n_lines, render: (v) => String(v), note: 'shipped L1 lines in the design matrix' };
     for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
-      out[`fitDiagCond${key}`] = { get: () => fdg().regimes[reg].conditioning.condition_number, render: g3, note: `condition number of the centred L1 design matrix, ${reg}` };
-      out[`fitDiagMaxVif${key}`] = { get: () => fdg().regimes[reg].vif.max_vif, render: g3, note: `largest variance inflation factor among the L1 columns, ${reg}` };
+      // three significant figures; the large regimes' values in the site's scientific notation (a bare 1.77e+6 typesets as a binary plus in TeX)
+      const sig3 = (v) => (Math.abs(v) >= 1e4 ? fmtSci(v, 2) : Number(v).toPrecision(3));
+      out[`fitDiagCond${key}`] = { get: () => fdg().regimes[reg].conditioning.condition_number, render: sig3, note: `condition number of the centred L1 design matrix, ${reg}` };
+      out[`fitDiagMaxVif${key}`] = { get: () => fdg().regimes[reg].vif.max_vif, render: sig3, note: `largest variance inflation factor among the L1 columns, ${reg}` };
       out[`fitDiagUnresolvedGroups${key}`] = { get: () => fdg().regimes[reg].rayleigh.n_unresolved_groups, render: (v) => String(v), note: `groups of lines closer than one Rayleigh element (1/T) of the window, ${reg}` };
       out[`fitDiagUnresolvedLines${key}`] = { get: () => fdg().regimes[reg].rayleigh.n_lines_in_unresolved_groups, render: (v) => String(v), note: `lines inside those groups, ${reg}` };
       out[`fitDiagOlsR2${key}`] = { get: () => fdg().regimes[reg].ols.r2_l1, render: (v) => Number(v).toFixed(4), note: `L1-layer R² of plain OLS on normalized data, ${reg}` };
@@ -1485,7 +1487,10 @@ export const VALUES = {
         const res = () => { const j = rd('data/core-mantle-resonator-stage1.json'); return j.variants[j.selected_variant]; };
         const fit = () => rd('data/deltaT-4flag-fit.json');
         const stagesRms = () => { const m = fit().fit_metrics; return { bond: m.stage_a_bond_solo.rms_post, bh: m.stage_b_bond_hallstatt_joint.rms_post, bhj5: m.stage_c_bond_hallstatt_jose5.rms_post, all: m.stage_d_bond_hallstatt_jose5_jose4.rms_post }; };
-        const planetAKm = (p) => Math.pow(astro.planetOrbitalElements[p].orbitalPeriodInputDays / C.meanSiderealYearDays, 2 / 3) * C.currentAUDistance;
+        /** the semi-major axis by Kepler's law on the planet's SIDEREAL period — the chain's era-window mean motion
+         *  (ONE home scaffoldOrbitInputs; the astro-reference input period is the NASA fact sheet's TROPICAL period,
+         *  0.6 % short for Neptune), the IAU AU, the planet's mass neglected */
+        const planetAKm = (p) => Math.pow(scaffoldOrbitInputs(p, rd('data/nbody-secular-frequencies.json'), astro.planetOrbitalElements[p].orbitalPeriodInputDays).periodDays / C.meanSiderealYearDays, 2 / 3) * C.currentAUDistance;
         const shrinkDevonian = () => dtl().EPOCH_PARAMS.solarMassLossFracPerYear * 380e6;
         /** the minimum of one decomposition field over an age window, 100-yr steps: {v, tMa} */
         const scanMin = (fromMa, toMa, pick) => { let best = null; for (let t = fromMa; t <= toMa + 1e-12; t += 1e-4) { const v = pick(dtl().dLodDtDecompositionAtAge(t)); if (best === null || v < best.v) best = { v, tMa: t }; } return best; };
@@ -1515,11 +1520,11 @@ export const VALUES = {
           dtStackLadderRmsBondHallstattSeconds: { get: () => stagesRms().bh, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with Bond and Hallstatt (stage_b)' },
           dtStackLadderRmsThreeSeconds: { get: () => stagesRms().bhj5, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with Bond, Hallstatt and Jose5 (stage_c)' },
           dtStackLadderRmsAllFourSeconds: { get: () => stagesRms().all, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with all four harmonics (stage_d)' },
-          mercuryDistanceJ2000Km: { get: () => planetAKm('mercury'), render: (v) => thousands(v), unit: 'km', note: 'Mercury\'s semi-major axis from its J2000 period by Kepler\'s law on the IAU AU' },
+          mercuryDistanceJ2000Km: { get: () => planetAKm('mercury'), render: (v) => thousands(v), unit: 'km', note: 'Mercury\'s semi-major axis from the chain\'s sidereal period by Kepler\'s law on the IAU AU' },
           mercuryDistanceDevonianKm: { get: () => planetAKm('mercury') * (1 - shrinkDevonian()), render: (v) => thousands(v), unit: 'km', note: 'the same at the Devonian under Driver 2 (a·M☉ constant)' },
-          jupiterDistanceJ2000Km: { get: () => planetAKm('jupiter'), render: (v) => thousands(v), unit: 'km', note: 'Jupiter\'s semi-major axis from its J2000 period' },
+          jupiterDistanceJ2000Km: { get: () => planetAKm('jupiter'), render: (v) => thousands(v), unit: 'km', note: 'Jupiter\'s semi-major axis from the chain\'s sidereal period' },
           jupiterDistanceDevonianKm: { get: () => planetAKm('jupiter') * (1 - shrinkDevonian()), render: (v) => thousands(v), unit: 'km', note: 'the same at the Devonian' },
-          neptuneDistanceJ2000Km: { get: () => planetAKm('neptune'), render: (v) => thousands(v), unit: 'km', note: 'Neptune\'s semi-major axis from its J2000 period' },
+          neptuneDistanceJ2000Km: { get: () => planetAKm('neptune'), render: (v) => thousands(v), unit: 'km', note: 'Neptune\'s semi-major axis from the chain\'s sidereal period' },
           neptuneDistanceDevonianKm: { get: () => planetAKm('neptune') * (1 - shrinkDevonian()), render: (v) => thousands(v), unit: 'km', note: 'the same at the Devonian' },
           earthPrecSolarShareTwoFourSixZeroMaPct: { get: () => PRb().solarShareJ2000 / PRb().torqueTermAtYear(2000 - 2.46e9) * 100, render: (v) => String(Math.round(v)), unit: '%', note: 'the solar share of the precession torque at 2.46 Ga — f_S over the composed law\'s torque term of date' },
           dLodDtGiaMinLastDeglacialMsCy: { get: () => scanMin(0, 0.03, (d) => d.gia).v, render: signed2, unit: 'ms/cy', note: 'the GIA channel\'s rate minimum over the last 30 kyr (100-yr scan of the decomposition)' },
@@ -1537,6 +1542,26 @@ export const VALUES = {
               dLodDtNetSubZeroFractionLastGlacialPct: { get: () => subZero().fractionPct, render: (v) => String(Math.round(v)), unit: '%', note: 'the share of the last 25 kyr in which the full Layer-4 rate is negative (the day transiently shortening), 100-yr scan' },
               dLodDtNetSubZeroYoungestLabel: { get: () => eraLabel(subZero().first), render: (v) => String(v), note: 'the youngest sub-zero epoch of the full rate in the last 25 kyr' },
               dLodDtNetSubZeroOldestLabel: { get: () => eraLabel(subZero().last), render: (v) => String(v), note: 'the oldest sub-zero epoch of the full rate in the last 25 kyr' },
+            };
+          })(),
+          ...(() => {
+            /** the integrated non-tidal LOD swing over the solar-day figure's window (248 kyr BC .. 102 kyr AD):
+             *  LOD(t) − tidal trend = ∫ channel dt, 100-yr steps, read as a peak-to-peak; {giaMs, netMs}. The paper's
+             *  former "~250 ms" was the pre-plan-26 channel's. */
+            let memo = null;
+            const swing = () => {
+              if (memo) return memo;
+              const step = 1e-4; let g = 0, n = 0, gMin = Infinity, gMax = -Infinity, nMin = Infinity, nMax = -Infinity;
+              for (let t = -0.102; t <= 0.248 + 1e-12; t += step) {
+                const d = dtl().dLodDtDecompositionAtAge(t);
+                g -= d.gia * step * 1e4; n -= (d.net_L4 - d.tidal) * step * 1e4;   // ms/cy × centuries, walked into the past
+                if (g < gMin) gMin = g; if (g > gMax) gMax = g; if (n < nMin) nMin = n; if (n > nMax) nMax = n;
+              }
+              return (memo = { giaMs: gMax - gMin, netMs: nMax - nMin });
+            };
+            return {
+              lodMilankovitchGiaSwingPeakToPeakMs: { get: () => swing().giaMs, render: (v) => String(Math.round(v)), unit: 'ms', note: 'the GIA channel integrated over the solar-day figure\'s window (248 kyr BC .. 102 kyr AD): the peak-to-peak LOD swing the α(t) coupling puts on the tidal trend, 100-yr steps' },
+              lodMilankovitchNetSwingPeakToPeakMs: { get: () => swing().netMs, render: (v) => String(Math.round(v)), unit: 'ms', note: 'the same with the cycle stack and the Core-mantle swing included (the full Layer-4 rate minus the tidal trend, integrated)' },
             };
           })(),
           bondIrdVariancePct: { get: () => rd('data/lod-climate-correlation-summary.json').bondIrdPearsonR ** 2 * 100, render: (v) => String(Math.round(v)), unit: '%', note: 'the Bond IRD correlation squared — the share of variance it accounts for (the recorded campaign\'s r)' },
@@ -1945,6 +1970,11 @@ export const VALUES = {
     }
     out.earthMeanObliquityCitedJ2000Deg = { get: () => dtl().meanObliquityCitedDegAtAge(0), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the cited mean obliquity at age 0 (Farhat et al. 2022) — a Myr-scale MEAN of a secular solution, against the J2000 instant 23.44° the hybrid starts from; the rate’s factor is the RATIO cos ε̄(t)/cos ε̄(0), so the model keeps its own J2000 obliquity' };
     out.earthMeanObliquityCitedDevonianDeg = { get: () => dtl().meanObliquityCitedDegAtAge(380), render: (v) => Number(v).toFixed(2), unit: '°', note: 'the cited mean obliquity at the Devonian (380 Ma) — Farhat et al. 2022’s column' };
+    /** the leg-1 referee at 650 Ma and the spin-only reading beside the composed one: ω(t)/ω₀ × p₀ — the law
+     *  without the lunar torque's growth and the obliquity factor (the paper's "pure spin scaling") */
+    out.wuPrecession650MaArcsecPerYr = { get: () => 67.64, render: (v) => Number(v).toFixed(2), unit: '″/yr', note: 'Wu et al. 2024 (sciadv.ado2412): the cyclostratigraphic precession constant inferred at 650 Ma — a citation value, the leg-1 referee' };
+    out.earthPrecSpinOnly650MaArcsecPerYr = { get: () => dtl().precessionRateJ2000ArcsecPerYr() * dtl().meanLodSecondsAtAge(0) / dtl().meanLodSecondsAtAge(650), render: (v) => Number(v).toFixed(1), unit: '″/yr', note: 'p₀ scaled by the spin alone, ω(650 Ma)/ω₀ on the chain\'s LOD — no lunar-torque growth, no obliquity factor' };
+    out.earthPrecSpinOnlyShortfall650MaPct = { get: () => 100 * (1 - out.earthPrecSpinOnly650MaArcsecPerYr.get() / 67.64), render: (v) => String(Math.round(v)), unit: '%', note: 'how far the spin-only rate falls short of Wu 2024\'s 650 Ma constant' };
     out.earthPrecObliquityFactorDevonianPct = { get: () => 100 * (dtl().precessionObliquityFactorAtAge(380) - 1), render: (v) => Number(v).toFixed(2), unit: '%', note: 'cos ε̄(t)/cos ε̄(0) − 1 at the Devonian — what the cited mean obliquity adds to the precession rate of date' };
     return out;
   })(),
