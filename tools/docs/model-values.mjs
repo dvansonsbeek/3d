@@ -690,7 +690,7 @@ export const VALUES = {
     out.fitDiagLineCount = { get: () => fdg().metadata.n_lines, render: (v) => String(v), note: 'shipped L1 lines in the design matrix' };
     for (const [key, reg] of [['PostMpt', 'post-mpt'], ['InhgMpt', 'inhg-mpt'], ['PreInhg', 'pre-inhg'], ['Lr04Full', 'lr04-full']]) {
       // three significant figures; the large regimes' values in the site's scientific notation (a bare 1.77e+6 typesets as a binary plus in TeX)
-      const sig3 = (v) => (Math.abs(v) >= 1e4 ? fmtSci(v, 2) : Number(v).toPrecision(3));
+      const sig3 = (v) => (Math.abs(v) >= 1e4 ? fmtSci(v, 2) : String(Number(Number(v).toPrecision(3))));   // 3230, not 3.23e+3
       out[`fitDiagCond${key}`] = { get: () => fdg().regimes[reg].conditioning.condition_number, render: sig3, note: `condition number of the centred L1 design matrix, ${reg}` };
       out[`fitDiagMaxVif${key}`] = { get: () => fdg().regimes[reg].vif.max_vif, render: sig3, note: `largest variance inflation factor among the L1 columns, ${reg}` };
       out[`fitDiagUnresolvedGroups${key}`] = { get: () => fdg().regimes[reg].rayleigh.n_unresolved_groups, render: (v) => String(v), note: `groups of lines closer than one Rayleigh element (1/T) of the window, ${reg}` };
