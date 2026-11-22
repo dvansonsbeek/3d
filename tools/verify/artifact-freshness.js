@@ -31,7 +31,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { ROOT, hashFile } = require('../lib/artifact-inputs');
+const { ROOT, matchesRecorded } = require('../lib/artifact-inputs');
 
 // A recorded input that is MISSING is only a failure when git tracks it.
 // Gitignored datasets (the 319 MB xlsx, the 166 MB CSV class) are absent in
@@ -139,9 +139,9 @@ for (const rel of [...governed].sort()) {
   }
   for (const [inputRel, recorded] of Object.entries(inputs.files)) {
     checked++;
-    let current;
+    let fresh;
     try {
-      current = hashFile(inputRel);
+      fresh = matchesRecorded(inputRel, recorded);   // in the convention the record carries: bytes, or the tokens of a source
     } catch {
       if (isGitIgnored(inputRel)) {
         skipped.push(`${rel}: input ${inputRel} is a gitignored dataset absent here — hash unverifiable, skipped`);
@@ -150,7 +150,7 @@ for (const rel of [...governed].sort()) {
       failures.push(`${rel}: input ${inputRel} no longer exists — regenerate: ${inputs.generator}`);
       continue;
     }
-    if (current !== recorded) {
+    if (!fresh) {
       failures.push(`${rel}: input ${inputRel} CHANGED since generation — regenerate: ${inputs.generator}`);
     }
   }

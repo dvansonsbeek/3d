@@ -36,7 +36,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const require = createRequire(join(ROOT, 'package.json'));
-const { hashFile } = require(join(ROOT, 'tools/lib/artifact-inputs.js'));
+const { matchesRecorded } = require(join(ROOT, 'tools/lib/artifact-inputs.js'));
 
 const args = process.argv.slice(2);
 const RUN = args.includes('--run');
@@ -60,7 +60,7 @@ for (const dir of ['data', 'public/input']) for (const f of readdirSync(join(ROO
   const stale = [];
   for (const [p, h] of Object.entries(files)) {
     if (!existsSync(join(ROOT, p))) { if (!isGitIgnored(p)) stale.push(`${p} (missing)`); continue; }
-    if (hashFile(p) !== h) stale.push(p);
+    if (!matchesRecorded(p, h)) stale.push(p);
   }
   nodes.set(rel, { id: rel, cmd: String(j.inputs.generator), produces: [rel], inputs: Object.keys(files), stale, manual: /<[^>]+>/.test(String(j.inputs.generator)) });
 }

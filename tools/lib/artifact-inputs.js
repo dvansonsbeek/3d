@@ -24,16 +24,67 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 
-/** sha256 of a repo-relative file, formatted for the inputs block. */
+/** sha256 of a repo-relative file's BYTES, `sha256:<hex>` — the fingerprint of a data file. */
 function hashFile(relPath) {
   const bytes = fs.readFileSync(path.join(ROOT, relPath));
   return 'sha256:' + crypto.createHash('sha256').update(bytes).digest('hex');
 }
 
+/** The JavaScript sources are fingerprinted by their TOKENS (doc 111 §1.36, "the price of a comment": a one-word
+ *  comment in a fit-hashed source cost 2.2 h of bit-identical bank regeneration plus a by-hand re-close of the
+ *  governed fit — the byte hash cannot tell a comment from physics). acorn's tokenizer drops comments and
+ *  whitespace and keeps every literal, identifier and operator; a string or regex edit still moves the hash. */
+const SOURCE_EXT = new Set(['.js', '.mjs', '.cjs']);
+const acorn = require('acorn');
+
+/** The canonical token stream of a source text, or null where acorn cannot tokenize it (then the bytes stand). */
+function tokenStream(ext, text) {
+  const read = (sourceType) => {
+    const out = [];
+    for (const t of acorn.tokenizer(text, { ecmaVersion: 'latest', sourceType, allowHashBang: true, locations: false })) {
+      const v = t.value === undefined ? '' : typeof t.value === 'object' && t.value !== null ? JSON.stringify(t.value) : String(t.value);
+      out.push(t.type.label + '\u0001' + v);
+    }
+    return out;
+  };
+  for (const sourceType of ext === '.cjs' ? ['script', 'module'] : ['module', 'script']) {
+    try { return read(sourceType); } catch { /* the other goal symbol */ }
+  }
+  return null;
+}
+
+/** sha256 of a source TEXT's tokens, `sha256-tokens:<hex>`; null where it cannot be tokenized. */
+function hashSourceText(ext, text) {
+  const tokens = tokenStream(ext, text);
+  if (!tokens) return null;
+  return 'sha256-tokens:' + crypto.createHash('sha256').update(tokens.join('\n')).digest('hex');
+}
+
+/** The token fingerprint of a repo-relative source file (the byte hash where it cannot be tokenized). */
+function hashSource(relPath) {
+  if (process.env.ESSRT_ARTIFACT_INPUTS_PLANT === '1') return hashFile(relPath);   // the gate's plant: bytes again
+  const text = fs.readFileSync(path.join(ROOT, relPath), 'utf8');
+  return hashSourceText(path.extname(relPath), text) || hashFile(relPath);
+}
+
+/** The fingerprint a NEW stamp records: tokens for a JavaScript source, bytes for everything else. */
+function fingerprint(relPath) {
+  return SOURCE_EXT.has(path.extname(relPath)) ? hashSource(relPath) : hashFile(relPath);
+}
+
+/** Does the file still match a RECORDED fingerprint? Compared in the convention the record carries, so a byte-hash
+ *  stamp written before the token convention stays verifiable and migrates at the artifact's next write (the
+ *  Python twin stamps bytes only). Throws where the file is absent, like hashFile. */
+function matchesRecorded(relPath, recorded) {
+  if (typeof recorded !== 'string') return false;
+  if (recorded.startsWith('sha256-tokens:')) return hashSource(relPath) === recorded;
+  return hashFile(relPath) === recorded;
+}
+
 /** Build the `inputs` block for a generator invocation + its input files. */
 function buildInputsBlock(generatorCommand, relPaths) {
   const files = {};
-  for (const rel of [...relPaths].sort()) files[rel] = hashFile(rel);
+  for (const rel of [...relPaths].sort()) files[rel] = fingerprint(rel);
   return { generator: generatorCommand, files };
 }
 
@@ -67,4 +118,4 @@ function modelSourceFilesExcluding(excludedSlices) {
   return modelSourceFiles().filter((p) => !excludedSlices.some((f) => p === `${dir}/${f}`));
 }
 
-module.exports = { ROOT, hashFile, buildInputsBlock, modelSourceFiles, modelSourceFilesExcluding };
+module.exports = { ROOT, hashFile, hashSource, hashSourceText, fingerprint, matchesRecorded, buildInputsBlock, modelSourceFiles, modelSourceFilesExcluding };

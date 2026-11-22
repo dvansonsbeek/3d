@@ -1266,7 +1266,17 @@ stale, which the by-hand re-close moved with every coefficient reproduced;
 the constants embed came out byte-identical, so the stamp cost only the four
 campaigns' re-stamp (12 minutes), not a second bank run. A comment in a
 bank- or fit-hashed file is edited together with a physics change, never
-alone (plan 22's header-edit lesson, now measured on the banks).
+alone (plan 22's header-edit lesson, now measured on the banks). Resolved at
+the source since the paper review's close-out: a JavaScript source in an
+`inputs` stamp is fingerprinted by its TOKENS (`tools/lib/artifact-inputs.js`
+on acorn's tokenizer, `sha256-tokens:`), so a comment or whitespace edit
+moves no stamp while any literal, identifier or operator does; the freshness
+gate and the cascade verify a record in the convention it carries, so the
+byte-hash stamps written before stay valid and migrate at each artifact's
+next write (the next cascade migrates them all); the Python twin stamps
+bytes only. Gate `test:artifact-inputs` — its plant
+`ESSRT_ARTIFACT_INPUTS_PLANT=1` makes the source fingerprint the byte hash
+again and the comment-edit row fails.
 
 **A bank's limit is measured from the anchor, and a segment keeps the cells
 before the first undefined one.** The three banked tables — the five chain
