@@ -4,6 +4,8 @@
  *
  *   npm run regen:cascade            print the stale set in regeneration order (dry run)
  *   npm run regen:cascade -- --run   run it, stopping at the first failure
+ *   npm run regen:cascade -- --all   every governed node, stale or not (the stamp migration to the token
+ *                                    fingerprint; with --run it regenerates them all in order)
  *
  * Every governed artifact in data/ records its inputs (tools/lib/artifact-inputs.js);
  * the freshness gate (tools/verify/artifact-freshness.js) fails naming the ONE artifact
@@ -106,7 +108,13 @@ for (const n of nodes.values()) for (const p of n.inputs) { const src = producer
 // ── propagate: a stale node moves everything downstream when it regenerates ──
 /** @type {Map<string, string[]>} */
 const reason = new Map();
-for (const n of nodes.values()) if (n.stale.length) reason.set(n.id, n.stale);
+// --all: every governed node regenerates whether stale or not — the stamp migration (tools/lib/artifact-inputs.js:
+// a record written before the token convention stays valid, so nothing is stale, and only a regeneration rewrites it)
+// The importers of CITED data (tools/pipeline/import-*) are left out of --all: a re-import is a decision about
+// the input, never a regeneration (their stamps are data-file byte hashes, which the token convention leaves as they are).
+const ALL = args.includes('--all');
+const isImporter = (/** @type {Node} */ n) => /tools\/pipeline\/import-/.test(n.cmd);
+for (const n of nodes.values()) if (n.stale.length || (ALL && !n.manual && !isImporter(n))) reason.set(n.id, n.stale.length ? n.stale : ['--all: every governed node regenerates (a stamp migration, nothing stale)']);
 const queue = [...reason.keys()];
 while (queue.length) {
   const id = /** @type {string} */ (queue.shift());

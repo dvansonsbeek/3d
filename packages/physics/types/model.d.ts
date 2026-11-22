@@ -569,3 +569,26 @@ export function assembleModel(C: Readonly<Record<string, any>>, F: Readonly<Reco
         }>;
     }>;
 }>;
+/**
+ * Compose the slices in order THROUGH the named one (its file name), merging each slice's result into the
+ * shared context and filling the forward bindings — the composer's own walk, also the parity test's
+ * counterfactual and the residual-spectra sweep's context (they stop early or read the context itself).
+ * @param {any} inputs  { C, F, laws, secularSeriesArtifact, options, late }
+ * @param {string} throughFile  the last slice to apply, e.g. 'published-periods' or 'cardinal-instants'
+ */
+export function composeThrough(inputs: any, throughFile: string): any;
+/**
+ * THE SLICE ORDER — ONE home (plan 15; the one-home fix of the plan-34 cascade, where the residual-spectra
+ * sweep's hand-written twin of this list failed on a slice added here). Each entry is the slice's assembler, its
+ * file under model/ (the generators hash the files: tools/lib/artifact-inputs.js modelSourceFiles), and the
+ * forward bindings it fills the moment it returns (model/context.js). The Sun's mean-longitude table is its own
+ * slice before the eclipse tier: the lunar bank hashes it and not the eclipse slice (modelSourceFilesExcluding).
+ * The surface is the last slice and is RETURNED, not merged (assembleModel above); composeThrough stops before it.
+ * @type {ReadonlyArray<{ name: string, file: string, assemble: (c: any) => any, after?: (c: any, late: any) => void }>}
+ */
+export const MODEL_SLICES: ReadonlyArray<{
+    name: string;
+    file: string;
+    assemble: (c: any) => any;
+    after?: (c: any, late: any) => void;
+}>;

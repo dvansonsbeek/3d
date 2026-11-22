@@ -11,14 +11,8 @@ const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const P = join(ROOT, 'packages', 'physics', 'src');
 
-const ORDER = [
-  ['assembleDerivedConstants', 'derived-constants'], ['assembleDeepTimeChain', 'deep-time-chain'], ['assembleEarthScalars', 'earth-scalars'],
-  ['assembleYearDayLengths', 'year-day-lengths'], ['assembleOneSourceMovement', 'one-source-movement'], ['assembleMoonEpoch', 'moon-epoch'],
-  ['assembleDeltaT', 'delta-t'], ['assemblePlanetRecords', 'planet-records'], ['assemblePlanetSpinChannel', 'planet-spin-channel'],
-  ['assemblePlanetElementsOfDate', 'planet-elements-of-date'], ['assembleInvPlaneElements', 'inv-plane-elements'], ['assembleTimeAxis', 'time-axis'],
-  ['assembleLunarTheory', 'lunar-theory'], ['assembleSunMeanLongitude', 'sun-mean-longitude'], ['assembleSunAndEclipses', 'sun-and-eclipses'], ['assemblePublishedPeriods', 'published-periods'], ['assembleCardinalInstants', 'cardinal-instants'],
-];
-// (the composer's order, model.js — the parity test carries the same list; a slice added there is added here)
+// The slice order has ONE home, model.js MODEL_SLICES — this sweep walks it through composeThrough (the
+// plan-34 cascade failed on a hand-written twin of the list kept here).
 
 let _ctx = null;
 /** The composer's context after every slice — the shipped constants, the shipped fitted set, the banks seated. */
@@ -32,15 +26,9 @@ export async function composedContext() {
     options: { giaEllipticityOfDate: true, spinCheckpointsArtifact: require(join(ROOT, 'data', 'spin-axis-checkpoints.json')), lunarCheckpointsArtifact: require(join(ROOT, 'data', 'lunar-cumulative-checkpoints.json')) },
     late,
   };
-  for (const [fn, file] of ORDER) {
-    const slice = (await import(join(P, 'model', `${file}.js`)))[fn];
-    c = Object.assign(c, slice(c));
-    if (fn === 'assembleYearDayLengths') late.certifiedAxialPrecessionJ2000Years = c.certifiedAxialPrecessionJ2000Years;
-    if (fn === 'assembleOneSourceMovement') { late.oneSourceM = c.oneSourceM; late.yearLengthsM = c.yearLengthsM; }
-    if (fn === 'assembleSunMeanLongitude') late.sunMeanLongitudeDegAt = c.sunMeanLongitudeDegAt;
-    if (fn === 'assemblePublishedPeriods') { late.publishedAxialPrecessionYearsAtYear = c.publishedAxialPrecessionYearsAtYear; late.publishedSiderealYearSecondsAtYear = c.publishedSiderealYearSecondsAtYear; }
-    if (fn === 'assembleCardinalInstants') late.sunAberrationArcsecAt = c.sunAberrationArcsecAt;
-  }
+  // the composer's own walk through the last merged slice (the surface is returned by assembleModel, not merged)
+  const { composeThrough } = await import(join(P, 'model.js'));
+  c = composeThrough(c, 'cardinal-instants');
   _ctx = c;
   return c;
 }

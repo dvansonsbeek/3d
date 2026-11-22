@@ -264,33 +264,15 @@ if (model.identity.counterfactual !== false) failures.push('identity: default as
   check('moon ecc sensitivity node (physical, closed form)', 2000, S.nodePhysical, sN, 1e-12);
   if (!(Math.abs(S.perigeePhysical - 2.479) < 0.002 && Math.abs(S.nodePhysical - 0.867) < 0.002)) failures.push(`physical pair ${S.perigeePhysical} / ${S.nodePhysical} parted from the recorded 2.479 / 0.867 (doc 66 §1)`);
 
-  // (ii) the frame-freedom counterfactual: the composer's slices to the lunar one, twice
-  const slices = await Promise.all(['derived-constants', 'deep-time-chain', 'earth-scalars', 'year-day-lengths', 'one-source-movement', 'moon-epoch', 'delta-t', 'planet-records', 'planet-spin-channel', 'planet-elements-of-date', 'inv-plane-elements', 'time-axis', 'lunar-theory', 'sun-mean-longitude', 'sun-and-eclipses', 'published-periods'].map((f) => import(`../src/model/${f}.js`)));
+  // (ii) the frame-freedom counterfactual: the composer's own walk (model.js MODEL_SLICES, ONE home) through the
+  // published periods, twice — the second with the dynamical precession rate offset on the forward binding
+  const { composeThrough } = await import('../src/model.js');
   const { DEFAULT_CONSTANTS, FITTED_COEFFICIENTS } = await import('../src/index.js');
   /** @param {number} dpArcsecPerYr the counterfactual offset on the dynamical precession rate */
   const argsWith = (dpArcsecPerYr) => {
     /** @type {any} */ const late = {};
     /** @type {any} */ let c = { C: Object.freeze({ ...DEFAULT_CONSTANTS }), F: FITTED_COEFFICIENTS, laws: {}, secularSeriesArtifact, options: {}, late };
-    const [dc, dtc, es, ydl, osm, me, dtS, pr, psc, peod, ipe, ta, lt, sml, sae, pp] = slices;
-    c = Object.assign(c, dc.assembleDerivedConstants(c));
-    c = Object.assign(c, dtc.assembleDeepTimeChain(c));
-    c = Object.assign(c, es.assembleEarthScalars(c));
-    c = Object.assign(c, ydl.assembleYearDayLengths(c));
-    late.certifiedAxialPrecessionJ2000Years = c.certifiedAxialPrecessionJ2000Years;
-    c = Object.assign(c, osm.assembleOneSourceMovement(c));
-    late.oneSourceM = c.oneSourceM; late.yearLengthsM = c.yearLengthsM;
-    c = Object.assign(c, me.assembleMoonEpoch(c));
-    c = Object.assign(c, dtS.assembleDeltaT(c));
-    c = Object.assign(c, pr.assemblePlanetRecords(c));
-    c = Object.assign(c, psc.assemblePlanetSpinChannel(c));
-    c = Object.assign(c, peod.assemblePlanetElementsOfDate(c));
-    c = Object.assign(c, ipe.assembleInvPlaneElements(c));
-    c = Object.assign(c, ta.assembleTimeAxis(c));
-    c = Object.assign(c, lt.assembleLunarTheory(c));
-    c = Object.assign(c, sml.assembleSunMeanLongitude(c));   // the Sun's mean-longitude table, its own slice since the plan-34 cascade (model.js's order)
-    late.sunMeanLongitudeDegAt = c.sunMeanLongitudeDegAt;
-    c = Object.assign(c, sae.assembleSunAndEclipses(c));
-    c = Object.assign(c, pp.assemblePublishedPeriods(c));
+    c = composeThrough(c, 'published-periods');
     const pub = c.publishedAxialPrecessionYearsAtYear;
     late.publishedAxialPrecessionYearsAtYear = dpArcsecPerYr === 0 ? pub : (/** @param {number} y */ (y) => 360 / (360 / pub(y) + dpArcsecPerYr / 3600));
     late.publishedSiderealYearSecondsAtYear = c.publishedSiderealYearSecondsAtYear;

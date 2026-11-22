@@ -66,31 +66,58 @@ export function assembleModel(C, F, laws = {}, secularSeriesArtifact = /** @type
   const late = /** @type {import('./model/context.js').LateBindings} */ ({});
   /** @type {import('./model/context.js').ModelInputs} */
   const inputs = { C, F, laws, secularSeriesArtifact, options, late };
-  const c1 = Object.assign(inputs, assembleDerivedConstants(inputs));
-  const c2 = Object.assign(c1, assembleDeepTimeChain(c1));
-  const c3 = Object.assign(c2, assembleEarthScalars(c2));
-  const c4 = Object.assign(c3, assembleYearDayLengths(c3));
-  late.certifiedAxialPrecessionJ2000Years = c4.certifiedAxialPrecessionJ2000Years;
-  const c5 = Object.assign(c4, assembleOneSourceMovement(c4));
-  late.oneSourceM = c5.oneSourceM;
-  late.yearLengthsM = c5.yearLengthsM;
-  const c6 = Object.assign(c5, assembleMoonEpoch(c5));
-  const c7 = Object.assign(c6, assembleDeltaT(c6));
-  const c8 = Object.assign(c7, assemblePlanetRecords(c7));
-  const c9 = Object.assign(c8, assemblePlanetSpinChannel(c8));
-  const c10 = Object.assign(c9, assemblePlanetElementsOfDate(c9));
-  const c11 = Object.assign(c10, assembleInvPlaneElements(c10));
-  const c12 = Object.assign(c11, assembleTimeAxis(c11));
-  const c13 = Object.assign(c12, assembleLunarTheory(c12));
-  // the Sun's mean-longitude table is its own slice before the eclipse tier: the lunar bank hashes it
-  // and not the eclipse slice (tools/lib/artifact-inputs.js modelSourceFilesExcluding)
-  const c13b = Object.assign(c13, assembleSunMeanLongitude(c13));
-  late.sunMeanLongitudeDegAt = c13b.sunMeanLongitudeDegAt;
-  const c14 = Object.assign(c13b, assembleSunAndEclipses(c13b));
-  const c15 = Object.assign(c14, assemblePublishedPeriods(c14));
-  late.publishedAxialPrecessionYearsAtYear = c15.publishedAxialPrecessionYearsAtYear;
-  late.publishedSiderealYearSecondsAtYear = c15.publishedSiderealYearSecondsAtYear;
-  const c16 = Object.assign(c15, assembleCardinalInstants(c15));
-  late.sunAberrationArcsecAt = c16.sunAberrationArcsecAt;
-  return assembleSurface(c16);
+  return assembleSurface(composeThrough(inputs, 'cardinal-instants'));
+}
+
+/**
+ * THE SLICE ORDER — ONE home (plan 15; the one-home fix of the plan-34 cascade, where the residual-spectra
+ * sweep's hand-written twin of this list failed on a slice added here). Each entry is the slice's assembler, its
+ * file under model/ (the generators hash the files: tools/lib/artifact-inputs.js modelSourceFiles), and the
+ * forward bindings it fills the moment it returns (model/context.js). The Sun's mean-longitude table is its own
+ * slice before the eclipse tier: the lunar bank hashes it and not the eclipse slice (modelSourceFilesExcluding).
+ * The surface is the last slice and is RETURNED, not merged (assembleModel above); composeThrough stops before it.
+ * @type {ReadonlyArray<{ name: string, file: string, assemble: (c: any) => any, after?: (c: any, late: any) => void }>}
+ */
+export const MODEL_SLICES = Object.freeze([
+  { name: 'assembleDerivedConstants', file: 'derived-constants', assemble: assembleDerivedConstants },
+  { name: 'assembleDeepTimeChain', file: 'deep-time-chain', assemble: assembleDeepTimeChain },
+  { name: 'assembleEarthScalars', file: 'earth-scalars', assemble: assembleEarthScalars },
+  { name: 'assembleYearDayLengths', file: 'year-day-lengths', assemble: assembleYearDayLengths,
+    after: (c, late) => { late.certifiedAxialPrecessionJ2000Years = c.certifiedAxialPrecessionJ2000Years; } },
+  { name: 'assembleOneSourceMovement', file: 'one-source-movement', assemble: assembleOneSourceMovement,
+    after: (c, late) => { late.oneSourceM = c.oneSourceM; late.yearLengthsM = c.yearLengthsM; } },
+  { name: 'assembleMoonEpoch', file: 'moon-epoch', assemble: assembleMoonEpoch },
+  { name: 'assembleDeltaT', file: 'delta-t', assemble: assembleDeltaT },
+  { name: 'assemblePlanetRecords', file: 'planet-records', assemble: assemblePlanetRecords },
+  { name: 'assemblePlanetSpinChannel', file: 'planet-spin-channel', assemble: assemblePlanetSpinChannel },
+  { name: 'assemblePlanetElementsOfDate', file: 'planet-elements-of-date', assemble: assemblePlanetElementsOfDate },
+  { name: 'assembleInvPlaneElements', file: 'inv-plane-elements', assemble: assembleInvPlaneElements },
+  { name: 'assembleTimeAxis', file: 'time-axis', assemble: assembleTimeAxis },
+  { name: 'assembleLunarTheory', file: 'lunar-theory', assemble: assembleLunarTheory },
+  { name: 'assembleSunMeanLongitude', file: 'sun-mean-longitude', assemble: assembleSunMeanLongitude,
+    after: (c, late) => { late.sunMeanLongitudeDegAt = c.sunMeanLongitudeDegAt; } },
+  { name: 'assembleSunAndEclipses', file: 'sun-and-eclipses', assemble: assembleSunAndEclipses },
+  { name: 'assemblePublishedPeriods', file: 'published-periods', assemble: assemblePublishedPeriods,
+    after: (c, late) => { late.publishedAxialPrecessionYearsAtYear = c.publishedAxialPrecessionYearsAtYear; late.publishedSiderealYearSecondsAtYear = c.publishedSiderealYearSecondsAtYear; } },
+  { name: 'assembleCardinalInstants', file: 'cardinal-instants', assemble: assembleCardinalInstants,
+    after: (c, late) => { late.sunAberrationArcsecAt = c.sunAberrationArcsecAt; } },
+  { name: 'assembleSurface', file: 'surface', assemble: assembleSurface },
+]);
+
+/**
+ * Compose the slices in order THROUGH the named one (its file name), merging each slice's result into the
+ * shared context and filling the forward bindings — the composer's own walk, also the parity test's
+ * counterfactual and the residual-spectra sweep's context (they stop early or read the context itself).
+ * @param {any} inputs  { C, F, laws, secularSeriesArtifact, options, late }
+ * @param {string} throughFile  the last slice to apply, e.g. 'published-periods' or 'cardinal-instants'
+ */
+export function composeThrough(inputs, throughFile) {
+  let c = inputs;
+  for (const s of MODEL_SLICES) {
+    if (s.file === 'surface') break;           // the surface is returned by assembleModel, never merged
+    c = Object.assign(c, s.assemble(c));
+    if (s.after) s.after(c, inputs.late);
+    if (s.file === throughFile) return c;
+  }
+  throw new Error(`composeThrough: no slice "${throughFile}" before the surface`);
 }
