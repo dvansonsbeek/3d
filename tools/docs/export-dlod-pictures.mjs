@@ -21,7 +21,7 @@ import { join } from 'node:path';
 import { openSimulator } from '../../test/browser/harness.mjs';
 const arg = (k, d) => { const a = process.argv.find((x) => x.startsWith(k + '=')); return a ? a.slice(k.length + 1) : d; };
 /** the site's file names per range key (the labels are the panel's LCR_RANGE_TABS) */
-const SITE_NAMES = { deep: '04_dLOD_sinceLGM.png', glacial: '04_dLOD_200000BC.png' };
+const SITE_NAMES = { deep: '04_dLOD_sinceLGM.png', glacial: '04_dLOD_200000BC.png', holocene: '04_dLOD_4000BC.png' };
 const LABELS = { glacial: '200,000 BC–2050', deep: '27,500 BC–2050', lgm: '13,000 BC–2050', holocene: '4,000 BC–2050', historical: '750–2050 AD', nearFuture: '1,200–2,500 AD', full: '13,000 BC–15,000' };
 const SITE = process.env.ESSRT_SITE_DIR;
 const OUT = arg('out', SITE ? join(SITE, 'public', 'img') : 'exports');
