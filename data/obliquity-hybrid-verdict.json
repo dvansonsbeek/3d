@@ -122,8 +122,8 @@
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
-   "data/nbody-deep-secular-modes.json": "sha256:b80c50f3e09a6ba7c584a16bd5d4ff57e625e9ed5b9b46c48d0ad82b796027b8",
-   "data/nbody-secular-series.json": "sha256:347c8195a90a9132fdbf72e79d1c6ce6ff498736ea139a05d9bfbbdaa9126ff5",
+   "data/nbody-deep-secular-modes.json": "sha256-json:42d032d898a475df71d4082a25dbe9c2c2dd09d362b8dda56be5acec59d74690",
+   "data/nbody-secular-series.json": "sha256-json:000ae3b22c8619b476dcb084ab4b7e18dec746cf1dc4d4fb02e45519305dba1e",
    "packages/physics/src/deltat/deep-time.cjs": "sha256-tokens:f9be612fad167385eaa61ab77ba6d6ce571f8015d7302efb67346aa2330f85a3",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256-tokens:48e011f240207f4ee2b5eceef347fc236ffcd3357df7453d803183e1a0a52457",
    "packages/physics/src/earth/laplace-plane.cjs": "sha256-tokens:44c9776e35bb2d5ba151cf5808b5d4bdd82fa599b5b5fa29224aa7e2757c30d4",

@@ -47,8 +47,8 @@
   "inputs": {
     "generator": "node tools/verify/lod-climate-correlation.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:476116471c12d1b2677c1aa7f2efc68dfa5ccbc5d6871be5e2145d0d302d1ac5",
-      "data/deltaT-4flag-fit.json": "sha256:1d557be99373571818ca2c4a6da815b01ce00804146836753c8a49944cfafa7d",
+      "data/core-mantle-resonator-stage1.json": "sha256-json:4503c897366462b7514b8331895ffcb4e1de4b5d6d5d48cf3d633a42bed6233f",
+      "data/deltaT-4flag-fit.json": "sha256-json:eda8a56273d9041a98af4e472acc8b3471aaaf546a2eb7d5dc91c644159a4a95",
       "packages/physics/src/deltat/cycles.cjs": "sha256-tokens:66928223c5576144705e9dab974dbd35ef0a976605738d3ff56a55b3d75dafce",
       "public/input/climate-proxy.json": "sha256:38ce7219824777c49605807181bd9f744ece56b2b15d60cc668289118e2c6304",
       "tools/verify/lod-climate-correlation.js": "sha256-tokens:f1e863eb930f77eb639165e85737bea64c06125bda97f097bb9f067be8cfaecb"

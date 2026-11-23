@@ -656,10 +656,10 @@
   "inputs": {
     "generator": "node tools/verify/eclipse-audit.js --write",
     "files": {
-      "data/core-mantle-resonator-stage1.json": "sha256:476116471c12d1b2677c1aa7f2efc68dfa5ccbc5d6871be5e2145d0d302d1ac5",
+      "data/core-mantle-resonator-stage1.json": "sha256-json:4503c897366462b7514b8331895ffcb4e1de4b5d6d5d48cf3d633a42bed6233f",
       "data/deep-time-fitted.json": "sha256:cabf6484ed125969d7e1b829c29722939058fbfdd9fe45a604f869208250dd99",
-      "data/deltaT-4flag-fit.json": "sha256:1d557be99373571818ca2c4a6da815b01ce00804146836753c8a49944cfafa7d",
-      "data/nbody-secular-series.json": "sha256:347c8195a90a9132fdbf72e79d1c6ce6ff498736ea139a05d9bfbbdaa9126ff5",
+      "data/deltaT-4flag-fit.json": "sha256-json:eda8a56273d9041a98af4e472acc8b3471aaaf546a2eb7d5dc91c644159a4a95",
+      "data/nbody-secular-series.json": "sha256-json:000ae3b22c8619b476dcb084ab4b7e18dec746cf1dc4d4fb02e45519305dba1e",
       "packages/physics/src/chain-cycles/index.cjs": "sha256-tokens:be6f1ddec40154c86c1e8f2f71b9462a927b992e3cb60a214511f5ffd8d709ea",
       "packages/physics/src/deltat/cycles.cjs": "sha256-tokens:66928223c5576144705e9dab974dbd35ef0a976605738d3ff56a55b3d75dafce",
       "packages/physics/src/deltat/deep-time.cjs": "sha256-tokens:f9be612fad167385eaa61ab77ba6d6ce571f8015d7302efb67346aa2330f85a3",
@@ -697,7 +697,7 @@
       "packages/physics/src/moon/series.cjs": "sha256-tokens:b041b823733cde00acc23bb9529c64b9d3cb0a9a8c61aed5f02c18c05522e7b6",
       "packages/physics/src/phase/deep-calendar.cjs": "sha256-tokens:65b93ffb8199328c1f33329fb6a65096f84001737791d7fae704ee5b2c8361e1",
       "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
-      "public/input/climate-formula-coefficients.json": "sha256:2acbf36a16a1327ae95a61e8119ff0017d0ca4d005908652d88c917609d12c8b",
+      "public/input/climate-formula-coefficients.json": "sha256-json:3f38ec61c9ed682d89cf756036fd57b91e605e98a2cdf0dc1dbec8c93a9bb8a9",
       "public/input/lunar-eclipses-nasa.json": "sha256:2b0f6d1b4dab2d1e8a432a812b027631cfecde9714ce0600f030da5e2a2a792e",
       "public/input/lunar-eclipses-stephenson-2016.json": "sha256:ed8040ef4d688023ca38c1c8eac83b40bc36f75edb0894ba46dd04f2aed32fe6",
       "public/input/solar-eclipse-centerlines-nasa.json": "sha256:995d1b38879e6bd1983a1f2895c1269b9f8f4fa917ccb047bfc7b0be3da5985c",

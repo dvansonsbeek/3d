@@ -912,10 +912,10 @@
    "tools/explore/k45-residual-naff.mjs": "sha256-tokens:d51a6b16492475e48b74f029a5176e492e249e1a11fd87e55a777b70cb54b9a2",
    "tools/explore/k45e-amplitude-solve.mjs": "sha256-tokens:35e79c96c161d9e3d408d69a7d45c1a1da99564eae6b375992df53d32c4e5b93",
    "tools/explore/lattice-long-window-test.mjs": "sha256-tokens:6b84f464f3cda8a3bade2306293d05f0cfa7a9a23c9a2c51b8cb603475d2298e",
-   "tools/explore/naff-frequencies.mjs": "sha256-tokens:7a2b70b2282f7fc6a75ecc5c2ddb5ce0088bf132df8260bc405bedc00bbba8da",
+   "tools/explore/naff-frequencies.mjs": "sha256-tokens:c51c7c47511b682efd9d83e38758bbaa69efe4ea21948ebd1513acf24b132e74",
    "tools/explore/nbody-wh.mjs": "sha256-tokens:ac555e857e2553870716ebf687b17371de86a5ca5400ea8a670b7f89158dd618",
    "tools/lib/keplerian-chain.js": "sha256-tokens:5f4e72488a9a3293e1ffa42eeb8f5fb936d2a9f1f55a8dcd7cdeea028c1989ad",
-   "tools/verify/nbody-secular.js": "sha256-tokens:f2c66be637905948bc91586d38668b03a3cae24f6ab7e0df5c4d1ea1d139caa8"
+   "tools/verify/nbody-secular.js": "sha256-tokens:49659d811748516dc2b8c63bbe54489c4f923b1fbba045c2ebd4fbd43eb10eba"
   }
  },
  "periodicTerms": {

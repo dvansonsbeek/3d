@@ -473,8 +473,8 @@
   "generator": "node tools/verify/equinox-vs-vondrak.js --write",
   "files": {
    "data/la2004-earth-51myr-back.asc": "sha256:3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
-   "data/nbody-deep-secular-modes.json": "sha256:b80c50f3e09a6ba7c584a16bd5d4ff57e625e9ed5b9b46c48d0ad82b796027b8",
-   "data/nbody-secular-series.json": "sha256:347c8195a90a9132fdbf72e79d1c6ce6ff498736ea139a05d9bfbbdaa9126ff5",
+   "data/nbody-deep-secular-modes.json": "sha256-json:42d032d898a475df71d4082a25dbe9c2c2dd09d362b8dda56be5acec59d74690",
+   "data/nbody-secular-series.json": "sha256-json:000ae3b22c8619b476dcb084ab4b7e18dec746cf1dc4d4fb02e45519305dba1e",
    "packages/physics/src/climate/l1-orbital.cjs": "sha256-tokens:9245ff9cd9b2ace3c93fd1750a64157752056ec4a9a3085316da525c6894b344",
    "packages/physics/src/deltat/deep-time.cjs": "sha256-tokens:f9be612fad167385eaa61ab77ba6d6ce571f8015d7302efb67346aa2330f85a3",
    "packages/physics/src/earth/deep-orbital-history.cjs": "sha256-tokens:48e011f240207f4ee2b5eceef347fc236ffcd3357df7453d803183e1a0a52457",
@@ -483,7 +483,7 @@
    "packages/physics/src/earth/precession-composed.cjs": "sha256-tokens:2d1476adb245e49c8721c70ac76744da506fefc5ff89261fb710a18520158799",
    "packages/reference/src/published-curves.cjs": "sha256-tokens:87a28055e8af39c7b375ab12f1bb81c8789997a18f4ca8e962b3b1162d1d1d0a",
    "public/input/astro-reference.json": "sha256:bbc50ac853950ba045b5717928253422e0aa8eb4b79301e7eb6f024453f9b10d",
-   "public/input/climate-formula-coefficients.json": "sha256:2acbf36a16a1327ae95a61e8119ff0017d0ca4d005908652d88c917609d12c8b",
+   "public/input/climate-formula-coefficients.json": "sha256-json:3f38ec61c9ed682d89cf756036fd57b91e605e98a2cdf0dc1dbec8c93a9bb8a9",
    "tools/lib/deep-orbital-history.js": "sha256-tokens:5c987766502aac219c1e167484056257c79a9a1690d5011e48cb4207ce515cb9",
    "tools/lib/deep-time.js": "sha256-tokens:b7fc20c26e5f4ce71a98f55823d08137f2656d79602317ffeaa1cb21352ac096",
    "tools/verify/equinox-vs-vondrak.js": "sha256-tokens:a9ed46ab3a99d050b6d5abd2bdf3916051e31cff42a8c44eb85cc4a9f2993b95"

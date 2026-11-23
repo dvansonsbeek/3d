@@ -42,7 +42,7 @@
  "verdict": {
   "strongestBeatPeriodKyr": 405.6256163323512,
   "strongestBeatArcsecPerYr": 3.195064482658601,
-  "la2004BeatPeriodKyr": 405.6972922210049,
+  "la2004BeatPeriodKyr": 405.69119637582526,
   "rockMetronomeKyr": 405.6,
   "companion124Kyr": 123.8461774280429,
   "companion95Kyr": 94.8779191670953,
@@ -1434,8 +1434,8 @@
   "generator": "node tools/verify/deep-secular-modes.js --write",
   "files": {
    "tools/explore/lattice-long-window-test.mjs": "sha256-tokens:6b84f464f3cda8a3bade2306293d05f0cfa7a9a23c9a2c51b8cb603475d2298e",
-   "tools/explore/naff-frequencies.mjs": "sha256-tokens:7a2b70b2282f7fc6a75ecc5c2ddb5ce0088bf132df8260bc405bedc00bbba8da",
-   "tools/verify/deep-secular-modes.js": "sha256-tokens:f1f6dbfc15c71ed7f6e1c5de46925399cc2bf86ef5eea91a4b979a44f02fa7f4"
+   "tools/explore/naff-frequencies.mjs": "sha256-tokens:c51c7c47511b682efd9d83e38758bbaa69efe4ea21948ebd1513acf24b132e74",
+   "tools/verify/deep-secular-modes.js": "sha256-tokens:5e286ca335563e4168efaab99c69d5df08253464b8761a068a70a17e2f36267e"
   }
  }
 }

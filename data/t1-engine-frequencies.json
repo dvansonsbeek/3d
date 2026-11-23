@@ -183,9 +183,9 @@
   "generator": "node tools/explore/t1-export-engine-frequencies.mjs --write",
   "files": {
    "data/lr04-stack.txt": "sha256:7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945",
-   "data/nbody-deep-secular-modes.json": "sha256:b80c50f3e09a6ba7c584a16bd5d4ff57e625e9ed5b9b46c48d0ad82b796027b8",
-   "data/nbody-secular-frequencies.json": "sha256:f5e1ccdd3599dabe728fc405247c596c11b1640c65a15a973fbd2c3f1594422e",
-   "data/nbody-secular-series.json": "sha256:347c8195a90a9132fdbf72e79d1c6ce6ff498736ea139a05d9bfbbdaa9126ff5",
+   "data/nbody-deep-secular-modes.json": "sha256-json:42d032d898a475df71d4082a25dbe9c2c2dd09d362b8dda56be5acec59d74690",
+   "data/nbody-secular-frequencies.json": "sha256-json:44c82a38fc2f5e18892ea4b6da18ef74a4c4790da341c4d5b32df97fd4ae835e",
+   "data/nbody-secular-series.json": "sha256-json:000ae3b22c8619b476dcb084ab4b7e18dec746cf1dc4d4fb02e45519305dba1e",
    "tools/explore/t1-export-engine-frequencies.mjs": "sha256-tokens:753d3eec1282734b043e716cf780dbb52a774bb8a33b244b646a2dd8d6584ff8"
   }
  }
