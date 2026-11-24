@@ -83,6 +83,8 @@ const toolCall = (name, args) => {
     ['essrt_climate', { year: 2000 }, (d) => (typeof d.years[0].l1OrbitalPermil === 'number' ? null : 'no L1 value')],
     ['essrt_cross_validation', { curve: 'obliquity-berger1978', year: 2000 }, (d) => (Math.abs(d.years[0].model - d.years[0].published) < 0.05 ? null : `Berger delta: ${d.years[0].delta}`)],
     ['essrt_eclipses', { kind: 'solar', startYear: 2024, stopYear: 2025 }, (d) => (d.count === 2 && d.events[0].type === 'Total' && Math.abs(d.events[0].jd - 2460409.263) < 0.01 ? null : `2024 solar: ${JSON.stringify(d.events?.map((/** @type {any} */ e) => e.type))}`)],
+    // the observer tier through the MCP mirror: Rio's two visible lunar eclipses of 2024–2025 (the API gate's semantic anchor), every event carrying its altitude
+    ['essrt_eclipses', { kind: 'lunar', startYear: 2024, stopYear: 2025, lat: -22.9, lon: -43.2 }, (d) => (d.visibleCount === 2 && d.events.length >= 2 && d.events.every((/** @type {any} */ e) => typeof e.moonAltitudeDeg === 'number' && typeof e.visible === 'boolean') ? null : `lunar observer: visibleCount ${d.visibleCount} of ${d.events?.length}`)],
     // the injected constant is the obliquity anchor
     ['essrt_counterfactual', { overrides: { 'earthOrbital.obliquityJ2000_deg': 23.5 }, year: 2000 }, (d) => (Math.abs(d.earth.obliquityDeg - 23.5) < 1e-6 ? null : `cf obliquity: ${d.earth.obliquityDeg}`)],
   ];

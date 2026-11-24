@@ -25856,18 +25856,11 @@ async function runYearAnalysisExport(years) {
       ? (siVE + siSS + siAE + siWS) / 4 : null;
 
     // Day lengths — formula-only, no scene needed. The LOD ledger at this row's
-    // year, in the same three steps the tweakpane uses:
-    //   kinematic  = IAU sidereal-year seconds / epoch sidereal-year days
-    //                (identical to o.lodKinematic, but evaluated per row)
-    //   + nodal    = h5Correction(year), the ecliptic-turn term on the nodal
-    //                period 1,296,000/|s₃|
-    //   real       = + the 4-flag ΔT stack and core-mantle swing
-    //                (dtCycleLodCorrectionSum) — the production value, i.e.
-    //                what the tweakpane shows as Solar Day = REAL.
-    const derivedDayLength  = _lodKinematicSecondsOfDate(year);   // plan 09: the Layer-0 tidal mean (ω₀ at J2000)
-    const lodRealRow        = derivedDayLength +
-      h5Correction(year) +
-      dtCycleLodCorrectionSum(year);
+    // year through the ONE composite the tweakpane's Solar Day = REAL reads
+    // (computeLodRealSecondsAtEpoch: the Layer-0 tidal mean + the ecliptic-turn
+    // term on the nodal period 1,296,000/|s₃| + the 4-flag ΔT stack and the
+    // core-mantle swing) — the production value the report's Solar Day column shows.
+    const lodRealRow        = computeLodRealSecondsAtEpoch(year);
     // Sidereal and stellar day use the SAME formulas as the tweakpane
     // (predictions.siderealDayReal / stellarDayReal), evaluated at this row's
     // year instead of the live epoch:
