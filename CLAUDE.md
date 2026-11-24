@@ -695,6 +695,24 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   the prose called a marked one "the warmest"; ONE home
   `climate/forward-extrema`, the `climateForward*` keys, the labels on a row
   stagger, gate `test:climate-forward`. (§1.52)
+- **A fit reads the EMBED and stamps the JSON** — the ΔT fit's residual runs
+  through the chain, which reads the climate coefficients from the generated
+  embed; a close on an intermediate embed verified on every declared input and
+  did not reproduce from its own commit (the fitter is a fixed point: three
+  passes bit-identical; swapping ONE undeclared file reproduces the previous
+  close bit for bit). The fitter refuses to write unless `constants:generate`
+  reports the embed ≡ its JSON. **And an age has ONE anchor**: the chain's
+  age is Myr before J2000 = 2000.0 (Layer 0, the raw integral, the cycles'
+  year, the fitter), but the scene-anchored readers and the UT↔TT bridge made
+  theirs from the scene epoch 2000.5 in every twin, "a twins' convention" —
+  every runtime ΔT read stood half a year deep against the fitted stack
+  (9.3 s at −1000, 0.22 s at J2000), invisible to every gate that read the
+  clock against itself and to the 300-km eclipse verdicts; the first fix,
+  moving the chain's conversions to 2000.5, broke the J2000 LOD closure by
+  1.8 µs — the registry's gate caught it. Anchor J2000 everywhere now, the J3
+  past side closed, fitter ≡ runtime by construction; a manual node is never
+  planned by propagation, and the planner breaks the graph's real loops
+  deterministically, re-reading every node after the run. (§1.53)
 
 ---
 

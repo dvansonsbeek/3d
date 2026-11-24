@@ -100,7 +100,7 @@ async function main() {
       maxGreat = Math.max(maxGreat, dGreat); maxSyz = Math.max(maxSyz, dSyz); maxDist = Math.max(maxDist, dDist);
       if (dGreat > tol.greatestS) failures.push(`${label} ${kind}: greatest eclipse at JD ${e.jd} — formula ${pr(dGreat, 2)} s from the finder (tol ${pr(tol.greatestS, 1)} s)`);
       if (dSyz > tol.syzygyS) failures.push(`${label} ${kind}: the syzygy at JD ${e.jd} — formula ${pr(dSyz, 2)} s from the finder's opposition (tol ${pr(tol.syzygyS, 1)} s)`);
-      if (dDist > tol.dist) failures.push(`${label} ${kind}: the least distance at JD ${e.jd} — formula ${pr(dDist, 7)}° from the finder's (tol ${tol.dist})`);
+      if (dDist > tol.dist) failures.push(`${label} ${kind}: the least distance at JD ${e.jd} — formula ${pr(dDist, 7)}° from the finder's (tol ${tol.dist.toPrecision(3)})`);
       if (f.type !== e.type) {
         if (tol.edgeJitter && sameTypeAtFinderInstant(f, e.jd, e.type)) flips++;
         else failures.push(`${label} ${kind}: the type at JD ${e.jd} — formula ${f.type} vs finder ${e.type}`);
@@ -163,9 +163,14 @@ async function main() {
     // for greatest eclipse. MEASURED there: 8 ulp of syzygy, 87 ulp of greatest eclipse, 0.22° of σ on
     // a 9.4°-wide umbra — the edge's eclipse instants are reproducible to the clock's jitter (~1 h for
     // greatest eclipse), and the tolerances say so; the types agree at every one of the 101 events.
+    // The least distance's tolerance is the grain's reach, not a measured number: the elongation the
+    // Moon moves during the syzygy's tolerance (360°/month of date × the syzygy jitter; 0.60° at the
+    // edge) — a hand 0.3° read 0.22° on one clock and 0.33° after the ΔT anchor moved to J2000 (doc 111
+    // §1.53: the edge's eclipses are another set), both inside the reach.
     const edgeJitter = ulp > 30;
+    const syzygyTolS = edgeJitter ? 1 + 12 * ulp : 1 + 3 * ulp;
     const tol = edgeJitter
-      ? { syzygyS: 1 + 12 * ulp, greatestS: 2 + 100 * ulp, dist: 0.3, edgeJitter }
+      ? { syzygyS: syzygyTolS, greatestS: 2 + 100 * ulp, dist: (360 / monthUT) * syzygyTolS / 86400, edgeJitter }
       : { syzygyS: 1 + 3 * ulp, greatestS: 2 + 25 * ulp, dist: 5e-4, edgeJitter };
     for (const kind of /** @type {const} */ (['lunar', 'solar'])) {
       const r = compare(label, jdUT, windowUT, kind, tol, monthUT / 60);

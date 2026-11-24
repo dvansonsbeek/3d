@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.19
-coefficients: sha256:617134ba66522681
+modelVersion: v27.20
+coefficients: sha256:ca72029de8f1229d
 status: current
 ---
 
@@ -124,7 +124,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
 ## C. Historical era — gate- and artifact-backed
 
 - **Babylonian eclipse case study (−135)** — the model places the
-  totality path <!--v:babylon135BestGapKm-->113<!--/v--> km from Babylon at
+  totality path <!--v:babylon135BestGapKm-->111<!--/v--> km from Babylon at
   ΔUT <!--v:babylon135BestDeltaUT-->-0h50<!--/v--> (model
   <!--v:babylon135FrameworkUT-->06:07<!--/v--> vs documented
   <!--v:babylon135DocumentedUT-->06:14<!--/v-->):
@@ -175,7 +175,7 @@ The climate formula's orbital lines against the Cenozoic isotope record (the com
   all three runtimes. Against JPL Horizons over ±3000 yr it reads
   <!--v:sunVsHorizonsMeanArcsec-->2.50<!--/v-->″ mean / <!--v:sunVsHorizonsSdArcsec-->2.23<!--/v-->″ sd
   (modern sd <!--v:sunVsHorizonsModernSdArcsec-->0.71<!--/v-->″); the Babylon −135 umbra
-  track sits <!--v:babylon135BestGapKm-->113<!--/v--> km from the documented
+  track sits <!--v:babylon135BestGapKm-->111<!--/v--> km from the documented
   station — [doc 103](103-babylon-eclipse-bce135.md). The era-device
   Sun assembly this bullet once described (the fitted eccentricity channel
   and inclination coupling on the retired device's periods, the cos-ε

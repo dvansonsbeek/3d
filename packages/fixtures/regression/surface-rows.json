@@ -680,11 +680,11 @@
     "values": {
      "today": "0.991250 | AU",
      "m3000": "1.006483 | AU",
-     "m400Myr": "0.994515 | AU",
-     "m2460Myr": "0.998545 | AU",
-     "m4400Myr": "0.998671 | AU",
+     "m400Myr": "0.994513 | AU",
+     "m2460Myr": "0.998543 | AU",
+     "m4400Myr": "0.998631 | AU",
      "genesis": "0.989213 | AU",
-     "p990Myr": "1.014879 | AU"
+     "p990Myr": "1.014992 | AU"
     }
    },
    "earth#036 Semi-latus rectum (p)": {
@@ -751,12 +751,12 @@
     },
     "values": {
      "today": "108,167.21 | km/h",
-     "m3000": "106,532.02 | km/h",
-     "m400Myr": "107,816.70 | km/h",
-     "m2460Myr": "107,393.34 | km/h",
-     "m4400Myr": "107,389.40 | km/h",
+     "m3000": "106,532.01 | km/h",
+     "m400Myr": "107,816.83 | km/h",
+     "m2460Myr": "107,393.49 | km/h",
+     "m4400Myr": "107,393.74 | km/h",
      "genesis": "108,410.11 | km/h",
-     "p990Myr": "105,636.36 | km/h"
+     "p990Myr": "105,624.38 | km/h"
     }
    },
    "earth#040 Radial velocity (vᵣ)": {
@@ -769,12 +769,12 @@
     },
     "values": {
      "today": "-1,586.89 | km/h",
-     "m3000": "-1,859.41 | km/h",
-     "m400Myr": "465.42 | km/h",
-     "m2460Myr": "495.02 | km/h",
-     "m4400Myr": "-904.50 | km/h",
+     "m3000": "-1,859.40 | km/h",
+     "m400Myr": "467.30 | km/h",
+     "m2460Myr": "495.13 | km/h",
+     "m4400Myr": "-906.10 | km/h",
      "genesis": "397.50 | km/h",
-     "p990Myr": "-1,032.51 | km/h"
+     "p990Myr": "-1,053.69 | km/h"
     }
    },
    "earth#041 Transverse velocity (vₜ)": {
@@ -787,12 +787,12 @@
     },
     "values": {
      "today": "108,069.28 | km/h",
-     "m3000": "106,559.55 | km/h",
-     "m400Myr": "106,867.73 | km/h",
-     "m2460Myr": "106,738.44 | km/h",
-     "m4400Myr": "106,883.39 | km/h",
+     "m3000": "106,559.54 | km/h",
+     "m400Myr": "106,870.16 | km/h",
+     "m2460Myr": "106,738.55 | km/h",
+     "m4400Myr": "106,887.34 | km/h",
      "genesis": "108,352.42 | km/h",
-     "p990Myr": "108,718.44 | km/h"
+     "p990Myr": "108,703.48 | km/h"
     }
    },
    "earth#042 Perihelion velocity (vₚ)": {
@@ -860,11 +860,11 @@
     "values": {
      "today": "152,306.67 | km/h",
      "m3000": "151,149.75 | km/h",
-     "m400Myr": "152,059.34 | km/h",
-     "m2460Myr": "151,766.72 | km/h",
-     "m4400Myr": "151,770.76 | km/h",
+     "m400Myr": "152,059.44 | km/h",
+     "m2460Myr": "151,766.82 | km/h",
+     "m4400Myr": "151,773.83 | km/h",
      "genesis": "152,494.80 | km/h",
-     "p990Myr": "150,516.30 | km/h"
+     "p990Myr": "150,507.90 | km/h"
     }
    },
    "earth#046 Circular velocity (v_circ)": {
@@ -878,11 +878,11 @@
     "values": {
      "today": "107,697.08 | km/h",
      "m3000": "106,879.01 | km/h",
-     "m400Myr": "107,522.19 | km/h",
-     "m2460Myr": "107,315.28 | km/h",
-     "m4400Myr": "107,318.13 | km/h",
+     "m400Myr": "107,522.26 | km/h",
+     "m2460Myr": "107,315.35 | km/h",
+     "m4400Myr": "107,320.30 | km/h",
      "genesis": "107,830.11 | km/h",
-     "p990Myr": "106,431.10 | km/h"
+     "p990Myr": "106,425.16 | km/h"
     }
    },
    "earth#047 Velocity ratio (v/v_circ)": {
@@ -932,11 +932,11 @@
     "values": {
      "today": "4,455,105,164.80 | km²/s",
      "m3000": "4,454,965,993.64 | km²/s",
-     "m400Myr": "4,455,576,261.99 | km²/s",
+     "m400Myr": "4,455,576,261.98 | km²/s",
      "m2460Myr": "4,455,120,691.78 | km²/s",
-     "m4400Myr": "4,454,630,510.07 | km²/s",
+     "m4400Myr": "4,454,630,510.03 | km²/s",
      "genesis": "4,454,544,149.98 | km²/s",
-     "p990Myr": "4,455,298,583.44 | km²/s"
+     "p990Myr": "4,455,298,583.29 | km²/s"
     }
    },
    "earth#050 Area Sweep Rate (dA/dt)": {
@@ -967,12 +967,12 @@
     },
     "values": {
      "today": "103.39856731 | degrees (°)",
-     "m3000": "18.08954624 | degrees (°)",
-     "m400Myr": "105.08921650 | degrees (°)",
-     "m2460Myr": "357.41608141 | degrees (°)",
-     "m4400Myr": "94.09727947 | degrees (°)",
-     "genesis": "105.41741333 | degrees (°)",
-     "p990Myr": "287.41687688 | degrees (°)"
+     "m3000": "18.08954623 | degrees (°)",
+     "m400Myr": "105.08920267 | degrees (°)",
+     "m2460Myr": "357.41608027 | degrees (°)",
+     "m4400Myr": "94.09727605 | degrees (°)",
+     "genesis": "105.41741349 | degrees (°)",
+     "p990Myr": "287.41684952 | degrees (°)"
     }
    },
    "earth#052 Argument of periapsis (ω)": {
@@ -985,12 +985,12 @@
     },
     "values": {
      "today": "103.39856731 | degrees (°)",
-     "m3000": "18.08954624 | degrees (°)",
-     "m400Myr": "105.08921650 | degrees (°)",
-     "m2460Myr": "357.41608141 | degrees (°)",
-     "m4400Myr": "94.09727947 | degrees (°)",
-     "genesis": "105.41741333 | degrees (°)",
-     "p990Myr": "287.41687688 | degrees (°)"
+     "m3000": "18.08954623 | degrees (°)",
+     "m400Myr": "105.08920267 | degrees (°)",
+     "m2460Myr": "357.41608027 | degrees (°)",
+     "m4400Myr": "94.09727605 | degrees (°)",
+     "genesis": "105.41741349 | degrees (°)",
+     "p990Myr": "287.41684952 | degrees (°)"
     }
    },
    "earth#053 Longitude of ascending node (Ω)": {
@@ -1080,7 +1080,7 @@
      "m2460Myr": "208.1218 | degrees (°)",
      "m4400Myr": "235.1150 | degrees (°)",
      "genesis": "229.0402 | degrees (°)",
-     "p990Myr": "188.5112 | degrees (°)"
+     "p990Myr": "188.5111 | degrees (°)"
     }
    },
    "earth#058 Height above Invariable Plane": {
@@ -1094,11 +1094,11 @@
     "values": {
      "today": "0.024357 | AU",
      "m3000": "0.014694 | AU",
-     "m400Myr": "-0.036466 | AU",
-     "m2460Myr": "-0.017099 | AU",
-     "m4400Myr": "0.080620 | AU",
+     "m400Myr": "-0.036355 | AU",
+     "m2460Myr": "-0.017102 | AU",
+     "m4400Myr": "0.080570 | AU",
      "genesis": "-0.029507 | AU",
-     "p990Myr": "-0.023171 | AU"
+     "p990Myr": "-0.023976 | AU"
     }
    },
    "earth#059 Position relative to Inv. Plane": {
@@ -1166,11 +1166,11 @@
     "values": {
      "today": "299.28 | degrees (°)",
      "m3000": "251.81 | degrees (°)",
-     "m400Myr": "127.28 | degrees (°)",
-     "m2460Myr": "134.81 | degrees (°)",
-     "m4400Myr": "248.84 | degrees (°)",
+     "m400Myr": "126.98 | degrees (°)",
+     "m2460Myr": "134.80 | degrees (°)",
+     "m4400Myr": "249.09 | degrees (°)",
      "genesis": "19.46 | degrees (°)",
-     "p990Myr": "326.25 | degrees (°)"
+     "p990Myr": "325.45 | degrees (°)"
     }
    },
    "earth#063 Eccentric Anomaly (E)": {
@@ -1184,11 +1184,11 @@
     "values": {
      "today": "298.44 | degrees (°)",
      "m3000": "250.81 | degrees (°)",
-     "m400Myr": "127.53 | degrees (°)",
-     "m2460Myr": "135.08 | degrees (°)",
-     "m4400Myr": "248.35 | degrees (°)",
+     "m400Myr": "127.23 | degrees (°)",
+     "m2460Myr": "135.07 | degrees (°)",
+     "m4400Myr": "248.60 | degrees (°)",
      "genesis": "19.67 | degrees (°)",
-     "p990Myr": "325.71 | degrees (°)"
+     "p990Myr": "324.89 | degrees (°)"
     }
    },
    "earth#064 True Anomaly (ν)": {
@@ -1202,11 +1202,11 @@
     "values": {
      "today": "297.60 | degrees (°)",
      "m3000": "249.81 | degrees (°)",
-     "m400Myr": "127.78 | degrees (°)",
-     "m2460Myr": "135.35 | degrees (°)",
-     "m4400Myr": "247.87 | degrees (°)",
+     "m400Myr": "127.48 | degrees (°)",
+     "m2460Myr": "135.33 | degrees (°)",
+     "m4400Myr": "248.12 | degrees (°)",
      "genesis": "19.88 | degrees (°)",
-     "p990Myr": "325.16 | degrees (°)"
+     "p990Myr": "324.34 | degrees (°)"
     }
    },
    "earth#065 Equation of the Center": {
@@ -1224,7 +1224,7 @@
      "m2460Myr": "0.53 | degrees (°)",
      "m4400Myr": "-0.97 | degrees (°)",
      "genesis": "0.42 | degrees (°)",
-     "p990Myr": "-1.09 | degrees (°)"
+     "p990Myr": "-1.11 | degrees (°)"
     }
    },
    "earth#066 Mean Longitude (L)": {
@@ -1237,12 +1237,12 @@
     },
     "values": {
      "today": "42.6799 | degrees (°)",
-     "m3000": "269.8992 | degrees (°)",
-     "m400Myr": "232.3711 | degrees (°)",
-     "m2460Myr": "132.2304 | degrees (°)",
-     "m4400Myr": "342.9340 | degrees (°)",
+     "m3000": "269.8990 | degrees (°)",
+     "m400Myr": "232.0705 | degrees (°)",
+     "m2460Myr": "132.2177 | degrees (°)",
+     "m4400Myr": "343.1857 | degrees (°)",
      "genesis": "124.8796 | degrees (°)",
-     "p990Myr": "253.6667 | degrees (°)"
+     "p990Myr": "252.8670 | degrees (°)"
     }
    },
    "earth#067 True Longitude (λ)": {
@@ -1255,12 +1255,12 @@
     },
     "values": {
      "today": "40.9940 | degrees (°)",
-     "m3000": "267.9029 | degrees (°)",
-     "m400Myr": "232.8698 | degrees (°)",
-     "m2460Myr": "132.7612 | degrees (°)",
-     "m4400Myr": "341.9652 | degrees (°)",
+     "m3000": "267.9027 | degrees (°)",
+     "m400Myr": "232.5711 | degrees (°)",
+     "m2460Myr": "132.7486 | degrees (°)",
+     "m4400Myr": "342.2152 | degrees (°)",
      "genesis": "125.3011 | degrees (°)",
-     "p990Myr": "252.5747 | degrees (°)"
+     "p990Myr": "251.7525 | degrees (°)"
     }
    },
    "earth#068 Argument of Latitude (u)": {
@@ -1273,12 +1273,12 @@
     },
     "values": {
      "today": "40.9940 | degrees (°)",
-     "m3000": "267.9029 | degrees (°)",
-     "m400Myr": "232.8698 | degrees (°)",
-     "m2460Myr": "132.7612 | degrees (°)",
-     "m4400Myr": "341.9652 | degrees (°)",
+     "m3000": "267.9027 | degrees (°)",
+     "m400Myr": "232.5711 | degrees (°)",
+     "m2460Myr": "132.7486 | degrees (°)",
+     "m4400Myr": "342.2152 | degrees (°)",
      "genesis": "125.3011 | degrees (°)",
-     "p990Myr": "252.5747 | degrees (°)"
+     "p990Myr": "251.7525 | degrees (°)"
     }
    },
    "earth#069 Flight Path Angle (γ)": {
@@ -1292,11 +1292,11 @@
     "values": {
      "today": "-0.8413 | degrees (°)",
      "m3000": "-0.9997 | degrees (°)",
-     "m400Myr": "0.2495 | degrees (°)",
-     "m2460Myr": "0.2657 | degrees (°)",
-     "m4400Myr": "-0.4849 | degrees (°)",
+     "m400Myr": "0.2505 | degrees (°)",
+     "m2460Myr": "0.2658 | degrees (°)",
+     "m4400Myr": "-0.4857 | degrees (°)",
      "genesis": "0.2102 | degrees (°)",
-     "p990Myr": "-0.5441 | degrees (°)"
+     "p990Myr": "-0.5554 | degrees (°)"
     }
    },
    "earth#070 Heliocentric Latitude (β)": {
@@ -1310,11 +1310,11 @@
     "values": {
      "today": "1.4501 | degrees (°)",
      "m3000": "0.8481 | degrees (°)",
-     "m400Myr": "0.4920 | degrees (°)",
-     "m2460Myr": "-0.2616 | degrees (°)",
-     "m4400Myr": "0.8021 | degrees (°)",
+     "m400Myr": "0.4942 | degrees (°)",
+     "m2460Myr": "-0.2618 | degrees (°)",
+     "m4400Myr": "0.7998 | degrees (°)",
      "genesis": "-0.8397 | degrees (°)",
-     "p990Myr": "0.5032 | degrees (°)"
+     "p990Myr": "0.5178 | degrees (°)"
     }
    },
    "earth#071 True Anomaly Rate (dν/dt)": {
@@ -1328,11 +1328,11 @@
     "values": {
      "today": "1.001372 | °/SI day",
      "m3000": "0.973619 | °/SI day",
-     "m400Myr": "0.979151 | °/SI day",
-     "m2460Myr": "0.977013 | °/SI day",
-     "m4400Myr": "0.981200 | °/SI day",
+     "m400Myr": "0.979196 | °/SI day",
+     "m2460Myr": "0.977015 | °/SI day",
+     "m4400Myr": "0.981273 | °/SI day",
      "genesis": "1.007421 | °/SI day",
-     "p990Myr": "1.013333 | °/SI day"
+     "p990Myr": "1.013054 | °/SI day"
     }
    },
    "earth#072 Eccentric Anomaly Rate (dE/dt)": {
@@ -1346,11 +1346,11 @@
     "values": {
      "today": "0.993548 | °/SI day",
      "m3000": "0.979698 | °/SI day",
-     "m400Myr": "0.982442 | °/SI day",
-     "m2460Myr": "0.981578 | °/SI day",
-     "m4400Myr": "0.984537 | °/SI day",
+     "m400Myr": "0.982464 | °/SI day",
+     "m2460Myr": "0.981579 | °/SI day",
+     "m4400Myr": "0.984573 | °/SI day",
      "genesis": "0.997143 | °/SI day",
-     "p990Myr": "0.999366 | °/SI day"
+     "p990Myr": "0.999228 | °/SI day"
     }
    },
    "earth#073 Radius of Curvature (ρ)": {
@@ -1362,13 +1362,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "150,761,654 | km",
-     "m3000": "148,661,387 | km",
-     "m400Myr": "149,088,756 | km",
-     "m2460Myr": "148,863,283 | km",
-     "m4400Myr": "149,027,438 | km",
+     "today": "150,761,655 | km",
+     "m3000": "148,661,378 | km",
+     "m400Myr": "149,092,181 | km",
+     "m2460Myr": "148,863,437 | km",
+     "m4400Myr": "149,033,001 | km",
      "genesis": "151,053,733 | km",
-     "p990Myr": "151,658,487 | km"
+     "p990Myr": "151,638,462 | km"
     }
    },
    "earth#074 Time since perihelion": {
@@ -1382,11 +1382,11 @@
     "values": {
      "today": "303.64 | SI days",
      "m3000": "255.48 | SI days",
-     "m400Myr": "129.12 | SI days",
-     "m2460Myr": "136.71 | SI days",
-     "m4400Myr": "251.90 | SI days",
+     "m400Myr": "128.82 | SI days",
+     "m2460Myr": "136.70 | SI days",
+     "m4400Myr": "252.15 | SI days",
      "genesis": "19.72 | SI days",
-     "p990Myr": "331.07 | SI days"
+     "p990Myr": "330.25 | SI days"
     }
    },
    "earth#075 Time to next perihelion": {
@@ -1400,11 +1400,11 @@
     "values": {
      "today": "61.60 | SI days",
      "m3000": "109.77 | SI days",
-     "m400Myr": "236.09 | SI days",
-     "m2460Myr": "228.35 | SI days",
-     "m4400Myr": "112.53 | SI days",
+     "m400Myr": "236.39 | SI days",
+     "m2460Myr": "228.36 | SI days",
+     "m4400Myr": "112.28 | SI days",
      "genesis": "345.05 | SI days",
-     "p990Myr": "34.25 | SI days"
+     "p990Myr": "35.06 | SI days"
     }
    },
    "earth#076 Approximate Date of Perihelion": {
@@ -1417,12 +1417,12 @@
     },
     "values": {
      "today": "04/01/2027, 00:23:48 | D/M/Y, h:m:s",
-     "m3000": "-3000-11-02 15:18:01 | D/M/Y, h:m:s",
-     "m400Myr": "-420002767-03-16 03:35:25 | D/M/Y, h:m:s",
-     "m2460Myr": "-3072754596-06-18 10:44:04 | D/M/Y, h:m:s",
-     "m4400Myr": "-6662400237-05-07 07:30:00 | D/M/Y, h:m:s",
-     "genesis": "-6764195127-12-29 22:04:41 | D/M/Y, h:m:s",
-     "p990Myr": "871597403-04-23 23:52:00 | D/M/Y, h:m:s"
+     "m3000": "-3000-11-02 15:18:17 | D/M/Y, h:m:s",
+     "m400Myr": "-420002767-04-05 11:20:45 | D/M/Y, h:m:s",
+     "m2460Myr": "-3072754596-09-09 09:08:26 | D/M/Y, h:m:s",
+     "m4400Myr": "-6662400236-05-20 23:00:56 | D/M/Y, h:m:s",
+     "genesis": "-6764195125-10-18 04:55:19 | D/M/Y, h:m:s",
+     "p990Myr": "871597403-11-17 10:21:39 | D/M/Y, h:m:s"
     }
    },
    "earth#077 Approximate Date of Aphelion": {
@@ -1435,12 +1435,12 @@
     },
     "values": {
      "today": "05/07/2026, 09:33:09 | D/M/Y, h:m:s",
-     "m3000": "-3000-05-04 00:27:03 | D/M/Y, h:m:s",
-     "m400Myr": "-420002768-08-26 13:44:41 | D/M/Y, h:m:s",
-     "m2460Myr": "-3072754595-03-05 12:58:00 | D/M/Y, h:m:s",
-     "m4400Myr": "-6662400239-11-16 22:47:35 | D/M/Y, h:m:s",
-     "genesis": "-6764195129-10-28 15:59:46 | D/M/Y, h:m:s",
-     "p990Myr": "871597409-07-12 12:42:48 | D/M/Y, h:m:s"
+     "m3000": "-3000-05-04 00:27:19 | D/M/Y, h:m:s",
+     "m400Myr": "-420002768-09-15 20:53:01 | D/M/Y, h:m:s",
+     "m2460Myr": "-3072754595-05-27 10:06:06 | D/M/Y, h:m:s",
+     "m4400Myr": "-6662400238-12-01 20:07:58 | D/M/Y, h:m:s",
+     "genesis": "-6764195127-08-14 16:34:55 | D/M/Y, h:m:s",
+     "p990Myr": "871597406-04-16 10:49:31 | D/M/Y, h:m:s"
     }
    },
    "earth#078 (sub-row)": {
@@ -1472,11 +1472,11 @@
     "values": {
      "today": "86,400.0004664464 | SI sec",
      "m3000": "86,399.9119838123 | SI sec",
-     "m400Myr": "78,260.4245503135 | SI sec",
-     "m2460Myr": "60,645.3043063372 | SI sec",
-     "m4400Myr": "29,369.0293354766 | SI sec",
+     "m400Myr": "78,260.4245503106 | SI sec",
+     "m2460Myr": "60,645.3043063370 | SI sec",
+     "m4400Myr": "29,369.0293355389 | SI sec",
      "genesis": "19,834.8984239370 | SI sec",
-     "p990Myr": "113,314.9588262650 | SI sec"
+     "p990Myr": "113,314.9588261716 | SI sec"
     }
    },
    "earth#080 Sidereal day (SI seconds)": {
@@ -1488,13 +1488,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "86,164.090997 | 86,164.0917299989",
-     "m3000": "86,164.002996 | 86,164.0100581524",
-     "m400Myr": "78,066.804710 | 78,066.8078135982",
-     "m2460Myr": "60,528.922856 | 60,528.9252661779",
-     "m4400Myr": "29,341.661142 | 29,341.6623593896",
-     "genesis": "19,822.423187 | 19,822.4244747315",
-     "p990Myr": "112,909.602360 | 112,908.8611772082"
+     "today": "86,164.090997 | 86,164.0917300015",
+     "m3000": "86,164.002996 | 86,164.0100579272",
+     "m400Myr": "78,066.804710 | 78,066.8078135951",
+     "m2460Myr": "60,528.922856 | 60,528.9252661778",
+     "m4400Myr": "29,341.661142 | 29,341.6623594517",
+     "genesis": "19,822.423187 | 19,822.4244747324",
+     "p990Myr": "112,909.602360 | 112,908.8611771368"
     }
    },
    "earth#081 Stellar day (SI seconds)": {
@@ -1506,13 +1506,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "86,164.099372 | 86,164.1001057944",
-     "m3000": "86,164.011372 | 86,164.0183964345",
-     "m400Myr": "78,066.813067 | 78,066.8161567751",
-     "m2460Myr": "60,528.931819 | 60,528.9342324942",
-     "m4400Myr": "29,341.697478 | 29,341.6987582089",
-     "genesis": "19,822.428877 | 19,822.4301758428",
-     "p990Myr": "112,909.611304 | 112,908.8701359961"
+     "today": "86,164.099372 | 86,164.1001057970",
+     "m3000": "86,164.011372 | 86,164.0183962092",
+     "m400Myr": "78,066.813067 | 78,066.8161567720",
+     "m2460Myr": "60,528.931819 | 60,528.9342324940",
+     "m4400Myr": "29,341.697478 | 29,341.6987582711",
+     "genesis": "19,822.428877 | 19,822.4301758436",
+     "p990Myr": "112,909.611303 | 112,908.8701359247"
     }
    },
    "earth#082 Solar year (SI seconds)": {
@@ -1528,7 +1528,7 @@
      "m3000": "31,556,925.224563 | 31,556,948.831878",
      "m400Myr": "31,554,314.233629 | 31,554,314.233632",
      "m2460Myr": "31,541,065.518062 | 31,541,065.518066",
-     "m4400Myr": "31,486,773.821106 | 31,486,773.821395",
+     "m4400Myr": "31,486,773.821107 | 31,486,773.821395",
      "genesis": "31,516,495.535506 | 31,516,495.531633",
      "p990Myr": "31,563,199.347026 | 31,563,199.219704"
     }
@@ -1542,13 +1542,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "365.242188 | 365.24218375031",
-     "m3000": "365.242562 | 365.24280613890",
-     "m400Myr": "403.196308 | 403.19629183474",
+     "today": "365.242188 | 365.24218375030",
+     "m3000": "365.242562 | 365.24280613985",
+     "m400Myr": "403.196308 | 403.19629183476",
      "m2460Myr": "520.090811 | 520.09079054952",
-     "m4400Myr": "1,072.108086 | 1,072.10804124629",
-     "genesis": "1,588.941615 | 1,588.94151153448",
-     "p990Myr": "278.543978 | 278.54581146795"
+     "m4400Myr": "1,072.108086 | 1,072.10804124403",
+     "genesis": "1,588.941615 | 1,588.94151153442",
+     "p990Myr": "278.543978 | 278.54581146812"
     }
    },
    "earth#084 Sidereal year (SI seconds)": {
@@ -1578,13 +1578,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "365.256361 | 365.25635794244",
-     "m3000": "365.256735 | 365.25669990786",
-     "m400Myr": "403.215321 | 403.21530520945",
+     "today": "365.256361 | 365.25635794243",
+     "m3000": "365.256735 | 365.25669990881",
+     "m400Myr": "403.215321 | 403.21530520947",
      "m2460Myr": "520.134530 | 520.13450936432",
-     "m4400Myr": "1,073.659715 | 1,073.65967062587",
-     "genesis": "1,589.731358 | 1,589.73125503845",
-     "p990Myr": "278.550701 | 278.55253514430"
+     "m4400Myr": "1,073.659715 | 1,073.65967062359",
+     "genesis": "1,589.731358 | 1,589.73125503838",
+     "p990Myr": "278.550701 | 278.55253514447"
     }
    },
    "earth#086 Anomalistic year (SI seconds)": {
@@ -1614,8 +1614,8 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "365.259636 | 365.25963245176",
-     "m3000": "365.259837 | 365.25980790011",
+     "today": "365.259636 | 365.25963245175",
+     "m3000": "365.259837 | 365.25980790107",
      "m400Myr": "NaN | —",
      "m2460Myr": "NaN | —",
      "m4400Myr": "NaN | —",
@@ -1632,13 +1632,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "23.439279 | 23.435789939393",
-     "m3000": "23.439279 | 24.020833296444",
-     "m400Myr": "23.439279 | 22.572292826041",
-     "m2460Myr": "23.439279 | 19.804657973439",
-     "m4400Myr": "23.439279 | 14.047146320444",
+     "today": "23.439279 | 23.435789939392",
+     "m3000": "23.439279 | 24.020833296489",
+     "m400Myr": "23.439279 | 22.572292787537",
+     "m2460Myr": "23.439279 | 19.804657973965",
+     "m4400Myr": "23.439279 | 14.047146320445",
      "genesis": "23.439279 | 11.866946650331",
-     "p990Myr": "23.439279 | 25.166854722922"
+     "p990Myr": "23.439279 | 25.166854973264"
     }
    },
    "earth#089 Orbital Eccentricity": {
@@ -1651,12 +1651,12 @@
     },
     "values": {
      "today": "0.016710 | 0.0166970420899",
-     "m3000": "0.016710 | 0.0184729400355",
-     "m400Myr": "0.016710 | 0.0054917369190",
-     "m2460Myr": "0.016710 | 0.0065677124011",
-     "m4400Myr": "0.016710 | 0.0091043137218",
-     "genesis": "0.016710 | 0.0108970754978",
-     "p990Myr": "0.016710 | 0.0168531456129"
+     "m3000": "0.016710 | 0.0184729400357",
+     "m400Myr": "0.016710 | 0.0054917372106",
+     "m2460Myr": "0.016710 | 0.0065677124250",
+     "m4400Myr": "0.016710 | 0.0091043145925",
+     "genesis": "0.016710 | 0.0108970754983",
+     "p990Myr": "0.016710 | 0.0168531475951"
     }
    },
    "earth#090 Inclination to Invariable plane (degrees)": {
@@ -1668,13 +1668,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "1.5770101618358 | ",
-     "m3000": "1.8247963486388 | ",
-     "m400Myr": "0.6441807846269 | ",
-     "m2460Myr": "0.9192517642491 | ",
-     "m4400Myr": "0.9562061871601 | ",
+     "today": "1.5770101618355 | ",
+     "m3000": "1.8247963486640 | ",
+     "m400Myr": "0.6441808407919 | ",
+     "m2460Myr": "0.9192517621263 | ",
+     "m4400Myr": "0.9562061718475 | ",
      "genesis": "0.8999022971754 | ",
-     "p990Myr": "1.1345660548997 | "
+     "p990Myr": "1.1345661008296 | "
     }
    },
    "earth#091 Length of AU (km)": {
@@ -1706,11 +1706,11 @@
     "values": {
      "today": "111,548.31 | years",
      "m3000": "117,524.80 | years",
-     "m400Myr": "281,948.96 | years",
+     "m400Myr": "281,948.94 | years",
      "m2460Myr": "75,833.92 | years",
-     "m4400Myr": "64,289.21 | years",
-     "genesis": "258,858.72 | years",
-     "p990Myr": "132,781.96 | years"
+     "m4400Myr": "64,289.22 | years",
+     "genesis": "258,858.26 | years",
+     "p990Myr": "132,781.95 | years"
     }
    },
    "earth#093 Axial precession period": {
@@ -1832,11 +1832,11 @@
     "values": {
      "today": "-79,525.39 | years",
      "m3000": "-85,027.46 | years",
-     "m400Myr": "-583,563.66 | years",
-     "m2460Myr": "-91,015.92 | years",
-     "m4400Myr": "-882,999.50 | years",
-     "genesis": "-1,255,938.50 | years",
-     "p990Myr": "-189,836.67 | years"
+     "m400Myr": "-583,563.83 | years",
+     "m2460Myr": "-91,015.69 | years",
+     "m4400Myr": "-882,995.63 | years",
+     "genesis": "-1,255,930.16 | years",
+     "p990Myr": "-189,836.69 | years"
     }
    },
    "earth#100 ┌ Secular base mode — g5 (Jupiter), A 0.0193 · 36 %": {
@@ -2014,8 +2014,8 @@
      "m3000": "5.155137 | degrees (°)",
      "m400Myr": "5.265493 | degrees (°)",
      "m2460Myr": "5.633762 | degrees (°)",
-     "m4400Myr": "7.282996 | degrees (°)",
-     "genesis": "7.735601 | degrees (°)",
+     "m4400Myr": "7.283092 | degrees (°)",
+     "genesis": "7.734190 | degrees (°)",
      "p990Myr": "4.920880 | degrees (°)"
     }
    },
@@ -2212,7 +2212,7 @@
      "m3000": "27.3216689905 | solar days of date",
      "m400Myr": "28.2958241057 | solar days of date",
      "m2460Myr": "29.7189890328 | solar days of date",
-     "m4400Myr": "17.9806563932 | solar days of date",
+     "m4400Myr": "17.9806563933 | solar days of date",
      "genesis": "3.9403023585 | solar days of date",
      "p990Myr": "23.9912945470 | solar days of date"
     }
@@ -2248,7 +2248,7 @@
      "m3000": "27.5546177190 | solar days of date",
      "m400Myr": "28.5077493278 | solar days of date",
      "m2460Myr": "29.8661990199 | solar days of date",
-     "m4400Myr": "17.9892118308 | solar days of date",
+     "m4400Myr": "17.9892118309 | solar days of date",
      "genesis": "3.9460133374 | solar days of date",
      "p990Myr": "24.2629013507 | solar days of date"
     }
@@ -2268,7 +2268,7 @@
      "m2460Myr": "29.6494652376 | solar days of date",
      "m4400Myr": "17.9765923562 | solar days of date",
      "genesis": "3.9372739525 | solar days of date",
-     "p990Myr": "23.8640528604 | solar days of date"
+     "p990Myr": "23.8640528605 | solar days of date"
     }
    },
    "moon#020 Tropical month": {
@@ -2284,9 +2284,9 @@
      "m3000": "27.3215896900 | solar days of date",
      "m400Myr": "28.2957304627 | solar days of date",
      "m2460Myr": "29.7188462313 | solar days of date",
-     "m4400Myr": "17.9802202375 | solar days of date",
+     "m4400Myr": "17.9802202376 | solar days of date",
      "genesis": "3.9402975005 | solar days of date",
-     "p990Myr": "23.9912446790 | solar days of date"
+     "p990Myr": "23.9912446791 | solar days of date"
     }
    },
    "moon#021 Orbit distance to Earth (Mean)": {
@@ -2426,11 +2426,11 @@
     "values": {
      "today": "3,608.50 | km/h",
      "m3000": "3,502.66 | km/h",
-     "m400Myr": "3,895.18 | km/h",
-     "m2460Myr": "3,979.39 | km/h",
-     "m4400Myr": "6,369.78 | km/h",
-     "genesis": "11,184.10 | km/h",
-     "p990Myr": "3,552.61 | km/h"
+     "m400Myr": "3,890.66 | km/h",
+     "m2460Myr": "3,980.11 | km/h",
+     "m4400Myr": "6,390.62 | km/h",
+     "genesis": "11,185.39 | km/h",
+     "p990Myr": "3,509.38 | km/h"
     }
    },
    "moon#029 Radial velocity (vᵣ)": {
@@ -2444,11 +2444,11 @@
     "values": {
      "today": "197.05 | km/h",
      "m3000": "99.75 | km/h",
-     "m400Myr": "-32.29 | km/h",
-     "m2460Myr": "209.34 | km/h",
-     "m4400Myr": "-114.29 | km/h",
-     "genesis": "-553.73 | km/h",
-     "p990Myr": "-184.51 | km/h"
+     "m400Myr": "-47.17 | km/h",
+     "m2460Myr": "209.58 | km/h",
+     "m4400Myr": "-17.91 | km/h",
+     "genesis": "-554.40 | km/h",
+     "p990Myr": "-191.07 | km/h"
     }
    },
    "moon#030 Transverse velocity (vₜ)": {
@@ -2462,11 +2462,11 @@
     "values": {
      "today": "3,629.02 | km/h",
      "m3000": "3,496.29 | km/h",
-     "m400Myr": "3,953.68 | km/h",
-     "m2460Myr": "3,947.16 | km/h",
-     "m4400Myr": "6,357.83 | km/h",
-     "genesis": "11,134.60 | km/h",
-     "p990Myr": "3,557.41 | km/h"
+     "m400Myr": "3,950.75 | km/h",
+     "m2460Myr": "3,947.90 | km/h",
+     "m4400Myr": "6,377.64 | km/h",
+     "genesis": "11,135.85 | km/h",
+     "p990Myr": "3,525.07 | km/h"
     }
    },
    "moon#031 Perigee velocity (vₚ)": {
@@ -2533,12 +2533,12 @@
     },
     "values": {
      "today": "5,143.94 | km/h",
-     "m3000": "5,070.25 | km/h",
-     "m400Myr": "5,403.24 | km/h",
-     "m2460Myr": "5,649.66 | km/h",
-     "m4400Myr": "8,776.12 | km/h",
-     "genesis": "15,979.06 | km/h",
-     "p990Myr": "4,985.59 | km/h"
+     "m3000": "5,070.26 | km/h",
+     "m400Myr": "5,399.99 | km/h",
+     "m2460Myr": "5,650.17 | km/h",
+     "m4400Myr": "8,791.25 | km/h",
+     "genesis": "15,979.97 | km/h",
+     "p990Myr": "4,954.87 | km/h"
     }
    },
    "moon#035 Circular velocity (v_circ)": {
@@ -2552,11 +2552,11 @@
     "values": {
      "today": "3,637.32 | km/h",
      "m3000": "3,585.21 | km/h",
-     "m400Myr": "3,820.67 | km/h",
-     "m2460Myr": "3,994.91 | km/h",
-     "m4400Myr": "6,205.65 | km/h",
-     "genesis": "11,298.90 | km/h",
-     "p990Myr": "3,525.34 | km/h"
+     "m400Myr": "3,818.37 | km/h",
+     "m2460Myr": "3,995.27 | km/h",
+     "m4400Myr": "6,216.36 | km/h",
+     "genesis": "11,299.55 | km/h",
+     "p990Myr": "3,503.62 | km/h"
     }
    },
    "moon#036 Velocity ratio (v/v_circ)": {
@@ -2570,11 +2570,11 @@
     "values": {
      "today": "0.9921 | ",
      "m3000": "0.9770 | ",
-     "m400Myr": "1.0195 | ",
-     "m2460Myr": "0.9961 | ",
-     "m4400Myr": "1.0264 | ",
-     "genesis": "0.9898 | ",
-     "p990Myr": "1.0077 | "
+     "m400Myr": "1.0189 | ",
+     "m2460Myr": "0.9962 | ",
+     "m4400Myr": "1.0280 | ",
+     "genesis": "0.9899 | ",
+     "p990Myr": "1.0016 | "
     }
    },
    "moon#037 Specific Orbital Energy (ε)": {
@@ -2642,11 +2642,11 @@
     "values": {
      "today": "411.7843997256 | solar days of date",
      "m3000": "411.7983634775 | solar days of date",
-     "m400Myr": "450.9904345313 | solar days of date",
+     "m400Myr": "450.9904345331 | solar days of date",
      "m2460Myr": "569.2405585041 | solar days of date",
-     "m4400Myr": "1,105.0409167553 | solar days of date",
+     "m4400Myr": "1,105.0409167544 | solar days of date",
      "genesis": "3,820.6465657562 | solar days of date",
-     "p990Myr": "320.1627706054 | solar days of date"
+     "p990Myr": "320.1627706043 | solar days of date"
     }
    },
    "moon#041 Draconic year (observed — eclipse year)": {
@@ -2660,11 +2660,11 @@
     "values": {
      "today": "346.6200734531 | solar days of date",
      "m3000": "346.6188425031 | solar days of date",
-     "m400Myr": "383.8604015640 | solar days of date",
+     "m400Myr": "383.8604015638 | solar days of date",
      "m2460Myr": "499.6301384559 | solar days of date",
-     "m4400Myr": "1,059.3591036810 | solar days of date",
+     "m4400Myr": "1,059.3591036785 | solar days of date",
      "genesis": "1,213.2371106626 | solar days of date",
-     "p990Myr": "262.3119064016 | solar days of date"
+     "p990Myr": "262.3119064020 | solar days of date"
     }
    },
    "moon#042 Apsidal precession (of date)": {
@@ -2678,11 +2678,11 @@
     "values": {
      "today": "3,231.4974166947 | solar days of date",
      "m3000": "3,230.6669666038 | solar days of date",
-     "m400Myr": "3,804.6030115334 | solar days of date",
-     "m2460Myr": "6,023.5667673142 | solar days of date",
-     "m4400Myr": "35,973.9283159966 | solar days of date",
+     "m400Myr": "3,804.6030114089 | solar days of date",
+     "m2460Myr": "6,023.5667673040 | solar days of date",
+     "m4400Myr": "35,973.9283143919 | solar days of date",
      "genesis": "2,720.2450407327 | solar days of date",
-     "p990Myr": "2,142.7678467620 | solar days of date"
+     "p990Myr": "2,142.7678468260 | solar days of date"
     }
    },
    "moon#043 (sub-row)": {
@@ -2696,11 +2696,11 @@
     "values": {
      "today": "8.8475469660 | tropical years of date",
      "m3000": "8.8452642194 | tropical years of date",
-     "m400Myr": "9.4361057801 | tropical years of date",
+     "m400Myr": "9.4361057798 | tropical years of date",
      "m2460Myr": "11.5817596398 | tropical years of date",
-     "m4400Myr": "33.5543857884 | tropical years of date",
+     "m4400Myr": "33.5543857870 | tropical years of date",
      "genesis": "1.7119855223 | tropical years of date",
-     "p990Myr": "7.6927452018 | tropical years of date"
+     "p990Myr": "7.6927452020 | tropical years of date"
     }
    },
    "moon#044 Apsidal precession (fixed stars)": {
@@ -2714,11 +2714,11 @@
     "values": {
      "today": "3,232.6071677100 | solar days of date",
      "m3000": "3,231.7761484593 | solar days of date",
-     "m400Myr": "3,806.2966379983 | solar days of date",
-     "m2460Myr": "6,029.4363060197 | solar days of date",
-     "m4400Myr": "37,807.2813403731 | solar days of date",
+     "m400Myr": "3,806.2966378737 | solar days of date",
+     "m2460Myr": "6,029.4363060095 | solar days of date",
+     "m4400Myr": "37,807.2813385888 | solar days of date",
      "genesis": "2,722.5605145337 | solar days of date",
-     "p990Myr": "2,143.1658001902 | solar days of date"
+     "p990Myr": "2,143.1658002542 | solar days of date"
     }
    },
    "moon#045 (sub-row)": {
@@ -2732,11 +2732,11 @@
     "values": {
      "today": "8.8505853636 | tropical years of date",
      "m3000": "8.8483010557 | tropical years of date",
-     "m400Myr": "9.4403062811 | tropical years of date",
+     "m400Myr": "9.4403062807 | tropical years of date",
      "m2460Myr": "11.5930452433 | tropical years of date",
-     "m4400Myr": "35.2644307444 | tropical years of date",
+     "m4400Myr": "35.2644307428 | tropical years of date",
      "genesis": "1.7134427652 | tropical years of date",
-     "p990Myr": "7.6941738933 | tropical years of date"
+     "p990Myr": "7.6941738936 | tropical years of date"
     }
    },
    "moon#046 Nodal precession (of date)": {
@@ -2750,11 +2750,11 @@
     "values": {
      "today": "6,798.3832068874 | solar days of date",
      "m3000": "6,797.7802700979 | solar days of date",
-     "m400Myr": "8,004.3362822255 | solar days of date",
-     "m2460Myr": "12,700.1221353118 | solar days of date",
-     "m4400Myr": "89,085.3446086658 | solar days of date",
+     "m400Myr": "8,004.3362821349 | solar days of date",
+     "m2460Myr": "12,700.1221353052 | solar days of date",
+     "m4400Myr": "89,085.3446066290 | solar days of date",
      "genesis": "5,131.0615434649 | solar days of date",
-     "p990Myr": "4,501.2987630029 | solar days of date"
+     "p990Myr": "4,501.2987630532 | solar days of date"
     }
    },
    "moon#047 (sub-row)": {
@@ -2768,11 +2768,11 @@
     "values": {
      "today": "18.6133568929 | tropical years of date",
      "m3000": "18.6116870653 | tropical years of date",
-     "m400Myr": "19.8522062959 | tropical years of date",
+     "m400Myr": "19.8522062956 | tropical years of date",
      "m2460Myr": "24.4190473268 | tropical years of date",
-     "m4400Myr": "83.0936225489 | tropical years of date",
+     "m4400Myr": "83.0936225472 | tropical years of date",
      "genesis": "3.2292322732 | tropical years of date",
-     "p990Myr": "16.1601008309 | tropical years of date"
+     "p990Myr": "16.1601008311 | tropical years of date"
     }
    },
    "moon#048 Nodal precession (fixed stars)": {
@@ -2786,11 +2786,11 @@
     "values": {
      "today": "6,793.4767663282 | solar days of date",
      "m3000": "6,792.8746939682 | solar days of date",
-     "m400Myr": "7,996.8502801365 | solar days of date",
-     "m2460Myr": "12,674.1086314318 | solar days of date",
-     "m4400Myr": "79,534.4445216129 | solar days of date",
+     "m400Myr": "7,996.8502800461 | solar days of date",
+     "m2460Myr": "12,674.1086314253 | solar days of date",
+     "m4400Myr": "79,534.4445200420 | solar days of date",
      "genesis": "5,122.8434210093 | solar days of date",
-     "p990Myr": "4,499.5436395626 | solar days of date"
+     "p990Myr": "4,499.5436396129 | solar days of date"
     }
    },
    "moon#049 (sub-row)": {
@@ -2804,11 +2804,11 @@
     "values": {
      "today": "18.5999235035 | tropical years of date",
      "m3000": "18.5982560563 | tropical years of date",
-     "m400Myr": "19.8336396524 | tropical years of date",
+     "m400Myr": "19.8336396522 | tropical years of date",
      "m2460Myr": "24.3690300927 | tropical years of date",
-     "m4400Myr": "74.1850990390 | tropical years of date",
+     "m4400Myr": "74.1850990377 | tropical years of date",
      "genesis": "3.2240601999 | tropical years of date",
-     "p990Myr": "16.1537997669 | tropical years of date"
+     "p990Myr": "16.1537997670 | tropical years of date"
     }
    },
    "moon#050 Nodal meets Apsidal precession": {
@@ -2822,11 +2822,11 @@
     "values": {
      "today": "2,190.3508720836 | solar days of date",
      "m3000": "2,189.9067369536 | solar days of date",
-     "m400Myr": "2,578.8363516083 | solar days of date",
-     "m2460Myr": "4,085.7351365396 | solar days of date",
-     "m4400Myr": "25,625.8470564499 | solar days of date",
+     "m400Myr": "2,578.8363515417 | solar days of date",
+     "m2460Myr": "4,085.7351365342 | solar days of date",
+     "m4400Myr": "25,625.8470554636 | solar days of date",
      "genesis": "1,777.7607545472 | solar days of date",
-     "p990Myr": "1,451.7070379542 | solar days of date"
+     "p990Myr": "1,451.7070379888 | solar days of date"
     }
    },
    "moon#051 (sub-row)": {
@@ -2840,11 +2840,11 @@
     "values": {
      "today": "5.9969821150 | tropical years of date",
      "m3000": "5.9957599791 | tropical years of date",
-     "m400Myr": "6.3959820590 | tropical years of date",
+     "m400Myr": "6.3959820588 | tropical years of date",
      "m2460Myr": "7.8558110387 | tropical years of date",
-     "m4400Myr": "23.9022980958 | tropical years of date",
+     "m4400Myr": "23.9022980949 | tropical years of date",
      "genesis": "1.1188332773 | tropical years of date",
-     "p990Myr": "5.2117696126 | tropical years of date"
+     "p990Myr": "5.2117696127 | tropical years of date"
     }
    },
    "moon#052 Longitude of perigee (ϖ)": {
@@ -2856,13 +2856,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "95.45596989 | degrees (°)",
-     "m3000": "101.24520501 | degrees (°)",
-     "m400Myr": "233.07987416 | degrees (°)",
-     "m2460Myr": "151.57700108 | degrees (°)",
-     "m4400Myr": "225.39382508 | degrees (°)",
-     "genesis": "113.40837764 | degrees (°)",
-     "p990Myr": "127.93552599 | degrees (°)"
+     "today": "95.45597016 | degrees (°)",
+     "m3000": "101.24518472 | degrees (°)",
+     "m400Myr": "233.04982829 | degrees (°)",
+     "m2460Myr": "151.57700207 | degrees (°)",
+     "m4400Myr": "225.40165036 | degrees (°)",
+     "genesis": "113.40837748 | degrees (°)",
+     "p990Myr": "127.82520930 | degrees (°)"
     }
    },
    "moon#053 Argument of perigee (ω)": {
@@ -2874,13 +2874,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "130.11050249 | degrees (°)",
-     "m3000": "51.59087529 | degrees (°)",
-     "m400Myr": "213.88127536 | degrees (°)",
-     "m2460Myr": "8.96194830 | degrees (°)",
-     "m4400Myr": "224.86673270 | degrees (°)",
-     "genesis": "306.12095677 | degrees (°)",
-     "p990Myr": "277.46620834 | degrees (°)"
+     "today": "130.11050290 | degrees (°)",
+     "m3000": "51.59084619 | degrees (°)",
+     "m400Myr": "213.83349867 | degrees (°)",
+     "m2460Myr": "8.96194857 | degrees (°)",
+     "m4400Myr": "224.87998629 | degrees (°)",
+     "genesis": "306.13411600 | degrees (°)",
+     "p990Myr": "277.31124921 | degrees (°)"
     }
    },
    "moon#054 Longitude of ascending node (Ω)": {
@@ -2892,13 +2892,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "325.34546740 | degrees (°)",
-     "m3000": "49.65432972 | degrees (°)",
-     "m400Myr": "19.19859880 | degrees (°)",
-     "m2460Myr": "142.61505278 | degrees (°)",
-     "m4400Myr": "0.52709238 | degrees (°)",
-     "genesis": "167.28742088 | degrees (°)",
-     "p990Myr": "210.46931765 | degrees (°)"
+     "today": "325.34546727 | degrees (°)",
+     "m3000": "49.65433853 | degrees (°)",
+     "m400Myr": "19.21632962 | degrees (°)",
+     "m2460Myr": "142.61505350 | degrees (°)",
+     "m4400Myr": "0.52166408 | degrees (°)",
+     "genesis": "167.27426148 | degrees (°)",
+     "p990Myr": "210.51396009 | degrees (°)"
     }
    },
    "moon#055 Longitude of descending node": {
@@ -2910,13 +2910,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "145.34546740 | degrees (°)",
-     "m3000": "229.65432972 | degrees (°)",
-     "m400Myr": "199.19859880 | degrees (°)",
-     "m2460Myr": "322.61505278 | degrees (°)",
-     "m4400Myr": "180.52709238 | degrees (°)",
-     "genesis": "347.28742088 | degrees (°)",
-     "p990Myr": "30.46931765 | degrees (°)"
+     "today": "145.34546727 | degrees (°)",
+     "m3000": "229.65433853 | degrees (°)",
+     "m400Myr": "199.21632962 | degrees (°)",
+     "m2460Myr": "322.61505350 | degrees (°)",
+     "m4400Myr": "180.52166408 | degrees (°)",
+     "genesis": "347.27426148 | degrees (°)",
+     "p990Myr": "30.51396009 | degrees (°)"
     }
    },
    "moon#056 Mean Anomaly (M)": {
@@ -2930,11 +2930,11 @@
     "values": {
      "today": "99.08 | degrees (°)",
      "m3000": "148.78 | degrees (°)",
-     "m400Myr": "351.46 | degrees (°)",
-     "m2460Myr": "105.28 | degrees (°)",
-     "m4400Myr": "340.95 | degrees (°)",
-     "genesis": "244.73 | degrees (°)",
-     "p990Myr": "289.41 | degrees (°)"
+     "m400Myr": "347.47 | degrees (°)",
+     "m2460Myr": "105.07 | degrees (°)",
+     "m4400Myr": "357.08 | degrees (°)",
+     "genesis": "244.86 | degrees (°)",
+     "p990Myr": "279.66 | degrees (°)"
     }
    },
    "moon#057 Eccentric Anomaly (E)": {
@@ -2947,12 +2947,12 @@
     },
     "values": {
      "today": "102.16 | degrees (°)",
-     "m3000": "150.34 | degrees (°)",
-     "m400Myr": "350.97 | degrees (°)",
-     "m2460Myr": "108.27 | degrees (°)",
-     "m4400Myr": "339.86 | degrees (°)",
-     "genesis": "241.95 | degrees (°)",
-     "p990Myr": "286.39 | degrees (°)"
+     "m3000": "150.33 | degrees (°)",
+     "m400Myr": "346.74 | degrees (°)",
+     "m2460Myr": "108.06 | degrees (°)",
+     "m4400Myr": "356.91 | degrees (°)",
+     "genesis": "242.08 | degrees (°)",
+     "p990Myr": "276.54 | degrees (°)"
     }
    },
    "moon#058 True Anomaly (ν)": {
@@ -2966,11 +2966,11 @@
     "values": {
      "today": "102.15 | degrees (°)",
      "m3000": "150.34 | degrees (°)",
-     "m400Myr": "350.98 | degrees (°)",
-     "m2460Myr": "108.31 | degrees (°)",
-     "m4400Myr": "339.86 | degrees (°)",
-     "genesis": "241.94 | degrees (°)",
-     "p990Myr": "286.39 | degrees (°)"
+     "m400Myr": "346.76 | degrees (°)",
+     "m2460Myr": "108.11 | degrees (°)",
+     "m4400Myr": "356.91 | degrees (°)",
+     "genesis": "242.07 | degrees (°)",
+     "p990Myr": "276.55 | degrees (°)"
     }
    },
    "moon#059 Equation of the Center": {
@@ -2984,11 +2984,11 @@
     "values": {
      "today": "3.07 | degrees (°)",
      "m3000": "1.56 | degrees (°)",
-     "m400Myr": "-0.49 | degrees (°)",
-     "m2460Myr": "3.03 | degrees (°)",
-     "m4400Myr": "-1.09 | degrees (°)",
+     "m400Myr": "-0.71 | degrees (°)",
+     "m2460Myr": "3.04 | degrees (°)",
+     "m4400Myr": "-0.17 | degrees (°)",
      "genesis": "-2.79 | degrees (°)",
-     "p990Myr": "-3.02 | degrees (°)"
+     "p990Myr": "-3.11 | degrees (°)"
     }
    },
    "moon#060 Mean Longitude (L)": {
@@ -3000,13 +3000,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "194.5372 | degrees (°)",
-     "m3000": "250.0236 | degrees (°)",
-     "m400Myr": "224.5416 | degrees (°)",
-     "m2460Myr": "256.8568 | degrees (°)",
-     "m4400Myr": "206.3392 | degrees (°)",
-     "genesis": "358.1341 | degrees (°)",
-     "p990Myr": "57.3410 | degrees (°)"
+     "today": "194.5373 | degrees (°)",
+     "m3000": "250.0213 | degrees (°)",
+     "m400Myr": "220.5151 | degrees (°)",
+     "m2460Myr": "256.6502 | degrees (°)",
+     "m4400Myr": "222.4787 | degrees (°)",
+     "genesis": "358.2672 | degrees (°)",
+     "p990Myr": "47.4858 | degrees (°)"
     }
    },
    "moon#061 True Longitude (λ)": {
@@ -3018,13 +3018,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "197.6037 | degrees (°)",
-     "m3000": "251.5843 | degrees (°)",
-     "m400Myr": "224.0557 | degrees (°)",
-     "m2460Myr": "259.8883 | degrees (°)",
-     "m4400Myr": "205.2539 | degrees (°)",
-     "genesis": "355.3464 | degrees (°)",
-     "p990Myr": "54.3239 | degrees (°)"
+     "today": "197.6038 | degrees (°)",
+     "m3000": "251.5821 | degrees (°)",
+     "m400Myr": "219.8057 | degrees (°)",
+     "m2460Myr": "259.6853 | degrees (°)",
+     "m4400Myr": "222.3084 | degrees (°)",
+     "genesis": "355.4761 | degrees (°)",
+     "p990Myr": "44.3725 | degrees (°)"
     }
    },
    "moon#062 Argument of Latitude (u)": {
@@ -3037,12 +3037,12 @@
     },
     "values": {
      "today": "232.2583 | degrees (°)",
-     "m3000": "201.9299 | degrees (°)",
-     "m400Myr": "204.8571 | degrees (°)",
-     "m2460Myr": "117.2733 | degrees (°)",
-     "m4400Myr": "204.7269 | degrees (°)",
-     "genesis": "188.0590 | degrees (°)",
-     "p990Myr": "203.8546 | degrees (°)"
+     "m3000": "201.9278 | degrees (°)",
+     "m400Myr": "200.5894 | degrees (°)",
+     "m2460Myr": "117.0702 | degrees (°)",
+     "m4400Myr": "221.7867 | degrees (°)",
+     "genesis": "188.2018 | degrees (°)",
+     "p990Myr": "193.8585 | degrees (°)"
     }
    },
    "moon#063 Flight Path Angle (γ)": {
@@ -3055,12 +3055,12 @@
     },
     "values": {
      "today": "3.1080 | degrees (°)",
-     "m3000": "1.6342 | degrees (°)",
-     "m400Myr": "-0.4680 | degrees (°)",
-     "m2460Myr": "3.0359 | degrees (°)",
-     "m4400Myr": "-1.0299 | degrees (°)",
-     "genesis": "-2.8470 | degrees (°)",
-     "p990Myr": "-2.9691 | degrees (°)"
+     "m3000": "1.6343 | degrees (°)",
+     "m400Myr": "-0.6841 | degrees (°)",
+     "m2460Myr": "3.0388 | degrees (°)",
+     "m4400Myr": "-0.1609 | degrees (°)",
+     "genesis": "-2.8501 | degrees (°)",
+     "p990Myr": "-3.1026 | degrees (°)"
     }
    },
    "moon#064 Ecliptic Latitude (β)": {
@@ -3073,12 +3073,12 @@
     },
     "values": {
      "today": "-4.0762 | degrees (°)",
-     "m3000": "-1.9239 | degrees (°)",
-     "m400Myr": "-2.1655 | degrees (°)",
-     "m2460Myr": "4.5827 | degrees (°)",
-     "m4400Myr": "-2.1549 | degrees (°)",
-     "genesis": "-0.7221 | degrees (°)",
-     "p990Myr": "-2.0833 | degrees (°)"
+     "m3000": "-1.9237 | degrees (°)",
+     "m400Myr": "-1.8115 | degrees (°)",
+     "m2460Myr": "4.5910 | degrees (°)",
+     "m4400Myr": "-3.4340 | degrees (°)",
+     "genesis": "-0.7348 | degrees (°)",
+     "p990Myr": "-1.2337 | degrees (°)"
     }
    },
    "moon#065 True Anomaly Rate (dν/dt)": {
@@ -3090,13 +3090,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "12.822789 | °/solar day of date",
-     "m3000": "11.901889 | °/solar day of date",
-     "m400Myr": "14.098383 | °/solar day of date",
-     "m2460Myr": "11.694356 | °/solar day of date",
-     "m4400Myr": "22.228562 | °/solar day of date",
-     "genesis": "86.972693 | °/solar day of date",
-     "p990Myr": "15.370129 | °/solar day of date"
+     "today": "12.822788 | °/solar day of date",
+     "m3000": "11.901915 | °/solar day of date",
+     "m400Myr": "14.077511 | °/solar day of date",
+     "m2460Myr": "11.698754 | °/solar day of date",
+     "m4400Myr": "22.367319 | °/solar day of date",
+     "genesis": "86.992285 | °/solar day of date",
+     "p990Myr": "15.091993 | °/solar day of date"
     }
    },
    "moon#066 Eccentric Anomaly Rate (dE/dt)": {
@@ -3109,12 +3109,12 @@
     },
     "values": {
      "today": "12.915676 | °/solar day of date",
-     "m3000": "12.470076 | °/solar day of date",
-     "m400Myr": "13.352092 | °/solar day of date",
-     "m2460Myr": "11.849846 | °/solar day of date",
-     "m4400Myr": "21.099557 | °/solar day of date",
-     "genesis": "88.935292 | °/solar day of date",
-     "p990Myr": "15.070906 | °/solar day of date"
+     "m3000": "12.470088 | °/solar day of date",
+     "m400Myr": "13.341060 | °/solar day of date",
+     "m2460Myr": "11.852001 | °/solar day of date",
+     "m4400Myr": "21.172692 | °/solar day of date",
+     "genesis": "88.944810 | °/solar day of date",
+     "p990Myr": "14.930765 | °/solar day of date"
     }
    },
    "moon#067 Radius of Curvature (ρ)": {
@@ -3128,11 +3128,11 @@
     "values": {
      "today": "380,489 | km",
      "m3000": "365,403 | km",
-     "m400Myr": "387,239 | km",
-     "m2460Myr": "316,035 | km",
-     "m4400Myr": "148,668 | km",
-     "genesis": "38,665 | km",
-     "p990Myr": "429,195 | km"
+     "m400Myr": "386,997 | km",
+     "m2460Myr": "316,097 | km",
+     "m4400Myr": "149,061 | km",
+     "genesis": "38,669 | km",
+     "p990Myr": "425,451 | km"
     }
    },
    "moon#068 Elongation from Sun": {
@@ -3146,11 +3146,11 @@
     "values": {
      "today": "26.88 | degrees (°)",
      "m3000": "95.43 | degrees (°)",
-     "m400Myr": "81.53 | degrees (°)",
-     "m2460Myr": "157.16 | degrees (°)",
-     "m4400Myr": "23.74 | degrees (°)",
-     "genesis": "62.30 | degrees (°)",
-     "p990Myr": "104.86 | degrees (°)"
+     "m400Myr": "85.50 | degrees (°)",
+     "m2460Myr": "157.34 | degrees (°)",
+     "m4400Myr": "8.88 | degrees (°)",
+     "genesis": "62.17 | degrees (°)",
+     "p990Myr": "95.74 | degrees (°)"
     }
    },
    "moon#069 Lunar Phase Angle": {
@@ -3164,11 +3164,11 @@
     "values": {
      "today": "333.39 | degrees (°)",
      "m3000": "95.42 | degrees (°)",
-     "m400Myr": "278.48 | degrees (°)",
-     "m2460Myr": "202.42 | degrees (°)",
-     "m4400Myr": "336.70 | degrees (°)",
-     "genesis": "297.68 | degrees (°)",
-     "p990Myr": "104.85 | degrees (°)"
+     "m400Myr": "274.51 | degrees (°)",
+     "m2460Myr": "202.23 | degrees (°)",
+     "m4400Myr": "353.50 | degrees (°)",
+     "genesis": "297.81 | degrees (°)",
+     "p990Myr": "95.72 | degrees (°)"
     }
    },
    "moon#070 Current distance from Earth": {
@@ -3182,11 +3182,11 @@
     "values": {
      "today": "390,465 | km",
      "m3000": "401,897 | km",
-     "m400Myr": "353,887 | km",
-     "m2460Myr": "323,690 | km",
-     "m4400Myr": "134,143 | km",
-     "genesis": "40,464 | km",
-     "p990Myr": "415,664 | km"
+     "m400Myr": "354,314 | km",
+     "m2460Myr": "323,632 | km",
+     "m4400Myr": "133,682 | km",
+     "genesis": "40,460 | km",
+     "p990Myr": "420,832 | km"
     }
    },
    "moon#071 Time since perigee": {
@@ -3200,11 +3200,11 @@
     "values": {
      "today": "7.58 | solar days of date",
      "m3000": "11.39 | solar days of date",
-     "m400Myr": "27.83 | solar days of date",
-     "m2460Myr": "8.73 | solar days of date",
-     "m4400Myr": "17.04 | solar days of date",
+     "m400Myr": "27.52 | solar days of date",
+     "m2460Myr": "8.72 | solar days of date",
+     "m4400Myr": "17.84 | solar days of date",
      "genesis": "2.68 | solar days of date",
-     "p990Myr": "19.51 | solar days of date"
+     "p990Myr": "18.85 | solar days of date"
     }
    },
    "moon#072 Time to next perigee": {
@@ -3218,11 +3218,11 @@
     "values": {
      "today": "19.97 | solar days of date",
      "m3000": "16.17 | solar days of date",
-     "m400Myr": "0.68 | solar days of date",
-     "m2460Myr": "21.13 | solar days of date",
-     "m4400Myr": "0.95 | solar days of date",
+     "m400Myr": "0.99 | solar days of date",
+     "m2460Myr": "21.15 | solar days of date",
+     "m4400Myr": "0.15 | solar days of date",
      "genesis": "1.26 | solar days of date",
-     "p990Myr": "4.76 | solar days of date"
+     "p990Myr": "5.41 | solar days of date"
     }
    },
    "moon#073 Lunar age": {
@@ -3236,11 +3236,11 @@
     "values": {
      "today": "27.35 | solar days of date",
      "m3000": "7.83 | solar days of date",
-     "m400Myr": "23.54 | solar days of date",
-     "m2460Myr": "17.72 | solar days of date",
-     "m4400Myr": "17.10 | solar days of date",
+     "m400Myr": "23.21 | solar days of date",
+     "m2460Myr": "17.71 | solar days of date",
+     "m4400Myr": "17.96 | solar days of date",
      "genesis": "3.27 | solar days of date",
-     "p990Myr": "7.65 | solar days of date"
+     "p990Myr": "6.98 | solar days of date"
     }
    },
    "moon#074 Lunar phase": {
@@ -3256,7 +3256,7 @@
      "m3000": "First Quarter | ",
      "m400Myr": "Third Quarter | ",
      "m2460Myr": "Full Moon | ",
-     "m4400Myr": "Waning Crescent | ",
+     "m4400Myr": "New Moon | ",
      "genesis": "Waning Crescent | ",
      "p990Myr": "First Quarter | "
     }
@@ -3361,12 +3361,12 @@
     },
     "values": {
      "today": "2027-02-20 23:14:36 UT · Penumbral · γ -1.049 · certified | ",
-     "m3000": "-3000-09-19 17:10:53 UT · Partial · γ -0.788 · reproducible | ",
-     "m400Myr": "-420002768-04-02 19:30:24 UT · Total · γ -0.265 · reproducible | ",
-     "m2460Myr": "-3072754597-09-07 10:51:27 UT · Partial · γ 0.784 · reproducible | ",
-     "m4400Myr": "-6662400240-06-24 17:11:29 UT · Partial · γ 1.136 · reproducible | ",
-     "genesis": "-6764195131-10-03 09:54:51 UT · Total · γ 0.627 · reproducible | ",
-     "p990Myr": "871597408-02-20 00:49:29 UT · Penumbral · γ -1.468 · reproducible | "
+     "m3000": "-3000-09-19 17:11:09 UT · Partial · γ -0.788 · reproducible | ",
+     "m400Myr": "-420002768-04-23 02:52:24 UT · Total · γ -0.265 · reproducible | ",
+     "m2460Myr": "-3072754597-11-29 10:39:30 UT · Partial · γ 0.785 · reproducible | ",
+     "m4400Myr": "-6662400239-07-09 20:03:45 UT · Partial · γ 1.136 · reproducible | ",
+     "genesis": "-6764195129-07-20 05:59:18 UT · Total · γ 0.626 · reproducible | ",
+     "p990Myr": "871597408-01-07 16:37:12 UT · Penumbral · γ -1.468 · reproducible | "
     }
    },
    "moon#081 Next solar eclipse": {
@@ -3379,12 +3379,12 @@
     },
     "values": {
      "today": "2027-02-06 16:01:36 UT · Annular · γ 0.295 · certified | ",
-     "m3000": "-3000-10-03 19:34:54 UT · Annular · γ 0.580 · reproducible | ",
-     "m400Myr": "-420002768-03-17 18:58:08 UT · Partial · γ 1.085 · reproducible | ",
-     "m2460Myr": "-3072754597-09-23 09:05:59 UT · Total · γ 0.199 · reproducible | ",
-     "m4400Myr": "-6662400240-06-14 22:54:37 UT · Partial · γ 1.287 · reproducible | ",
-     "genesis": "-6764195131-10-01 13:14:32 UT · Total · γ 0.589 · reproducible | ",
-     "p990Myr": "871597408-03-04 19:39:56 UT · Annular · γ 0.274 · reproducible | "
+     "m3000": "-3000-10-03 19:35:09 UT · Annular · γ 0.580 · reproducible | ",
+     "m400Myr": "-420002768-04-07 02:21:25 UT · Partial · γ 1.085 · reproducible | ",
+     "m2460Myr": "-3072754597-12-15 08:49:48 UT · Total · γ 0.199 · reproducible | ",
+     "m4400Myr": "-6662400239-06-30 01:51:48 UT · Partial · γ 1.287 · reproducible | ",
+     "genesis": "-6764195129-07-18 09:14:46 UT · Total · γ 0.588 · reproducible | ",
+     "p990Myr": "871597408-01-21 11:27:50 UT · Annular · γ 0.274 · reproducible | "
     }
    },
    "moon#082 Eclipses per year (mean elements)": {
@@ -3884,11 +3884,11 @@
     "values": {
      "today": "770,644 | km",
      "m3000": "1,189,915 | km",
-     "m400Myr": "1,196,550 | km",
-     "m2460Myr": "937,252 | km",
-     "m4400Myr": "1,157,874 | km",
-     "genesis": "585,979 | km",
-     "p990Myr": "900,002 | km"
+     "m400Myr": "1,191,510 | km",
+     "m2460Myr": "912,991 | km",
+     "m4400Myr": "1,167,984 | km",
+     "genesis": "537,410 | km",
+     "p990Myr": "868,091 | km"
     }
    },
    "sun#027 In solar radii": {
@@ -3902,11 +3902,11 @@
     "values": {
      "today": "1.107 | R☉",
      "m3000": "1.709 | R☉",
-     "m400Myr": "1.718 | R☉",
-     "m2460Myr": "1.346 | R☉",
-     "m4400Myr": "1.663 | R☉",
-     "genesis": "0.842 | R☉",
-     "p990Myr": "1.292 | R☉"
+     "m400Myr": "1.711 | R☉",
+     "m2460Myr": "1.311 | R☉",
+     "m4400Myr": "1.677 | R☉",
+     "genesis": "0.772 | R☉",
+     "p990Myr": "1.247 | R☉"
     }
    },
    "sun#028 Direction (inv.-plane λ)": {
@@ -3920,11 +3920,11 @@
     "values": {
      "today": "78.54 | °",
      "m3000": "193.05 | °",
-     "m400Myr": "121.54 | °",
-     "m2460Myr": "217.05 | °",
-     "m4400Myr": "55.20 | °",
-     "genesis": "144.56 | °",
-     "p990Myr": "115.31 | °"
+     "m400Myr": "120.45 | °",
+     "m2460Myr": "213.55 | °",
+     "m4400Myr": "50.14 | °",
+     "genesis": "138.78 | °",
+     "p990Myr": "119.93 | °"
     }
    },
    "sun#029 Inside Sun?": {
@@ -3976,9 +3976,9 @@
      "m3000": "50.3 | %",
      "m400Myr": "49.0 | %",
      "m2460Myr": "49.0 | %",
-     "m4400Myr": "49.3 | %",
-     "genesis": "48.4 | %",
-     "p990Myr": "49.3 | %"
+     "m4400Myr": "49.2 | %",
+     "genesis": "48.2 | %",
+     "p990Myr": "49.4 | %"
     }
    },
    "mercury#000 Size diameter": {
@@ -4066,9 +4066,9 @@
      "m3000": "7.256054 | degrees (°)",
      "m400Myr": "8.045947 | degrees (°)",
      "m2460Myr": "3.276521 | degrees (°)",
-     "m4400Myr": "3.514452 | degrees (°)",
+     "m4400Myr": "3.514451 | degrees (°)",
      "genesis": "5.255465 | degrees (°)",
-     "p990Myr": "4.197732 | degrees (°)"
+     "p990Myr": "4.197731 | degrees (°)"
     }
    },
    "mercury#005 Inclination to Inv. plane (I)": {
@@ -4423,12 +4423,12 @@
     },
     "values": {
      "today": "0.311079 | AU",
-     "m3000": "0.377643 | AU",
-     "m400Myr": "0.430771 | AU",
-     "m2460Myr": "0.324627 | AU",
-     "m4400Myr": "0.426277 | AU",
+     "m3000": "0.377644 | AU",
+     "m400Myr": "0.429728 | AU",
+     "m2460Myr": "0.324555 | AU",
+     "m4400Myr": "0.425637 | AU",
      "genesis": "0.419052 | AU",
-     "p990Myr": "0.393110 | AU"
+     "p990Myr": "0.396996 | AU"
     }
    },
    "mercury#025 Semi-latus rectum (p)": {
@@ -4495,12 +4495,12 @@
     },
     "values": {
      "today": "210,278.93 | km/h",
-     "m3000": "176,601.65 | km/h",
-     "m400Myr": "153,881.36 | km/h",
-     "m2460Myr": "202,834.11 | km/h",
-     "m4400Myr": "155,728.36 | km/h",
+     "m3000": "176,601.17 | km/h",
+     "m400Myr": "154,301.98 | km/h",
+     "m2460Myr": "202,872.89 | km/h",
+     "m4400Myr": "155,988.36 | km/h",
      "genesis": "158,687.54 | km/h",
-     "p990Myr": "169,675.62 | km/h"
+     "p990Myr": "167,980.37 | km/h"
     }
    },
    "mercury#029 Radial velocity (vᵣ)": {
@@ -4512,13 +4512,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "-13,051.40 | km/h",
-     "m3000": "-36,025.13 | km/h",
-     "m400Myr": "22,949.79 | km/h",
-     "m2460Myr": "37,304.03 | km/h",
-     "m4400Myr": "-15,264.21 | km/h",
-     "genesis": "-35,484.48 | km/h",
-     "p990Myr": "-28,289.46 | km/h"
+     "today": "-13,051.39 | km/h",
+     "m3000": "-36,025.09 | km/h",
+     "m400Myr": "23,318.17 | km/h",
+     "m2460Myr": "37,278.00 | km/h",
+     "m4400Myr": "-15,551.62 | km/h",
+     "genesis": "-35,484.80 | km/h",
+     "p990Myr": "-27,804.43 | km/h"
     }
    },
    "mercury#030 Transverse velocity (vₜ)": {
@@ -4531,12 +4531,12 @@
     },
     "values": {
      "today": "209,878.24 | km/h",
-     "m3000": "172,898.07 | km/h",
-     "m400Myr": "152,154.97 | km/h",
-     "m2460Myr": "199,362.91 | km/h",
-     "m4400Myr": "154,979.42 | km/h",
-     "genesis": "154,672.74 | km/h",
-     "p990Myr": "167,310.80 | km/h"
+     "m3000": "172,897.58 | km/h",
+     "m400Myr": "152,524.32 | km/h",
+     "m2460Myr": "199,407.62 | km/h",
+     "m4400Myr": "155,212.42 | km/h",
+     "genesis": "154,673.24 | km/h",
+     "p990Myr": "165,673.11 | km/h"
     }
    },
    "mercury#031 Perihelion velocity (vₚ)": {
@@ -4603,12 +4603,12 @@
     },
     "values": {
      "today": "271,878.92 | km/h",
-     "m3000": "246,757.09 | km/h",
-     "m400Myr": "231,044.36 | km/h",
-     "m2460Myr": "266,175.49 | km/h",
-     "m4400Myr": "232,302.37 | km/h",
+     "m3000": "246,756.75 | km/h",
+     "m400Myr": "231,324.72 | km/h",
+     "m2460Myr": "266,205.04 | km/h",
+     "m4400Myr": "232,476.75 | km/h",
      "genesis": "234,296.59 | km/h",
-     "p990Myr": "241,842.92 | km/h"
+     "p990Myr": "240,656.58 | km/h"
     }
    },
    "mercury#035 Circular velocity (v_circ)": {
@@ -4621,12 +4621,12 @@
     },
     "values": {
      "today": "192,247.43 | km/h",
-     "m3000": "174,483.61 | km/h",
-     "m400Myr": "163,373.04 | km/h",
-     "m2460Myr": "188,214.49 | km/h",
-     "m4400Myr": "164,262.58 | km/h",
+     "m3000": "174,483.37 | km/h",
+     "m400Myr": "163,571.28 | km/h",
+     "m2460Myr": "188,235.39 | km/h",
+     "m4400Myr": "164,385.89 | km/h",
      "genesis": "165,672.71 | km/h",
-     "p990Myr": "171,008.77 | km/h"
+     "p990Myr": "170,169.90 | km/h"
     }
    },
    "mercury#036 Velocity ratio (v/v_circ)": {
@@ -4640,11 +4640,11 @@
     "values": {
      "today": "1.0938 | ",
      "m3000": "1.0121 | ",
-     "m400Myr": "0.9419 | ",
-     "m2460Myr": "1.0777 | ",
-     "m4400Myr": "0.9480 | ",
+     "m400Myr": "0.9433 | ",
+     "m2460Myr": "1.0778 | ",
+     "m4400Myr": "0.9489 | ",
      "genesis": "0.9578 | ",
-     "p990Myr": "0.9922 | "
+     "p990Myr": "0.9871 | "
     }
    },
    "mercury#037 Specific Orbital Energy (ε)": {
@@ -4676,11 +4676,11 @@
     "values": {
      "today": "2,712,993,615.52 | km²/s",
      "m3000": "2,713,130,231.16 | km²/s",
-     "m400Myr": "2,723,659,925.71 | km²/s",
+     "m400Myr": "2,723,659,926.01 | km²/s",
      "m2460Myr": "2,688,933,341.05 | km²/s",
-     "m4400Myr": "2,744,153,949.04 | km²/s",
+     "m4400Myr": "2,744,153,949.12 | km²/s",
      "genesis": "2,692,262,985.31 | km²/s",
-     "p990Myr": "2,733,230,091.60 | km²/s"
+     "p990Myr": "2,733,230,091.14 | km²/s"
     }
    },
    "mercury#039 Area Sweep Rate (dA/dt)": {
@@ -4712,11 +4712,11 @@
     "values": {
      "today": "77.49928266 | degrees (°)",
      "m3000": "69.77120303 | degrees (°)",
-     "m400Myr": "25.96449461 | degrees (°)",
-     "m2460Myr": "122.48211160 | degrees (°)",
-     "m4400Myr": "199.30275420 | degrees (°)",
+     "m400Myr": "25.96449343 | degrees (°)",
+     "m2460Myr": "122.48211155 | degrees (°)",
+     "m4400Myr": "199.30275532 | degrees (°)",
      "genesis": "189.90826763 | degrees (°)",
-     "p990Myr": "215.39056671 | degrees (°)"
+     "p990Myr": "215.39056301 | degrees (°)"
     }
    },
    "mercury#041 Argument of periapsis (ω)": {
@@ -4730,11 +4730,11 @@
     "values": {
      "today": "29.21254603 | degrees (°)",
      "m3000": "14.97721073 | degrees (°)",
-     "m400Myr": "348.79078150 | degrees (°)",
-     "m2460Myr": "256.07107811 | degrees (°)",
-     "m4400Myr": "252.09899756 | degrees (°)",
-     "genesis": "241.46197496 | degrees (°)",
-     "p990Myr": "56.00365815 | degrees (°)"
+     "m400Myr": "348.79077929 | degrees (°)",
+     "m2460Myr": "256.07107795 | degrees (°)",
+     "m4400Myr": "252.09900086 | degrees (°)",
+     "genesis": "241.46197497 | degrees (°)",
+     "p990Myr": "56.00365243 | degrees (°)"
     }
    },
    "mercury#042 Longitude of ascending node (Ω)": {
@@ -4748,11 +4748,11 @@
     "values": {
      "today": "48.28673664 | degrees (°)",
      "m3000": "54.79399230 | degrees (°)",
-     "m400Myr": "37.17371310 | degrees (°)",
-     "m2460Myr": "226.41103350 | degrees (°)",
-     "m4400Myr": "307.20375664 | degrees (°)",
+     "m400Myr": "37.17371414 | degrees (°)",
+     "m2460Myr": "226.41103360 | degrees (°)",
+     "m4400Myr": "307.20375446 | degrees (°)",
      "genesis": "308.44629267 | degrees (°)",
-     "p990Myr": "159.38690856 | degrees (°)"
+     "p990Myr": "159.38691058 | degrees (°)"
     }
    },
    "mercury#043 Longitude of descending node": {
@@ -4766,11 +4766,11 @@
     "values": {
      "today": "228.28673664 | degrees (°)",
      "m3000": "234.79399230 | degrees (°)",
-     "m400Myr": "217.17371310 | degrees (°)",
-     "m2460Myr": "46.41103350 | degrees (°)",
-     "m4400Myr": "127.20375664 | degrees (°)",
+     "m400Myr": "217.17371414 | degrees (°)",
+     "m2460Myr": "46.41103360 | degrees (°)",
+     "m4400Myr": "127.20375446 | degrees (°)",
      "genesis": "128.44629267 | degrees (°)",
-     "p990Myr": "339.38690856 | degrees (°)"
+     "p990Myr": "339.38691058 | degrees (°)"
     }
    },
    "mercury#044 Ascending Node on Inv. Plane (Ω)": {
@@ -4838,11 +4838,11 @@
     "values": {
      "today": "0.012017 | AU",
      "m3000": "-0.039393 | AU",
-     "m400Myr": "0.040327 | AU",
-     "m2460Myr": "-0.021530 | AU",
-     "m4400Myr": "0.033369 | AU",
+     "m400Myr": "0.040876 | AU",
+     "m2460Myr": "-0.021538 | AU",
+     "m4400Myr": "0.033061 | AU",
      "genesis": "0.041075 | AU",
-     "p990Myr": "-0.022226 | AU"
+     "p990Myr": "-0.022886 | AU"
     }
    },
    "mercury#048 Position relative to Inv. Plane": {
@@ -4910,11 +4910,11 @@
     "values": {
      "today": "346.27 | degrees (°)",
      "m3000": "288.53 | degrees (°)",
-     "m400Myr": "118.80 | degrees (°)",
-     "m2460Myr": "37.97 | degrees (°)",
-     "m4400Myr": "229.52 | degrees (°)",
+     "m400Myr": "117.65 | degrees (°)",
+     "m2460Myr": "37.92 | degrees (°)",
+     "m4400Myr": "230.58 | degrees (°)",
      "genesis": "262.45 | degrees (°)",
-     "p990Myr": "274.25 | degrees (°)"
+     "p990Myr": "270.72 | degrees (°)"
     }
    },
    "mercury#052 Eccentric Anomaly (E)": {
@@ -4927,12 +4927,12 @@
     },
     "values": {
      "today": "342.78 | degrees (°)",
-     "m3000": "276.85 | degrees (°)",
-     "m400Myr": "127.29 | degrees (°)",
-     "m2460Myr": "48.37 | degrees (°)",
-     "m4400Myr": "223.94 | degrees (°)",
+     "m3000": "276.84 | degrees (°)",
+     "m400Myr": "126.26 | degrees (°)",
+     "m2460Myr": "48.31 | degrees (°)",
+     "m4400Myr": "224.90 | degrees (°)",
      "genesis": "249.68 | degrees (°)",
-     "p990Myr": "264.70 | degrees (°)"
+     "p990Myr": "261.24 | degrees (°)"
     }
    },
    "mercury#053 True Anomaly (ν)": {
@@ -4946,11 +4946,11 @@
     "values": {
      "today": "338.87 | degrees (°)",
      "m3000": "264.93 | degrees (°)",
-     "m400Myr": "135.38 | degrees (°)",
-     "m2460Myr": "59.83 | degrees (°)",
-     "m4400Myr": "218.60 | degrees (°)",
-     "genesis": "237.29 | degrees (°)",
-     "p990Myr": "255.17 | degrees (°)"
+     "m400Myr": "134.47 | degrees (°)",
+     "m2460Myr": "59.76 | degrees (°)",
+     "m4400Myr": "219.46 | degrees (°)",
+     "genesis": "237.30 | degrees (°)",
+     "p990Myr": "251.83 | degrees (°)"
     }
    },
    "mercury#054 Equation of the Center": {
@@ -4964,11 +4964,11 @@
     "values": {
      "today": "-7.40 | degrees (°)",
      "m3000": "-23.60 | degrees (°)",
-     "m400Myr": "16.58 | degrees (°)",
-     "m2460Myr": "21.86 | degrees (°)",
-     "m4400Myr": "-10.93 | degrees (°)",
+     "m400Myr": "16.82 | degrees (°)",
+     "m2460Myr": "21.84 | degrees (°)",
+     "m4400Myr": "-11.12 | degrees (°)",
      "genesis": "-25.15 | degrees (°)",
-     "p990Myr": "-19.07 | degrees (°)"
+     "p990Myr": "-18.89 | degrees (°)"
     }
    },
    "mercury#055 Mean Longitude (L)": {
@@ -4980,13 +4980,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "63.7703 | degrees (°)",
-     "m3000": "358.3003 | degrees (°)",
-     "m400Myr": "144.7647 | degrees (°)",
-     "m2460Myr": "160.4513 | degrees (°)",
-     "m4400Myr": "68.8261 | degrees (°)",
-     "genesis": "92.3552 | degrees (°)",
-     "p990Myr": "129.6388 | degrees (°)"
+     "today": "63.7704 | degrees (°)",
+     "m3000": "358.2995 | degrees (°)",
+     "m400Myr": "143.6145 | degrees (°)",
+     "m2460Myr": "160.4015 | degrees (°)",
+     "m4400Myr": "69.8857 | degrees (°)",
+     "genesis": "92.3562 | degrees (°)",
+     "p990Myr": "126.1059 | degrees (°)"
     }
    },
    "mercury#056 True Longitude (λ)": {
@@ -4999,12 +4999,12 @@
     },
     "values": {
      "today": "56.3721 | degrees (°)",
-     "m3000": "334.7022 | degrees (°)",
-     "m400Myr": "161.3464 | degrees (°)",
-     "m2460Myr": "182.3128 | degrees (°)",
-     "m4400Myr": "57.8996 | degrees (°)",
-     "genesis": "67.2025 | degrees (°)",
-     "p990Myr": "110.5652 | degrees (°)"
+     "m3000": "334.7015 | degrees (°)",
+     "m400Myr": "160.4317 | degrees (°)",
+     "m2460Myr": "182.2441 | degrees (°)",
+     "m4400Myr": "58.7659 | degrees (°)",
+     "genesis": "67.2033 | degrees (°)",
+     "p990Myr": "107.2206 | degrees (°)"
     }
    },
    "mercury#057 Argument of Latitude (u)": {
@@ -5017,12 +5017,12 @@
     },
     "values": {
      "today": "8.0854 | degrees (°)",
-     "m3000": "279.9082 | degrees (°)",
-     "m400Myr": "124.1727 | degrees (°)",
-     "m2460Myr": "315.9017 | degrees (°)",
-     "m4400Myr": "110.6958 | degrees (°)",
-     "genesis": "118.7562 | degrees (°)",
-     "p990Myr": "311.1783 | degrees (°)"
+     "m3000": "279.9075 | degrees (°)",
+     "m400Myr": "123.2580 | degrees (°)",
+     "m2460Myr": "315.8330 | degrees (°)",
+     "m4400Myr": "111.5622 | degrees (°)",
+     "genesis": "118.7570 | degrees (°)",
+     "p990Myr": "307.8337 | degrees (°)"
     }
    },
    "mercury#058 Flight Path Angle (γ)": {
@@ -5036,11 +5036,11 @@
     "values": {
      "today": "-3.5584 | degrees (°)",
      "m3000": "-11.7698 | degrees (°)",
-     "m400Myr": "8.5774 | degrees (°)",
-     "m2460Myr": "10.5984 | degrees (°)",
-     "m4400Myr": "-5.6250 | degrees (°)",
-     "genesis": "-12.9210 | degrees (°)",
-     "p990Myr": "-9.5970 | degrees (°)"
+     "m400Myr": "8.6922 | degrees (°)",
+     "m2460Myr": "10.5889 | degrees (°)",
+     "m4400Myr": "-5.7217 | degrees (°)",
+     "genesis": "-12.9211 | degrees (°)",
+     "p990Myr": "-9.5270 | degrees (°)"
     }
    },
    "mercury#059 Heliocentric Latitude (β)": {
@@ -5054,11 +5054,11 @@
     "values": {
      "today": "2.2139 | degrees (°)",
      "m3000": "-5.9879 | degrees (°)",
-     "m400Myr": "5.3716 | degrees (°)",
-     "m2460Myr": "-3.8025 | degrees (°)",
-     "m4400Myr": "4.4898 | degrees (°)",
+     "m400Myr": "5.4581 | degrees (°)",
+     "m2460Myr": "-3.8048 | degrees (°)",
+     "m4400Myr": "4.4549 | degrees (°)",
      "genesis": "5.6252 | degrees (°)",
-     "p990Myr": "-3.2413 | degrees (°)"
+     "p990Myr": "-3.3051 | degrees (°)"
     }
    },
    "mercury#060 Phase Angle to Earth (α)": {
@@ -5072,11 +5072,11 @@
     "values": {
      "today": "15.77 | degrees (°)",
      "m3000": "2.41 | degrees (°)",
-     "m400Myr": "35.08 | degrees (°)",
-     "m2460Myr": "52.85 | degrees (°)",
-     "m4400Myr": "10.28 | degrees (°)",
+     "m400Myr": "34.47 | degrees (°)",
+     "m2460Myr": "52.90 | degrees (°)",
+     "m4400Myr": "10.90 | degrees (°)",
      "genesis": "170.80 | degrees (°)",
-     "p990Myr": "21.09 | degrees (°)"
+     "p990Myr": "23.62 | degrees (°)"
     }
    },
    "mercury#061 True Anomaly Rate (dν/dt)": {
@@ -5088,13 +5088,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "6.201783 | °/SI day",
-     "m3000": "4.208625 | °/SI day",
-     "m400Myr": "3.246825 | °/SI day",
-     "m2460Myr": "5.646636 | °/SI day",
-     "m4400Myr": "3.343951 | °/SI day",
-     "genesis": "3.394931 | °/SI day",
-     "p990Myr": "3.911860 | °/SI day"
+     "today": "6.201784 | °/SI day",
+     "m3000": "4.208601 | °/SI day",
+     "m400Myr": "3.262608 | °/SI day",
+     "m2460Myr": "5.649170 | °/SI day",
+     "m4400Myr": "3.354013 | °/SI day",
+     "genesis": "3.394953 | °/SI day",
+     "p990Myr": "3.835653 | °/SI day"
     }
    },
    "mercury#062 Eccentric Anomaly Rate (dE/dt)": {
@@ -5107,12 +5107,12 @@
     },
     "values": {
      "today": "5.092536 | °/SI day",
-     "m3000": "4.195029 | °/SI day",
-     "m400Myr": "3.677611 | °/SI day",
-     "m2460Myr": "4.881801 | °/SI day",
-     "m4400Myr": "3.719286 | °/SI day",
-     "genesis": "3.783481 | °/SI day",
-     "p990Myr": "4.029250 | °/SI day"
+     "m3000": "4.195018 | °/SI day",
+     "m400Myr": "3.686539 | °/SI day",
+     "m2460Myr": "4.882896 | °/SI day",
+     "m4400Myr": "3.724878 | °/SI day",
+     "genesis": "3.783494 | °/SI day",
+     "p990Myr": "3.989811 | °/SI day"
     }
    },
    "mercury#063 Radius of Curvature (ρ)": {
@@ -5124,13 +5124,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "66,481,711 | km",
-     "m3000": "58,044,529 | km",
-     "m400Myr": "50,150,274 | km",
-     "m2460Myr": "64,369,037 | km",
-     "m4400Myr": "51,246,308 | km",
-     "genesis": "51,410,899 | km",
-     "p990Myr": "56,206,903 | km"
+     "today": "66,481,712 | km",
+     "m3000": "58,044,379 | km",
+     "m400Myr": "50,317,924 | km",
+     "m2460Myr": "64,377,454 | km",
+     "m4400Myr": "51,349,165 | km",
+     "genesis": "51,411,111 | km",
+     "p990Myr": "55,622,383 | km"
     }
    },
    "mercury#064 Time since perihelion": {
@@ -5144,11 +5144,11 @@
     "values": {
      "today": "84.61 | SI days",
      "m3000": "70.50 | SI days",
-     "m400Myr": "29.03 | SI days",
-     "m2460Myr": "9.27 | SI days",
-     "m4400Myr": "56.04 | SI days",
+     "m400Myr": "28.75 | SI days",
+     "m2460Myr": "9.26 | SI days",
+     "m4400Myr": "56.30 | SI days",
      "genesis": "64.08 | SI days",
-     "p990Myr": "67.03 | SI days"
+     "p990Myr": "66.16 | SI days"
     }
    },
    "mercury#065 Time to next perihelion": {
@@ -5162,11 +5162,11 @@
     "values": {
      "today": "3.35 | SI days",
      "m3000": "17.46 | SI days",
-     "m400Myr": "58.93 | SI days",
-     "m2460Myr": "78.66 | SI days",
-     "m4400Myr": "31.86 | SI days",
+     "m400Myr": "59.22 | SI days",
+     "m2460Myr": "78.67 | SI days",
+     "m4400Myr": "31.60 | SI days",
      "genesis": "23.82 | SI days",
-     "p990Myr": "20.96 | SI days"
+     "p990Myr": "21.82 | SI days"
     }
    },
    "mercury#066 Perihelion Precession Duration against Ecliptic": {
@@ -5181,10 +5181,10 @@
      "today": "226,738.79 | years",
      "m3000": "224,893.43 | years",
      "m400Myr": "242,413.40 | years",
-     "m2460Myr": "320,640.77 | years",
-     "m4400Myr": "395,035.67 | years",
-     "genesis": "435,368.77 | years",
-     "p990Myr": "120,272.00 | years"
+     "m2460Myr": "320,640.75 | years",
+     "m4400Myr": "395,035.54 | years",
+     "genesis": "435,368.50 | years",
+     "p990Myr": "120,271.86 | years"
     }
    },
    "mercury#067 Axial Precession Period": {
@@ -5792,11 +5792,11 @@
     "values": {
      "today": "0.722356 | AU",
      "m3000": "0.728653 | AU",
-     "m400Myr": "0.725219 | AU",
-     "m2460Myr": "0.716951 | AU",
-     "m4400Myr": "0.719374 | AU",
+     "m400Myr": "0.725295 | AU",
+     "m2460Myr": "0.716949 | AU",
+     "m4400Myr": "0.719500 | AU",
      "genesis": "0.714664 | AU",
-     "p990Myr": "0.740828 | AU"
+     "p990Myr": "0.741372 | AU"
     }
    },
    "venus#025 Semi-latus rectum (p)": {
@@ -5863,12 +5863,12 @@
     },
     "values": {
      "today": "126,244.42 | km/h",
-     "m3000": "125,150.06 | km/h",
-     "m400Myr": "125,748.05 | km/h",
-     "m2460Myr": "127,205.78 | km/h",
-     "m4400Myr": "126,791.85 | km/h",
+     "m3000": "125,150.05 | km/h",
+     "m400Myr": "125,734.89 | km/h",
+     "m2460Myr": "127,206.28 | km/h",
+     "m4400Myr": "126,769.70 | km/h",
      "genesis": "127,620.35 | km/h",
-     "p990Myr": "123,055.00 | km/h"
+     "p990Myr": "122,962.37 | km/h"
     }
    },
    "venus#029 Radial velocity (vᵣ)": {
@@ -5880,13 +5880,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "-834.96 | km/h",
+     "today": "-834.95 | km/h",
      "m3000": "-730.52 | km/h",
-     "m400Myr": "-1,679.59 | km/h",
-     "m2460Myr": "1,435.21 | km/h",
-     "m4400Myr": "3,042.80 | km/h",
-     "genesis": "-207.63 | km/h",
-     "p990Myr": "-3,967.31 | km/h"
+     "m400Myr": "-1,676.79 | km/h",
+     "m2460Myr": "1,434.83 | km/h",
+     "m4400Myr": "3,047.22 | km/h",
+     "genesis": "-207.62 | km/h",
+     "p990Myr": "-3,893.22 | km/h"
     }
    },
    "venus#030 Transverse velocity (vₜ)": {
@@ -5900,11 +5900,11 @@
     "values": {
      "today": "126,241.70 | km/h",
      "m3000": "125,147.96 | km/h",
-     "m400Myr": "125,737.18 | km/h",
-     "m2460Myr": "127,197.59 | km/h",
-     "m4400Myr": "126,755.05 | km/h",
+     "m400Myr": "125,724.06 | km/h",
+     "m2460Myr": "127,198.09 | km/h",
+     "m4400Myr": "126,732.78 | km/h",
      "genesis": "127,620.19 | km/h",
-     "p990Myr": "122,991.56 | km/h"
+     "p990Myr": "122,901.25 | km/h"
     }
    },
    "venus#031 Perihelion velocity (vₚ)": {
@@ -5972,11 +5972,11 @@
     "values": {
      "today": "178,416.49 | km/h",
      "m3000": "177,643.82 | km/h",
-     "m400Myr": "178,067.27 | km/h",
-     "m2460Myr": "179,108.17 | km/h",
-     "m4400Myr": "178,822.44 | km/h",
+     "m400Myr": "178,057.98 | km/h",
+     "m2460Myr": "179,108.52 | km/h",
+     "m4400Myr": "178,806.74 | km/h",
      "genesis": "179,410.96 | km/h",
-     "p990Myr": "176,169.97 | km/h"
+     "p990Myr": "176,105.28 | km/h"
     }
    },
    "venus#035 Circular velocity (v_circ)": {
@@ -5990,11 +5990,11 @@
     "values": {
      "today": "126,159.51 | km/h",
      "m3000": "125,613.15 | km/h",
-     "m400Myr": "125,912.57 | km/h",
-     "m2460Myr": "126,648.60 | km/h",
-     "m4400Myr": "126,446.56 | km/h",
+     "m400Myr": "125,906.00 | km/h",
+     "m2460Myr": "126,648.85 | km/h",
+     "m4400Myr": "126,435.46 | km/h",
      "genesis": "126,862.71 | km/h",
-     "p990Myr": "124,570.98 | km/h"
+     "p990Myr": "124,525.24 | km/h"
     }
    },
    "venus#036 Velocity ratio (v/v_circ)": {
@@ -6008,11 +6008,11 @@
     "values": {
      "today": "1.0007 | ",
      "m3000": "0.9963 | ",
-     "m400Myr": "0.9987 | ",
+     "m400Myr": "0.9986 | ",
      "m2460Myr": "1.0044 | ",
-     "m4400Myr": "1.0027 | ",
+     "m4400Myr": "1.0026 | ",
      "genesis": "1.0060 | ",
-     "p990Myr": "0.9878 | "
+     "p990Myr": "0.9874 | "
     }
    },
    "venus#037 Specific Orbital Energy (ε)": {
@@ -6044,11 +6044,11 @@
     "values": {
      "today": "3,789,455,553.91 | km²/s",
      "m3000": "3,789,374,686.31 | km²/s",
-     "m400Myr": "3,789,120,459.18 | km²/s",
+     "m400Myr": "3,789,120,459.17 | km²/s",
      "m2460Myr": "3,788,720,048.43 | km²/s",
-     "m4400Myr": "3,787,619,151.70 | km²/s",
+     "m4400Myr": "3,787,619,151.69 | km²/s",
      "genesis": "3,788,484,501.45 | km²/s",
-     "p990Myr": "3,786,638,175.54 | km²/s"
+     "p990Myr": "3,786,638,175.46 | km²/s"
     }
    },
    "venus#039 Area Sweep Rate (dA/dt)": {
@@ -6079,12 +6079,12 @@
     },
     "values": {
      "today": "131.38202627 | degrees (°)",
-     "m3000": "128.70910528 | degrees (°)",
-     "m400Myr": "114.04498051 | degrees (°)",
-     "m2460Myr": "147.83206844 | degrees (°)",
-     "m4400Myr": "134.43258321 | degrees (°)",
+     "m3000": "128.70910517 | degrees (°)",
+     "m400Myr": "114.04497898 | degrees (°)",
+     "m2460Myr": "147.83206846 | degrees (°)",
+     "m4400Myr": "134.43258739 | degrees (°)",
      "genesis": "128.29061050 | degrees (°)",
-     "p990Myr": "218.84833646 | degrees (°)"
+     "p990Myr": "218.84832818 | degrees (°)"
     }
    },
    "venus#041 Argument of periapsis (ω)": {
@@ -6097,12 +6097,12 @@
     },
     "values": {
      "today": "54.78294430 | degrees (°)",
-     "m3000": "38.14200193 | degrees (°)",
-     "m400Myr": "93.81096725 | degrees (°)",
-     "m2460Myr": "295.57406893 | degrees (°)",
-     "m4400Myr": "0.91662813 | degrees (°)",
+     "m3000": "38.14200182 | degrees (°)",
+     "m400Myr": "93.81096290 | degrees (°)",
+     "m2460Myr": "295.57406881 | degrees (°)",
+     "m4400Myr": "0.91663429 | degrees (°)",
      "genesis": "109.90604308 | degrees (°)",
-     "p990Myr": "145.11640447 | degrees (°)"
+     "p990Myr": "145.11639024 | degrees (°)"
     }
    },
    "venus#042 Longitude of ascending node (Ω)": {
@@ -6116,11 +6116,11 @@
     "values": {
      "today": "76.59908197 | degrees (°)",
      "m3000": "90.56710335 | degrees (°)",
-     "m400Myr": "20.23401326 | degrees (°)",
-     "m2460Myr": "212.25799952 | degrees (°)",
-     "m4400Myr": "133.51595508 | degrees (°)",
+     "m400Myr": "20.23401608 | degrees (°)",
+     "m2460Myr": "212.25799965 | degrees (°)",
+     "m4400Myr": "133.51595310 | degrees (°)",
      "genesis": "18.38456742 | degrees (°)",
-     "p990Myr": "73.73193199 | degrees (°)"
+     "p990Myr": "73.73193794 | degrees (°)"
     }
    },
    "venus#043 Longitude of descending node": {
@@ -6134,11 +6134,11 @@
     "values": {
      "today": "256.59908197 | degrees (°)",
      "m3000": "270.56710335 | degrees (°)",
-     "m400Myr": "200.23401326 | degrees (°)",
-     "m2460Myr": "32.25799952 | degrees (°)",
-     "m4400Myr": "313.51595508 | degrees (°)",
+     "m400Myr": "200.23401608 | degrees (°)",
+     "m2460Myr": "32.25799965 | degrees (°)",
+     "m4400Myr": "313.51595310 | degrees (°)",
      "genesis": "198.38456742 | degrees (°)",
-     "p990Myr": "253.73193199 | degrees (°)"
+     "p990Myr": "253.73193794 | degrees (°)"
     }
    },
    "venus#044 Ascending Node on Inv. Plane (Ω)": {
@@ -6206,11 +6206,11 @@
     "values": {
      "today": "-0.001150 | AU",
      "m3000": "-0.024294 | AU",
-     "m400Myr": "0.016095 | AU",
-     "m2460Myr": "-0.025848 | AU",
-     "m4400Myr": "0.006440 | AU",
+     "m400Myr": "0.015870 | AU",
+     "m2460Myr": "-0.025858 | AU",
+     "m4400Myr": "0.006514 | AU",
      "genesis": "0.013538 | AU",
-     "p990Myr": "0.020829 | AU"
+     "p990Myr": "0.020137 | AU"
     }
    },
    "venus#048 Position relative to Inv. Plane": {
@@ -6278,11 +6278,11 @@
     "values": {
      "today": "281.89 | degrees (°)",
      "m3000": "218.75 | degrees (°)",
-     "m400Myr": "259.71 | degrees (°)",
-     "m2460Myr": "51.34 | degrees (°)",
-     "m4400Myr": "75.79 | degrees (°)",
+     "m400Myr": "259.26 | degrees (°)",
+     "m2460Myr": "51.32 | degrees (°)",
+     "m4400Myr": "76.21 | degrees (°)",
      "genesis": "352.36 | degrees (°)",
-     "p990Myr": "234.96 | degrees (°)"
+     "p990Myr": "233.58 | degrees (°)"
     }
    },
    "venus#052 Eccentric Anomaly (E)": {
@@ -6296,11 +6296,11 @@
     "values": {
      "today": "281.51 | degrees (°)",
      "m3000": "218.42 | degrees (°)",
-     "m400Myr": "258.95 | degrees (°)",
-     "m2460Myr": "51.99 | degrees (°)",
-     "m4400Myr": "77.17 | degrees (°)",
+     "m400Myr": "258.50 | degrees (°)",
+     "m2460Myr": "51.97 | degrees (°)",
+     "m4400Myr": "77.58 | degrees (°)",
      "genesis": "352.27 | degrees (°)",
-     "p990Myr": "233.11 | degrees (°)"
+     "p990Myr": "231.76 | degrees (°)"
     }
    },
    "venus#053 True Anomaly (ν)": {
@@ -6314,11 +6314,11 @@
     "values": {
      "today": "281.13 | degrees (°)",
      "m3000": "218.09 | degrees (°)",
-     "m400Myr": "258.18 | degrees (°)",
-     "m2460Myr": "52.64 | degrees (°)",
-     "m4400Myr": "78.55 | degrees (°)",
+     "m400Myr": "257.74 | degrees (°)",
+     "m2460Myr": "52.62 | degrees (°)",
+     "m4400Myr": "78.97 | degrees (°)",
      "genesis": "352.17 | degrees (°)",
-     "p990Myr": "231.29 | degrees (°)"
+     "p990Myr": "229.97 | degrees (°)"
     }
    },
    "venus#054 Equation of the Center": {
@@ -6334,9 +6334,9 @@
      "m3000": "-0.67 | degrees (°)",
      "m400Myr": "-1.53 | degrees (°)",
      "m2460Myr": "1.30 | degrees (°)",
-     "m4400Myr": "2.75 | degrees (°)",
+     "m4400Myr": "2.76 | degrees (°)",
      "genesis": "-0.19 | degrees (°)",
-     "p990Myr": "-3.67 | degrees (°)"
+     "p990Myr": "-3.61 | degrees (°)"
     }
    },
    "venus#055 Mean Longitude (L)": {
@@ -6349,12 +6349,12 @@
     },
     "values": {
      "today": "53.2713 | degrees (°)",
-     "m3000": "347.4627 | degrees (°)",
-     "m400Myr": "13.7584 | degrees (°)",
-     "m2460Myr": "199.1766 | degrees (°)",
-     "m4400Myr": "210.2249 | degrees (°)",
-     "genesis": "120.6507 | degrees (°)",
-     "p990Myr": "93.8093 | degrees (°)"
+     "m3000": "347.4624 | degrees (°)",
+     "m400Myr": "13.3080 | degrees (°)",
+     "m2460Myr": "199.1571 | degrees (°)",
+     "m4400Myr": "210.6395 | degrees (°)",
+     "genesis": "120.6512 | degrees (°)",
+     "p990Myr": "92.4262 | degrees (°)"
     }
    },
    "venus#056 True Longitude (λ)": {
@@ -6367,12 +6367,12 @@
     },
     "values": {
      "today": "52.5132 | degrees (°)",
-     "m3000": "346.7950 | degrees (°)",
-     "m400Myr": "12.2288 | degrees (°)",
-     "m2460Myr": "200.4723 | degrees (°)",
-     "m4400Myr": "212.9788 | degrees (°)",
-     "genesis": "120.4637 | degrees (°)",
-     "p990Myr": "90.1374 | degrees (°)"
+     "m3000": "346.7948 | degrees (°)",
+     "m400Myr": "11.7808 | degrees (°)",
+     "m2460Myr": "200.4524 | degrees (°)",
+     "m4400Myr": "213.3977 | degrees (°)",
+     "genesis": "120.4642 | degrees (°)",
+     "p990Myr": "88.8210 | degrees (°)"
     }
    },
    "venus#057 Argument of Latitude (u)": {
@@ -6385,12 +6385,12 @@
     },
     "values": {
      "today": "335.9141 | degrees (°)",
-     "m3000": "256.2279 | degrees (°)",
-     "m400Myr": "351.9947 | degrees (°)",
-     "m2460Myr": "348.2143 | degrees (°)",
-     "m4400Myr": "79.4629 | degrees (°)",
-     "genesis": "102.0792 | degrees (°)",
-     "p990Myr": "16.4055 | degrees (°)"
+     "m3000": "256.2277 | degrees (°)",
+     "m400Myr": "351.5468 | degrees (°)",
+     "m2460Myr": "348.1944 | degrees (°)",
+     "m4400Myr": "79.8818 | degrees (°)",
+     "genesis": "102.0797 | degrees (°)",
+     "p990Myr": "15.0890 | degrees (°)"
     }
    },
    "venus#058 Flight Path Angle (γ)": {
@@ -6404,11 +6404,11 @@
     "values": {
      "today": "-0.3789 | degrees (°)",
      "m3000": "-0.3344 | degrees (°)",
-     "m400Myr": "-0.7653 | degrees (°)",
-     "m2460Myr": "0.6465 | degrees (°)",
-     "m4400Myr": "1.3751 | degrees (°)",
+     "m400Myr": "-0.7641 | degrees (°)",
+     "m2460Myr": "0.6463 | degrees (°)",
+     "m4400Myr": "1.3774 | degrees (°)",
      "genesis": "-0.0932 | degrees (°)",
-     "p990Myr": "-1.8475 | degrees (°)"
+     "p990Myr": "-1.8144 | degrees (°)"
     }
    },
    "venus#059 Heliocentric Latitude (β)": {
@@ -6422,11 +6422,11 @@
     "values": {
      "today": "-0.0912 | degrees (°)",
      "m3000": "-1.9107 | degrees (°)",
-     "m400Myr": "1.2717 | degrees (°)",
-     "m2460Myr": "-2.0661 | degrees (°)",
-     "m4400Myr": "0.5129 | degrees (°)",
+     "m400Myr": "1.2538 | degrees (°)",
+     "m2460Myr": "-2.0669 | degrees (°)",
+     "m4400Myr": "0.5187 | degrees (°)",
      "genesis": "1.0854 | degrees (°)",
-     "p990Myr": "1.6111 | degrees (°)"
+     "p990Myr": "1.5565 | degrees (°)"
     }
    },
    "venus#060 Phase Angle to Earth (α)": {
@@ -6440,11 +6440,11 @@
     "values": {
      "today": "11.91 | degrees (°)",
      "m3000": "9.69 | degrees (°)",
-     "m400Myr": "114.03 | degrees (°)",
+     "m400Myr": "114.18 | degrees (°)",
      "m2460Myr": "34.69 | degrees (°)",
-     "m4400Myr": "165.36 | degrees (°)",
+     "m4400Myr": "165.53 | degrees (°)",
      "genesis": "117.54 | degrees (°)",
-     "p990Myr": "41.52 | degrees (°)"
+     "p990Myr": "42.02 | degrees (°)"
     }
    },
    "venus#061 True Anomaly Rate (dν/dt)": {
@@ -6458,11 +6458,11 @@
     "values": {
      "today": "1.606418 | °/SI day",
      "m3000": "1.578736 | °/SI day",
-     "m400Myr": "1.593775 | °/SI day",
-     "m2460Myr": "1.631341 | °/SI day",
-     "m4400Myr": "1.620626 | °/SI day",
+     "m400Myr": "1.593442 | °/SI day",
+     "m2460Myr": "1.631354 | °/SI day",
+     "m4400Myr": "1.620057 | °/SI day",
      "genesis": "1.642452 | °/SI day",
-     "p990Myr": "1.525832 | °/SI day"
+     "p990Myr": "1.523592 | °/SI day"
     }
    },
    "venus#062 Eccentric Anomaly Rate (dE/dt)": {
@@ -6476,11 +6476,11 @@
     "values": {
      "today": "1.604291 | °/SI day",
      "m3000": "1.590425 | °/SI day",
-     "m400Myr": "1.598081 | °/SI day",
-     "m2460Myr": "1.617123 | °/SI day",
-     "m4400Myr": "1.612255 | °/SI day",
+     "m400Myr": "1.597914 | °/SI day",
+     "m2460Myr": "1.617129 | °/SI day",
+     "m4400Myr": "1.611972 | °/SI day",
      "genesis": "1.622894 | °/SI day",
-     "p990Myr": "1.564007 | °/SI day"
+     "p990Myr": "1.562859 | °/SI day"
     }
    },
    "venus#063 Radius of Curvature (ρ)": {
@@ -6493,12 +6493,12 @@
     },
     "values": {
      "today": "108,351,348 | km",
-     "m3000": "107,404,179 | km",
-     "m400Myr": "107,911,502 | km",
-     "m2460Myr": "109,121,898 | km",
-     "m4400Myr": "108,720,644 | km",
-     "genesis": "109,443,558 | km",
-     "p990Myr": "105,484,041 | km"
+     "m3000": "107,404,176 | km",
+     "m400Myr": "107,900,153 | km",
+     "m2460Myr": "109,122,314 | km",
+     "m4400Myr": "108,701,854 | km",
+     "genesis": "109,443,559 | km",
+     "p990Myr": "105,400,739 | km"
     }
    },
    "venus#064 Time since perihelion": {
@@ -6512,11 +6512,11 @@
     "values": {
      "today": "175.95 | SI days",
      "m3000": "136.54 | SI days",
-     "m400Myr": "162.09 | SI days",
-     "m2460Myr": "32.03 | SI days",
-     "m4400Myr": "47.27 | SI days",
+     "m400Myr": "161.81 | SI days",
+     "m2460Myr": "32.02 | SI days",
+     "m4400Myr": "47.53 | SI days",
      "genesis": "219.75 | SI days",
-     "p990Myr": "146.68 | SI days"
+     "p990Myr": "145.82 | SI days"
     }
    },
    "venus#065 Time to next perihelion": {
@@ -6530,11 +6530,11 @@
     "values": {
      "today": "48.75 | SI days",
      "m3000": "88.16 | SI days",
-     "m400Myr": "62.59 | SI days",
-     "m2460Myr": "192.57 | SI days",
-     "m4400Myr": "177.25 | SI days",
+     "m400Myr": "62.87 | SI days",
+     "m2460Myr": "192.58 | SI days",
+     "m4400Myr": "176.99 | SI days",
      "genesis": "4.76 | SI days",
-     "p990Myr": "78.06 | SI days"
+     "p990Myr": "78.92 | SI days"
     }
    },
    "venus#066 Perihelion Precession Duration against Ecliptic": {
@@ -6549,10 +6549,10 @@
      "today": "4,828,409.02 | years",
      "m3000": "322,519.91 | years",
      "m400Myr": "128,966.14 | years",
-     "m2460Myr": "158,605.95 | years",
-     "m4400Myr": "-1,573,780.93 | years",
-     "genesis": "372,417.68 | years",
-     "p990Myr": "188,470.14 | years"
+     "m2460Myr": "158,606.14 | years",
+     "m4400Myr": "-1,573,739.34 | years",
+     "genesis": "372,417.15 | years",
+     "p990Myr": "188,471.73 | years"
     }
    },
    "venus#067 Axial Precession Period (derived, of date)": {
@@ -6710,11 +6710,11 @@
     "values": {
      "today": "-51.9 | ″/100yr",
      "m3000": "92.7 | ″/100yr",
-     "m400Myr": "2,318.5 | ″/100yr",
+     "m400Myr": "2,318.2 | ″/100yr",
      "m2460Myr": "834.0 | ″/100yr",
      "m4400Myr": "733.5 | ″/100yr",
      "genesis": "1,197.7 | ″/100yr",
-     "p990Myr": "657.8 | ″/100yr"
+     "p990Myr": "657.5 | ″/100yr"
     }
    },
    "venus#076 └ Perihelion rate of date (secular tier, ±1,000 yr)": {
@@ -6730,7 +6730,7 @@
      "m3000": "401.8 | ″/100yr",
      "m400Myr": "1,004.9 | ″/100yr",
      "m2460Myr": "817.1 | ″/100yr",
-     "m4400Myr": "-82.3 | ″/100yr",
+     "m4400Myr": "-82.4 | ″/100yr",
      "genesis": "348.0 | ″/100yr",
      "p990Myr": "687.6 | ″/100yr"
     }
@@ -6858,7 +6858,7 @@
      "m2460Myr": "7.926215 | degrees (°)",
      "m4400Myr": "3.094548 | degrees (°)",
      "genesis": "4.627916 | degrees (°)",
-     "p990Myr": "6.395389 | degrees (°)"
+     "p990Myr": "6.395388 | degrees (°)"
     }
    },
    "mars#007 Inclination to Inv. plane (I)": {
@@ -7214,11 +7214,11 @@
     "values": {
      "today": "1.600660 | AU",
      "m3000": "1.396881 | AU",
-     "m400Myr": "1.401574 | AU",
-     "m2460Myr": "1.481993 | AU",
-     "m4400Myr": "1.442704 | AU",
+     "m400Myr": "1.401843 | AU",
+     "m2460Myr": "1.482011 | AU",
+     "m4400Myr": "1.442964 | AU",
      "genesis": "1.391500 | AU",
-     "p990Myr": "1.447795 | AU"
+     "p990Myr": "1.448434 | AU"
     }
    },
    "mars#027 Semi-latus rectum (p)": {
@@ -7285,12 +7285,12 @@
     },
     "values": {
      "today": "82,582.58 | km/h",
-     "m3000": "94,422.14 | km/h",
-     "m400Myr": "94,131.59 | km/h",
-     "m2460Myr": "89,285.96 | km/h",
-     "m4400Myr": "91,630.46 | km/h",
+     "m3000": "94,422.15 | km/h",
+     "m400Myr": "94,114.88 | km/h",
+     "m2460Myr": "89,284.95 | km/h",
+     "m4400Myr": "91,614.74 | km/h",
      "genesis": "94,778.17 | km/h",
-     "p990Myr": "91,301.13 | km/h"
+     "p990Myr": "91,262.73 | km/h"
     }
    },
    "mars#031 Radial velocity (vᵣ)": {
@@ -7303,12 +7303,12 @@
     },
     "values": {
      "today": "6,501.54 | km/h",
-     "m3000": "2,654.57 | km/h",
-     "m400Myr": "-5,948.15 | km/h",
-     "m2460Myr": "-8,799.27 | km/h",
-     "m4400Myr": "6,276.06 | km/h",
-     "genesis": "-1,577.80 | km/h",
-     "p990Myr": "-4,598.14 | km/h"
+     "m3000": "2,654.56 | km/h",
+     "m400Myr": "-5,968.14 | km/h",
+     "m2460Myr": "-8,799.44 | km/h",
+     "m4400Myr": "6,287.09 | km/h",
+     "genesis": "-1,577.76 | km/h",
+     "p990Myr": "-4,633.76 | km/h"
     }
    },
    "mars#032 Transverse velocity (vₜ)": {
@@ -7322,11 +7322,11 @@
     "values": {
      "today": "82,325.80 | km/h",
      "m3000": "94,384.76 | km/h",
-     "m400Myr": "93,943.71 | km/h",
-     "m2460Myr": "88,851.49 | km/h",
-     "m4400Myr": "91,415.07 | km/h",
-     "genesis": "94,765.05 | km/h",
-     "p990Myr": "91,185.94 | km/h"
+     "m400Myr": "93,925.71 | km/h",
+     "m2460Myr": "88,850.47 | km/h",
+     "m4400Myr": "91,398.55 | km/h",
+     "genesis": "94,765.06 | km/h",
+     "p990Myr": "91,145.69 | km/h"
     }
    },
    "mars#033 Perihelion velocity (vₚ)": {
@@ -7394,11 +7394,11 @@
     "values": {
      "today": "119,856.36 | km/h",
      "m3000": "128,301.24 | km/h",
-     "m400Myr": "128,088.65 | km/h",
-     "m2460Myr": "124,576.78 | km/h",
-     "m4400Myr": "126,273.10 | km/h",
+     "m400Myr": "128,076.38 | km/h",
+     "m2460Myr": "124,576.06 | km/h",
+     "m4400Myr": "126,261.69 | km/h",
      "genesis": "128,575.57 | km/h",
-     "p990Myr": "126,019.31 | km/h"
+     "p990Myr": "125,991.49 | km/h"
     }
    },
    "mars#037 Circular velocity (v_circ)": {
@@ -7411,12 +7411,12 @@
     },
     "values": {
      "today": "84,751.25 | km/h",
-     "m3000": "90,722.67 | km/h",
-     "m400Myr": "90,572.35 | km/h",
-     "m2460Myr": "88,089.09 | km/h",
-     "m4400Myr": "89,288.56 | km/h",
+     "m3000": "90,722.68 | km/h",
+     "m400Myr": "90,563.67 | km/h",
+     "m2460Myr": "88,088.58 | km/h",
+     "m4400Myr": "89,280.50 | km/h",
      "genesis": "90,916.66 | km/h",
-     "p990Myr": "89,109.11 | km/h"
+     "p990Myr": "89,089.44 | km/h"
     }
    },
    "mars#038 Velocity ratio (v/v_circ)": {
@@ -7430,11 +7430,11 @@
     "values": {
      "today": "0.9744 | ",
      "m3000": "1.0408 | ",
-     "m400Myr": "1.0393 | ",
+     "m400Myr": "1.0392 | ",
      "m2460Myr": "1.0136 | ",
-     "m4400Myr": "1.0262 | ",
+     "m4400Myr": "1.0261 | ",
      "genesis": "1.0425 | ",
-     "p990Myr": "1.0246 | "
+     "p990Myr": "1.0244 | "
     }
    },
    "mars#039 Specific Orbital Energy (ε)": {
@@ -7465,12 +7465,12 @@
     },
     "values": {
      "today": "5,475,958,109.79 | km²/s",
-     "m3000": "5,478,789,140.84 | km²/s",
-     "m400Myr": "5,471,284,397.64 | km²/s",
+     "m3000": "5,478,789,140.83 | km²/s",
+     "m400Myr": "5,471,284,397.61 | km²/s",
      "m2460Myr": "5,470,584,041.51 | km²/s",
-     "m4400Myr": "5,478,242,527.03 | km²/s",
+     "m4400Myr": "5,478,242,526.54 | km²/s",
      "genesis": "5,477,410,780.60 | km²/s",
-     "p990Myr": "5,486,487,879.63 | km²/s"
+     "p990Myr": "5,486,487,880.14 | km²/s"
     }
    },
    "mars#041 Area Sweep Rate (dA/dt)": {
@@ -7486,7 +7486,7 @@
      "m3000": "2,739,394,570 | km²/s",
      "m400Myr": "2,735,642,199 | km²/s",
      "m2460Myr": "2,735,292,021 | km²/s",
-     "m4400Myr": "2,739,121,264 | km²/s",
+     "m4400Myr": "2,739,121,263 | km²/s",
      "genesis": "2,738,705,390 | km²/s",
      "p990Myr": "2,743,243,940 | km²/s"
     }
@@ -7501,12 +7501,12 @@
     },
     "values": {
      "today": "336.15707439 | degrees (°)",
-     "m3000": "313.23242323 | degrees (°)",
-     "m400Myr": "134.38845261 | degrees (°)",
-     "m2460Myr": "328.26906821 | degrees (°)",
-     "m4400Myr": "78.94113860 | degrees (°)",
-     "genesis": "217.50143269 | degrees (°)",
-     "p990Myr": "70.70833267 | degrees (°)"
+     "m3000": "313.23242322 | degrees (°)",
+     "m400Myr": "134.38844847 | degrees (°)",
+     "m2460Myr": "328.26906807 | degrees (°)",
+     "m4400Myr": "78.94114248 | degrees (°)",
+     "genesis": "217.50143270 | degrees (°)",
+     "p990Myr": "70.70831615 | degrees (°)"
     }
    },
    "mars#043 Argument of periapsis (ω)": {
@@ -7519,12 +7519,12 @@
     },
     "values": {
      "today": "286.69950648 | degrees (°)",
-     "m3000": "251.42965638 | degrees (°)",
-     "m400Myr": "288.08229983 | degrees (°)",
-     "m2460Myr": "263.05805530 | degrees (°)",
-     "m4400Myr": "41.86222715 | degrees (°)",
-     "genesis": "214.05164738 | degrees (°)",
-     "p990Myr": "280.98695424 | degrees (°)"
+     "m3000": "251.42965637 | degrees (°)",
+     "m400Myr": "288.08229131 | degrees (°)",
+     "m2460Myr": "263.05805503 | degrees (°)",
+     "m4400Myr": "41.86223344 | degrees (°)",
+     "genesis": "214.05164739 | degrees (°)",
+     "p990Myr": "280.98692878 | degrees (°)"
     }
    },
    "mars#044 Longitude of ascending node (Ω)": {
@@ -7538,11 +7538,11 @@
     "values": {
      "today": "49.45756791 | degrees (°)",
      "m3000": "61.80276685 | degrees (°)",
-     "m400Myr": "206.30615278 | degrees (°)",
-     "m2460Myr": "65.21101291 | degrees (°)",
-     "m4400Myr": "37.07891144 | degrees (°)",
+     "m400Myr": "206.30615715 | degrees (°)",
+     "m2460Myr": "65.21101304 | degrees (°)",
+     "m4400Myr": "37.07890904 | degrees (°)",
      "genesis": "3.44978531 | degrees (°)",
-     "p990Myr": "149.72137843 | degrees (°)"
+     "p990Myr": "149.72138737 | degrees (°)"
     }
    },
    "mars#045 Longitude of descending node": {
@@ -7556,11 +7556,11 @@
     "values": {
      "today": "229.45756791 | degrees (°)",
      "m3000": "241.80276685 | degrees (°)",
-     "m400Myr": "26.30615278 | degrees (°)",
-     "m2460Myr": "245.21101291 | degrees (°)",
-     "m4400Myr": "217.07891144 | degrees (°)",
+     "m400Myr": "26.30615715 | degrees (°)",
+     "m2460Myr": "245.21101304 | degrees (°)",
+     "m4400Myr": "217.07890904 | degrees (°)",
      "genesis": "183.44978531 | degrees (°)",
-     "p990Myr": "329.72137843 | degrees (°)"
+     "p990Myr": "329.72138737 | degrees (°)"
     }
    },
    "mars#046 Ascending Node on Inv. Plane (Ω)": {
@@ -7628,11 +7628,11 @@
     "values": {
      "today": "0.044922 | AU",
      "m3000": "-0.026592 | AU",
-     "m400Myr": "-0.040174 | AU",
-     "m2460Myr": "-0.036140 | AU",
-     "m4400Myr": "0.058728 | AU",
+     "m400Myr": "-0.040001 | AU",
+     "m2460Myr": "-0.036121 | AU",
+     "m4400Myr": "0.058617 | AU",
      "genesis": "-0.080403 | AU",
-     "p990Myr": "-0.088728 | AU"
+     "p990Myr": "-0.087882 | AU"
     }
    },
    "mars#050 Position relative to Inv. Plane": {
@@ -7700,11 +7700,11 @@
     "values": {
      "today": "118.22 | degrees (°)",
      "m3000": "17.00 | degrees (°)",
-     "m400Myr": "325.44 | degrees (°)",
-     "m2460Myr": "291.17 | degrees (°)",
-     "m4400Myr": "48.23 | degrees (°)",
+     "m400Myr": "325.30 | degrees (°)",
+     "m2460Myr": "291.16 | degrees (°)",
+     "m4400Myr": "48.37 | degrees (°)",
      "genesis": "350.13 | degrees (°)",
-     "p990Myr": "317.60 | degrees (°)"
+     "p990Myr": "317.15 | degrees (°)"
     }
    },
    "mars#054 Eccentric Anomaly (E)": {
@@ -7718,11 +7718,11 @@
     "values": {
      "today": "122.73 | degrees (°)",
      "m3000": "18.61 | degrees (°)",
-     "m400Myr": "321.83 | degrees (°)",
+     "m400Myr": "321.67 | degrees (°)",
      "m2460Myr": "285.52 | degrees (°)",
-     "m4400Myr": "52.15 | degrees (°)",
+     "m4400Myr": "52.30 | degrees (°)",
      "genesis": "349.18 | degrees (°)",
-     "p990Myr": "314.72 | degrees (°)"
+     "p990Myr": "314.24 | degrees (°)"
     }
    },
    "mars#055 True Anomaly (ν)": {
@@ -7736,11 +7736,11 @@
     "values": {
      "today": "127.13 | degrees (°)",
      "m3000": "20.28 | degrees (°)",
-     "m400Myr": "318.07 | degrees (°)",
-     "m2460Myr": "279.79 | degrees (°)",
-     "m4400Myr": "56.19 | degrees (°)",
+     "m400Myr": "317.89 | degrees (°)",
+     "m2460Myr": "279.78 | degrees (°)",
+     "m4400Myr": "56.34 | degrees (°)",
      "genesis": "348.18 | degrees (°)",
-     "p990Myr": "311.76 | degrees (°)"
+     "p990Myr": "311.26 | degrees (°)"
     }
    },
    "mars#056 Equation of the Center": {
@@ -7754,11 +7754,11 @@
     "values": {
      "today": "8.91 | degrees (°)",
      "m3000": "3.28 | degrees (°)",
-     "m400Myr": "-7.38 | degrees (°)",
+     "m400Myr": "-7.40 | degrees (°)",
      "m2460Myr": "-11.38 | degrees (°)",
-     "m4400Myr": "7.95 | degrees (°)",
+     "m4400Myr": "7.97 | degrees (°)",
      "genesis": "-1.95 | degrees (°)",
-     "p990Myr": "-5.84 | degrees (°)"
+     "p990Myr": "-5.89 | degrees (°)"
     }
    },
    "mars#057 Mean Longitude (L)": {
@@ -7771,12 +7771,12 @@
     },
     "values": {
      "today": "94.3778 | degrees (°)",
-     "m3000": "330.2337 | degrees (°)",
-     "m400Myr": "99.8320 | degrees (°)",
-     "m2460Myr": "259.4353 | degrees (°)",
-     "m4400Myr": "127.1759 | degrees (°)",
-     "genesis": "207.6287 | degrees (°)",
-     "p990Myr": "28.3107 | degrees (°)"
+     "m3000": "330.2336 | degrees (°)",
+     "m400Myr": "99.6846 | degrees (°)",
+     "m2460Myr": "259.4289 | degrees (°)",
+     "m4400Myr": "127.3116 | degrees (°)",
+     "genesis": "207.6289 | degrees (°)",
+     "p990Myr": "27.8583 | degrees (°)"
     }
    },
    "mars#058 True Longitude (λ)": {
@@ -7789,12 +7789,12 @@
     },
     "values": {
      "today": "103.2841 | degrees (°)",
-     "m3000": "333.5171 | degrees (°)",
-     "m400Myr": "92.4547 | degrees (°)",
-     "m2460Myr": "248.0576 | degrees (°)",
-     "m4400Myr": "135.1267 | degrees (°)",
-     "genesis": "205.6832 | degrees (°)",
-     "p990Myr": "22.4701 | degrees (°)"
+     "m3000": "333.5170 | degrees (°)",
+     "m400Myr": "92.2816 | degrees (°)",
+     "m2460Myr": "248.0509 | degrees (°)",
+     "m4400Myr": "135.2774 | degrees (°)",
+     "genesis": "205.6834 | degrees (°)",
+     "p990Myr": "21.9705 | degrees (°)"
     }
    },
    "mars#059 Argument of Latitude (u)": {
@@ -7807,12 +7807,12 @@
     },
     "values": {
      "today": "53.8265 | degrees (°)",
-     "m3000": "271.7144 | degrees (°)",
-     "m400Myr": "246.1486 | degrees (°)",
-     "m2460Myr": "182.8466 | degrees (°)",
-     "m4400Myr": "98.0478 | degrees (°)",
-     "genesis": "202.2334 | degrees (°)",
-     "p990Myr": "232.7487 | degrees (°)"
+     "m3000": "271.7142 | degrees (°)",
+     "m400Myr": "245.9754 | degrees (°)",
+     "m2460Myr": "182.8399 | degrees (°)",
+     "m4400Myr": "98.1985 | degrees (°)",
+     "genesis": "202.2337 | degrees (°)",
+     "p990Myr": "232.2491 | degrees (°)"
     }
    },
    "mars#060 Flight Path Angle (γ)": {
@@ -7826,11 +7826,11 @@
     "values": {
      "today": "4.5155 | degrees (°)",
      "m3000": "1.6110 | degrees (°)",
-     "m400Myr": "-3.6229 | degrees (°)",
-     "m2460Myr": "-5.6558 | degrees (°)",
-     "m4400Myr": "3.9275 | degrees (°)",
-     "genesis": "-0.9539 | degrees (°)",
-     "p990Myr": "-2.8867 | degrees (°)"
+     "m400Myr": "-3.6357 | degrees (°)",
+     "m2460Myr": "-5.6559 | degrees (°)",
+     "m4400Myr": "3.9350 | degrees (°)",
+     "genesis": "-0.9538 | degrees (°)",
+     "p990Myr": "-2.9104 | degrees (°)"
     }
    },
    "mars#061 Heliocentric Latitude (β)": {
@@ -7844,11 +7844,11 @@
     "values": {
      "today": "1.6082 | degrees (°)",
      "m3000": "-1.0908 | degrees (°)",
-     "m400Myr": "-1.6425 | degrees (°)",
-     "m2460Myr": "-1.3974 | degrees (°)",
-     "m4400Myr": "2.3330 | degrees (°)",
+     "m400Myr": "-1.6351 | degrees (°)",
+     "m2460Myr": "-1.3966 | degrees (°)",
+     "m4400Myr": "2.3281 | degrees (°)",
      "genesis": "-3.3125 | degrees (°)",
-     "p990Myr": "-3.5136 | degrees (°)"
+     "p990Myr": "-3.4785 | degrees (°)"
     }
    },
    "mars#062 Phase Angle to Earth (α)": {
@@ -7862,11 +7862,11 @@
     "values": {
      "today": "62.68 | degrees (°)",
      "m3000": "3.59 | degrees (°)",
-     "m400Myr": "33.81 | degrees (°)",
+     "m400Myr": "33.68 | degrees (°)",
      "m2460Myr": "12.90 | degrees (°)",
-     "m4400Myr": "87.51 | degrees (°)",
+     "m4400Myr": "87.41 | degrees (°)",
      "genesis": "32.32 | degrees (°)",
-     "p990Myr": "109.19 | degrees (°)"
+     "p990Myr": "108.87 | degrees (°)"
     }
    },
    "mars#063 True Anomaly Rate (dν/dt)": {
@@ -7880,11 +7880,11 @@
     "values": {
      "today": "0.472757 | °/SI day",
      "m3000": "0.621077 | °/SI day",
-     "m400Myr": "0.616141 | °/SI day",
-     "m2460Myr": "0.551279 | °/SI day",
-     "m4400Myr": "0.582786 | °/SI day",
+     "m400Myr": "0.615905 | °/SI day",
+     "m2460Myr": "0.551267 | °/SI day",
+     "m4400Myr": "0.582576 | °/SI day",
      "genesis": "0.626378 | °/SI day",
-     "p990Myr": "0.578852 | °/SI day"
+     "p990Myr": "0.578341 | °/SI day"
     }
    },
    "mars#064 Eccentric Anomaly Rate (dE/dt)": {
@@ -7898,11 +7898,11 @@
     "values": {
      "today": "0.498828 | °/SI day",
      "m3000": "0.571600 | °/SI day",
-     "m400Myr": "0.569731 | °/SI day",
-     "m2460Myr": "0.539021 | °/SI day",
-     "m4400Myr": "0.553897 | °/SI day",
+     "m400Myr": "0.569621 | °/SI day",
+     "m2460Myr": "0.539014 | °/SI day",
+     "m4400Myr": "0.553797 | °/SI day",
      "genesis": "0.574284 | °/SI day",
-     "p990Myr": "0.551402 | °/SI day"
+     "p990Myr": "0.551159 | °/SI day"
     }
    },
    "mars#065 Radius of Curvature (ρ)": {
@@ -7915,12 +7915,12 @@
     },
     "values": {
      "today": "215,199,265 | km",
-     "m3000": "245,100,921 | km",
-     "m400Myr": "244,127,202 | km",
-     "m2460Myr": "232,808,055 | km",
-     "m4400Myr": "238,714,657 | km",
-     "genesis": "245,713,455 | km",
-     "p990Myr": "238,418,355 | km"
+     "m3000": "245,100,931 | km",
+     "m400Myr": "244,090,815 | km",
+     "m2460Myr": "232,805,584 | km",
+     "m4400Myr": "238,678,041 | km",
+     "genesis": "245,713,471 | km",
+     "p990Myr": "238,328,038 | km"
     }
    },
    "mars#066 Time since perihelion": {
@@ -7934,11 +7934,11 @@
     "values": {
      "today": "225.60 | SI days",
      "m3000": "32.44 | SI days",
-     "m400Myr": "620.99 | SI days",
-     "m2460Myr": "555.37 | SI days",
-     "m4400Myr": "91.97 | SI days",
+     "m400Myr": "620.71 | SI days",
+     "m2460Myr": "555.36 | SI days",
+     "m4400Myr": "92.23 | SI days",
      "genesis": "667.59 | SI days",
-     "p990Myr": "606.19 | SI days"
+     "p990Myr": "605.32 | SI days"
     }
    },
    "mars#067 Time to next perihelion": {
@@ -7952,11 +7952,11 @@
     "values": {
      "today": "461.38 | SI days",
      "m3000": "654.54 | SI days",
-     "m400Myr": "65.94 | SI days",
-     "m2460Myr": "131.29 | SI days",
-     "m4400Myr": "594.45 | SI days",
+     "m400Myr": "66.22 | SI days",
+     "m2460Myr": "131.31 | SI days",
+     "m4400Myr": "594.19 | SI days",
      "genesis": "18.82 | SI days",
-     "p990Myr": "80.92 | SI days"
+     "p990Myr": "81.78 | SI days"
     }
    },
    "mars#068 Perihelion Precession Duration against Ecliptic": {
@@ -7970,11 +7970,11 @@
     "values": {
      "today": "81,381.59 | years",
      "m3000": "77,560.12 | years",
-     "m400Myr": "73,758.00 | years",
-     "m2460Myr": "108,447.28 | years",
-     "m4400Myr": "90,332.97 | years",
-     "genesis": "153,168.40 | years",
-     "p990Myr": "74,008.32 | years"
+     "m400Myr": "73,757.85 | years",
+     "m2460Myr": "108,447.48 | years",
+     "m4400Myr": "90,332.72 | years",
+     "genesis": "153,167.55 | years",
+     "p990Myr": "74,008.53 | years"
     }
    },
    "mars#069 Axial Precession Period (derived, of date)": {
@@ -8152,9 +8152,9 @@
      "m3000": "1,718.6 | ″/100yr",
      "m400Myr": "1,949.4 | ″/100yr",
      "m2460Myr": "1,739.2 | ″/100yr",
-     "m4400Myr": "1,771.7 | ″/100yr",
+     "m4400Myr": "1,771.8 | ″/100yr",
      "genesis": "2,100.3 | ″/100yr",
-     "p990Myr": "1,813.9 | ″/100yr"
+     "p990Myr": "1,813.8 | ″/100yr"
     }
    },
    "mars#079 └ Perihelion rate of date (secular tier, ±1,000 yr)": {
@@ -8169,10 +8169,10 @@
      "today": "1,592.5 | ″/100yr",
      "m3000": "1,671.0 | ″/100yr",
      "m400Myr": "1,757.1 | ″/100yr",
-     "m2460Myr": "1,195.1 | ″/100yr",
+     "m2460Myr": "1,195.0 | ″/100yr",
      "m4400Myr": "1,434.7 | ″/100yr",
      "genesis": "846.1 | ″/100yr",
-     "p990Myr": "1,751.2 | ″/100yr"
+     "p990Myr": "1,751.1 | ″/100yr"
     }
    },
    "jupiter#000 Size diameter": {
@@ -8564,7 +8564,7 @@
     "values": {
      "today": "5.202748 | AU",
      "m3000": "5.201661 | AU",
-     "m400Myr": "5.201710 | AU",
+     "m400Myr": "5.201709 | AU",
      "m2460Myr": "5.201897 | AU",
      "m4400Myr": "5.202106 | AU",
      "genesis": "5.203566 | AU",
@@ -8581,12 +8581,12 @@
     },
     "values": {
      "today": "778,319,969.35 | km",
-     "m3000": "778,157,356.86 | km",
-     "m400Myr": "778,135,747.47 | km",
-     "m2460Myr": "778,014,807.16 | km",
-     "m4400Myr": "777,905,738.40 | km",
-     "genesis": "778,121,839.95 | km",
-     "p990Myr": "778,312,256.31 | km"
+     "m3000": "778,157,356.87 | km",
+     "m400Myr": "778,135,688.96 | km",
+     "m2460Myr": "778,014,806.01 | km",
+     "m4400Myr": "777,905,704.72 | km",
+     "genesis": "778,121,839.94 | km",
+     "p990Myr": "778,312,300.45 | km"
     }
    },
    "jupiter#023 Semi-minor axis (b)": {
@@ -8600,11 +8600,11 @@
     "values": {
      "today": "5.196688 | AU",
      "m3000": "5.197417 | AU",
-     "m400Myr": "5.198373 | AU",
+     "m400Myr": "5.198372 | AU",
      "m2460Myr": "5.193595 | AU",
-     "m4400Myr": "5.192867 | AU",
+     "m4400Myr": "5.192866 | AU",
      "genesis": "5.199394 | AU",
-     "p990Myr": "5.194135 | AU"
+     "p990Myr": "5.194136 | AU"
     }
    },
    "jupiter#024 Perihelion distance (q)": {
@@ -8620,7 +8620,7 @@
      "m3000": "4.991592 | AU",
      "m400Myr": "5.015412 | AU",
      "m2460Myr": "4.908120 | AU",
-     "m4400Myr": "4.892195 | AU",
+     "m4400Myr": "4.892194 | AU",
      "genesis": "4.995218 | AU",
      "p990Myr": "4.912355 | AU"
     }
@@ -8638,7 +8638,7 @@
      "m3000": "5.411729 | AU",
      "m400Myr": "5.388007 | AU",
      "m2460Myr": "5.495675 | AU",
-     "m4400Myr": "5.512018 | AU",
+     "m4400Myr": "5.512017 | AU",
      "genesis": "5.411915 | AU",
      "p990Myr": "5.492079 | AU"
     }
@@ -8654,11 +8654,11 @@
     "values": {
      "today": "5.318907 | AU",
      "m3000": "5.352545 | AU",
-     "m400Myr": "5.385012 | AU",
-     "m2460Myr": "4.941822 | AU",
-     "m4400Myr": "4.987439 | AU",
+     "m400Myr": "5.385025 | AU",
+     "m2460Myr": "4.941824 | AU",
+     "m4400Myr": "4.987352 | AU",
      "genesis": "5.411549 | AU",
-     "p990Myr": "4.914495 | AU"
+     "p990Myr": "4.914542 | AU"
     }
    },
    "jupiter#027 Semi-latus rectum (p)": {
@@ -8672,11 +8672,11 @@
     "values": {
      "today": "5.190635 | AU",
      "m3000": "5.193177 | AU",
-     "m400Myr": "5.195038 | AU",
+     "m400Myr": "5.195037 | AU",
      "m2460Myr": "5.185306 | AU",
      "m4400Myr": "5.183643 | AU",
      "genesis": "5.195224 | AU",
-     "p990Myr": "5.186066 | AU"
+     "p990Myr": "5.186067 | AU"
     }
    },
    "jupiter#028 Focal distance (c)": {
@@ -8708,7 +8708,7 @@
     "values": {
      "today": "47,030.20 | km/h",
      "m3000": "47,020.92 | km/h",
-     "m400Myr": "47,022.62 | km/h",
+     "m400Myr": "47,022.61 | km/h",
      "m2460Myr": "47,033.32 | km/h",
      "m4400Myr": "47,043.69 | km/h",
      "genesis": "47,057.03 | km/h",
@@ -8726,11 +8726,11 @@
     "values": {
      "today": "45,970.72 | km/h",
      "m3000": "45,669.21 | km/h",
-     "m400Myr": "45,385.82 | km/h",
-     "m2460Myr": "49,430.57 | km/h",
-     "m4400Myr": "49,003.41 | km/h",
+     "m400Myr": "45,385.71 | km/h",
+     "m2460Myr": "49,430.55 | km/h",
+     "m4400Myr": "49,004.24 | km/h",
      "genesis": "45,171.74 | km/h",
-     "p990Myr": "49,685.04 | km/h"
+     "p990Myr": "49,684.59 | km/h"
     }
    },
    "jupiter#031 Radial velocity (vᵣ)": {
@@ -8744,11 +8744,11 @@
     "values": {
      "today": "1,966.80 | km/h",
      "m3000": "-1,283.85 | km/h",
-     "m400Myr": "-290.51 | km/h",
-     "m2460Myr": "-1,299.79 | km/h",
-     "m4400Myr": "-2,107.36 | km/h",
+     "m400Myr": "-289.88 | km/h",
+     "m2460Myr": "-1,299.83 | km/h",
+     "m4400Myr": "-2,106.60 | km/h",
      "genesis": "107.24 | km/h",
-     "p990Myr": "-336.15 | km/h"
+     "p990Myr": "-339.79 | km/h"
     }
    },
    "jupiter#032 Transverse velocity (vₜ)": {
@@ -8762,11 +8762,11 @@
     "values": {
      "today": "45,928.54 | km/h",
      "m3000": "45,651.22 | km/h",
-     "m400Myr": "45,384.90 | km/h",
-     "m2460Myr": "49,413.52 | km/h",
-     "m4400Myr": "48,958.10 | km/h",
+     "m400Myr": "45,384.79 | km/h",
+     "m2460Myr": "49,413.50 | km/h",
+     "m4400Myr": "48,958.96 | km/h",
      "genesis": "45,171.61 | km/h",
-     "p990Myr": "49,683.92 | km/h"
+     "p990Myr": "49,683.45 | km/h"
     }
    },
    "jupiter#033 Perihelion velocity (vₚ)": {
@@ -8780,7 +8780,7 @@
     "values": {
      "today": "49,334.46 | km/h",
      "m3000": "48,952.30 | km/h",
-     "m400Myr": "48,729.43 | km/h",
+     "m400Myr": "48,729.44 | km/h",
      "m2460Myr": "49,752.77 | km/h",
      "m4400Myr": "49,911.23 | km/h",
      "genesis": "48,936.49 | km/h",
@@ -8834,11 +8834,11 @@
     "values": {
      "today": "65,750.55 | km/h",
      "m3000": "65,543.62 | km/h",
-     "m400Myr": "65,346.95 | km/h",
-     "m2460Myr": "68,220.79 | km/h",
-     "m4400Myr": "67,914.20 | km/h",
+     "m400Myr": "65,346.87 | km/h",
+     "m2460Myr": "68,220.77 | km/h",
+     "m4400Myr": "67,914.80 | km/h",
      "genesis": "65,198.75 | km/h",
-     "p990Myr": "68,399.22 | km/h"
+     "p990Myr": "68,398.89 | km/h"
     }
    },
    "jupiter#037 Circular velocity (v_circ)": {
@@ -8852,11 +8852,11 @@
     "values": {
      "today": "46,492.66 | km/h",
      "m3000": "46,346.34 | km/h",
-     "m400Myr": "46,207.27 | km/h",
-     "m2460Myr": "48,239.38 | km/h",
-     "m4400Myr": "48,022.59 | km/h",
+     "m400Myr": "46,207.22 | km/h",
+     "m2460Myr": "48,239.37 | km/h",
+     "m4400Myr": "48,023.01 | km/h",
      "genesis": "46,102.48 | km/h",
-     "p990Myr": "48,365.55 | km/h"
+     "p990Myr": "48,365.32 | km/h"
     }
    },
    "jupiter#038 Velocity ratio (v/v_circ)": {
@@ -8904,13 +8904,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "10,151,465,884.20 | km²/s",
-     "m3000": "10,153,951,185.41 | km²/s",
-     "m400Myr": "10,155,580,995.81 | km²/s",
-     "m2460Myr": "10,145,093,420.25 | km²/s",
-     "m4400Myr": "10,142,552,003.43 | km²/s",
-     "genesis": "10,153,860,696.40 | km²/s",
-     "p990Myr": "10,147,464,311.73 | km²/s"
+     "today": "10,151,465,884.21 | km²/s",
+     "m3000": "10,153,951,185.54 | km²/s",
+     "m400Myr": "10,155,580,614.44 | km²/s",
+     "m2460Myr": "10,145,093,412.73 | km²/s",
+     "m4400Myr": "10,142,551,784.08 | km²/s",
+     "genesis": "10,153,860,696.35 | km²/s",
+     "p990Myr": "10,147,464,598.08 | km²/s"
     }
    },
    "jupiter#041 Area Sweep Rate (dA/dt)": {
@@ -8924,11 +8924,11 @@
     "values": {
      "today": "5,075,732,942 | km²/s",
      "m3000": "5,076,975,593 | km²/s",
-     "m400Myr": "5,077,790,498 | km²/s",
-     "m2460Myr": "5,072,546,710 | km²/s",
-     "m4400Myr": "5,071,276,002 | km²/s",
+     "m400Myr": "5,077,790,307 | km²/s",
+     "m2460Myr": "5,072,546,706 | km²/s",
+     "m4400Myr": "5,071,275,892 | km²/s",
      "genesis": "5,076,930,348 | km²/s",
-     "p990Myr": "5,073,732,156 | km²/s"
+     "p990Myr": "5,073,732,299 | km²/s"
     }
    },
    "jupiter#042 Longitude of perihelion (ϖ), ecliptic": {
@@ -8941,12 +8941,12 @@
     },
     "values": {
      "today": "14.08899674 | degrees (°)",
-     "m3000": "6.26434124 | degrees (°)",
-     "m400Myr": "33.71850200 | degrees (°)",
-     "m2460Myr": "10.90645867 | degrees (°)",
-     "m4400Myr": "132.60674037 | degrees (°)",
+     "m3000": "6.26434127 | degrees (°)",
+     "m400Myr": "33.71850216 | degrees (°)",
+     "m2460Myr": "10.90645857 | degrees (°)",
+     "m4400Myr": "132.60674229 | degrees (°)",
      "genesis": "167.91274047 | degrees (°)",
-     "p990Myr": "212.59953553 | degrees (°)"
+     "p990Myr": "212.59952925 | degrees (°)"
     }
    },
    "jupiter#043 Argument of periapsis (ω)": {
@@ -8959,12 +8959,12 @@
     },
     "values": {
      "today": "273.54523229 | degrees (°)",
-     "m3000": "271.89289596 | degrees (°)",
-     "m400Myr": "278.68769228 | degrees (°)",
-     "m2460Myr": "263.77441027 | degrees (°)",
-     "m4400Myr": "26.06223299 | degrees (°)",
+     "m3000": "271.89289599 | degrees (°)",
+     "m400Myr": "278.68769150 | degrees (°)",
+     "m2460Myr": "263.77441013 | degrees (°)",
+     "m4400Myr": "26.06223589 | degrees (°)",
      "genesis": "47.06171612 | degrees (°)",
-     "p990Myr": "94.48767824 | degrees (°)"
+     "p990Myr": "94.48766926 | degrees (°)"
     }
    },
    "jupiter#044 Longitude of ascending node (Ω)": {
@@ -8978,11 +8978,11 @@
     "values": {
      "today": "100.54376445 | degrees (°)",
      "m3000": "94.37144528 | degrees (°)",
-     "m400Myr": "115.03080972 | degrees (°)",
-     "m2460Myr": "107.13204840 | degrees (°)",
-     "m4400Myr": "106.54450738 | degrees (°)",
-     "genesis": "120.85102435 | degrees (°)",
-     "p990Myr": "118.11185729 | degrees (°)"
+     "m400Myr": "115.03081066 | degrees (°)",
+     "m2460Myr": "107.13204844 | degrees (°)",
+     "m4400Myr": "106.54450640 | degrees (°)",
+     "genesis": "120.85102436 | degrees (°)",
+     "p990Myr": "118.11185999 | degrees (°)"
     }
    },
    "jupiter#045 Longitude of descending node": {
@@ -8996,11 +8996,11 @@
     "values": {
      "today": "280.54376445 | degrees (°)",
      "m3000": "274.37144528 | degrees (°)",
-     "m400Myr": "295.03080972 | degrees (°)",
-     "m2460Myr": "287.13204840 | degrees (°)",
-     "m4400Myr": "286.54450738 | degrees (°)",
-     "genesis": "300.85102435 | degrees (°)",
-     "p990Myr": "298.11185729 | degrees (°)"
+     "m400Myr": "295.03081066 | degrees (°)",
+     "m2460Myr": "287.13204844 | degrees (°)",
+     "m4400Myr": "286.54450640 | degrees (°)",
+     "genesis": "300.85102436 | degrees (°)",
+     "p990Myr": "298.11185999 | degrees (°)"
     }
    },
    "jupiter#046 Ascending Node on Inv. Plane (Ω)": {
@@ -9068,11 +9068,11 @@
     "values": {
      "today": "0.001484 | AU",
      "m3000": "-0.028117 | AU",
-     "m400Myr": "0.032787 | AU",
+     "m400Myr": "0.032783 | AU",
      "m2460Myr": "-0.022556 | AU",
-     "m4400Myr": "-0.009805 | AU",
+     "m4400Myr": "-0.009792 | AU",
      "genesis": "0.045273 | AU",
-     "p990Myr": "0.023143 | AU"
+     "p990Myr": "0.023106 | AU"
     }
    },
    "jupiter#050 Position relative to Inv. Plane": {
@@ -9140,11 +9140,11 @@
     "values": {
      "today": "115.11 | degrees (°)",
      "m3000": "225.70 | degrees (°)",
-     "m400Myr": "190.66 | degrees (°)",
+     "m400Myr": "190.63 | degrees (°)",
      "m2460Myr": "333.79 | degrees (°)",
-     "m4400Myr": "316.30 | degrees (°)",
+     "m4400Myr": "316.33 | degrees (°)",
      "genesis": "176.47 | degrees (°)",
-     "p990Myr": "353.42 | degrees (°)"
+     "p990Myr": "353.35 | degrees (°)"
     }
    },
    "jupiter#054 Eccentric Anomaly (E)": {
@@ -9158,11 +9158,11 @@
     "values": {
      "today": "117.57 | degrees (°)",
      "m3000": "224.09 | degrees (°)",
-     "m400Myr": "190.29 | degrees (°)",
+     "m400Myr": "190.27 | degrees (°)",
      "m2460Myr": "332.29 | degrees (°)",
-     "m4400Myr": "313.84 | degrees (°)",
+     "m4400Myr": "313.87 | degrees (°)",
      "genesis": "176.60 | degrees (°)",
-     "p990Myr": "353.04 | degrees (°)"
+     "p990Myr": "352.96 | degrees (°)"
     }
    },
    "jupiter#055 True Anomaly (ν)": {
@@ -9176,11 +9176,11 @@
     "values": {
      "today": "119.99 | degrees (°)",
      "m3000": "222.50 | degrees (°)",
-     "m400Myr": "189.93 | degrees (°)",
+     "m400Myr": "189.91 | degrees (°)",
      "m2460Myr": "330.74 | degrees (°)",
-     "m4400Myr": "311.33 | degrees (°)",
+     "m4400Myr": "311.35 | degrees (°)",
      "genesis": "176.74 | degrees (°)",
-     "p990Myr": "352.64 | degrees (°)"
+     "p990Myr": "352.56 | degrees (°)"
     }
    },
    "jupiter#056 Equation of the Center": {
@@ -9212,11 +9212,11 @@
     "values": {
      "today": "129.2038 | degrees (°)",
      "m3000": "231.9659 | degrees (°)",
-     "m400Myr": "224.3741 | degrees (°)",
-     "m2460Myr": "344.6993 | degrees (°)",
-     "m4400Myr": "88.9113 | degrees (°)",
+     "m400Myr": "224.3507 | degrees (°)",
+     "m2460Myr": "344.6983 | degrees (°)",
+     "m4400Myr": "88.9328 | degrees (°)",
      "genesis": "344.3804 | degrees (°)",
-     "p990Myr": "206.0231 | degrees (°)"
+     "p990Myr": "205.9513 | degrees (°)"
     }
    },
    "jupiter#058 True Longitude (λ)": {
@@ -9230,11 +9230,11 @@
     "values": {
      "today": "134.0792 | degrees (°)",
      "m3000": "228.7684 | degrees (°)",
-     "m400Myr": "223.6473 | degrees (°)",
-     "m2460Myr": "341.6502 | degrees (°)",
-     "m4400Myr": "83.9338 | degrees (°)",
+     "m400Myr": "223.6255 | degrees (°)",
+     "m2460Myr": "341.6490 | degrees (°)",
+     "m4400Myr": "83.9571 | degrees (°)",
      "genesis": "344.6496 | degrees (°)",
-     "p990Myr": "205.2377 | degrees (°)"
+     "p990Myr": "205.1574 | degrees (°)"
     }
    },
    "jupiter#059 Argument of Latitude (u)": {
@@ -9248,11 +9248,11 @@
     "values": {
      "today": "33.5354 | degrees (°)",
      "m3000": "134.3969 | degrees (°)",
-     "m400Myr": "108.6165 | degrees (°)",
-     "m2460Myr": "234.5181 | degrees (°)",
-     "m4400Myr": "337.3893 | degrees (°)",
+     "m400Myr": "108.5947 | degrees (°)",
+     "m2460Myr": "234.5170 | degrees (°)",
+     "m4400Myr": "337.4126 | degrees (°)",
      "genesis": "223.7986 | degrees (°)",
-     "p990Myr": "87.1258 | degrees (°)"
+     "p990Myr": "87.0455 | degrees (°)"
     }
    },
    "jupiter#060 Flight Path Angle (γ)": {
@@ -9266,11 +9266,11 @@
     "values": {
      "today": "2.4521 | degrees (°)",
      "m3000": "-1.6109 | degrees (°)",
-     "m400Myr": "-0.3668 | degrees (°)",
+     "m400Myr": "-0.3660 | degrees (°)",
      "m2460Myr": "-1.5068 | degrees (°)",
-     "m4400Myr": "-2.4647 | degrees (°)",
+     "m4400Myr": "-2.4638 | degrees (°)",
      "genesis": "0.1360 | degrees (°)",
-     "p990Myr": "-0.3876 | degrees (°)"
+     "p990Myr": "-0.3918 | degrees (°)"
     }
    },
    "jupiter#061 Heliocentric Latitude (β)": {
@@ -9286,9 +9286,9 @@
      "m3000": "-0.3010 | degrees (°)",
      "m400Myr": "0.3488 | degrees (°)",
      "m2460Myr": "-0.2615 | degrees (°)",
-     "m4400Myr": "-0.1126 | degrees (°)",
+     "m4400Myr": "-0.1125 | degrees (°)",
      "genesis": "0.4793 | degrees (°)",
-     "p990Myr": "0.2698 | degrees (°)"
+     "p990Myr": "0.2694 | degrees (°)"
     }
    },
    "jupiter#062 Phase Angle to Earth (α)": {
@@ -9302,11 +9302,11 @@
     "values": {
      "today": "93.48 | degrees (°)",
      "m3000": "108.34 | degrees (°)",
-     "m400Myr": "97.38 | degrees (°)",
-     "m2460Myr": "106.49 | degrees (°)",
-     "m4400Myr": "36.32 | degrees (°)",
+     "m400Myr": "97.66 | degrees (°)",
+     "m2460Myr": "106.50 | degrees (°)",
+     "m4400Myr": "36.09 | degrees (°)",
      "genesis": "106.64 | degrees (°)",
-     "p990Myr": "73.58 | degrees (°)"
+     "p990Myr": "74.32 | degrees (°)"
     }
    },
    "jupiter#063 True Anomaly Rate (dν/dt)": {
@@ -9322,9 +9322,9 @@
      "m3000": "0.078409 | °/SI day",
      "m400Myr": "0.077486 | °/SI day",
      "m2460Myr": "0.091962 | °/SI day",
-     "m4400Myr": "0.090311 | °/SI day",
+     "m4400Myr": "0.090314 | °/SI day",
      "genesis": "0.076828 | °/SI day",
-     "p990Myr": "0.092943 | °/SI day"
+     "p990Myr": "0.092941 | °/SI day"
     }
    },
    "jupiter#064 Eccentric Anomaly Rate (dE/dt)": {
@@ -9340,9 +9340,9 @@
      "m3000": "0.080749 | °/SI day",
      "m400Myr": "0.080268 | °/SI day",
      "m2460Myr": "0.087504 | °/SI day",
-     "m4400Myr": "0.086738 | °/SI day",
+     "m4400Myr": "0.086740 | °/SI day",
      "genesis": "0.079963 | °/SI day",
-     "p990Myr": "0.087939 | °/SI day"
+     "p990Myr": "0.087938 | °/SI day"
     }
    },
    "jupiter#065 Radius of Curvature (ρ)": {
@@ -9355,12 +9355,12 @@
     },
     "values": {
      "today": "760,087,451 | km",
-     "m3000": "755,030,489 | km",
-     "m400Myr": "750,136,307 | km",
-     "m2460Myr": "814,960,615 | km",
-     "m4400Myr": "808,214,901 | km",
-     "genesis": "745,925,814 | km",
-     "p990Myr": "819,150,491 | km"
+     "m3000": "755,030,483 | km",
+     "m400Myr": "750,134,284 | km",
+     "m2460Myr": "814,960,258 | km",
+     "m4400Myr": "808,227,397 | km",
+     "genesis": "745,925,813 | km",
+     "p990Myr": "819,143,915 | km"
     }
    },
    "jupiter#066 Time since perihelion": {
@@ -9374,11 +9374,11 @@
     "values": {
      "today": "1,385.41 | SI days",
      "m3000": "2,716.30 | SI days",
-     "m400Myr": "2,294.37 | SI days",
-     "m2460Myr": "4,015.37 | SI days",
-     "m4400Myr": "3,803.62 | SI days",
+     "m400Myr": "2,294.09 | SI days",
+     "m2460Myr": "4,015.36 | SI days",
+     "m4400Myr": "3,803.88 | SI days",
      "genesis": "2,122.04 | SI days",
-     "p990Myr": "4,254.24 | SI days"
+     "p990Myr": "4,253.38 | SI days"
     }
    },
    "jupiter#067 Time to next perihelion": {
@@ -9392,11 +9392,11 @@
     "values": {
      "today": "2,947.20 | SI days",
      "m3000": "1,616.27 | SI days",
-     "m400Myr": "2,037.91 | SI days",
-     "m2460Myr": "315.26 | SI days",
-     "m4400Myr": "525.45 | SI days",
+     "m400Myr": "2,038.19 | SI days",
+     "m2460Myr": "315.27 | SI days",
+     "m4400Myr": "525.19 | SI days",
      "genesis": "2,207.00 | SI days",
-     "p990Myr": "79.16 | SI days"
+     "p990Myr": "80.03 | SI days"
     }
    },
    "jupiter#068 Perihelion Precession Duration against Ecliptic": {
@@ -9410,11 +9410,11 @@
     "values": {
      "today": "173,134.83 | years",
      "m3000": "399,245.93 | years",
-     "m400Myr": "-352,940.87 | years",
-     "m2460Myr": "-217,479.80 | years",
-     "m4400Myr": "225,462.89 | years",
-     "genesis": "-331,782.93 | years",
-     "p990Myr": "164,369.60 | years"
+     "m400Myr": "-352,932.07 | years",
+     "m2460Myr": "-217,472.26 | years",
+     "m4400Myr": "225,463.54 | years",
+     "genesis": "-331,804.05 | years",
+     "p990Myr": "164,364.90 | years"
     }
    },
    "jupiter#069 Axial Precession Period (derived, of date)": {
@@ -9698,11 +9698,11 @@
     "values": {
      "today": "0.05514253 | dimensionless",
      "m3000": "0.06857171 | dimensionless",
-     "m400Myr": "0.07832209 | dimensionless",
+     "m400Myr": "0.07832210 | dimensionless",
      "m2460Myr": "0.02555517 | dimensionless",
      "m4400Myr": "0.02426318 | dimensionless",
      "genesis": "0.07059782 | dimensionless",
-     "p990Myr": "0.03345332 | dimensionless"
+     "p990Myr": "0.03345331 | dimensionless"
     }
    },
    "saturn#006 Ecliptic Inclination (i)": {
@@ -9720,7 +9720,7 @@
      "m2460Myr": "0.697266 | degrees (°)",
      "m4400Myr": "0.656933 | degrees (°)",
      "genesis": "2.283837 | degrees (°)",
-     "p990Myr": "1.199875 | degrees (°)"
+     "p990Myr": "1.199876 | degrees (°)"
     }
    },
    "saturn#007 Inclination to Inv. plane (I)": {
@@ -9986,11 +9986,11 @@
     "values": {
      "today": "9.536404 | AU",
      "m3000": "9.573245 | AU",
-     "m400Myr": "9.553647 | AU",
-     "m2460Myr": "9.527195 | AU",
-     "m4400Myr": "9.512072 | AU",
+     "m400Myr": "9.553653 | AU",
+     "m2460Myr": "9.527196 | AU",
+     "m4400Myr": "9.512073 | AU",
      "genesis": "9.538465 | AU",
-     "p990Myr": "9.536735 | AU"
+     "p990Myr": "9.536768 | AU"
     }
    },
    "saturn#022 Semi-major axis (km)": {
@@ -10002,13 +10002,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "1,426,625,726.26 | km",
-     "m3000": "1,432,137,006.20 | km",
-     "m400Myr": "1,429,152,074.02 | km",
-     "m2460Myr": "1,424,922,184.51 | km",
-     "m4400Myr": "1,422,403,748.92 | km",
-     "genesis": "1,426,346,348.64 | km",
-     "p990Myr": "1,426,806,655.00 | km"
+     "today": "1,426,625,726.25 | km",
+     "m3000": "1,432,137,006.86 | km",
+     "m400Myr": "1,429,152,959.85 | km",
+     "m2460Myr": "1,424,922,220.14 | km",
+     "m4400Myr": "1,422,403,940.50 | km",
+     "genesis": "1,426,346,349.63 | km",
+     "p990Myr": "1,426,811,556.70 | km"
     }
    },
    "saturn#023 Semi-minor axis (b)": {
@@ -10022,11 +10022,11 @@
     "values": {
      "today": "9.521894 | AU",
      "m3000": "9.550711 | AU",
-     "m400Myr": "9.524299 | AU",
+     "m400Myr": "9.524305 | AU",
      "m2460Myr": "9.524084 | AU",
-     "m4400Myr": "9.509271 | AU",
+     "m4400Myr": "9.509273 | AU",
      "genesis": "9.514665 | AU",
-     "p990Myr": "9.531397 | AU"
+     "p990Myr": "9.531430 | AU"
     }
    },
    "saturn#024 Perihelion distance (q)": {
@@ -10040,11 +10040,11 @@
     "values": {
      "today": "9.010543 | AU",
      "m3000": "8.916791 | AU",
-     "m400Myr": "8.805385 | AU",
+     "m400Myr": "8.805391 | AU",
      "m2460Myr": "9.283726 | AU",
-     "m4400Myr": "9.281279 | AU",
+     "m4400Myr": "9.281280 | AU",
      "genesis": "8.865070 | AU",
-     "p990Myr": "9.217700 | AU"
+     "p990Myr": "9.217732 | AU"
     }
    },
    "saturn#025 Aphelion distance (Q)": {
@@ -10058,11 +10058,11 @@
     "values": {
      "today": "10.062265 | AU",
      "m3000": "10.229698 | AU",
-     "m400Myr": "10.301909 | AU",
-     "m2460Myr": "9.770664 | AU",
-     "m4400Myr": "9.742865 | AU",
+     "m400Myr": "10.301915 | AU",
+     "m2460Myr": "9.770665 | AU",
+     "m4400Myr": "9.742866 | AU",
      "genesis": "10.211860 | AU",
-     "p990Myr": "9.855771 | AU"
+     "p990Myr": "9.855805 | AU"
     }
    },
    "saturn#026 Current distance from Sun (r)": {
@@ -10076,11 +10076,11 @@
     "values": {
      "today": "9.423830 | AU",
      "m3000": "9.407410 | AU",
-     "m400Myr": "9.886630 | AU",
-     "m2460Myr": "9.677152 | AU",
-     "m4400Myr": "9.321948 | AU",
+     "m400Myr": "9.886743 | AU",
+     "m2460Myr": "9.677151 | AU",
+     "m4400Myr": "9.321970 | AU",
      "genesis": "10.177695 | AU",
-     "p990Myr": "9.845356 | AU"
+     "p990Myr": "9.845350 | AU"
     }
    },
    "saturn#027 Semi-latus rectum (p)": {
@@ -10094,11 +10094,11 @@
     "values": {
      "today": "9.507407 | AU",
      "m3000": "9.528230 | AU",
-     "m400Myr": "9.495041 | AU",
-     "m2460Myr": "9.520973 | AU",
-     "m4400Myr": "9.506472 | AU",
+     "m400Myr": "9.495047 | AU",
+     "m2460Myr": "9.520974 | AU",
+     "m4400Myr": "9.506473 | AU",
      "genesis": "9.490925 | AU",
-     "p990Myr": "9.526063 | AU"
+     "p990Myr": "9.526095 | AU"
     }
    },
    "saturn#028 Focal distance (c)": {
@@ -10116,7 +10116,7 @@
      "m2460Myr": "0.243469 | AU",
      "m4400Myr": "0.230793 | AU",
      "genesis": "0.673395 | AU",
-     "p990Myr": "0.319035 | AU"
+     "p990Myr": "0.319036 | AU"
     }
    },
    "saturn#029 Mean orbital speed": {
@@ -10130,11 +10130,11 @@
     "values": {
      "today": "34,714.57 | km/h",
      "m3000": "34,846.22 | km/h",
-     "m400Myr": "34,778.41 | km/h",
+     "m400Myr": "34,778.43 | km/h",
      "m2460Myr": "34,688.76 | km/h",
-     "m4400Myr": "34,639.94 | km/h",
+     "m4400Myr": "34,639.95 | km/h",
      "genesis": "34,736.16 | km/h",
-     "p990Myr": "34,712.22 | km/h"
+     "p990Myr": "34,712.34 | km/h"
     }
    },
    "saturn#030 Current orbital velocity": {
@@ -10148,11 +10148,11 @@
     "values": {
      "today": "35,134.21 | km/h",
      "m3000": "35,260.62 | km/h",
-     "m400Myr": "33,502.41 | km/h",
+     "m400Myr": "33,502.02 | km/h",
      "m2460Myr": "34,200.03 | km/h",
-     "m4400Myr": "35,475.50 | km/h",
+     "m4400Myr": "35,475.42 | km/h",
      "genesis": "32,471.13 | km/h",
-     "p990Myr": "33,613.72 | km/h"
+     "p990Myr": "33,613.80 | km/h"
     }
    },
    "saturn#031 Radial velocity (vᵣ)": {
@@ -10166,11 +10166,11 @@
     "values": {
      "today": "-1,892.60 | km/h",
      "m3000": "2,339.82 | km/h",
-     "m400Myr": "-2,351.32 | km/h",
-     "m2460Myr": "688.61 | km/h",
-     "m4400Myr": "488.07 | km/h",
+     "m400Myr": "-2,351.10 | km/h",
+     "m2460Myr": "688.62 | km/h",
+     "m4400Myr": "488.18 | km/h",
      "genesis": "-722.54 | km/h",
-     "p990Myr": "285.12 | km/h"
+     "p990Myr": "285.65 | km/h"
     }
    },
    "saturn#032 Transverse velocity (vₜ)": {
@@ -10184,11 +10184,11 @@
     "values": {
      "today": "35,083.26 | km/h",
      "m3000": "35,182.82 | km/h",
-     "m400Myr": "33,419.88 | km/h",
+     "m400Myr": "33,419.50 | km/h",
      "m2460Myr": "34,193.08 | km/h",
-     "m4400Myr": "35,472.14 | km/h",
+     "m4400Myr": "35,472.06 | km/h",
      "genesis": "32,463.10 | km/h",
-     "p990Myr": "33,612.51 | km/h"
+     "p990Myr": "33,612.58 | km/h"
     }
    },
    "saturn#033 Perihelion velocity (vₚ)": {
@@ -10202,11 +10202,11 @@
     "values": {
      "today": "36,692.36 | km/h",
      "m3000": "37,118.73 | km/h",
-     "m400Myr": "37,523.53 | km/h",
+     "m400Myr": "37,523.52 | km/h",
      "m2460Myr": "35,642.13 | km/h",
      "m4400Myr": "35,627.58 | km/h",
      "genesis": "37,269.81 | km/h",
-     "p990Myr": "35,901.27 | km/h"
+     "p990Myr": "35,901.20 | km/h"
     }
    },
    "saturn#034 Aphelion velocity (vₐ)": {
@@ -10220,11 +10220,11 @@
     "values": {
      "today": "32,857.22 | km/h",
      "m3000": "32,354.81 | km/h",
-     "m400Myr": "32,072.62 | km/h",
+     "m400Myr": "32,072.61 | km/h",
      "m2460Myr": "33,865.84 | km/h",
-     "m4400Myr": "33,939.66 | km/h",
+     "m4400Myr": "33,939.65 | km/h",
      "genesis": "32,354.48 | km/h",
-     "p990Myr": "33,576.99 | km/h"
+     "p990Myr": "33,576.93 | km/h"
     }
    },
    "saturn#035 Velocity ratio (vₚ/vₐ)": {
@@ -10256,11 +10256,11 @@
     "values": {
      "today": "49,396.58 | km/h",
      "m3000": "49,439.67 | km/h",
-     "m400Myr": "48,227.48 | km/h",
+     "m400Myr": "48,227.20 | km/h",
      "m2460Myr": "48,751.33 | km/h",
-     "m4400Myr": "49,675.94 | km/h",
+     "m4400Myr": "49,675.88 | km/h",
      "genesis": "47,541.77 | km/h",
-     "p990Myr": "48,325.34 | km/h"
+     "p990Myr": "48,325.35 | km/h"
     }
    },
    "saturn#037 Circular velocity (v_circ)": {
@@ -10274,11 +10274,11 @@
     "values": {
      "today": "34,928.66 | km/h",
      "m3000": "34,959.13 | km/h",
-     "m400Myr": "34,101.98 | km/h",
+     "m400Myr": "34,101.78 | km/h",
      "m2460Myr": "34,472.40 | km/h",
-     "m4400Myr": "35,126.19 | km/h",
+     "m4400Myr": "35,126.15 | km/h",
      "genesis": "33,617.11 | km/h",
-     "p990Myr": "34,171.17 | km/h"
+     "p990Myr": "34,171.18 | km/h"
     }
    },
    "saturn#038 Velocity ratio (v/v_circ)": {
@@ -10314,7 +10314,7 @@
      "m2460Myr": "-46.5683 | km²/s²",
      "m4400Myr": "-46.6508 | km²/s²",
      "genesis": "-46.5218 | km²/s²",
-     "p990Myr": "-46.5068 | km²/s²"
+     "p990Myr": "-46.5066 | km²/s²"
     }
    },
    "saturn#040 Specific Angular Momentum (h)": {
@@ -10326,13 +10326,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "13,738,823,424.84 | km²/s",
-     "m3000": "13,753,861,075.84 | km²/s",
-     "m400Myr": "13,729,630,949.55 | km²/s",
-     "m2460Myr": "13,747,050,163.41 | km²/s",
-     "m4400Myr": "13,735,338,690.81 | km²/s",
-     "genesis": "13,724,082,482.92 | km²/s",
-     "p990Myr": "13,752,929,403.13 | km²/s"
+     "today": "13,738,823,424.79 | km²/s",
+     "m3000": "13,753,861,078.89 | km²/s",
+     "m400Myr": "13,729,635,202.69 | km²/s",
+     "m2460Myr": "13,747,050,335.32 | km²/s",
+     "m4400Myr": "13,735,339,615.01 | km²/s",
+     "genesis": "13,724,082,487.67 | km²/s",
+     "p990Myr": "13,752,953,030.53 | km²/s"
     }
    },
    "saturn#041 Area Sweep Rate (dA/dt)": {
@@ -10345,12 +10345,12 @@
     },
     "values": {
      "today": "6,869,411,712 | km²/s",
-     "m3000": "6,876,930,538 | km²/s",
-     "m400Myr": "6,864,815,475 | km²/s",
-     "m2460Myr": "6,873,525,082 | km²/s",
-     "m4400Myr": "6,867,669,345 | km²/s",
-     "genesis": "6,862,041,241 | km²/s",
-     "p990Myr": "6,876,464,702 | km²/s"
+     "m3000": "6,876,930,539 | km²/s",
+     "m400Myr": "6,864,817,601 | km²/s",
+     "m2460Myr": "6,873,525,168 | km²/s",
+     "m4400Myr": "6,867,669,808 | km²/s",
+     "genesis": "6,862,041,244 | km²/s",
+     "p990Myr": "6,876,476,515 | km²/s"
     }
    },
    "saturn#042 Longitude of perihelion (ϖ), ecliptic": {
@@ -10362,13 +10362,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "92.81856242 | degrees (°)",
-     "m3000": "68.55549901 | degrees (°)",
-     "m400Myr": "75.91415669 | degrees (°)",
-     "m2460Myr": "260.29731851 | degrees (°)",
-     "m4400Myr": "12.40747829 | degrees (°)",
+     "today": "92.81856243 | degrees (°)",
+     "m3000": "68.55549951 | degrees (°)",
+     "m400Myr": "75.91415267 | degrees (°)",
+     "m2460Myr": "260.29731820 | degrees (°)",
+     "m4400Myr": "12.40748544 | degrees (°)",
      "genesis": "225.40594711 | degrees (°)",
-     "p990Myr": "108.97200347 | degrees (°)"
+     "p990Myr": "108.97198463 | degrees (°)"
     }
    },
    "saturn#043 Argument of periapsis (ω)": {
@@ -10380,13 +10380,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "339.22016038 | degrees (°)",
-     "m3000": "302.58069063 | degrees (°)",
-     "m400Myr": "359.48670642 | degrees (°)",
-     "m2460Myr": "137.54687530 | degrees (°)",
-     "m4400Myr": "261.87260177 | degrees (°)",
+     "today": "339.22016039 | degrees (°)",
+     "m3000": "302.58069114 | degrees (°)",
+     "m400Myr": "359.48670445 | degrees (°)",
+     "m2460Myr": "137.54687529 | degrees (°)",
+     "m4400Myr": "261.87260185 | degrees (°)",
      "genesis": "129.04407627 | degrees (°)",
-     "p990Myr": "34.46157723 | degrees (°)"
+     "p990Myr": "34.46155978 | degrees (°)"
     }
    },
    "saturn#044 Longitude of ascending node (Ω)": {
@@ -10400,11 +10400,11 @@
     "values": {
      "today": "113.59840204 | degrees (°)",
      "m3000": "125.97480838 | degrees (°)",
-     "m400Myr": "76.42745027 | degrees (°)",
-     "m2460Myr": "122.75044321 | degrees (°)",
-     "m4400Myr": "110.53487652 | degrees (°)",
+     "m400Myr": "76.42744822 | degrees (°)",
+     "m2460Myr": "122.75044292 | degrees (°)",
+     "m4400Myr": "110.53488359 | degrees (°)",
      "genesis": "96.36187084 | degrees (°)",
-     "p990Myr": "74.51042623 | degrees (°)"
+     "p990Myr": "74.51042485 | degrees (°)"
     }
    },
    "saturn#045 Longitude of descending node": {
@@ -10418,11 +10418,11 @@
     "values": {
      "today": "293.59840204 | degrees (°)",
      "m3000": "305.97480838 | degrees (°)",
-     "m400Myr": "256.42745027 | degrees (°)",
-     "m2460Myr": "302.75044321 | degrees (°)",
-     "m4400Myr": "290.53487652 | degrees (°)",
+     "m400Myr": "256.42744822 | degrees (°)",
+     "m2460Myr": "302.75044292 | degrees (°)",
+     "m4400Myr": "290.53488359 | degrees (°)",
      "genesis": "276.36187084 | degrees (°)",
-     "p990Myr": "254.51042623 | degrees (°)"
+     "p990Myr": "254.51042485 | degrees (°)"
     }
    },
    "saturn#046 Ascending Node on Inv. Plane (Ω)": {
@@ -10490,11 +10490,11 @@
     "values": {
      "today": "-0.142447 | AU",
      "m3000": "-0.030283 | AU",
-     "m400Myr": "-0.014091 | AU",
+     "m400Myr": "-0.014115 | AU",
      "m2460Myr": "0.143320 | AU",
-     "m4400Myr": "0.126998 | AU",
+     "m4400Myr": "0.126986 | AU",
      "genesis": "-0.027484 | AU",
-     "p990Myr": "-0.131522 | AU"
+     "p990Myr": "-0.131556 | AU"
     }
    },
    "saturn#050 Position relative to Inv. Plane": {
@@ -10546,9 +10546,9 @@
      "m3000": "22,501,372 | km",
      "m400Myr": "22,674,347 | km",
      "m2460Myr": "23,103,855 | km",
-     "m4400Myr": "23,083,260 | km",
+     "m4400Myr": "23,083,259 | km",
      "genesis": "19,931,539 | km",
-     "p990Myr": "21,768,165 | km"
+     "p990Myr": "21,768,164 | km"
     }
    },
    "saturn#053 Mean Anomaly (M)": {
@@ -10562,11 +10562,11 @@
     "values": {
      "today": "285.45 | degrees (°)",
      "m3000": "71.57 | degrees (°)",
-     "m400Myr": "247.60 | degrees (°)",
+     "m400Myr": "247.59 | degrees (°)",
      "m2460Myr": "126.87 | degrees (°)",
-     "m4400Myr": "33.75 | degrees (°)",
+     "m4400Myr": "33.76 | degrees (°)",
      "genesis": "199.60 | degrees (°)",
-     "p990Myr": "164.83 | degrees (°)"
+     "p990Myr": "164.81 | degrees (°)"
     }
    },
    "saturn#054 Eccentric Anomaly (E)": {
@@ -10580,11 +10580,11 @@
     "values": {
      "today": "282.36 | degrees (°)",
      "m3000": "75.37 | degrees (°)",
-     "m400Myr": "243.58 | degrees (°)",
+     "m400Myr": "243.57 | degrees (°)",
      "m2460Myr": "128.02 | degrees (°)",
      "m4400Myr": "34.54 | degrees (°)",
      "genesis": "198.33 | degrees (°)",
-     "p990Myr": "165.32 | degrees (°)"
+     "p990Myr": "165.29 | degrees (°)"
     }
    },
    "saturn#055 True Anomaly (ν)": {
@@ -10598,11 +10598,11 @@
     "values": {
      "today": "279.26 | degrees (°)",
      "m3000": "79.21 | degrees (°)",
-     "m400Myr": "239.62 | degrees (°)",
+     "m400Myr": "239.61 | degrees (°)",
      "m2460Myr": "129.16 | degrees (°)",
-     "m4400Myr": "35.33 | degrees (°)",
+     "m4400Myr": "35.34 | degrees (°)",
      "genesis": "197.10 | degrees (°)",
-     "p990Myr": "165.80 | degrees (°)"
+     "p990Myr": "165.77 | degrees (°)"
     }
    },
    "saturn#056 Equation of the Center": {
@@ -10620,7 +10620,7 @@
      "m2460Myr": "2.30 | degrees (°)",
      "m4400Myr": "1.58 | degrees (°)",
      "genesis": "-2.50 | degrees (°)",
-     "p990Myr": "0.96 | degrees (°)"
+     "p990Myr": "0.97 | degrees (°)"
     }
    },
    "saturn#057 Mean Longitude (L)": {
@@ -10634,11 +10634,11 @@
     "values": {
      "today": "18.2677 | degrees (°)",
      "m3000": "140.1234 | degrees (°)",
-     "m400Myr": "323.5110 | degrees (°)",
-     "m2460Myr": "27.1635 | degrees (°)",
-     "m4400Myr": "46.1547 | degrees (°)",
+     "m400Myr": "323.5015 | degrees (°)",
+     "m2460Myr": "27.1631 | degrees (°)",
+     "m4400Myr": "46.1633 | degrees (°)",
      "genesis": "65.0077 | degrees (°)",
-     "p990Myr": "273.8061 | degrees (°)"
+     "p990Myr": "273.7771 | degrees (°)"
     }
    },
    "saturn#058 True Longitude (λ)": {
@@ -10652,11 +10652,11 @@
     "values": {
      "today": "12.0754 | degrees (°)",
      "m3000": "147.7626 | degrees (°)",
-     "m400Myr": "315.5379 | degrees (°)",
-     "m2460Myr": "29.4616 | degrees (°)",
-     "m4400Myr": "47.7390 | degrees (°)",
+     "m400Myr": "315.5291 | degrees (°)",
+     "m2460Myr": "29.4612 | degrees (°)",
+     "m4400Myr": "47.7480 | degrees (°)",
      "genesis": "62.5033 | degrees (°)",
-     "p990Myr": "274.7700 | degrees (°)"
+     "p990Myr": "274.7428 | degrees (°)"
     }
    },
    "saturn#059 Argument of Latitude (u)": {
@@ -10670,11 +10670,11 @@
     "values": {
      "today": "258.4770 | degrees (°)",
      "m3000": "21.7878 | degrees (°)",
-     "m400Myr": "239.1104 | degrees (°)",
-     "m2460Myr": "266.7112 | degrees (°)",
-     "m4400Myr": "297.2041 | degrees (°)",
-     "genesis": "326.1414 | degrees (°)",
-     "p990Myr": "200.2596 | degrees (°)"
+     "m400Myr": "239.1016 | degrees (°)",
+     "m2460Myr": "266.7108 | degrees (°)",
+     "m4400Myr": "297.2131 | degrees (°)",
+     "genesis": "326.1415 | degrees (°)",
+     "p990Myr": "200.2324 | degrees (°)"
     }
    },
    "saturn#060 Flight Path Angle (γ)": {
@@ -10688,11 +10688,11 @@
     "values": {
      "today": "-3.0879 | degrees (°)",
      "m3000": "3.8048 | degrees (°)",
-     "m400Myr": "-4.0245 | degrees (°)",
+     "m400Myr": "-4.0242 | degrees (°)",
      "m2460Myr": "1.1537 | degrees (°)",
-     "m4400Myr": "0.7883 | degrees (°)",
+     "m4400Myr": "0.7885 | degrees (°)",
      "genesis": "-1.2750 | degrees (°)",
-     "p990Myr": "0.4860 | degrees (°)"
+     "p990Myr": "0.4869 | degrees (°)"
     }
    },
    "saturn#061 Heliocentric Latitude (β)": {
@@ -10706,11 +10706,11 @@
     "values": {
      "today": "-0.8661 | degrees (°)",
      "m3000": "-0.1844 | degrees (°)",
-     "m400Myr": "-0.0817 | degrees (°)",
+     "m400Myr": "-0.0818 | degrees (°)",
      "m2460Myr": "0.8486 | degrees (°)",
-     "m4400Myr": "0.7806 | degrees (°)",
+     "m4400Myr": "0.7805 | degrees (°)",
      "genesis": "-0.1547 | degrees (°)",
-     "p990Myr": "-0.7654 | degrees (°)"
+     "p990Myr": "-0.7656 | degrees (°)"
     }
    },
    "saturn#062 Phase Angle to Earth (α)": {
@@ -10724,11 +10724,11 @@
     "values": {
      "today": "28.52 | degrees (°)",
      "m3000": "170.65 | degrees (°)",
-     "m400Myr": "170.72 | degrees (°)",
-     "m2460Myr": "154.30 | degrees (°)",
+     "m400Myr": "170.43 | degrees (°)",
+     "m2460Myr": "154.31 | degrees (°)",
      "m4400Myr": "0.12 | degrees (°)",
      "genesis": "175.50 | degrees (°)",
-     "p990Myr": "143.11 | degrees (°)"
+     "p990Myr": "143.90 | degrees (°)"
     }
    },
    "saturn#063 True Anomaly Rate (dν/dt)": {
@@ -10742,9 +10742,9 @@
     "values": {
      "today": "0.034213 | °/SI day",
      "m3000": "0.034567 | °/SI day",
-     "m400Myr": "0.031151 | °/SI day",
+     "m400Myr": "0.031150 | °/SI day",
      "m2460Myr": "0.032436 | °/SI day",
-     "m4400Myr": "0.034858 | °/SI day",
+     "m4400Myr": "0.034857 | °/SI day",
      "genesis": "0.029340 | °/SI day",
      "p990Myr": "0.031372 | °/SI day"
     }
@@ -10777,12 +10777,12 @@
     },
     "values": {
      "today": "1,448,065,460 | km",
-     "m3000": "1,454,626,556 | km",
-     "m400Myr": "1,378,352,376 | km",
-     "m2460Myr": "1,409,928,602 | km",
-     "m4400Myr": "1,460,780,404 | km",
-     "genesis": "1,330,501,353 | km",
-     "p990Myr": "1,385,686,377 | km"
+     "m3000": "1,454,626,567 | km",
+     "m400Myr": "1,378,335,835 | km",
+     "m2460Myr": "1,409,928,806 | km",
+     "m4400Myr": "1,460,777,446 | km",
+     "genesis": "1,330,501,361 | km",
+     "p990Myr": "1,385,692,533 | km"
     }
    },
    "saturn#066 Time since perihelion": {
@@ -10796,11 +10796,11 @@
     "values": {
      "today": "8,530.87 | SI days",
      "m3000": "2,139.01 | SI days",
-     "m400Myr": "7,399.12 | SI days",
-     "m2460Myr": "3,789.78 | SI days",
-     "m4400Myr": "1,007.74 | SI days",
-     "genesis": "5,960.37 | SI days",
-     "p990Myr": "4,927.15 | SI days"
+     "m400Myr": "7,398.83 | SI days",
+     "m2460Myr": "3,789.77 | SI days",
+     "m4400Myr": "1,008.00 | SI days",
+     "genesis": "5,960.38 | SI days",
+     "p990Myr": "4,926.29 | SI days"
     }
    },
    "saturn#067 Time to next perihelion": {
@@ -10814,11 +10814,11 @@
     "values": {
      "today": "2,228.01 | SI days",
      "m3000": "8,620.62 | SI days",
-     "m400Myr": "3,359.03 | SI days",
-     "m2460Myr": "6,964.24 | SI days",
-     "m4400Myr": "9,742.40 | SI days",
+     "m400Myr": "3,359.31 | SI days",
+     "m2460Myr": "6,964.25 | SI days",
+     "m4400Myr": "9,742.14 | SI days",
      "genesis": "4,789.71 | SI days",
-     "p990Myr": "5,833.82 | SI days"
+     "p990Myr": "5,834.68 | SI days"
     }
    },
    "saturn#068 Perihelion Precession Duration against Ecliptic": {
@@ -10833,10 +10833,10 @@
      "today": "67,651.22 | years",
      "m3000": "69,637.37 | years",
      "m400Myr": "74,595.48 | years",
-     "m2460Myr": "94,005.83 | years",
-     "m4400Myr": "78,008.20 | years",
-     "genesis": "119,898.13 | years",
-     "p990Myr": "51,158.30 | years"
+     "m2460Myr": "94,005.80 | years",
+     "m4400Myr": "78,011.02 | years",
+     "genesis": "119,898.15 | years",
+     "p990Myr": "51,158.28 | years"
     }
    },
    "saturn#069 Axial Precession Period (derived, of date)": {
@@ -10994,11 +10994,11 @@
     "values": {
      "today": "-4,143.2 | ″/100yr",
      "m3000": "4,154.0 | ″/100yr",
-     "m400Myr": "-2,826.4 | ″/100yr",
-     "m2460Myr": "5,646.8 | ″/100yr",
-     "m4400Myr": "4,717.2 | ″/100yr",
+     "m400Myr": "-2,825.5 | ″/100yr",
+     "m2460Myr": "5,646.7 | ″/100yr",
+     "m4400Myr": "4,716.2 | ″/100yr",
      "genesis": "890.0 | ″/100yr",
-     "p990Myr": "-952.5 | ″/100yr"
+     "p990Myr": "-943.4 | ″/100yr"
     }
    },
    "saturn#078 └ Perihelion rate of date (secular tier, ±1,000 yr)": {
@@ -11014,7 +11014,7 @@
      "m3000": "1,861.1 | ″/100yr",
      "m400Myr": "1,737.4 | ″/100yr",
      "m2460Myr": "1,378.6 | ″/100yr",
-     "m4400Myr": "1,661.4 | ″/100yr",
+     "m4400Myr": "1,661.3 | ″/100yr",
      "genesis": "1,080.9 | ″/100yr",
      "p990Myr": "2,533.3 | ″/100yr"
     }
@@ -11408,11 +11408,11 @@
     "values": {
      "today": "19.260217 | AU",
      "m3000": "19.234032 | AU",
-     "m400Myr": "19.305399 | AU",
-     "m2460Myr": "19.184855 | AU",
-     "m4400Myr": "19.149391 | AU",
+     "m400Myr": "19.305407 | AU",
+     "m2460Myr": "19.184856 | AU",
+     "m4400Myr": "19.149410 | AU",
      "genesis": "19.161800 | AU",
-     "p990Myr": "19.183916 | AU"
+     "p990Myr": "19.184008 | AU"
     }
    },
    "uranus#022 Semi-major axis (km)": {
@@ -11424,13 +11424,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "2,881,287,425.04 | km",
-     "m3000": "2,877,370,225.49 | km",
-     "m400Myr": "2,887,939,164.71 | km",
-     "m2460Myr": "2,869,357,138.57 | km",
-     "m4400Myr": "2,863,536,621.50 | km",
-     "genesis": "2,865,383,883.88 | km",
-     "p990Myr": "2,870,137,207.10 | km"
+     "today": "2,881,287,425.01 | km",
+     "m3000": "2,877,370,228.15 | km",
+     "m400Myr": "2,887,940,411.75 | km",
+     "m2460Myr": "2,869,357,299.21 | km",
+     "m4400Myr": "2,863,539,367.40 | km",
+     "genesis": "2,865,383,878.64 | km",
+     "p990Myr": "2,870,150,916.52 | km"
     }
    },
    "uranus#023 Semi-minor axis (b)": {
@@ -11444,11 +11444,11 @@
     "values": {
      "today": "19.238342 | AU",
      "m3000": "19.210649 | AU",
-     "m400Myr": "19.291903 | AU",
-     "m2460Myr": "19.148417 | AU",
-     "m4400Myr": "19.133368 | AU",
+     "m400Myr": "19.291912 | AU",
+     "m2460Myr": "19.148418 | AU",
+     "m4400Myr": "19.133386 | AU",
      "genesis": "19.159855 | AU",
-     "p990Myr": "19.167608 | AU"
+     "p990Myr": "19.167700 | AU"
     }
    },
    "uranus#024 Perihelion distance (q)": {
@@ -11462,11 +11462,11 @@
     "values": {
      "today": "18.342525 | AU",
      "m3000": "18.285896 | AU",
-     "m400Myr": "18.583668 | AU",
-     "m2460Myr": "18.002991 | AU",
-     "m4400Myr": "18.366174 | AU",
+     "m400Myr": "18.583676 | AU",
+     "m2460Myr": "18.002992 | AU",
+     "m4400Myr": "18.366191 | AU",
      "genesis": "18.888802 | AU",
-     "p990Myr": "18.393078 | AU"
+     "p990Myr": "18.393166 | AU"
     }
    },
    "uranus#025 Aphelion distance (Q)": {
@@ -11480,11 +11480,11 @@
     "values": {
      "today": "20.177908 | AU",
      "m3000": "20.182168 | AU",
-     "m400Myr": "20.027130 | AU",
-     "m2460Myr": "20.366719 | AU",
-     "m4400Myr": "19.932609 | AU",
+     "m400Myr": "20.027138 | AU",
+     "m2460Myr": "20.366720 | AU",
+     "m4400Myr": "19.932628 | AU",
      "genesis": "19.434799 | AU",
-     "p990Myr": "19.974754 | AU"
+     "p990Myr": "19.974849 | AU"
     }
    },
    "uranus#026 Current distance from Sun (r)": {
@@ -11498,11 +11498,11 @@
     "values": {
      "today": "19.434376 | AU",
      "m3000": "18.468839 | AU",
-     "m400Myr": "18.643404 | AU",
-     "m2460Myr": "19.547523 | AU",
-     "m4400Myr": "18.451000 | AU",
+     "m400Myr": "18.643429 | AU",
+     "m2460Myr": "19.547522 | AU",
+     "m4400Myr": "18.450998 | AU",
      "genesis": "19.359976 | AU",
-     "p990Myr": "19.239330 | AU"
+     "p990Myr": "19.239558 | AU"
     }
    },
    "uranus#027 Semi-latus rectum (p)": {
@@ -11516,11 +11516,11 @@
     "values": {
      "today": "19.216492 | AU",
      "m3000": "19.187294 | AU",
-     "m400Myr": "19.278417 | AU",
-     "m2460Myr": "19.112048 | AU",
-     "m4400Myr": "19.117357 | AU",
+     "m400Myr": "19.278425 | AU",
+     "m2460Myr": "19.112049 | AU",
+     "m4400Myr": "19.117376 | AU",
      "genesis": "19.157911 | AU",
-     "p990Myr": "19.151314 | AU"
+     "p990Myr": "19.151406 | AU"
     }
    },
    "uranus#028 Focal distance (c)": {
@@ -11536,9 +11536,9 @@
      "m3000": "0.948136 | AU",
      "m400Myr": "0.721731 | AU",
      "m2460Myr": "1.181864 | AU",
-     "m4400Myr": "0.783217 | AU",
+     "m4400Myr": "0.783218 | AU",
      "genesis": "0.272999 | AU",
-     "p990Myr": "0.790838 | AU"
+     "p990Myr": "0.790842 | AU"
     }
    },
    "uranus#029 Mean orbital speed": {
@@ -11552,11 +11552,11 @@
     "values": {
      "today": "24,582.09 | km/h",
      "m3000": "24,546.23 | km/h",
-     "m400Myr": "24,633.75 | km/h",
+     "m400Myr": "24,633.76 | km/h",
      "m2460Myr": "24,484.63 | km/h",
-     "m4400Myr": "24,443.77 | km/h",
+     "m4400Myr": "24,443.80 | km/h",
      "genesis": "24,459.69 | km/h",
-     "p990Myr": "24,477.74 | km/h"
+     "p990Myr": "24,477.86 | km/h"
     }
    },
    "uranus#030 Current orbital velocity": {
@@ -11570,11 +11570,11 @@
     "values": {
      "today": "24,212.40 | km/h",
      "m3000": "25,441.76 | km/h",
-     "m400Myr": "25,255.87 | km/h",
+     "m400Myr": "25,255.84 | km/h",
      "m2460Myr": "24,024.55 | km/h",
-     "m4400Myr": "25,418.68 | km/h",
+     "m4400Myr": "25,418.69 | km/h",
      "genesis": "24,247.96 | km/h",
-     "p990Myr": "24,409.14 | km/h"
+     "p990Myr": "24,408.91 | km/h"
     }
    },
    "uranus#031 Radial velocity (vᵣ)": {
@@ -11588,11 +11588,11 @@
     "values": {
      "today": "-1,132.73 | km/h",
      "m3000": "-741.12 | km/h",
-     "m400Myr": "-376.32 | km/h",
+     "m400Myr": "-376.37 | km/h",
      "m2460Myr": "1,408.85 | km/h",
-     "m4400Myr": "-470.89 | km/h",
+     "m4400Myr": "-470.84 | km/h",
      "genesis": "237.62 | km/h",
-     "p990Myr": "-1,003.78 | km/h"
+     "p990Myr": "-1,003.76 | km/h"
     }
    },
    "uranus#032 Transverse velocity (vₜ)": {
@@ -11606,11 +11606,11 @@
     "values": {
      "today": "24,185.91 | km/h",
      "m3000": "25,430.98 | km/h",
-     "m400Myr": "25,253.08 | km/h",
+     "m400Myr": "25,253.05 | km/h",
      "m2460Myr": "23,983.19 | km/h",
-     "m4400Myr": "25,414.32 | km/h",
+     "m4400Myr": "25,414.33 | km/h",
      "genesis": "24,246.80 | km/h",
-     "p990Myr": "24,388.54 | km/h"
+     "p990Myr": "24,388.31 | km/h"
     }
    },
    "uranus#033 Perihelion velocity (vₚ)": {
@@ -11626,9 +11626,9 @@
      "m3000": "25,685.39 | km/h",
      "m400Myr": "25,334.24 | km/h",
      "m2460Myr": "26,040.79 | km/h",
-     "m4400Myr": "25,531.70 | km/h",
+     "m4400Myr": "25,531.68 | km/h",
      "genesis": "24,851.62 | km/h",
-     "p990Myr": "25,510.59 | km/h"
+     "p990Myr": "25,510.53 | km/h"
     }
    },
    "uranus#034 Aphelion velocity (vₐ)": {
@@ -11642,11 +11642,11 @@
     "values": {
      "today": "23,294.67 | km/h",
      "m3000": "23,272.05 | km/h",
-     "m400Myr": "23,508.27 | km/h",
+     "m400Myr": "23,508.26 | km/h",
      "m2460Myr": "23,018.54 | km/h",
-     "m4400Myr": "23,525.25 | km/h",
+     "m4400Myr": "23,525.24 | km/h",
      "genesis": "24,153.44 | km/h",
-     "p990Myr": "23,490.57 | km/h"
+     "p990Myr": "23,490.51 | km/h"
     }
    },
    "uranus#035 Velocity ratio (vₚ/vₐ)": {
@@ -11678,11 +11678,11 @@
     "values": {
      "today": "34,397.37 | km/h",
      "m3000": "35,285.05 | km/h",
-     "m400Myr": "35,120.13 | km/h",
+     "m400Myr": "35,120.10 | km/h",
      "m2460Myr": "34,301.60 | km/h",
      "m4400Myr": "35,309.33 | km/h",
      "genesis": "34,470.50 | km/h",
-     "p990Myr": "34,569.70 | km/h"
+     "p990Myr": "34,569.50 | km/h"
     }
    },
    "uranus#037 Circular velocity (v_circ)": {
@@ -11696,11 +11696,11 @@
     "values": {
      "today": "24,322.62 | km/h",
      "m3000": "24,950.30 | km/h",
-     "m400Myr": "24,833.68 | km/h",
-     "m2460Myr": "24,254.89 | km/h",
+     "m400Myr": "24,833.66 | km/h",
+     "m2460Myr": "24,254.90 | km/h",
      "m4400Myr": "24,967.47 | km/h",
      "genesis": "24,374.33 | km/h",
-     "p990Myr": "24,444.47 | km/h"
+     "p990Myr": "24,444.33 | km/h"
     }
    },
    "uranus#038 Velocity ratio (v/v_circ)": {
@@ -11736,7 +11736,7 @@
      "m2460Myr": "-23.1258 | km²/s²",
      "m4400Myr": "-23.1728 | km²/s²",
      "genesis": "-23.1579 | km²/s²",
-     "p990Myr": "-23.1195 | km²/s²"
+     "p990Myr": "-23.1194 | km²/s²"
     }
    },
    "uranus#040 Specific Angular Momentum (h)": {
@@ -11748,13 +11748,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "19,532,397,645.62 | km²/s",
-     "m3000": "19,517,553,140.36 | km²/s",
-     "m400Myr": "19,563,480,297.81 | km²/s",
-     "m2460Myr": "19,477,017,371.65 | km²/s",
-     "m4400Myr": "19,477,966,525.23 | km²/s",
-     "genesis": "19,498,586,428.16 | km²/s",
-     "p990Myr": "19,500,142,850.19 | km²/s"
+     "today": "19,532,397,645.51 | km²/s",
+     "m3000": "19,517,553,148.76 | km²/s",
+     "m400Myr": "19,563,484,521.41 | km²/s",
+     "m2460Myr": "19,477,017,916.86 | km²/s",
+     "m4400Myr": "19,477,975,864.07 | km²/s",
+     "genesis": "19,498,586,410.32 | km²/s",
+     "p990Myr": "19,500,189,422.33 | km²/s"
     }
    },
    "uranus#041 Area Sweep Rate (dA/dt)": {
@@ -11767,12 +11767,12 @@
     },
     "values": {
      "today": "9,766,198,823 | km²/s",
-     "m3000": "9,758,776,570 | km²/s",
-     "m400Myr": "9,781,740,149 | km²/s",
-     "m2460Myr": "9,738,508,686 | km²/s",
-     "m4400Myr": "9,738,983,263 | km²/s",
-     "genesis": "9,749,293,214 | km²/s",
-     "p990Myr": "9,750,071,425 | km²/s"
+     "m3000": "9,758,776,574 | km²/s",
+     "m400Myr": "9,781,742,261 | km²/s",
+     "m2460Myr": "9,738,508,958 | km²/s",
+     "m4400Myr": "9,738,987,932 | km²/s",
+     "genesis": "9,749,293,205 | km²/s",
+     "p990Myr": "9,750,094,711 | km²/s"
     }
    },
    "uranus#042 Longitude of perihelion (ϖ), ecliptic": {
@@ -11784,13 +11784,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "166.68119971 | degrees (°)",
-     "m3000": "166.52330215 | degrees (°)",
-     "m400Myr": "182.75429887 | degrees (°)",
-     "m2460Myr": "194.25239797 | degrees (°)",
-     "m4400Myr": "357.38695121 | degrees (°)",
+     "today": "166.68119972 | degrees (°)",
+     "m3000": "166.52330146 | degrees (°)",
+     "m400Myr": "182.75429803 | degrees (°)",
+     "m2460Myr": "194.25239794 | degrees (°)",
+     "m4400Myr": "357.38695177 | degrees (°)",
      "genesis": "356.57759095 | degrees (°)",
-     "p990Myr": "66.02157385 | degrees (°)"
+     "p990Myr": "66.02157195 | degrees (°)"
     }
    },
    "uranus#043 Argument of periapsis (ω)": {
@@ -11802,13 +11802,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "92.65074506 | degrees (°)",
-     "m3000": "95.21595160 | degrees (°)",
-     "m400Myr": "61.46807260 | degrees (°)",
-     "m2460Myr": "79.24820456 | degrees (°)",
-     "m4400Myr": "287.49832393 | degrees (°)",
-     "genesis": "261.83723370 | degrees (°)",
-     "p990Myr": "340.32284261 | degrees (°)"
+     "today": "92.65074508 | degrees (°)",
+     "m3000": "95.21595089 | degrees (°)",
+     "m400Myr": "61.46807144 | degrees (°)",
+     "m2460Myr": "79.24820452 | degrees (°)",
+     "m4400Myr": "287.49832459 | degrees (°)",
+     "genesis": "261.83723371 | degrees (°)",
+     "p990Myr": "340.32284256 | degrees (°)"
     }
    },
    "uranus#044 Longitude of ascending node (Ω)": {
@@ -11821,12 +11821,12 @@
     },
     "values": {
      "today": "74.03045465 | degrees (°)",
-     "m3000": "71.30735055 | degrees (°)",
-     "m400Myr": "121.28622627 | degrees (°)",
-     "m2460Myr": "115.00419341 | degrees (°)",
-     "m4400Myr": "69.88862727 | degrees (°)",
-     "genesis": "94.74035725 | degrees (°)",
-     "p990Myr": "85.69873125 | degrees (°)"
+     "m3000": "71.30735057 | degrees (°)",
+     "m400Myr": "121.28622659 | degrees (°)",
+     "m2460Myr": "115.00419342 | degrees (°)",
+     "m4400Myr": "69.88862718 | degrees (°)",
+     "genesis": "94.74035724 | degrees (°)",
+     "p990Myr": "85.69872940 | degrees (°)"
     }
    },
    "uranus#045 Longitude of descending node": {
@@ -11839,12 +11839,12 @@
     },
     "values": {
      "today": "254.03045465 | degrees (°)",
-     "m3000": "251.30735055 | degrees (°)",
-     "m400Myr": "301.28622627 | degrees (°)",
-     "m2460Myr": "295.00419341 | degrees (°)",
-     "m4400Myr": "249.88862727 | degrees (°)",
-     "genesis": "274.74035725 | degrees (°)",
-     "p990Myr": "265.69873125 | degrees (°)"
+     "m3000": "251.30735057 | degrees (°)",
+     "m400Myr": "301.28622659 | degrees (°)",
+     "m2460Myr": "295.00419342 | degrees (°)",
+     "m4400Myr": "249.88862718 | degrees (°)",
+     "genesis": "274.74035724 | degrees (°)",
+     "p990Myr": "265.69872940 | degrees (°)"
     }
    },
    "uranus#046 Ascending Node on Inv. Plane (Ω)": {
@@ -11898,7 +11898,7 @@
      "m2460Myr": "68.6827 | degrees (°)",
      "m4400Myr": "23.2833 | degrees (°)",
      "genesis": "280.6859 | degrees (°)",
-     "p990Myr": "121.7529 | degrees (°)"
+     "p990Myr": "121.7528 | degrees (°)"
     }
    },
    "uranus#049 Height above Invariable Plane": {
@@ -11912,11 +11912,11 @@
     "values": {
      "today": "0.325478 | AU",
      "m3000": "0.051738 | AU",
-     "m400Myr": "0.071863 | AU",
-     "m2460Myr": "0.000771 | AU",
-     "m4400Myr": "-0.025652 | AU",
+     "m400Myr": "0.071846 | AU",
+     "m2460Myr": "0.000772 | AU",
+     "m4400Myr": "-0.025634 | AU",
      "genesis": "0.310431 | AU",
-     "p990Myr": "0.135822 | AU"
+     "p990Myr": "0.135774 | AU"
     }
    },
    "uranus#050 Position relative to Inv. Plane": {
@@ -11970,7 +11970,7 @@
      "m2460Myr": "55,812,592 | km",
      "m4400Myr": "48,680,495 | km",
      "genesis": "54,494,522 | km",
-     "p990Myr": "47,377,386 | km"
+     "p990Myr": "47,377,387 | km"
     }
    },
    "uranus#053 Mean Anomaly (M)": {
@@ -11988,7 +11988,7 @@
      "m2460Myr": "104.51 | degrees (°)",
      "m4400Myr": "334.15 | degrees (°)",
      "genesis": "135.98 | degrees (°)",
-     "p990Myr": "268.34 | degrees (°)"
+     "p990Myr": "268.33 | degrees (°)"
     }
    },
    "uranus#054 Eccentric Anomaly (E)": {
@@ -12002,7 +12002,7 @@
     "values": {
      "today": "259.06 | degrees (°)",
      "m3000": "323.81 | degrees (°)",
-     "m400Myr": "336.53 | degrees (°)",
+     "m400Myr": "336.52 | degrees (°)",
      "m2460Myr": "107.87 | degrees (°)",
      "m4400Myr": "333.09 | degrees (°)",
      "genesis": "136.55 | degrees (°)",
@@ -12020,11 +12020,11 @@
     "values": {
      "today": "256.39 | degrees (°)",
      "m3000": "322.11 | degrees (°)",
-     "m400Myr": "335.66 | degrees (°)",
+     "m400Myr": "335.65 | degrees (°)",
      "m2460Myr": "111.20 | degrees (°)",
      "m4400Myr": "332.01 | degrees (°)",
      "genesis": "137.10 | degrees (°)",
-     "p990Myr": "263.63 | degrees (°)"
+     "p990Myr": "263.62 | degrees (°)"
     }
    },
    "uranus#056 Equation of the Center": {
@@ -12056,11 +12056,11 @@
     "values": {
      "today": "68.4229 | degrees (°)",
      "m3000": "132.0010 | degrees (°)",
-     "m400Myr": "160.1340 | degrees (°)",
-     "m2460Myr": "298.7637 | degrees (°)",
-     "m4400Myr": "331.5348 | degrees (°)",
+     "m400Myr": "160.1307 | degrees (°)",
+     "m2460Myr": "298.7636 | degrees (°)",
+     "m4400Myr": "331.5378 | degrees (°)",
      "genesis": "132.5613 | degrees (°)",
-     "p990Myr": "334.3627 | degrees (°)"
+     "p990Myr": "334.3527 | degrees (°)"
     }
    },
    "uranus#058 True Longitude (λ)": {
@@ -12074,11 +12074,11 @@
     "values": {
      "today": "63.0732 | degrees (°)",
      "m3000": "128.6308 | degrees (°)",
-     "m400Myr": "158.4124 | degrees (°)",
-     "m2460Myr": "305.4532 | degrees (°)",
-     "m4400Myr": "329.3932 | degrees (°)",
+     "m400Myr": "158.4089 | degrees (°)",
+     "m2460Myr": "305.4530 | degrees (°)",
+     "m4400Myr": "329.3965 | degrees (°)",
      "genesis": "133.6813 | degrees (°)",
-     "p990Myr": "329.6531 | degrees (°)"
+     "p990Myr": "329.6432 | degrees (°)"
     }
    },
    "uranus#059 Argument of Latitude (u)": {
@@ -12092,11 +12092,11 @@
     "values": {
      "today": "349.0428 | degrees (°)",
      "m3000": "57.3234 | degrees (°)",
-     "m400Myr": "37.1261 | degrees (°)",
-     "m2460Myr": "190.4490 | degrees (°)",
-     "m4400Myr": "259.5046 | degrees (°)",
+     "m400Myr": "37.1227 | degrees (°)",
+     "m2460Myr": "190.4488 | degrees (°)",
+     "m4400Myr": "259.5078 | degrees (°)",
      "genesis": "38.9409 | degrees (°)",
-     "p990Myr": "243.9543 | degrees (°)"
+     "p990Myr": "243.9445 | degrees (°)"
     }
    },
    "uranus#060 Flight Path Angle (γ)": {
@@ -12110,9 +12110,9 @@
     "values": {
      "today": "-2.6815 | degrees (°)",
      "m3000": "-1.6693 | degrees (°)",
-     "m400Myr": "-0.8537 | degrees (°)",
+     "m400Myr": "-0.8539 | degrees (°)",
      "m2460Myr": "3.3619 | degrees (°)",
-     "m4400Myr": "-1.0615 | degrees (°)",
+     "m4400Myr": "-1.0614 | degrees (°)",
      "genesis": "0.5615 | degrees (°)",
      "p990Myr": "-2.3568 | degrees (°)"
     }
@@ -12128,11 +12128,11 @@
     "values": {
      "today": "0.9596 | degrees (°)",
      "m3000": "0.1605 | degrees (°)",
-     "m400Myr": "0.2209 | degrees (°)",
+     "m400Myr": "0.2208 | degrees (°)",
      "m2460Myr": "0.0023 | degrees (°)",
-     "m4400Myr": "-0.0797 | degrees (°)",
+     "m4400Myr": "-0.0796 | degrees (°)",
      "genesis": "0.9188 | degrees (°)",
-     "p990Myr": "0.4045 | degrees (°)"
+     "p990Myr": "0.4043 | degrees (°)"
     }
    },
    "uranus#062 Phase Angle to Earth (α)": {
@@ -12146,11 +12146,11 @@
     "values": {
      "today": "22.47 | degrees (°)",
      "m3000": "151.52 | degrees (°)",
-     "m400Myr": "32.15 | degrees (°)",
-     "m2460Myr": "70.29 | degrees (°)",
-     "m4400Myr": "78.23 | degrees (°)",
+     "m400Myr": "32.45 | degrees (°)",
+     "m2460Myr": "70.31 | degrees (°)",
+     "m4400Myr": "78.47 | degrees (°)",
      "genesis": "104.32 | degrees (°)",
-     "p990Myr": "162.01 | degrees (°)"
+     "p990Myr": "161.19 | degrees (°)"
     }
    },
    "uranus#063 True Anomaly Rate (dν/dt)": {
@@ -12199,12 +12199,12 @@
     },
     "values": {
      "today": "2,847,316,695 | km",
-     "m3000": "2,985,124,125 | km",
-     "m400Myr": "2,971,385,436 | km",
-     "m2460Myr": "2,815,790,074 | km",
-     "m4400Myr": "2,975,900,154 | km",
-     "genesis": "2,845,315,394 | km",
-     "p990Myr": "2,866,190,184 | km"
+     "m3000": "2,985,124,124 | km",
+     "m400Myr": "2,971,383,023 | km",
+     "m2460Myr": "2,815,790,486 | km",
+     "m4400Myr": "2,975,902,953 | km",
+     "genesis": "2,845,315,390 | km",
+     "p990Myr": "2,866,169,651 | km"
     }
    },
    "uranus#066 Time since perihelion": {
@@ -12218,11 +12218,11 @@
     "values": {
      "today": "22,310.37 | SI days",
      "m3000": "27,745.87 | SI days",
-     "m400Myr": "28,763.55 | SI days",
-     "m2460Myr": "8,906.78 | SI days",
-     "m4400Myr": "28,466.84 | SI days",
+     "m400Myr": "28,763.27 | SI days",
+     "m2460Myr": "8,906.77 | SI days",
+     "m4400Myr": "28,467.09 | SI days",
      "genesis": "11,584.70 | SI days",
-     "p990Myr": "22,881.51 | SI days"
+     "p990Myr": "22,880.66 | SI days"
     }
    },
    "uranus#067 Time to next perihelion": {
@@ -12236,11 +12236,11 @@
     "values": {
      "today": "8,375.35 | SI days",
      "m3000": "2,942.91 | SI days",
-     "m400Myr": "1,928.51 | SI days",
-     "m2460Myr": "21,773.53 | SI days",
-     "m4400Myr": "2,202.41 | SI days",
+     "m400Myr": "1,928.79 | SI days",
+     "m2460Myr": "21,773.54 | SI days",
+     "m4400Myr": "2,202.15 | SI days",
      "genesis": "19,084.36 | SI days",
-     "p990Myr": "7,815.78 | SI days"
+     "p990Myr": "7,816.62 | SI days"
     }
    },
    "uranus#068 Perihelion Precession Duration against Ecliptic": {
@@ -12254,11 +12254,11 @@
     "values": {
      "today": "373,327.80 | years",
      "m3000": "363,388.52 | years",
-     "m400Myr": "271,764.99 | years",
-     "m2460Myr": "407,815.00 | years",
-     "m4400Myr": "451,787.34 | years",
-     "genesis": "479,495.79 | years",
-     "p990Myr": "222,950.08 | years"
+     "m400Myr": "271,765.04 | years",
+     "m2460Myr": "407,814.49 | years",
+     "m4400Myr": "451,782.60 | years",
+     "genesis": "479,495.98 | years",
+     "p990Myr": "222,952.81 | years"
     }
    },
    "uranus#069 Axial Precession Period (derived, of date)": {
@@ -12416,11 +12416,11 @@
     "values": {
      "today": "-2,732.3 | ″/100yr",
      "m3000": "-4,361.1 | ″/100yr",
-     "m400Myr": "-453.7 | ″/100yr",
-     "m2460Myr": "-12,724.5 | ″/100yr",
-     "m4400Myr": "2,096.6 | ″/100yr",
+     "m400Myr": "-453.6 | ″/100yr",
+     "m2460Myr": "-12,724.6 | ″/100yr",
+     "m4400Myr": "2,098.3 | ″/100yr",
      "genesis": "17,140.4 | ″/100yr",
-     "p990Myr": "3,564.0 | ″/100yr"
+     "p990Myr": "3,574.6 | ″/100yr"
     }
    },
    "uranus#078 └ Perihelion rate of date (secular tier, ±1,000 yr)": {
@@ -12830,11 +12830,11 @@
     "values": {
      "today": "30.060838 | AU",
      "m3000": "30.244202 | AU",
-     "m400Myr": "30.201700 | AU",
-     "m2460Myr": "30.125175 | AU",
-     "m4400Myr": "30.011291 | AU",
+     "m400Myr": "30.201735 | AU",
+     "m2460Myr": "30.125178 | AU",
+     "m4400Myr": "30.011320 | AU",
      "genesis": "30.265324 | AU",
-     "p990Myr": "30.231919 | AU"
+     "p990Myr": "30.231814 | AU"
     }
    },
    "neptune#022 Semi-major axis (km)": {
@@ -12846,13 +12846,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "4,497,037,359.02 | km",
-     "m3000": "4,524,468,283.65 | km",
-     "m400Myr": "4,517,941,929.20 | km",
-     "m2460Myr": "4,505,631,420.98 | km",
-     "m4400Myr": "4,487,789,195.70 | km",
-     "genesis": "4,525,763,315.60 | km",
-     "p990Myr": "4,523,047,105.12 | km"
+     "today": "4,497,037,358.97 | km",
+     "m3000": "4,524,468,286.65 | km",
+     "m400Myr": "4,517,947,165.37 | km",
+     "m2460Myr": "4,505,631,799.56 | km",
+     "m4400Myr": "4,487,793,590.64 | km",
+     "genesis": "4,525,763,310.49 | km",
+     "p990Myr": "4,523,031,402.78 | km"
     }
    },
    "neptune#023 Semi-minor axis (b)": {
@@ -12866,11 +12866,11 @@
     "values": {
      "today": "30.059422 | AU",
      "m3000": "30.243856 | AU",
-     "m400Myr": "30.201510 | AU",
-     "m2460Myr": "30.125141 | AU",
-     "m4400Myr": "30.009805 | AU",
+     "m400Myr": "30.201545 | AU",
+     "m2460Myr": "30.125144 | AU",
+     "m4400Myr": "30.009834 | AU",
      "genesis": "30.263776 | AU",
-     "p990Myr": "30.230831 | AU"
+     "p990Myr": "30.230726 | AU"
     }
    },
    "neptune#024 Perihelion distance (q)": {
@@ -12884,11 +12884,11 @@
     "values": {
      "today": "29.769115 | AU",
      "m3000": "30.099383 | AU",
-     "m400Myr": "30.094537 | AU",
-     "m2460Myr": "30.079783 | AU",
-     "m4400Myr": "29.712608 | AU",
+     "m400Myr": "30.094572 | AU",
+     "m2460Myr": "30.079786 | AU",
+     "m4400Myr": "29.712637 | AU",
      "genesis": "29.959224 | AU",
-     "p990Myr": "29.975469 | AU"
+     "p990Myr": "29.975364 | AU"
     }
    },
    "neptune#025 Aphelion distance (Q)": {
@@ -12902,11 +12902,11 @@
     "values": {
      "today": "30.352561 | AU",
      "m3000": "30.389021 | AU",
-     "m400Myr": "30.308862 | AU",
-     "m2460Myr": "30.170567 | AU",
-     "m4400Myr": "30.309974 | AU",
+     "m400Myr": "30.308897 | AU",
+     "m2460Myr": "30.170570 | AU",
+     "m4400Myr": "30.310004 | AU",
      "genesis": "30.571424 | AU",
-     "p990Myr": "30.488369 | AU"
+     "p990Myr": "30.488264 | AU"
     }
    },
    "neptune#026 Current distance from Sun (r)": {
@@ -12920,11 +12920,11 @@
     "values": {
      "today": "29.876508 | AU",
      "m3000": "30.244636 | AU",
-     "m400Myr": "30.102691 | AU",
-     "m2460Myr": "30.139543 | AU",
-     "m4400Myr": "30.200218 | AU",
+     "m400Myr": "30.102727 | AU",
+     "m2460Myr": "30.139545 | AU",
+     "m4400Myr": "30.200254 | AU",
      "genesis": "30.249402 | AU",
-     "p990Myr": "30.008599 | AU"
+     "p990Myr": "30.008505 | AU"
     }
    },
    "neptune#027 Semi-latus rectum (p)": {
@@ -12938,11 +12938,11 @@
     "values": {
      "today": "30.058007 | AU",
      "m3000": "30.243509 | AU",
-     "m400Myr": "30.201320 | AU",
-     "m2460Myr": "30.125107 | AU",
-     "m4400Myr": "30.008318 | AU",
+     "m400Myr": "30.201355 | AU",
+     "m2460Myr": "30.125109 | AU",
+     "m4400Myr": "30.008348 | AU",
      "genesis": "30.262228 | AU",
-     "p990Myr": "30.229744 | AU"
+     "p990Myr": "30.229639 | AU"
     }
    },
    "neptune#028 Focal distance (c)": {
@@ -12974,11 +12974,11 @@
     "values": {
      "today": "19,560.21 | km/h",
      "m3000": "19,682.14 | km/h",
-     "m400Myr": "19,660.02 | km/h",
+     "m400Myr": "19,660.04 | km/h",
      "m2460Myr": "19,613.96 | km/h",
-     "m4400Myr": "19,543.34 | km/h",
+     "m4400Myr": "19,543.36 | km/h",
      "genesis": "19,708.82 | km/h",
-     "p990Myr": "19,674.94 | km/h"
+     "p990Myr": "19,674.87 | km/h"
     }
    },
    "neptune#030 Current orbital velocity": {
@@ -12992,11 +12992,11 @@
     "values": {
      "today": "19,676.97 | km/h",
      "m3000": "19,497.02 | km/h",
-     "m400Myr": "19,575.45 | km/h",
+     "m400Myr": "19,575.44 | km/h",
      "m2460Myr": "19,528.70 | km/h",
-     "m4400Myr": "19,453.96 | km/h",
+     "m4400Myr": "19,453.95 | km/h",
      "genesis": "19,504.77 | km/h",
-     "p990Myr": "19,644.95 | km/h"
+     "p990Myr": "19,644.98 | km/h"
     }
    },
    "neptune#031 Radial velocity (vᵣ)": {
@@ -13010,11 +13010,11 @@
     "values": {
      "today": "-148.00 | km/h",
      "m3000": "93.36 | km/h",
-     "m400Myr": "-26.54 | km/h",
+     "m400Myr": "-26.55 | km/h",
      "m2460Myr": "27.92 | km/h",
-     "m4400Myr": "149.96 | km/h",
+     "m4400Myr": "149.95 | km/h",
      "genesis": "-197.00 | km/h",
-     "p990Myr": "-81.95 | km/h"
+     "p990Myr": "-81.97 | km/h"
     }
    },
    "neptune#032 Transverse velocity (vₜ)": {
@@ -13028,11 +13028,11 @@
     "values": {
      "today": "19,676.41 | km/h",
      "m3000": "19,496.80 | km/h",
-     "m400Myr": "19,575.44 | km/h",
+     "m400Myr": "19,575.43 | km/h",
      "m2460Myr": "19,528.70 | km/h",
-     "m4400Myr": "19,453.38 | km/h",
+     "m4400Myr": "19,453.37 | km/h",
      "genesis": "19,503.78 | km/h",
-     "p990Myr": "19,644.76 | km/h"
+     "p990Myr": "19,644.79 | km/h"
     }
    },
    "neptune#033 Perihelion velocity (vₚ)": {
@@ -13046,11 +13046,11 @@
     "values": {
      "today": "19,747.39 | km/h",
      "m3000": "19,590.89 | km/h",
-     "m400Myr": "19,580.73 | km/h",
+     "m400Myr": "19,580.72 | km/h",
      "m2460Myr": "19,567.48 | km/h",
-     "m4400Myr": "19,772.63 | km/h",
+     "m4400Myr": "19,772.62 | km/h",
      "genesis": "19,692.69 | km/h",
-     "p990Myr": "19,666.49 | km/h"
+     "p990Myr": "19,666.52 | km/h"
     }
    },
    "neptune#034 Aphelion velocity (vₐ)": {
@@ -13064,11 +13064,11 @@
     "values": {
      "today": "19,367.80 | km/h",
      "m3000": "19,404.17 | km/h",
-     "m400Myr": "19,442.27 | km/h",
+     "m400Myr": "19,442.26 | km/h",
      "m2460Myr": "19,508.60 | km/h",
-     "m4400Myr": "19,382.94 | km/h",
+     "m4400Myr": "19,382.93 | km/h",
      "genesis": "19,298.33 | km/h",
-     "p990Myr": "19,335.64 | km/h"
+     "p990Myr": "19,335.68 | km/h"
     }
    },
    "neptune#035 Velocity ratio (vₚ/vₐ)": {
@@ -13100,11 +13100,11 @@
     "values": {
      "today": "27,742.51 | km/h",
      "m3000": "27,573.15 | km/h",
-     "m400Myr": "27,638.60 | km/h",
+     "m400Myr": "27,638.58 | km/h",
      "m2460Myr": "27,624.34 | km/h",
-     "m4400Myr": "27,599.07 | km/h",
+     "m4400Myr": "27,599.05 | km/h",
      "genesis": "27,576.66 | km/h",
-     "p990Myr": "27,680.11 | km/h"
+     "p990Myr": "27,680.15 | km/h"
     }
    },
    "neptune#037 Circular velocity (v_circ)": {
@@ -13118,11 +13118,11 @@
     "values": {
      "today": "19,616.91 | km/h",
      "m3000": "19,497.16 | km/h",
-     "m400Myr": "19,543.44 | km/h",
+     "m400Myr": "19,543.43 | km/h",
      "m2460Myr": "19,533.36 | km/h",
-     "m4400Myr": "19,515.49 | km/h",
+     "m4400Myr": "19,515.47 | km/h",
      "genesis": "19,499.64 | km/h",
-     "p990Myr": "19,572.79 | km/h"
+     "p990Myr": "19,572.82 | km/h"
     }
    },
    "neptune#038 Velocity ratio (v/v_circ)": {
@@ -13154,7 +13154,7 @@
     "values": {
      "today": "-14.7555 | km²/s²",
      "m3000": "-14.6661 | km²/s²",
-     "m400Myr": "-14.6873 | km²/s²",
+     "m400Myr": "-14.6872 | km²/s²",
      "m2460Myr": "-14.7274 | km²/s²",
      "m4400Myr": "-14.7859 | km²/s²",
      "genesis": "-14.6619 | km²/s²",
@@ -13170,13 +13170,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "24,428,601,112.59 | km²/s",
-     "m3000": "24,503,865,311.38 | km²/s",
-     "m400Myr": "24,486,312,611.01 | km²/s",
-     "m2460Myr": "24,453,055,820.88 | km²/s",
-     "m4400Myr": "24,403,409,990.25 | km²/s",
-     "genesis": "24,506,399,386.33 | km²/s",
-     "p990Myr": "24,499,415,929.21 | km²/s"
+     "today": "24,428,601,112.44 | km²/s",
+     "m3000": "24,503,865,319.44 | km²/s",
+     "m400Myr": "24,486,326,800.48 | km²/s",
+     "m2460Myr": "24,453,056,848.18 | km²/s",
+     "m4400Myr": "24,403,421,939.51 | km²/s",
+     "genesis": "24,506,399,372.48 | km²/s",
+     "p990Myr": "24,499,373,402.72 | km²/s"
     }
    },
    "neptune#041 Area Sweep Rate (dA/dt)": {
@@ -13189,12 +13189,12 @@
     },
     "values": {
      "today": "12,214,300,556 | km²/s",
-     "m3000": "12,251,932,656 | km²/s",
-     "m400Myr": "12,243,156,306 | km²/s",
-     "m2460Myr": "12,226,527,910 | km²/s",
-     "m4400Myr": "12,201,704,995 | km²/s",
-     "genesis": "12,253,199,693 | km²/s",
-     "p990Myr": "12,249,707,965 | km²/s"
+     "m3000": "12,251,932,660 | km²/s",
+     "m400Myr": "12,243,163,400 | km²/s",
+     "m2460Myr": "12,226,528,424 | km²/s",
+     "m4400Myr": "12,201,710,970 | km²/s",
+     "genesis": "12,253,199,686 | km²/s",
+     "p990Myr": "12,249,686,701 | km²/s"
     }
    },
    "neptune#042 Longitude of perihelion (ϖ), ecliptic": {
@@ -13206,13 +13206,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "54.12649791 | degrees (°)",
-     "m3000": "92.76226614 | degrees (°)",
-     "m400Myr": "122.56723887 | degrees (°)",
-     "m2460Myr": "251.96639885 | degrees (°)",
-     "m4400Myr": "221.89566780 | degrees (°)",
+     "today": "54.12649795 | degrees (°)",
+     "m3000": "92.76227415 | degrees (°)",
+     "m400Myr": "122.56723910 | degrees (°)",
+     "m2460Myr": "251.96639890 | degrees (°)",
+     "m4400Myr": "221.89566812 | degrees (°)",
      "genesis": "91.66879282 | degrees (°)",
-     "p990Myr": "231.95924289 | degrees (°)"
+     "p990Myr": "231.95924168 | degrees (°)"
     }
    },
    "neptune#043 Argument of periapsis (ω)": {
@@ -13224,13 +13224,13 @@
      "hoverAtJ2000": false
     },
     "values": {
-     "today": "282.31426052 | degrees (°)",
-     "m3000": "320.64009914 | degrees (°)",
-     "m400Myr": "43.10918647 | degrees (°)",
-     "m2460Myr": "170.69748072 | degrees (°)",
-     "m4400Myr": "98.41339120 | degrees (°)",
+     "today": "282.31426056 | degrees (°)",
+     "m3000": "320.64010716 | degrees (°)",
+     "m400Myr": "43.10918669 | degrees (°)",
+     "m2460Myr": "170.69748077 | degrees (°)",
+     "m4400Myr": "98.41339159 | degrees (°)",
      "genesis": "355.94843900 | degrees (°)",
-     "p990Myr": "133.61565652 | degrees (°)"
+     "p990Myr": "133.61565508 | degrees (°)"
     }
    },
    "neptune#044 Longitude of ascending node (Ω)": {
@@ -13243,12 +13243,12 @@
     },
     "values": {
      "today": "131.81223739 | degrees (°)",
-     "m3000": "132.12216700 | degrees (°)",
+     "m3000": "132.12216699 | degrees (°)",
      "m400Myr": "79.45805240 | degrees (°)",
      "m2460Myr": "81.26891813 | degrees (°)",
-     "m4400Myr": "123.48227660 | degrees (°)",
+     "m4400Myr": "123.48227653 | degrees (°)",
      "genesis": "95.72035382 | degrees (°)",
-     "p990Myr": "98.34358637 | degrees (°)"
+     "p990Myr": "98.34358660 | degrees (°)"
     }
    },
    "neptune#045 Longitude of descending node": {
@@ -13261,12 +13261,12 @@
     },
     "values": {
      "today": "311.81223739 | degrees (°)",
-     "m3000": "312.12216700 | degrees (°)",
+     "m3000": "312.12216699 | degrees (°)",
      "m400Myr": "259.45805240 | degrees (°)",
      "m2460Myr": "261.26891813 | degrees (°)",
-     "m4400Myr": "303.48227660 | degrees (°)",
+     "m4400Myr": "303.48227653 | degrees (°)",
      "genesis": "275.72035382 | degrees (°)",
-     "p990Myr": "278.34358637 | degrees (°)"
+     "p990Myr": "278.34358660 | degrees (°)"
     }
    },
    "neptune#046 Ascending Node on Inv. Plane (Ω)": {
@@ -13334,11 +13334,11 @@
     "values": {
      "today": "0.077718 | AU",
      "m3000": "-0.086411 | AU",
-     "m400Myr": "0.393682 | AU",
-     "m2460Myr": "0.029572 | AU",
-     "m4400Myr": "-0.108465 | AU",
+     "m400Myr": "0.393685 | AU",
+     "m2460Myr": "0.029571 | AU",
+     "m4400Myr": "-0.108476 | AU",
      "genesis": "-0.217538 | AU",
-     "p990Myr": "0.324131 | AU"
+     "p990Myr": "0.324148 | AU"
     }
    },
    "neptune#050 Position relative to Inv. Plane": {
@@ -13478,11 +13478,11 @@
     "values": {
      "today": "3.7463 | degrees (°)",
      "m3000": "182.6605 | degrees (°)",
-     "m400Myr": "100.1774 | degrees (°)",
+     "m400Myr": "100.1757 | degrees (°)",
      "m2460Myr": "0.3032 | degrees (°)",
-     "m4400Myr": "350.6932 | degrees (°)",
+     "m4400Myr": "350.6948 | degrees (°)",
      "genesis": "5.2302 | degrees (°)",
-     "p990Myr": "202.7405 | degrees (°)"
+     "p990Myr": "202.7356 | degrees (°)"
     }
    },
    "neptune#058 True Longitude (λ)": {
@@ -13496,11 +13496,11 @@
     "values": {
      "today": "2.8831 | degrees (°)",
      "m3000": "183.2092 | degrees (°)",
-     "m400Myr": "100.0219 | degrees (°)",
+     "m400Myr": "100.0201 | degrees (°)",
      "m2460Myr": "0.4670 | degrees (°)",
-     "m4400Myr": "351.5751 | degrees (°)",
+     "m4400Myr": "351.5767 | degrees (°)",
      "genesis": "4.0726 | degrees (°)",
-     "p990Myr": "202.2616 | degrees (°)"
+     "p990Myr": "202.2566 | degrees (°)"
     }
    },
    "neptune#059 Argument of Latitude (u)": {
@@ -13514,11 +13514,11 @@
     "values": {
      "today": "231.0708 | degrees (°)",
      "m3000": "51.0870 | degrees (°)",
-     "m400Myr": "20.5638 | degrees (°)",
+     "m400Myr": "20.5621 | degrees (°)",
      "m2460Myr": "279.1981 | degrees (°)",
-     "m4400Myr": "228.0929 | degrees (°)",
+     "m4400Myr": "228.0945 | degrees (°)",
      "genesis": "268.3523 | degrees (°)",
-     "p990Myr": "103.9180 | degrees (°)"
+     "p990Myr": "103.9130 | degrees (°)"
     }
    },
    "neptune#060 Flight Path Angle (γ)": {
@@ -13536,7 +13536,7 @@
      "m2460Myr": "0.0819 | degrees (°)",
      "m4400Myr": "0.4417 | degrees (°)",
      "genesis": "-0.5787 | degrees (°)",
-     "p990Myr": "-0.2390 | degrees (°)"
+     "p990Myr": "-0.2391 | degrees (°)"
     }
    },
    "neptune#061 Heliocentric Latitude (β)": {
@@ -13568,11 +13568,11 @@
     "values": {
      "today": "37.72 | degrees (°)",
      "m3000": "153.90 | degrees (°)",
-     "m400Myr": "26.24 | degrees (°)",
-     "m2460Myr": "125.31 | degrees (°)",
-     "m4400Myr": "56.04 | degrees (°)",
+     "m400Myr": "25.94 | degrees (°)",
+     "m2460Myr": "125.32 | degrees (°)",
+     "m4400Myr": "56.29 | degrees (°)",
      "genesis": "126.07 | degrees (°)",
-     "p990Myr": "70.60 | degrees (°)"
+     "p990Myr": "71.42 | degrees (°)"
     }
    },
    "neptune#063 True Anomaly Rate (dν/dt)": {
@@ -13621,12 +13621,12 @@
     },
     "values": {
      "today": "4,530,757,353 | km",
-     "m3000": "4,503,324,131 | km",
-     "m400Myr": "4,517,986,286 | km",
-     "m2460Myr": "4,500,261,650 | km",
-     "m4400Myr": "4,472,949,249 | km",
-     "genesis": "4,503,724,001 | km",
-     "p990Myr": "4,536,834,294 | km"
+     "m3000": "4,503,324,135 | km",
+     "m400Myr": "4,517,986,100 | km",
+     "m2460Myr": "4,500,261,658 | km",
+     "m4400Myr": "4,472,948,262 | km",
+     "genesis": "4,503,724,002 | km",
+     "p990Myr": "4,536,832,703 | km"
     }
    },
    "neptune#066 Time since perihelion": {
@@ -13639,12 +13639,12 @@
     },
     "values": {
      "today": "51,766.37 | SI days",
-     "m3000": "15,028.40 | SI days",
-     "m400Myr": "56,420.69 | SI days",
-     "m2460Myr": "18,098.09 | SI days",
-     "m4400Myr": "21,508.37 | SI days",
+     "m3000": "15,028.39 | SI days",
+     "m400Myr": "56,420.39 | SI days",
+     "m2460Myr": "18,098.08 | SI days",
+     "m4400Myr": "21,508.64 | SI days",
      "genesis": "45,682.74 | SI days",
-     "p990Myr": "55,299.96 | SI days"
+     "p990Myr": "55,299.15 | SI days"
     }
    },
    "neptune#067 Time to next perihelion": {
@@ -13658,11 +13658,11 @@
     "values": {
      "today": "8,423.23 | SI days",
      "m3000": "45,153.23 | SI days",
-     "m400Myr": "3,741.74 | SI days",
-     "m2460Myr": "42,041.30 | SI days",
-     "m4400Myr": "38,609.33 | SI days",
+     "m400Myr": "3,742.03 | SI days",
+     "m2460Myr": "42,041.31 | SI days",
+     "m4400Myr": "38,609.06 | SI days",
      "genesis": "14,434.61 | SI days",
-     "p990Myr": "4,884.79 | SI days"
+     "p990Myr": "4,885.60 | SI days"
     }
    },
    "neptune#068 Perihelion Precession Duration against Ecliptic": {
@@ -13676,11 +13676,11 @@
     "values": {
      "today": "1,287,409.90 | years",
      "m3000": "2,924,105.35 | years",
-     "m400Myr": "1,219,291.99 | years",
-     "m2460Myr": "1,180,286.94 | years",
-     "m4400Myr": "2,849,628.63 | years",
-     "genesis": "1,607,760.63 | years",
-     "p990Myr": "1,163,507.07 | years"
+     "m400Myr": "1,219,292.09 | years",
+     "m2460Myr": "1,180,284.80 | years",
+     "m4400Myr": "2,849,630.43 | years",
+     "genesis": "1,607,761.25 | years",
+     "p990Myr": "1,163,506.77 | years"
     }
    },
    "neptune#069 Axial Precession Period (derived, of date)": {
@@ -13838,11 +13838,11 @@
     "values": {
      "today": "-15,974.9 | ″/100yr",
      "m3000": "49,030.9 | ″/100yr",
-     "m400Myr": "-27,768.8 | ″/100yr",
-     "m2460Myr": "25,197.4 | ″/100yr",
-     "m4400Myr": "-17,637.4 | ″/100yr",
-     "genesis": "-6,334.7 | ″/100yr",
-     "p990Myr": "43,574.3 | ″/100yr"
+     "m400Myr": "-27,769.7 | ″/100yr",
+     "m2460Myr": "25,197.8 | ″/100yr",
+     "m4400Myr": "-17,639.1 | ″/100yr",
+     "genesis": "-6,334.6 | ″/100yr",
+     "p990Myr": "43,579.4 | ″/100yr"
     }
    },
    "neptune#078 └ Perihelion rate of date (secular tier, ±1,000 yr)": {
@@ -13866,88 +13866,88 @@
   },
   "predictions": {
    "lodReal": {
-    "today": 86400.00120476236,
-    "m3000": 86399.91890730681,
-    "m400Myr": 78260.4276692232,
-    "m2460Myr": 60645.30672565777,
-    "m4400Myr": 29369.030554786426,
-    "genesis": 19834.899713329567,
-    "p990Myr": 113314.21231346176
+    "today": 86400.00120476494,
+    "m3000": 86399.91890708034,
+    "m400Myr": 78260.42766922017,
+    "m2460Myr": 60645.3067256576,
+    "m4400Myr": 29369.03055484871,
+    "genesis": 19834.899713330415,
+    "p990Myr": 113314.21231338984
    },
    "siderealDayReal": {
-    "today": 86164.09172999888,
-    "m3000": 86164.0100581524,
-    "m400Myr": 78066.80781359815,
-    "m2460Myr": 60528.925266177925,
-    "m4400Myr": 29341.66235938955,
-    "genesis": 19822.42447473152,
-    "p990Myr": 112908.86117720816
+    "today": 86164.09173000146,
+    "m3000": 86164.01005792717,
+    "m400Myr": 78066.80781359514,
+    "m2460Myr": 60528.925266177765,
+    "m4400Myr": 29341.66235945172,
+    "genesis": 19822.42447473237,
+    "p990Myr": 112908.86117713677
    },
    "stellarDayReal": {
-    "today": 86164.10010579438,
-    "m3000": 86164.01839643445,
-    "m400Myr": 78066.81615677505,
-    "m2460Myr": 60528.93423249416,
-    "m4400Myr": 29341.698758208895,
-    "genesis": 19822.430175842797,
-    "p990Myr": 112908.8701359961
+    "today": 86164.10010579696,
+    "m3000": 86164.01839620921,
+    "m400Myr": 78066.81615677204,
+    "m2460Myr": 60528.934232494,
+    "m4400Myr": 29341.698758271064,
+    "genesis": 19822.430175843645,
+    "p990Myr": 112908.87013592469
    },
    "solarYearSeconds": {
-    "today": 31556925.116057005,
+    "today": 31556925.116057012,
     "m3000": 31556948.831877876,
-    "m400Myr": 31554314.233632065,
+    "m400Myr": 31554314.233632058,
     "m2460Myr": 31541065.51806559,
-    "m4400Myr": 31486773.821394593,
+    "m4400Myr": 31486773.821394973,
     "genesis": 31516495.531632803,
-    "p990Myr": 31563199.219704308
+    "p990Myr": 31563199.21970429
    },
    "solarYearDays": {
-    "today": 365.2421888432524,
+    "today": 365.24218884325245,
     "m3000": 365.24246333191985,
-    "m400Myr": 365.2119702966674,
+    "m400Myr": 365.21197029666735,
     "m2460Myr": 365.0586286813147,
-    "m4400Myr": 364.43025256243743,
+    "m4400Myr": 364.4302525624418,
     "genesis": 364.77425383834264,
-    "p990Myr": 365.31480578361464
+    "p990Myr": 365.3148057836145
    },
    "solarYearLodDays": {
-    "today": 365.24218375031217,
-    "m3000": 365.2428061388969,
-    "m400Myr": 403.19629183474495,
-    "m2460Myr": 520.0907905495219,
-    "m4400Myr": 1072.1080412462925,
-    "genesis": 1588.9415115344848,
-    "p990Myr": 278.54581146794584
+    "today": 365.24218375030136,
+    "m3000": 365.2428061398543,
+    "m400Myr": 403.1962918347605,
+    "m2460Myr": 520.0907905495234,
+    "m4400Myr": 1072.108041244032,
+    "genesis": 1588.941511534417,
+    "p990Myr": 278.54581146812245
    },
    "siderealYearSeconds": {
     "today": 31558149.766274318,
     "m3000": 31558149.252389245,
-    "m400Myr": 31555802.228467904,
+    "m400Myr": 31555802.228467897,
     "m2460Myr": 31543716.858998507,
     "m4400Myr": 31532343.672053088,
     "genesis": 31532160.014833216,
-    "p990Myr": 31563961.10779379
+    "p990Myr": 31563961.107793774
    },
    "siderealYearDays": {
     "today": 365.2563630355824,
     "m3000": 365.25635708783847,
-    "m400Myr": 365.22919245911925,
+    "m400Myr": 365.2291924591192,
     "m2460Myr": 365.0893154976679,
     "m4400Myr": 364.9576813895033,
     "genesis": 364.9555557272363,
-    "p990Myr": 365.3236239327985
+    "p990Myr": 365.32362393279834
    },
    "siderealYearLodDays": {
-    "today": 365.25635794244454,
-    "m3000": 365.2566999078559,
-    "m400Myr": 403.21530520944987,
-    "m2460Myr": 520.1345093643168,
-    "m4400Myr": 1073.6596706258692,
-    "genesis": 1589.7312550384506,
-    "p990Myr": 278.55253514429614
+    "today": 365.2563579424336,
+    "m3000": 365.25669990881323,
+    "m400Myr": 403.2153052094653,
+    "m2460Myr": 520.1345093643182,
+    "m4400Myr": 1073.6596706235925,
+    "genesis": 1589.7312550383826,
+    "p990Myr": 278.55253514447276
    },
    "anomalisticYearSeconds": {
-    "today": 31558432.683882806,
+    "today": 31558432.683882814,
     "m3000": 31558417.782668117,
     "m400Myr": null,
     "m2460Myr": null,
@@ -13956,7 +13956,7 @@
     "p990Myr": null
    },
    "anomalisticYearDays": {
-    "today": 365.2596375449399,
+    "today": 365.25963754493995,
     "m3000": 365.2594650771773,
     "m400Myr": null,
     "m2460Myr": null,
@@ -13965,8 +13965,8 @@
     "p990Myr": null
    },
    "anomalisticYearLodDays": {
-    "today": 365.2596324517564,
-    "m3000": 365.25980790011175,
+    "today": 365.2596324517456,
+    "m3000": 365.25980790106917,
     "m400Myr": null,
     "m2460Myr": null,
     "m4400Myr": null,
@@ -13974,16 +13974,16 @@
     "p990Myr": null
    },
    "axialPrecession": {
-    "today": 25768.561850914488,
+    "today": 25768.561851071267,
     "m3000": 26288.702812111525,
-    "m400Myr": 21204.721835852553,
-    "m2460Myr": 11891.035673587105,
-    "m4400Myr": 690.4032758664571,
-    "genesis": 2010.349672812613,
-    "p990Myr": 41435.95597642896
+    "m400Myr": 21204.72183585088,
+    "m2460Myr": 11891.035673587006,
+    "m4400Myr": 690.4032758721784,
+    "genesis": 2010.3496728125529,
+    "p990Myr": 41435.955976384
    },
    "perihelionPrecession": {
-    "today": 20932.8941902504,
+    "today": 20932.89419025041,
     "m3000": 21483.20202917515,
     "m400Myr": null,
     "m2460Myr": null,
@@ -13992,7 +13992,7 @@
     "p990Myr": null
    },
    "inclinationPrecession": {
-    "today": 111548.31483726033,
+    "today": 111548.31483432277,
     "m3000": 117524.79899762718,
     "m400Myr": null,
     "m2460Myr": null,
@@ -14001,25 +14001,25 @@
     "p990Myr": null
    },
    "eclipticPrecession": {
-    "today": -79525.39252390961,
-    "m3000": -85027.46107539766,
-    "m400Myr": -583563.6586634839,
-    "m2460Myr": -91015.91548679759,
-    "m4400Myr": -882999.5040793895,
-    "genesis": -1255938.4959659723,
-    "p990Myr": -189836.66569351056
+    "today": -79525.39252219202,
+    "m3000": -85027.46107067163,
+    "m400Myr": -583563.8311213654,
+    "m2460Myr": -91015.6886838839,
+    "m4400Myr": -882995.6306923144,
+    "genesis": -1255930.1585778706,
+    "p990Myr": -189836.6899601018
    },
    "lunisolarMeanPeriod": {
-    "today": 25768.561850914488,
+    "today": 25768.561851071267,
     "m3000": 26288.702812111525,
-    "m400Myr": 21204.721835852553,
-    "m2460Myr": 11891.035673587105,
-    "m4400Myr": 690.4032758664571,
-    "genesis": 2010.349672812613,
-    "p990Myr": 41435.95597642896
+    "m400Myr": 21204.72183585088,
+    "m2460Myr": 11891.035673587006,
+    "m4400Myr": 690.4032758721784,
+    "genesis": 2010.3496728125529,
+    "p990Myr": 41435.955976384
    },
    "lunisolarApsidalPeriod": {
-    "today": 111548.31483726033,
+    "today": 111548.31483432277,
     "m3000": 117524.79899762718,
     "m400Myr": null,
     "m2460Myr": null,
@@ -14028,13 +14028,13 @@
     "p990Myr": null
    },
    "deltaTCorrectionSeconds": {
-    "today": 67.6521818484451,
-    "m3000": 73678.54056468436,
-    "m400Myr": 632091257258209.2,
-    "m2460Myr": 19358399623577940,
-    "m4400Myr": 71469165029182120,
-    "genesis": 73693690317979550,
-    "p990Myr": 3739582822288146.5
+    "today": 67.64701376105423,
+    "m3000": 73678.70248550504,
+    "m400Myr": 632091257260735.2,
+    "m2460Myr": 19358399623578388,
+    "m4400Myr": 71469165029138696,
+    "genesis": 73693690317979460,
+    "p990Myr": 3739582822270430.5
    },
    "lengthofAU": {
     "today": 149597870.69919458,
@@ -14043,25 +14043,25 @@
     "m2460Myr": 149563658.0037402,
     "m4400Myr": 149536692.74779722,
     "genesis": 149536257.26584363,
-    "p990Myr": 149611644.36052608
+    "p990Myr": 149611644.36052606
    },
    "longitudePerihelion": {
-    "today": 103.39856731004323,
-    "m3000": 18.08954623602068,
-    "m400Myr": 105.08921649950793,
-    "m2460Myr": 357.4160814128643,
-    "m4400Myr": 94.09727946619637,
-    "genesis": 105.41741332629465,
-    "p990Myr": 287.4168768805632
+    "today": 103.39856731015999,
+    "m3000": 18.08954622766305,
+    "m400Myr": 105.08920266858308,
+    "m2460Myr": 357.4160802704656,
+    "m4400Myr": 94.09727605161208,
+    "genesis": 105.417413489885,
+    "p990Myr": 287.4168495215547
    },
    "earthInvPlaneInclinationDynamic": {
-    "today": 1.5770101618357748,
-    "m3000": 1.8247963486387857,
-    "m400Myr": 0.6441807846268968,
-    "m2460Myr": 0.9192517642491213,
-    "m4400Myr": 0.9562061871600626,
+    "today": 1.5770101618355437,
+    "m3000": 1.8247963486639558,
+    "m400Myr": 0.6441808407919443,
+    "m2460Myr": 0.9192517621262776,
+    "m4400Myr": 0.956206171847511,
     "genesis": 0.8999022971754467,
-    "p990Myr": 1.134566054899694
+    "p990Myr": 1.134566100829643
    }
   }
  }

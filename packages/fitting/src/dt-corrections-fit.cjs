@@ -126,6 +126,25 @@ if (WRITE && process.env.DT_CORRECTIONS_DISABLED !== '1') {
   process.exit(1);
 }
 
+// ─── Guard: the generated constants must equal their JSON sources ───
+// The residual runs through the deep-time chain, which reads the climate coefficients (the
+// GIA α channel) and every other input through the GENERATED embeds in
+// packages/physics/src/constants/, while this artifact stamps the JSON sources. A re-close on
+// a stale embed fits physics the stamp cannot see: the 2026-11-12 close ran on an intermediate
+// embed and did not reproduce from its own commit, every declared input verifying (1e-8
+// relative; doc 111 §1.53). The generator's check mode is the gate (exit 1 if stale): REFUSE
+// to write on a stale embed, warn on a diagnostic run.
+{
+  const { spawnSync } = require('child_process');
+  const check = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'constants', 'generate.mjs')], { encoding: 'utf8' });
+  if (check.status !== 0) {
+    const why = ' the generated constants are STALE relative to their JSON sources — the chain this fit runs'
+              + ' through reads the EMBED, the artifact stamps the JSON. Run `npm run constants:generate` first.';
+    if (WRITE) { console.log('✗ REFUSING TO WRITE:' + why); process.exit(1); }
+    console.log('⚠ WARNING:' + why + ' (diagnostic run continues on the stale embed)');
+  }
+}
+
 const DT = require(path.join(TOOLS_LIB, 'deep-time.js'));
 const C = require(path.join(TOOLS_LIB, 'constants.js'));
 
@@ -410,10 +429,32 @@ function stephensonDeltaT(year, segments) {
   return NaN; // outside range
 }
 
-// ─── Framework model ΔT (pure-tidal via DT_CORRECTIONS_DISABLED) ───
-function frameworkModelDeltaT(year) {
-  const t_Ma = (2000 - year) / 1e6;
-  return DT.meanDeltaTSecondsAtAge(t_Ma);
+// ─── Framework model ΔT (pure-tidal via DT_CORRECTIONS_DISABLED) — the record's two ages ───
+// The record (Stephenson 2016, Espenak) is tabulated on the CIVIL calendar year — proleptic
+// Julian before 1582-10-15, Gregorian after — and the fitted cycles ride that axis (the
+// runtime evaluates them at the civil year of the UT count). The raw integral is a function of
+// the TT instant: its age is Julian years of TT BEFORE J2000 (the chain's unit — Layer 0's
+// epochYear is 2000, the raw integral is 0 at J2000), the UT↔TT bridge's `tMaOfJdTT`. The
+// civil year y is its Jan 1.0 UT (time/calendar's calendarToJD, the calendar of date), reaching
+// TT by the record's own ΔT. The former `(2000 − y)/1e6` for the raw age read the civil year
+// as the Julian year (12.5 days in the proleptic Julian era, plan 27 §8 J3); the runtime's
+// scene-anchored readers and the bridge, meanwhile, made their ages from the scene epoch 2000.5
+// and read the whole stack half a year deep against this fit — the bridge's ΔT at a civil
+// instant was the fitted model shifted by 0.5 yr: 9.3 s at −1000, 5.2 s at AD 0, 0.78 s at
+// 1500, 0.22 s at J2000 itself (doc 111 §1.53). Both sides now anchor at J2000.
+const { calendarToJD } = require(path.join(ROOT, 'packages', 'physics', 'src', 'time', 'calendar.cjs'));
+const { J2000_JD, DAYS_PER_JULIAN_YEAR } = require(path.join(ROOT, 'packages', 'physics', 'src', 'constants', 'units.cjs'));
+function rawAgeMaOfCivilYear(year, recordDeltaTSeconds) {
+  const y0 = Math.floor(year);
+  const jdUT = calendarToJD(y0, 1, 1) + (year - y0) * DAYS_PER_JULIAN_YEAR;
+  const jdTT = jdUT + (Number.isFinite(recordDeltaTSeconds) ? recordDeltaTSeconds : 0) / 86400;
+  return (J2000_JD - jdTT) / DAYS_PER_JULIAN_YEAR / 1e6;
+}
+function correctionsAgeMaOfCivilYear(year) {
+  return (2000 - year) / 1e6;
+}
+function frameworkModelDeltaT(year, recordDeltaTSeconds = 0) {
+  return DT.meanDeltaTSecondsAtAges(rawAgeMaOfCivilYear(year, recordDeltaTSeconds), correctionsAgeMaOfCivilYear(year));
 }
 
 // ─── Sample residual R(y) = Stephenson(y) − model(y) on year grid ───
@@ -422,7 +463,7 @@ function sampleResidual(segments) {
   const years = [], stephenson = [], model = [], residual = [];
   for (let y = year_start; y <= year_end; y += step_yr) {
     const dt_s = stephensonDeltaT(y, segments);
-    const dt_m = frameworkModelDeltaT(y);
+    const dt_m = frameworkModelDeltaT(y, dt_s);
     if (!Number.isFinite(dt_s) || !Number.isFinite(dt_m)) continue;
     years.push(y);
     stephenson.push(dt_s);
@@ -721,7 +762,7 @@ function findJointOptimum(years, residual, { sweepMin = 86400.0014, sweepMax = 8
   const espenakYears = Object.keys(ESPENAK_REFERENCE).map(Number).sort((a,b) => a-b);
   const physicsByYear = new Map();
   for (const y of espenakYears) {
-    physicsByYear.set(y, DT.meanDeltaTSecondsAtAge((2000 - y) / 1e6));
+    physicsByYear.set(y, frameworkModelDeltaT(y, ESPENAK_REFERENCE[y]));
   }
 
   const sweep = [];
@@ -796,7 +837,7 @@ function runSweepEpoch() {
     years.push(y); steph.push(s); baseModel.push(m);
   }
   const espenakYears = Object.keys(ESPENAK_REFERENCE).map(Number).sort((a, b) => a - b);
-  const basePhysEsp = espenakYears.map(y => DT.meanDeltaTSecondsAtAge((2000 - y) / 1e6));
+  const basePhysEsp = espenakYears.map(y => frameworkModelDeltaT(y, ESPENAK_REFERENCE[y]));
 
   const DELTAS = [];   // seconds/day
   for (let d = -1500e-6; d <= 1500e-6 + 1e-12; d += 250e-6) DELTAS.push(Math.round(d * 1e6) / 1e6);
@@ -1601,7 +1642,7 @@ function runJointMode() {
 
   const espenakYears = Object.keys(ESPENAK_REFERENCE).map(Number).sort((a, b) => a - b);
   const physicsByYear = new Map();
-  for (const y of espenakYears) physicsByYear.set(y, DT.meanDeltaTSecondsAtAge((2000 - y) / 1e6));
+  for (const y of espenakYears) physicsByYear.set(y, frameworkModelDeltaT(y, ESPENAK_REFERENCE[y]));
 
   let best = null;
   const rows = [];
@@ -1658,7 +1699,7 @@ function runJointMode() {
     for (let y = FULL_LO; y <= FULL_HI; y += FULL_STEP) {
       if (y >= CONFIG.fit_window.year_start && y <= CONFIG.fit_window.year_end) continue;
       const ds = stephensonDeltaT(y, segsHo);
-      const dm = DT.meanDeltaTSecondsAtAge((2000 - y) / 1e6);
+      const dm = frameworkModelDeltaT(y, ds);
       if (Number.isFinite(ds) && Number.isFinite(dm)) te.push({ y, r: ds - dm });
     }
     console.log('\n  ── HELD-OUT (years the fit never saw) ──────────────────────────');
@@ -1850,6 +1891,8 @@ function runJointMode() {
     'packages/physics/src/earth/precession-composed.cjs',
     'packages/physics/src/earth/laplace-plane.cjs',
     'packages/physics/src/climate/l1-orbital.cjs',
+    'packages/physics/src/time/calendar.cjs',
+    'packages/physics/src/constants/units.cjs',
     'public/input/astro-reference.json',
   ];
   resJson.inputs = buildInputsBlock(GEN, COMMON_INPUTS);

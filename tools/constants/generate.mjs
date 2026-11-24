@@ -570,9 +570,12 @@ const CHAIN_ARTIFACT_PATH = join(ROOT, 'data/nbody-secular-frequencies.json');
 const OUT_CHAIN = join(ROOT, 'packages/physics/src/planets/chain-artifact.js');
 
 function buildChainArtifact() {
-  const raw = readFileSync(CHAIN_ARTIFACT_PATH, 'utf8');
-  const art = JSON.parse(raw);
-  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
+  // The embed is the artifact MINUS its `inputs` provenance stamp, its identity hash of that
+  // payload: identity hashes cover VALUES. Hashed over the raw file, CHAIN_ARTIFACT_HASH moved
+  // on a stamp-only re-run of the N-body trio (f5e1ccdd → ebcbfc2e at 4dea5e65; doc 111 §1.53).
+  const art = JSON.parse(readFileSync(CHAIN_ARTIFACT_PATH, 'utf8'));
+  delete art.inputs;
+  const hash = createHash('sha256').update(JSON.stringify(art)).digest('hex').slice(0, 16);
   return { art, hash };
 }
 
@@ -738,9 +741,7 @@ module.exports = { SUN_COMPLETION_ARTIFACT, SUN_COMPLETION_ARTIFACT_HASH };
 }
 
 function buildDeepModes(chainArt) {
-  const raw = readFileSync(DEEP_MODES_PATH, 'utf8');
-  const art = JSON.parse(raw);
-  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 16);
+  const art = JSON.parse(readFileSync(DEEP_MODES_PATH, 'utf8'));
   const anchor = chainArt.art.j2000AnchorElements.earth;
   // The SLOPE anchor (deep-ecc-channel.cjs): the run's own J2000 z-rate,
   // read from the banked ±10-Myr series the mode table compresses — the
@@ -767,9 +768,7 @@ function buildDeepModes(chainArt) {
   // (the slope anchor's taper is the lunar arguments' recorded completion
   // taper — ONE home, @essrt/physics moon/arguments.cjs)
   const slopeTaperYears = SECULAR_COMPLETION_TAPER_YEARS;
-  return {
-    hash,
-    payload: {
+  const payload = {
       meta: art.meta,
       verdict: art.verdict,
       earthZ: art.modes.earth.z,
@@ -810,8 +809,11 @@ function buildDeepModes(chainArt) {
       // the slope anchor pair (see above): [d(e·cos ϖ)/dt, d(e·sin ϖ)/dt] per year
       anchorZDotPerYr,
       slopeTaperYears,
-    },
   };
+  // the identity hash of the PAYLOAD (the artifact's `inputs` stamp is provenance, not identity —
+  // the chain embed's lesson, doc 111 §1.53)
+  const hash = createHash('sha256').update(JSON.stringify(payload)).digest('hex').slice(0, 16);
+  return { hash, payload };
 }
 
 function emitDeepModes({ hash, payload }) {

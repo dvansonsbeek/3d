@@ -355,32 +355,34 @@ function createDeepCalendar({
     return { jdAtYear, yearAtJD, range };
   }
   const ttTable = meanTropicalYearDaysAtAgeMa ? makePositionTable(meanTropicalYearDaysAtAgeMa) : null;
-  /** The civil decimal year of the scene epoch — where the raw integral's age leaves the civil axis. */
-  const epochCivilYear = jdToDecimalYear(startModelJD);
-  /** The age (Myr before the scene epoch, the chain's unit) of a TT instant, for the RAW
-   *  integral. Up to the scene epoch: the CIVIL calendar year the fitted ΔT convention reads
-   *  (the fitter's own axis — proleptic Julian before 1582: the engine's Julian-year axis to a
-   *  constant 12.5 days, which is 1 s of raw integral at −3000 and nothing at depth), unchanged.
-   *  AHEAD of the scene epoch: Julian years of TT from it, the engine's axis — the civil year
-   *  there is GREGORIAN and runs 2.05e-5 of the span ahead of the engine year (20.5 yr at
-   *  +1 Myr, 2,053 yr at +100 Myr, 20,329 yr at +990 Myr, measured): the raw integral was read
-   *  that far into the future of the instant, and the UT day parted from the chain's day by
-   *  1.2e-6 at +100 Myr and 1.5e-5 at +990 Myr (plan 27 §8 J3 — the third axis finding; no
-   *  record lies ahead of today, so the fitted convention has nothing to say there).
+  /** The age of a TT instant for the RAW integral — Myr BEFORE J2000 (the chain's unit: Layer 0's
+   *  `epochYear` is 2000, the raw integral is 0 at J2000), Julian years of TT, on BOTH sides of
+   *  the epoch. Two conventions left here with the ΔT stack's re-close (doc 111 §1.53): the
+   *  anchor was the scene epoch `startModelYear` = 2000.5, half a year deep against the chain's
+   *  own age (9.3 s of ΔT at −1000, 0.22 s at J2000, in every twin); and up to the epoch the
+   *  age was read off the CIVIL calendar year (plan 27 §8 J3's past side) — proleptic Julian
+   *  before 1582, a constant 12.5 days from this axis (0.4 s of raw integral at −1000, 1 s at
+   *  −3000; at the deep edge, where the UT clock runs 3.4× TT, days of ΔT). Ahead of the epoch
+   *  the civil year is GREGORIAN and runs 2.05e-5 of the span ahead of the engine year (20.5 yr
+   *  at +1 Myr, 2,053 yr at +100 Myr, 20,329 yr at +990 Myr, measured) — the UT day parted from
+   *  the chain's day by 1.2e-6 at +100 Myr and 1.5e-5 at +990 Myr before the future side moved.
+   *  The fitted era corrections keep the civil year of the UT count (`tMaCivilOfJdUT`).
    *  @param {number} jdTT @returns {number} */
-  const tMaOfJdTT = (jdTT) => (startModelYear - (jdTT <= startModelJD ? jdToDecimalYear(jdTT) : epochCivilYear + (jdTT - startModelJD) / JULIAN_YEAR_DAYS)) / 1e6;
+  const tMaOfJdTT = (jdTT) => (J2000_JD - jdTT) / JULIAN_YEAR_DAYS / 1e6;
   /** The Newton slope of the bridge f(jdTT) = jdTT − ΔT(jdTT)/86400 − jdUT: f′ = 86,400/LOD =
    *  solar days per SI day of date = (solar days per year)/(SI days per year). The inverse
    *  ratio (0.73 at −2 Gyr) overshoots every step and diverges at depth (measured).
    *  @param {number} jdTT @returns {number} */
   const bridgeSlopeAtJdTT = (jdTT) => {
-    const tMa = (startModelYear - (2000 + (jdTT - J2000_JD) / JULIAN_YEAR_DAYS)) / 1e6;
+    const tMa = tMaOfJdTT(jdTT);
     const si = meanTropicalYearDaysAtAgeMa ? meanTropicalYearDaysAtAgeMa(tMa) : null, solar = meanYearInDaysAtAgeMa(tMa);
     return (si !== null && solar !== null && si > 0) ? solar / si : 1;
   };
   /** The age the fitted era corrections read: the civil calendar year of the UT count (the ΔT
-   *  records' own axis). @param {number} jdUT @returns {number} */
-  const tMaCivilOfJdUT = (jdUT) => (startModelYear - jdToDecimalYear(jdUT)) / 1e6;
+   *  records' own axis), before J2000 — the chain converts it back with the same 2000, so the
+   *  cycles evaluate at the civil year the fitter fitted them on (the former `startModelYear`
+   *  anchor read them half a year early). @param {number} jdUT @returns {number} */
+  const tMaCivilOfJdUT = (jdUT) => (2000 - jdToDecimalYear(jdUT)) / 1e6;
   /** THE BRIDGE — ΔT (seconds) at a UT Julian Day, its two ages named: the raw integral at
    *  the TT age the UT count has reached (solved implicitly — ΔT changes by ≪ 1 of itself per
    *  ΔT of time, three fixed-point steps reach the double's floor), the era corrections at the

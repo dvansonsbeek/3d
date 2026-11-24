@@ -44,7 +44,7 @@ const chain = P.createDeepTimeChain({
   fitted: P.FITTED_COEFFICIENTS,
   deepModes: DEEP_MODES_ARTIFACT,
   moonDistanceArtifact: MOON_DISTANCE_ARTIFACT,
-  ageAnchorYear: C.startmodelYear,
+  ageAnchorYear: 2000,   // J2000, the chain's own age anchor — the scene epoch 2000.5 read every ΔT half a year deep (doc 111 §1.53)
   flagsAt: () => _flags,
   planetAuRatios: _planetAuRatios,
   stellarDayRaProjection: C.STELLAR_DAY_RA_PROJECTION,
@@ -227,7 +227,7 @@ module.exports = {
   _deepEcc,
   EPOCH_PARAMS,
   _jdToSIyear, siYearToJD, yearToJDDeepTime, SI_TROPICAL_YEAR_DAYS,
-  posFromJD, jdFromPos, jdTTFromPos, navigablePosRange, deltaTSecondsAtJdUT,
+  posFromJD, jdFromPos, jdTTFromPos, navigablePosRange, deltaTSecondsAtJdUT, meanDeltaTSecondsAtAges,
   MEAN_SIDEREAL_YEAR_J2000_S, MEAN_TROPICAL_YEAR_J2000_S, LOD_NOW_H13_S, A_MOON_NOW_M, A_LOCK_M,
   MOON_APSIDAL_J2000_S, MOON_NODAL_J2000_S, MOON_SIDEREAL_MONTH_J2000_S, SOLAR_MASS_LOSS_FRAC_PER_YR,
   earthMoiFactorAtAge, iEarthAtAge,

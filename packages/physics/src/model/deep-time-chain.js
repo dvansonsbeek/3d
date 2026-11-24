@@ -10,6 +10,7 @@ import { DEEP_MODES_ARTIFACT } from '../moon/deep-modes-artifact.cjs';
 
 /** @param {import('./derived-constants.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleDeepTimeChain(ctx) {
+  // eslint-disable-next-line no-unused-vars -- `startmodelYear` left the chain's anchor (J2000 now, doc 111 §1.53); the symbol goes at the next deep cascade — this slice is a token-hashed input of both banks
   const { C, F, late, startmodelYear } = ctx;
   // The GIA α channel (the lagged response to the L1 ice history, with the R2
   // pin and the exact-argument memo), the Layer-0 bundle, the cited
@@ -20,7 +21,7 @@ export function assembleDeepTimeChain(ctx) {
   // the Node twin and the browser destructure the same module.
   const chain = createDeepTimeChain({
     constants: C, fitted: F, deepModes: DEEP_MODES_ARTIFACT, moonDistanceArtifact: MOON_DISTANCE_ARTIFACT,
-    ageAnchorYear: startmodelYear,
+    ageAnchorYear: 2000,   // J2000, the chain's own age anchor — the scene epoch read every ΔT half a year deep (doc 111 §1.53)
   });
   const { alphaGia, earthMoiFactorAtAge, EPOCH_PARAMS, recession, dtCycles, dtCycleLodCorrectionSum, s3ArcsecPerYr, deepLod, deepEcc, moonChain } = chain;
   const CLIMATE_REGIME = F.CLIMATE_FORMULA_COEFFS.regimes['lr04-post-mpt'];

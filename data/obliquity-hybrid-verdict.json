@@ -131,7 +131,7 @@
    "packages/physics/src/model.js": "sha256-tokens:aa81b888dca52174a40eee76f4e36d827d4f05dbe499d85936d76e41500b73b2",
    "packages/physics/src/model/cardinal-instants.js": "sha256-tokens:cabd002d09d5195d090d3558a2e28617d685655ca619a77f5fbd6ffa579026d8",
    "packages/physics/src/model/context.js": "sha256-tokens:8c43ad51678a96803e29ffa127c4c7083d174da8dd66e5762c50390c7615419e",
-   "packages/physics/src/model/deep-time-chain.js": "sha256-tokens:f281e9e7d262ea43956c988690765cbb51a37be792a5d295d10f366203352891",
+   "packages/physics/src/model/deep-time-chain.js": "sha256-tokens:3dac56cf3f821b55b12f8332505afaa6668ecbcba7940d0df0f6e46c112c0c5a",
    "packages/physics/src/model/delta-t.js": "sha256-tokens:ca82471ecf504a172ca37bff60382c78ae7ae88850746a3c8dffa06b8c4d8ee3",
    "packages/physics/src/model/derived-constants.js": "sha256-tokens:bea5fcb947fed1629d3475d489ecc19c94a515644eb26c2cd38643a5a8c5c833",
    "packages/physics/src/model/earth-scalars.js": "sha256-tokens:36e5165a8619b3f9973db69bd278ea89bd605dd3e2fd3c6127112d0afe1c6bf7",
@@ -149,7 +149,7 @@
    "packages/physics/src/model/time-axis.js": "sha256-tokens:67383a32044715dfffc6c7e61feacc3748b8ceac3a6bedebc19b9e653dcd078b",
    "packages/physics/src/model/year-day-lengths.js": "sha256-tokens:f2a4dc0ea1b3ac1c6d653527aef90556621a5e7b3beb8ab9d67457f3ddf85d1a",
    "tools/explore/stage-c-obliquity-hybrid.mjs": "sha256-tokens:21c3f287b9b4b586040fa393d99c7550512e56ac23453b9d154259ea793b302e",
-   "tools/lib/deep-time.js": "sha256-tokens:b7fc20c26e5f4ce71a98f55823d08137f2656d79602317ffeaa1cb21352ac096",
+   "tools/lib/deep-time.js": "sha256-tokens:a706aa893d538d1a7735a1f075807fbd3cfde36355931a5abebb2bd6b8f49a52",
    "tools/verify/obliquity-hybrid.js": "sha256-tokens:ba9504dbed4ac5c2a261224a8b52ac4ad948166fd7d6f9d1e363ba4c67c4cb69"
   }
  }

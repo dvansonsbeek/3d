@@ -17,10 +17,12 @@
  * the goldens pin the values.
  *
  * Twin differences that are CONVENTIONS, kept as parameters:
- *  - `ageAnchorYear`: the year the twins' `h5Correction`/`frameworkDeltaT`
- *    convert to t_Ma from (the scene epoch 2000.5 in both twins; the model's
- *    own surfaces use 2000 — `yearToTMa` here is always 2000-anchored, the
- *    Layer-0 rule, and the scene-anchored readers take `ageAnchorYear`).
+ *  - `ageAnchorYear`: the year the scene-anchored readers (`h5Correction`,
+ *    `frameworkDeltaT`, `ageFromSceneYear`) convert to t_Ma from — J2000 = 2000,
+ *    the SAME anchor as the chain's own age (`yearToTMa`, the Layer-0 rule, the
+ *    raw integral's zero, the cycles' year). Until the ΔT stack's re-close on one
+ *    axis (doc 111 §1.53) every twin passed the scene epoch 2000.5 here and read
+ *    the whole stack half a year deep against the fitted convention.
  *  - `flagsAt()`: the ΔT stack's five post-integration terms, each
  *    switchable (the browser's research toggles; the Node engine maps its
  *    two env gates onto them; the model runs all ON).
@@ -87,7 +89,9 @@ export function createDeepTimeChain(deps) {
   const C = deps.constants, F = deps.fitted;
   /** @type {() => DeltaTFlags} */
   const flagsAt = deps.flagsAt ?? (() => ({ bond: true, hallstatt: true, jose5: true, jose4: true, resonator: true }));
-  const ageAnchorYear = deps.ageAnchorYear ?? C.timeReference.sceneEpochYear;
+  // J2000 — the chain's own age anchor (the Layer-0 rule); the scene epoch 2000.5 that every twin
+  // passed here put the scene-anchored reads half a year deep against the fitted stack (doc 111 §1.53).
+  const ageAnchorYear = deps.ageAnchorYear ?? 2000;
 
   // ── Derived constants (constants.js §9 order — the twins' operations) ─────
   const meanSolarYearDays = computeMeanTropicalYearJ2000Days(C.yearLengthRef.siderealYear, C.earthOrbital.generalPrecessionJ2000_arcsecPerYr);
@@ -179,7 +183,7 @@ export function createDeepTimeChain(deps) {
     if (latticeAlphaRef) return earthMoiFactorJ2000;
     let v = alphaMemo.get(tMa);
     if (v === undefined) {
-      v = alphaGia.alphaAt(2000 - tMa * 1e6);
+      v = alphaGia.alphaAt(2000 - tMa * 1e6);   // the chain's age is before J2000 = 2000.0, the Layer-0 rule (doc 111 §1.53)
       if (alphaMemo.size >= 8192) alphaMemo.clear();
       alphaMemo.set(tMa, v);
     }
@@ -402,6 +406,10 @@ export function createDeepTimeChain(deps) {
    *  history is a function of the physical (TT) age, the fitted era corrections were fitted on
    *  the civil calendar year of the UT count and keep that axis. One argument for both is the
    *  era's reading; the UT→TT bridge passes the TT age the UT count has reached for the first.
+   *  An age is Myr before J2000 = year 2000.0 (the Layer-0 rule) and converts back to a year
+   *  with that anchor; a caller that made its age from the scene epoch 2000.5 (`ageAnchorYear`
+   *  as it was passed by every twin and by the UT↔TT bridge) read the whole stack half a year
+   *  deep against the fitted convention — 9.3 s of ΔT at −1000, 0.22 s at J2000 (doc 111 §1.53).
    *  @param {number} tMaRaw @param {number} tMaCorrections @returns {number} */
   const meanDeltaTSecondsAtAges = (tMaRaw, tMaCorrections) => {
     if (tMaRaw === 0 && tMaCorrections === 0) return 0;

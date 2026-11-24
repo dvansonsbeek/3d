@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.19
-coefficients: sha256:617134ba66522681
+modelVersion: v27.20
+coefficients: sha256:ca72029de8f1229d
 status: current
 ---
 
@@ -443,7 +443,7 @@ Earth's perihelion of date is the series' ϖ in every runtime (doc 110 chain 1.1
 
 | Constant | Variable | Value | Description |
 |----------|----------|-------|-------------|
-| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->56.08<!--/v--> s | The joint fit's OUTPUT, shipped in its own artifact `data/deltaT-4flag-fit.json` (`optimum.deltaTStart`, embedded as `FIT.DT_ANCHOR.deltaTStartSeconds` — not an astro-reference input). Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0012<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
+| Initial Delta-T | `deltaTStart` | <!--v:deltaTStart-->56.07<!--/v--> s | The joint fit's OUTPUT, shipped in its own artifact `data/deltaT-4flag-fit.json` (`optimum.deltaTStart`, embedded as `FIT.DT_ANCHOR.deltaTStartSeconds` — not an astro-reference input). Long-term ΔT trend value at J2000 (paired with `usno_target_lod_s` = <!--v:usnoLodJ2000-->86,400.0012<!--/v--> at the joint optimum against Espenak). Not the IERS instantaneous observation (63.63 s at J2000) — the trend value passing through J2000, which excludes industrial-era Earth-rotation acceleration our cyclic model doesn't capture. |
 
 ---
 

@@ -115,10 +115,18 @@ const reason = new Map();
 const ALL = args.includes('--all');
 const isImporter = (/** @type {Node} */ n) => /tools\/pipeline\/import-/.test(n.cmd);
 for (const n of nodes.values()) if (n.stale.length || (ALL && !n.manual && !isImporter(n))) reason.set(n.id, n.stale.length ? n.stale : ['--all: every governed node regenerates (a stamp migration, nothing stale)']);
+// A MANUAL node (a FIT, a downloaded source) is never planned by propagation: its regeneration is a decision the
+// cascade does not take, and the ΔT fit's edge back to the constants closes a cycle through its own stamp (climate
+// coefficients → fit → constants → N-body series → engine lines → climate coefficients; doc 111 §1.53). A manual
+// node stale on its OWN inputs is still listed; every manual node is re-checked after the run (below).
 const queue = [...reason.keys()];
 while (queue.length) {
   const id = /** @type {string} */ (queue.shift());
-  for (const d of downstream.get(id)) if (!reason.has(d)) { reason.set(d, [`${id} regenerates (an input)`]); queue.push(d); }
+  for (const d of downstream.get(id)) {
+    if (reason.has(d) || /** @type {Node} */ (nodes.get(d)).manual) continue;
+    reason.set(d, [`${id} regenerates (an input)`]);
+    queue.push(d);
+  }
 }
 
 // ── order: Kahn over the induced subgraph ────────────────────────────────────
@@ -127,24 +135,41 @@ const indeg = new Map([...inSet].map((k) => [k, 0]));
 for (const id of inSet) for (const d of downstream.get(id)) if (inSet.has(d)) indeg.set(d, (indeg.get(d) ?? 0) + 1);
 const ready = [...inSet].filter((k) => indeg.get(k) === 0).sort();
 const order = [];
-while (ready.length) {
-  const id = /** @type {string} */ (ready.shift());
-  order.push(id);
-  for (const d of [...downstream.get(id)].sort()) if (inSet.has(d)) { indeg.set(d, indeg.get(d) - 1); if (indeg.get(d) === 0) { ready.push(d); ready.sort(); } }
-}
-if (order.length !== inSet.size) {
-  console.error('regen-cascade: the artifact graph has a cycle — fix the inputs blocks. Nodes still waiting on a producer:');
-  for (const id of inSet) if ((indeg.get(id) ?? 0) > 0) {
-    const n = /** @type {Node} */ (nodes.get(id));
-    const from = n.inputs.map((p) => producerOf.get(p)).filter((s) => s && s !== id && inSet.has(s));
-    console.error(`  ${id}  ←  ${[...new Set(from)].join(', ')}`);
+// The governed graph carries real LOOPS since the series declared the model its verdict runs on (the constants
+// embed the series; the series' verdict reads the generated constants and the climate coefficients, whose lines
+// come from the series' frequencies — doc 111 §1.53): weak fixed points that converge in one pass (the values a
+// loop feeds back do not move the values that feed it). Kahn stalls on them; the cycle is BROKEN deterministically
+// at the remaining node with the fewest unresolved producers, a node stale on its OWN inputs preferred (it runs
+// regardless), the broken edges reported, and every planned node is re-read after the run — a node still stale
+// then is the loop's back edge changing content, and the run is repeated.
+/** @type {string[]} */
+const cycleBreaks = [];
+const emitted = new Set();
+while (emitted.size < inSet.size) {
+  if (!ready.length) {
+    const waiting = [...inSet].filter((k) => !emitted.has(k));
+    const selfStale = (/** @type {string} */ k) => (/** @type {Node} */ (nodes.get(k))).stale.length > 0;
+    waiting.sort((a, b) => (Number(selfStale(b)) - Number(selfStale(a))) || ((indeg.get(a) ?? 0) - (indeg.get(b) ?? 0)) || a.localeCompare(b));
+    const pick = /** @type {string} */ (waiting[0]);
+    const from = (/** @type {Node} */ (nodes.get(pick))).inputs.map((p) => producerOf.get(p)).filter((s) => s && s !== pick && inSet.has(s) && !emitted.has(s));
+    cycleBreaks.push(`${pick}  ←  ${[...new Set(from)].join(', ')}`);
+    indeg.set(pick, 0);
+    ready.push(pick);
   }
-  process.exit(2);
+  const id = /** @type {string} */ (ready.shift());
+  if (emitted.has(id)) continue;
+  emitted.add(id);
+  order.push(id);
+  for (const d of [...downstream.get(id)].sort()) if (inSet.has(d) && !emitted.has(d)) { indeg.set(d, (indeg.get(d) ?? 0) - 1); if (indeg.get(d) <= 0) { ready.push(d); ready.sort(); } }
 }
 
 // ── report ───────────────────────────────────────────────────────────────────
 console.log(`regen-cascade — ${nodes.size} governed nodes, ${order.length} to regenerate${RUN ? ' (running)' : ' (dry run; add --run)'}`);
 if (!order.length) { console.log('  nothing is stale.'); process.exit(0); }
+if (cycleBreaks.length) {
+  console.log(`\n  the graph has ${cycleBreaks.length} loop(s), broken for this pass at (every node is re-read after the run):`);
+  for (const b of cycleBreaks) console.log(`    ${b}`);
+}
 order.forEach((id, i) => {
   const n = /** @type {Node} */ (nodes.get(id));
   console.log(`\n${String(i + 1).padStart(2)}. ${n.cmd}${n.manual ? '   [MANUAL — run by hand: a downloaded source, or a FIT whose re-close is a decision]' : ''}`);
@@ -197,4 +222,13 @@ for (const id of order) {
   console.log(`  ${r.status === 0 ? 'done' : 'FAILED'} in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   if (r.status !== 0) { console.error(`regen-cascade: stopped at "${n.cmd}" (exit ${r.status}).`); process.exit(1); }
 }
+// Every node re-read on the regenerated tree. A MANUAL node whose declared input moved in CONTENT during this cascade
+// is a re-close to decide (then `npm run regen:cascade -- --run` again); a stamp-only move leaves its record
+// verifying. A planned node still stale is a loop's back edge that changed content: run the cascade again.
+let again = 0;
+for (const n of nodes.values()) {
+  if (n.manual) { if (staleNow(n)) console.log(`\n⚠ BY HAND — stale after this cascade: ${n.id}\n    ${n.cmd}`); continue; }
+  if (inSet.has(n.id) && staleNow(n)) { again++; console.log(`\n⚠ STILL STALE after this pass (a loop's back edge moved its content): ${n.id}`); }
+}
+if (again) console.log(`\nregen-cascade: ${again} node(s) still stale — run \`npm run regen:cascade -- --run\` again.`);
 console.log('\nregen-cascade: every stale node regenerated. Run `npm run check:artifacts`, then the hand steps above.');

@@ -1148,7 +1148,7 @@
   "meta": {
     "script": "milankovitch_climate_formula.py",
     "doc": "docs/92-climate-formula.md",
-    "runtime_sec": 0.2990565299987793
+    "runtime_sec": 0.29500293731689453
   },
   "inputs": {
     "generator": "python3 scripts/milankovitch_climate_formula.py",

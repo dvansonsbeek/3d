@@ -1,7 +1,7 @@
 ---
 docVersion: 1.0
-modelVersion: v27.19
-coefficients: sha256:617134ba66522681
+modelVersion: v27.20
+coefficients: sha256:ca72029de8f1229d
 status: current
 ---
 
@@ -80,11 +80,11 @@ the series at its own cadence; the floor the AR(1) p < 0.01 level of normalised 
 |---|:---|---:|:---|---:|---:|---:|---:|---:|---:|---:|:---|:---|
 | 1 | ΔT: Espenak & Meeus 2006 − model, yearly | 361 | 1,650 … 2,010 yr | 13.5 s | 0.998 | 0.962 | 0 | 240.0 yr | 17.5 | 0.86 | yes | a span-scale family (1.50 cycles) |
 | 2 | ΔT: SMH2016 timed observations − model | 322 | -720.0 … 1,280 yr | 1231 s | 0.000 | 0.114 | 0 | 14.16 yr | 454 | 0.66 | no | (unnamed — see the probes) |
-| 2b | ΔT: SMH2016 spline − model (the stack's own fit record) | 274 | -720.0 … 2,010 yr | 24.5 s | 0.976 | 0.873 | 0 | 949.6 yr | 17.9 | 0.41 | yes | a span-scale family (2.88 cycles) |
+| 2b | ΔT: SMH2016 spline − model (the stack's own fit record) | 274 | -720.0 … 2,010 yr | 24.4 s | 0.977 | 0.874 | 0 | 949.6 yr | 17.8 | 0.41 | yes | a span-scale family (2.88 cycles) |
 | 2-J | as 2, the shipped Jose pair subtracted | 322 | -720.0 … 1,280 yr | 1226 s | 0.000 | 0.114 | 0 | 14.16 yr | 451 | 0.65 | no | (unnamed — see the probes) |
-| 2-J | as 2b, the shipped Jose pair subtracted | 274 | -720.0 … 2,010 yr | 79.7 s | 0.991 | 0.942 | 0 | 910.0 yr | 64.7 | 0.65 | no | a span-scale family (3.00 cycles) |
-| 2-J′ | the stack RE-FITTED on the spline with all four cycles (the check) | 274 | -720.0 … 2,010 yr | 15.9 s | 0.937 | 0.676 | 0 | 532.7 yr | 16.8 | 0.82 | yes | a span-scale family (5.13 cycles) |
-| 2-J′ | the stack RE-FITTED with Bond + Hallstatt only (free of the Jose fit) | 274 | -720.0 … 2,010 yr | 64.9 s | 0.994 | 0.949 | 0 | 949.6 yr | 64.8 | 0.56 | no | a span-scale family (2.88 cycles) |
+| 2-J | as 2b, the shipped Jose pair subtracted | 274 | -720.0 … 2,010 yr | 79.9 s | 0.991 | 0.942 | 0 | 910.0 yr | 64.6 | 0.64 | no | a span-scale family (3.00 cycles) |
+| 2-J′ | the stack RE-FITTED on the spline with all four cycles (the check) | 274 | -720.0 … 2,010 yr | 15.9 s | 0.937 | 0.678 | 0 | 532.7 yr | 16.8 | 0.82 | yes | a span-scale family (5.13 cycles) |
+| 2-J′ | the stack RE-FITTED with Bond + Hallstatt only (free of the Jose fit) | 274 | -720.0 … 2,010 yr | 65.0 s | 0.994 | 0.949 | 0 | 949.6 yr | 64.7 | 0.55 | no | a span-scale family (2.88 cycles) |
 | 3 | the 45 paleo anchors − the chain (relative) | 45 | -3,200 … 0.000 Myr | 0.00725 relative | 0.120 | 0.907 | 0 | 116.9 Myr | 0.00826 | 0.23 | yes | (unnamed — see the probes) |
 | 3 | the anchors inside 600 Ma | 25 | -600.0 … 0.000 Myr | 0.00674 relative | 0.000 | 0.793 | 0 | 85.71 Myr | 0.00963 | 0.48 | no | (unnamed — see the probes) |
 | 4 | LR04 − the climate formula, post-MPT window | 801 | -1,000 … 0.000 kyr | 0.205 ‰ | 0.875 | 0.245 | 0 | 72.73 kyr | 0.137 | 0.93 | yes | obliquity p+s6 (53.6) − climate-internal harmonic (g₂−g₅)/2 (202.8) |
@@ -95,7 +95,7 @@ the series at its own cadence; the floor the AR(1) p < 0.01 level of normalised 
 | 5 | the Sun − Horizons, 10-d cadence, −2500…−2200 | 10,957 | -2,500 … -2,200 yr | 2.73 ″ | 0.991 | 0.252 | 1 | 3.986 yr | 1.20 | 1.20 | yes | 2V − 3E |
 | 5 | the Sun − Horizons, 10-d cadence, −400…−100 | 10,957 | -400.0 … -100.0 yr | 4.74 ″ | 0.986 | 0.178 | 2 | 1.000 yr | 0.755 | 1.30 | yes | annual (M) |
 | 5 | the Sun − Horizons, 10-d cadence, 1700…2000 | 10,958 | 1,700 … 2,000 yr | 1.59 ″ | 0.982 | 0.152 | 2 | 1.000 yr | 0.834 | 2.70 | yes | annual (M) |
-| 6 | the lunar canon − the finder, UT | 12,056 | -1,998 … 3,001 yr | 4.78 min | 0.992 | 0.260 | 2 | 1,428 yr | 4.25 | 1.77 | yes | a span-scale family (3.50 cycles) |
+| 6 | the lunar canon − the finder, UT | 12,056 | -1,998 … 3,001 yr | 4.79 min | 0.992 | 0.259 | 2 | 1,428 yr | 4.25 | 1.78 | yes | a span-scale family (3.50 cycles) |
 | 6 | the lunar canon − the finder, dynamical time | 12,056 | -1,998 … 3,001 yr | 1.42 min | 0.916 | 0.034 | 2 | 2,500 yr | 0.712 | 4.00 | yes | a span-scale family (2.00 cycles) |
 | 7 | e − La2004 (×10³), a linear trend removed | 4,999 | -9,996 … 0.000 kyr | 0.129 ‰ | 0.570 | 0.015 | 6 | 94.97 kyr | 0.0605 | 7.28 | yes | the solutions' own eccentricity line eccentricity g4−g5 (94.9 kyr) |
 | 7 | ε − La2004 (″), a linear trend removed | 4,999 | -9,996 … 0.000 kyr | 803 ″ | 0.947 | 0.116 | 1 | 40.76 kyr | 702 | 3.31 | no | the solutions' own obliquity line obliquity p+s3 (40.9 kyr) |
@@ -139,10 +139,10 @@ needs is kept as what the paper calls it, a labelled hypothesis; nothing in the 
 <!-- generated:doc112-jose -->
 | the re-fit on the SMH2016 spline | Bond (s) | Hallstatt (s) | Jose5 (s) | Jose4 (s) | residual rms (s) | power at 897 yr (× AR(1) / × white) | power at 716 yr |
 |:---|---:|---:|---:|---:|---:|---:|---:|
-| all four cycles (the check) | 375.8 (shipped 368.8) | 87.2 (shipped 80.0) | 67.8 (shipped 50.0) | 45.8 (shipped 50.0) | 15.9 | 0.004 (0.01 / 0.06) | 0.003 (0.00 / 0.04) |
-| Bond + Hallstatt only | 373.6 (shipped 368.8) | 67.2 (shipped 80.0) | — | — | 64.9 | 0.525 (0.55 / 6.68) | 0.266 (0.28 / 3.38) |
+| all four cycles (the check) | 375.9 (shipped 368.8) | 87.4 (shipped 80.0) | 67.8 (shipped 50.0) | 45.8 (shipped 50.0) | 15.9 | 0.004 (0.01 / 0.05) | 0.003 (0.00 / 0.04) |
+| Bond + Hallstatt only | 373.7 (shipped 368.8) | 67.3 (shipped 80.0) | — | — | 65.0 | 0.524 (0.55 / 6.66) | 0.266 (0.28 / 3.38) |
 
-The Jose-free residual's strongest line: 949.6 yr, 64.8 s — 17.0 s in the first half of the record, 114.5 s in the second; 6.7× the white floor, 0.56× the AR(1) floor.
+The Jose-free residual's strongest line: 949.6 yr, 64.7 s — 16.8 s in the first half of the record, 114.6 s in the second; 6.7× the white floor, 0.55× the AR(1) floor.
 <!-- /generated:doc112-jose -->
 
 ## 4. LR04 and the formula's mixing tones
@@ -365,7 +365,7 @@ corpus moved with the Moon: its −400 century's standard error fell from 188 to
 | the lunar canon against the finder | value |
 |:---|---:|
 | matched eclipses | 12,056 |
-| residual in UT (canon UT − model UT, the shipped greatest-eclipse instant) | -1.75 ± 4.45 min |
+| residual in UT (canon UT − model UT, the shipped greatest-eclipse instant) | -1.81 ± 4.44 min |
 | residual in dynamical time (canon TD − model TT, the shipped instant) | -0.38 ± 1.37 min |
 | its node term in the five-term fit (sin 2F) | 0.04 min |
 | its direct anomaly term (cos M′, sin M′) — the model's M′ against the ephemeris's | 0.08 min; remainder 1.372 min sd |
@@ -425,7 +425,7 @@ corpus moved with the Moon: its −400 century's standard error fell from 188 to
 |:---|:---|
 | lunar-canon-TD | 2499.6511 / 0.712 / 4.0× / stands; 1666.4341 / 0.368 / 1.1× / stands |
 | lunar-canon-TD-anomaly-term-removed | 2499.6511 / 0.712 / 3.9× / stands; 1666.4341 / 0.368 / 1.0× / stands |
-| lunar-canon-TD-opposition | 3.6174 / 7.037 / 94.0× / stands; 1.2033 / 2.278 / 10.8× / stands; 1.3822 / 1.646 / 5.6× / stands; 1.8030 / 1.587 / 5.2× / stands; 3.6135 / 1.435 / 4.3× / stands; 1.8087 / 1.372 / 3.9× / stands |
+| lunar-canon-TD-opposition | 3.6174 / 7.037 / 94.0× / stands; 1.2033 / 2.279 / 10.8× / stands; 1.3822 / 1.646 / 5.6× / stands; 1.8030 / 1.587 / 5.2× / stands; 3.6135 / 1.435 / 4.3× / stands; 1.8087 / 1.372 / 3.9× / stands |
 | lunar-canon-TD-opposition-node-term-removed | 1.1274 / 4.148 / 275.3× / stands; 1.1270 / 0.912 / 13.3× / stands; 3.6174 / 0.869 / 11.1× / stands; 1.1278 / 0.828 / 11.0× / stands; 2499.6511 / 0.719 / 8.3× / stands; 1.0593 / 0.600 / 5.8× / stands |
 | lunar-canon-TD-opposition-five-term-removed | 2499.6511 / 0.717 / 4.9× / stands; 1666.4341 / 0.367 / 1.3× / stands |
 <!-- /generated:doc112-lunar -->

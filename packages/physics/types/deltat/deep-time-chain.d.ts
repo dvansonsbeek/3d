@@ -83,7 +83,7 @@ export function createDeepTimeChain(deps: {
     certifiedAxialPrecessionJ2000Years: () => number;
     precessionRateJ2000ArcsecPerYr: () => number;
     EPOCH_PARAMS: import("../layer0/index.js").EpochParams;
-    ageAnchorYear: any;
+    ageAnchorYear: number;
     alphaGia: {
         alphaAt: (year: number) => number;
         j2RatioAt: (year: number) => number;

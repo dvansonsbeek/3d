@@ -118,7 +118,7 @@
     "n_lines": 28,
     "ridge_lambda": 0.01,
     "cv": "split-half, both directions, canonical baseline (without the line) fitted on the full regime",
-    "runtime_sec": 3.377124547958374
+    "runtime_sec": 2.620633602142334
   },
   "regime_results": {
     "post-mpt": {
