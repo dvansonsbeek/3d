@@ -55,6 +55,8 @@ const REQUIRED = [
   'data/cassini-moontilt-results.json',
   // stamped in Phase 2:
   'data/lod-climate-correlation-summary.json',
+  // plan 38 §7.1 — the ΔT stack's withheld-era ladder (the fitter's cross-validation hook, recorded):
+  'data/dt-stack-withheld-era.json',
   // stamped in Phase 3 (lunar/solar sections; audit26/babylon135 still hand-recorded):
   'data/eclipse-audit-summary.json',
   // stamped at Batch D of the restatement (engine-D secular frequencies):

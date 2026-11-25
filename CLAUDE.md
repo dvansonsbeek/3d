@@ -713,6 +713,18 @@ Each line names the rule; doc 111 §1.n carries the measurement.
   past side closed, fitter ≡ runtime by construction; a manual node is never
   planned by propagation, and the planner breaks the graph's real loops
   deterministically, re-reading every node after the run. (§1.53)
+- **A number on a page is not a source — a test's numbers are RECORDED by the
+  instrument that measures them** — the website quoted the ΔT stack's
+  withheld-era test (85 s against 94–307 s, 223 s with no correction) for
+  weeks, the paper for a day, and no artifact, script or doc in either repo
+  produced the numbers; run on the current model the fitter's own
+  cross-validation hook reads 148.8 s for the full set against 113.7 s for the
+  trend anchor alone and 131.1 s with no correction, with three of seven
+  reduced sets better than the full one (34.5 s without Hallstatt). The
+  ladder is a generator (`dt-stack-withheld-era.js`), the surfaces read its
+  keys, and the stack's out-of-sample standing is stated as the open item it
+  is. Before quoting a website number anywhere, find the artifact that made
+  it; where there is none, make one. (§1.54)
 
 ---
 
@@ -792,7 +804,10 @@ window-mean prediction), `measure-rms-by-epoch.js` and `equinox-vs-vondrak.js`
 missing), the five campaign generators (cassini-results /
 lod-climate-correlation / eclipse-audit / lunar-alignment /
 lunar-canon-recall — the latter three REFUSE on divergence; `--write
---rebaseline` is the conscious re-measurement path), the Horizons
+--rebaseline` is the conscious re-measurement path), the ΔT stack's
+withheld-era ladder (`dt-stack-withheld-era.js` — the joint fitter's own
+cross-validation hook run over a ladder of configurations and RECORDED, ~15 s;
+plain run = reproduction check, exit 1 on divergence; §1.54), the Horizons
 comparison (`sun-vs-horizons.js` — the Sun tier's swap gate) and the
 panel's osculating-orbit exhibit table (`earth-osculating-wobble.js` —
 REFUSES if the lab's mean parts from the series') and the spin-axis
@@ -809,7 +824,7 @@ model reproduces a spread of nodes bit-exactly and a model loaded with the
 table reads the same drawn obliquity as one without; its check mode re-reads
 the spread, §1.44). `npm run regen:cascade`
 lists the stale generators in regeneration order; `npm run
-test:verify:list` the full classification (16 generators, 11 gates — the
+test:verify:list` the full classification (17 generators, 11 gates — the
 newest gate, `gmst-of-date.js`, reads the sidereal angle of date against its
 three referees: the non-rotating origin on the model's frames vs IAU 2006, the
 shipped angle vs the retired 1982 polynomial within its stated convention gap,

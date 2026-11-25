@@ -38,6 +38,8 @@ const MANIFEST = [
     writes: 'data/cassini-moontilt-results.json (tracked; --write only — runs both Cassini labs live)' },
   { n: 'lod-climate-correlation.js', class: 'generator', ms: 2000,
     writes: 'data/lod-climate-correlation-summary.json (tracked; --write only)' },
+  { n: 'dt-stack-withheld-era.js', class: 'generator', ms: 15000,
+    writes: 'data/dt-stack-withheld-era.json (tracked; --write only — the ΔT stack\'s withheld-era ladder: the joint fitter trained on the post-CE residual alone (0..2017) and scored on −720..−10 for the full set, the four leave-one-out triples and the nested cascade, with and without the swing kicks, beside the intercept-only and no-correction baselines, plus the same ladder\'s in-sample closure on the full window; plain run = reproduction check, exit 1 on divergence)' },
   { n: 'eclipse-audit.js', class: 'generator', ms: 180000, slow: true,
     writes: 'data/eclipse-audit-summary.json (tracked; --write only, REFUSES on divergence — --rebaseline is the conscious re-measurement path)' },
   { n: 'nbody-secular.js', class: 'generator', ms: 1200000, slow: true,

@@ -1599,6 +1599,50 @@ export const VALUES = {
           dtStackLadderRmsBondHallstattSeconds: { get: () => stagesRms().bh, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with Bond and Hallstatt (stage_b)' },
           dtStackLadderRmsThreeSeconds: { get: () => stagesRms().bhj5, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with Bond, Hallstatt and Jose5 (stage_c)' },
           dtStackLadderRmsAllFourSeconds: { get: () => stagesRms().all, render: (v) => Number(v).toFixed(1), unit: 's', note: 'with all four harmonics (stage_d)' },
+          // The withheld-era ladder (plan 38 §7.1): data/dt-stack-withheld-era.json, written by
+          // tools/verify/dt-stack-withheld-era.js from the joint fitter's own cross-validation hook —
+          // trained on the post-CE residual alone (0..2017), scored on −720..−10 (72 samples), with the
+          // shipped swing kicks unless a key says otherwise. A website sentence once typed this test's
+          // numbers with no artifact behind them; these keys are the record.
+          ...(() => {
+            const wh = () => rd('data/dt-stack-withheld-era.json');
+            const S = () => wh().summary.shipped_kicks;
+            const row = (swing, flagSet) => wh().ladder.find((r) => r.swing === swing && r.flag_set === flagSet);
+            const fw = (flagSet) => wh().full_window_in_sample.rows.find((r) => r.flag_set === flagSet);
+            const LABEL = { without_bond: 'without Bond', without_hallstatt: 'without Hallstatt', without_jose5: 'without Jose5', without_jose4: 'without Jose4',
+              bond_only: 'Bond alone', bond_hallstatt: 'Bond and Hallstatt', bond_hallstatt_jose5: 'Bond, Hallstatt and Jose5' };
+            const reduced = () => wh().ladder.filter((r) => r.swing === 'shipped_kicks' && r.kind !== 'full');
+            const bestReduced = () => reduced().reduce((a, r) => (!a || r.held_out.rms_fitted_stack_s < a.held_out.rms_fitted_stack_s ? r : a), null);
+            const s1 = (v) => Number(v).toFixed(1);
+            const yr = (v) => String(v).replace('-', '−');
+            const loo = ['Bond', 'Hallstatt', 'Jose5', 'Jose4'];
+            const o = {
+              dtStackWithheldEraTrainStartYear: { get: () => wh().training_window.year_start, render: yr, note: 'the withheld-era test\'s training window starts here (the post-CE record)' },
+              dtStackWithheldEraTrainEndYear: { get: () => wh().training_window.year_end, render: yr, note: 'the training window\'s last year' },
+              dtStackWithheldEraTestStartYear: { get: () => wh().held_out_window.year_start, render: yr, note: 'the withheld era\'s first year (the fitter\'s grid, step 10)' },
+              dtStackWithheldEraTestEndYear: { get: () => wh().held_out_window.year_end, render: yr, note: 'the withheld era\'s last sample' },
+              dtStackWithheldEraTestN: { get: () => wh().held_out_window.n, render: (v) => String(v), note: 'the withheld samples the fit never saw' },
+              dtStackWithheldEraRmsFullSetSeconds: { get: () => S().full_set_rms_s, render: s1, unit: 's', note: 'held-out RMS of the full four-harmonic set with the shipped swing kicks, trained on the post-CE record alone' },
+              dtStackWithheldEraRmsInterceptOnlySeconds: { get: () => S().intercept_only_rms_s, render: s1, unit: 's', note: 'held-out RMS of the trend anchor alone (the fitter\'s "baseline that matters")' },
+              dtStackWithheldEraRmsNoCorrectionSeconds: { get: () => S().no_correction_rms_s, render: s1, unit: 's', note: 'held-out RMS with no correction at all (the pure-tidal + GIA residual)' },
+              dtStackWithheldEraRmsReducedMinSeconds: { get: () => S().reduced_sets_rms_min_s, render: s1, unit: 's', note: 'the best held-out RMS among the seven reduced sets (four leave-one-out triples, the nested cascade)' },
+              dtStackWithheldEraRmsReducedMaxSeconds: { get: () => S().reduced_sets_rms_max_s, render: s1, unit: 's', note: 'the worst held-out RMS among the seven reduced sets' },
+              dtStackWithheldEraBestReducedSetLabel: { get: () => LABEL[bestReduced().flag_set], render: (v) => String(v), note: 'the reduced set with the best held-out RMS' },
+              dtStackWithheldEraReducedSetsBetterThanFull: { get: () => S().reduced_sets_better_than_full.length, render: (v) => String(v), note: 'how many of the seven reduced sets predict the withheld era better than the full set' },
+              dtStackWithheldEraRmsFullSetNoSwingSeconds: { get: () => wh().summary.no_swing.full_set_rms_s, render: s1, unit: 's', note: 'the full four-harmonic set with NO swing columns (the harmonics alone), held-out RMS' },
+              dtStackWithheldEraRmsBondHallstattSeconds: { get: () => row('shipped_kicks', 'bond_hallstatt').held_out.rms_fitted_stack_s, render: s1, unit: 's', note: 'held-out RMS of Bond and Hallstatt alone (with the swing kicks)' },
+              dtStackWithheldEraFullSetBeatsBaselines: { get: () => (S().full_set_beats_intercept_only && S().full_set_beats_no_correction ? 'yes' : 'no'), render: (v) => String(v), note: 'does the full set beat BOTH baselines out of sample' },
+              dtStackFullWindowEspenakRmsAllFourSeconds: { get: () => fw('all_four').train.espenak_rms_s, render: s1, unit: 's', note: 'the same ladder on the fitter\'s full window: the Espenak 1650–2017 RMS of the full set (≡ the shipped optimum)' },
+              dtStackFullWindowEspenakRmsWithoutMinSeconds: { get: () => Math.min(...loo.map((n) => fw(`without_${n.toLowerCase()}`).train.espenak_rms_s)), render: s1, unit: 's', note: 'the smallest Espenak RMS among the four leave-one-out triples on the full window' },
+              dtStackFullWindowEspenakRmsWithoutMaxSeconds: { get: () => Math.max(...loo.map((n) => fw(`without_${n.toLowerCase()}`).train.espenak_rms_s)), render: s1, unit: 's', note: 'the largest Espenak RMS among the four leave-one-out triples on the full window' },
+            };
+            for (const n of loo) {
+              o[`dtStackWithheldEraRmsWithout${n}Seconds`] = { get: () => row('shipped_kicks', `without_${n.toLowerCase()}`).held_out.rms_fitted_stack_s, render: s1, unit: 's', note: `held-out RMS of the three-harmonic set without ${n} (with the swing kicks)` };
+              o[`dtStackFullWindowEspenakRmsWithout${n}Seconds`] = { get: () => fw(`without_${n.toLowerCase()}`).train.espenak_rms_s, render: s1, unit: 's', note: `the full-window fit without ${n}: its Espenak 1650–2017 RMS` };
+              o[`dtStackFullWindowRmsWithout${n}Seconds`] = { get: () => fw(`without_${n.toLowerCase()}`).train.full_window_rms_s, render: s1, unit: 's', note: `the full-window fit without ${n}: its RMS over the whole −720..2017 record` };
+            }
+            return o;
+          })(),
           mercuryDistanceJ2000Km: { get: () => planetAKm('mercury'), render: (v) => thousands(v), unit: 'km', note: 'Mercury\'s semi-major axis from the chain\'s sidereal period by Kepler\'s law on the IAU AU' },
           mercuryDistanceDevonianKm: { get: () => planetAKm('mercury') * (1 - shrinkDevonian()), render: (v) => thousands(v), unit: 'km', note: 'the same at the Devonian under Driver 2 (a·M☉ constant)' },
           jupiterDistanceJ2000Km: { get: () => planetAKm('jupiter'), render: (v) => thousands(v), unit: 'km', note: 'Jupiter\'s semi-major axis from the chain\'s sidereal period' },
