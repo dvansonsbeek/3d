@@ -10,8 +10,7 @@ import { DEEP_MODES_ARTIFACT } from '../moon/deep-modes-artifact.cjs';
 
 /** @param {import('./derived-constants.js').Ctx} ctx @returns the bindings the later slices read */
 export function assembleDeepTimeChain(ctx) {
-  // eslint-disable-next-line no-unused-vars -- `startmodelYear` left the chain's anchor (J2000 now, doc 111 §1.53); the symbol goes at the next deep cascade — this slice is a token-hashed input of both banks
-  const { C, F, late, startmodelYear } = ctx;
+  const { C, F, late } = ctx;
   // The GIA α channel (the lagged response to the L1 ice history, with the R2
   // pin and the exact-argument memo), the Layer-0 bundle, the cited
   // Earth–Moon distance history, the ΔT cycle stack (all

@@ -35,8 +35,12 @@ sources — IERS α at J2000, LLR-observed da/dt, Cox & Chao satellite dJ₂/dt,
 and the Peltier ICE-6G LOD-coupling range for the J₂→α conversion. None
 are fitted to the eclipse data.**
 
-The full Munk-MacDonald-scale (~5-6 ms/century) non-tidal-speedup assumption
-baked into mainstream Stephenson empirical fits is rejected. A GIA-scale
+A Munk-MacDonald-scale (~5-6 ms/century) non-tidal speedup is excluded — as
+the modern analysis itself excludes it: Stephenson, Morrison & Hohenkerk 2016
+read the non-tidal remainder at ≈ −0.5 ms/century, and the model agrees with
+that scale (doc 99, "What matches consensus"); the paper and the website said
+"rejected" against a figure no modern analysis holds until the claims triage
+that followed v27.20. A GIA-scale
 non-tidal contribution IS detectable in the record and its dominant
 component is well-matched by the GIA viscoelastic relaxation measured by
 GRACE/LAGEOS satellite gravimetry — about ten times smaller than the
@@ -731,11 +735,10 @@ three parts:
   medieval feature; shipped default-ON as the Bond component of the
   4-flag stack (Bond + Hallstatt + Jose5 + Jose4).
 - **A fractional non-tidal channel** ~0.5 ms/century window-average
-  (about 2× Cox-Chao satellite value, and ~10% of the full
-  Munk-MacDonald postulate) — time-varying mantle-core coupling: the
-  era-localized signature of the millennial core–mantle rotation
-  swing, now modelled as the Core-mantle swing episode (Resonator
-  driver, the 4th dLOD/dt channel — doc 104).
+  (about 2× Cox-Chao satellite value) — time-varying mantle-core
+  coupling: the era-localized signature of the millennial core–mantle
+  rotation swing, now modelled as the Core-mantle swing episode
+  (Resonator driver, the 4th dLOD/dt channel — doc 104).
 - **Observation noise + Bond-fit imperfection artifacts** at the
   ~60 s RMS level — the irreducible floor from Stephenson's dataset
   precision averaged into the sampled Δ curve.
@@ -1191,17 +1194,20 @@ What this validation establishes:
    exists; the lunar-eclipse data discriminates this signal at sub-100 s
    ΔT resolution, where solar-eclipse visibility cannot.
 
-2. **The FULL Munk-MacDonald non-tidal magnitude is rejected; a
-   FRACTIONAL non-tidal contribution IS present.** The full ~6 ms/century
-   Munk-MacDonald non-tidal assumption would over-correct Babylonian ΔT
-   by ~2,700 s (H1 constant-Holme test). But the §16 rate sensitivity
+2. **A Munk-MacDonald-scale non-tidal magnitude is excluded — as the
+   modern analysis itself excludes it; a FRACTIONAL non-tidal
+   contribution IS present.** A ~6 ms/century non-tidal rate carried
+   into the past would over-correct Babylonian ΔT by ~2,700 s
+   (H1 constant-Holme test). The §16 rate sensitivity
    diagnostic (see "Complete residual decomposition" above) finds a
    **fractional non-tidal channel of ~0.5 ms/century (window-average)** present in
    the ΔT residual after Bond correction — approximately 2× the Cox &
-   Chao 2002 satellite-measured GIA value, and ~10% of the full
-   Munk-MacDonald postulate. This fractional contribution is real and
-   is carried by the **Core-mantle swing** (doc 104). The
-   residual supports ~2× Cox-Chao, not 25× Cox-Chao.
+   Chao 2002 satellite-measured GIA value. This fractional
+   contribution is real and is carried by the **Core-mantle swing**
+   (doc 104). The residual supports ~2× Cox-Chao. The non-tidal
+   contribution as a whole — the α(t) GIA channel plus this fractional
+   channel — sits at the glacial-rebound scale Stephenson, Morrison &
+   Hohenkerk 2016 read for the non-tidal remainder (≈ −0.5 ms/century).
 
 3. **α(t) uses zero eclipse-fitting parameters; the 4-flag stack
    PERIODS are zero-fit while its amplitudes/phases are fit-derived.**
