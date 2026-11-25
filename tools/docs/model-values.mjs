@@ -1780,12 +1780,24 @@ export const VALUES = {
       fullMoonCycleEarthExact: { get: () => C.moonFullMoonCycleEarth, render: (v) => thousands(v, 10), unit: 'd' },
       draconicYearICRF:  { get: () => C.moonDraconicYearICRF, render: (v) => thousands(v, 10), unit: 'd', note: 'the lunar chain\'s fixed-frame (inertial) draconic year' },
       draconicYearEarth: { get: () => C.moonDraconicYearEarth, render: (v) => thousands(v, 10), unit: 'd', note: 'observed eclipse year' },
-      apsidalPrecICRF:      { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 2), unit: 'yr' },
-      apsidalPrecICRFexact: { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
-      apsidalPrecEarth:     { get: () => C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
-      nodalPrecICRF:        { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 1), unit: 'yr' },
-      nodalPrecICRFexact:   { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
-      nodalPrecEarth:       { get: () => C.moonNodalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr' },
+      // The Moon's apsidal and nodal periods, named by FRAME (model-values 25.27.0, plan 37 §7).
+      // The constants' ICRF/Earth suffixes are inverted relative to the frame they hold:
+      // `moonApsidalPrecessionDaysICRF` is the Meeus rate against the mean equinox OF DATE
+      // (8.8475 yr; the node 18.6134 yr) and the derived `…Earth` value is the INERTIAL one
+      // (1/T_Earth = 1/T_input ∓ 1/T_p: 8.8506 and 18.5999 yr). Every surface reads them by
+      // position and is right; the names below say what each value IS. The constants' rename
+      // is a code audit (TODO A); the old keys stay as deprecated aliases.
+      moonApsidalPeriodOfDateYears:   { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr', note: 'the Moon\'s apsidal period against the mean equinox of date (Meeus\'s perigee rate) — the constant is named …ICRF' },
+      moonApsidalPeriodInertialYears: { get: () => C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr', note: 'the Moon\'s apsidal period against the fixed frame (ICRF): the of-date rate less the general precession — the constant is named …Earth' },
+      moonNodalPeriodOfDateYears:     { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr', note: 'the Moon\'s nodal period against the mean equinox of date (Meeus\'s node rate, the 18.6-yr cycle as observed) — the constant is named …ICRF' },
+      moonNodalPeriodInertialYears:   { get: () => C.moonNodalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr', note: 'the Moon\'s nodal period against the fixed frame (ICRF): the retrograde node gains the general precession — the constant is named …Earth' },
+      moonNodalPeriodOfDateRoundYears: { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 1), unit: 'yr', note: 'the rounded 18.6-yr nodal cycle of date' },
+      apsidalPrecICRF:      { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 2), unit: 'yr', note: 'DEPRECATED (25.27.0): misnamed — this is the OF-DATE apsidal period; read moonApsidalPeriodOfDateYears' },
+      apsidalPrecICRFexact: { get: () => C.moonApsidalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr', note: 'DEPRECATED (25.27.0): misnamed — this is the OF-DATE apsidal period; read moonApsidalPeriodOfDateYears' },
+      apsidalPrecEarth:     { get: () => C.moonApsidalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr', note: 'DEPRECATED (25.27.0): misnamed — this is the INERTIAL apsidal period; read moonApsidalPeriodInertialYears' },
+      nodalPrecICRF:        { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 1), unit: 'yr', note: 'DEPRECATED (25.27.0): misnamed — this is the OF-DATE nodal period; read moonNodalPeriodOfDateRoundYears' },
+      nodalPrecICRFexact:   { get: () => C.moonNodalPrecessionDaysICRF / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr', note: 'DEPRECATED (25.27.0): misnamed — this is the OF-DATE nodal period; read moonNodalPeriodOfDateYears' },
+      nodalPrecEarth:       { get: () => C.moonNodalPrecessionDaysEarth / C.meanSolarYearDays, render: (v) => thousands(v, 5), unit: 'yr', note: 'DEPRECATED (25.27.0): misnamed — this is the INERTIAL nodal period; read moonNodalPeriodInertialYears' },
       moonLevelingCycle: { get: () => C.moonLunarLevelingCycleDays / C.meanSolarYearDays, render: (v) => '~' + thousands(v, 2), unit: 'yr' },
     };
   })(),
