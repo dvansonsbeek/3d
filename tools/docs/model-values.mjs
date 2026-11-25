@@ -1089,6 +1089,12 @@ export const VALUES = {
         unit: '°',
         note: 'La2004 obliquity from the tracked artifact (interpolated where off-grid)',
       };
+      out[`obliqModelMinusLaskar${r.key}Deg`] = {
+        get: () => oeOb(r.year) - laskarObliquityDeg(r.year),
+        render: (v) => (Math.abs(Number(v)) < 5e-5 ? '0.0000' : (v >= 0 ? '+' : '−') + Math.abs(Number(v)).toFixed(4)),
+        unit: '°',
+        note: 'the published obliquity minus La2004 at this epoch — two integrations compared, the Difference column of the paper\'s derived-vs-references table',
+      };
       if (r.chapront) {
         out[`obliqChapront${r.key}`] = {
           get: () => astro.obliquityChapront2002[r.chapront],
