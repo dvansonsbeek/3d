@@ -488,6 +488,15 @@ export const VALUES = {
     unit: '″/yr',
     note: 'axial precession rate at J2000 — the one-family route (B): 1,296,000 / its sidereal–tropical beat',
   },
+  // The equinox's motion projected on the equator, m = p·cos ε (model-values 25.28.0, plan 37 §7):
+  // what a meridian clock sees of the general precession — the stellar–sidereal day gap rides it,
+  // not the ecliptic rate p (the website's Days & Years page).
+  axialRateEquatorialProjectionJ2000: {
+    get: () => (1296000 / oneYL().axialPrecessionYearsAtYear(2000)) * Math.cos(astro.earthOrbital.obliquityJ2000_deg * Math.PI / 180),
+    render: (v) => Number(v).toFixed(2),
+    unit: '″/yr',
+    note: 'the general precession projected on the equator at J2000, m = p·cos ε (p the one-family axial rate, ε the IAU 2006 J2000 obliquity) — the rate a meridian clock sees; the stellar–sidereal day gap is its one-rotation-per-year identity',
+  },
   periRateJ2000: {
     get: () => 1296000 / oneYL().perihelionPrecessionYearsAtYear(2000),
     render: (v) => Number(v).toFixed(3),
@@ -3401,6 +3410,21 @@ export const VALUES = {
     out.paleoRmsAllPct = { get: () => rms(deltas(daysSet)), render: (v) => Number(v).toFixed(2), unit: '%' };
     out.paleoMaxPhanPct = { get: () => maxAbs(deltas(phan())), render: (v) => Number(v).toFixed(2), unit: '%' };
     out.paleoMaxAllPct = { get: () => maxAbs(deltas(daysSet)), render: (v) => Number(v).toFixed(2), unit: '%' };
+    // The open Mesoproterozoic discrepancy as a RANGE (model-values 25.28.0, plan 37 §7): the three Zhou 2024
+    // precession-rate rows, their deviations below the observed rates and the same in the rows' own 1σ
+    // (parsed from the anchor's method string, "±X ″/yr" — the one place the uncertainty is recorded).
+    // The paper's "1.9–5.5 % below (0.9–2.7σ)" and two website pages typed these by hand.
+    const zhouPrec = anchors.filter((a) => a.source === 'zhou2024' && a.quantity === 'precArcsecPerYr' && a.observed !== undefined);
+    const zhouBelowPct = () => zhouPrec.map((a) => -(predictOf[a.quantity](a.ageMa) / a.observed - 1) * 100);
+    const zhouSigma = () => zhouPrec.map((a) => {
+      const m = /±\s*([\d.]+)\s*″\/yr/.exec(a.method ?? '');
+      if (!m) throw new Error(`model-values: anchor ${a.id} carries no ±σ in its method string`);
+      return Math.abs(predictOf[a.quantity](a.ageMa) - a.observed) / Number(m[1]);
+    });
+    out.zhouPrecBelowMinPct = { get: () => Math.min(...zhouBelowPct()), render: (v) => Number(v).toFixed(1), unit: '%', note: 'the smallest of the three Zhou 2024 precession-rate deviations (the composed rate below the observed), the open Mesoproterozoic discrepancy\'s range' };
+    out.zhouPrecBelowMaxPct = { get: () => Math.max(...zhouBelowPct()), render: (v) => Number(v).toFixed(1), unit: '%', note: 'the largest of the three Zhou 2024 precession-rate deviations (the composed rate below the observed)' };
+    out.zhouPrecSigmaMin = { get: () => Math.min(...zhouSigma()), render: (v) => Number(v).toFixed(1), unit: 'σ', note: 'the smallest Zhou 2024 precession-rate deviation in the row\'s own 1σ' };
+    out.zhouPrecSigmaMax = { get: () => Math.max(...zhouSigma()), render: (v) => Number(v).toFixed(1), unit: 'σ', note: 'the largest Zhou 2024 precession-rate deviation in the row\'s own 1σ' };
     out.paleoWithin1All = { get: () => `${deltas(daysSet).filter((d) => Math.abs(d) < 1).length}/${daysSet.length}`, render: (v) => String(v) };
     out.paleoWithin2All = { get: () => `${deltas(daysSet).filter((d) => Math.abs(d) < 2).length}/${daysSet.length}`, render: (v) => String(v) };
     out.paleoWithin1Phan = { get: () => `${deltas(phan()).filter((d) => Math.abs(d) < 1).length}/${phan().length}`, render: (v) => String(v) };
