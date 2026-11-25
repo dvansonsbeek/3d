@@ -512,7 +512,7 @@ inside the model-values registry (`lodRealPhysical`), so the engine and the
 
 The correction represents Earth's need to rotate slightly MORE per solar day to compensate for the ecliptic's precession in ICRF over the ecliptic-precession period — the chain's nodal mode T_s₃. The mean solar day is measured against the Sun, whose apparent motion follows the ecliptic — so it is the ecliptic frame, not the invariable-plane frame, that sets the meridian passage.
 
-Over one full ecliptic-precession cycle (T_s₃ = <!--v:eclPrecYears-->~68,751<!--/v--> yr), the ecliptic completes one full revolution of its orientation in ICRF. Over one solar day (= 1/mSY of one year), the ecliptic direction therefore precesses by:
+Over one full ecliptic-precession cycle (T_s₃ = <!--v:nodalPrecYears-->~68,751<!--/v--> yr), the ecliptic completes one full revolution of its orientation in ICRF. Over one solar day (= 1/mSY of one year), the ecliptic direction therefore precesses by:
 
 ```
 δ_rev = 1 / (T_s₃ × mSY) revolutions per day        (mSY the year in SI days)

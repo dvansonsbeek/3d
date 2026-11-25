@@ -46,7 +46,7 @@ The ICRF is the fundamental celestial reference frame defined by the positions o
 - Used as the "fixed" background reference
 
 **In the simulation:**
-- Earth's apsidal period against the stars is the one-family beat of the anomalistic and sidereal years (registry `inclPrecYears`; the former `earthPerihelionICRFYears` on the retired device's period is deleted, plan 09 step 4b)
+- Earth's apsidal period against the stars is the one-family beat of the anomalistic and sidereal years (registry `apsidalPrecYears`; `inclPrecYears` is its deprecated alias until the next model-values MAJOR)
 - Other planets: `<planet>PerihelionEclipticYears`, the chain's inertial apsidal period 1,296,000/g
 
 ### 1.2 Ecliptic Coordinates

@@ -235,13 +235,13 @@ LOD_real = o.lodKinematic + h5Correction(year) + dtCycleLodCorrectionSum(year)
 where:
   o.lodKinematic     = the Layer-0 tidal mean LOD of date = ω₀ = 86,400 s at J2000
   h5Correction(year) = LOD_mean / (T_s₃ × mSY)        ≈ <!--v:h5LodCorrectionMs-->3.441<!--/v--> ms
-                       (T_s₃ = the nodal period 1,296,000/|s₃| = <!--v:eclPrecYears-->~68,751<!--/v--> yr;
+                       (T_s₃ = the nodal period 1,296,000/|s₃| = <!--v:nodalPrecYears-->~68,751<!--/v--> yr;
                         the identifier keeps its historical name)
   dtCycleLodCorrectionSum = Bond/Hallstatt/Jose5/Jose4 cyclic δLOD + Core-mantle
                             swing (≈ −1.85 ms at J2000)
 ```
 
-The correction represents Earth's need to rotate slightly MORE per solar day to catch the Sun on the meridian, because the Sun's apparent motion follows the ecliptic — whose plane turns on the invariable plane once per nodal period T_s₃ (the dominant nodal mode s₃ of Earth's orbit from the model's own N-body secular modes, <!--v:eclPrecYears-->~68,751<!--/v--> yr). Over one solar day (= 1/mSY of one year), the ecliptic advances by 1/(T_s₃·mSY) revolutions — requiring that many extra revolutions of Earth rotation:
+The correction represents Earth's need to rotate slightly MORE per solar day to catch the Sun on the meridian, because the Sun's apparent motion follows the ecliptic — whose plane turns on the invariable plane once per nodal period T_s₃ (the dominant nodal mode s₃ of Earth's orbit from the model's own N-body secular modes, <!--v:nodalPrecYears-->~68,751<!--/v--> yr). Over one solar day (= 1/mSY of one year), the ecliptic advances by 1/(T_s₃·mSY) revolutions — requiring that many extra revolutions of Earth rotation:
 
 ```
 δ_rev = 1 / (T_s₃ × mSY)                                 ≈ 3.98 × 10⁻⁸ rev/day
@@ -270,7 +270,7 @@ All precession periods emerge from ratios of year lengths:
 | Perihelion | `Y_anom(s) / (Y_anom(s) − Y_trop(s))` | T_peri ≈ <!--v:earthPeriPeriod-->20,936<!--/v--> yr |
 | Inclination | `Y_anom(s) / (Y_anom(s) − Y_sid(s))` | T_aps ≈ <!--v:earthPeriPeriodICRF-->111,581<!--/v--> yr |
 | Obliquity | the beat of the spin axis's inertial precession against the nodal mode: 1/(1/T_ψ̇ᵢₙ − 1/T_s₃) with T_ψ̇ᵢₙ = <!--v:spinAxisInertialPeriodYearsJ2000-->25,722<!--/v--> yr (the pole's period, 0.097 ″/yr above the equinox clock T_p — IAU's planetary precession). A record sees the window mean of the pole rate, not the J2000 instant: <!--v:obliqCycleRealizedLr04Years-->~40,925<!--/v--> yr over the LR04 record | <!--v:obliqCycleYears-->~41,099<!--/v--> yr at J2000 |
-| Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| | <!--v:eclPrecYears-->~68,751<!--/v--> yr |
+| Ecliptic (nodal) | the N-body chain's dominant nodal mode s₃: 1,296,000/\|s₃\| | <!--v:nodalPrecYears-->~68,751<!--/v--> yr |
 
 These are time-varying — each uses the instantaneous year lengths at the given epoch, so precession periods themselves oscillate slightly.
 

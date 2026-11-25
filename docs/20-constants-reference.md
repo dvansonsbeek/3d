@@ -239,8 +239,8 @@ These are computed from foundational constants. The formula is the definition; t
 
 | Cycle | Formula | Period (years) | Direction |
 |-------|---------|----------------|-----------|
-| Apsidal Precession | the beat of the one-family anomalistic and sidereal years, T_anom·T_sid/(T_anom − T_sid) — the movement's own apsidal rate | <!--v:inclPrecYears-->~111,581<!--/v--> | Counter-clockwise |
-| Ecliptic Precession | 1,296,000/\|s₃\|, the N-body chain's dominant nodal mode | <!--v:eclPrecYears-->~68,751<!--/v--> | Counter-clockwise |
+| Apsidal Precession | the beat of the one-family anomalistic and sidereal years, T_anom·T_sid/(T_anom − T_sid) — the movement's own apsidal rate | <!--v:apsidalPrecYears-->~111,581<!--/v--> | Counter-clockwise |
+| Ecliptic Precession | 1,296,000/\|s₃\|, the N-body chain's dominant nodal mode | <!--v:nodalPrecYears-->~68,751<!--/v--> | Counter-clockwise |
 | Obliquity Cycle | the beat 1,296,000/(ψ̇ᵢₙ − \|s₃\|) of the spin axis's inertial rate against s₃ (the instantaneous limit) | <!--v:obliqCycleYears-->~41,099<!--/v--> | Clockwise (negative) |
 | Axial Precession | 1,296,000 / p_A — the IAU 2006 general precession input | <!--v:axialPrecRound-->~25,772<!--/v--> | Clockwise (negative) |
 | Perihelion Precession | the perihelion-of-date beat, 1/T_peri = 1/T_p + 1/T_aps | <!--v:periPrecYears-->~20,936<!--/v--> | Both directions |

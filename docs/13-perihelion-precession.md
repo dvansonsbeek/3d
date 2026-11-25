@@ -180,7 +180,7 @@ to the ICRF (true inertial):
 1. **General precession (T_p ≈ <!--v:earthAxialPeriod-->25,772<!--/v--> yr)** — Earth's axial precession
    carries the equinox westward through the inertial sky at ~50 ″/yr. The
    "ecliptic-of-date" frame rotates at this rate relative to the ICRF.
-2. **Ecliptic precession (the chain's nodal mode, <!--v:eclPrecYears-->~68,751<!--/v--> yr)** — Earth's orbital plane itself
+2. **Ecliptic precession (the chain's nodal mode, <!--v:nodalPrecYears-->~68,751<!--/v--> yr)** — Earth's orbital plane itself
    precesses around the invariable plane, so the ecliptic-of-J2000 is also
    not identical to the invariable plane in the long run.
 

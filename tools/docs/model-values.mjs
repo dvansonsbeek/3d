@@ -395,22 +395,26 @@ export const VALUES = {
   // The website's convention, reproduced exactly: a `~` prefix on the rounded
   // ones, and axial precession alone carried to 2dp (it is the one compared
   // against the IAU figure). Earth's cycle periods are the model's OWN J2000
-  // dynamical values. Key names kept (P4); the *Formula keys (consumed by the
-  // website appendix) render the derivation.
-  inclPrecYears: {
+  // dynamical values. Named for what they ARE since model-values 25.26.0
+  // (plan 36 §5): apsidalPrec* is the perihelion's turn against the stars,
+  // nodalPrec* the orbit plane's nodal mode s₃ — the former inclPrec*/eclPrec*
+  // names were misnomers and stay one release as DEPRECATED aliases (appended
+  // below VALUES). The *Formula keys (consumed by the website appendix) render
+  // the derivation.
+  apsidalPrecYears: {
     get: () => oneYL().inclinationPrecessionYearsAtYear(2000),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'apsidal precession period at J2000, Julian years — the perihelion against the stars, the ONE movement’s own apsidal rate of date (the scene’s perihelion; anom/(anom − sid) of the one family, the Prec. cell’s rate; the key keeps the historical inclPrec name)',
+    note: 'apsidal precession period at J2000, Julian years — the perihelion against the stars, the ONE movement’s own apsidal rate of date (the scene’s perihelion; anom/(anom − sid) of the one family, the Prec. cell’s rate)',
   },
-  inclPrecFormula: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: () => 'the beat of the one-family anomalistic and sidereal years at J2000, T_anom·T_sid/(T_anom − T_sid) — the movement’s own apsidal rate of date' },
-  eclPrecYears: {
+  apsidalPrecFormula: { get: () => oneYL().inclinationPrecessionYearsAtYear(2000), render: () => 'the beat of the one-family anomalistic and sidereal years at J2000, T_anom·T_sid/(T_anom − T_sid) — the movement’s own apsidal rate of date' },
+  nodalPrecYears: {
     get: () => 1296000 / s3ArcsecPerYr(),
     render: (v) => `~${thousands(Math.round(v))}`,
     unit: 'yr',
-    note: 'ecliptic (nodal) precession period — the dominant nodal mode s₃ of Earth’s orbit on the invariable plane, from the engine’s deep secular modes (the obliquity beat’s partner; the of-date tangent wanders far from it)',
+    note: 'nodal precession period of Earth’s orbit — the dominant nodal mode s₃ on the invariable plane, from the engine’s deep secular modes (the obliquity beat’s partner; the of-date tangent wanders far from it)',
   },
-  eclPrecFormula: { get: () => 1296000 / s3ArcsecPerYr(), render: () => 'the N-body chain’s dominant nodal mode s₃, 1,296,000/|s₃|' },
+  nodalPrecFormula: { get: () => 1296000 / s3ArcsecPerYr(), render: () => 'the N-body chain’s dominant nodal mode s₃, 1,296,000/|s₃|' },
   obliqCycleYears: {
     get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()),
     render: (v) => `~${thousands(Math.round(v))}`,
@@ -420,8 +424,8 @@ export const VALUES = {
   obliqCycleFormula: { get: () => 1296000 / (physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr()), render: () => 'the beat of the spin axis\'s inertial precession against the nodal mode s₃, 1,296,000/(ψ̇ᵢₙ − |s₃|)' },
   // The three RATES beside the three periods above — the same evaluators,
   // 1,296,000″ per period (model-values 23.1.0).
-  inclPrecRateArcsecPerYr: { get: () => 1296000 / oneYL().inclinationPrecessionYearsAtYear(2000), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'apsidal precession rate at J2000 — 1,296,000″ / inclPrecYears, the one movement\'s own apsidal rate of date' },
-  eclPrecRateArcsecPerYr: { get: () => Math.abs(s3ArcsecPerYr()), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'ecliptic (nodal) precession rate — |s₃|, the dominant nodal mode of Earth\'s orbit on the invariable plane (regression, quoted as a magnitude); 1,296,000″ / eclPrecYears' },
+  apsidalPrecRateArcsecPerYr: { get: () => 1296000 / oneYL().inclinationPrecessionYearsAtYear(2000), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'apsidal precession rate at J2000 — 1,296,000″ / apsidalPrecYears, the one movement\'s own apsidal rate of date' },
+  nodalPrecRateArcsecPerYr: { get: () => Math.abs(s3ArcsecPerYr()), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'nodal precession rate of Earth\'s orbit — |s₃|, the dominant nodal mode on the invariable plane (regression, quoted as a magnitude); 1,296,000″ / nodalPrecYears' },
   obliqCycleRateArcsecPerYr: { get: () => physModel().lunisolar.spinAxisInertialRateArcsecPerYrJ2000 - s3ArcsecPerYr(), render: (v) => Number(v).toFixed(3), unit: '″/yr', note: 'the obliquity beat rate at J2000, ψ̇ᵢₙ − |s₃| — 1,296,000″ / obliqCycleYears (the instantaneous limit; a record sees the window mean)' },
   // v23.0 — THE REALIZED OBLIQUITY PERIOD: what a record spanning a window sees — the window mean of the
   // pole rate (the inertial rate of date × solar torque at e(t) × J₂(t)/J₂₀ × cos ε(t)/cos ε₀) minus |s₃|.
@@ -3585,6 +3589,19 @@ export const VALUES = {
     note: 'IAU 2006 obliquity at J2000 (84381.406″)',
   },
 };
+
+// DEPRECATED aliases (model-values 25.26.0, plan 36 §5). Earth's apsidal and
+// nodal periods were published as inclPrec* / eclPrec* — misnomers: the
+// perihelion's turn is no inclination precession, and "ecliptic precession"
+// named the orbit plane's nodal mode. The old six keys stay ONE release on the
+// SAME getters so no installed consumer breaks, and leave at the next MAJOR.
+// New consumers read apsidalPrec* / nodalPrec*.
+for (const [alias, key] of [
+  ['inclPrecYears', 'apsidalPrecYears'], ['inclPrecFormula', 'apsidalPrecFormula'], ['inclPrecRateArcsecPerYr', 'apsidalPrecRateArcsecPerYr'],
+  ['eclPrecYears', 'nodalPrecYears'], ['eclPrecFormula', 'nodalPrecFormula'], ['eclPrecRateArcsecPerYr', 'nodalPrecRateArcsecPerYr'],
+]) {
+  VALUES[alias] = { ...VALUES[key], note: `DEPRECATED alias of ${key} (model-values 25.26.0) — removed at the next MAJOR` };
+}
 
 /**
  * DELIBERATELY ABSENT — values the prose quotes that cannot yet be derived

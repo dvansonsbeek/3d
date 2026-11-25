@@ -47,7 +47,7 @@ Derivations in which each quantity is computed from the one before it, each with
 The scene's display marker for axial precession: it circles Earth clockwise once per axial precession period (<!--v:axialPrecRound-->~25,772<!--/v--> years), marking the direction Earth's axis leans — the precession of the equinoxes. A reference point placed from the engine, not a force; every instrument measures from Earth itself.
 
 ### PERIHELION-OF-EARTH
-The scene's reference point for Earth's perihelion. It moves counter-clockwise around the Sun in one apsidal period (<!--v:inclPrecYears-->~111,581<!--/v--> years at J2000) and sets Earth's varying distance to the Sun through the year.
+The scene's reference point for Earth's perihelion. It moves counter-clockwise around the Sun in one apsidal period (<!--v:apsidalPrecYears-->~111,581<!--/v--> years at J2000) and sets Earth's varying distance to the Sun through the year.
 
 ### Geo-heliocentric
 A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Earth's perspective. Produces identical predictions to standard heliocentric models.
@@ -60,7 +60,7 @@ A reference frame that is heliocentric (Earth orbits the Sun) but viewed from Ea
 The slow wobble of Earth's rotational axis, causing the celestial poles to trace circles against the stars. Period: the clock, <!--v:axialPrecExact-->25,771.58<!--/v--> years at J2000 in the model.
 
 ### Apsidal Precession
-The perihelion's revolution against the fixed stars — for Earth the one-source movement's own apsidal rate, for a planet the N-body chain's secular rate g (period 1,296,000″/g). Earth's period at J2000: <!--v:inclPrecYears-->~111,581<!--/v--> years, <!--v:lunisolarApsidalPerPrecessionJ2000-->4.330<!--/v--> precession periods, a reading of the orbit's own motion that wanders. The scene draws it as PERIHELION-OF-EARTH moving around the Sun — a construction of the picture, not a force. Scene nodes and code identifiers keep the historical name "inclination precession".
+The perihelion's revolution against the fixed stars — for Earth the one-source movement's own apsidal rate, for a planet the N-body chain's secular rate g (period 1,296,000″/g). Earth's period at J2000: <!--v:apsidalPrecYears-->~111,581<!--/v--> years, <!--v:lunisolarApsidalPerPrecessionJ2000-->4.330<!--/v--> precession periods, a reading of the orbit's own motion that wanders. The scene draws it as PERIHELION-OF-EARTH moving around the Sun — a construction of the picture, not a force. Scene nodes and code identifiers keep the historical name "inclination precession".
 
 ### Perihelion Precession
 Two usages, both in the simulator. **For Earth** (the climate sense): the advance of the perihelion point through the seasons — the perihelion-of-date cycle, the beat of the two motions above: 1/T_peri = 1/T_p + 1/T_aps, <!--v:periPrecYears-->~20,936<!--/v--> years at J2000, the carrier of the climatic-precession band. **For a planet** (the standard planetary sense, as in "Mercury's perihelion precession"): the apsidal advance itself, quoted as a rate in arcseconds per century — the Perihelion of Planets Verification panel compares the chain's rate with the JPL WebGeoCalc observations in this sense ([doc 13](13-perihelion-precession.md)).

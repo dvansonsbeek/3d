@@ -195,7 +195,7 @@ elements are the `astro-reference.json` inputs ([Constants
 Reference](20-constants-reference.md)), the rendered obliquity of date is the
 hybrid integration, the published inclination and node are the engine's
 one-source orbit normal, the published eccentricity is the N-body series,
-and the published apsidal period is `inclPrecYears`. The scene's world frame
+and the published apsidal period is `apsidalPrecYears`. The scene's world frame
 is the J2000 ecliptic (`@essrt/physics` `computeSceneWorldFrameJ2000`) and
 the Earth frame is placed from the engine every frame; the Wobble marker's
 display radius is the scene literal `WOBBLE_MARKER_RADIUS_SCENE_UNITS`.
