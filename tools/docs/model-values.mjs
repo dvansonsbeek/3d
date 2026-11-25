@@ -158,6 +158,24 @@ function predictiveMachinery() {
 const astro = rd('public/input/astro-reference.json');   // the ONE input file
 const versionInfo = rd('public/input/model-version.json');
 const dtFit = rd('data/deltaT-4flag-fit.json');
+// The cited Earth–Moon history WITH its published interval (data/astrogeo22-earth-moon.json,
+// Farhat et al. 2022): the chain's only uncertainty source on the Ledger-2 path — nothing is
+// fitted there — so a deep-time row's MODEL BAND is the input's own half-interval at that age
+// (the chain reproduces the solution's day-length column to 0.14 h at 2.46 Ga; plan 36 phase 4).
+const astroGeo = (() => { /** @type {any} */ let a; return () => a || (a = rd('data/astrogeo22-earth-moon.json')); })();
+const ASTROGEO_COLUMNS = {
+  a: ['aEarthRadii', 'aMinEarthRadii', 'aMaxEarthRadii'],
+  lod: ['lodHours', 'lodMinHours', 'lodMaxHours'],
+  prec: ['precessionArcsecPerYr', 'precessionMinArcsecPerYr', 'precessionMaxArcsecPerYr'],
+};
+/** half-width of the cited interval at an integer age, in % of its central value
+ *  @param {'a'|'lod'|'prec'} column @param {number} ageMa */
+const citedBandPct = (column, ageMa) => {
+  const c = astroGeo().columns, i = c.ageMa.indexOf(ageMa);
+  if (i < 0) throw new Error(`AstroGeo22 has no sample at ${ageMa} Ma`);
+  const [mid, lo, hi] = ASTROGEO_COLUMNS[column].map((k) => c[k][i]);
+  return (hi - lo) / 2 / mid * 100;
+};
 // THE CHAIN ARTIFACT as the planets' one home: secular eigenfrequencies g/s
 // (″/yr, the leading z/ζ modes of the 1-Myr WH+NAFF run), the 1800–2100 window
 // rates (1PN and Newtonian), the J2000 anchor elements. Every planet key below
@@ -1390,6 +1408,21 @@ export const VALUES = {
       hallstattYr: { get: () => Math.round(dtFit.shipped_coefficients.hallstatt.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted Hallstatt period — the solar-activity Hallstatt cycle' },
       joseFiveYr:  { get: () => Math.round(dtFit.shipped_coefficients.jose5.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted period — 5 × Charvátová Jose 179' },
       joseFourYr:  { get: () => Math.round(dtFit.shipped_coefficients.jose4.period_yr), render: (v) => thousands(v), unit: 'yr', note: 'the fitted period — 4 × Charvátová Jose 179' },
+      // The stack's fitted amplitudes and phases (the joint solve's shipped coefficients; each cycle is
+      // A·cos(2πy/P − φ) on the Julian year y, anchored to 0 at y = 2000), the amplitude priors three of
+      // them sit at, and the taper that takes the stack to zero beyond ±400 kyr (plan 36 phase 4).
+      ...(() => {
+        /** @type {Record<string, any>} */ const o = {};
+        for (const [K, k] of [['Bond', 'bond'], ['Hallstatt', 'hallstatt'], ['JoseFive', 'jose5'], ['JoseFour', 'jose4']]) {
+          o[`dtStack${K}AmplitudeSeconds`] = { get: () => dtFit.shipped_coefficients[k].amplitude_s, render: (v) => Number(v).toFixed(1), unit: 's', note: `the ${k} cycle's fitted ΔT amplitude A = √(c² + s²) (data/deltaT-4flag-fit.json shipped_coefficients)` };
+          o[`dtStack${K}PhaseDeg`] = { get: () => dtFit.shipped_coefficients[k].phase_deg, render: (v) => (v < 0 ? '−' : '') + Math.abs(Number(v)).toFixed(1), unit: '°', note: `the ${k} cycle's fitted phase φ in A·cos(2πy/P − φ), y the Julian year` };
+          const cap = dtFit.config.cycles.find((c) => c.name === k).target_amp_s;
+          if (cap !== null) o[`dtStack${K}AmplitudeCapSeconds`] = { get: () => cap, render: (v) => Number(v).toFixed(0), unit: 's', note: `the amplitude prior (cap) the joint solve holds the ${k} cycle to` };
+        }
+        o.dtStackTaperFullHalfwidthKyr = { get: () => dtFit.shipped_taper.full_halfwidth_yr / 1000, render: (v) => Number(v).toFixed(0), unit: 'kyr', note: 'the stack is at full strength within this half-width of J2000' };
+        o.dtStackTaperTotalHalfwidthKyr = { get: () => dtFit.shipped_taper.total_halfwidth_yr / 1000, render: (v) => Number(v).toFixed(0), unit: 'kyr', note: 'the stack is zero beyond this half-width of J2000 (a cosine roll-off between the two)' };
+        return o;
+      })(),
     };
   })(),
 
@@ -1501,9 +1534,36 @@ export const VALUES = {
         for (const t of Object.keys(WU_DAYS)) {
           // the registry's digit form (daysPerYearAt200Ma); the TeX generator spells the digits
           wuKeys[`daysPerYearWuDeltaAt${t}MaPct`] = { get: () => wuDelta(Number(t)), render: signedPct, unit: '%', note: `the model's day count at ${t} Ma against Wu et al. 2024's ${WU_DAYS[t]} d/yr (their TimeOptB inversion, cited)` };
+          wuKeys[`daysPerYearWuCitedBandAt${t}MaPct`] = { get: () => citedBandPct('lod', Number(t)), render: (v) => Number(v).toFixed(1), unit: '%', note: `the model band at ${t} Ma: the cited history's own half-interval in day length there (the day count scales inversely with the day)` };
         }
+        // The 28 L1 lines from THE ONE HOME (data/l1-physical-lines.json: family, label, period, relative
+        // mode amplitude) with each line's fitted post-MPT amplitude (public/input/climate-formula-
+        // coefficients.json: √(a² + b²) on the normalised proxy times the regime's y_std, in ‰ of δ¹⁸O) —
+        // the paper's line table (plan 36 phase 4). Index-aligned with the coefficients' L1 array, guarded.
+        const lOneLineKeys = (() => {
+          /** @type {Record<string, any>} */ const o = {};
+          const lines = () => rd('data/l1-physical-lines.json').lines;
+          const postMpt = () => rd('public/input/climate-formula-coefficients.json').regimes['lr04-post-mpt'];
+          const ascii = (/** @type {string} */ s) => s.replace(/ζ/g, 'zeta').replace(/−/g, '-').replace(/[₀-₉]/g, (d) => String('₀₁₂₃₄₅₆₇₈₉'.indexOf(d)));
+          const n = lines().length;
+          for (let i = 0; i < n; i++) {
+            const idx = String(i + 1).padStart(2, '0');
+            o[`lOneLine${idx}Label`] = { get: () => ascii(lines()[i].label), render: (v) => String(v), note: `L1 line ${i + 1}: its beat label (${lines()[i].family})` };
+            o[`lOneLine${idx}PeriodKyr`] = { get: () => lines()[i].periodKyr, render: (v) => Number(v).toFixed(2), unit: 'kyr', note: `L1 line ${i + 1} (${lines()[i].label}): the period on the engine's own modes and clock` };
+            o[`lOneLine${idx}RelAmp`] = { get: () => lines()[i].relAmp ?? '—', render: (v) => (typeof v === 'string' ? v : Number(v).toFixed(3)), note: `L1 line ${i + 1} (${lines()[i].label}): relative mode amplitude within its family (the selection admits ≥ 0.1); the 405-kyr family carries none` };
+            o[`lOneLine${idx}PostMptAmplitudePermil`] = {
+              get: () => { const r = postMpt(), e = r.L1[i]; if (Math.abs(e.period_kyr - lines()[i].periodKyr) > 1e-9) throw new Error(`climate-formula-coefficients L1[${i}] is not line ${i + 1} of l1-physical-lines`); return Math.hypot(e.a, e.b) * r.denormalization.y_std; },
+              render: (v) => Number(v).toFixed(3), unit: '‰',
+              note: `L1 line ${i + 1} (${lines()[i].label}): the fitted post-MPT LR04 amplitude, √(a² + b²) × the regime's y_std`,
+            };
+          }
+          o.canonPostMptNSamples = { get: () => postMpt().n_samples, render: (v) => thousands(v), note: 'the post-MPT LR04 regime fit: samples on the 1-kyr grid (0–1 Ma)' };
+          o.l1CoefficientsPerRegime = { get: () => 2 * n, render: (v) => String(v), note: 'the free numbers of one regime\'s L1 fit: a cos and a sin coefficient per line' };
+          return o;
+        })();
         return {
           ...wuKeys,
+          ...lOneLineKeys,
           daysPerYearWuDeltaMinPct: { get: () => Math.min(...wuDeltas()), render: signedPct, unit: '%', note: 'the smallest (most negative) deviation of the model\'s day count from Wu et al. 2024\'s six century-mark counts' },
           daysPerYearWuDeltaMaxPct: { get: () => Math.max(...wuDeltas()), render: signedPct, unit: '%', note: 'the largest deviation from Wu et al. 2024\'s six counts' },
           daysPerYearWuDeltaMeanAbsPct: { get: () => wuDeltas().reduce((s, v) => s + Math.abs(v), 0) / wuDeltas().length, render: (v) => Number(v).toFixed(1), unit: '%', note: 'the mean absolute deviation over the six Wu et al. 2024 counts' },
@@ -3291,6 +3351,14 @@ export const VALUES = {
         render: (v) => Number(v).toFixed(2),
         unit: unitOf[a.quantity],
         note: `paleo anchor ${a.id} (${a.source})`,
+      };
+      // the model band: the cited history's own half-interval at the row's age, in the row's quantity
+      const bandColumn = /** @type {Record<string, 'a'|'lod'|'prec'>} */ ({ daysPerYear: 'lod', lodHr: 'lod', moonDistanceRE: 'a', moonDistanceRawRE: 'a', precArcsecPerYr: 'prec' })[a.quantity];
+      out[`anchor${cid.charAt(0).toUpperCase() + cid.slice(1)}CitedBandPct`] = {
+        get: () => citedBandPct(bandColumn, a.ageMa),
+        render: (v) => Number(v).toFixed(1),
+        unit: '%',
+        note: `paleo anchor ${a.id}: the model band — the cited history's own half-interval at ${a.ageMa} Ma in the row's quantity (no parameter is fitted on this path)`,
       };
       if (a.observed !== undefined) {
         out[`anchor${cid.charAt(0).toUpperCase() + cid.slice(1)}DeltaPct`] = {
