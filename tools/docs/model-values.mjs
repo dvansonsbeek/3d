@@ -290,6 +290,21 @@ export const VALUES = {
     unit: 's',
     note: 'ΔT trend anchor at J2000, joint-fit optimum',
   },
+  // The shipped ΔT (the chain's trend + the four harmonics + the swing) at a civil UT instant: the
+  // trend anchor at J2000 plus the runtime's own UT↔TT bridge (deltaTSecondsAtJdUT — the raw integral
+  // at the TT age, the era cycles at the civil year, 0 at J2000; the anchor is the consumers' to add,
+  // as the fitter's intercept is: doc 111 §1.53). A forecast the IERS will have measured by the date:
+  // the website's "value to check in 2030".
+  deltaT2030PredictedSeconds: {
+    get: () => {
+      const DT = require(join(ROOT, 'tools', 'lib', 'deep-time.js'));
+      const { calendarToJD } = require(join(ROOT, 'packages', 'physics', 'src', 'time', 'calendar.cjs'));
+      return dtFit.optimum.deltaTStart + DT.deltaTSecondsAtJdUT(calendarToJD(2030, 1, 1));
+    },
+    render: (v) => Number(v).toFixed(1),
+    unit: 's',
+    note: 'the shipped ΔT formula (trend + the four harmonics + the Core-mantle swing) at 2030-01-01 UT — a forecast; its band is the fit\'s own 1650–2017 Espenak scatter (deltaTEspenakRmsSeconds), the decadal wobble the trend averages over excluded by design',
+  },
   usnoLodJ2000: {
     get: () => dtFit.optimum.usno_target_lod_s,
     render: (v) => thousands(v, 4),
