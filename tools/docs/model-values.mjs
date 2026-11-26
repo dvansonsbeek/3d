@@ -1452,6 +1452,14 @@ export const VALUES = {
           o[`dtStack${K}PhaseDeg`] = { get: () => dtFit.shipped_coefficients[k].phase_deg, render: (v) => (v < 0 ? '−' : '') + Math.abs(Number(v)).toFixed(1), unit: '°', note: `the ${k} cycle's fitted phase φ in A·cos(2πy/P − φ), y the Julian year` };
           const cap = dtFit.config.cycles.find((c) => c.name === k).target_amp_s;
           if (cap !== null) o[`dtStack${K}AmplitudeCapSeconds`] = { get: () => cap, render: (v) => Number(v).toFixed(0), unit: 's', note: `the amplitude prior (cap) the joint solve holds the ${k} cycle to` };
+          // The amplitude the anchored solve read BEFORE the cap — the fitter's own record in
+          // target_amp_source ("CAPPED from anchored quad-fit free amp 100.73 s → 80 s prior" /
+          // "unconstrained: quad-fit free amp 47.06 s …"); plan 39 §2.3 blind spot 1.
+          if (cap !== null) o[`dtStack${K}FreeAmplitudeSeconds`] = {
+            get: () => { const m = /free amp ([0-9.]+) s/.exec(String(dtFit.shipped_coefficients[k].target_amp_source ?? '')); if (!m) throw new Error(`deltaT-4flag-fit ${k}: no free amplitude recorded in target_amp_source`); return Number(m[1]); },
+            render: (v) => Number(v).toFixed(1), unit: 's',
+            note: `the ${k} cycle's amplitude in the anchored solve before the cap, as the fitter recorded it in target_amp_source; where it exceeds the cap the shipped amplitude is the cap with the phase preserved`,
+          };
         }
         o.dtStackTaperFullHalfwidthKyr = { get: () => dtFit.shipped_taper.full_halfwidth_yr / 1000, render: (v) => Number(v).toFixed(0), unit: 'kyr', note: 'the stack is at full strength within this half-width of J2000' };
         o.dtStackTaperTotalHalfwidthKyr = { get: () => dtFit.shipped_taper.total_halfwidth_yr / 1000, render: (v) => Number(v).toFixed(0), unit: 'kyr', note: 'the stack is zero beyond this half-width of J2000 (a cosine roll-off between the two)' };
@@ -1593,6 +1601,23 @@ export const VALUES = {
           }
           o.canonPostMptNSamples = { get: () => postMpt().n_samples, render: (v) => thousands(v), note: 'the post-MPT LR04 regime fit: samples on the 1-kyr grid (0–1 Ma)' };
           o.l1CoefficientsPerRegime = { get: () => 2 * n, render: (v) => String(v), note: 'the free numbers of one regime\'s L1 fit: a cos and a sin coefficient per line' };
+          // The selection rule's edge and the closure test's power (plan 39 §2.3 blind spots 7 and 8).
+          const withAmp = () => lines().filter((l) => l.relAmp != null);
+          o.l1LinesWithinTenPctOfThresholdCount = { get: () => withAmp().filter((l) => l.relAmp >= 0.1 && l.relAmp < 0.11).length, render: (v) => String(v), note: 'the L1 lines whose relative mode amplitude lies within 10 % above the 0.1 selection threshold (0.100–0.110): the lines a slightly stricter threshold would drop' };
+          o.l1MinRelAmp = { get: () => Math.min(...withAmp().map((l) => l.relAmp)), render: (v) => Number(v).toFixed(3), note: 'the smallest relative mode amplitude among the selected L1 lines (the threshold is 0.1)' };
+          // The share of the 10–500-kyr period axis (log-spaced) that lies within one Rayleigh element
+          // (Δf = 1/T, T the record length) of at least one of the 28 lines: the closure test
+          // ("no significant peak where the model has no line") can only fail outside that share.
+          const rayleighCoveragePct = (/** @type {string} */ regime) => {
+            const w = rd('public/input/climate-formula-coefficients.json').regimes[regime].window_kyr;
+            const df = 1 / (w[1] - w[0]);
+            const f = lines().map((l) => 1 / l.periodKyr);
+            const N = 20000; let hit = 0;
+            for (let i = 0; i < N; i++) { const fp = 1 / (10 * 50 ** ((i + 0.5) / N)); if (f.some((q) => Math.abs(fp - q) <= df)) hit++; }
+            return (100 * hit) / N;
+          };
+          o.l1ClosureRayleighCoverageFullRecordPct = { get: () => rayleighCoveragePct('lr04-full'), render: (v) => Number(v).toFixed(0), unit: '%', note: 'the share of the 10–500-kyr period axis (log-spaced) within one Rayleigh element of an L1 line at the full LR04 record length (5.32 Myr): the closure test has power only on the rest' };
+          o.l1ClosureRayleighCoveragePostMptPct = { get: () => rayleighCoveragePct('lr04-post-mpt'), render: (v) => Number(v).toFixed(0), unit: '%', note: 'the same share at the post-MPT window length (1 Myr), where the lines blur into each other' };
           return o;
         })();
         return {
